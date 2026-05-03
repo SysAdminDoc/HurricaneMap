@@ -65,6 +65,7 @@ function render(storm, landfall) {
   const nhcWalletUrl = nhcWalletUrlFor(storm);
   const sliderUrl = sliderSatelliteUrl(storm);
   const tornadoUrl = tornadoSearchUrl(storm);
+  const reconUrl = reconArchiveUrl(storm);
 
   const radarApi = getRadar();
   const landfallsHtml = storm.us_landfalls.map((lf, idx) => {
@@ -115,6 +116,7 @@ function render(storm, landfall) {
       ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
       ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
       ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
+      ${reconUrl ? `<a class="action-btn" href="${reconUrl}" target="_blank" rel="noopener">✈️ Recon archive</a>` : ''}
     </div>
 
     <div class="panel-actions-row">
@@ -275,6 +277,19 @@ function tornadoSearchUrl(storm) {
     statefips: fipsList,
   });
   return `https://www.ncei.noaa.gov/stormevents/listevents.jsp?${params.toString()}`;
+}
+
+/** Aircraft reconnaissance archive (Tropical Atlantic mirror). Hurricane
+ *  Hunters fly into Atlantic-basin storms threatening land — vortex
+ *  messages, high-density observations, and dropsonde data. The archive
+ *  is per-storm and best surfaced via search rather than a constructed URL. */
+function reconArchiveUrl(storm) {
+  if (storm.basin !== 'AL') return null;
+  if (storm.year < 1989) return null;  // Tropical Atlantic archive thins out before this
+  if (!storm.name || storm.name === 'UNNAMED') return null;
+  const name = storm.name[0].toUpperCase() + storm.name.slice(1).toLowerCase();
+  // Tropical Atlantic uses a per-storm storm-archive page indexed by name+year.
+  return `https://tropicalatlantic.com/recon/?archive=${storm.year}&storm=${encodeURIComponent(name)}`;
 }
 
 function nhcWalletUrlFor(storm) {
