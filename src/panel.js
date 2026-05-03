@@ -3,20 +3,30 @@ import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
   ktToMph, formatTime,
 } from './data.js';
-import { showTrack, clearTracks } from './map.js';
+import { showTrack, clearTracks, getMap } from './map.js';
+import { TrackAnimator } from './animation.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
 const closeBtn = document.getElementById('close-panel');
 
+let animator = null;
+function getAnimator() {
+  if (!animator) animator = new TrackAnimator(getMap());
+  return animator;
+}
+
 closeBtn.addEventListener('click', () => {
   panel.hidden = true;
   clearTracks();
+  if (animator) animator.stop();
 });
 
 export async function showStorm(landfall) {
   panel.hidden = false;
   body.innerHTML = '<p class="meta-row" style="padding:24px 0;">Loading storm track…</p>';
+  // Stop any running animation when switching storms.
+  if (animator) animator.stop();
   await ensureStormsLoaded();
   const storm = getStorm(landfall.storm_id);
   if (!storm) {
@@ -80,8 +90,19 @@ function render(storm, landfall) {
       ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
       ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
     </div>
+
+    <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
+      <span class="play-icon"></span>Play track animation
+    </button>
   `;
   panel.scrollTop = 0;
+
+  const playBtn = document.getElementById('play-anim-btn');
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      getAnimator().play(storm);
+    });
+  }
 }
 
 function titleCase(name) {
