@@ -27,6 +27,8 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).
 - **Multi-state tracking** for storms like Andrew (FL → FL → LA), Charley (FL → FL → SC → SC), Hugo (PR → PR → SC), Katrina (FL → LA → LA).
 - Per-segment **intensity-coloured tracks** — you can see exactly where a storm intensified, peaked, and weakened.
+- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Watch Andrew '92 ramp from TS to Cat 5 to Cat 4 over the Gulf in 14 seconds.
+- **📡 Archived NEXRAD radar at landfall** — for every U.S. landfall from August 1995 onward, click 📡 to overlay the real radar reflectivity composite at that landfall's UTC timestamp (live from Iowa State IEM's NEXRAD archive). Step ±5 min, or play a ±30-minute loop to watch the eye approach the coast. Helene '24, Katrina '05, Andrew '92's Florida landfall — all fully retrievable.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
 ## Quick start
@@ -114,6 +116,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 | Atlantic best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Format spec | [Landsea, C. W. — *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
+| Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/) — fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |
 | Map tiles | [CartoDB Dark Matter](https://carto.com/) over OpenStreetMap |
 | Map library | [Leaflet 1.9](https://leafletjs.com/) |

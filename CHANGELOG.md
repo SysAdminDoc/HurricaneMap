@@ -2,6 +2,12 @@
 
 All notable changes to HurricaneMap.
 
+## Unreleased
+
+- **Track animation** (opt-in via "Play track animation" button on every storm): spinning hurricane glyph + translucent wind-field disk traveling the full HURDAT2 track. Glyph and wind-field both resize live with current Saffir-Simpson category. Bottom-center control bar with play/pause/restart, a scrubber, speed selector (0.5×/1×/2×/4×), live HUD (timestamp + status + wind), and close.
+- **📡 Archived NEXRAD radar overlay at landfall.** For every U.S. landfall from August 1995 onward, a 📡 button appears next to the timestamp in the storm panel. Click it to overlay the actual NEXRAD reflectivity composite at that moment, fetched live from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/). Stepper buttons (±5 min) and a ±30-minute loop animator let you watch the eye approach and cross the coast.
+- Replaced placeholder logo with proper hurricane-spiral branding.
+
 ## v0.1.0 — 2026-05-03
 
 Initial release.
