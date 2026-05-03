@@ -738,6 +738,39 @@ label > input[type="checkbox"] {
 }
 .im-source a { color: var(--sapphire); }
 
+/* Active storm badge (top-right, only shown during hurricane season when
+   NHC is tracking storms). */
+.active-badge {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.ab-pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f38ba8;
+  box-shadow: 0 0 12px #f38ba8;
+  animation: ab-pulse 1.4s ease-in-out infinite;
+}
+@keyframes ab-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.85); }
+  50%      { opacity: 1.0; transform: scale(1.15); }
+}
+.active-track, .active-forecast, .active-cone {
+  filter: drop-shadow(0 0 6px rgba(137, 180, 250, 0.5));
+}
+
 /* State deep-dive panel (slides in right, like the storm/stats/compare panels) */
 .state-panel {
   position: absolute;
