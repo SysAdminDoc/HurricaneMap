@@ -720,11 +720,14 @@ label > input[type="checkbox"] {
   .anim-scrubber { width: 100%; order: 99; }
 }
 
-/* NEXRAD radar overlay — black "no echo" pixels are masked out via blend mode
-   so only the colored reflectivity returns show on the dark basemap. */
+/* NEXRAD radar overlay — local PNGs are post-processed with a tRNS chunk
+   (palette index 0 = black = transparent) so the basemap shows through
+   no-echo areas natively. Saturation boost helps weak echoes on the dark
+   basemap. Saved-via-IEM frames may still be opaque-black; the screen
+   blend mode below keeps those readable too without washing out the dark
+   basemap as `lighten` did. */
 .radar-overlay-img {
-  mix-blend-mode: lighten;
-  /* Slight saturation boost to make weak echoes more readable on a dark base. */
+  mix-blend-mode: screen;
   filter: saturate(1.15) contrast(1.05);
   pointer-events: none;
 }
