@@ -11,6 +11,7 @@
 // the storm lasted 3 days or 3 weeks.
 
 import { categoryColor, formatTime } from './data.js';
+import { getStormRadarFrames } from './radar.js';
 
 const BASE_DURATION_MS = 14000;        // 1× speed = 14 sec total
 const FRAME_INTERPOLATION_STEPS = 4;   // sub-divide each 6h leg for smoothness
@@ -61,6 +62,11 @@ export class TrackAnimator {
     this.densifiedTrack = null;
     this.storm = null;
     this.endCallback = null;
+    this.radarLayer = null;       // L.imageOverlay swapped in lockstep with sim UTC
+    this.radarFrames = null;      // sorted [{ts, date, url, region}, ...] or null
+    this.radarBounds = null;
+    this.radarEnabled = true;     // toggled via checkbox in controls
+    this.lastRadarUrl = null;
   }
 
   isPlaying() {
@@ -90,13 +96,14 @@ export class TrackAnimator {
     return out;
   }
 
-  play(storm, { onEnd } = {}) {
+  async play(storm, { onEnd } = {}) {
     this.stop();
     this.storm = storm;
     this.densifiedTrack = this.densify(storm.track);
     this.elapsed = 0;
     this.paused = false;
     this.endCallback = onEnd || null;
+    this.lastRadarUrl = null;
 
     const first = this.densifiedTrack[0];
     this.marker = L.marker([first.lat, first.lon], {
@@ -115,6 +122,18 @@ export class TrackAnimator {
       fillOpacity: 0.10,
       interactive: false,
     }).addTo(this.map);
+
+    // Pull this storm's local radar frames so we can paint reflectivity into
+    // the animation in lockstep with the simulated UTC clock. Returns null if
+    // the storm has no offline radar (e.g. pre-1995 storms or post-2025).
+    const radar = await getStormRadarFrames(storm.id);
+    if (radar) {
+      this.radarFrames = radar.frames;
+      this.radarBounds = radar.bounds;
+    } else {
+      this.radarFrames = null;
+      this.radarBounds = null;
+    }
 
     this.buildControls();
     this.lastTickAt = performance.now();
@@ -141,6 +160,7 @@ export class TrackAnimator {
     const t = Math.min(1, this.elapsed / this.duration);
     const sample = this.sampleAt(t);
     this.updateGlyph(sample);
+    this.updateRadar(sample.t);
     this.updateControlsHud(sample, t);
     if (t < 1) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -149,6 +169,43 @@ export class TrackAnimator {
       this.markEnded();
     }
   };
+
+  /** Sync the radar overlay to the current simulated UTC time. We pick the
+   *  most recent local frame whose timestamp is ≤ the simulated time so
+   *  the radar lags the glyph by at most one HURDAT2 6-hour interval — the
+   *  glyph shows where the eye IS, the radar shows what was last observed.
+   *  No-ops when radar is disabled, no local frames exist for this storm,
+   *  or the storm is between US-coverage windows. */
+  updateRadar(simIso) {
+    if (!this.radarEnabled || !this.radarFrames || !this.radarBounds) return;
+    const simMs = new Date(simIso).getTime();
+    let best = null;
+    for (const f of this.radarFrames) {
+      if (f.date.getTime() <= simMs) best = f;
+      else break;
+    }
+    if (!best) {
+      // Sim time is before the first available frame — clear any stale layer.
+      if (this.radarLayer) {
+        this.map.removeLayer(this.radarLayer);
+        this.radarLayer = null;
+        this.lastRadarUrl = null;
+      }
+      return;
+    }
+    if (best.url === this.lastRadarUrl) return;
+    if (!this.radarLayer) {
+      this.radarLayer = L.imageOverlay(best.url, this.radarBounds, {
+        opacity: 1.0,
+        className: 'radar-overlay-img',
+        interactive: false,
+      });
+      this.radarLayer.addTo(this.map);
+    } else {
+      this.radarLayer.setUrl(best.url);
+    }
+    this.lastRadarUrl = best.url;
+  }
 
   sampleAt(t) {
     const n = this.densifiedTrack.length - 1;
@@ -193,6 +250,13 @@ export class TrackAnimator {
       el.className = 'anim-controls glass';
       document.body.appendChild(el);
     }
+    const radarCount = this.radarFrames?.length || 0;
+    const radarChip = radarCount
+      ? `<label class="anim-radar-toggle" title="Show NEXRAD reflectivity in lockstep with the simulated UTC clock">
+           <input type="checkbox" class="anim-radar-cb" ${this.radarEnabled ? 'checked' : ''}>
+           📡 radar (${radarCount})
+         </label>`
+      : '<span class="anim-radar-toggle anim-radar-disabled" title="No archived radar for this storm (pre-1995 or out of coverage)">📡 —</span>';
     el.innerHTML = `
       <button class="anim-btn" data-act="toggle" title="Play / pause">⏸</button>
       <button class="anim-btn" data-act="restart" title="Restart">↻</button>
@@ -203,6 +267,7 @@ export class TrackAnimator {
         <option value="2">2×</option>
         <option value="4">4×</option>
       </select>
+      ${radarChip}
       <div class="anim-hud">
         <div class="anim-title"></div>
         <div class="anim-meta"></div>
@@ -211,6 +276,17 @@ export class TrackAnimator {
     `;
     el.hidden = false;
     this.controls = el;
+    const radarCb = el.querySelector('.anim-radar-cb');
+    if (radarCb) {
+      radarCb.addEventListener('change', () => {
+        this.radarEnabled = radarCb.checked;
+        if (!this.radarEnabled && this.radarLayer) {
+          this.map.removeLayer(this.radarLayer);
+          this.radarLayer = null;
+          this.lastRadarUrl = null;
+        }
+      });
+    }
 
     const titleEl = el.querySelector('.anim-title');
     titleEl.textContent = formatStormTitle(this.storm);
@@ -285,11 +361,18 @@ export class TrackAnimator {
       this.map.removeLayer(this.windCircle);
       this.windCircle = null;
     }
+    if (this.radarLayer) {
+      this.map.removeLayer(this.radarLayer);
+      this.radarLayer = null;
+    }
     if (this.controls) {
       this.controls.hidden = true;
     }
     this.densifiedTrack = null;
     this.storm = null;
+    this.radarFrames = null;
+    this.radarBounds = null;
+    this.lastRadarUrl = null;
   }
 }
 

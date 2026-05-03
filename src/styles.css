@@ -715,9 +715,32 @@ label > input[type="checkbox"] {
   border-bottom: 6px solid transparent;
 }
 
+.anim-radar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+.anim-radar-toggle:hover { border-color: var(--lavender); }
+.anim-radar-toggle input { margin: 0; cursor: pointer; }
+.anim-radar-disabled {
+  color: var(--overlay);
+  cursor: default;
+  border-style: dashed;
+}
+.anim-radar-disabled:hover { border-color: var(--surface0); }
+
 @media (max-width: 720px) {
   .anim-controls { bottom: auto; top: 80px; flex-wrap: wrap; }
   .anim-scrubber { width: 100%; order: 99; }
+  .anim-radar-toggle { font-size: 10px; padding: 4px 7px; }
 }
 
 /* NEXRAD radar overlay — local PNGs are post-processed with a tRNS chunk

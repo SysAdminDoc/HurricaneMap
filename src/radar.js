@@ -59,6 +59,24 @@ function loadManifest() {
   return manifestPromise;
 }
 
+/** Public helper for the track animation: returns the storm's full local
+ *  frame list sorted ascending by UTC, or null if no offline data is bundled. */
+export async function getStormRadarFrames(stormId) {
+  await loadManifest();
+  const entry = manifest?.[stormId];
+  if (!entry?.frames || !entry.region) return null;
+  const region = entry.region;
+  const frames = Object.entries(entry.frames)
+    .map(([ts, file]) => ({
+      ts,
+      date: stampToDate(ts),
+      url: `${LOCAL_ROOT}/${file}`,
+      region,
+    }))
+    .sort((a, b) => a.ts.localeCompare(b.ts));
+  return frames.length ? { frames, region, bounds: REGIONS[region].bounds } : null;
+}
+
 function regionFor(landfall) {
   if (landfall.state === 'Hawaii') return 'hicomp';
   if (landfall.state === 'Puerto Rico') return 'prcomp';

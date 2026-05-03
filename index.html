@@ -116,12 +116,18 @@
         <li>NOAA Tropical Cyclone Reports archive</li>
         <li>National Hurricane Center storm wallet (1995-onward)</li>
       </ul>
-      <h3>Archived NEXRAD radar at landfall (📡)</h3>
-      <p>Every landfall from <strong>August 1995 onward</strong> has a 📡 button next to its timestamp. Click it to overlay the actual NEXRAD reflectivity composite for that landfall moment, sourced live from the <a href="https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/" target="_blank" rel="noopener">Iowa Environmental Mesonet NEXRAD archive</a>. Step ±5 min with the arrow buttons, or play a ±30-minute loop to watch the eye approach and cross the coast. Coverage:</p>
+      <h3>Archived NEXRAD radar (📡)</h3>
+      <p>Every storm from <strong>August 1995 onward</strong> ships with the full set of in-coverage 6-hourly radar frames baked into the repo (~512 MB across 1700+ PNGs in 139 storm folders). Two ways to use it:</p>
       <ul>
-        <li>CONUS landfalls — base reflectivity (<code>n0r</code>) at 5-minute cadence (1-min for the 1995-2002 window when it was hourly).</li>
+        <li><strong>Direct:</strong> click 📡 next to any landfall in the storm panel. Steppers walk frame-by-frame; loop animates the storm's full U.S. radar timeline (Katrina '05 = 22 frames over five days), with the map auto-panning to follow the eye.</li>
+        <li><strong>In track animation:</strong> when "Play track animation" is on, a 📡 checkbox in the control bar binds the radar overlay to the simulated UTC clock — as the spinning glyph travels the path, the actual NEXRAD reflectivity paints onto the map at exactly the right moment. Toggle off to hide.</li>
+      </ul>
+      <p>Coverage:</p>
+      <ul>
+        <li>CONUS landfalls — base reflectivity (<code>n0r</code>) at 5-minute cadence (hourly for the 1995-2002 window).</li>
         <li>Hawaii / Puerto Rico — composite (<code>n0q</code>), 2010-onward.</li>
         <li>Pre-1995 — no radar archive available.</li>
+        <li>Frames not in the local archive transparently fall back to live IEM URLs.</li>
       </ul>
       <p class="meta">Data: <a href="https://www.nhc.noaa.gov/data/" target="_blank" rel="noopener">NOAA NHC HURDAT2</a>. Radar: <a href="https://mesonet.agron.iastate.edu/" target="_blank" rel="noopener">Iowa State IEM NEXRAD archive</a>. State boundaries: U.S. Census Bureau via PublicaMundi MappingAPI. Map tiles: CartoDB Dark Matter / OpenStreetMap. MIT-licensed source, see GitHub.</p>
     </div>
