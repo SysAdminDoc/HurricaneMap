@@ -10,7 +10,8 @@
 >
 > **Live demo:** https://sysadmindoc.github.io/HurricaneMap/
 
-![HurricaneMap example](examplemap.png)
+<img width="2402" height="1118" alt="2026-05-03 12_30_10-Greenshot" src="https://github.com/user-attachments/assets/846e6a97-5494-4165-a9ab-b59f5555f4be" />
+
 
 ## What this is
 
