@@ -1,11 +1,14 @@
 # HurricaneMap
 
+[![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
 
 > **174 years of U.S. hurricane landfalls**, every dot drawn directly from NOAA's HURDAT2 best-track database (1851–2025).
+>
+> **Live demo:** https://sysadmindoc.github.io/HurricaneMap/
 
 ![HurricaneMap example](examplemap.png)
 
@@ -27,7 +30,9 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 ## Quick start
 
-This is a static web app — no build step.
+The map is **already published** on GitHub Pages — open https://sysadmindoc.github.io/HurricaneMap/ and you're done.
+
+To run locally (e.g. after refreshing the HURDAT2 data):
 
 ```bash
 # Clone
