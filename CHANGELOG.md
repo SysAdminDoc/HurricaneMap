@@ -9,6 +9,7 @@ All notable changes to HurricaneMap.
 - Refined the map chrome with a sharper glass theme, compact header branding, clearer filter/toggle controls, stronger panel hierarchy, and responsive mobile layout fixes.
 - Synced category/panel selected states for assistive tech and made Reset filters clear tracks, heatmap, storm-surge, and population overlays.
 - Added real sort controls to the state deep-dive storm list for newest, strongest, and most-hit storm views.
+- Added a header filter toggle so the filter sheet can collapse into a map-first view, defaulting to collapsed on mobile.
 
 ### 13-feature analytics roadmap (Phases 1-3) shipped
 
