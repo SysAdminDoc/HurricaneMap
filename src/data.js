@@ -8,19 +8,26 @@ const DATA = {
   storms: [],          // populated lazily on first track-render
   stormsById: new Map(),
   stats: null,
+  impacts: null,       // storm_id -> { deaths, damages, wiki_title, wiki_url }
 };
 
 let stormsLoaded = false;
 let stormsPromise = null;
 
 export async function loadInitial() {
-  const [lf, st] = await Promise.all([
+  const [lf, st, im] = await Promise.all([
     fetch('data/landfalls.json').then(r => r.json()),
     fetch('data/stats.json').then(r => r.json()),
+    fetch('data/impacts.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ]);
   DATA.landfalls = lf;
   DATA.stats = st;
+  DATA.impacts = im || {};
   return DATA;
+}
+
+export function getImpactsFor(stormId) {
+  return DATA.impacts?.[stormId] || null;
 }
 
 export function ensureStormsLoaded() {

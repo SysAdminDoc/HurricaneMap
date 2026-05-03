@@ -1,7 +1,7 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  ktToMph, formatTime,
+  ktToMph, formatTime, getImpactsFor,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -98,6 +98,8 @@ function render(storm, landfall) {
       <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
       <div class="stat"><div class="label">Track points</div><div class="value">${storm.track.length}</div></div>
     </div>
+
+    ${renderImpactsBlock(storm)}
 
     <h3 class="panel-section-h3">Intensity over time</h3>
     <div class="chart-host" id="chart-host"></div>
@@ -219,6 +221,23 @@ function noaaTcrUrl(storm) {
   if (storm.year < 1995) return null;
   // The NHC "data" archive supports yearly indices.
   return `https://www.nhc.noaa.gov/data/tcr/index.php?season=${storm.year}&basin=atl`;
+}
+
+function renderImpactsBlock(storm) {
+  const im = getImpactsFor(storm.id);
+  if (!im) return '';
+  const rows = [];
+  if (im.deaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(im.deaths)}</span></div>`);
+  if (im.damages) rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${escapeHtml(im.damages)}</span></div>`);
+  if (!rows.length) return '';
+  const src = im.wiki_url ? `<a href="${im.wiki_url}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
+  return `
+    <h3 class="panel-section-h3">Impacts</h3>
+    <div class="impacts-block">
+      ${rows.join('')}
+      <div class="im-source">${src}</div>
+    </div>
+  `;
 }
 
 function nhcWalletUrlFor(storm) {
