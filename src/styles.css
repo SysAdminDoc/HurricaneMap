@@ -1037,13 +1037,13 @@ section.storm-panel.glass {
 
 /* Bottom control bars stack vertically so they don't collide when more than
    one is active. Order from bottom up:
-     22px  — compare tray (lowest, persistent across sessions)
-     86px  — radar controls
-     150px — animation controls (highest priority, on top) */
+     24px — animation controls (primary playback, closest to bottom)
+     86px — radar controls
+     92px — compare tray only while animation controls are open */
 
 .anim-controls {
   position: absolute;
-  bottom: 150px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
@@ -1178,7 +1178,7 @@ section.storm-panel.glass {
 .anim-radar-disabled:hover { border-color: var(--surface0); }
 
 @media (max-width: 720px) {
-  .anim-controls { bottom: auto; top: 80px; flex-wrap: wrap; }
+  .anim-controls { bottom: 12px; top: auto; flex-wrap: wrap; }
   .anim-scrubber { width: 100%; order: 99; }
   .anim-radar-toggle { font-size: 10px; padding: 4px 7px; }
 }
@@ -1798,6 +1798,10 @@ section.storm-panel.glass {
   border-radius: var(--radius-lg);
 }
 
+body:has(.anim-controls:not([hidden])) .compare-tray {
+  bottom: 92px;
+}
+
 .info-modal {
   background: rgba(4, 8, 14, 0.72);
   backdrop-filter: blur(10px);
@@ -1944,11 +1948,17 @@ section.storm-panel.glass {
   }
 
   .anim-controls {
-    top: 86px;
+    top: auto;
+    bottom: 12px;
   }
 
   .radar-controls {
     top: 142px;
+  }
+
+  body:has(.anim-controls:not([hidden])) .compare-tray {
+    top: auto;
+    bottom: 96px;
   }
 }
 
