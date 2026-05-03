@@ -9,6 +9,7 @@ import { toggleStats } from './stats.js';
 import './compare.js';  // wires up the Compare button + pin tray
 import { enableStateClicks, openState } from './state.js';
 import { setSurgeCategory } from './surge.js';
+import { startActiveStormPolling } from './active.js';
 
 const filters = {
   yearMin: 1851,
@@ -47,6 +48,8 @@ async function boot() {
   wireUI();
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
   enableStateClicks(map).catch(() => { /* non-fatal */ });
+  // Live NHC active-storm feed — appears only when a storm is active.
+  startActiveStormPolling().catch(() => { /* non-fatal */ });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
