@@ -684,6 +684,24 @@ label > input[type="checkbox"] {
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
 }
 
+.wind-field-row { margin-top: 10px; }
+.wf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text);
+  user-select: none;
+}
+.wf-toggle:hover { border-color: var(--lavender); }
+.wf-toggle input { margin: 0; cursor: pointer; }
+.wind-swath { pointer-events: none; }
+
 /* State deep-dive panel (slides in right, like the storm/stats/compare panels) */
 .state-panel {
   position: absolute;
