@@ -9,6 +9,7 @@ import { RadarOverlay } from './radar.js';
 import { renderIntensityChart } from './chart.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
+import { closePanelsExcept } from './panels.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -35,6 +36,7 @@ closeBtn.addEventListener('click', () => {
 });
 
 export async function showStorm(landfall) {
+  closePanelsExcept('storm-panel');
   panel.hidden = false;
   body.innerHTML = '<p class="meta-row" style="padding:24px 0;">Loading storm track…</p>';
   // Stop any running animation when switching storms.

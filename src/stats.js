@@ -1,5 +1,6 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { getStats, getLandfalls } from './data.js';
+import { closePanelsExcept } from './panels.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -9,6 +10,7 @@ closeBtn.addEventListener('click', () => { panel.hidden = true; });
 
 export function toggleStats() {
   if (panel.hidden) {
+    closePanelsExcept('stats-panel');
     render();
     panel.hidden = false;
   } else {
