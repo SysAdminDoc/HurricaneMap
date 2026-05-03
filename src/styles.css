@@ -770,6 +770,17 @@ label > input[type="checkbox"] {
 .active-track, .active-forecast, .active-cone {
   filter: drop-shadow(0 0 6px rgba(137, 180, 250, 0.5));
 }
+.ab-link {
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  color: var(--text);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ab-link:hover { border-color: var(--lavender); background: var(--surface0); }
 
 /* State deep-dive panel (slides in right, like the storm/stats/compare panels) */
 .state-panel {
