@@ -1,0 +1,156 @@
+// Leaflet map + landfall markers + track overlays.
+import { categoryColor, ensureStormsLoaded, getStorm } from './data.js';
+
+let map;
+let landfallLayer;
+let trackLayer;
+let activeMarker = null;
+const markersByEventKey = new Map();
+
+export function initMap() {
+  map = L.map('map', {
+    center: [29.5, -84.0],
+    zoom: 5,
+    minZoom: 3,
+    maxZoom: 11,
+    worldCopyJump: true,
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a> | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(map);
+
+  landfallLayer = L.layerGroup().addTo(map);
+  trackLayer = L.layerGroup().addTo(map);
+  return map;
+}
+
+function radiusForCategory(cat) {
+  if (cat <= 0) return 4;
+  return 4 + cat * 1.4;
+}
+
+function eventKey(lf) {
+  return `${lf.storm_id}|${lf.t}|${lf.lat}|${lf.lon}`;
+}
+
+export function renderLandfalls(landfalls, onSelect) {
+  landfallLayer.clearLayers();
+  markersByEventKey.clear();
+  // Render major hurricanes on top of weaker storms so a TS dot doesn't bury a Cat 5.
+  const sorted = [...landfalls].sort((a, b) => a.category - b.category);
+  for (const lf of sorted) {
+    const marker = L.circleMarker([lf.lat, lf.lon], {
+      radius: radiusForCategory(lf.category),
+      color: '#000',
+      weight: 1.2,
+      opacity: 0.6,
+      fillColor: categoryColor(lf.category),
+      fillOpacity: 0.92,
+      className: 'landfall-marker',
+    });
+    const tt = `${lf.year} ${titleCase(lf.name)} — ${shortCat(lf.category)} • ${lf.state}`;
+    marker.bindTooltip(tt, { direction: 'top', offset: [0, -4] });
+    marker.on('click', (e) => {
+      L.DomEvent.stopPropagation(e);
+      onSelect(lf, marker);
+    });
+    marker.addTo(landfallLayer);
+    markersByEventKey.set(eventKey(lf), marker);
+  }
+}
+
+function shortCat(c) {
+  if (c <= 0) return 'TS';
+  return `Cat ${c}`;
+}
+function titleCase(name) {
+  if (!name || name === 'UNNAMED') return 'Unnamed storm';
+  return name[0].toUpperCase() + name.slice(1).toLowerCase();
+}
+
+export function focusLandfall(lf, panTo = true) {
+  const key = eventKey(lf);
+  const marker = markersByEventKey.get(key);
+  if (activeMarker) {
+    activeMarker.getElement()?.classList.remove('selected');
+    activeMarker.setStyle({ weight: 1.2 });
+  }
+  if (marker) {
+    activeMarker = marker;
+    marker.bringToFront();
+    marker.getElement()?.classList.add('selected');
+    marker.setStyle({ weight: 2.5 });
+    if (panTo) {
+      map.flyTo([lf.lat, lf.lon], Math.max(map.getZoom(), 7), { duration: 0.6 });
+    }
+  }
+}
+
+export function clearTracks() {
+  trackLayer.clearLayers();
+}
+
+export async function showTrack(stormId, opts = {}) {
+  await ensureStormsLoaded();
+  const storm = getStorm(stormId);
+  if (!storm) return null;
+  const segments = buildIntensitySegments(storm.track);
+  const color = opts.color;
+  const layers = [];
+  for (const seg of segments) {
+    const poly = L.polyline(seg.coords, {
+      color: color || categoryColor(seg.cat),
+      weight: opts.weight || 2.5,
+      opacity: 0.85,
+      lineJoin: 'round',
+      className: 'track-line',
+    });
+    layers.push(poly);
+    poly.addTo(trackLayer);
+  }
+  // Genesis marker (small empty circle).
+  if (storm.track.length) {
+    const start = storm.track[0];
+    L.circleMarker([start.lat, start.lon], {
+      radius: 3, color: '#cdd6f4', weight: 1, fillOpacity: 0,
+    }).bindTooltip('Genesis', { direction: 'top' }).addTo(trackLayer);
+  }
+  return storm;
+}
+
+function buildIntensitySegments(track) {
+  const segs = [];
+  for (let i = 1; i < track.length; i++) {
+    const a = track[i - 1];
+    const b = track[i];
+    const cat = saffirSimpson(b.wind);
+    segs.push({
+      coords: [[a.lat, a.lon], [b.lat, b.lon]],
+      cat,
+    });
+  }
+  return segs;
+}
+
+function saffirSimpson(kt) {
+  if (kt == null || kt < 34) return -2; // td
+  if (kt < 64) return -1;
+  if (kt < 83) return 1;
+  if (kt < 96) return 2;
+  if (kt < 113) return 3;
+  if (kt < 137) return 4;
+  return 5;
+}
+
+export function fitToLandfalls(landfalls) {
+  if (!landfalls.length) return;
+  const bounds = L.latLngBounds(landfalls.map(l => [l.lat, l.lon]));
+  map.fitBounds(bounds, { padding: [40, 40] });
+}
+
+export function getMap() { return map; }

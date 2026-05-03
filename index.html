@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#11111b" />
+  <meta name="description" content="HurricaneMap — Interactive map of every U.S. hurricane landfall on record (1851-present), built from NOAA's HURDAT2 best-track database." />
+  <title>HurricaneMap — 174 Years of U.S. Hurricane Landfalls</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="branding/logo.png" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <div id="map" aria-label="Hurricane landfall map"></div>
+
+  <header class="app-header glass">
+    <div class="title-block">
+      <h1>HurricaneMap</h1>
+      <p class="subtitle">174 years of U.S. hurricane landfalls — <span id="storm-count">…</span></p>
+    </div>
+    <button class="icon-btn" id="toggle-stats" title="Toggle statistics panel" aria-label="Toggle statistics panel">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 6h2v6h-2v-6zm4-10h2v16h-2V5zm4 4h2v12h-2V9z"/></svg>
+    </button>
+    <button class="icon-btn" id="toggle-info" title="About" aria-label="About">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-11h2V7h-2v2z"/></svg>
+    </button>
+  </header>
+
+  <aside class="filters glass" id="filters">
+    <div class="filter-row">
+      <label>Year range</label>
+      <div class="year-inputs">
+        <input type="number" id="year-min" min="1851" max="2025" value="1851" />
+        <span>—</span>
+        <input type="number" id="year-max" min="1851" max="2025" value="2025" />
+      </div>
+    </div>
+    <div class="filter-row">
+      <label>Category</label>
+      <div class="cat-toggles">
+        <button data-cat="ts" class="cat-btn cat-ts on" title="Tropical Storm at landfall">TS</button>
+        <button data-cat="1" class="cat-btn cat-1 on">1</button>
+        <button data-cat="2" class="cat-btn cat-2 on">2</button>
+        <button data-cat="3" class="cat-btn cat-3 on">3</button>
+        <button data-cat="4" class="cat-btn cat-4 on">4</button>
+        <button data-cat="5" class="cat-btn cat-5 on">5</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <label for="state-filter">State</label>
+      <select id="state-filter">
+        <option value="">All states</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      <label for="search-input">Search storm</label>
+      <input type="search" id="search-input" placeholder="e.g. Katrina, 2005, Helene…" />
+      <ul id="search-results" class="search-results" hidden></ul>
+    </div>
+    <div class="filter-row">
+      <label>
+        <input type="checkbox" id="show-tracks" />
+        Show tracks for visible landfalls
+      </label>
+    </div>
+    <div class="filter-row">
+      <button id="reset-filters" class="text-btn">Reset filters</button>
+      <span class="visible-count" id="visible-count"></span>
+    </div>
+  </aside>
+
+  <aside class="legend glass">
+    <h3>Saffir-Simpson at landfall</h3>
+    <ul>
+      <li><span class="dot cat-ts"></span><span>Tropical Storm (34-63 kt)</span></li>
+      <li><span class="dot cat-1"></span><span>Category 1 (64-82 kt)</span></li>
+      <li><span class="dot cat-2"></span><span>Category 2 (83-95 kt)</span></li>
+      <li><span class="dot cat-3"></span><span>Category 3 (96-112 kt) — major</span></li>
+      <li><span class="dot cat-4"></span><span>Category 4 (113-136 kt)</span></li>
+      <li><span class="dot cat-5"></span><span>Category 5 (137+ kt)</span></li>
+    </ul>
+  </aside>
+
+  <section class="storm-panel glass" id="storm-panel" hidden>
+    <button class="close-btn" id="close-panel" aria-label="Close storm details">×</button>
+    <div id="panel-body"></div>
+  </section>
+
+  <section class="stats-panel glass" id="stats-panel" hidden>
+    <button class="close-btn" id="close-stats" aria-label="Close statistics">×</button>
+    <div id="stats-body"></div>
+  </section>
+
+  <section class="info-modal" id="info-modal" hidden>
+    <div class="info-card glass">
+      <button class="close-btn" id="close-info" aria-label="Close">×</button>
+      <h2>About HurricaneMap</h2>
+      <p>Every dot on this map is a recorded U.S. hurricane or tropical-storm landfall, drawn directly from NOAA's HURDAT2 Atlantic and Eastern North Pacific best-track databases — the same data the National Hurricane Center uses for its post-season analyses.</p>
+      <h3>How landfalls are detected</h3>
+      <ul>
+        <li><strong>Explicit:</strong> HURDAT2 records flagged with the <code>L</code> identifier (the official landfall marker — center of the cyclone crossing a coastline).</li>
+        <li><strong>Inferred:</strong> For storms without an <code>L</code> marker but whose 6-hourly track passes over U.S. land while at tropical-storm or hurricane intensity (e.g. Iniki 1992 on Kauai). Landfall position interpolated when the crossing happens between synoptic times.</li>
+      </ul>
+      <h3>Known gaps in the source data</h3>
+      <ul>
+        <li>1971-1990: HURDAT2 only marks continental-U.S. landfalls for <em>1851-1970 and 1991-onward</em>. Some 1971-1990 landfalls are picked up by inferred-landfall detection but a few will be missing from this database.</li>
+        <li>Pre-aircraft (before 1944) and pre-satellite (before late-1960s) eras under-sample storms and bias intensities low.</li>
+        <li>Wind radii and radius-of-maximum-wind only available from 2004 and 2021 onward respectively.</li>
+      </ul>
+      <h3>Each storm card links to</h3>
+      <ul>
+        <li>Wikipedia article for the storm (best-effort, by name + year)</li>
+        <li>YouTube search for footage and aftermath</li>
+        <li>NOAA Tropical Cyclone Reports archive</li>
+        <li>National Hurricane Center storm wallet (1995-onward)</li>
+      </ul>
+      <p class="meta">Data: <a href="https://www.nhc.noaa.gov/data/" target="_blank" rel="noopener">NOAA NHC HURDAT2</a>. State boundaries: U.S. Census Bureau via PublicaMundi MappingAPI. Map tiles: CartoDB Dark Matter / OpenStreetMap. MIT-licensed source, see GitHub.</p>
+    </div>
+  </section>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Loading 174 years of hurricane data…</p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

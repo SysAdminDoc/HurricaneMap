@@ -1,0 +1,132 @@
+// Data loading + indexes for HurricaneMap.
+// landfalls.json — flat list of every US landfall event (one per L marker).
+// storms.json    — full track + metadata, keyed by storm id.
+// stats.json     — pre-computed roll-ups (by state, decade, year, category).
+
+const DATA = {
+  landfalls: [],
+  storms: [],          // populated lazily on first track-render
+  stormsById: new Map(),
+  stats: null,
+};
+
+let stormsLoaded = false;
+let stormsPromise = null;
+
+export async function loadInitial() {
+  const [lf, st] = await Promise.all([
+    fetch('data/landfalls.json').then(r => r.json()),
+    fetch('data/stats.json').then(r => r.json()),
+  ]);
+  DATA.landfalls = lf;
+  DATA.stats = st;
+  return DATA;
+}
+
+export function ensureStormsLoaded() {
+  if (stormsLoaded) return Promise.resolve(DATA);
+  if (stormsPromise) return stormsPromise;
+  stormsPromise = fetch('data/storms.json')
+    .then(r => r.json())
+    .then(storms => {
+      DATA.storms = storms;
+      DATA.stormsById = new Map(storms.map(s => [s.id, s]));
+      stormsLoaded = true;
+      return DATA;
+    });
+  return stormsPromise;
+}
+
+export function getStorm(id) {
+  return DATA.stormsById.get(id);
+}
+
+export function getLandfalls() {
+  return DATA.landfalls;
+}
+
+export function getStats() {
+  return DATA.stats;
+}
+
+// Filter helpers
+export function filterLandfalls(landfalls, filters) {
+  return landfalls.filter(lf => {
+    if (lf.year < filters.yearMin || lf.year > filters.yearMax) return false;
+    if (!categoryAllowed(lf.category, filters.categories)) return false;
+    if (filters.state && lf.state !== filters.state) return false;
+    return true;
+  });
+}
+
+function categoryAllowed(cat, allowed) {
+  if (cat <= 0) return allowed.has('ts');
+  return allowed.has(String(cat));
+}
+
+// Search index for the search box.
+export function searchStorms(query, landfalls) {
+  if (!query) return [];
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return [];
+  // Year-only search.
+  if (/^\d{4}$/.test(q)) {
+    const yr = parseInt(q, 10);
+    const seen = new Set();
+    const out = [];
+    for (const lf of landfalls) {
+      if (lf.year !== yr) continue;
+      if (seen.has(lf.storm_id)) continue;
+      seen.add(lf.storm_id);
+      out.push(lf);
+      if (out.length >= 25) break;
+    }
+    return out;
+  }
+  const seen = new Set();
+  const out = [];
+  for (const lf of landfalls) {
+    const tag = `${lf.name.toLowerCase()} ${lf.year}`;
+    if (!tag.includes(q)) continue;
+    if (seen.has(lf.storm_id)) continue;
+    seen.add(lf.storm_id);
+    out.push(lf);
+    if (out.length >= 25) break;
+  }
+  return out;
+}
+
+// Saffir-Simpson display helpers
+export function categoryLabel(cat) {
+  if (cat === -1) return 'TS';
+  if (cat === 0) return 'TD';
+  return `Cat ${cat}`;
+}
+
+export function categoryClass(cat) {
+  if (cat <= 0) return 'cat-ts';
+  return `cat-${cat}`;
+}
+
+export function categoryColor(cat) {
+  const map = {
+    '-1': '#74c7ec', 0: '#74c7ec',
+    1: '#a6e3a1', 2: '#f9e2af',
+    3: '#fab387', 4: '#f38ba8',
+    5: '#cba6f7',
+  };
+  return map[cat] || '#74c7ec';
+}
+
+export function ktToMph(kt) {
+  return kt == null ? null : Math.round(kt * 1.15078);
+}
+
+export function formatTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
+  }) + ' UTC';
+}

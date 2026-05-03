@@ -1,0 +1,36 @@
+# AI agent working files (local only — never commit)
+CLAUDE.md
+CODEX_CHANGELOG.md
+.claude/
+.codex/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.python-version
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
+*.bak.*
+
+# Build / dist
+dist/
+build/
+*.tgz
+
+# Playwright / dev artifacts
+.playwright-mcp/
+smoke-*.png
+test-results/
