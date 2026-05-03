@@ -50,6 +50,8 @@ function ensureBadge(count) {
     badgeEl.innerHTML = `
       <span class="ab-pulse"></span>
       <span class="ab-text">${count} active storm${count === 1 ? '' : 's'}</span>
+      <a class="ab-link" href="https://www.tropicaltidbits.com/storminfo/" target="_blank" rel="noopener" title="Model spaghetti tracks (Tropical Tidbits)">🍝 models</a>
+      <a class="ab-link" href="https://www.trackthetropics.com/" target="_blank" rel="noopener" title="Spaghetti model viewer">tracks</a>
     `;
   } else {
     badgeEl.hidden = true;
