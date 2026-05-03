@@ -10,6 +10,7 @@ import './compare.js';  // wires up the Compare button + pin tray
 import { enableStateClicks, openState } from './state.js';
 import { setSurgeCategory } from './surge.js';
 import { startActiveStormPolling } from './active.js';
+import { setPopulation } from './population.js';
 
 const filters = {
   yearMin: 1851,
@@ -30,6 +31,7 @@ const els = {
   showTracks: document.getElementById('show-tracks'),
   showHeatmap: document.getElementById('show-heatmap'),
   surgeCategory: document.getElementById('surge-category'),
+  showPopulation: document.getElementById('show-population'),
   resetFilters: document.getElementById('reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
@@ -187,6 +189,11 @@ function wireUI() {
   els.surgeCategory.addEventListener('change', () => {
     const v = parseInt(els.surgeCategory.value, 10);
     setSurgeCategory(Number.isFinite(v) && v > 0 ? v : null);
+  });
+
+  // Population density overlay.
+  els.showPopulation.addEventListener('change', () => {
+    setPopulation(els.showPopulation.checked);
   });
 
   // Reset
