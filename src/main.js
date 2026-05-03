@@ -7,6 +7,7 @@ import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, cle
 import { showStorm } from './panel.js';
 import { toggleStats } from './stats.js';
 import './compare.js';  // wires up the Compare button + pin tray
+import { enableStateClicks, openState } from './state.js';
 
 const filters = {
   yearMin: 1851,
@@ -37,11 +38,13 @@ const els = {
 };
 
 async function boot() {
-  initMap();
+  const map = initMap();
   await loadInitial();
   populateStateFilter();
   applyFilters();
   wireUI();
+  // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
+  enableStateClicks(map).catch(() => { /* non-fatal */ });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
@@ -122,10 +125,11 @@ function wireUI() {
     });
   }
 
-  // State filter
+  // State filter — additionally opens the state deep-dive panel when set.
   els.stateFilter.addEventListener('change', () => {
     filters.state = els.stateFilter.value;
     applyFilters();
+    if (filters.state) openState(filters.state);
   });
 
   // Search

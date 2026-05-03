@@ -7,7 +7,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 - [x] **P1.1 Intensity time-series chart** — SVG line chart in the storm panel showing wind (kt) and pressure (mb) across the full HURDAT2 track, with vertical markers for each U.S. landfall and a hover tooltip.
 - [x] **P1.2 Storm comparison mode** — pin up to 4 storms into a compare tray; overlays their tracks color-coded by storm and shows a side-by-side intensity chart + stat grid in a dedicated panel.
 - [x] **P1.3 Landfall density heatmap** — toggleable layer that swaps the colored Saffir-Simpson dots for a [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat) heatmap weighted by category, showing where strikes concentrate vs avoid.
-- [ ] **P1.4 State deep-dive** — clicking a state polygon (or selecting via the filter) opens a panel with that state's full landfall history: by-category histogram, by-decade trend, deadliest/costliest, every storm sortable.
+- [x] **P1.4 State deep-dive** — clicking a state polygon (or selecting via the filter) opens a panel with that state's full landfall history: by-category histogram, by-decade trend, deadliest/costliest, every storm sortable.
 
 ## Phase 2 — New external data integrations
 
