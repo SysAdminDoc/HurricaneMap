@@ -574,17 +574,10 @@ label > input[type="checkbox"] {
 }
 .leaflet-control-zoom a:hover { background: var(--surface0) !important; }
 
-.landfall-marker {
-  border-radius: 50%;
-  border: 1.5px solid rgba(0,0,0,0.55);
-  box-shadow: 0 0 6px rgba(0,0,0,0.4);
-  transition: transform 120ms ease;
-}
-.landfall-marker:hover { transform: scale(1.4); z-index: 999; }
-.landfall-marker.selected {
-  border-color: var(--text);
-  box-shadow: 0 0 0 2px var(--lavender), 0 0 12px var(--lavender);
-}
+/* Leaflet circleMarkers render as SVG <path>; CSS transform on SVG paths
+   scales relative to the SVG origin, not the dot's center, so hover-scaling
+   in CSS would flicker. We change radius/weight via setStyle() in map.js. */
+.landfall-marker { cursor: pointer; }
 
 /* Track-line stroke color is set per-segment via Leaflet's `color` option,
    so we don't override it here — only width/opacity. */

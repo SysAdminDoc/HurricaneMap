@@ -44,8 +44,9 @@ export function renderLandfalls(landfalls, onSelect) {
   // Render major hurricanes on top of weaker storms so a TS dot doesn't bury a Cat 5.
   const sorted = [...landfalls].sort((a, b) => a.category - b.category);
   for (const lf of sorted) {
+    const baseRadius = radiusForCategory(lf.category);
     const marker = L.circleMarker([lf.lat, lf.lon], {
-      radius: radiusForCategory(lf.category),
+      radius: baseRadius,
       color: '#000',
       weight: 1.2,
       opacity: 0.6,
@@ -53,8 +54,21 @@ export function renderLandfalls(landfalls, onSelect) {
       fillOpacity: 0.92,
       className: 'landfall-marker',
     });
+    marker._baseRadius = baseRadius;
     const tt = `${lf.year} ${titleCase(lf.name)} — ${shortCat(lf.category)} • ${lf.state}`;
     marker.bindTooltip(tt, { direction: 'top', offset: [0, -4] });
+    // Grow on hover via Leaflet setStyle (NOT CSS transform — see styles.css).
+    marker.on('mouseover', () => {
+      if (marker !== activeMarker) {
+        marker.setStyle({ radius: baseRadius + 3, weight: 2 });
+        marker.bringToFront();
+      }
+    });
+    marker.on('mouseout', () => {
+      if (marker !== activeMarker) {
+        marker.setStyle({ radius: baseRadius, weight: 1.2 });
+      }
+    });
     marker.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       onSelect(lf, marker);
@@ -77,14 +91,20 @@ export function focusLandfall(lf, panTo = true) {
   const key = eventKey(lf);
   const marker = markersByEventKey.get(key);
   if (activeMarker) {
-    activeMarker.getElement()?.classList.remove('selected');
-    activeMarker.setStyle({ weight: 1.2 });
+    activeMarker.setStyle({
+      weight: 1.2,
+      color: '#000',
+      radius: activeMarker._baseRadius,
+    });
   }
   if (marker) {
     activeMarker = marker;
     marker.bringToFront();
-    marker.getElement()?.classList.add('selected');
-    marker.setStyle({ weight: 2.5 });
+    marker.setStyle({
+      weight: 3,
+      color: '#cdd6f4',
+      radius: (marker._baseRadius || 6) + 4,
+    });
     if (panTo) {
       map.flyTo([lf.lat, lf.lon], Math.max(map.getZoom(), 7), { duration: 0.6 });
     }
