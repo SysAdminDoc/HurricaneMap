@@ -32,10 +32,10 @@ export async function enableStateClicks(map) {
       stateLayer = L.geoJSON(gj, {
         pane: 'statesPane',
         style: () => ({
-          color: '#cdd6f4',
+          color: '#9fb2c7',
           weight: 0.6,
-          opacity: 0.18,
-          fillColor: '#cdd6f4',
+          opacity: 0.2,
+          fillColor: '#64d2ff',
           fillOpacity: 0,
           interactive: true,
         }),

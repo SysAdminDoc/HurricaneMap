@@ -16,19 +16,22 @@
   <div id="map" aria-label="Hurricane landfall map"></div>
 
   <header class="app-header glass">
+    <img class="brand-mark" src="branding/favicon.png" alt="" aria-hidden="true" />
     <div class="title-block">
       <h1>HurricaneMap</h1>
       <p class="subtitle">174 years of U.S. hurricane landfalls — <span id="storm-count">…</span></p>
     </div>
-    <button class="icon-btn" id="toggle-stats" title="Toggle statistics panel" aria-label="Toggle statistics panel">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 6h2v6h-2v-6zm4-10h2v16h-2V5zm4 4h2v12h-2V9z"/></svg>
-    </button>
-    <button class="icon-btn" id="toggle-compare" title="Compare pinned storms" aria-label="Compare pinned storms">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
-    </button>
-    <button class="icon-btn" id="toggle-info" title="About" aria-label="About">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-11h2V7h-2v2z"/></svg>
-    </button>
+    <div class="header-actions" aria-label="View controls">
+      <button class="icon-btn" id="toggle-stats" title="Toggle statistics panel" aria-label="Toggle statistics panel" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 6h2v6h-2v-6zm4-10h2v16h-2V5zm4 4h2v12h-2V9z"/></svg>
+      </button>
+      <button class="icon-btn" id="toggle-compare" title="Compare pinned storms" aria-label="Compare pinned storms" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+      </button>
+      <button class="icon-btn" id="toggle-info" title="About" aria-label="About">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-11h2V7h-2v2z"/></svg>
+      </button>
+    </div>
   </header>
 
   <aside class="filters glass" id="filters">
@@ -63,15 +66,15 @@
       <ul id="search-results" class="search-results" hidden></ul>
     </div>
     <div class="filter-row">
-      <label>
+      <label class="toggle-row">
         <input type="checkbox" id="show-tracks" />
-        Show tracks for visible landfalls
+        <span>Show tracks for visible landfalls</span>
       </label>
     </div>
     <div class="filter-row">
-      <label>
+      <label class="toggle-row">
         <input type="checkbox" id="show-heatmap" />
-        Density heatmap (weighted by category)
+        <span>Density heatmap (weighted by category)</span>
       </label>
     </div>
     <div class="filter-row">
@@ -86,12 +89,12 @@
       </select>
     </div>
     <div class="filter-row">
-      <label>
+      <label class="toggle-row">
         <input type="checkbox" id="show-population" />
-        Population density (SEDAC GPW 1km)
+        <span>Population density (SEDAC GPW 1km)</span>
       </label>
     </div>
-    <div class="filter-row">
+    <div class="filter-row filter-footer">
       <button id="reset-filters" class="text-btn">Reset filters</button>
       <span class="visible-count" id="visible-count"></span>
     </div>

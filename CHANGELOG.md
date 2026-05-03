@@ -4,6 +4,11 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Interface polish pass
+
+- Refined the map chrome with a sharper glass theme, compact header branding, clearer filter/toggle controls, stronger panel hierarchy, and responsive mobile layout fixes.
+- Synced category/panel selected states for assistive tech and made Reset filters clear tracks, heatmap, storm-surge, and population overlays.
+
 ### 13-feature analytics roadmap (Phases 1-3) shipped
 
 **Phase 1 — In-app analytics, no new data sources:**
