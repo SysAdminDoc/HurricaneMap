@@ -1414,7 +1414,8 @@ header.app-header.glass {
 
 .icon-btn:hover,
 .icon-btn:focus-visible,
-.icon-btn[aria-pressed="true"] {
+.icon-btn[aria-pressed="true"],
+#toggle-filters[aria-expanded="false"] {
   color: var(--text);
   border-color: rgba(100, 210, 255, 0.42);
   background: rgba(100, 210, 255, 0.12);
@@ -1432,6 +1433,14 @@ header.app-header.glass {
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--surface1) transparent;
+  transition: opacity 180ms ease, transform 180ms ease;
+  will-change: opacity, transform;
+}
+
+.filters.collapsed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(-100% - 80px));
 }
 
 .filter-row {
@@ -1875,6 +1884,10 @@ section.storm-panel.glass {
     padding: 14px;
   }
 
+  .filters.collapsed {
+    transform: translateY(calc(100% + 24px));
+  }
+
   .year-inputs {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1945,6 +1958,24 @@ section.storm-panel.glass {
     right: auto;
     width: min(326px, calc(100vw - 64px));
     max-width: calc(100vw - 64px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .brand-mark {
+    display: none;
+  }
+
+  .header-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    justify-self: stretch;
+  }
+
+  .icon-btn {
+    width: 100%;
+    height: 31px;
   }
 }
 
@@ -1955,7 +1986,7 @@ section.storm-panel.glass {
     right: 8px;
     width: calc(100vw - 58px);
     max-width: calc(100vw - 58px);
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     gap: 7px;
   }
 
@@ -1964,11 +1995,14 @@ section.storm-panel.glass {
   }
 
   .header-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
+    justify-self: stretch;
   }
 
   .icon-btn {
-    width: 31px;
+    width: 100%;
     height: 31px;
   }
 

@@ -28,6 +28,7 @@ const els = {
   stateFilter: document.getElementById('state-filter'),
   searchInput: document.getElementById('search-input'),
   searchResults: document.getElementById('search-results'),
+  filtersPanel: document.getElementById('filters'),
   showTracks: document.getElementById('show-tracks'),
   showHeatmap: document.getElementById('show-heatmap'),
   surgeCategory: document.getElementById('surge-category'),
@@ -35,6 +36,7 @@ const els = {
   resetFilters: document.getElementById('reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
+  toggleFiltersBtn: document.getElementById('toggle-filters'),
   toggleStatsBtn: document.getElementById('toggle-stats'),
   toggleInfoBtn: document.getElementById('toggle-info'),
   infoModal: document.getElementById('info-modal'),
@@ -105,6 +107,8 @@ function onLandfallClick(landfall, marker) {
 }
 
 function wireUI() {
+  wireFilterPanel();
+
   // Year inputs
   const onYearChange = () => {
     const a = parseInt(els.yearMin.value, 10);
@@ -233,6 +237,34 @@ function wireUI() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !els.infoModal.hidden) els.infoModal.hidden = true;
   });
+}
+
+function wireFilterPanel() {
+  if (!els.toggleFiltersBtn || !els.filtersPanel) return;
+  const mobileQuery = window.matchMedia('(max-width: 720px)');
+  let userChanged = false;
+
+  const setCollapsed = (collapsed) => {
+    els.filtersPanel.classList.toggle('collapsed', collapsed);
+    els.toggleFiltersBtn.setAttribute('aria-expanded', String(!collapsed));
+    els.toggleFiltersBtn.setAttribute('aria-label', collapsed ? 'Show filters' : 'Hide filters');
+    els.toggleFiltersBtn.title = collapsed ? 'Show filters' : 'Hide filters';
+  };
+
+  setCollapsed(mobileQuery.matches);
+  els.toggleFiltersBtn.addEventListener('click', () => {
+    userChanged = true;
+    setCollapsed(!els.filtersPanel.classList.contains('collapsed'));
+  });
+
+  const onViewportChange = () => {
+    if (!userChanged) setCollapsed(mobileQuery.matches);
+  };
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', onViewportChange);
+  } else if (mobileQuery.addListener) {
+    mobileQuery.addListener(onViewportChange);
+  }
 }
 
 function titleCase(name) {
