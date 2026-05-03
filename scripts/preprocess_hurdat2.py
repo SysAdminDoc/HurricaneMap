@@ -97,7 +97,23 @@ def parse_hurdat2(path: Path, basin_label: str):
                 lon = parse_lon(lon_s)
             except (ValueError, IndexError):
                 continue
-            current["track"].append({
+            # Wind radii (best-tracked from 2004 onward). 4 quadrants per
+            # threshold: 34 kt (TS-force), 50 kt, 64 kt (hurricane-force).
+            # Stored as nautical miles; -999/0 means missing or no extent.
+            radii = None
+            try:
+                if len(cols) >= 21:
+                    raw_r = [int(cols[i]) for i in range(8, 20)]
+                    # If any value is positive, keep the record. Negative-999
+                    # means "no analysis"; zero means "no wind at that radius".
+                    if any(v > 0 for v in raw_r):
+                        # Store as flat 12-int array: [r34_ne, r34_se, r34_sw, r34_nw,
+                        # r50_ne, r50_se, r50_sw, r50_nw, r64_ne, r64_se, r64_sw, r64_nw]
+                        # Replace -999 with 0 to keep the JSON small.
+                        radii = [max(0, v) for v in raw_r]
+            except (ValueError, IndexError):
+                radii = None
+            rec = {
                 "t": iso_time(date8, hhmm),
                 "rec": rec_id,
                 "status": status,
@@ -105,7 +121,10 @@ def parse_hurdat2(path: Path, basin_label: str):
                 "lon": lon,
                 "wind": wind if wind > 0 else None,
                 "pres": pres if pres > 0 else None,
-            })
+            }
+            if radii:
+                rec["radii"] = radii
+            current["track"].append(rec)
         if current:
             yield current
 
@@ -385,7 +404,6 @@ def main():
                 "landfall_max_wind_kt": max_landfall_wind,
                 "us_landfall_count": len(us_landfalls),
                 "us_landfalls": us_landfalls,
-                # Compact track: drop the wind-radii fields, keep position+intensity.
                 "track": [
                     {
                         "t": r["t"],
@@ -395,6 +413,9 @@ def main():
                         "pres": r["pres"],
                         "status": r["status"],
                         "rec": r["rec"] or None,
+                        # Wind radii kept ONLY when present (2004-onward best-track).
+                        # Format: 12-int flat array, see parse_hurdat2.
+                        **({"radii": r["radii"]} if r.get("radii") else {}),
                     }
                     for r in storm["track"]
                 ],

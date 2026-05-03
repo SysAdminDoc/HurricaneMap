@@ -8,6 +8,7 @@ import { TrackAnimator } from './animation.js';
 import { RadarOverlay } from './radar.js';
 import { renderIntensityChart } from './chart.js';
 import { togglePin, isPinned } from './compare.js';
+import { radiiCount, showWindField, hideWindField } from './windfield.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -30,6 +31,7 @@ closeBtn.addEventListener('click', () => {
   clearTracks();
   if (animator) animator.stop();
   if (radar) radar.close();
+  hideWindField();
 });
 
 export async function showStorm(landfall) {
@@ -117,6 +119,14 @@ function render(storm, landfall) {
         <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
       </button>
     </div>
+    ${radiiCount(storm) > 0 ? `
+      <div class="wind-field-row">
+        <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
+          <input type="checkbox" id="wf-cb">
+          <span>🌬️ Show wind-field swath (${radiiCount(storm)} analyzed records)</span>
+        </label>
+      </div>
+    ` : ''}
   `;
   panel.scrollTop = 0;
 
@@ -144,6 +154,14 @@ function render(storm, landfall) {
       const nowPinned = await togglePin(storm);
       pinBtn.classList.toggle('pinned', nowPinned);
       pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
+    });
+  }
+
+  const wfCb = document.getElementById('wf-cb');
+  if (wfCb) {
+    wfCb.addEventListener('change', () => {
+      if (wfCb.checked) showWindField(storm);
+      else hideWindField();
     });
   }
 }
