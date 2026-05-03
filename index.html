@@ -69,6 +69,12 @@
       </label>
     </div>
     <div class="filter-row">
+      <label>
+        <input type="checkbox" id="show-heatmap" />
+        Density heatmap (weighted by category)
+      </label>
+    </div>
+    <div class="filter-row">
       <button id="reset-filters" class="text-btn">Reset filters</button>
       <span class="visible-count" id="visible-count"></span>
     </div>
@@ -148,6 +154,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
