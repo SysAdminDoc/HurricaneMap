@@ -48,11 +48,11 @@ export function renderLandfalls(landfalls, onSelect) {
     const baseRadius = radiusForCategory(lf.category);
     const marker = L.circleMarker([lf.lat, lf.lon], {
       radius: baseRadius,
-      color: '#000',
-      weight: 1.2,
-      opacity: 0.6,
+      color: '#070b12',
+      weight: 1.5,
+      opacity: 0.78,
       fillColor: categoryColor(lf.category),
-      fillOpacity: 0.92,
+      fillOpacity: 0.9,
       className: 'landfall-marker',
     });
     marker._baseRadius = baseRadius;
@@ -93,8 +93,8 @@ export function focusLandfall(lf, panTo = true) {
   const marker = markersByEventKey.get(key);
   if (activeMarker) {
     activeMarker.setStyle({
-      weight: 1.2,
-      color: '#000',
+      weight: 1.5,
+      color: '#070b12',
       radius: activeMarker._baseRadius,
     });
   }
@@ -103,7 +103,7 @@ export function focusLandfall(lf, panTo = true) {
     marker.bringToFront();
     marker.setStyle({
       weight: 3,
-      color: '#cdd6f4',
+      color: '#f7fbff',
       radius: (marker._baseRadius || 6) + 4,
     });
     if (panTo) {
@@ -126,8 +126,8 @@ export async function showTrack(stormId, opts = {}) {
   for (const seg of segments) {
     const poly = L.polyline(seg.coords, {
       color: color || categoryColor(seg.cat),
-      weight: opts.weight || 2.5,
-      opacity: 0.85,
+      weight: opts.weight || 2.75,
+      opacity: 0.88,
       lineJoin: 'round',
       className: 'track-line',
     });

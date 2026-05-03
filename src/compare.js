@@ -4,7 +4,7 @@
 import { ensureStormsLoaded, getStorm, categoryLabel, categoryClass, ktToMph, formatTime } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
-import { closePanelsExcept } from './panels.js';
+import { closePanelsExcept, syncPanelControls } from './panels.js';
 
 const MAX_PINS = 4;
 
@@ -40,7 +40,10 @@ function ensureTray() {
 }
 
 if (compareBtn) compareBtn.addEventListener('click', openComparePanel);
-if (compareCloseBtn) compareCloseBtn.addEventListener('click', () => { comparePanel.hidden = true; });
+if (compareCloseBtn) compareCloseBtn.addEventListener('click', () => {
+  comparePanel.hidden = true;
+  syncPanelControls();
+});
 
 export function isPinned(stormId) {
   return pinned.some(p => p.id === stormId);
@@ -89,6 +92,7 @@ export function removePin(stormId) {
 export function clearAll() {
   while (pinned.length) removePin(pinned[0].id);
   comparePanel.hidden = true;
+  syncPanelControls();
 }
 
 function drawTrack(storm, color) {
@@ -147,10 +151,12 @@ function openComparePanel() {
         <p class="hint">Click any landfall, then hit <strong>📌 Pin to compare</strong> in the storm panel. Pinned storms appear as a tray at the bottom; come back here for the full breakdown.</p>
       </div>
     `;
+    syncPanelControls();
     return;
   }
   comparePanel.hidden = false;
   renderComparePanel();
+  syncPanelControls();
 }
 
 function refreshComparePanelIfOpen() {

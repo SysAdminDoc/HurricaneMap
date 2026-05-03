@@ -119,6 +119,7 @@ function wireUI() {
 
   // Category toggles
   for (const btn of els.catBtns) {
+    btn.setAttribute('aria-pressed', String(btn.classList.contains('on')));
     btn.addEventListener('click', () => {
       const cat = btn.dataset.cat;
       if (filters.categories.has(cat)) {
@@ -128,6 +129,7 @@ function wireUI() {
         filters.categories.add(cat);
         btn.classList.add('on');
       }
+      btn.setAttribute('aria-pressed', String(filters.categories.has(cat)));
       applyFilters();
     });
   }
@@ -201,11 +203,21 @@ function wireUI() {
     filters.yearMin = 1851; filters.yearMax = 2025;
     els.yearMin.value = 1851; els.yearMax.value = 2025;
     filters.categories = new Set(['ts', '1', '2', '3', '4', '5']);
-    for (const btn of els.catBtns) btn.classList.add('on');
+    for (const btn of els.catBtns) {
+      btn.classList.add('on');
+      btn.setAttribute('aria-pressed', 'true');
+    }
     filters.state = '';
     els.stateFilter.value = '';
     filters.showTracks = false;
     els.showTracks.checked = false;
+    filters.showHeatmap = false;
+    els.showHeatmap.checked = false;
+    els.surgeCategory.value = '';
+    els.showPopulation.checked = false;
+    setSurgeCategory(null);
+    setPopulation(false);
+    lastTracksKey = '';
     applyFilters();
   });
 
@@ -217,6 +229,9 @@ function wireUI() {
   els.closeInfo.addEventListener('click', () => { els.infoModal.hidden = true; });
   els.infoModal.addEventListener('click', (e) => {
     if (e.target === els.infoModal) els.infoModal.hidden = true;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !els.infoModal.hidden) els.infoModal.hidden = true;
   });
 }
 
