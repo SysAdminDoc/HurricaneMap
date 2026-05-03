@@ -64,6 +64,7 @@ function render(storm, landfall) {
   const noaaReportUrl = noaaTcrUrl(storm);
   const nhcWalletUrl = nhcWalletUrlFor(storm);
   const sliderUrl = sliderSatelliteUrl(storm);
+  const tornadoUrl = tornadoSearchUrl(storm);
 
   const radarApi = getRadar();
   const landfallsHtml = storm.us_landfalls.map((lf, idx) => {
@@ -113,6 +114,7 @@ function render(storm, landfall) {
       ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
       ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
       ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
+      ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
     </div>
 
     <div class="panel-actions-row">
@@ -238,6 +240,41 @@ function renderImpactsBlock(storm) {
       <div class="im-source">${src}</div>
     </div>
   `;
+}
+
+/** NOAA Storm Events listing pre-filtered to tornadoes during this storm's
+ *  active window in any state it affected. Storm Events DB starts 1950 but
+ *  tornado linkage is most useful from 1995 onward. */
+function tornadoSearchUrl(storm) {
+  if (!storm.year || storm.year < 1950) return null;
+  if (!storm.track?.length) return null;
+  const start = new Date(storm.track[0].t);
+  const end = new Date(storm.track[storm.track.length - 1].t);
+  const states = [...new Set((storm.us_landfalls || []).map(l => l.state))];
+  if (!states.length) return null;
+  // Storm Events expects FIPS state codes.
+  const FIPS = {
+    'Alabama': '01', 'Alaska': '02', 'Connecticut': '09', 'Delaware': '10',
+    'District of Columbia': '11', 'Florida': '12', 'Georgia': '13', 'Hawaii': '15',
+    'Louisiana': '22', 'Maine': '23', 'Maryland': '24', 'Massachusetts': '25',
+    'Mississippi': '28', 'New Hampshire': '33', 'New Jersey': '34', 'New York': '36',
+    'North Carolina': '37', 'Pennsylvania': '42', 'Puerto Rico': '72',
+    'Rhode Island': '44', 'South Carolina': '45', 'Texas': '48', 'Virginia': '51',
+    'California': '06',
+  };
+  const fipsList = states.map(s => `${FIPS[s] || ''},${s.toUpperCase()}`).filter(Boolean).join('%2C');
+  if (!fipsList) return null;
+  const params = new URLSearchParams({
+    eventType: '(C) Tornado',
+    beginDate_mm: String(start.getUTCMonth() + 1).padStart(2, '0'),
+    beginDate_dd: String(start.getUTCDate()).padStart(2, '0'),
+    beginDate_yyyy: String(start.getUTCFullYear()),
+    endDate_mm: String(end.getUTCMonth() + 1).padStart(2, '0'),
+    endDate_dd: String(end.getUTCDate()).padStart(2, '0'),
+    endDate_yyyy: String(end.getUTCFullYear()),
+    statefips: fipsList,
+  });
+  return `https://www.ncei.noaa.gov/stormevents/listevents.jsp?${params.toString()}`;
 }
 
 function nhcWalletUrlFor(storm) {

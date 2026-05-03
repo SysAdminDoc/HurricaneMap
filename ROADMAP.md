@@ -20,7 +20,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 
 - [x] **P3.1 Active storm tracking** — pull [NHC `CurrentStorms.json`](https://www.nhc.noaa.gov/CurrentStorms.json) at runtime; if any storms are active, render their cones of uncertainty + advisory tracks in a distinctive style.
 - [x] **P3.2 Spaghetti models** — fetch model tracks (GFS, ECMWF, HMON, HWRF, ensemble means) for active storms via NOMADS or a-deck data; overlay as thin polylines.
-- [ ] **P3.3 Tornado activity** — for storms 1995+, pull tornado reports from NOAA Storm Events Database (or Tropycal-equivalent) within the storm's lifetime + state of impact; plot as small markers on the map and list in the storm panel.
+- [x] **P3.3 Tornado activity** — for storms 1995+, pull tornado reports from NOAA Storm Events Database (or Tropycal-equivalent) within the storm's lifetime + state of impact; plot as small markers on the map and list in the storm panel.
 - [ ] **P3.4 Population exposure** — overlay U.S. Census block-level population density as a heat layer; for each storm, compute "X million in Cat-N wind zone" using H*Wind swath × population.
 - [ ] **P3.5 Aircraft recon** — NHC `/recon/` archive provides flight tracks + dropsonde data; render flight paths on the storm's map view.
 
