@@ -8,6 +8,7 @@ import { showStorm } from './panel.js';
 import { toggleStats } from './stats.js';
 import './compare.js';  // wires up the Compare button + pin tray
 import { enableStateClicks, openState } from './state.js';
+import { setSurgeCategory } from './surge.js';
 
 const filters = {
   yearMin: 1851,
@@ -27,6 +28,7 @@ const els = {
   searchResults: document.getElementById('search-results'),
   showTracks: document.getElementById('show-tracks'),
   showHeatmap: document.getElementById('show-heatmap'),
+  surgeCategory: document.getElementById('surge-category'),
   resetFilters: document.getElementById('reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
@@ -176,6 +178,12 @@ function wireUI() {
   els.showHeatmap.addEventListener('change', () => {
     filters.showHeatmap = els.showHeatmap.checked;
     applyFilters();
+  });
+
+  // Storm-surge SLOSH MOM tile layer (per category).
+  els.surgeCategory.addEventListener('change', () => {
+    const v = parseInt(els.surgeCategory.value, 10);
+    setSurgeCategory(Number.isFinite(v) && v > 0 ? v : null);
   });
 
   // Reset
