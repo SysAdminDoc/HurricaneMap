@@ -6,6 +6,7 @@ import {
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
 import { RadarOverlay } from './radar.js';
+import { renderIntensityChart } from './chart.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -94,7 +95,10 @@ function render(storm, landfall) {
       <div class="stat"><div class="label">Track points</div><div class="value">${storm.track.length}</div></div>
     </div>
 
-    <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--subtext);margin:0 0 6px;">U.S. landfalls (chronological)</h3>
+    <h3 class="panel-section-h3">Intensity over time</h3>
+    <div class="chart-host" id="chart-host"></div>
+
+    <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
     <ul class="landfall-list">${landfallsHtml}</ul>
 
     <div class="action-row">
@@ -109,6 +113,9 @@ function render(storm, landfall) {
     </button>
   `;
   panel.scrollTop = 0;
+
+  // Render the intensity chart inline in the panel.
+  renderIntensityChart(document.getElementById('chart-host'), storm);
 
   const playBtn = document.getElementById('play-anim-btn');
   if (playBtn) {
