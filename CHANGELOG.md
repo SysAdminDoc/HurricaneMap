@@ -5,7 +5,9 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 - **Track animation** (opt-in via "Play track animation" button on every storm): spinning hurricane glyph + translucent wind-field disk traveling the full HURDAT2 track. Glyph and wind-field both resize live with current Saffir-Simpson category. Bottom-center control bar with play/pause/restart, a scrubber, speed selector (0.5×/1×/2×/4×), live HUD (timestamp + status + wind), and close.
-- **📡 Archived NEXRAD radar overlay at landfall.** For every U.S. landfall from August 1995 onward, a 📡 button appears next to the timestamp in the storm panel. Click it to overlay the actual NEXRAD reflectivity composite at that moment, fetched live from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/). Stepper buttons (±5 min) and a ±30-minute loop animator let you watch the eye approach and cross the coast.
+- **📡 Archived NEXRAD radar — full-storm timeline, baked into the repo.** Every storm from August 1995 onward ships with every in-coverage 6-hourly track frame as a local PNG (~512 MB across 1700+ frames in 139 storm folders). Click 📡 next to any landfall and the loop animates the storm's complete U.S. passage from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days. Frames not in the local archive transparently fall back to live IEM URLs. Tool now works fully offline after `git clone`.
+- New scraper: `scripts/scrape_radar.py` with `--cadence`, `--hurricane-only`, `--major-only`, `--landfalls-only`, `--start`, `--end`, `--force`, `--concurrency`, `--dry-run` flags. See README "Refreshing the radar archive".
+- Storage layout: `data/radar/<Name>-<Year>/t_<UTC>.png` + `data/radar/manifest.json`.
 - Replaced placeholder logo with proper hurricane-spiral branding.
 
 ## v0.1.0 — 2026-05-03

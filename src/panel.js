@@ -67,7 +67,7 @@ function render(storm, landfall) {
     const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
     const lfWithYear = { ...lf, year: storm.year };
     const radarBtn = radarApi.available(lfWithYear)
-      ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall">📡</button>`
+      ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall — full-storm timeline if scraped offline">📡</button>`
       : '';
     return `<li>
       <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state}${inferred}</span>
@@ -121,9 +121,7 @@ function render(storm, landfall) {
   panel.querySelectorAll('.radar-quick-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = parseInt(btn.dataset.lfIdx, 10);
-      const lf = storm.us_landfalls[idx];
-      if (!lf) return;
-      getRadar().show({ ...lf, year: storm.year });
+      getRadar().show(storm, idx);
     });
   });
 }
