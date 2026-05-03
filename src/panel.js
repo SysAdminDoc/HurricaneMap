@@ -5,6 +5,7 @@ import {
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
+import { RadarOverlay } from './radar.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -16,10 +17,17 @@ function getAnimator() {
   return animator;
 }
 
+let radar = null;
+function getRadar() {
+  if (!radar) radar = new RadarOverlay(getMap());
+  return radar;
+}
+
 closeBtn.addEventListener('click', () => {
   panel.hidden = true;
   clearTracks();
   if (animator) animator.stop();
+  if (radar) radar.close();
 });
 
 export async function showStorm(landfall) {
@@ -52,13 +60,18 @@ function render(storm, landfall) {
   const noaaReportUrl = noaaTcrUrl(storm);
   const nhcWalletUrl = nhcWalletUrlFor(storm);
 
-  const landfallsHtml = storm.us_landfalls.map(lf => {
+  const radarApi = getRadar();
+  const landfallsHtml = storm.us_landfalls.map((lf, idx) => {
     const cat = categoryLabel(lf.category);
     const cls = categoryClass(lf.category);
     const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
+    const lfWithYear = { ...lf, year: storm.year };
+    const radarBtn = radarApi.available(lfWithYear)
+      ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall">📡</button>`
+      : '';
     return `<li>
       <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state}${inferred}</span>
-      <span class="when">${formatTime(lf.t)}</span>
+      <span class="when">${formatTime(lf.t)}${radarBtn}</span>
     </li>`;
   }).join('');
 
@@ -103,6 +116,16 @@ function render(storm, landfall) {
       getAnimator().play(storm);
     });
   }
+
+  // Wire each radar quick-button to fetch NEXRAD imagery for that specific landfall.
+  panel.querySelectorAll('.radar-quick-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.lfIdx, 10);
+      const lf = storm.us_landfalls[idx];
+      if (!lf) return;
+      getRadar().show({ ...lf, year: storm.year });
+    });
+  });
 }
 
 function titleCase(name) {

@@ -720,6 +720,102 @@ label > input[type="checkbox"] {
   .anim-scrubber { width: 100%; order: 99; }
 }
 
+/* NEXRAD radar overlay — black "no echo" pixels are masked out via blend mode
+   so only the colored reflectivity returns show on the dark basemap. */
+.radar-overlay-img {
+  mix-blend-mode: lighten;
+  /* Slight saturation boost to make weak echoes more readable on a dark base. */
+  filter: saturate(1.15) contrast(1.05);
+  pointer-events: none;
+}
+
+.radar-quick-btn {
+  background: transparent;
+  border: 1px solid var(--surface0);
+  color: var(--subtext);
+  padding: 1px 5px;
+  margin-left: 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 120ms ease;
+}
+.radar-quick-btn:hover {
+  background: var(--surface0);
+  color: var(--text);
+  border-color: var(--lavender);
+}
+
+.radar-controls {
+  position: absolute;
+  bottom: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  padding: 10px 14px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 280px;
+  max-width: calc(100vw - 32px);
+}
+.radar-title {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.radar-pip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f38ba8;
+  box-shadow: 0 0 8px #f38ba8;
+  animation: radar-pip 1.4s ease-in-out infinite;
+}
+@keyframes radar-pip {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1.0; transform: scale(1.15); }
+}
+.radar-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.radar-btn {
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  color: var(--text);
+  width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.radar-btn:hover { background: var(--surface0); border-color: var(--lavender); }
+.radar-time {
+  flex: 1;
+  text-align: center;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--text);
+  padding: 0 6px;
+}
+.radar-source {
+  font-size: 10px;
+  color: var(--subtext);
+}
+.radar-close { color: var(--subtext); }
+
+@media (max-width: 720px) {
+  .radar-controls { bottom: auto; top: 140px; }
+}
+
 /* Responsive */
 @media (max-width: 720px) {
   .filters { width: calc(100% - 32px); top: auto; bottom: 16px; }
