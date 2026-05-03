@@ -702,6 +702,42 @@ label > input[type="checkbox"] {
 .wf-toggle input { margin: 0; cursor: pointer; }
 .wind-swath { pointer-events: none; }
 
+/* Impacts block (deaths + damage from Wikipedia) */
+.impacts-block {
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-left: 3px solid var(--cat-4);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.im-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+.im-label {
+  color: var(--subtext);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.im-value {
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  max-width: 65%;
+}
+.im-source {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--surface0);
+  font-size: 10px;
+  color: var(--subtext);
+}
+.im-source a { color: var(--sapphire); }
+
 /* State deep-dive panel (slides in right, like the storm/stats/compare panels) */
 .state-panel {
   position: absolute;
