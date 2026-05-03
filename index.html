@@ -23,6 +23,9 @@
     <button class="icon-btn" id="toggle-stats" title="Toggle statistics panel" aria-label="Toggle statistics panel">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 6h2v6h-2v-6zm4-10h2v16h-2V5zm4 4h2v12h-2V9z"/></svg>
     </button>
+    <button class="icon-btn" id="toggle-compare" title="Compare pinned storms" aria-label="Compare pinned storms">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+    </button>
     <button class="icon-btn" id="toggle-info" title="About" aria-label="About">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-11h2V7h-2v2z"/></svg>
     </button>
@@ -91,6 +94,11 @@
   <section class="stats-panel glass" id="stats-panel" hidden>
     <button class="close-btn" id="close-stats" aria-label="Close statistics">×</button>
     <div id="stats-body"></div>
+  </section>
+
+  <section class="compare-panel glass" id="compare-panel" hidden>
+    <button class="close-btn" id="close-compare" aria-label="Close comparison">×</button>
+    <div id="compare-body"></div>
   </section>
 
   <section class="info-modal" id="info-modal" hidden>

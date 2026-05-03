@@ -7,6 +7,7 @@ import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
 import { RadarOverlay } from './radar.js';
 import { renderIntensityChart } from './chart.js';
+import { togglePin, isPinned } from './compare.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -108,9 +109,14 @@ function render(storm, landfall) {
       ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
     </div>
 
-    <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
-      <span class="play-icon"></span>Play track animation
-    </button>
+    <div class="panel-actions-row">
+      <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
+        <span class="play-icon"></span>Play track animation
+      </button>
+      <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
+        <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
+      </button>
+    </div>
   `;
   panel.scrollTop = 0;
 
@@ -131,6 +137,15 @@ function render(storm, landfall) {
       getRadar().show(storm, idx);
     });
   });
+
+  const pinBtn = document.getElementById('pin-btn');
+  if (pinBtn) {
+    pinBtn.addEventListener('click', async () => {
+      const nowPinned = await togglePin(storm);
+      pinBtn.classList.toggle('pinned', nowPinned);
+      pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
+    });
+  }
 }
 
 function titleCase(name) {
