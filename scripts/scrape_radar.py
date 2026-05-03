@@ -129,9 +129,32 @@ def download(url: str, dest: Path, timeout: int = 60) -> bool:
         if len(data) < 200:
             return False
         dest.write_bytes(data)
-        return True
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError):
         return False
+    add_transparency_inplace(dest)
+    return True
+
+
+def add_transparency_inplace(path: Path) -> None:
+    """Re-save the PNG with a tRNS chunk on palette index 0 so the black
+    "no echo" background renders as transparent in the browser. Skips files
+    that aren't paletted-with-black-at-index-0 (e.g. truecolor PNGs)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+    try:
+        with Image.open(path) as img:
+            if img.mode != "P" or img.info.get("transparency") == 0:
+                return
+            pal = img.getpalette()
+            if not pal or (pal[0], pal[1], pal[2]) != (0, 0, 0):
+                return
+            img.save(path, optimize=True, transparency=0)
+    except Exception:
+        # If anything goes wrong, leave the original PNG in place — the
+        # CSS blend-mode fallback in radar.js will still render it correctly.
+        pass
 
 
 def parse_iso(iso: str) -> datetime:
