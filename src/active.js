@@ -5,7 +5,10 @@
 
 import { getMap } from './map.js';
 
-const CURRENT_URL = 'https://www.nhc.noaa.gov/CurrentStorms.json';
+// NHC's CurrentStorms.json doesn't send CORS headers, so route through a
+// public CORS proxy. The endpoint payload is tiny (a few KB even with multiple
+// active storms), and we hit it once on boot + every 10 min after.
+const CURRENT_URL = 'https://corsproxy.io/?url=' + encodeURIComponent('https://www.nhc.noaa.gov/CurrentStorms.json');
 const REFRESH_MS = 10 * 60 * 1000;  // every 10 minutes
 
 let layerGroup = null;
