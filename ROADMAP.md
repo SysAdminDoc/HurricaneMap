@@ -13,7 +13,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 
 - [x] **P2.1 Storm surge SLOSH MOMs** — pull NHC's [SLOSH Maximum-of-Maximums](https://www.nhc.noaa.gov/nationalsurge/) GIS rasters (Cat 1 through Cat 5) for the U.S. Gulf + East coasts; commit as compressed PNGs with a layer toggle that overlays the inundation band matching the selected storm's landfall category.
 - [x] **P2.2 HRD H*Wind swaths** — scrape the [NOAA HRD H*Wind archive](https://www.aoml.noaa.gov/hrd/data_sub/wind.html) for storms 1994–2013, convert each to a transparent PNG raster, and add a "Wind field" button to the storm panel that overlays the actual analyzed wind field.
-- [ ] **P2.3 GOES satellite imagery** — for each storm 2000+, pull GOES IR/visible composites at HURDAT2 6-hourly synoptic times (NCEI archive), bake into `data/satellite/` mirroring the radar layout, and add a "🛰️ Satellite" toggle alongside the radar checkbox.
+- [x] **P2.3 GOES satellite imagery** — for each storm 2000+, pull GOES IR/visible composites at HURDAT2 6-hourly synoptic times (NCEI archive), bake into `data/satellite/` mirroring the radar layout, and add a "🛰️ Satellite" toggle alongside the radar checkbox.
 - [ ] **P2.4 Casualty + damage data** — scrape NHC Tropical Cyclone Reports (where available) and Wikipedia infoboxes for deaths/damage, store in `data/impacts.json`, surface in the storm panel as an "Impacts" subsection.
 
 ## Phase 3 — Live data + niche overlays

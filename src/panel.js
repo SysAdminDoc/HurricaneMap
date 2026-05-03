@@ -63,6 +63,7 @@ function render(storm, landfall) {
   const ytUrl = youtubeUrl(storm);
   const noaaReportUrl = noaaTcrUrl(storm);
   const nhcWalletUrl = nhcWalletUrlFor(storm);
+  const sliderUrl = sliderSatelliteUrl(storm);
 
   const radarApi = getRadar();
   const landfallsHtml = storm.us_landfalls.map((lf, idx) => {
@@ -109,6 +110,7 @@ function render(storm, landfall) {
       ${ytUrl ? `<a class="action-btn" href="${ytUrl}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
       ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
       ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
+      ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
     </div>
 
     <div class="panel-actions-row">
@@ -223,4 +225,21 @@ function nhcWalletUrlFor(storm) {
   // NHC storm wallet: 1995-onward, numbered AL/EPxxYYYY.
   if (storm.year < 1995) return null;
   return `https://www.nhc.noaa.gov/archive/${storm.year}/${storm.id}.shtml`;
+}
+
+/** Open the storm's first U.S. landfall on CIRA's RAMMB SLIDER. SLIDER carries
+ *  GOES-16 (East) imagery from late 2017 onward. We pin to the storm's first
+ *  landfall time so the user lands on the eyewall over the coast. */
+function sliderSatelliteUrl(storm) {
+  if (storm.year < 2018) return null;
+  const lfs = storm.us_landfalls || [];
+  const refIso = lfs.length ? lfs[0].t : storm.track[0]?.t;
+  if (!refIso) return null;
+  const ts = new Date(refIso);
+  // SLIDER takes Unix seconds and a sector. CONUS sector is the right scale
+  // for U.S. landfalls; tropical-atlantic for storms still over open ocean.
+  const unix = Math.floor(ts.getTime() / 1000);
+  const sector = lfs.length && lfs[0].state === 'Hawaii' ? 'goes-18---full_disk' : 'goes-16---conus';
+  // Default to the GeoColor product — most legible, day-and-night.
+  return `https://rammb-slider.cira.colostate.edu/?sat=goes-16&sec=${encodeURIComponent(sector.split('---')[1] || 'conus')}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
 }
