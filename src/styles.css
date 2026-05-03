@@ -342,6 +342,78 @@ label > input[type="checkbox"] {
   margin-top: 2px;
 }
 
+/* Panel section heading shared style */
+.panel-section-h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--subtext);
+  margin: 16px 0 8px;
+  font-weight: 600;
+}
+
+/* Intensity chart */
+.chart-host { margin-bottom: 8px; }
+.intensity-chart {
+  position: relative;
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-radius: 10px;
+  padding: 8px 8px 6px;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--subtext);
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+.cl-item { display: inline-flex; align-items: center; gap: 5px; }
+.cl-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+}
+.cl-swatch.wind { background: rgba(205, 214, 244, 0.85); }
+.cl-swatch.pres { background: linear-gradient(to right, var(--sapphire) 0%, var(--sapphire) 50%, transparent 50%, transparent 100%); background-size: 6px 2px; height: 2px; }
+.cl-landfall { color: rgba(243,139,168,0.9); }
+
+.intensity-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.intensity-svg .ax-tick {
+  font-size: 9px;
+  fill: var(--subtext);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.chart-dot { transition: r 80ms ease; }
+.chart-dot:hover { r: 4; }
+
+.chart-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--crust);
+  color: var(--text);
+  border: 1px solid var(--surface0);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
+  min-width: 130px;
+}
+.tt-time { color: var(--lavender); font-size: 10px; margin-bottom: 4px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.tt-row { display: flex; justify-content: space-between; gap: 12px; line-height: 1.5; }
+.tt-row span { color: var(--subtext); }
+
 .landfall-list {
   list-style: none;
   padding: 0;
