@@ -4,6 +4,7 @@ import { categoryColor, ensureStormsLoaded, getStorm } from './data.js';
 let map;
 let landfallLayer;
 let trackLayer;
+let heatLayer = null;
 let activeMarker = null;
 const markersByEventKey = new Map();
 
@@ -171,6 +172,46 @@ export function fitToLandfalls(landfalls) {
   if (!landfalls.length) return;
   const bounds = L.latLngBounds(landfalls.map(l => [l.lat, l.lon]));
   map.fitBounds(bounds, { padding: [40, 40] });
+}
+
+/** Density heatmap toggle. Each landfall becomes a heat point with intensity
+ *  weighted by Saffir-Simpson category (TS=0.4 → Cat 5=1.0). When the heatmap
+ *  is on, the colored Saffir-Simpson dot layer is dimmed for clarity. */
+export function setHeatmap(enabled, landfalls) {
+  if (!enabled) {
+    if (heatLayer) {
+      map.removeLayer(heatLayer);
+      heatLayer = null;
+    }
+    landfallLayer.eachLayer(l => l.setStyle({ fillOpacity: 0.92, opacity: 0.6 }));
+    return;
+  }
+  const points = landfalls.map(lf => {
+    const c = lf.category;
+    const weight = c <= 0 ? 0.4 : 0.55 + c * 0.09;  // TS .4, Cat1 .64, Cat5 1.0
+    return [lf.lat, lf.lon, weight];
+  });
+  if (heatLayer) {
+    heatLayer.setLatLngs(points);
+  } else {
+    heatLayer = L.heatLayer(points, {
+      radius: 22,
+      blur: 28,
+      maxZoom: 9,
+      max: 1.0,
+      // Catppuccin-tinted gradient: cold blue → green → yellow → orange → red → mauve
+      gradient: {
+        0.10: '#74c7ec',
+        0.30: '#a6e3a1',
+        0.50: '#f9e2af',
+        0.70: '#fab387',
+        0.85: '#f38ba8',
+        1.00: '#cba6f7',
+      },
+    }).addTo(map);
+  }
+  // Dim the underlying dots so the heatmap reads cleanly.
+  landfallLayer.eachLayer(l => l.setStyle({ fillOpacity: 0.25, opacity: 0.25 }));
 }
 
 export function getMap() { return map; }

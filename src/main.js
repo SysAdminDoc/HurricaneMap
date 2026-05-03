@@ -3,7 +3,7 @@ import {
   loadInitial, getLandfalls, getStats, filterLandfalls,
   searchStorms, categoryLabel,
 } from './data.js';
-import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks } from './map.js';
+import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
 import { showStorm } from './panel.js';
 import { toggleStats } from './stats.js';
 import './compare.js';  // wires up the Compare button + pin tray
@@ -14,6 +14,7 @@ const filters = {
   categories: new Set(['ts', '1', '2', '3', '4', '5']),
   state: '',
   showTracks: false,
+  showHeatmap: false,
 };
 
 const els = {
@@ -24,6 +25,7 @@ const els = {
   searchInput: document.getElementById('search-input'),
   searchResults: document.getElementById('search-results'),
   showTracks: document.getElementById('show-tracks'),
+  showHeatmap: document.getElementById('show-heatmap'),
   resetFilters: document.getElementById('reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
@@ -65,6 +67,7 @@ function applyFilters() {
   } else {
     clearTracks();
   }
+  setHeatmap(filters.showHeatmap, visible);
 }
 
 let lastTracksKey = '';
@@ -162,6 +165,12 @@ function wireUI() {
   // Tracks toggle
   els.showTracks.addEventListener('change', () => {
     filters.showTracks = els.showTracks.checked;
+    applyFilters();
+  });
+
+  // Heatmap toggle
+  els.showHeatmap.addEventListener('change', () => {
+    filters.showHeatmap = els.showHeatmap.checked;
     applyFilters();
   });
 
