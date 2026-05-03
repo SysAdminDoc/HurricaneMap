@@ -6,6 +6,7 @@ import {
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks } from './map.js';
 import { showStorm } from './panel.js';
 import { toggleStats } from './stats.js';
+import './compare.js';  // wires up the Compare button + pin tray
 
 const filters = {
   yearMin: 1851,
