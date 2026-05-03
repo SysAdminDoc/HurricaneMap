@@ -1,12 +1,29 @@
 // Historical NEXRAD composite radar overlay for hurricane landfalls.
 //
-// Source: Iowa Environmental Mesonet (IEM) NEXRAD mosaic archive.
-//   https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/
+// Source priority (offline-first):
+//   1. Local archive at  data/radar/<file>  if listed in data/radar/manifest.json
+//   2. Remote Iowa Environmental Mesonet (IEM) NEXRAD mosaic archive
+//      https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/
+//
+// Local data is scraped via scripts/scrape_radar.py and committed to the repo
+// so the tool works fully offline once cloned. The manifest's `frames` map
+// keys exact UTC timestamps to local file paths so the stepper / loop / play
+// controls can hit local first and only touch IEM as a fallback.
+//
+// Manifest schema (data/radar/manifest.json):
+//   {
+//     "<storm_id>": {
+//       "name": "KATRINA", "year": 2005, "dir": "Katrina-2005",
+//       "region": "uscomp",
+//       "landfalls": { "0": "200508251830", "1": "200508291110", ... },
+//       "frames":    { "200508241800": "Katrina-2005/t_200508241800.png", ... }
+//     }
+//   }
 //
 // Coverage:
 //   uscomp (CONUS)        — n0r — Aug 1995 onward, 5-min cadence from Aug 2003
-//   hicomp (Hawaii)       — n0q — limited; per-storm verification at fetch time
-//   prcomp (Puerto Rico)  — n0q — limited; per-storm verification at fetch time
+//   hicomp (Hawaii)       — n0q — 2010 onward
+//   prcomp (Puerto Rico)  — n0q — 2010 onward
 //
 // Geographic bounds (precomputed from each region's world file + image size):
 //   uscomp: 6000 x 2600 px @ 0.01°  -> [[24, -126], [50, -66]]
@@ -20,73 +37,94 @@
 import { formatTime } from './data.js';
 
 const IEM_ROOT = 'https://mesonet.agron.iastate.edu/archive/data';
+const LOCAL_ROOT = 'data/radar';
+const MANIFEST_URL = 'data/radar/manifest.json';
 
 const REGIONS = {
-  uscomp: {
-    bounds: [[24, -126], [50, -66]],
-    product: 'n0r',
-    earliestYear: 1995,
-  },
-  hicomp: {
-    bounds: [[15.44, -162.4], [24.44, -152.4]],
-    product: 'n0q',
-    earliestYear: 2010,
-  },
-  prcomp: {
-    bounds: [[13.1, -71.07], [23.1, -61.07]],
-    product: 'n0q',
-    earliestYear: 2010,
-  },
+  uscomp: { bounds: [[24, -126], [50, -66]], product: 'n0r', earliestYear: 1995 },
+  hicomp: { bounds: [[15.44, -162.4], [24.44, -152.4]], product: 'n0q', earliestYear: 2010 },
+  prcomp: { bounds: [[13.1, -71.07], [23.1, -61.07]], product: 'n0q', earliestYear: 2010 },
 };
 
-/** Pick the right regional composite for a landfall. */
+let manifest = null;
+let manifestPromise = null;
+
+function loadManifest() {
+  if (manifest) return Promise.resolve(manifest);
+  if (manifestPromise) return manifestPromise;
+  manifestPromise = fetch(MANIFEST_URL)
+    .then(r => r.ok ? r.json() : {})
+    .catch(() => ({}))
+    .then(m => { manifest = m; return m; });
+  return manifestPromise;
+}
+
 function regionFor(landfall) {
   if (landfall.state === 'Hawaii') return 'hicomp';
   if (landfall.state === 'Puerto Rico') return 'prcomp';
   return 'uscomp';
 }
 
-/** Round a Date down to the nearest N-minute boundary. */
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function dateToStamp(d) {
+  return `${d.getUTCFullYear()}${pad2(d.getUTCMonth() + 1)}${pad2(d.getUTCDate())}${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}`;
+}
+
+function stampToDate(stamp) {
+  return new Date(Date.UTC(
+    parseInt(stamp.slice(0, 4), 10),
+    parseInt(stamp.slice(4, 6), 10) - 1,
+    parseInt(stamp.slice(6, 8), 10),
+    parseInt(stamp.slice(8, 10), 10),
+    parseInt(stamp.slice(10, 12), 10),
+  ));
+}
+
 function roundToMinutes(date, mins) {
   const ms = date.getTime();
   const stepMs = mins * 60 * 1000;
   return new Date(Math.floor(ms / stepMs) * stepMs);
 }
 
-function pad2(n) { return String(n).padStart(2, '0'); }
-
-function buildUrl(region, date) {
+function buildIemUrl(region, date) {
   const yyyy = date.getUTCFullYear();
   const mm = pad2(date.getUTCMonth() + 1);
   const dd = pad2(date.getUTCDate());
-  const HH = pad2(date.getUTCHours());
-  const MI = pad2(date.getUTCMinutes());
-  const stamp = `${yyyy}${mm}${dd}${HH}${MI}`;
-  const product = REGIONS[region].product;
-  return `${IEM_ROOT}/${yyyy}/${mm}/${dd}/GIS/${region}/${product}_${stamp}.png`;
+  const stamp = dateToStamp(date);
+  return `${IEM_ROOT}/${yyyy}/${mm}/${dd}/GIS/${region}/${REGIONS[region].product}_${stamp}.png`;
 }
 
-/** HEAD-probe the IEM archive for the closest available frame to the target time.
- *  Walks back in 5-min steps up to maxMinutes. Returns { url, date } or null. */
-async function findNearestFrame(region, targetDate, maxMinutes = 60) {
-  // Try the rounded 5-min frame first.
-  let probe = roundToMinutes(targetDate, 5);
+/** Resolve a frame URL: prefer local manifest entry, fall back to IEM. */
+function resolveFrameUrl(stormId, region, date) {
+  const stamp = dateToStamp(date);
+  const entry = manifest?.[stormId];
+  const localPath = entry?.frames?.[stamp];
+  if (localPath) {
+    return { url: `${LOCAL_ROOT}/${localPath}`, source: 'local', date };
+  }
+  return { url: buildIemUrl(region, date), source: 'remote', date };
+}
+
+/** For ONLINE mode only: probe IEM for the nearest available frame, walking
+ *  back in 5-min steps then hourly. Returns null if nothing within ±60 min. */
+async function findRemoteNearest(region, target, maxMinutes = 60) {
+  let probe = roundToMinutes(target, 5);
   for (let stepMin = 0; stepMin <= maxMinutes; stepMin += 5) {
-    const url = buildUrl(region, probe);
+    const url = buildIemUrl(region, probe);
     try {
       const r = await fetch(url, { method: 'HEAD' });
-      if (r.ok) return { url, date: probe };
-    } catch (_) { /* CORS / network — try next */ }
+      if (r.ok) return { url, date: probe, source: 'remote' };
+    } catch (_) { /* keep probing */ }
     probe = new Date(probe.getTime() - 5 * 60 * 1000);
   }
-  // Hourly fallback for 1995-2002 archive.
-  probe = roundToMinutes(targetDate, 60);
-  for (let stepHr = 0; stepHr <= 3; stepHr++) {
-    const url = buildUrl(region, probe);
+  probe = roundToMinutes(target, 60);
+  for (let i = 0; i <= 3; i++) {
+    const url = buildIemUrl(region, probe);
     try {
       const r = await fetch(url, { method: 'HEAD' });
-      if (r.ok) return { url, date: probe };
-    } catch (_) { /* keep trying */ }
+      if (r.ok) return { url, date: probe, source: 'remote' };
+    } catch (_) { /* keep probing */ }
     probe = new Date(probe.getTime() - 60 * 60 * 1000);
   }
   return null;
@@ -100,6 +138,9 @@ export class RadarOverlay {
     this.region = null;
     this.currentDate = null;
     this.landfall = null;
+    this.storm = null;
+    this.stormId = null;
+    this.localFrames = null;     // sorted array of {ts, date, url} for full-storm loop
     this.animTimer = null;
   }
 
@@ -108,24 +149,60 @@ export class RadarOverlay {
     return landfall.year >= r.earliestYear;
   }
 
-  async show(landfall) {
+  /** Open radar for a specific landfall on a specific storm.
+   *  `storm` is the full storm record (from storms.json) so we can pan the
+   *  map along the storm's track during the loop. */
+  async show(storm, lfIdx) {
     this.stopAnimation();
-    this.landfall = landfall;
-    this.region = regionFor(landfall);
-    const target = new Date(landfall.t);
-    this.buildControls(landfall);
-    this.setStatus('Locating nearest radar frame…');
-    const found = await findNearestFrame(this.region, target);
-    if (!found) {
-      this.setStatus('No archived radar found within ±1 hour of landfall.');
-      return;
-    }
-    this.currentDate = found.date;
-    this.draw(found.url);
-    this.setStatus(this.timestampLabel());
+    await loadManifest();
+    this.storm = storm;
+    this.stormId = storm.id;
+    const lf = storm.us_landfalls[lfIdx];
+    this.landfall = { ...lf, year: storm.year };
+    this.region = regionFor(this.landfall);
 
-    // Center the map on the landfall so the radar return is visible.
-    this.map.setView([landfall.lat, landfall.lon], Math.max(this.map.getZoom(), 7), { animate: true });
+    // Pre-compute the sorted local frame list for this storm before building
+    // controls so the loop button can advertise the right frame count.
+    const stormEntry = manifest?.[this.stormId];
+    if (stormEntry?.frames) {
+      this.localFrames = Object.entries(stormEntry.frames)
+        .map(([ts, file]) => ({
+          ts,
+          date: stampToDate(ts),
+          url: `${LOCAL_ROOT}/${file}`,
+        }))
+        .sort((a, b) => a.ts.localeCompare(b.ts));
+    } else {
+      this.localFrames = [];
+    }
+
+    this.buildControls(this.landfall);
+    this.setStatus('Locating radar frame…');
+
+    // Pick the local frame at this landfall's timestamp if we have one.
+    let landfallTs = stormEntry?.landfalls?.[String(lfIdx)];
+    let frame = null;
+    if (landfallTs && stormEntry.frames[landfallTs]) {
+      frame = {
+        url: `${LOCAL_ROOT}/${stormEntry.frames[landfallTs]}`,
+        date: stampToDate(landfallTs),
+        source: 'local',
+      };
+    } else {
+      // Fall back to remote walkback.
+      const target = new Date(this.landfall.t);
+      frame = await findRemoteNearest(this.region, target);
+      if (!frame) {
+        this.setStatus('No archived radar found within ±1 hour of landfall.');
+        return;
+      }
+    }
+
+    this.currentDate = frame.date;
+    this.draw(frame.url);
+    this.setStatus(this.timestampLabel(frame.source));
+
+    this.map.setView([lf.lat, lf.lon], Math.max(this.map.getZoom(), 7), { animate: true });
   }
 
   draw(url) {
@@ -141,8 +218,10 @@ export class RadarOverlay {
     }).addTo(this.map);
   }
 
-  timestampLabel() {
-    return formatTime(this.currentDate.toISOString());
+  timestampLabel(source = 'local') {
+    if (!this.currentDate) return '';
+    const tag = source === 'remote' ? ' · live' : '';
+    return formatTime(this.currentDate.toISOString()) + tag;
   }
 
   buildControls(landfall) {
@@ -154,23 +233,25 @@ export class RadarOverlay {
       document.body.appendChild(el);
     }
     el.hidden = false;
+    const totalFrames = this.localFrames?.length || 0;
+    const loopHint = totalFrames > 1 ? `Animate full storm (${totalFrames} frames)` : 'Animate ±30 min around landfall';
     el.innerHTML = `
       <div class="radar-title">
         <span class="radar-pip"></span>
         NEXRAD radar — ${escapeHtml(landfall.state)} landfall
       </div>
       <div class="radar-controls-row">
-        <button class="radar-btn" data-act="prev" title="−5 min">◀</button>
+        <button class="radar-btn" data-act="prev" title="Previous frame">◀</button>
         <span class="radar-time" id="radar-time">…</span>
-        <button class="radar-btn" data-act="next" title="+5 min">▶</button>
-        <button class="radar-btn" data-act="loop" title="Animate ±30 min around landfall">▶▶</button>
+        <button class="radar-btn" data-act="next" title="Next frame">▶</button>
+        <button class="radar-btn" data-act="loop" title="${loopHint}">▶▶</button>
         <button class="radar-btn radar-close" data-act="close" title="Close radar">×</button>
       </div>
       <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>
     `;
     this.controls = el;
-    el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-5));
-    el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(5));
+    el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-1));
+    el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(+1));
     el.querySelector('[data-act="loop"]').addEventListener('click', () => this.toggleLoop());
     el.querySelector('[data-act="close"]').addEventListener('click', () => this.close());
   }
@@ -180,11 +261,30 @@ export class RadarOverlay {
     if (el) el.textContent = text;
   }
 
-  async step(deltaMinutes) {
+  /** Step ±N frames in the local frame list when available. If there aren't
+   *  any local frames (storm not in the offline archive), step ±5 minutes
+   *  against IEM directly. */
+  async step(direction) {
     this.stopAnimation();
     if (!this.currentDate) return;
-    const next = new Date(this.currentDate.getTime() + deltaMinutes * 60 * 1000);
-    const url = buildUrl(this.region, next);
+    if (this.localFrames && this.localFrames.length > 1) {
+      const curStamp = dateToStamp(this.currentDate);
+      let idx = this.localFrames.findIndex(f => f.ts === curStamp);
+      if (idx < 0) idx = 0;
+      const next = this.localFrames[Math.max(0, Math.min(this.localFrames.length - 1, idx + direction))];
+      if (next.ts === curStamp) {
+        this.setStatus(`(${direction > 0 ? 'last' : 'first'} frame) ${this.timestampLabel()}`);
+        return;
+      }
+      this.currentDate = next.date;
+      this.draw(next.url);
+      this.panToTrackPoint(next.date);
+      this.setStatus(this.timestampLabel('local'));
+      return;
+    }
+    // Online stepper: 5-min steps.
+    const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
+    const url = buildIemUrl(this.region, next);
     this.setStatus('Loading…');
     try {
       const r = await fetch(url, { method: 'HEAD' });
@@ -198,7 +298,26 @@ export class RadarOverlay {
     }
     this.currentDate = next;
     this.draw(url);
-    this.setStatus(this.timestampLabel());
+    this.setStatus(this.timestampLabel('remote'));
+  }
+
+  /** Pan the map to follow the storm during the loop. We snap to the closest
+   *  HURDAT2 track point to the current radar timestamp. */
+  panToTrackPoint(date) {
+    if (!this.storm?.track) return;
+    let best = null;
+    let bestDt = Infinity;
+    const target = date.getTime();
+    for (const rec of this.storm.track) {
+      const dt = Math.abs(new Date(rec.t).getTime() - target);
+      if (dt < bestDt) {
+        bestDt = dt;
+        best = rec;
+      }
+    }
+    if (best) {
+      this.map.panTo([best.lat, best.lon], { animate: true, duration: 0.4 });
+    }
   }
 
   async toggleLoop() {
@@ -208,36 +327,45 @@ export class RadarOverlay {
       if (btn) btn.textContent = '▶▶';
       return;
     }
-    if (btn) btn.textContent = '⏸';
-    // Pre-flight: probe ±30 min around landfall in 5-min steps and only keep
-    // frames that exist. Keeps the animation smooth even when some are missing.
-    const t0 = new Date(this.landfall.t);
-    const start = new Date(t0.getTime() - 30 * 60 * 1000);
-    const frames = [];
-    this.setStatus('Building loop (probing frames)…');
-    for (let m = 0; m <= 60; m += 5) {
-      const d = new Date(start.getTime() + m * 60 * 1000);
-      const u = buildUrl(this.region, roundToMinutes(d, 5));
-      try {
-        const r = await fetch(u, { method: 'HEAD' });
-        if (r.ok) frames.push({ url: u, date: roundToMinutes(d, 5) });
-      } catch (_) { /* skip */ }
+
+    let frames = [];
+
+    // Prefer the full-storm local frame list when available.
+    if (this.localFrames && this.localFrames.length > 1) {
+      frames = this.localFrames;
+    } else {
+      // Online mode: probe ±30 min around the landfall in 5-min steps.
+      this.setStatus('Building loop (probing IEM)…');
+      const t0 = new Date(this.landfall.t);
+      const start = new Date(t0.getTime() - 30 * 60 * 1000);
+      for (let m = 0; m <= 60; m += 5) {
+        const d = roundToMinutes(new Date(start.getTime() + m * 60 * 1000), 5);
+        const u = buildIemUrl(this.region, d);
+        try {
+          const r = await fetch(u, { method: 'HEAD' });
+          if (r.ok) frames.push({ ts: dateToStamp(d), date: d, url: u });
+        } catch (_) { /* skip */ }
+      }
     }
+
     if (!frames.length) {
       this.setStatus('No frames available for loop.');
-      if (btn) btn.textContent = '▶▶';
       return;
     }
+    if (btn) btn.textContent = '⏸';
     let idx = 0;
+    // Total target: ~16 sec across the loop, with 350-1200 ms per frame.
+    const perFrame = Math.max(350, Math.min(1200, Math.round(16000 / frames.length)));
     const tick = () => {
       const f = frames[idx];
       this.currentDate = f.date;
       this.draw(f.url);
-      this.setStatus(`${this.timestampLabel()} (${idx + 1}/${frames.length})`);
+      this.panToTrackPoint(f.date);
+      this.setStatus(`${this.timestampLabel(f.url.startsWith('http') ? 'remote' : 'local')} (${idx + 1}/${frames.length})`);
       idx = (idx + 1) % frames.length;
     };
     tick();
-    this.animTimer = setInterval(tick, 600);
+    this.animTimer = setInterval(tick, perFrame);
   }
 
   stopAnimation() {
@@ -257,7 +385,10 @@ export class RadarOverlay {
     }
     if (this.controls) this.controls.hidden = true;
     this.landfall = null;
+    this.storm = null;
+    this.stormId = null;
     this.currentDate = null;
+    this.localFrames = null;
   }
 }
 

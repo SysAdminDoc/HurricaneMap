@@ -28,7 +28,7 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 - **Multi-state tracking** for storms like Andrew (FL → FL → LA), Charley (FL → FL → SC → SC), Hugo (PR → PR → SC), Katrina (FL → LA → LA).
 - Per-segment **intensity-coloured tracks** — you can see exactly where a storm intensified, peaked, and weakened.
 - **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Watch Andrew '92 ramp from TS to Cat 5 to Cat 4 over the Gulf in 14 seconds.
-- **📡 Archived NEXRAD radar at landfall** — for every U.S. landfall from August 1995 onward, click 📡 to overlay the real radar reflectivity composite at that landfall's UTC timestamp (live from Iowa State IEM's NEXRAD archive). Step ±5 min, or play a ±30-minute loop to watch the eye approach the coast. Helene '24, Katrina '05, Andrew '92's Florida landfall — all fully retrievable.
+- **📡 Archived NEXRAD radar — full-storm timeline, offline-capable** — every storm from August 1995 onward ships with **every in-coverage 6-hourly track frame** baked into the repo. Click 📡 next to any landfall and the loop animates the entire U.S. passage of that storm from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days; Helene '24 shows the eyewall crossing the Big Bend. **No internet required after `git clone`.** Frames not in the local archive transparently fall back to live IEM URLs.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
 ## Quick start
@@ -62,6 +62,8 @@ HurricaneMap/
 │   ├── data.js             # JSON loaders + index helpers
 │   ├── map.js              # Leaflet map, markers, tracks
 │   ├── panel.js            # storm details + Wikipedia/YouTube/NOAA links
+│   ├── animation.js        # spinning hurricane glyph + wind-field disk along the track
+│   ├── radar.js            # NEXRAD overlay — local manifest first, IEM fallback
 │   ├── stats.js            # state hotspot / decade / category breakdowns
 │   └── styles.css          # Catppuccin Mocha + glassmorphism
 ├── data/
@@ -70,9 +72,17 @@ HurricaneMap/
 │   ├── us-states.geojson       # US state polygons (point-in-polygon attribution)
 │   ├── landfalls.json          # flat list, one entry per US landfall event
 │   ├── storms.json             # full track + metadata for every US-landfalling storm
-│   └── stats.json              # pre-computed stats: by state, decade, category, cold spots
+│   ├── stats.json              # pre-computed stats: by state, decade, category, cold spots
+│   └── radar/                  # archived NEXRAD composites (~512 MB, 1700+ frames)
+│       ├── manifest.json           # storm_id → {landfalls, frames}
+│       ├── Katrina-2005/           # one folder per storm
+│       │   ├── t_200508241800.png
+│       │   ├── t_200508250000.png
+│       │   └── ...
+│       └── ...
 ├── scripts/
-│   └── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
+│   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
+│   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
 └── examplemap.png          # design reference
 ```
 
@@ -121,7 +131,45 @@ A storm's **headline landfall category** is the highest category recorded at *an
 | Map tiles | [CartoDB Dark Matter](https://carto.com/) over OpenStreetMap |
 | Map library | [Leaflet 1.9](https://leafletjs.com/) |
 
-## Refreshing the data when NOAA publishes a new season
+## Refreshing the radar archive
+
+Radar PNGs in `data/radar/` come from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/). They're committed to the repo so the tool works offline, but you can re-scrape them at any time:
+
+```bash
+# Default — every covered landfall + every in-coverage TS+ track point
+# at HURDAT2's native 6-hourly cadence. ~330 MB on first run.
+python scripts/scrape_radar.py
+
+# Subset to hurricane-strength only (~195 MB)
+python scripts/scrape_radar.py --hurricane-only
+
+# Major hurricanes only (~68 MB)
+python scripts/scrape_radar.py --major-only
+
+# Just the landfall frames, no full track (~35 MB)
+python scripts/scrape_radar.py --landfalls-only
+
+# Densify to hourly cadence between HURDAT2 records (multi-GB — needs LFS)
+python scripts/scrape_radar.py --cadence 60
+
+# Resume / refill — existing files are skipped automatically
+python scripts/scrape_radar.py
+```
+
+Scraper flags:
+
+| Flag | Default | Effect |
+| ---- | ------- | ------ |
+| `--cadence MIN` | 360 (= 6h) | Densify track-point fetches to N-min interpolation between HURDAT2 records |
+| `--hurricane-only` | off | Skip storms that landed at TS strength only |
+| `--major-only` | off | Skip everything below Cat 3 at landfall |
+| `--landfalls-only` | off | Skip the full-track expansion, fetch only landfall frames |
+| `--start YYYY` / `--end YYYY` | none | Year-range filter |
+| `--force` | off | Re-download even if file exists locally |
+| `--concurrency N` | 8 | Parallel HTTP fetches |
+| `--dry-run` | off | Print task count + estimated MB without downloading |
+
+## Refreshing the HURDAT2 best-track when NOAA publishes a new season
 
 NOAA typically releases the previous season's HURDAT2 update in February. To pull the latest:
 
