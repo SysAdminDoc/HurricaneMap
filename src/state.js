@@ -3,6 +3,7 @@
 
 import { getLandfalls, getStats, getStorm, ensureStormsLoaded, categoryLabel, categoryClass, formatTime } from './data.js';
 import { showStorm } from './panel.js';
+import { closePanelsExcept } from './panels.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -13,13 +14,23 @@ if (closeBtn) closeBtn.addEventListener('click', () => { panel.hidden = true; })
 let stateBoundariesPromise = null;
 let stateLayer = null;
 
-/** Lazy-load the US states geojson + draw clickable polygons on the map. */
+/** Lazy-load the US states geojson + draw clickable polygons on the map.
+ *  IMPORTANT: state polygons live in a custom pane below the default
+ *  overlayPane so the landfall markers (circle dots) sit above them and
+ *  always intercept clicks first. Otherwise clicking a dot inside Florida
+ *  would select Florida instead of the storm. */
 export async function enableStateClicks(map) {
   if (stateBoundariesPromise) return stateBoundariesPromise;
+  // Custom pane with z-index lower than overlayPane (400). Markers stay on top.
+  if (!map.getPane('statesPane')) {
+    map.createPane('statesPane');
+    map.getPane('statesPane').style.zIndex = 350;
+  }
   stateBoundariesPromise = fetch('data/us-states.geojson')
     .then(r => r.json())
     .then(gj => {
       stateLayer = L.geoJSON(gj, {
+        pane: 'statesPane',
         style: () => ({
           color: '#cdd6f4',
           weight: 0.6,
@@ -48,6 +59,7 @@ export async function enableStateClicks(map) {
 }
 
 export async function openState(stateName) {
+  closePanelsExcept('state-panel');
   panel.hidden = false;
   body.innerHTML = `<p class="state-loading">Loading ${escapeHtml(stateName)}…</p>`;
   await ensureStormsLoaded();

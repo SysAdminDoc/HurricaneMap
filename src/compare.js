@@ -4,6 +4,7 @@
 import { ensureStormsLoaded, getStorm, categoryLabel, categoryClass, ktToMph, formatTime } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
+import { closePanelsExcept } from './panels.js';
 
 const MAX_PINS = 4;
 
@@ -135,6 +136,7 @@ function refreshTray() {
 }
 
 function openComparePanel() {
+  closePanelsExcept('compare-panel');
   if (!pinned.length) {
     // If user clicks Compare with no pins, show a hint instead of an empty panel.
     comparePanel.hidden = false;

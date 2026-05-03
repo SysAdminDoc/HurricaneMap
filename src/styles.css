@@ -258,19 +258,26 @@ label > input[type="checkbox"] {
 .dot.cat-4  { background: var(--cat-4); }
 .dot.cat-5  { background: var(--cat-5); }
 
-/* Storm panel */
-.storm-panel {
+/* All right-side mode-panels share the same slot (mutually exclusive — only
+   one open at a time, managed by panels.js). Storm panel is the primary;
+   state / stats / compare swap into the same position when opened. */
+.storm-panel,
+.stats-panel,
+.compare-panel,
+.state-panel {
   position: absolute;
-  bottom: 16px;
+  top: 110px;
   right: 16px;
+  bottom: 80px;
   z-index: 1000;
-  width: 380px;
-  max-height: 70vh;
+  width: 420px;
+  max-width: calc(100vw - 32px);
   overflow-y: auto;
-  padding: 18px 20px 20px;
+  padding: 18px 22px 22px;
   font-size: 13px;
   line-height: 1.55;
 }
+
 .close-btn {
   position: absolute;
   top: 8px;
@@ -583,18 +590,6 @@ label > input[type="checkbox"] {
 }
 .ct-btn.primary:hover { background: var(--blue); border-color: var(--blue); }
 
-/* Compare panel — same shape as stats panel but wider for the table */
-.compare-panel {
-  position: absolute;
-  top: 90px;
-  right: 16px;
-  z-index: 1050;
-  width: 480px;
-  max-height: calc(100vh - 130px);
-  overflow-y: auto;
-  padding: 18px 22px 22px;
-  font-size: 13px;
-}
 .compare-panel h2 {
   margin: 0 0 4px;
   font-size: 18px;
@@ -782,18 +777,6 @@ label > input[type="checkbox"] {
 }
 .ab-link:hover { border-color: var(--lavender); background: var(--surface0); }
 
-/* State deep-dive panel (slides in right, like the storm/stats/compare panels) */
-.state-panel {
-  position: absolute;
-  top: 90px;
-  right: 16px;
-  z-index: 1040;
-  width: 380px;
-  max-height: calc(100vh - 130px);
-  overflow-y: auto;
-  padding: 18px 22px 20px;
-  font-size: 13px;
-}
 .state-panel h2 {
   margin: 0 0 4px;
   font-size: 20px;
@@ -852,17 +835,6 @@ label > input[type="checkbox"] {
 }
 
 /* Stats panel */
-.stats-panel {
-  position: absolute;
-  top: 90px;
-  right: 16px;
-  z-index: 1000;
-  width: 300px;
-  max-height: calc(100vh - 130px);
-  overflow-y: auto;
-  padding: 16px 18px 20px;
-  font-size: 12px;
-}
 .stats-panel h2 {
   margin: 0 0 12px;
   font-size: 16px;
@@ -1044,10 +1016,15 @@ label > input[type="checkbox"] {
 }
 @keyframes hg-rotate { to { transform: rotate(-360deg); } }
 
-/* Animation control bar (bottom-center floater) */
+/* Bottom control bars stack vertically so they don't collide when more than
+   one is active. Order from bottom up:
+     22px  — compare tray (lowest, persistent across sessions)
+     86px  — radar controls
+     150px — animation controls (highest priority, on top) */
+
 .anim-controls {
   position: absolute;
-  bottom: 22px;
+  bottom: 150px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
@@ -1219,7 +1196,7 @@ label > input[type="checkbox"] {
 
 .radar-controls {
   position: absolute;
-  bottom: 92px;
+  bottom: 86px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
