@@ -1,7 +1,7 @@
 // State deep-dive: per-state landfall history, by-category histogram, by-decade
 // trend, and a sortable list of every storm to hit that state.
 
-import { getLandfalls, getStats, getStorm, ensureStormsLoaded, categoryLabel, categoryClass, formatTime } from './data.js';
+import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass } from './data.js';
 import { showStorm } from './panel.js';
 import { closePanelsExcept } from './panels.js';
 
@@ -66,8 +66,6 @@ export async function openState(stateName) {
 
   const allLandfalls = getLandfalls();
   const stateLandfalls = allLandfalls.filter(lf => lf.state === stateName);
-  const stats = getStats();
-  const stateStats = stats.by_state?.[stateName];
 
   if (!stateLandfalls.length) {
     body.innerHTML = `
@@ -141,19 +139,7 @@ export async function openState(stateName) {
     `;
   }).join('');
 
-  // Full sortable storm list
-  const fullListHtml = storms.map(s => {
-    const cat = categoryLabel(s.max_cat);
-    const cls = categoryClass(s.max_cat);
-    return `
-      <li class="state-storm-row" data-storm-id="${s.storm_id}">
-        <span class="cat-pill ${cls}">${cat}</span>
-        <span class="ssr-name">${escapeHtml(titleCase(s.name))}</span>
-        <span class="ssr-year">${s.year}</span>
-        <span class="ssr-count">${s.count} hit${s.count === 1 ? '' : 's'}</span>
-      </li>
-    `;
-  }).join('');
+  const fullListHtml = renderStateStormRows(sortStateStorms(storms, 'newest'));
 
   // Headline counters
   const total = stateLandfalls.length;
@@ -182,17 +168,66 @@ export async function openState(stateName) {
       <ul class="state-storm-list">${worstHtml}</ul>
     ` : ''}
 
-    <h3 class="panel-section-h3">All storms (newest first)</h3>
-    <ul class="state-storm-list">${fullListHtml}</ul>
+    <div class="state-list-head">
+      <h3 class="panel-section-h3">All storms</h3>
+      <div class="segmented-control state-sort" role="group" aria-label="Sort state storm list">
+        <button class="seg-btn active" type="button" data-sort="newest" aria-pressed="true">Newest</button>
+        <button class="seg-btn" type="button" data-sort="strongest" aria-pressed="false">Strongest</button>
+        <button class="seg-btn" type="button" data-sort="hits" aria-pressed="false">Most hits</button>
+      </div>
+    </div>
+    <ul class="state-storm-list" id="state-storm-list">${fullListHtml}</ul>
   `;
 
-  // Wire up clickable storm rows.
-  body.querySelectorAll('.state-storm-row').forEach((row) => {
+  wireStateStormRows(body, stateName);
+  const list = body.querySelector('#state-storm-list');
+  const sortButtons = body.querySelectorAll('.state-sort .seg-btn');
+  sortButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const mode = button.dataset.sort || 'newest';
+      sortButtons.forEach((b) => {
+        const isActive = b === button;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-pressed', String(isActive));
+      });
+      list.innerHTML = renderStateStormRows(sortStateStorms(storms, mode));
+      wireStateStormRows(list, stateName);
+    });
+  });
+}
+
+function sortStateStorms(storms, mode) {
+  const sorted = [...storms];
+  if (mode === 'strongest') {
+    return sorted.sort((a, b) => b.max_cat - a.max_cat || b.year - a.year || titleCase(a.name).localeCompare(titleCase(b.name)));
+  }
+  if (mode === 'hits') {
+    return sorted.sort((a, b) => b.count - a.count || b.max_cat - a.max_cat || b.year - a.year);
+  }
+  return sorted.sort((a, b) => b.year - a.year || b.max_cat - a.max_cat || titleCase(a.name).localeCompare(titleCase(b.name)));
+}
+
+function renderStateStormRows(storms) {
+  return storms.map(s => {
+    const cat = categoryLabel(s.max_cat);
+    const cls = categoryClass(s.max_cat);
+    return `
+      <li class="state-storm-row" data-storm-id="${s.storm_id}">
+        <span class="cat-pill ${cls}">${cat}</span>
+        <span class="ssr-name">${escapeHtml(titleCase(s.name))}</span>
+        <span class="ssr-year">${s.year}</span>
+        <span class="ssr-count">${s.count} hit${s.count === 1 ? '' : 's'}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+function wireStateStormRows(container, stateName) {
+  container.querySelectorAll('.state-storm-row').forEach((row) => {
     row.addEventListener('click', async () => {
       const sid = row.dataset.stormId;
       const storm = getStorm(sid);
       if (!storm || !storm.us_landfalls?.length) return;
-      // Find the first landfall in this state to focus the storm panel on.
       const lf = storm.us_landfalls.find(l => l.state === stateName) || storm.us_landfalls[0];
       showStorm({ ...lf, storm_id: sid });
     });
