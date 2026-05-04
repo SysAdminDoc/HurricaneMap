@@ -53,13 +53,16 @@ export async function initGlossary() {
   modal.id = 'glossary-modal';
   modal.className = 'glass glossary-modal';
   modal.hidden = true;
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'glossary-title');
   modal.innerHTML = `
     <div class="glossary-content">
       <div class="glossary-header">
-        <h2>Meteorology Glossary</h2>
-        <button class="close-btn" id="close-glossary" title="Close glossary (Esc)">×</button>
+        <h2 id="glossary-title">Meteorology glossary</h2>
+        <button class="close-btn" id="close-glossary" title="Close glossary" aria-label="Close glossary">×</button>
       </div>
-      <input type="text" id="glossary-search" class="glossary-search" placeholder="Search terms..." />
+      <input type="search" id="glossary-search" class="glossary-search" placeholder="Search terms or definitions" aria-label="Search glossary" />
       <div id="glossary-list" class="glossary-list"></div>
     </div>
   `;
@@ -71,6 +74,14 @@ export async function initGlossary() {
   const closeBtn = document.getElementById('close-glossary');
   
   const renderList = (items = glossaryData) => {
+    if (!items.length) {
+      glossaryList.innerHTML = `
+        <div class="empty-state glossary-empty">
+          <strong>No glossary match.</strong>
+          <span>Try a broader term such as wind, pressure, eyewall, surge, or ACE.</span>
+        </div>`;
+      return;
+    }
     glossaryList.innerHTML = items.map(item => `
       <div class="glossary-item">
         <h3 class="glossary-term">${escapeHtml(item.term)}</h3>
@@ -114,4 +125,6 @@ export async function initGlossary() {
 export function showGlossary() {
   const modal = document.getElementById('glossary-modal');
   if (modal) modal.hidden = false;
+  const searchInput = document.getElementById('glossary-search');
+  if (searchInput) searchInput.focus();
 }

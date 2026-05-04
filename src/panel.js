@@ -101,7 +101,7 @@ function render(storm, landfall, allStorms) {
       const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
       const lfWithYear = { ...lf, year: storm.year };
       const radarBtn = radarApi.available(lfWithYear)
-        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall — full-storm timeline if scraped offline">📡</button>`
+        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">Radar</button>`
         : '';
       return `<li>
         <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state || 'Unknown'}${inferred}</span>
@@ -433,7 +433,11 @@ function saffirCat(kt) {
 
 function renderSimilarStorms(host, similarStorms) {
   if (!host || !Array.isArray(similarStorms) || similarStorms.length === 0) {
-    if (host) host.innerHTML = '<p class="meta-row" style="color:var(--subtext);font-size:13px;">No similar storms found.</p>';
+    if (host) host.innerHTML = `
+      <div class="panel-empty-state">
+        <strong>No close historical matches.</strong>
+        <span>This storm is unusual across the current similarity dimensions.</span>
+      </div>`;
     return;
   }
   const rows = similarStorms.map(s => {
@@ -463,7 +467,6 @@ function renderSimilarStorms(host, similarStorms) {
   });
 }
 
-let _toastTimer = null;
 function showToast(msg, tone = 'info') {
   let host = document.getElementById('hm-toast-host');
   if (!host) {
@@ -478,8 +481,7 @@ function showToast(msg, tone = 'info') {
   el.textContent = msg;
   host.appendChild(el);
   requestAnimationFrame(() => el.classList.add('is-visible'));
-  if (_toastTimer) clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => {
+  setTimeout(() => {
     el.classList.remove('is-visible');
     setTimeout(() => el.remove(), 240);
   }, 2200);

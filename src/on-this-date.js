@@ -3,8 +3,9 @@
 
 import { ensureStormsLoaded, getLandfalls, formatTime, categoryLabel, categoryClass, ktToMph } from './data.js';
 import { showStorm } from './panel.js';
-import { closePanelsExcept } from './panels.js';
+import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { formatWind } from './settings.js';
+import { escapeHtml } from './html-utils.js';
 
 const panel = document.getElementById('on-this-date-panel');
 const body = document.getElementById('on-this-date-body');
@@ -12,6 +13,7 @@ const closeBtn = document.getElementById('close-on-this-date');
 
 closeBtn.addEventListener('click', () => {
   panel.hidden = true;
+  syncPanelControls();
 });
 
 /** Compute ISO month-day string (e.g., "09-15" for September 15). */
@@ -48,10 +50,31 @@ function isWithinDaysOfToday(lfDate, targetMonthDay, daysOffset = 7) {
   return diff <= daysOffset;
 }
 
+function calendarDistanceDays(lfDate, targetMonthDay) {
+  const lfDateObj = new Date(lfDate);
+  const lfMonth = lfDateObj.getUTCMonth();
+  const lfDay = lfDateObj.getUTCDate();
+  const [targetMonthRaw, targetDayRaw] = targetMonthDay.split('-').map(Number);
+  const lfDoyDate = new Date(2024, lfMonth, lfDay);
+  const targetDoyDate = new Date(2024, targetMonthRaw - 1, targetDayRaw);
+  const lfDoy = Math.floor((lfDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
+  const targetDoy = Math.floor((targetDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
+  const raw = lfDoy - targetDoy;
+  if (raw > 183) return raw - 366;
+  if (raw < -183) return raw + 366;
+  return raw;
+}
+
+function formatCalendarOffset(days) {
+  if (days === 0) return 'today';
+  const abs = Math.abs(days);
+  return days > 0 ? `in ${abs}d` : `${abs}d ago`;
+}
+
 export async function showOnThisDate() {
   closePanelsExcept('on-this-date-panel');
   panel.hidden = false;
-  body.innerHTML = '<p class="meta-row" style="padding:24px 0;">Loading…</p>';
+  body.innerHTML = '<div class="state-loading">Finding historical landfalls near today...</div>';
   
   await ensureStormsLoaded();
   const landfalls = getLandfalls();
@@ -73,7 +96,10 @@ export async function showOnThisDate() {
     body.innerHTML = `
       <div class="otd-content">
         <h2>On this date in history</h2>
-        <p class="otd-meta">No recorded U.S. hurricane landfalls within 7 days of today (${todayMonthDay}).</p>
+        <div class="empty-state">
+          <strong>No nearby landfall anniversaries.</strong>
+          <span>No recorded U.S. hurricane or tropical-storm landfalls fall within seven calendar days of today (${todayMonthDay}).</span>
+        </div>
       </div>
     `;
     return;
@@ -82,32 +108,30 @@ export async function showOnThisDate() {
   const html = `
     <div class="otd-content">
       <h2>On this date in history</h2>
-      <p class="otd-meta">Landfalls within ±7 days of ${todayMonthDay}</p>
+      <p class="otd-meta">Recorded U.S. landfalls within seven calendar days of ${todayMonthDay}.</p>
       <ul class="otd-list">
         ${matchingLandfalls.map(lf => {
           const cat = categoryLabel(lf.category);
           const cls = categoryClass(lf.category);
           const wind = formatWind(lf.wind);
           const date = formatTime(lf.t);
-          const stormName = lf.storm_name && lf.storm_name !== 'UNNAMED' 
-            ? lf.storm_name 
+          const stormName = lf.storm_name && lf.storm_name !== 'UNNAMED'
+            ? lf.storm_name
             : `${lf.year} unnamed`;
-          const daysFromToday = Math.round(
-            Math.abs(new Date(lf.t) - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / (1000 * 60 * 60 * 24)
-          );
+          const daysFromToday = calendarDistanceDays(lf.t, todayMonthDay);
           return `
             <li class="otd-item">
               <div class="otd-header">
                 <span class="otd-year">${lf.year}</span>
                 <button class="otd-link" data-storm-id="${lf.storm_id}" title="Show full storm details">
-                  <strong>${stormName}</strong> at ${lf.state}
+                  <strong>${escapeHtml(stormName)}</strong> at ${escapeHtml(lf.state || 'Unknown')}
                 </button>
               </div>
               <div class="otd-details">
                 <span class="cat-pill ${cls}">${cat}</span>
                 <span class="otd-wind">${wind}</span>
                 <span class="otd-date">${date}</span>
-                <span class="otd-days">+${daysFromToday}d</span>
+                <span class="otd-days">${formatCalendarOffset(daysFromToday)}</span>
               </div>
             </li>
           `;

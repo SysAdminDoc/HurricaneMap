@@ -14,21 +14,28 @@ const DATA = {
 let stormsLoaded = false;
 let stormsPromise = null;
 
+async function fetchJson(url, { optional = false, fallback = null } = {}) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    if (optional) {
+      console.warn(`Optional dataset unavailable: ${url}`, error);
+      return fallback;
+    }
+    throw new Error(`Unable to load ${url}: ${error.message || error}`);
+  }
+}
+
 export async function loadInitial() {
   const [lf, st, im] = await Promise.all([
-    fetch('data/landfalls.json').then(r => r.json()).catch(e => {
-      console.error('Failed to load landfalls:', e);
-      return [];
-    }),
-    fetch('data/stats.json').then(r => r.json()).catch(e => {
-      console.error('Failed to load stats:', e);
-      return { total_storms: 0, total_landfall_events: 0 };
-    }),
-    fetch('data/impacts.json').then(r => r.ok ? r.json() : {}).catch(e => {
-      console.warn('Failed to load impacts (non-critical):', e);
-      return {};
-    }),
+    fetchJson('data/landfalls.json'),
+    fetchJson('data/stats.json'),
+    fetchJson('data/impacts.json', { optional: true, fallback: {} }),
   ]);
+  if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
+  if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
   DATA.landfalls = lf || [];
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.impacts = im || {};
@@ -42,12 +49,10 @@ export function getImpactsFor(stormId) {
 export function ensureStormsLoaded() {
   if (stormsLoaded) return Promise.resolve(DATA);
   if (stormsPromise) return stormsPromise;
-  stormsPromise = fetch('data/storms.json')
-    .then(r => r.json())
+  stormsPromise = fetchJson('data/storms.json')
     .then(storms => {
       if (!Array.isArray(storms)) {
-        console.warn('Invalid storms data format, expected array');
-        return DATA;
+        throw new Error('storms.json did not contain an array');
       }
       DATA.storms = storms;
       DATA.stormsById = new Map(storms.map(s => [s.id, s]));
@@ -56,9 +61,10 @@ export function ensureStormsLoaded() {
     })
     .catch(e => {
       console.error('Failed to load storms data:', e);
-      // Return empty storms array to allow app to continue
       DATA.storms = [];
       DATA.stormsById = new Map();
+      stormsLoaded = false;
+      stormsPromise = null;
       return DATA;
     });
   return stormsPromise;

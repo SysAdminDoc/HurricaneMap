@@ -2,6 +2,26 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.1 — Premium UX refinement pass (May 2026)
+
+**Focused premium-polish pass across panels, search, loading states, accessibility, and visual consistency.**
+
+### Improved
+- Added a final cohesive refinement layer for panels, filters, settings, empty states, stats sections, search results, season summary cards, closest-pass cards, days-at-intensity bars, segmented controls, and toasts.
+- Improved search into a keyboard-friendly combobox/listbox pattern with active-result highlighting, Arrow Up/Down navigation, Enter selection, Escape close, and clearer no-result copy.
+- Reworked boot failure feedback into a calm error card with retry action and local-server guidance.
+- Improved settings and header microcopy so icon-only actions communicate their purpose more clearly.
+- Added stronger empty/loading/error states for statistics, state details, storm similarity, glossary search, and "on this date" history.
+- Improved timeline selection stability by anchoring the selection overlay inside the timeline axis.
+
+### Fixed
+- Registered the "On this date" panel with the shared panel manager so it no longer overlaps storm, state, statistics, or comparison panels.
+- Restored side-panel scrolling after late global glass-surface styling could override panel overflow behavior.
+- Fixed "On this date" day-offset labels to compare calendar anniversaries instead of real year-to-current-year date distances.
+- Replaced a global toast timer with per-toast removal so rapid consecutive success/warning messages do not leave stale notifications behind.
+- Made required core datasets fail explicitly instead of silently rendering an empty map when `landfalls.json` or `stats.json` cannot load.
+- Bumped the service worker shell cache to `hm-v1.3.1` so live users receive the refreshed UI assets.
+
 ## v1.3.0 — Phase 9-11: Advanced analytics, real-time forecasts, localization (May 2026)
 
 **Major research features, forecast ensemble infrastructure, and Spanish localization foundation.**

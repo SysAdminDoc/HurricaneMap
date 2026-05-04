@@ -3,10 +3,11 @@
 // stack on top of each other. Any side panel that opens kicks the others
 // closed; closing a panel doesn't restore a previous one.
 
-const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel'];
+const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel'];
 const PANEL_BUTTONS = {
   'stats-panel': 'toggle-stats',
   'compare-panel': 'toggle-compare',
+  'on-this-date-panel': 'toggle-on-this-date',
 };
 
 /** Close every right-side panel except the named one. Pass null to close all. */
