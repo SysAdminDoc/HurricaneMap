@@ -21,6 +21,7 @@ import { refreshSeasonSummary } from './season.js';
 import { fuzzyAugment } from './fuzzy.js';
 import { recordView, getHistory } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
+import { initGlossary, showGlossary } from './glossary.js';
 
 const filters = {
   yearMin: 1851,
@@ -168,6 +169,10 @@ async function boot() {
   // Live NHC active-storm feed — appears only when a storm is active.
   startActiveStormPolling().catch(() => { /* non-fatal */ });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
+  
+  // Initialize glossary (loads data asynchronously, non-blocking)
+  initGlossary().catch(() => { /* non-fatal */ });
+  
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
 
@@ -607,6 +612,12 @@ function wireUI() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !els.infoModal.hidden) els.infoModal.hidden = true;
   });
+
+  // Glossary modal
+  const glossaryBtn = document.getElementById('toggle-glossary');
+  if (glossaryBtn) {
+    glossaryBtn.addEventListener('click', showGlossary);
+  }
 }
 
 function wireFilterPanel() {
