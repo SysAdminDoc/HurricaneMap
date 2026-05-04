@@ -50,9 +50,11 @@ export function initMap() {
     minZoom: 3,
     maxZoom: 11,
     worldCopyJump: true,
-    zoomControl: true,
+    zoomControl: false,
     attributionControl: true,
   });
+
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
 
   addBasemap(map);
 

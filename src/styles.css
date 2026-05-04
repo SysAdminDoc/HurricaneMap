@@ -62,8 +62,7 @@ html, body {
 header.app-header.glass {
   position: absolute;
   top: 16px;
-  left: 16px;
-  margin-left: 35px;
+  left: 12px;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -110,11 +109,10 @@ header.app-header.glass {
 .filters {
   position: absolute;
   top: 100px;
-  left: 16px;
-  margin-left: 35px;       /* matches .app-header alignment */
+  left: 12px;
   z-index: 1000;
   width: 280px;
-  max-height: calc(100vh - 360px);  /* never collide with the bottom-left legend */
+  max-height: calc(100vh - 360px);
   overflow-y: auto;
   padding: 14px 16px;
   display: flex;
@@ -228,8 +226,7 @@ label > input[type="checkbox"] {
 .legend {
   position: absolute;
   bottom: 30px;
-  left: 16px;
-  margin-left: 35px;
+  left: 12px;
   z-index: 1000;
   padding: 12px 16px;
   font-size: 12px;
@@ -2180,9 +2177,12 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.55));
 }
 
-/* Leaflet zoom buttons — the existing override only set background; on the
-   fallback (filtered) basemap they inverted oddly. Pin to dark glass and
-   give them a defined border + radius cluster. */
+/* Leaflet zoom buttons — moved to bottom-right via map.js. Sit above the
+   attribution. Right-side glass panels (z:1000) intentionally cover the
+   zoom while open since map navigation isn't the focus then. */
+.leaflet-bottom.leaflet-right .leaflet-control-zoom {
+  margin: 0 16px 36px 0 !important;
+}
 .leaflet-control-zoom {
   border: 1px solid rgba(218, 229, 255, 0.16) !important;
   border-radius: 8px !important;
