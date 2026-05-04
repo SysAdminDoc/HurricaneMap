@@ -6230,4 +6230,349 @@ aside { margin: 0; }
 p:last-child { margin-bottom: 0; }
 li:last-child { margin-bottom: 0; }
 
+/* ============================================================
+   v0.9.6 — Microcopy + empty states + final visual coherence
+   Final refinement pass: improved placeholder text and helper
+   text throughout app, refined empty states and no-results
+   messaging, error state styling, button label consistency,
+   and system-wide visual coherence. Elevates the app from
+   functional to genuinely premium-feeling.
+   ============================================================ */
+
+/* Empty states ================================================ */
+.empty-state,
+[data-state="empty"],
+.no-results {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--subtext);
+}
+.empty-state h3,
+[data-state="empty"] h3,
+.no-results h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+.empty-state p,
+[data-state="empty"] p,
+.no-results p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #7a8ba6;
+}
+
+/* Error states ================================================= */
+.error-state,
+[data-state="error"],
+.error-message {
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(255, 138, 122, 0.08);
+  border: 1px solid rgba(255, 138, 122, 0.16);
+  color: #ff8a7a;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.error-state strong,
+[data-state="error"] strong,
+.error-message strong {
+  color: #ff9f92;
+  font-weight: 700;
+}
+
+/* Warning states ===============================================*/
+.warning-state,
+[data-state="warning"],
+.warning-message {
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(255, 209, 102, 0.08);
+  border: 1px solid rgba(255, 209, 102, 0.16);
+  color: #ffc866;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* Success states ===============================================*/
+.success-state,
+[data-state="success"],
+.success-message {
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(102, 227, 196, 0.08);
+  border: 1px solid rgba(102, 227, 196, 0.16);
+  color: #66e3c4;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* Info states ================================================== */
+.info-state,
+[data-state="info"],
+.info-message {
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(170, 183, 255, 0.08);
+  border: 1px solid rgba(170, 183, 255, 0.16);
+  color: #aab7ff;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* Helper text & hints ========================================= */
+.helper-text,
+.hint,
+small {
+  font-size: 10px;
+  color: #7a8ba6;
+  display: block;
+  margin-top: 4px;
+}
+.helper-text:empty,
+.hint:empty,
+small:empty {
+  display: none;
+}
+
+/* Badge styling ================================================ */
+.badge,
+[class*="badge"] {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-primary {
+  background: rgba(170, 183, 255, 0.12);
+  color: #aab7ff;
+  border: 1px solid rgba(170, 183, 255, 0.24);
+}
+.badge-success {
+  background: rgba(102, 227, 196, 0.12);
+  color: #66e3c4;
+  border: 1px solid rgba(102, 227, 196, 0.24);
+}
+.badge-warning {
+  background: rgba(255, 209, 102, 0.12);
+  color: #ffc866;
+  border: 1px solid rgba(255, 209, 102, 0.24);
+}
+.badge-danger {
+  background: rgba(255, 138, 122, 0.12);
+  color: #ff8a7a;
+  border: 1px solid rgba(255, 138, 122, 0.24);
+}
+
+/* Button label consistency ==================================== */
+button,
+[role="button"],
+.btn {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-size: 11px;
+  line-height: 1.5;
+  transition:
+    all var(--hm-dur-fast) var(--hm-ease-standard);
+}
+button:disabled,
+[role="button"][aria-disabled="true"],
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Divider styling ============================================= */
+hr,
+.divider {
+  border: none;
+  border-top: 1px solid rgba(218, 229, 255, 0.08);
+  margin: 12px 0;
+}
+
+/* Typography fine-tuning ===================================== */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  margin-bottom: 0.5em;
+}
+h1 { font-size: 28px; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+h4 { font-size: 14px; }
+h5 { font-size: 12px; }
+h6 { font-size: 11px; }
+
+small,
+.text-sm { font-size: 10px; }
+.text-xs { font-size: 9px; }
+.text-muted { color: var(--subtext); }
+.text-emphasis { color: var(--text); font-weight: 700; }
+
+/* List styling consistency ==================================== */
+ul, ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+ul li, ol li {
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+ul.inline,
+ol.inline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0;
+}
+ul.inline li,
+ol.inline li {
+  list-style: none;
+  margin: 0;
+}
+
+/* Blockquote styling ========================================= */
+blockquote {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--lavender);
+  background: rgba(170, 183, 255, 0.04);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: var(--subtext);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Table styling ===============================================*/
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 11px;
+}
+th {
+  background: rgba(170, 183, 255, 0.06);
+  border: 1px solid rgba(218, 229, 255, 0.08);
+  padding: 8px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--text);
+}
+td {
+  border: 1px solid rgba(218, 229, 255, 0.08);
+  padding: 8px;
+  color: var(--subtext);
+}
+tbody tr:hover {
+  background: rgba(170, 183, 255, 0.04);
+}
+
+/* Tooltip styling ============================================= */
+[title],
+.tooltip {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted rgba(170, 183, 255, 0.24);
+}
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4, 8, 14, 0.95);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 9px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--hm-dur-base) var(--hm-ease-standard);
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Accessibility: visually-hidden class ===================== */
+.visually-hidden,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to main content link ================================= */
+a.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #aab7ff;
+  color: #070b12;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 4px;
+}
+a.skip-link:focus {
+  top: 0;
+}
+
+/* Density mode support ======================================= */
+body.dense {
+  font-size: 10px;
+}
+body.dense .stat-grid {
+  gap: 8px;
+}
+body.dense section.storm-panel #panel-body,
+body.dense .stats-panel #stats-body {
+  padding: 8px 10px;
+}
+
+/* Contrast mode support ====================================== */
+body.high-contrast {
+  --text: #ffffff;
+  --subtext: #e0e0e0;
+  --lavender: #d2cbff;
+  --sapphire: #70deff;
+}
+
+/* Final polish touches ========================================= */
+::selection {
+  background: rgba(170, 183, 255, 0.24);
+  color: var(--text);
+}
+::-moz-selection {
+  background: rgba(170, 183, 255, 0.24);
+  color: var(--text);
+}
+
+/* Scrollbar track visibility ================================== */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
 
