@@ -48,6 +48,10 @@ export function getStorm(id) {
   return DATA.stormsById.get(id);
 }
 
+export function getAllStorms() {
+  return DATA.storms;
+}
+
 export function getLandfalls() {
   return DATA.landfalls;
 }

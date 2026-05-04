@@ -5381,6 +5381,21 @@ section.storm-panel .closest-pass-value {
   font-weight: 600;
 }
 
+.return-periods-row {
+  width: 100%;
+  font-size: 11px;
+  color: var(--subtext);
+  line-height: 1.5;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(108, 112, 134, 0.12);
+}
+
+.return-periods-label {
+  color: var(--overlay);
+  font-weight: 500;
+}
+
 /* Impacts block — tighter spacing ----------------------------- */
 section.storm-panel .impacts-block {
   margin: 8px 0 10px;
