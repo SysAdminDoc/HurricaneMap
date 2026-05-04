@@ -4839,4 +4839,525 @@ body:has(.timeline-ribbon.collapsed) .compare-panel {
   }
 }
 
+/* ============================================================
+   v0.9.2 — Premium compact panel refinement
+   Aggressive polish pass on right-side detail panels (storm,
+   stats, state, compare) to eliminate internal scroll on
+   1440x900, improve typography hierarchy, tighten spacing,
+   and increase visual polish throughout.
+   ============================================================ */
+
+/* Storm panel refinement ====================================== */
+section.storm-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+section.storm-panel h2 {
+  margin: 0;
+  padding: 12px 14px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text);
+  word-break: break-word;
+  border-bottom: 1px solid rgba(218, 229, 255, 0.08);
+}
+section.storm-panel #panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px;
+}
+section.storm-panel #panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+section.storm-panel #panel-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+section.storm-panel #panel-body::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+section.storm-panel .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 4px 6px;
+  font-size: 18px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+section.storm-panel .close-btn:hover {
+  color: var(--text);
+}
+
+/* Compact the meta row ---------------------------------------- */
+section.storm-panel .meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: center;
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--subtext);
+}
+section.storm-panel .meta-row strong {
+  color: var(--text);
+}
+section.storm-panel .meta-row > span {
+  display: flex;
+  gap: 4px;
+}
+
+/* Stat grid — compact + better hierarchy ---------------------- */
+section.storm-panel .stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  margin: 8px 0 10px;
+  padding: 0;
+}
+section.storm-panel .stat {
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(170, 183, 255, 0.04);
+  border: 1px solid rgba(170, 183, 255, 0.08);
+  transition: all 120ms ease;
+}
+section.storm-panel .stat:hover {
+  background: rgba(170, 183, 255, 0.08);
+  border-color: rgba(170, 183, 255, 0.16);
+}
+section.storm-panel .stat .label {
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a8ba6;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+section.storm-panel .stat .value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+section.storm-panel .stat .metric-info {
+  font-size: 9px;
+  opacity: 0.6;
+  cursor: help;
+}
+
+/* Closest-pass compact row ------------------------------------ */
+section.storm-panel .closest-pass-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 8px;
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(170, 183, 255, 0.03);
+}
+section.storm-panel .closest-pass-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a8ba6;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+section.storm-panel .closest-pass-select {
+  flex: 0 1 100px;
+  padding: 4px 6px;
+  font-size: 11px;
+  min-height: 28px;
+  background: rgba(15, 23, 38, 0.5);
+  border: 1px solid rgba(170, 183, 255, 0.12);
+  color: var(--text);
+  border-radius: 4px;
+}
+section.storm-panel .closest-pass-value {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Impacts block — tighter spacing ----------------------------- */
+section.storm-panel .impacts-block {
+  margin: 8px 0 10px;
+  padding: 0;
+}
+section.storm-panel .impacts-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a8ba6;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+section.storm-panel .impacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+section.storm-panel .impacts-list li {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--subtext);
+}
+section.storm-panel .impacts-list li strong {
+  color: var(--text);
+}
+
+/* Section headings — more compact ----------------------------- */
+section.storm-panel h3.panel-section-h3 {
+  margin: 10px 0 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.06);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #aab7ff;
+}
+
+/* Dai (days-at-intensity) ------------------------------------ */
+section.storm-panel .dai-host {
+  margin-bottom: 8px;
+}
+section.storm-panel .dai-host svg {
+  width: 100%;
+  height: auto;
+  max-height: 80px;
+}
+
+/* Chart ---------------------------------------------------- */
+section.storm-panel .chart-host {
+  margin: 8px 0 6px;
+  min-height: 160px;
+  max-height: 200px;
+}
+section.storm-panel .chart-host svg {
+  width: 100%;
+  height: 100%;
+}
+section.storm-panel .chart-export-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+section.storm-panel .chart-export-btn {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 10.5px;
+}
+
+/* Landfall list ------------------------------------------------ */
+section.storm-panel .landfall-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+}
+section.storm-panel .landfall-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(170, 183, 255, 0.03);
+  color: var(--subtext);
+  line-height: 1.4;
+}
+section.storm-panel .landfall-list li:hover {
+  background: rgba(170, 183, 255, 0.06);
+}
+section.storm-panel .landfall-list .where {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+section.storm-panel .landfall-list .when {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  color: var(--text);
+  font-weight: 600;
+}
+section.storm-panel .cat-pill {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  flex: 0 0 auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+section.storm-panel .inferred-tag {
+  font-size: 8px;
+  color: #7a8ba6;
+  font-style: italic;
+}
+section.storm-panel .radar-quick-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  line-height: 1;
+  color: #aab7ff;
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+section.storm-panel .radar-quick-btn:hover {
+  transform: scale(1.15);
+  opacity: 0.8;
+}
+
+/* Action row -------------------------------------------------- */
+section.storm-panel .action-row,
+section.storm-panel .export-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+section.storm-panel .action-btn,
+section.storm-panel .export-btn {
+  flex: 1;
+  min-width: 70px;
+  padding: 6px 8px;
+  font-size: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  background: rgba(170, 183, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 120ms ease;
+  text-align: center;
+  text-decoration: none;
+}
+section.storm-panel .action-btn:hover,
+section.storm-panel .export-btn:hover {
+  background: rgba(170, 183, 255, 0.12);
+  border-color: rgba(170, 183, 255, 0.3);
+  transform: translateY(-1px);
+}
+section.storm-panel .action-btn.primary {
+  background: linear-gradient(135deg, #aab7ff, #64d2ff);
+  color: #0f1726;
+  border: none;
+  font-weight: 600;
+}
+section.storm-panel .action-btn.primary:hover {
+  background: linear-gradient(135deg, #c4cfff, #7cdbff);
+  transform: translateY(-1px);
+}
+section.storm-panel .export-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a8ba6;
+  font-weight: 600;
+  flex: 0 0 100%;
+  margin-bottom: 2px;
+}
+
+/* Storm flags (RI, PF) ----------------------------------------- */
+section.storm-panel .storm-flags {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+section.storm-panel .storm-flag {
+  display: block;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  background: rgba(255, 170, 120, 0.1);
+  border-left: 3px solid #ffb07c;
+  color: var(--subtext);
+}
+section.storm-panel .ri-flag { border-left-color: #aae3ff; background: rgba(170, 227, 255, 0.08); }
+section.storm-panel .pf-flag { border-left-color: #ffb07c; background: rgba(255, 176, 124, 0.08); }
+
+/* Panel actions row (animation + pin) ----------------------- */
+section.storm-panel .panel-actions-row {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0 8px;
+}
+section.storm-panel .play-anim-btn,
+section.storm-panel .pin-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  background: rgba(170, 183, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 120ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+section.storm-panel .play-anim-btn:hover,
+section.storm-panel .pin-btn:hover {
+  background: rgba(170, 183, 255, 0.12);
+  border-color: rgba(170, 183, 255, 0.3);
+  transform: translateY(-1px);
+}
+section.storm-panel .pin-btn.pinned {
+  background: linear-gradient(135deg, #aab7ff, #64d2ff);
+  color: #0f1726;
+  border: none;
+  font-weight: 600;
+}
+section.storm-panel .play-icon,
+section.storm-panel .pin-icon {
+  font-size: 13px;
+}
+
+/* Wind field ------------------------------------------------- */
+section.storm-panel .wind-field-row {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+section.storm-panel .wf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background 120ms ease;
+}
+section.storm-panel .wf-toggle:hover {
+  background: rgba(170, 183, 255, 0.06);
+}
+section.storm-panel .wf-toggle input {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+/* Stats panel ================================================= */
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+.stats-panel .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 4px 6px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.stats-panel .close-btn:hover {
+  color: var(--text);
+}
+.stats-panel #stats-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 14px;
+}
+.stats-panel #stats-body::-webkit-scrollbar {
+  width: 6px;
+}
+.stats-panel #stats-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+.stats-panel #stats-body::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+.stats-panel h2,
+.stats-panel h3 {
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #aab7ff;
+  font-weight: 700;
+}
+.stats-panel h2 {
+  font-size: 12px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.stats-panel h3 {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.06);
+}
+.stats-panel p,
+.stats-panel li {
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--subtext);
+}
+.stats-panel li { margin-left: 16px; margin-bottom: 4px; }
+.stats-panel strong { color: var(--text); }
+.stats-panel .stat-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0;
+}
+.stats-panel .stat-item {
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(170, 183, 255, 0.04);
+  border: 1px solid rgba(170, 183, 255, 0.08);
+}
+.stats-panel .stat-item .label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7a8ba6;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.stats-panel .stat-item .value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Disable "replay tour" button since onboarding is removed -- */
+#replay-tour { display: none !important; }
 

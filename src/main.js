@@ -165,9 +165,8 @@ async function boot() {
   if (restored && restored.s) {
     setTimeout(() => openState(restored.s), 80);
   }
-  // First-run coachmark tour. Idempotent — only fires if the user hasn't
-  // already dismissed it.
-  setTimeout(() => maybeStartOnboarding(), 600);
+  // Onboarding disabled — users go straight to the map with no interruption.
+  // setTimeout(() => maybeStartOnboarding(), 600);
 }
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
@@ -229,11 +228,6 @@ function wireSettingsControls() {
     if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
-    if (e.target.closest('#replay-tour')) {
-      menu.setAttribute('hidden', '');
-      cog.setAttribute('aria-expanded', 'false');
-      maybeStartOnboarding({ force: true });
-    }
   });
 
   // Live-react to palette changes — re-stamp the body class and force a
