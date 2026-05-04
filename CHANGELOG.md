@@ -11,6 +11,30 @@ All notable changes to HurricaneMap.
 - Histogram color intensity: category and decade bars now have colored fills with opacity scaling based on storm count
 - Play button accessibility: workflow now unblocked for users without needing to scroll
 
+### Enhanced
+- **Input focus states**: Enhanced with box-shadow feedback, better visual hierarchy, and smooth transitions
+- **Button interactions**: Added transform feedback, elevated shadows on hover, and improved visual feedback across all button types
+- **Text button styling**: Better contrast, hover lift effect, and focus visibility
+- **Search results**: Fade-in animation, smoother transitions, better hover feedback with padding animation
+- **Stat cards**: Hover effects with subtle border and background transitions
+- **Category buttons**: Improved disabled state (reduced opacity), better hover feedback
+- **Icon button styling**: Enhanced focus visibility with color-ring shadows, better hover transitions
+- **Close button**: Added scale transform on hover, focus ring, and border feedback
+- **Action buttons**: Primary buttons now use gradient background with shadow elevation
+- **Pin button styling**: Added hover shadows, pinned state gradient, and better visual feedback
+- **Play button**: Now features gradient background (lavender to blue), enhanced shadows, and improved focus visibility
+- **Playback controls**: Better animation control styling with smooth transitions
+- **Compare cards**: Hover effects with subtle border and shadow transitions
+- **Removed button**: Improved hover state with scale transform and background color
+- **Radar controls**: Better button styling with hover lift and transitions
+- **Animation scrubber**: Thumb element now scales on hover with improved feedback and shadows
+- **Checkbox interactions**: Added scale transform on hover, improved transitions
+- **Segmented control buttons**: Added hover lift effect and focus visibility
+- **Empty/loading states**: Better visual styling with subtle background and animations
+- **Landfall list items**: Hover effects with background transitions
+- **State storm rows**: Improved visual feedback on interaction
+- **Intensity chart**: Subtle hover effects for better interactivity feedback
+
 ## v1.0.0 — FINAL RELEASE: Complete Premium Design System (2025)
 
 **Production-ready complete premium design system.** This release marks the completion of the comprehensive extreme premium-polish pass. Every surface, interaction, state, and detail has been refined to professional standards.
