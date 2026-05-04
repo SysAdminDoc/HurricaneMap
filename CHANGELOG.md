@@ -4,6 +4,19 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.2 — Onboarding removal + premium panel compaction (2025)
+
+Removed the onboarding overlay entirely and executed an aggressive premium-polish pass on the detail panels (storm, stats, state, compare) to eliminate internal scrolling and dramatically increase visual refinement.
+
+- **Onboarding overlay removed completely.** Users now land on the map immediately with zero interruption. The "Replay welcome tour" button removed from the settings menu. Fast, confident startup.
+- **Storm panel compacted + premium refined.** Complete layout restructuring: header area with close button, scrollable content region with branded slim scrollbar, tightened margins/padding throughout. Stat grid now a 2-col layout with hover states. Closest-pass selector compacted into a single-line row. Impacts block, days-at-intensity chart, intensity chart, landfall list, action links, export buttons, and animation/pin controls all reflow elegantly within the panel bounds without requiring scroll on 1440×900 and above.
+- **Typography hierarchy elevated.** Panel headings demoted from `<h3>` to contextual labels; section titles use proper uppercase scaling with letter-spacing. Meta row, impacts block, and list items use semantic nesting with appropriate font scales and color depths.
+- **Component consistency across right-side panels.** Stat boxes, buttons, toggles, and lists all share a consistent background/border treatment: lavender-tinted backgrounds on hover, lift transforms on interaction, proper focus rings. Close buttons positioned absolutely top-right with gentle hover color transition.
+- **Stats panel refinement.** Same compact layout as storm panel; scrollable content with branded scrollbar; heading hierarchy clarified.
+- **Visual polish systemic.** Stat items ship with a baseline background wash + border; buttons use gradient primaries where primary, subtle borders elsewhere; radar/animation/pin buttons gain emoji icons for better affordance; CAT pills remain crisp with shadows; flags (RI/PF) use semantic border-left accents + tinted backgrounds.
+- **Settings menu cleaned.** Removed the onboarding-dependent "Replay welcome tour" button entirely; the meta note remains.
+- **Service worker bumped** to `hm-v0.9.2`.
+
 ## v0.9.1 — Layout consolidation (2025)
 
 Dedicated pass to eliminate panel overlap and internal scrolling on the primary surfaces. The user-visible surface area now fits cleanly on 1366×768 and up without ever needing to scroll a control panel to see an option.
