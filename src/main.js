@@ -22,6 +22,7 @@ import { fuzzyAugment } from './fuzzy.js';
 import { recordView, getHistory } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
 import { initGlossary, showGlossary } from './glossary.js';
+import { init as initKeyboard } from './keyboard.js';
 
 const filters = {
   yearMin: 1851,
@@ -172,6 +173,21 @@ async function boot() {
   
   // Initialize glossary (loads data asynchronously, non-blocking)
   initGlossary().catch(() => { /* non-fatal */ });
+  
+  // Initialize keyboard shortcuts and navigation
+  // Wire macro filter functions to window
+  window.filterByMacro = (mode) => {
+    if (mode === 'major') {
+      // Major hurricanes only (Cat 3-5)
+      filters.categories = new Set(['3', '4', '5']);
+    } else if (mode === 'tropical') {
+      // Tropical storms only
+      filters.categories = new Set(['ts']);
+    }
+    syncFilterUiFromState();
+    applyFilters();
+  };
+  initKeyboard();
   
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);

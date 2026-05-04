@@ -7991,6 +7991,148 @@ code {
 .select-text { user-select: text; }
 .select-all { user-select: all; }
 
+/* Keyboard palette ========================================== */
+#keyboard-palette {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  border-radius: 12px;
+  padding: 0;
+  z-index: 5000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+#keyboard-palette[hidden] {
+  display: none;
+}
+
+.palette-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(170, 183, 255, 0.15);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.palette-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.palette-close {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.palette-close:hover {
+  background: rgba(170, 183, 255, 0.1);
+  color: var(--text);
+}
+
+.palette-close:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.palette-content {
+  overflow-y: auto;
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.shortcut-group h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  padding: 6px 0;
+}
+
+.shortcut-row kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(170, 183, 255, 0.1);
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.shortcut-row span {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.palette-footer {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(170, 183, 255, 0.1);
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* HC mode keyboard palette */
+:root.high-contrast #keyboard-palette {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid var(--text);
+}
+
+:root.high-contrast .palette-header {
+  border-bottom: 2px solid var(--text);
+  background: rgba(0, 0, 0, 0.8);
+}
+
+:root.high-contrast .shortcut-row kbd {
+  background: rgba(170, 183, 255, 0.15);
+  border: 2px solid var(--text);
+  font-weight: 600;
+}
+
+:root.high-contrast .palette-footer {
+  border-top: 2px solid var(--text);
+}
+
+
 /* Pointer events utilities ================================= */
 .pointer-events-none { pointer-events: none; }
 .pointer-events-auto { pointer-events: auto; }
