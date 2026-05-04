@@ -11,7 +11,7 @@ import { enableStateClicks, openState } from './state.js';
 import { setSurgeCategory } from './surge.js';
 import { startActiveStormPolling } from './active.js';
 import { setPopulation } from './population.js';
-import { applyPaletteToBody, getSetting, setSetting } from './settings.js';
+import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
 import { maybeStartOnboarding } from './onboarding.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
@@ -125,6 +125,7 @@ const els = {
 };
 
 async function boot() {
+  applyThemeToRoot();
   applyPaletteToBody();
   const map = initMap();
   await loadInitial();
@@ -183,6 +184,10 @@ function wireSettingsControls() {
       btn.classList.toggle('on', btn.dataset.setUnit === getSetting('windUnit'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setUnit === getSetting('windUnit')));
     });
+    menu.querySelectorAll('[data-set-theme]').forEach(btn => {
+      btn.classList.toggle('on', btn.dataset.setTheme === getSetting('theme'));
+      btn.setAttribute('aria-pressed', String(btn.dataset.setTheme === getSetting('theme')));
+    });
     menu.querySelectorAll('[data-set-palette]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setPalette === getSetting('palette')));
@@ -225,15 +230,19 @@ function wireSettingsControls() {
   menu.addEventListener('click', (e) => {
     const u = e.target.closest('[data-set-unit]');
     if (u) { setSetting('windUnit', u.dataset.setUnit); syncMenu(); return; }
+    const t = e.target.closest('[data-set-theme]');
+    if (t) { setSetting('theme', t.dataset.setTheme); syncMenu(); return; }
     const p = e.target.closest('[data-set-palette]');
     if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
   });
 
-  // Live-react to palette changes — re-stamp the body class and force a
-  // re-render of map markers + open panels.
+  // Live-react to theme and palette changes — re-stamp the classes.
   document.addEventListener('hm-settings:change', (e) => {
+    if (e.detail.key === 'theme') {
+      applyThemeToRoot();
+    }
     if (e.detail.key === 'palette') {
       applyPaletteToBody();
       applyFilters();
