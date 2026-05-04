@@ -114,6 +114,25 @@ python -m http.server 8765
 # open http://127.0.0.1:8765/
 ```
 
+## Data Export & Research
+
+**Export filtered data as publication-ready CSV:**
+
+HurricaneMap includes a one-click CSV export button (📄 icon in the header) that downloads your filtered dataset with:
+
+- **Full documentation:** data dictionary, methodology notes, NOAA citation, attribution requirements
+- **All landfall fields:** storm ID, name, year, month, day, hour, latitude, longitude, wind speed (kt/mph), pressure, Saffir-Simpson category, state
+- **Timestamped filename:** `HurricaneMap-Export-YYYY-MM-DD.csv`
+- **Proper CSV escaping:** handles commas, quotes, and newlines
+
+Perfect for:
+- Academic research papers (includes full HURDAT2 citation)
+- Climate & seasonal analysis
+- Geographic & statistical software (ArcGIS, R, Python, QGIS)
+- Spreadsheet analysis (Excel, Google Sheets)
+
+See [LICENSE.md](LICENSE.md#how-to-cite-hurriranemap) for citation formats.
+
 ## Project layout
 
 ```
@@ -182,7 +201,46 @@ A storm's **headline landfall category** is the highest category recorded at *an
 - **Wind radii** (34/50/64 kt) only present from 2004 onward in HURDAT2; **radius of maximum wind** only from 2021. We store/parse these but don't surface them in the UI.
 - **Hawaii 1959 Hurricane Dot, 1992 Iniki** etc. are inferred landfalls because HURDAT2's `L` marker convention doesn't apply outside continental U.S. The category is interpolated from the nearest 6-hour position.
 
-## Data sources & credits
+## Data Sources, Licensing & Attribution
+
+### Open Data License Clarity
+
+**HurricaneMap is built on entirely open and public data.** All datasets carry clear, permissive licenses:
+
+| Dataset | Source | License | Citation |
+| --- | --- | --- | --- |
+| **HURDAT2 Best-Track** | [NOAA National Hurricane Center](https://www.nhc.noaa.gov/data/) | Public Domain (U.S. Govt) | Landsea, C. W. & Franklin, 2013 |
+| **NEXRAD Radar Archive** | [Iowa State IEM](https://mesonet.agron.iastate.edu/) | Public Domain | Acknowledgment required |
+| **Population Density (GPWv4)** | [SEDAC, Columbia University](https://sedac.ciesin.columbia.edu/) | CC BY 4.0 | [See attribution](LICENSE.md#population-density) |
+| **State Boundaries** | [U.S. Census Bureau TIGER](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) | Public Domain | Acknowledgment required |
+| **Storm Impacts** | [Wikipedia](https://en.wikipedia.org/) | CC BY-SA 3.0 | [See details](LICENSE.md#storm-impacts-data) |
+| **Map Tiles** | [OpenStreetMap](https://www.openstreetmap.org/) | ODbL | © OSM contributors |
+
+### For Research & Publications
+
+**When using HurricaneMap data in research, reports, or presentations,** please:
+
+1. **Acknowledge NOAA/NHC** as the original data source for all hurricane/landfall data:
+   > "Historical hurricane landfall data sourced from NOAA's National Hurricane Center HURDAT2 database (https://www.nhc.noaa.gov/data/)"
+
+2. **See [LICENSE.md](LICENSE.md) for:**
+   - Per-dataset attribution requirements (SEDAC, Wikipedia, OpenStreetMap, etc.)
+   - Full citation formats (Chicago, APA, BibTeX)
+   - Data accuracy & pre-satellite-era caveats
+   - Landfall detection methodology
+
+3. **Link to HurricaneMap GitHub:** https://github.com/SysAdminDoc/HurricaneMap
+
+### Data Accuracy Notes
+
+- **Pre-1944** (no aircraft) and **pre-1960s** (no satellite): lower completeness and accuracy
+- **1971–1990**: documented gaps in continental U.S. landfall marking in HURDAT2
+- **Historical uncertainty:** Pre-1900 tracks have ±100+ km uncertainty; modern (post-1960) ±10–20 km
+- **More details:** [Data Accuracy & Disclaimers in LICENSE.md](LICENSE.md#data-accuracy--disclaimers)
+
+---
+
+## Data sources & credits (Detailed table)
 
 | What | Where |
 | ---- | ----- |
