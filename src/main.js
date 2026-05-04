@@ -139,6 +139,7 @@ const els = {
 };
 
 async function boot() {
+  console.log('[boot] Starting');
   // Initialize locale (before any rendering)
   initLocale();
   const savedLocale = getSetting('locale');
@@ -146,6 +147,7 @@ async function boot() {
 
   // Start performance monitoring early
   initPerformanceMonitoring();
+  console.log('[boot] Theme and settings initialized');
   
   applyThemeToRoot();
   applyPaletteToBody();
@@ -153,17 +155,26 @@ async function boot() {
   if (getSetting('highContrast')) {
     document.documentElement.classList.add('high-contrast');
   }
+  console.log('[boot] Initializing map');
   const map = initMap();
+  console.log('[boot] Loading initial data');
   await loadInitial();
+  console.log('[boot] Initial data loaded');
+  console.log('[boot] Populating state filter');
   populateStateFilter();
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
   const restored = applyHashToFilters();
+  console.log('[boot] Syncing filter UI');
   syncFilterUiFromState();
+  console.log('[boot] Applying filters');
   applyFilters();
+  console.log('[boot] Wiring UI');
   wireUI();
+  console.log('[boot] Wiring settings');
   wireSettingsControls();
   // 174-year timeline ribbon along the bottom edge.
+  console.log('[boot] Mounting timeline');
   mountTimeline(getLandfalls(), {
     onYearRangeChange: ({ yearMin, yearMax }) => {
       filters.yearMin = yearMin;
@@ -172,12 +183,14 @@ async function boot() {
       applyFilters();
     },
   });
+  console.log('[boot] Timeline mounted');
   highlightYearRange(filters.yearMin, filters.yearMax);
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
   enableStateClicks(map).catch(() => { /* non-fatal */ });
   // Live NHC active-storm feed — appears only when a storm is active.
   startActiveStormPolling().catch(() => { /* non-fatal */ });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
+  console.log('[boot] Storm count set');
   
   // Initialize glossary (loads data asynchronously, non-blocking)
   initGlossary().catch(() => { /* non-fatal */ });
@@ -195,10 +208,13 @@ async function boot() {
     syncFilterUiFromState();
     applyFilters();
   };
+  console.log('[boot] About to init keyboard');
   initKeyboard();
+  console.log('[boot] Keyboard initialized, fading splash screen');
   
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
+  console.log('[boot] Splash screen fade initiated');
 
   // Re-open the storm encoded in the hash, if any. Done after first render
   // so the marker exists.
@@ -214,7 +230,7 @@ async function boot() {
   }
   // Onboarding disabled — users go straight to the map with no interruption.
   // setTimeout(() => maybeStartOnboarding(), 600);
-}
+  console.log('[boot] Complete!');
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
 // the header and re-renders dependent surfaces on change.
@@ -724,7 +740,7 @@ function titleCase(name) {
 }
 
 boot().catch(err => {
-  console.error('Boot failed', err);
+  console.error('[boot] Boot failed', err);
   const safeMsg = escapeHtml(err.message || 'Unknown error');
   els.loading.innerHTML = `<p style="color:var(--cat-4);max-width:480px;text-align:center;padding:0 24px;">
     Failed to load data: ${safeMsg}<br><br>If you opened the file directly, run a local web server first

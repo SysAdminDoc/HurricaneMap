@@ -13,6 +13,9 @@
 import { categoryColor, formatTime } from './data.js';
 import { getStormRadarFrames } from './radar.js';
 
+// Leaflet is loaded from CDN as a UMD module, available as window.L
+const L = window.L;
+
 const BASE_DURATION_MS = 14000;        // 1× speed = 14 sec total
 const FRAME_INTERPOLATION_STEPS = 4;   // sub-divide each 6h leg for smoothness
 

@@ -8,6 +8,9 @@ import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
 import { escapeHtml } from './html-utils.js';
 
+// Leaflet is loaded from CDN as a UMD module, available as window.L
+const L = window.L;
+
 const MAX_PINS = 4;
 
 // Distinct, high-contrast track colors. Each pin gets one in pin order.
