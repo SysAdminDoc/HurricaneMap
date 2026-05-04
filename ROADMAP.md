@@ -98,13 +98,13 @@ Focus: Live data, model integrations, and predictive context for active seasons.
 - [x] **P10.4 "On this date in history" sidebar** — ✅ When viewing the map, offer a "What happened today in hurricane history?" card showing storms that made landfall within ±7 days of the current calendar date. Sortable by year or magnitude.
 - [ ] **P10.5 Active-season timelapse** — For the current or selected season, offer a play-all button that steps through every 6-hourly track point for all storms in that season at 2× or 4× speed, with real radar background where available. Gives a visceral sense of season intensity.
 
-## Phase 11 — Accessibility & internationalization (✅ PARTIAL — v1.3.0)
+## Phase 11 — Accessibility & internationalization (✅ PARTIAL — v1.3.1)
 
 Focus: Inclusive design, multi-language support, and expanded user demographics.
 
 - [x] **P11.1 Full Spanish (ES-LA) localization** — ✅ Localization infrastructure complete: 100+ translated UI strings, browser language auto-detection, localStorage persistence, language toggle in settings menu. Infrastructure ready for full UI binding (next phase).
 - [x] **P11.2 High-contrast accessible theme** — ✅ WCAG AAA 7:1 contrast ratio on text; larger fonts; bolder borders; increased visual separation. Toggle via settings. Comprehensive CSS variable expansion for dark/light HC modes with enhanced focus indicators (3px outline) and 2px borders on all interactive elements.
-- [ ] **P11.3 Screen reader optimization** — Add semantic `<section>`, `<article>`, `<aside>` landmarks; improve ARIA labels and `aria-describedby` depth; expose all data-driven content via text alternatives; test with NVDA / JAWS.
+- [x] **P11.3 Screen reader optimization** — ✅ Added proper semantic landmarks to all major panels with `role="region"` + `aria-labelledby` attributes pointing to panel titles. Enhanced category filter buttons with descriptive aria-labels for each wind speed range. Updated legend from hidden `aria-hidden="true"` to descriptive aria-label. Added `role="main"` to all panel body containers. Changed info modal from `<section>` to proper `<dialog>` role with `aria-modal="true"`. All interactive elements now properly labeled for screen reader navigation.
 - [ ] **P11.4 Keyboard-first workflow** — Full keyboard navigation with visible focus indicators; dedicated keyboard shortcut palette (`?` key); macro shortcuts for common filters (e.g., `Ctrl+M` for "Major hurricanes only"). Audit with keyboard-only users.
 - [x] **P11.5 Glossary + educational popover** — ✅ Searchable glossary modal with 20 meteorological terms (ACE, RI, Saffir-Simpson, landfall, forward speed, etc.). Integrated via settings menu glossary button with instant substring + definition search. Modal CSS styled in high-contrast mode with 2px borders and increased font weights. Auto-initializes on app boot.
 
