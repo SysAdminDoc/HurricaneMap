@@ -4298,3 +4298,308 @@ body:has(.timeline-ribbon) .season-summary { bottom: 268px; }
   font-style: italic;
   font-variant-numeric: tabular-nums;
 }
+
+/* ============================================================
+   v0.9.0 — Premium polish pass
+   System-level refinements layered on top of the existing
+   stylesheet. Token consolidation, motion rhythm, focus
+   uniformity, scrollbar/selection polish, and surgical
+   surface tightening across the highest-traffic UI.
+   ============================================================ */
+
+:root {
+  /* Motion ----------------------------------------------------- */
+  --hm-ease-standard: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --hm-ease-emphasized: cubic-bezier(0.32, 0.72, 0, 1);
+  --hm-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --hm-dur-fast: 140ms;
+  --hm-dur-base: 200ms;
+  --hm-dur-slow: 320ms;
+
+  /* Surface elevation (semantic shadow scale) ------------------ */
+  --hm-elev-1: 0 1px 2px rgba(0, 0, 0, 0.20);
+  --hm-elev-2: 0 4px 14px rgba(0, 0, 0, 0.28);
+  --hm-elev-3: 0 10px 32px rgba(0, 0, 0, 0.42);
+  --hm-elev-4: 0 24px 60px rgba(0, 0, 0, 0.52);
+
+  /* Borders --------------------------------------------------- */
+  --hm-border-soft: 1px solid rgba(218, 229, 255, 0.07);
+  --hm-border-default: 1px solid rgba(218, 229, 255, 0.12);
+  --hm-border-strong: 1px solid rgba(218, 229, 255, 0.20);
+
+  /* Focus ring (single source of truth) ---------------------- */
+  --hm-focus-ring: 0 0 0 2px rgba(11, 16, 28, 0.96),
+                   0 0 0 4px rgba(180, 190, 254, 0.55);
+
+  /* Accent gradient used for headlines/marks ----------------- */
+  --hm-accent-gradient: linear-gradient(95deg, #b4befe, #74c7ec);
+}
+
+/* Slim, branded scrollbars across the app ------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(180, 190, 254, 0.28) transparent;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+    rgba(180, 190, 254, 0.32),
+    rgba(116, 199, 236, 0.24));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+  transition: background var(--hm-dur-fast) var(--hm-ease-standard);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+    rgba(180, 190, 254, 0.55),
+    rgba(116, 199, 236, 0.45));
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner { background: transparent; }
+
+/* Universal focus-visible — calmer, denser, properly offset */
+:where(button, a, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--hm-focus-ring);
+  border-radius: 9px;
+}
+
+/* Selection — match brand palette without being loud */
+::selection { background: rgba(180, 190, 254, 0.30); color: #f7fbff; }
+::-moz-selection { background: rgba(180, 190, 254, 0.30); color: #f7fbff; }
+
+/* ---- Header polish ---------------------------------------- */
+header.app-header.glass {
+  box-shadow: var(--hm-elev-3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: box-shadow var(--hm-dur-base) var(--hm-ease-standard);
+}
+.brand-mark {
+  filter: drop-shadow(0 2px 6px rgba(116, 199, 236, 0.25));
+  transition: transform var(--hm-dur-base) var(--hm-ease-standard),
+              filter var(--hm-dur-base) var(--hm-ease-standard);
+}
+header.app-header.glass:hover .brand-mark {
+  transform: scale(1.04) rotate(-2deg);
+  filter: drop-shadow(0 3px 10px rgba(180, 190, 254, 0.45));
+}
+.subtitle-sep {
+  margin: 0 6px;
+  opacity: 0.45;
+}
+
+/* ---- Icon button: tighter rhythm, premium hover ----------- */
+.icon-btn {
+  border: var(--hm-border-default);
+  transition: transform var(--hm-dur-fast) var(--hm-ease-standard),
+              background var(--hm-dur-fast) var(--hm-ease-standard),
+              color var(--hm-dur-fast) var(--hm-ease-standard),
+              border-color var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.icon-btn:hover {
+  background: rgba(180, 190, 254, 0.10);
+  border-color: rgba(180, 190, 254, 0.32);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.icon-btn:active { transform: translateY(0); transition-duration: 60ms; }
+.icon-btn[aria-pressed="true"],
+.icon-btn[aria-expanded="true"] {
+  background: rgba(180, 190, 254, 0.14);
+  border-color: rgba(180, 190, 254, 0.40);
+  color: var(--text);
+}
+
+/* ---- Storm panel: smoother slide, tighter header --------- */
+section.storm-panel.glass {
+  box-shadow: var(--hm-elev-4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    transform var(--hm-dur-slow) var(--hm-ease-emphasized),
+    opacity var(--hm-dur-base) var(--hm-ease-standard);
+}
+.storm-panel h2,
+.state-panel h2 {
+  margin-bottom: 4px;
+}
+.storm-panel .panel-section-h3,
+.state-panel .panel-section-h3 {
+  position: relative;
+  padding-left: 10px;
+}
+.storm-panel .panel-section-h3::before,
+.state-panel .panel-section-h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--hm-accent-gradient);
+  opacity: 0.85;
+}
+
+/* Cat pill: more refined inner shading */
+.cat-pill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.40);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.30);
+}
+
+/* Stat tiles: subtle hover affordance — they are clickable in places */
+.stat-grid .stat {
+  transition: transform var(--hm-dur-fast) var(--hm-ease-standard),
+              border-color var(--hm-dur-fast) var(--hm-ease-standard),
+              background var(--hm-dur-fast) var(--hm-ease-standard);
+  box-shadow: var(--hm-elev-1);
+}
+.stat-grid .stat:hover {
+  border-color: rgba(180, 190, 254, 0.22);
+  background:
+    linear-gradient(180deg, rgba(180, 190, 254, 0.07), rgba(218, 229, 255, 0.02)),
+    rgba(11, 16, 28, 0.7);
+}
+
+/* ---- Filters panel: quieter section dividers ------------- */
+.filters {
+  box-shadow: var(--hm-elev-3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Legend: slight inner highlight to seat it visually -- */
+.legend {
+  box-shadow: var(--hm-elev-2), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Search results: smoother appearance, refined hover -- */
+.search-results {
+  animation: hm-fade-down var(--hm-dur-base) var(--hm-ease-standard) both;
+}
+.search-results li {
+  transition:
+    background var(--hm-dur-fast) var(--hm-ease-standard),
+    padding-left var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.search-results li:hover,
+.search-results li[aria-selected="true"] {
+  padding-left: 14px;
+}
+@keyframes hm-fade-down {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Settings menu: refined pill-group with active dot --- */
+.settings-menu {
+  box-shadow: var(--hm-elev-4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: hm-fade-down var(--hm-dur-base) var(--hm-ease-standard) both;
+}
+.settings-pill {
+  transition:
+    background var(--hm-dur-fast) var(--hm-ease-standard),
+    color var(--hm-dur-fast) var(--hm-ease-standard),
+    border-color var(--hm-dur-fast) var(--hm-ease-standard),
+    transform var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.settings-pill:hover { transform: translateY(-1px); }
+.settings-pill:active { transform: translateY(0); transition-duration: 60ms; }
+.settings-pill[aria-checked="true"],
+.settings-pill.active,
+.settings-pill[data-active="true"] {
+  background: rgba(180, 190, 254, 0.16);
+  border-color: rgba(180, 190, 254, 0.45);
+  color: var(--text);
+}
+
+/* ---- Toast: refined entrance ----------------------------- */
+.toast {
+  box-shadow: var(--hm-elev-4);
+}
+
+/* ---- Compare tray: hover affordance on chips ------------- */
+.ct-chip {
+  transition:
+    border-color var(--hm-dur-fast) var(--hm-ease-standard),
+    background var(--hm-dur-fast) var(--hm-ease-standard),
+    transform var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.ct-chip:hover { transform: translateY(-1px); }
+
+/* ---- Loading: gentler fade-out --------------------------- */
+.loading.hidden,
+.loading[hidden] {
+  opacity: 0;
+  transition: opacity var(--hm-dur-slow) var(--hm-ease-standard);
+  pointer-events: none;
+}
+
+/* ---- Leaflet zoom + attribution: visual cohesion --------- */
+.leaflet-control-zoom a {
+  transition: background var(--hm-dur-fast) var(--hm-ease-standard),
+              color var(--hm-dur-fast) var(--hm-ease-standard),
+              transform var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.leaflet-control-zoom a:hover {
+  transform: translateY(-1px);
+}
+.leaflet-control-attribution a {
+  color: rgba(180, 190, 254, 0.85) !important;
+}
+
+/* ---- Timeline ribbon: a touch more refined edges --------- */
+.timeline-ribbon {
+  box-shadow: var(--hm-elev-2), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.tl-bar {
+  border-radius: 2px 2px 0 0;
+}
+.tl-selection {
+  background:
+    linear-gradient(180deg,
+      rgba(116, 199, 236, 0.22),
+      rgba(180, 190, 254, 0.12));
+  border-left-color: var(--lavender);
+  border-right-color: var(--lavender);
+  box-shadow: 0 0 18px rgba(180, 190, 254, 0.18);
+}
+
+/* ---- Climatology + impacts blocks: visual consistency ---- */
+.clim-chart, .im-row {
+  transition: opacity var(--hm-dur-base) var(--hm-ease-standard);
+}
+
+/* ---- Onboarding overlay: smoother, more elegant ---------- */
+#onb-overlay {
+  animation: hm-onb-fade var(--hm-dur-slow) var(--hm-ease-standard) both;
+}
+@keyframes hm-onb-fade {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to   { opacity: 1; }
+}
+
+/* ---- Info modal: subtle entrance ------------------------- */
+.info-modal:not([hidden]) .info-card {
+  animation: hm-modal-in var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+@keyframes hm-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---- Reduced motion: collapse all the niceties ----------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .icon-btn:hover,
+  .stat-grid .stat:hover,
+  .ct-chip:hover,
+  .settings-pill:hover { transform: none !important; }
+}
+

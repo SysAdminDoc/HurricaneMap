@@ -59,6 +59,10 @@ Iteration-7 research replenishment. Phase 5 closed the metrics/share/PWA gaps; P
 - [x] **P6.9 Reduced-motion full pass** — ✅ v0.7.0. Single end-of-stylesheet `@media (prefers-reduced-motion: reduce)` block clamps all `animation-duration` + `transition-duration` to 0.01ms (state changes still register) and disables named animations entirely on toasts, the onboarding overlay/card, install prompt, season summary, panel actions, search results, tier blocks, legend items, and timeline bars.
 - [x] **P6.10 Lighthouse green-bar pass** — ✅ v0.8.1. Real `npx lighthouse --preset=desktop` run produced an a11y score of 87/100 on v0.8.0; closed the four real findings to land at 100/100. Onboarding dialog now exposes `aria-labelledby` + `aria-describedby` to its title/body. Year-min/year-max number inputs gained `aria-label`s. The legend heading was promoted to `<h2>` (with selector rewrites in styles.css) so heading order no longer skips a level after the page `<h1>`. The timeline-axis slider now exposes a live `aria-valuenow` + `aria-valuetext` that update with every drag/keyboard step, plus the explicit `tabindex="0"`. SEO 100, Best-Practices 96, Performance ~80–90 (LCP varies with network conditions; tile CDN is the bound).
 
+## Phase 7 — Premium polish
+
+- [x] **P7.1 Premium polish pass** — ✅ v0.9.0. System-level UX/UI refinement layered on top of the existing surfaces: extended token system (motion easings/durations, elevation 1-4, semantic borders, single-source-of-truth focus ring); branded slim scrollbars; universal `:focus-visible`; refined hover/active idiom on icon buttons, settings pills, and compare-tray chips; storm-panel section headings with lavender→sapphire accent bar; CAT pill upgraded with inner highlight + drop-shadow; stat tiles gained hover affordance + base elevation; search results animate in with fade-down + selected-row indent; settings menu + info modal + onboarding overlay smoother entrances; loading screen fades cleanly; Leaflet zoom matched to the system; timeline selection band picks up brand gradient + glow; full reduced-motion respect.
+
 ---
 
 See `docs/research/` for full-source iteration history and tier scoring.
