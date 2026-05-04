@@ -2112,8 +2112,8 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
   }
 
   .icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
   }
 
   .filters {
@@ -2134,6 +2134,10 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
   .year-inputs {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .year-inputs input[type="number"] {
+    min-height: 44px;
   }
 
   .cat-toggles {
@@ -2199,6 +2203,22 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
     top: auto;
     bottom: 96px;
   }
+
+  /* Mobile-friendly Leaflet controls */
+  .leaflet-control-zoom a {
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 20px !important;
+  }
+
+  .leaflet-control-zoom a:first-child {
+    border-radius: 10px 10px 0 0 !important;
+  }
+
+  .leaflet-control-zoom a:last-child {
+    border-radius: 0 0 10px 10px !important;
+  }
 }
 
 @media (max-width: 540px) {
@@ -2252,7 +2272,7 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
 
   .icon-btn {
     width: 100%;
-    height: 31px;
+    height: 44px;
   }
 
   .title-block h1 {
