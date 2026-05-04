@@ -8,6 +8,7 @@ const STORAGE_KEY = 'hm-settings-v1';
 
 const DEFAULTS = {
   windUnit: 'kt',          // 'kt' | 'mph' | 'kmh'
+  theme: 'dark',           // 'dark' (Catppuccin Mocha) | 'light' (Catppuccin Latte)
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   onboarded: false,
@@ -91,4 +92,14 @@ export function getPaletteColor(cat) {
 export function applyPaletteToBody() {
   const pal = getSetting('palette');
   document.body.classList.toggle('palette-colorblind', pal === 'colorblind');
+}
+
+// Apply theme to html element root
+export function applyThemeToRoot() {
+  const theme = getSetting('theme');
+  if (theme === 'light') {
+    document.documentElement.classList.add('light-theme');
+  } else {
+    document.documentElement.classList.remove('light-theme');
+  }
 }

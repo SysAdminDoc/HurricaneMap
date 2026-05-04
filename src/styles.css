@@ -24,6 +24,32 @@
   --shadow:     0 8px 32px rgba(0, 0, 0, 0.45);
 }
 
+/* Light theme — Catppuccin Latte */
+html.light-theme {
+  --base:   #eff1f5;
+  --mantle: #e6e9f0;
+  --crust:  #dce0e8;
+  --surface0: #ccd0dd;
+  --surface1: #bcc0cc;
+  --text:    #4c4f69;
+  --subtext: #6c6f85;
+  --overlay: #7c8296;
+  --blue:    #1e66f5;
+  --lavender:#7c3aed;
+  --sapphire:#04a5e5;
+
+  --cat-ts:  #04a5e5;  /* sapphire */
+  --cat-1:   #40a02b;  /* green */
+  --cat-2:   #e49320;  /* yellow */
+  --cat-3:   #fe640b;  /* peach */
+  --cat-4:   #d20f39;  /* pink */
+  --cat-5:   #8839ef;  /* mauve */
+
+  --glass-bg:   rgba(239, 241, 245, 0.85);
+  --glass-edge: rgba(76, 79, 105, 0.12);
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
 * { box-sizing: border-box; }
 
 html, body {
