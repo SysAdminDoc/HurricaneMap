@@ -4,6 +4,18 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.1 — Layout consolidation (2025)
+
+Dedicated pass to eliminate panel overlap and internal scrolling on the primary surfaces. The user-visible surface area now fits cleanly on 1366×768 and up without ever needing to scroll a control panel to see an option.
+
+- **Floating Saffir-Simpson legend folded into the filters panel** as a compact two-column block. The standalone `<aside class="legend">` is gone — no more overlap with the filters above it or the timeline below.
+- **Map layers grouped.** Tracks, density heatmap, population density, and storm-surge selection now live under a single "Map layers" sub-section with denser typography and a unified rhythm. Reduces the filter panel from 9 visually-equivalent rows to 4 logical groups.
+- **Filter panel rhythm tightened.** Padding, gaps, label scale, and control heights re-tuned so the entire panel fits the viewport on 768px-tall laptops without overflow. `max-height` is calculated against the live header + timeline footprint.
+- **Right-side detail panels (storm / stats / state / compare) now clear the timeline ribbon properly.** Bottom edge sits 102px above the viewport floor (timeline 78px + 12px gap + 12px buffer). When the timeline is collapsed, panels reclaim the freed space automatically via `body:has(.timeline-ribbon.collapsed)`.
+- **Settings menu** capped to viewport height with a quiet internal scroll only as a last-ditch safety net.
+- **Compact-viewport tuning** at `max-height: 800px` and `max-width: 1180px` — filter padding shrinks, right-panel width drops to 400px so the storm panel never crowds the filters column.
+- **Service worker bumped** to `hm-v0.9.1`.
+
 ## v0.9.0 — Premium polish pass (2025)
 
 System-level UX/UI refinement layered on top of the existing surfaces. No behavioral changes, no API changes — just a noticeable lift in how the product feels.

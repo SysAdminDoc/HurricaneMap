@@ -4603,3 +4603,240 @@ section.storm-panel.glass {
   .settings-pill:hover { transform: none !important; }
 }
 
+/* ============================================================
+   v0.9.1 — Layout consolidation
+   Eliminate panel overlaps + scrolling on the primary surfaces.
+   - Floating .legend is folded INTO the filters panel.
+   - Filters use a tight rhythm so every control is visible
+     without internal scroll on 1366×768 and up.
+   - Right-side detail panels (storm/stats/state/compare) clear
+     the timeline ribbon properly.
+   ============================================================ */
+
+/* Hide the now-redundant standalone floating legend ---------- */
+aside.legend {
+  display: none !important;
+}
+
+/* Filters panel — tighter rhythm, no internal scroll --------- */
+aside.filters.glass {
+  top: 96px;
+  left: 12px;
+  width: 296px;
+  padding: 12px 14px;
+  gap: 8px;
+  /* Grow naturally; cap to viewport height minus header (96px),
+     timeline (78px + 12px gap) and a small top/bottom buffer.
+     overflow stays auto only as a last-ditch safety net. */
+  max-height: calc(100vh - 96px - 90px - 16px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.filters .filter-row {
+  gap: 5px;
+}
+.filters .filter-row > label,
+.filters .filter-group-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aeb9cd;
+  font-weight: 600;
+  margin: 0;
+}
+.filters input[type="number"],
+.filters input[type="search"],
+.filters select {
+  min-height: 32px;
+  font-size: 12.5px;
+}
+.filters .cat-btn {
+  height: 30px;
+  font-size: 11.5px;
+  padding: 0 6px;
+}
+.filters .cat-toggles {
+  gap: 5px;
+}
+
+/* Map-layers grouping — 2-col compact toggle grid ----------- */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  margin-top: 2px;
+  border-top: 1px solid rgba(218, 229, 255, 0.07);
+}
+.filter-layer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.filter-layer-grid .toggle-row {
+  font-size: 12px;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  color: var(--text);
+}
+.filter-layer-grid .toggle-row span {
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  font-weight: 500;
+}
+.filter-layer-grid .layer-select {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.filter-layer-grid .layer-select-label {
+  font-size: 11.5px;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+}
+.filter-layer-grid .layer-select select {
+  min-height: 30px;
+  font-size: 12px;
+  padding: 4px 26px 4px 10px;
+}
+
+/* Filter footer — reset button + visible count ------------- */
+.filters .filter-footer {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 6px;
+  margin-top: 2px;
+  border-top: 1px solid rgba(218, 229, 255, 0.07);
+}
+.filters .filter-footer .text-btn {
+  padding: 5px 10px;
+  font-size: 11.5px;
+}
+
+/* Integrated legend (now part of filters) ------------------ */
+.filter-legend {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.07);
+}
+.filter-legend .legend-heading {
+  margin: 0 0 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aeb9cd;
+  font-weight: 600;
+}
+.filter-legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+}
+.filter-legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--subtext);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.filter-legend-list .dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 6px currentColor;
+}
+
+/* Right-side detail panels — clear the timeline ribbon ----- */
+section.storm-panel.glass,
+.stats-panel,
+.state-panel,
+.compare-panel {
+  top: 12px;
+  right: 16px;
+  bottom: 102px; /* timeline (78) + bottom gap (12) + buffer (12) */
+  max-height: calc(100vh - 12px - 102px);
+  width: 440px;
+  max-width: min(440px, calc(100vw - 28px));
+}
+
+/* When the timeline is collapsed, panels reclaim the space -- */
+body:has(.timeline-ribbon.collapsed) section.storm-panel.glass,
+body:has(.timeline-ribbon.collapsed) .stats-panel,
+body:has(.timeline-ribbon.collapsed) .state-panel,
+body:has(.timeline-ribbon.collapsed) .compare-panel {
+  bottom: 52px;
+  max-height: calc(100vh - 12px - 52px);
+}
+
+/* Search results — anchor to input, narrower so they don't
+   overlap the right-side panels on small viewports --------- */
+.search-results {
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1100;
+}
+
+/* Settings menu — tighter rhythm, never overflow viewport -- */
+.settings-menu[role="menu"] {
+  max-height: calc(100vh - 90px - 78px);
+  overflow-y: auto;
+}
+
+/* Compact viewport: shrink filters width + tighten toggles - */
+@media (max-height: 800px) {
+  aside.filters.glass {
+    top: 92px;
+    padding: 10px 12px;
+    gap: 7px;
+    max-height: calc(100vh - 92px - 90px - 12px);
+  }
+  .filter-legend {
+    padding-top: 6px;
+    margin-top: 2px;
+  }
+  .filter-legend-list {
+    gap: 3px 8px;
+  }
+  .filter-legend-list li { font-size: 10.5px; }
+}
+
+/* Narrower viewport: shrink right panel so storm + filters
+   don't crowd each other ------------------------------------ */
+@media (max-width: 1180px) {
+  section.storm-panel.glass,
+  .stats-panel,
+  .state-panel,
+  .compare-panel {
+    width: 400px;
+  }
+}
+
+/* Mobile (<= 720px): keep existing stacked behavior already
+   defined upstream; force the integrated legend into a single
+   column so it doesn't wrap awkwardly ----------------------- */
+@media (max-width: 720px) {
+  aside.filters.glass {
+    max-height: 60vh;
+  }
+  .filter-legend-list {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+
