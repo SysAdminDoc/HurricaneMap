@@ -1433,11 +1433,16 @@ section.storm-panel.glass {
 .spinner {
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  border: 3px solid var(--surface0);
-  border-top-color: var(--lavender);
-  animation: spin 800ms linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.hurricane-icon {
+  color: var(--lavender);
+  animation: spin 2s linear infinite;
+}
+
 .loading p { color: var(--subtext); font-size: 13px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -3274,23 +3279,6 @@ input[type="checkbox"]:focus-visible {
   border: none;
   position: relative;
   animation: none;
-}
-.spinner-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px solid rgba(218, 229, 255, 0.10);
-  border-top-color: var(--lavender);
-  border-right-color: var(--sapphire);
-  animation: spin 1100ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-.spinner-ring-2 {
-  inset: 8px;
-  border-width: 2px;
-  border-top-color: var(--sapphire);
-  border-right-color: transparent;
-  animation: spin 1700ms cubic-bezier(0.45, 0, 0.55, 1) infinite reverse;
-  opacity: 0.7;
 }
 
 /* --- Info modal card: lift readability ----------------------------------- */
