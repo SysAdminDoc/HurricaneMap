@@ -4,6 +4,16 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.8.1 — Accessibility 100 / Lighthouse pass (2025)
+
+Closes Phase 6 (10/10) by closing P6.10. Real `npx lighthouse --preset=desktop` run on v0.8.0 produced an Accessibility score of 87. v0.8.1 lands at **100**.
+
+- **Onboarding dialog accessible name (P6.10).** `.onb-overlay` now sets `aria-labelledby` to the title `<h3>` and `aria-describedby` to the body `<p>`, satisfying `aria-dialog-name`.
+- **Year-range inputs labeled (P6.10).** `#year-min` / `#year-max` get explicit `aria-label`s (the visible "Year range" label was for the group, not each input).
+- **Heading order fixed (P6.10).** The map legend heading is now `<h2 class="legend-heading">` (was `<h3>`); CSS selectors rewritten from `.legend h3` to `.legend .legend-heading` in three places. Page heading order is now `h1 → h2 → h3` everywhere.
+- **Timeline slider live state (P6.10).** `#timeline-axis` (role=slider) now ships with `aria-valuenow` + `aria-valuetext` initialised to the full range and updated on every drag/keyboard step inside `drawSelection()`. Also gains explicit `tabindex="0"`.
+- **Service worker bumped** to `hm-v0.8.1` so the v0.8.1 a11y fixes propagate through the PWA cache.
+
 ## v0.8.0 — Inflation-adjusted damages, annual climatology chart (2025)
 
 Two more Phase 6 items, both data-density wins for the comparative-history use case.

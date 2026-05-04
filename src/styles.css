@@ -231,7 +231,7 @@ label > input[type="checkbox"] {
   padding: 12px 16px;
   font-size: 12px;
 }
-.legend h3 {
+.legend .legend-heading {
   margin: 0 0 8px;
   font-size: 11px;
   font-weight: 600;
@@ -1610,7 +1610,7 @@ a:focus-visible {
   padding: 14px 16px;
 }
 
-.legend h3,
+.legend .legend-heading,
 .panel-section-h3,
 .stats-panel h3 {
   color: #b3bdd2;
@@ -2544,7 +2544,7 @@ input[type="checkbox"]:focus-visible { box-shadow: var(--ring-strong); }
   padding: 12px 14px 14px;
   border-radius: 16px;
 }
-.legend h3 {
+.legend .legend-heading {
   font-size: 10.5px;
   letter-spacing: 0.08em;
   margin-bottom: 10px;
