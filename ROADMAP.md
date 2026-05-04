@@ -108,13 +108,13 @@ Focus: Inclusive design, multi-language support, and expanded user demographics.
 - [x] **P11.4 Keyboard-first workflow** — ✅ Implemented dedicated keyboard shortcut palette (`?` key opens). Macro shortcuts: `Ctrl+M` for major hurricanes only, `Ctrl+T` for tropical storms only, `Ctrl+L` to focus search. Full focus trapping inside palette; Escape closes palette and open panels. Keyboard palette styled with glass morphism in light/dark/HC modes. All keyboard shortcuts documented with descriptions.
 - [x] **P11.5 Glossary + educational popover** — ✅ Searchable glossary modal with 20 meteorological terms (ACE, RI, Saffir-Simpson, landfall, forward speed, etc.). Integrated via settings menu glossary button with instant substring + definition search. Modal CSS styled in high-contrast mode with 2px borders and increased font weights. Auto-initializes on app boot.
 
-## Phase 12 — Data science & educational export (🚧 IN PROGRESS, 4/5)
+## Phase 12 — Data science & educational export (✅ COMPLETE, 5/5)
 
 Focus: Research-grade export, reproducible analysis, and educational integration.
 
 - [x] **P12.1 Publication-ready export** — One-click export of any filtered dataset (storms + landfalls) as a clean CSV with documentation (data dictionary, methodology notes, NOAA attribution). Suitable for academic research papers.
 - [x] **P12.2 Jupyter notebook template** — Provide a starter Jupyter notebook (Python + pandas) that loads HurricaneMap's `data/storms.json` + `data/impacts.json` and demonstrates: filtering, plotting, computing climatology, ACE analysis. Links to Colab for zero-install runs.
-- [ ] **P12.3 QGIS layer export** — Export any storm selection as a shapefile or GeoPackage with full attribute table (wind, pressure, ACE, impacts) ready to import into QGIS. Preserves track geometry.
+- [x] **P12.3 QGIS layer export** — Export any storm selection as GeoJSON (RFC 7946) with LineString tracks + Point landfalls. Full attribute table (storm_id, name, year, category, wind, pressure, state) ready for direct QGIS import. Preserves track geometry with metadata.
 - [x] **P12.4 Statistical summary auto-report** — Select a year/state/category filter → auto-generate a one-page markdown report with key stats, charts, and narratives. Render as PDF via client-side or serverless endpoint. Teachers can print for classroom.
 - [x] **P12.5 Open data license clarity** — Prominently document all data sources (HURDAT2, NOAA, Wikipedia impacts, SEDAC population), their licenses (Public Domain, CC BY, etc.), and attribution requirements. Link from README + data download.
 
