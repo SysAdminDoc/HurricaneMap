@@ -31,10 +31,10 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 - [x] **P4.4 URL permalinks** — encode filters + opened storm + opened state to `location.hash`; restore on cold load. Format: `#y=2000-2025&c=3,4,5&s=Florida&storm=AL122005`.
 - [x] **P4.5 Track export (CSV / GeoJSON / KML)** — one-click client-side export; CSV for spreadsheets, GeoJSON for QGIS/Mapbox, KML for Google Earth with donut landfall icons.
 
-## Phase 5 — Next up (Tier 2/3 from `docs/research/iter-1-scored.md`)
+## Phase 5 — Tier 2 metrics + share (partially shipped in v0.5.0)
 
-- [ ] **P5.1 Pressure-fall rate metric** — max mb/hour drop window, quantifies "explosive deepening" beyond the wind-only RI signal (Wilma 2005 dropped 95 mb in 24h).
-- [ ] **P5.2 Translation speed (forward speed)** — km/h between consecutive obs; surface min/mean/max + flag stalled storms (<10 km/h, e.g. Harvey 2017, Dorian 2019).
+- [x] **P5.1 Pressure-fall rate metric** — ✅ v0.5.0. Detects ≥20 mb / 24h drop; surfaced as "📉 Explosive deepening" pill alongside the RI badge. Katrina shows both wind (+50 kt) and pressure (−46 mb) deepening flags.
+- [x] **P5.2 Translation speed (forward speed)** — ✅ v0.5.0. New stat tile shows time-weighted mean km/h with mph in subtitle; tooltip includes peak speed and total stalled-hours (<10 km/h flood-disaster threshold).
 - [ ] **P5.3 Days-at-intensity histogram** — hours spent at TS / Cat-1 / Cat-2 / Cat-3 / Cat-4 / Cat-5; stacked bar in the panel.
 - [ ] **P5.4 First-run onboarding** — 4-step coachmark tour highlighting filters, search, compare-tray, permalink button.
 - [ ] **P5.5 Color-blind palette toggle** — alternate Saffir-Simpson palette using ColorBrewer YlOrRd; persisted in `localStorage`.
@@ -42,7 +42,7 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 - [ ] **P5.7 PWA install** — `manifest.json` + service worker for offline tile + data caching of last-viewed storms.
 - [ ] **P5.8 Timeline ribbon** — 174-year horizontal ribbon at the bottom showing storm density per year, click to jump filter.
 - [ ] **P5.9 PNG / SVG export of intensity chart** — `<canvas>` rasterize for social-media share.
-- [ ] **P5.10 Share button** — copies permalink to clipboard + shows toast confirmation.
+- [x] **P5.10 Share button** — ✅ v0.5.0. "🔗 Share view" copies permalink to clipboard with toast confirmation; reusable toast component now available app-wide.
 
 ---
 
