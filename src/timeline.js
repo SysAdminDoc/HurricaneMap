@@ -43,7 +43,7 @@ export function mountTimeline(landfalls, callbacks) {
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
     </button>
     <div class="timeline-inner">
-      <div class="timeline-axis" id="timeline-axis" role="slider" aria-label="Year range" aria-valuemin="${Y0}" aria-valuemax="${Y1}"></div>
+      <div class="timeline-axis" id="timeline-axis" role="slider" aria-label="Year range" aria-valuemin="${Y0}" aria-valuemax="${Y1}" aria-valuenow="${Y0}" aria-valuetext="${Y0} to ${Y1}" tabindex="0"></div>
       <div class="timeline-labels">
         <span>${Y0}</span><span>1900</span><span>1950</span><span>2000</span><span>${Y1}</span>
       </div>
@@ -107,6 +107,9 @@ function drawSelection(a, b) {
   const right = ((hi - Y0) / (Y1 - Y0)) * 100;
   sel.style.left = `${left}%`;
   sel.style.width = `${Math.max(0.3, right - left)}%`;
+  // Keep ARIA slider state honest for AT.
+  axis.setAttribute('aria-valuenow', String(lo));
+  axis.setAttribute('aria-valuetext', `${lo} to ${hi}`);
 }
 
 function redraw(landfalls) {

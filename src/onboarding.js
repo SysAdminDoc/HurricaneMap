@@ -43,12 +43,14 @@ function start() {
   overlay.className = 'onb-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'onb-title-id');
+  overlay.setAttribute('aria-describedby', 'onb-body-id');
   overlay.innerHTML = `
     <div class="onb-spotlight" aria-hidden="true"></div>
     <div class="onb-card glass" role="document">
       <div class="onb-step" aria-live="polite"></div>
-      <h3 class="onb-title"></h3>
-      <p class="onb-body"></p>
+      <h3 class="onb-title" id="onb-title-id"></h3>
+      <p class="onb-body" id="onb-body-id"></p>
       <div class="onb-actions">
         <button class="onb-skip text-btn" type="button">Skip tour</button>
         <div class="onb-nav">
