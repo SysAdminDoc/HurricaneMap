@@ -21,6 +21,78 @@ const filters = {
   showHeatmap: false,
 };
 
+// Track currently-opened storm so URL hash can encode it.
+let openStormId = null;
+
+// ---------------- URL hash state (permalinks) ----------------
+// Format: #y=1990-2025&c=3,4,5&s=Florida&t=1&h=0&storm=AL092005
+// Falsy/default values are omitted to keep links short.
+const DEFAULT_HASH = {
+  y: '1851-2025',
+  c: 'ts,1,2,3,4,5',
+  s: '',
+  t: '0',
+  h: '0',
+  storm: '',
+};
+
+function encodeHash() {
+  const cur = {
+    y: `${filters.yearMin}-${filters.yearMax}`,
+    c: [...filters.categories].sort().join(','),
+    s: filters.state,
+    t: filters.showTracks ? '1' : '0',
+    h: filters.showHeatmap ? '1' : '0',
+    storm: openStormId || '',
+  };
+  const parts = [];
+  for (const k of Object.keys(cur)) {
+    if (cur[k] && cur[k] !== DEFAULT_HASH[k]) {
+      parts.push(`${k}=${encodeURIComponent(cur[k])}`);
+    }
+  }
+  return parts.length ? '#' + parts.join('&') : '';
+}
+
+function writeHash() {
+  const newHash = encodeHash();
+  // Avoid re-firing hashchange when nothing actually changed.
+  const cur = location.hash || '';
+  if (cur === newHash) return;
+  history.replaceState(null, '', newHash || location.pathname + location.search);
+}
+
+function decodeHash() {
+  const h = (location.hash || '').replace(/^#/, '');
+  if (!h) return null;
+  const out = {};
+  for (const pair of h.split('&')) {
+    const eq = pair.indexOf('=');
+    if (eq < 0) continue;
+    const k = pair.slice(0, eq);
+    const v = decodeURIComponent(pair.slice(eq + 1));
+    out[k] = v;
+  }
+  return out;
+}
+
+function applyHashToFilters() {
+  const h = decodeHash();
+  if (!h) return null;
+  if (h.y && /^\d{4}-\d{4}$/.test(h.y)) {
+    const [a, b] = h.y.split('-').map(Number);
+    filters.yearMin = Math.max(1851, Math.min(a, b));
+    filters.yearMax = Math.min(2025, Math.max(a, b));
+  }
+  if (h.c) {
+    filters.categories = new Set(h.c.split(',').filter(Boolean));
+  }
+  if (h.s !== undefined) filters.state = h.s;
+  if (h.t !== undefined) filters.showTracks = h.t === '1';
+  if (h.h !== undefined) filters.showHeatmap = h.h === '1';
+  return h;
+}
+
 const els = {
   yearMin: document.getElementById('year-min'),
   yearMax: document.getElementById('year-max'),
@@ -48,6 +120,10 @@ async function boot() {
   const map = initMap();
   await loadInitial();
   populateStateFilter();
+  // Restore filters from URL hash BEFORE first render so the user's
+  // permalink reproduces what they shared.
+  const restored = applyHashToFilters();
+  syncFilterUiFromState();
   applyFilters();
   wireUI();
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
@@ -57,6 +133,35 @@ async function boot() {
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
+
+  // Re-open the storm encoded in the hash, if any. Done after first render
+  // so the marker exists.
+  if (restored && restored.storm) {
+    const lf = getLandfalls().find(x => x.storm_id === restored.storm);
+    if (lf) {
+      // Defer slightly so map zoom/markers settle first.
+      setTimeout(() => onLandfallClick(lf), 60);
+    }
+  }
+  if (restored && restored.s) {
+    setTimeout(() => openState(restored.s), 80);
+  }
+}
+
+// Reflect the in-memory `filters` state back into the DOM controls. Used
+// after restoring a permalink so the toggles match what was applied.
+function syncFilterUiFromState() {
+  if (els.yearMin) els.yearMin.value = String(filters.yearMin);
+  if (els.yearMax) els.yearMax.value = String(filters.yearMax);
+  els.catBtns.forEach((btn) => {
+    const cat = btn.dataset.cat;
+    const on = filters.categories.has(cat);
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', String(on));
+  });
+  if (els.stateFilter) els.stateFilter.value = filters.state;
+  if (els.showTracks) els.showTracks.checked = filters.showTracks;
+  if (els.showHeatmap) els.showHeatmap.checked = filters.showHeatmap;
 }
 
 function populateStateFilter() {
@@ -80,6 +185,7 @@ function applyFilters() {
     clearTracks();
   }
   setHeatmap(filters.showHeatmap, visible);
+  writeHash();
 }
 
 let lastTracksKey = '';
@@ -104,7 +210,14 @@ async function redrawTracks(visible) {
 function onLandfallClick(landfall, marker) {
   focusLandfall(landfall);
   showStorm(landfall);
+  openStormId = landfall.storm_id;
+  writeHash();
 }
+
+document.addEventListener('storm-panel:close', () => {
+  openStormId = null;
+  writeHash();
+});
 
 function wireUI() {
   wireFilterPanel();

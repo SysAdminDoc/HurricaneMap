@@ -4,6 +4,17 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.4.0 — Storm metrics + permalinks (2025)
+
+Five Tier-1 features from the research-driven roadmap, all client-side, no new dependencies.
+
+- **Accumulated Cyclone Energy (ACE).** New stat tile in the storm panel computing Σ(v² / 10⁴) over 6-hourly synoptic obs ≥ 34 kt — the standard NHC measure of total wind-energy output across a storm's life. Shows alongside peak wind and min pressure with a definition tooltip (Atlantic season ≈ 100, single major hurricane ≈ 10–30; Katrina = 20.0).
+- **Rapid intensification flag.** Detects ≥30 kt wind gain in any 24-hour window per the NHC definition. Surfaces as a pink "⚡ Rapid intensification (+XX kt / 24h)" pill at the top of the storm panel and as a red-tinted overlay segment on the intensity chart with an inline "⚡ RI +XX kt" label so the explosive-deepening window is visible at a glance.
+- **Closest pass to coastal city.** New panel row with a dropdown of 25 hand-curated U.S. coastal cities (Boston → Brownsville on the Atlantic/Gulf, plus Honolulu and San Juan). Computes a haversine-shortest-distance to the nearest track point and shows distance (mi + km), wind at that point, and timestamp. Auto-defaults to a city in the storm's first U.S. landfall state, so opening Katrina lands on Miami / opening Andrew lands on Miami / opening Iniki lands on Honolulu.
+- **URL permalinks.** Filters, opened storm, and opened state now serialize to `location.hash` and restore on cold load. Format: `#y=2000-2025&c=3,4,5&s=Florida&storm=AL122005`. Shareable links reproduce the exact view another user clicked.
+- **Track export.** New "Export track" row offers one-click CSV (spreadsheet-friendly, full HURDAT2 columns), GeoJSON FeatureCollection (LineString + Point features for QGIS / Mapbox / Leaflet), and KML (Google Earth / ArcGIS, with track styled in sapphire and donut-icon landfall pins). All client-side via `Blob` + synthetic `<a download>` — no server round-trip.
+- **Research artifacts.** New `docs/research/iter-1-*.md` capture the five-phase roadmap research protocol — repo recon, 92-item harvest, six-dimension tiered scoring with rejection reasoning, and a seven-dimension self-audit. Future iterations replenish from this baseline.
+
 ### Interactive surfaces polish — v0.3.1
 
 - **Storm panel internals.** Section headings (`Landfalls`, `Track`, `Intensity over time`, etc.) now read as proper SECTION LABELS — uppercase, 0.09em tracked, with a 3px lavender→sapphire gradient bar on the left. Bottom hairline divider clearly separates each section.

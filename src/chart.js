@@ -38,13 +38,14 @@ function escapeHtml(s) {
   })[c]);
 }
 
-export function renderIntensityChart(container, storm) {
+export function renderIntensityChart(container, storm, opts = {}) {
   if (!container) return;
   const track = storm.track;
   if (!track || !track.length) {
     container.innerHTML = '';
     return;
   }
+  const ri = opts.ri || null;
   const t0 = new Date(track[0].t).getTime();
   const t1 = new Date(track[track.length - 1].t).getTime();
   const tspan = Math.max(1, t1 - t0);
@@ -125,6 +126,25 @@ export function renderIntensityChart(container, storm) {
     `<polyline points="${seg.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="rgba(116,199,236,0.7)" stroke-width="1" stroke-dasharray="3 2"/>`
   ).join('');
 
+  // Rapid-intensification overlay — red-tinted thick segment + label.
+  let riOverlay = '';
+  if (ri && track[ri.from_idx] && track[ri.to_idx]) {
+    const a = track[ri.from_idx];
+    const b = track[ri.to_idx];
+    if (a.wind != null && b.wind != null) {
+      const x1 = xOf(a.t), y1 = yWind(a.wind);
+      const x2 = xOf(b.t), y2 = yWind(b.wind);
+      const xMid = (x1 + x2) / 2;
+      const yLabel = Math.min(y1, y2) - 6;
+      riOverlay = `
+        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(243,139,168,0.85)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="${x1}" cy="${y1}" r="3.5" fill="rgba(243,139,168,1)" stroke="rgba(0,0,0,0.4)" stroke-width="0.6"/>
+        <circle cx="${x2}" cy="${y2}" r="3.5" fill="rgba(243,139,168,1)" stroke="rgba(0,0,0,0.4)" stroke-width="0.6"/>
+        <text x="${xMid}" y="${yLabel}" text-anchor="middle" fill="rgba(243,139,168,1)" font-size="9" font-weight="600">⚡ RI +${ri.delta_kt} kt</text>
+      `;
+    }
+  }
+
   const svg = `
     <div class="intensity-chart">
       <div class="chart-legend">
@@ -143,6 +163,7 @@ export function renderIntensityChart(container, storm) {
         ${landfallLines}
         ${presLine}
         ${windLine}
+        ${riOverlay}
         ${dots}
         <line class="chart-cursor" x1="-10" x2="-10" y1="${M.top}" y2="${M.top + PH}" stroke="rgba(180,190,254,0.6)" stroke-width="1" style="display:none"/>
       </svg>
