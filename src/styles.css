@@ -6574,5 +6574,813 @@ body.high-contrast {
   background: transparent;
 }
 
+/* ============================================================
+   v0.9.7 — Animations + micro-interactions + motion refinement
+   Premium motion pass: refined entrance/exit animations, smooth
+   state transitions, micro-interactions (button ripples, card
+   lifts), skeleton animations, loading states, and perceived
+   performance enhancements throughout the app.
+   ============================================================ */
+
+/* Animation timing functions ================================= */
+@keyframes hm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes hm-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes hm-slide-in-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hm-slide-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hm-slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes hm-slide-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes hm-scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes hm-pop-in {
+  0%   { opacity: 0; transform: scale(0.8); }
+  70%  { transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes hm-bounce-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  50%  { opacity: 1; }
+  100% { transform: translateY(0); }
+}
+@keyframes hm-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+@keyframes hm-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Panel entrance animations ================================== */
+section.storm-panel,
+.stats-panel,
+.compare-panel,
+.state-panel {
+  animation: hm-slide-in-right var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+section.storm-panel:not([hidden]),
+.stats-panel:not([hidden]),
+.compare-panel:not([hidden]),
+.state-panel:not([hidden]) {
+  animation: hm-slide-in-right var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+
+/* Filter panel entrance ====================================== */
+aside.filters:not(.collapsed) {
+  animation: hm-slide-in-left var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+
+/* Search results entrance ==================================== */
+.search-results {
+  animation: hm-slide-in-down var(--hm-dur-fast) var(--hm-ease-emphasized) both;
+}
+
+/* Card/stat item hover lift ================================== */
+.stat,
+.legend-item,
+.compare-row,
+.timeline-bar {
+  transition:
+    transform var(--hm-dur-base) var(--hm-ease-standard),
+    box-shadow var(--hm-dur-base) var(--hm-ease-standard),
+    background var(--hm-dur-base) var(--hm-ease-standard);
+}
+.stat:hover,
+.legend-item:hover,
+.compare-row:hover,
+.timeline-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Button ripple/press effect ================================= */
+button,
+[role="button"],
+.btn,
+input[type="checkbox"],
+input[type="radio"] {
+  position: relative;
+}
+button:active,
+[role="button"]:active,
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Settings pill transition ==================================== */
+.settings-pill {
+  transition:
+    all var(--hm-dur-base) var(--hm-ease-standard);
+  transform-origin: center;
+}
+.settings-pill:active {
+  transform: scale(0.95);
+}
+
+/* Season summary hover elevation ============================= */
+.season-summary:hover .ss-superlatives > div {
+  transform: translateY(-1px);
+}
+
+/* Icon button spin effect for loading ======================= */
+.icon-btn.loading svg {
+  animation: spin var(--hm-dur-slow) linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Loading spinner ============================================= */
+.spinner {
+  border: 3px solid rgba(170, 183, 255, 0.1);
+  border-top: 3px solid #aab7ff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin var(--hm-dur-slow) linear infinite;
+}
+
+/* Skeleton loading shimmer ==================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(170, 183, 255, 0.06),
+    rgba(170, 183, 255, 0.12),
+    rgba(170, 183, 255, 0.06)
+  );
+  background-size: 1000px 100%;
+  animation: hm-shimmer 2s ease-in-out infinite;
+}
+
+/* Toast notification animations ============================== */
+.toast {
+  animation: hm-slide-in-up var(--hm-dur-base) var(--hm-ease-emphasized) both;
+}
+.toast.exit {
+  animation: hm-slide-out-down var(--hm-dur-base) var(--hm-ease-emphasized) both;
+}
+@keyframes hm-slide-out-down {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(12px); }
+}
+
+/* Modal/dialog entrance ====================================== */
+.info-modal:not([hidden]) {
+  animation: hm-fade-in var(--hm-dur-base) var(--hm-ease-standard) both;
+}
+.info-modal:not([hidden]) .info-card {
+  animation: hm-pop-in var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+
+/* Tab switching animation ==================================== */
+[role="tabpanel"] {
+  animation: hm-fade-in var(--hm-dur-base) var(--hm-ease-standard);
+}
+
+/* Accordion expand/collapse ================================== */
+[role="region"][aria-expanded="true"] {
+  animation: hm-slide-in-down var(--hm-dur-base) var(--hm-ease-standard) both;
+}
+
+/* State change pulse ========================================= */
+[data-changed="true"],
+.changed {
+  animation: hm-pulse var(--hm-dur-base) var(--hm-ease-standard);
+}
+
+/* Micro-interactions: Checkbox animation ==================== */
+input[type="checkbox"]:checked {
+  animation: hm-bounce-in var(--hm-dur-fast) var(--hm-ease-emphasized);
+}
+
+/* Select dropdown open animation ============================= */
+select:focus {
+  animation: hm-bounce-in var(--hm-dur-fast) var(--hm-ease-emphasized);
+}
+
+/* Scroll-to indicator pulse ================================= */
+.scroll-to-me {
+  animation: hm-pulse var(--hm-dur-slow) ease-in-out infinite;
+}
+
+/* Focus indicator subtle glow =============================== */
+:focus-visible {
+  animation: hm-pulse 1.2s ease-in-out 1;
+}
+
+/* Disable animations on prefers-reduced-motion ============= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  button:active,
+  [role="button"]:active,
+  .btn:active {
+    transform: none;
+  }
+  .stat:hover,
+  .legend-item:hover,
+  .compare-row:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   v0.9.8 — Mobile UI polish + touch interactions + responsive
+   Mobile-first refinement: touch target sizing, mobile-optimized
+   spacing, swipe gestures, hamburger menu polish, tab bar, and
+   responsive layout adjustments for small screens.
+   ============================================================ */
+
+/* Touch target sizing (minimum 44px) ========================= */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  a,
+  [role="link"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+  .icon-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Mobile panel layout ========================================= */
+@media (max-width: 640px) {
+  section.storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel {
+    border-radius: 12px 12px 0 0;
+    max-height: 85vh;
+    bottom: 0 !important;
+  }
+  
+  section.storm-panel #panel-body,
+  .stats-panel #stats-body,
+  .compare-panel #compare-body,
+  .state-panel #state-body {
+    padding: 14px 12px;
+  }
+  
+  .stat-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* Mobile search results ====================================== */
+@media (max-width: 640px) {
+  .search-results {
+    max-height: 50vh;
+    border-radius: 12px;
+  }
+  .search-results li {
+    padding: 12px 14px;
+  }
+}
+
+/* Mobile button sizing ======================================= */
+@media (max-width: 640px) {
+  button:not(.icon-btn):not(.close-btn),
+  [role="button"]:not(.icon-btn) {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+}
+
+/* Mobile filter panel spacing =============================== */
+@media (max-width: 640px) {
+  aside.filters {
+    padding: 12px;
+  }
+  .filter-row {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .cat-toggles {
+    gap: 6px;
+  }
+  .cat-btn {
+    padding: 8px 0;
+    min-width: 0;
+  }
+}
+
+/* Mobile legend spacing ====================================== */
+@media (max-width: 640px) {
+  .legend {
+    padding: 12px;
+  }
+  .legend-item {
+    padding: 8px 0;
+  }
+}
+
+/* Mobile header responsive ================================== */
+@media (max-width: 640px) {
+  .app-header,
+  header.app-header.glass {
+    padding: 10px;
+    gap: 10px;
+  }
+  .title-block h1 {
+    font-size: 16px;
+  }
+  .title-block .subtitle {
+    font-size: 10px;
+  }
+}
+
+/* Mobile timeline =========================================== */
+@media (max-width: 640px) {
+  .timeline-ribbon {
+    height: 64px;
+    padding: 6px;
+  }
+  .timeline-ribbon.collapsed {
+    height: 24px;
+    padding: 2px;
+  }
+}
+
+/* Mobile season summary ===================================== */
+@media (max-width: 640px) {
+  .season-summary {
+    width: calc(100vw - 32px);
+    left: 16px;
+    right: 16px;
+    padding: 12px;
+  }
+  .ss-stat-num {
+    font-size: 18px;
+  }
+  .ss-stat-label {
+    font-size: 8px;
+  }
+}
+
+/* Mobile info card ========================================== */
+@media (max-width: 640px) {
+  .info-card {
+    padding: 16px 14px;
+    font-size: 12px;
+  }
+  .info-card h2 {
+    font-size: 18px;
+    margin: 0 0 8px;
+  }
+  .info-card h3 {
+    font-size: 10.5px;
+    margin: 12px 0 6px;
+  }
+}
+
+/* Mobile compare tray ======================================= */
+@media (max-width: 640px) {
+  .compare-tray {
+    padding: 8px 10px;
+    max-height: 40vh;
+  }
+  .compare-tray li {
+    padding: 8px;
+    font-size: 10px;
+  }
+}
+
+/* Touch feedback for interactive elements =================== */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  [role="button"],
+  a,
+  [role="link"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    -webkit-tap-highlight-color: rgba(170, 183, 255, 0.16);
+  }
+}
+
+/* Prevent zoom on input focus (iOS) ========================= */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Mobile-optimized dropdowns =============================== */
+@media (max-width: 640px) {
+  select {
+    min-height: 44px;
+    padding: 12px 10px;
+  }
+}
+
+/* Safe area support for notched devices ==================== */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  .app-header,
+  header.app-header.glass {
+    left: max(12px, env(safe-area-inset-left));
+  }
+  .timeline-ribbon {
+    left: max(16px, env(safe-area-inset-left));
+    right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Landscape mode adjustments =============================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header,
+  header.app-header.glass {
+    min-height: 50px;
+    padding: 8px 12px;
+  }
+  .title-block h1 {
+    font-size: 14px;
+  }
+  .timeline-ribbon {
+    height: 60px;
+    padding: 4px;
+  }
+}
+
+/* Tablet layout optimization =============================== */
+@media (max-width: 1024px) and (min-width: 641px) {
+  aside.filters {
+    max-width: 360px;
+  }
+  section.storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel {
+    max-width: 420px;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large screen optimization =============================== */
+@media (min-width: 1921px) {
+  .stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .compare-row {
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   v0.9.9 — Performance polish + perceived quality + final touches
+   Final polish pass: optimized rendering, perceived performance
+   improvements, subtle delight moments, better loading indicators,
+   final visual refinements, and quality-of-life improvements.
+   ============================================================ */
+
+/* GPU acceleration for smooth animations ==================== */
+.storm-panel,
+.stats-panel,
+.compare-panel,
+.state-panel,
+aside.filters,
+.search-results,
+button,
+input,
+select {
+  will-change: transform, opacity;
+}
+
+/* Prevent layout shift on scrollbar appearance ============= */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Faster focus visible response ============================= */
+:focus-visible {
+  outline-offset: 2px;
+  outline-width: 2px;
+}
+
+/* Smooth page transitions ==================================== */
+* {
+  transition: background-color var(--hm-dur-base) var(--hm-ease-standard);
+}
+button,
+input,
+select,
+a {
+  transition: 
+    background-color var(--hm-dur-base) var(--hm-ease-standard),
+    color var(--hm-dur-base) var(--hm-ease-standard),
+    border-color var(--hm-dur-base) var(--hm-ease-standard),
+    box-shadow var(--hm-dur-base) var(--hm-ease-standard);
+}
+
+/* Better text rendering ===================================== */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* No flashing on page load ================================== */
+body.loading {
+  opacity: 0;
+  animation: hm-fade-in var(--hm-dur-slow) var(--hm-ease-standard) forwards;
+}
+
+/* Better cursor feedback ===================================== */
+button,
+[role="button"],
+a,
+[role="link"],
+label,
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+input:disabled,
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Placeholder text refinement =============================== */
+::placeholder {
+  color: #7a8ba6;
+  opacity: 0.8;
+  font-weight: 400;
+}
+::-moz-placeholder {
+  color: #7a8ba6;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+/* Autofill styling ========================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(170, 183, 255, 0.04) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+}
+
+/* Link underline animation ================================== */
+a:not([class]) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: 
+    text-decoration-color var(--hm-dur-base) var(--hm-ease-standard);
+}
+a:not([class]):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Code block background animation =========================== */
+code {
+  transition: 
+    background var(--hm-dur-base) var(--hm-ease-standard),
+    color var(--hm-dur-base) var(--hm-ease-standard);
+}
+
+/* Better disabled state contrast ============================= */
+[disabled],
+[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading indicator size ===================================== */
+.loading-icon,
+.spinner {
+  color: #aab7ff;
+}
+
+/* Subtle underline on links ================================= */
+.info-card a,
+.comparison-text a {
+  text-decoration: none;
+  position: relative;
+  border-bottom: 1px solid rgba(170, 183, 255, 0.24);
+  transition: all var(--hm-dur-base) var(--hm-ease-standard);
+}
+.info-card a:hover,
+.comparison-text a:hover {
+  border-bottom-color: #aab7ff;
+  background: rgba(170, 183, 255, 0.08);
+  padding-bottom: 1px;
+}
+
+/* Breadcrumb styling ======================================== */
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 10px;
+  align-items: center;
+}
+.breadcrumb-item {
+  color: var(--subtext);
+}
+.breadcrumb-item.active {
+  color: var(--text);
+  font-weight: 600;
+}
+.breadcrumb-separator {
+  color: #7a8ba6;
+  opacity: 0.5;
+}
+
+/* Vertical spacing system ================================== */
+.spacing-xs { margin: 4px; }
+.spacing-sm { margin: 8px; }
+.spacing-md { margin: 12px; }
+.spacing-lg { margin: 16px; }
+.spacing-xl { margin: 24px; }
+
+.gap-xs { gap: 4px; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 12px; }
+.gap-lg { gap: 16px; }
+.gap-xl { gap: 24px; }
+
+/* Max-width containers ===================================== */
+.container { max-width: 1200px; margin: 0 auto; }
+.container-sm { max-width: 600px; margin: 0 auto; }
+.container-lg { max-width: 1400px; margin: 0 auto; }
+
+/* Flex utilities ============================================ */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center { justify-content: center; align-items: center; }
+.flex-between { justify-content: space-between; align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+
+/* Grid utilities ============================================ */
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Text alignment utilities ================================= */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Font weight utilities ===================================== */
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* Opacity utilities ========================================= */
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+/* Display utilities ========================================= */
+.hidden { display: none !important; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.block { display: block; }
+
+/* Transition utilities ====================================== */
+.transition-none { transition: none; }
+.transition-fast { transition: all var(--hm-dur-fast) var(--hm-ease-standard); }
+.transition-base { transition: all var(--hm-dur-base) var(--hm-ease-standard); }
+.transition-slow { transition: all var(--hm-dur-slow) var(--hm-ease-standard); }
+
+/* Rounded utilities ========================================= */
+.rounded-none { border-radius: 0; }
+.rounded-sm { border-radius: 4px; }
+.rounded { border-radius: 6px; }
+.rounded-lg { border-radius: 10px; }
+.rounded-xl { border-radius: 16px; }
+.rounded-full { border-radius: 9999px; }
+
+/* Shadow utilities ========================================== */
+.shadow-none { box-shadow: none; }
+.shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+.shadow { box-shadow: var(--hm-elev-1); }
+.shadow-lg { box-shadow: var(--hm-elev-2); }
+.shadow-xl { box-shadow: var(--hm-elev-3); }
+
+/* Cursor utilities ========================================== */
+.cursor-auto { cursor: auto; }
+.cursor-default { cursor: default; }
+.cursor-pointer { cursor: pointer; }
+.cursor-wait { cursor: wait; }
+.cursor-help { cursor: help; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* User select utilities ===================================== */
+.select-none { user-select: none; }
+.select-text { user-select: text; }
+.select-all { user-select: all; }
+
+/* Pointer events utilities ================================= */
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }
+
+/* Print media optimization ================================= */
+@media print {
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  a {
+    text-decoration: underline;
+  }
+  button {
+    border: 1px solid #000;
+  }
+}
+
+/* Final quality-of-life improvements ======================= */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure readable fonts at all sizes ======================= */
+body {
+  min-font-size: 12px;
+}
+
+/* Better aspect ratio support ============================== */
+[style*="--aspect-ratio"] {
+  position: relative;
+}
+[style*="--aspect-ratio"]::before {
+  content: "";
+  display: block;
+  padding-bottom: calc(100% / (var(--aspect-ratio, 1)));
+}
+[style*="--aspect-ratio"] > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+
 
 

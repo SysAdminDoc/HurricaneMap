@@ -4,6 +4,52 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.9 — Performance polish + perceived quality + utilities (2025)
+
+Final comprehensive refinement pass: optimized rendering with GPU acceleration, perceived performance improvements, comprehensive utility classes for rapid composition, loading state animations, better cursor feedback, and final visual polish touches.
+
+- **GPU acceleration.** Applied `will-change` to animated elements for smooth 60fps rendering; `scrollbar-gutter: stable` prevents layout shift.
+- **Perceived performance.** Refined focus responses, smooth page transitions, better text rendering, and loading indicators with spinner animations.
+- **Cursor feedback.** Proper cursor states (pointer, not-allowed, wait, help) on all interactive elements.
+- **Autofill styling.** iOS/Chrome autofill fields now styled consistently with app palette.
+- **Link styling.** Animated underlines and subtle background highlights on hover.
+- **Breadcrumb component.** Professional breadcrumb styling with separators.
+- **Comprehensive utility classes.** Spacing (spacing-xs/sm/md/lg/xl), gaps, flex helpers, grid templates, text alignment, font weights, opacity, display, transitions, rounded corners, shadows, cursors, user-select, pointer-events.
+- **Container utilities.** .container, .container-sm, .container-lg with max-widths.
+- **Print media optimization.** Proper print stylesheet with readable fonts and visible links.
+- **Aspect ratio support.** CSS aspect-ratio helper with fallback for older browsers.
+- **Image/video optimization.** Responsive media elements with proper max-widths.
+- **Service worker bumped** to `hm-v0.9.9`.
+
+## v0.9.8 — Mobile UI polish + touch interactions (2025)
+
+Mobile-first refinement: touch target sizing (minimum 44px), mobile-optimized spacing, safe area support for notched devices, landscape mode adjustments, and responsive layout optimizations for all screen sizes.
+
+- **Touch target sizing.** All interactive elements (buttons, inputs, checkboxes, links) now have minimum 44x44px touch targets on mobile.
+- **Mobile panel layout.** Panels use full-width layout with rounded top corners on mobile.
+- **Mobile search results.** Optimized dropdown sizing and spacing for touch interaction.
+- **Safe area support.** Proper padding for notched devices using CSS `env(safe-area-inset-*)`.
+- **Landscape mode.** Adjusted header and timeline heights for landscape viewing.
+- **Tablet optimization.** Mid-sized screens get optimized panel widths (360px filters, 420px storm panel).
+- **Large screen optimization.** 3-column stat grid for ultra-wide displays.
+- **Prevent zoom on input.** iOS font-size set to 16px to prevent unwanted zoom on input focus.
+- **Mobile button sizing.** Larger, easier-to-tap buttons on touch devices.
+- **Touch feedback.** -webkit-tap-highlight-color for visual feedback on touch.
+
+## v0.9.7 — Animations + micro-interactions + motion refinement (2025)
+
+Premium motion design pass: refined entrance/exit animations, smooth state transitions, micro-interactions (button presses, card lifts, ripples), skeleton animations, and loading states with proper timing and easing.
+
+- **Entrance/exit animations.** Panels slide in from sides (hm-slide-in-right/left), modals pop in (hm-pop-in), toasts slide in from bottom.
+- **Card hover animations.** Stats, legend items, and compare rows lift on hover with shadow elevation.
+- **Button interactions.** Press effect with slight scale-down (scale 0.98); settings pills have active state animations.
+- **Loading animations.** Spinner rotation, shimmer effect for skeleton states, pulse animation for state changes.
+- **Focus animations.** Subtle pulse on focus-visible for better visibility.
+- **Tab/accordion animations.** Smooth fade-in and slide-down for expanding content.
+- **Checkbox animation.** Bounce-in effect when checked.
+- **Select focus animation.** Bounce-in effect when select dropdown opens.
+- **Reduced motion support.** All animations disabled when `prefers-reduced-motion: reduce`.
+
 ## v0.9.6 — Microcopy + empty states + design system polish (2025)
 
 Final premium-polish pass completing the comprehensive design system overhaul. Includes refined empty states and error messaging with semantic color coding, improved helper text and placeholder styling, button label consistency, badge styling system, enhanced typography scales, list and table styling, tooltips, accessibility features, and support for density and high-contrast modes. The app now feels cohesive, intentional, and premium across every surface.
