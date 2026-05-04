@@ -5725,3 +5725,225 @@ section.storm-panel .meta-row[style*="padding:24px"] {
     padding: 10px 12px;
   }
 }
+
+/* ============================================================
+   v0.9.4 — Info panel + settings polish + scrollbar unification
+   Final polish pass: info card styled with branded scrollbar,
+   settings panel visual refinement, consistent keyboard focus
+   across all surfaces, and scrollbar unification system-wide.
+   ============================================================ */
+
+/* Info card — branded scrollbar + refined content typography -- */
+.info-card::-webkit-scrollbar {
+  width: 6px;
+}
+.info-card::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+.info-card::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+.info-card a {
+  transition: opacity var(--hm-dur-fast) var(--hm-ease-standard),
+              color var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.info-card a:hover {
+  opacity: 0.9;
+  text-decoration: underline;
+}
+.info-card a:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.info-card em {
+  font-style: italic;
+  color: var(--subtext);
+}
+.info-card strong {
+  font-weight: 700;
+}
+
+/* Settings menu polish — button group consistency ----------- */
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(218, 229, 255, 0.06);
+}
+.settings-row:last-child {
+  border-bottom: none;
+}
+.settings-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a8ba6;
+  padding: 0 0 4px;
+}
+.settings-pillgroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.settings-pill {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid rgba(218, 229, 255, 0.12);
+  background: rgba(170, 183, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background var(--hm-dur-fast) var(--hm-ease-standard),
+    border-color var(--hm-dur-fast) var(--hm-ease-standard),
+    color var(--hm-dur-fast) var(--hm-ease-standard),
+    box-shadow var(--hm-dur-fast) var(--hm-ease-standard);
+}
+.settings-pill:hover {
+  background: rgba(170, 183, 255, 0.10);
+  border-color: rgba(170, 183, 255, 0.24);
+}
+.settings-pill.on {
+  background: rgba(170, 183, 255, 0.18);
+  border-color: #aab7ff;
+  color: #e9f0ff;
+  box-shadow: 0 0 12px rgba(170, 183, 255, 0.14);
+}
+.settings-pill:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+}
+.settings-meta {
+  font-size: 9px;
+  color: #7a8ba6;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.06);
+  font-weight: 600;
+}
+
+/* Info modal backdrop ======================================== */
+.info-modal {
+  background: rgba(4, 8, 14, 0.82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.info-modal:not([hidden]) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.info-modal:not([hidden]) .info-card {
+  animation: hm-modal-in var(--hm-dur-slow) var(--hm-ease-emphasized) both;
+}
+@keyframes hm-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Close button styling — consistent across all panels -------- */
+.close-btn,
+button.close-btn,
+.panel-close {
+  padding: 4px 6px;
+  font-size: 18px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: color var(--hm-dur-fast) var(--hm-ease-standard),
+              background var(--hm-dur-fast) var(--hm-ease-standard),
+              border-radius var(--hm-dur-fast) var(--hm-ease-standard);
+  border-radius: 4px;
+}
+.close-btn:hover,
+button.close-btn:hover,
+.panel-close:hover {
+  color: var(--text);
+  background: rgba(170, 183, 255, 0.08);
+}
+.close-btn:focus-visible,
+button.close-btn:focus-visible,
+.panel-close:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+}
+
+/* Icon button consistency ===================================== */
+.icon-btn:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+/* Scrollbar system-wide styling —  unified --- */
+aside.filters::-webkit-scrollbar-thumb,
+section.storm-panel #panel-body::-webkit-scrollbar-thumb,
+.stats-panel #stats-body::-webkit-scrollbar-thumb,
+.compare-panel #compare-body::-webkit-scrollbar-thumb,
+.state-panel #state-body::-webkit-scrollbar-thumb,
+.info-card::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+aside.filters::-webkit-scrollbar-thumb:hover,
+section.storm-panel #panel-body::-webkit-scrollbar-thumb:hover,
+.stats-panel #stats-body::-webkit-scrollbar-thumb:hover,
+.compare-panel #compare-body::-webkit-scrollbar-thumb:hover,
+.state-panel #state-body::-webkit-scrollbar-thumb:hover,
+.info-card::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+
+/* Search results scrollbar (already exists, keeping for completeness) */
+.search-results::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+.search-results::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+
+/* Link styling in list items ================================= */
+.info-card a,
+.info-card li > a {
+  text-decoration: none;
+  color: #aab7ff;
+}
+.info-card a:visited {
+  color: #c8a8ff;
+}
+.info-card a:hover {
+  color: #d2cbff;
+  text-decoration: underline;
+}
+
+/* Code block styling in info ================================ */
+.info-card code {
+  background: rgba(170, 183, 255, 0.06);
+  border: 1px solid rgba(170, 183, 255, 0.12);
+  color: #aab7ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 500;
+}
+
+/* Typography refinements ===================================== */
+.info-card strong { color: var(--text); font-weight: 700; }
+.info-card em { color: var(--subtext); font-style: italic; }
+.info-card p { line-height: 1.65; margin-bottom: 8px; color: var(--subtext); }
+.info-card li { line-height: 1.6; margin-bottom: 6px; }
+
