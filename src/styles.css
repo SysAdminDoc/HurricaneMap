@@ -3904,3 +3904,297 @@ body:has(.timeline-ribbon.collapsed) .legend { bottom: calc(12px + 28px + 12px);
   outline-offset: 2px;
   border-radius: 6px;
 }
+
+/* ============================================================
+   v0.7.0 — Season summary card, search section labels,
+   print stylesheet, full reduced-motion sweep.
+   ============================================================ */
+
+/* Season summary card — bottom-left, sibling of legend */
+.season-summary {
+  position: fixed;
+  left: 16px;
+  bottom: 224px;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  z-index: 720;
+  padding: 14px 16px 16px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  animation: ssEnter 240ms cubic-bezier(.2,.7,.2,1);
+}
+@keyframes ssEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+body:has(.timeline-ribbon) .season-summary { bottom: 268px; }
+.season-summary[hidden] { display: none !important; }
+.season-summary > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.season-summary h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+.season-close {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-size: 18px;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.season-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+.season-close:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99,179,237,0.3);
+}
+.ss-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ss-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+}
+.ss-stat-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ss-stat-lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.ss-tiers {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+.ss-tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  font-size: 10px;
+  transition: background 120ms ease, transform 120ms ease;
+}
+.ss-tier.has { background: rgba(255,255,255,0.05); }
+.ss-tier.empty { opacity: 0.45; }
+.ss-tier:hover { transform: translateY(-1px); }
+.ss-tier-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.5);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.ss-tier-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+.ss-tier-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.ss-superlatives {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ss-superlatives > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.025);
+  border-left: 2px solid var(--accent);
+  border-radius: 4px;
+}
+.ss-superlatives dt {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+.ss-superlatives dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text);
+}
+.ss-superlatives dd.ss-loading {
+  opacity: 0.45;
+  font-style: italic;
+}
+.ss-meta {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+.season-empty {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-style: italic;
+  margin: 4px 0 0;
+}
+
+/* Search section labels (history + did-you-mean dividers) */
+.search-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  padding: 6px 12px 4px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  pointer-events: none;
+  list-style: none;
+  cursor: default;
+}
+.search-section-label:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+/* ============================================================
+   Print stylesheet — keep map+open storm panel, hide chrome.
+   ============================================================ */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .app-header,
+  .legend,
+  .leaflet-control-container,
+  .timeline-ribbon,
+  .compare-tray,
+  .filters,
+  .filters-fab,
+  #toggle-stats,
+  #toggle-info,
+  #toggle-settings,
+  .onb-overlay,
+  .toast-host,
+  .toast,
+  .settings-panel,
+  .info-panel,
+  .stats-panel,
+  .season-summary,
+  .search-results,
+  .install-prompt {
+    display: none !important;
+  }
+  /* Map fills page; static last-rendered tiles. */
+  #map {
+    position: relative !important;
+    width: 100% !important;
+    height: 60vh !important;
+    page-break-inside: avoid;
+  }
+  /* If a storm panel is open, promote it below the map full-width. */
+  .storm-panel {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    inset: auto !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: 1px solid #999 !important;
+    page-break-inside: avoid;
+  }
+  .storm-panel * { color: black !important; }
+  .storm-panel .panel-close,
+  .storm-panel .panel-actions { display: none !important; }
+  /* Charts: keep but let them flow naturally, avoid splitting. */
+  .storm-panel canvas,
+  .storm-panel svg {
+    page-break-inside: avoid;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  /* Keep tile attribution visible for print compliance. */
+  .leaflet-control-attribution {
+    display: block !important;
+    position: static !important;
+    background: white !important;
+    color: black !important;
+    font-size: 9px !important;
+  }
+}
+
+/* ============================================================
+   Reduced-motion full sweep — disable transitions+animations,
+   keep state changes registering via 0.01ms duration.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Disable specific named animations entirely. */
+  .toast,
+  .onb-overlay,
+  .onb-card,
+  .install-prompt,
+  .season-summary,
+  .panel-actions__btn,
+  .search-results li,
+  .ss-tier,
+  .legend-item,
+  .timeline-ribbon-track .timeline-bar,
+  .ss-superlatives > div {
+    animation: none !important;
+  }
+  /* Map pan/zoom flash — Leaflet honors this internally already. */
+}
+
+/* Mobile: shrink season card and reposition above legend. */
+@media (max-width: 640px) {
+  .season-summary {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    bottom: 168px;
+    padding: 10px 12px;
+  }
+  body:has(.timeline-ribbon) .season-summary { bottom: 208px; }
+  .ss-stat-num { font-size: 16px; }
+  .ss-tiers { grid-template-columns: repeat(6, 1fr); gap: 2px; }
+}

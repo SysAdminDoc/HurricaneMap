@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v0.6.1';
+const SW_VERSION = 'hm-v0.7.0';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -35,6 +35,9 @@ const SHELL_ASSETS = [
   './src/onboarding.js',
   './src/timeline.js',
   './src/sparkline.js',
+  './src/season.js',
+  './src/fuzzy.js',
+  './src/search-history.js',
   './branding/favicon.png',
   './branding/logo.png',
 ];
