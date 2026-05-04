@@ -2,6 +2,17 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.6 — Theme system hardening (May 2026)
+
+**Full theme audit pass for dark, light, system, colorblind, and high-contrast modes.**
+
+### Improved
+- Added a System theme setting that follows the operating system color scheme while preserving existing Dark and Light choices.
+- Added effective-theme metadata on the document root so the UI can distinguish the stored preference from the active rendered theme.
+- Centralized semantic theme tokens for app background, foreground, muted text, surfaces, controls, borders, focus rings, status states, disabled states, and Leaflet controls.
+- Added a final theme-hardening CSS layer for panels, settings, filters, forms, buttons, popovers, search results, toasts, empty/error/loading states, comparison/radar/timelapse controls, and map controls.
+- Bumped the service worker shell cache to `hm-v1.3.6` so live users receive the theme-system fixes.
+
 ## v1.3.5 — Timelapse dock and playback contrast (May 2026)
 
 **Focused polish fix for unreadable playback state and the oversized season timelapse bar.**
