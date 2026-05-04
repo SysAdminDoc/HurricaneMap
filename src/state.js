@@ -32,9 +32,9 @@ export async function enableStateClicks(map) {
       stateLayer = L.geoJSON(gj, {
         pane: 'statesPane',
         style: () => ({
-          color: '#9fb2c7',
-          weight: 0.6,
-          opacity: 0.2,
+          color: '#aab7ff',
+          weight: 0.8,
+          opacity: 0.42,
           fillColor: '#64d2ff',
           fillOpacity: 0,
           interactive: true,
@@ -42,10 +42,10 @@ export async function enableStateClicks(map) {
         onEachFeature: (feature, layer) => {
           const name = feature.properties.name;
           layer.on('mouseover', () => {
-            layer.setStyle({ opacity: 0.5, fillOpacity: 0.04 });
+            layer.setStyle({ opacity: 0.9, weight: 1.3, fillOpacity: 0.06 });
           });
           layer.on('mouseout', () => {
-            layer.setStyle({ opacity: 0.18, fillOpacity: 0 });
+            layer.setStyle({ opacity: 0.42, weight: 0.8, fillOpacity: 0 });
           });
           layer.on('click', (e) => {
             L.DomEvent.stopPropagation(e);
