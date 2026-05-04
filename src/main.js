@@ -26,6 +26,7 @@ import { init as initKeyboard } from './keyboard.js';
 import { maybeShowTimelapseControls } from './timelapse.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
+import { exportQGISGeoJSON } from './qgis.js';
 
 const filters = {
   yearMin: 1851,
@@ -130,6 +131,7 @@ const els = {
   toggleInfoBtn: document.getElementById('toggle-info'),
   exportBtn: document.getElementById('export-publication'),
   reportBtn: document.getElementById('generate-report'),
+  qgisBtn: document.getElementById('export-qgis'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   loading: document.getElementById('loading'),
@@ -669,6 +671,13 @@ function wireUI() {
     els.reportBtn.addEventListener('click', () => {
       const { markdown, title } = generateStatisticalReport(filters);
       downloadReportAsText(markdown, title);
+    });
+  }
+
+  // QGIS export button
+  if (els.qgisBtn) {
+    els.qgisBtn.addEventListener('click', () => {
+      exportQGISGeoJSON(filters);
     });
   }
 
