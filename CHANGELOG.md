@@ -4,6 +4,19 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.4 — Info panel + settings polish + scrollbar unification (2025)
+
+Continued premium polish pass focused on secondary surfaces and consistency refinements. Info card panel receives branded scrollbar treatment with gradient styling, settings menu buttons refined with hover/active states and proper focus rings, and scrollbar styling unified across the entire application using a lavender-to-sapphire gradient.
+
+- **Info card styled with branded scrollbar.** Applied the same gradient scrollbar (lavender→sapphire) used throughout the app; improved link styling with hover states and focus rings; refined typography hierarchy (em, strong, code blocks).
+- **Settings menu button polish.** Settings pills now have proper hover backgrounds, active state with glow effect, and consistent focus ring treatment. Clear visual feedback for selected state with border highlight + box-shadow.
+- **Close button consistency.** All close buttons (×) across panels now share unified styling with subtle hover backgrounds, proper color transitions, and keyboard focus rings.
+- **Icon button keyboard focus.** Header icon buttons now have proper `focus-visible` rings with correct border-radius and outline offsets.
+- **Scrollbar system-wide unification.** All scrollable surfaces (filters, panels, info card, search results) now use the same branded gradient scrollbar with consistent opacity behavior (0.6 normal, 1.0 on hover).
+- **Link styling refinement.** Info card links properly styled with color inheritance, hover states, visited state, and keyboard focus visibility.
+- **Code block styling improved.** Inline code blocks in info card have subtle background tints, borders, and proper font sizing.
+- **Service worker bumped** to `hm-v0.9.4`.
+
 ## v0.9.3 — Compare/state panels + impacts card + search polish (2025)
 
 Continued premium polish pass focused on styling the compare and state panels with the same flexbox treatment as storm/stats, impacts block elevated to a proper info card, search results refined with better hover states, and comprehensive focus ring consistency across all interactive surfaces.
