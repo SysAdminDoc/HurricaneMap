@@ -332,7 +332,8 @@ label > input[type="checkbox"] {
 .storm-panel,
 .stats-panel,
 .compare-panel,
-.state-panel {
+.state-panel,
+.on-this-date-panel {
   position: absolute;
   top: 110px;
   right: 16px;
@@ -1073,6 +1074,89 @@ section.storm-panel.glass {
 @media (max-width: 720px) {
   .compare-panel { width: calc(100% - 32px); right: 16px; left: 16px; }
   .compare-tray { flex-wrap: wrap; bottom: auto; top: 80px; }
+}
+
+/* On this date panel */
+.otd-content h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.otd-meta {
+  font-size: 11px;
+  color: var(--subtext);
+  margin: 0 0 12px;
+}
+.otd-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.otd-item {
+  padding: 10px;
+  background: var(--mantle);
+  border: 1px solid var(--surface0);
+  border-radius: 8px;
+  font-size: 12px;
+  transition: all 120ms ease;
+}
+.otd-item:hover {
+  background: var(--surface0);
+  border-color: var(--lavender);
+}
+.otd-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.otd-year {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--subtext);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 40px;
+}
+.otd-link {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--lavender);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 120ms ease;
+}
+.otd-link:hover {
+  color: var(--lavender);
+}
+.otd-details {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--subtext);
+}
+.otd-wind {
+  font-weight: 600;
+  color: var(--text);
+}
+.otd-date,
+.otd-days {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (max-width: 720px) {
+  .on-this-date-panel { width: calc(100% - 32px); right: 16px; left: 16px; }
 }
 
 /* Stats panel */
