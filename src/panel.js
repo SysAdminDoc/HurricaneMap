@@ -15,7 +15,7 @@ import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
-  computeCityReturnPeriods, findSimilarStorms,
+  computeCityReturnPeriods, findSimilarStorms, computeRIRiskScore,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -111,6 +111,12 @@ function render(storm, landfall, allStorms) {
     ? `<span class="storm-flag pf-flag" title="Explosive deepening: pressure dropped ${formatNumber(pressureFall.drop_mb, 0)} mb in ${Math.round(pressureFall.hours)}h (${formatTime(pressureFall.from_t)} → ${formatTime(pressureFall.to_t)}). The conventional 'explosive' threshold is ≥20 mb / 24h.">📉 Explosive deepening (−${formatNumber(pressureFall.drop_mb, 0)} mb / 24h)</span>`
     : '';
 
+  // Compute RI risk score
+  const riRisk = computeRIRiskScore(storm, allStorms);
+  const riRiskTitle = `RI Risk Score: Based on ${riRisk.similar_count} similar historical storms (peak wind ±15kt, genesis month ±1mo, first-24h gain ±10kt). ${riRisk.ri_count} of them experienced RI (≥30kt/24h). Probability: ${Math.round(riRisk.probability * 100)}%.`;
+  const riRiskIcon = riRisk.category === 'high' ? '🔴' : riRisk.category === 'medium' ? '🟡' : '🟢';
+  const riRiskTile = `<div class="stat" title="${escapeHtml(riRiskTitle)}"><div class="label">RI risk <span class="metric-info">ⓘ</span></div><div class="value">${riRiskIcon} ${riRisk.category === 'high' ? 'High' : riRisk.category === 'medium' ? 'Medium' : 'Low'}</div></div>`;
+
   const transStats = computeTranslationStats(storm.track);
   const transStr = transStats
     ? `${formatNumber(transStats.mean_kmh, 0)} km/h <span style="font-size:11px;color:var(--subtext)">(${formatNumber(kmhToMph(transStats.mean_kmh), 0)} mph)</span>`
@@ -151,6 +157,7 @@ function render(storm, landfall, allStorms) {
       <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
       <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
       <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
+      ${riRiskTile}
     </div>
 
     <div class="closest-pass-row" id="closest-pass-row">
