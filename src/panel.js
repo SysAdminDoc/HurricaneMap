@@ -64,7 +64,6 @@ export async function showStorm(landfall) {
   const allStorms = getAllStorms();
   render(storm, landfall, allStorms);
 }
-}
 
 function render(storm, landfall, allStorms) {
   const niceName = titleCase(storm.name);
