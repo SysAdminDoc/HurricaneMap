@@ -2454,3 +2454,344 @@ a:focus-visible, [role="button"]:focus-visible {
   }
 }
 
+/* Phase 4: Advanced Responsive & Tablet Experience */
+@media (max-width: 1024px) {
+  .filters {
+    width: 300px;
+  }
+
+  .app-header {
+    gap: 10px;
+  }
+
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  input[type="number"],
+  input[type="search"],
+  select {
+    font-size: 16px; /* Prevent iOS zoom on input focus */
+  }
+}
+
+@media (max-width: 640px) {
+  .filters {
+    max-width: none;
+    width: calc(100% - 32px);
+  }
+
+  .app-header {
+    width: calc(100% - 32px);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .title-block h1 {
+    font-size: 18px;
+  }
+
+  .title-block .subtitle {
+    font-size: 11px;
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel {
+    width: calc(100% - 32px) !important;
+    max-height: 70vh;
+    border-radius: 12px;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cat-btn {
+    font-size: 12px;
+    padding: 6px 8px;
+    min-height: 32px;
+  }
+
+  .search-results {
+    max-height: 180px;
+  }
+
+  .legend {
+    display: none;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Phase 4: Ultra-Responsive (Mobile Phones) */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .title-block h1 {
+    font-size: 16px;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .filters {
+    padding: 12px 12px;
+  }
+
+  .filter-row {
+    gap: 4px;
+  }
+
+  .cat-toggles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .storm-panel h2,
+  .stats-panel h2 {
+    font-size: 18px;
+  }
+
+  .cat-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  input[type="number"],
+  input[type="search"],
+  select {
+    font-size: 16px;
+    height: 44px; /* WCAG AAA touch target */
+  }
+
+  .stat-tile,
+  .stat-group {
+    padding: 12px;
+  }
+
+  .text-btn {
+    font-size: 12px;
+    height: 36px;
+  }
+}
+
+/* Phase 4: Landscape Mobile */
+@media (max-height: 600px) and (max-width: 900px) {
+  .filters {
+    max-height: calc(100vh - 200px);
+  }
+
+  .storm-panel,
+  .stats-panel {
+    max-height: 85vh;
+  }
+
+  .legend {
+    display: none;
+  }
+}
+
+/* Phase 4: Large Screens (Desktop+) */
+@media (min-width: 1600px) {
+  .filters {
+    width: 340px;
+  }
+
+  .legend {
+    width: 200px;
+  }
+
+  .app-header {
+    max-width: 720px;
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel {
+    width: 420px;
+  }
+}
+
+/* Phase 4: Ultra-Wide Screens (4K+) */
+@media (min-width: 2560px) {
+  .filters {
+    width: 380px;
+    padding: 18px 20px;
+  }
+
+  .app-header {
+    max-width: 800px;
+    padding: 12px 16px;
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel {
+    width: 480px;
+  }
+
+  input[type="number"],
+  input[type="search"],
+  select {
+    font-size: 15px;
+    height: 44px;
+  }
+
+  .cat-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
+
+/* Phase 4: Landscape Optimization */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-header {
+    top: 8px;
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .title-block h1 {
+    font-size: 16px;
+  }
+
+  .filters {
+    top: auto;
+    bottom: 8px;
+  }
+
+  .legend {
+    bottom: 8px;
+  }
+
+  .storm-panel,
+  .stats-panel {
+    max-height: calc(100vh - 100px);
+  }
+}
+
+/* Phase 4: Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  input,
+  select,
+  [role="button"] {
+    min-height: 44px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .cat-btn {
+    min-height: 40px;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Remove hover effects on touch devices */
+  button:hover {
+    transform: none;
+    background: inherit;
+  }
+
+  .stat-tile:hover,
+  .stat-group:hover {
+    transform: none;
+  }
+
+  .cat-btn:hover:not(:disabled) {
+    background: inherit;
+  }
+
+  /* Use active states instead */
+  button:active {
+    opacity: 0.8;
+  }
+
+  .cat-btn:active {
+    background: rgba(170, 183, 255, 0.15);
+  }
+}
+
+/* Phase 4: High DPI (Retina) Adjustments */
+@media (-webkit-min-device-pixel-ratio: 2),
+       (min-resolution: 192dpi) {
+  .glass {
+    border-width: 0.5px;
+  }
+
+  .icon-btn,
+  .cat-btn,
+  input[type="number"],
+  input[type="search"],
+  select {
+    border-width: 0.5px;
+  }
+}
+
+/* Phase 4: Dark Mode Only Features */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
+  }
+}
+
+/* Phase 4: Light Mode Only Features */
+@media (prefers-color-scheme: light) {
+  .glass {
+    backdrop-filter: blur(12px) saturate(130%);
+  }
+
+  .icon-btn {
+    background: rgba(255, 255, 255, 0.4);
+  }
+}
+
+
