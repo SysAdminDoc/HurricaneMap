@@ -4,6 +4,16 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Interactive surfaces polish — v0.3.1
+
+- **Storm panel internals.** Section headings (`Landfalls`, `Track`, `Intensity over time`, etc.) now read as proper SECTION LABELS — uppercase, 0.09em tracked, with a 3px lavender→sapphire gradient bar on the left. Bottom hairline divider clearly separates each section.
+- **Landfall list.** Each entry is now a self-contained card with a left-edge lavender accent rail, soft hover lift (2px translate), and a tonal hover background. Date/time renders in JetBrains Mono with tabular numerals; place reads in semibold sans.
+- **Animation control bar.** Buttons unified to 32×32 with 8px radius, subtle hover lift, and lavender focus rings. Scrubber rebuilt with a sapphire→lavender gradient track and a 16px lavender thumb that scales on hover. HUD section gets dividers on either side; title/meta text is properly truncated. Radar toggle uses `:has(input:checked)` for a glowing on-state. Close button picks up a red-tinted destructive hover.
+- **Radar control panel.** Sapphire-themed throughout — title chip, pulsing pip, time readout in mono. Buttons share the unified 28×28 sizing with proper focus rings.
+- **Compare cards.** Cards now have hover state (border + background lift), swatch dots glow with their categorical color, table headers are uppercase tracked labels, empty state is generous and centered, hint banner reads as a tinted callout instead of plain text.
+- **Play-storm-animation button.** On the storm panel, this is now a full-width gradient lavender CTA with an inset highlight, hover lift, and proper focus ring — clearly the primary action.
+- **Mobile breakpoints.** 720px and 480px rules tighten the new surfaces (anim bar wraps cleanly, HUD goes full-width, padding shrinks proportionally). All new transforms suppressed under `prefers-reduced-motion`.
+
 ### Premium polish pass — v0.3.0
 
 - **Type system.** Adopted Inter (400/500/600/700/800) and JetBrains Mono with `cv11`/`ss03`/`tnum` font features so every numeric stat and timestamp renders in true tabular figures. Headings tightened to -0.015 to -0.02em tracking; body sits at a comfortable 14/1.55.
