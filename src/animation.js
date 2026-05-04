@@ -70,10 +70,38 @@ export class TrackAnimator {
     this.radarBounds = null;
     this.radarEnabled = true;     // toggled via checkbox in controls
     this.lastRadarUrl = null;
+    this.controlsHost = null;
+    this.stateCallback = null;
   }
 
   isPlaying() {
     return !!this.rafId && !this.paused;
+  }
+
+  isActive() {
+    return !!this.marker && !!this.storm;
+  }
+
+  isActiveFor(stormId) {
+    return this.isActive() && this.storm?.id === stormId;
+  }
+
+  hasEnded() {
+    return this.isActive() && !this.rafId && this.elapsed >= this.duration;
+  }
+
+  getPlaybackState() {
+    return {
+      active: this.isActive(),
+      playing: this.isPlaying(),
+      paused: this.isActive() && this.paused,
+      ended: this.hasEnded(),
+      stormId: this.storm?.id || null,
+    };
+  }
+
+  emitState() {
+    if (this.stateCallback) this.stateCallback(this.getPlaybackState());
   }
 
   /** Densify the 6-hour track by linear interpolation between adjacent points
@@ -99,14 +127,16 @@ export class TrackAnimator {
     return out;
   }
 
-  async play(storm, { onEnd } = {}) {
-    this.stop();
+  async play(storm, { onEnd, controlsHost, onStateChange } = {}) {
+    this.stop({ silent: true });
     this.storm = storm;
     this.densifiedTrack = this.densify(storm.track);
     this.elapsed = 0;
     this.paused = false;
     this.endCallback = onEnd || null;
     this.lastRadarUrl = null;
+    this.controlsHost = controlsHost || null;
+    this.stateCallback = typeof onStateChange === 'function' ? onStateChange : null;
 
     const first = this.densifiedTrack[0];
     this.marker = L.marker([first.lat, first.lon], {
@@ -141,6 +171,7 @@ export class TrackAnimator {
     this.buildControls();
     this.lastTickAt = performance.now();
     this.tick();
+    this.emitState();
   }
 
   buildIcon(sizePx) {
@@ -246,23 +277,25 @@ export class TrackAnimator {
   }
 
   buildControls() {
-    let el = document.getElementById('anim-controls');
-    if (!el) {
+    const host = this.controlsHost || document.body;
+    let el = this.controls;
+    if (!el || !host.contains(el)) {
+      if (el) el.remove();
       el = document.createElement('div');
-      el.id = 'anim-controls';
-      el.className = 'anim-controls glass';
-      document.body.appendChild(el);
+      el.className = this.controlsHost ? 'anim-controls anim-controls-inline glass' : 'anim-controls glass';
+      host.appendChild(el);
     }
+    if (this.controlsHost) this.controlsHost.hidden = false;
     const radarCount = this.radarFrames?.length || 0;
     const radarChip = radarCount
       ? `<label class="anim-radar-toggle" title="Show NEXRAD reflectivity in lockstep with the simulated UTC clock">
-           <input type="checkbox" class="anim-radar-cb" ${this.radarEnabled ? 'checked' : ''}>
-           📡 radar (${radarCount})
-         </label>`
-      : '<span class="anim-radar-toggle anim-radar-disabled" title="No archived radar for this storm (pre-1995 or out of coverage)">📡 —</span>';
+            <input type="checkbox" class="anim-radar-cb" ${this.radarEnabled ? 'checked' : ''}>
+            radar (${radarCount})
+          </label>`
+      : '<span class="anim-radar-toggle anim-radar-disabled" title="No archived radar for this storm (pre-1995 or out of coverage)">radar unavailable</span>';
     el.innerHTML = `
-      <button class="anim-btn" data-act="toggle" title="Play / pause">⏸</button>
-      <button class="anim-btn" data-act="restart" title="Restart">↻</button>
+      <button class="anim-btn" data-act="toggle" title="Pause playback" aria-label="Pause playback">Pause</button>
+      <button class="anim-btn" data-act="restart" title="Restart playback" aria-label="Restart playback">Restart</button>
       <input type="range" min="0" max="1000" value="0" class="anim-scrubber" />
       <select class="anim-speed" title="Playback speed">
         <option value="0.5">0.5×</option>
@@ -275,7 +308,7 @@ export class TrackAnimator {
         <div class="anim-title"></div>
         <div class="anim-meta"></div>
       </div>
-      <button class="anim-btn anim-close" data-act="close" title="Close animation">×</button>
+      <button class="anim-btn anim-close" data-act="close" title="Close animation" aria-label="Close animation">Close</button>
     `;
     el.hidden = false;
     this.controls = el;
@@ -323,37 +356,54 @@ export class TrackAnimator {
   }
 
   togglePause() {
+    if (!this.isActive()) return;
+    if (this.hasEnded()) {
+      this.restart();
+      return;
+    }
     this.paused = !this.paused;
     const btn = this.controls?.querySelector('[data-act="toggle"]');
-    if (btn) btn.textContent = this.paused ? '▶' : '⏸';
+    if (btn) {
+      btn.textContent = this.paused ? 'Play' : 'Pause';
+      btn.title = this.paused ? 'Resume playback' : 'Pause playback';
+      btn.setAttribute('aria-label', btn.title);
+    }
     if (!this.paused && !this.rafId && this.elapsed < this.duration) {
       this.lastTickAt = performance.now();
       this.tick();
     }
-    // If we hit the end and user un-pauses, restart from 0.
-    if (!this.paused && this.elapsed >= this.duration) {
-      this.restart();
-    }
+    this.emitState();
   }
 
   restart() {
     this.elapsed = 0;
     this.paused = false;
     const btn = this.controls?.querySelector('[data-act="toggle"]');
-    if (btn) btn.textContent = '⏸';
+    if (btn) {
+      btn.textContent = 'Pause';
+      btn.title = 'Pause playback';
+      btn.setAttribute('aria-label', btn.title);
+    }
     if (!this.rafId) {
       this.lastTickAt = performance.now();
       this.tick();
     }
+    this.emitState();
   }
 
   markEnded() {
     const btn = this.controls?.querySelector('[data-act="toggle"]');
-    if (btn) btn.textContent = '▶';
+    if (btn) {
+      btn.textContent = 'Replay';
+      btn.title = 'Replay track animation';
+      btn.setAttribute('aria-label', btn.title);
+    }
+    this.emitState();
     if (this.endCallback) this.endCallback();
   }
 
-  stop() {
+  stop({ silent = false } = {}) {
+    const callback = this.stateCallback;
     if (this.rafId) cancelAnimationFrame(this.rafId);
     this.rafId = null;
     if (this.marker) {
@@ -371,11 +421,21 @@ export class TrackAnimator {
     if (this.controls) {
       this.controls.hidden = true;
     }
+    if (this.controlsHost) {
+      this.controlsHost.hidden = true;
+    }
     this.densifiedTrack = null;
     this.storm = null;
     this.radarFrames = null;
     this.radarBounds = null;
     this.lastRadarUrl = null;
+    this.controlsHost = null;
+    this.stateCallback = null;
+    this.paused = false;
+    this.elapsed = 0;
+    if (!silent && callback) {
+      callback({ active: false, playing: false, paused: false, ended: false, stormId: null });
+    }
   }
 }
 

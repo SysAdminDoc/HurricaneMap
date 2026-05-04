@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.3.2-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.3.3-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -27,7 +27,7 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).
 - **Multi-state tracking** for storms like Andrew (FL → FL → LA), Charley (FL → FL → SC → SC), Hugo (PR → PR → SC), Katrina (FL → LA → LA).
 - Per-segment **intensity-coloured tracks** — you can see exactly where a storm intensified, peaked, and weakened.
-- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. **A 📡 checkbox in the control bar binds the actual NEXRAD reflectivity to the simulated UTC clock** — as the glyph traverses Florida and the Gulf, real radar paints onto the map at exactly the right moment. Watch Andrew '92 ramp from TS to Cat 5 to Cat 4 in 14 seconds with reflectivity locked to the same timeline.
+- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Playback controls live inside the storm side panel beneath the Play/Pause button, including radar sync, speed, restart, and scrubber controls.
 - **📡 Archived NEXRAD radar — full-storm timeline, offline-capable** — every storm from August 1995 onward ships with **every in-coverage 6-hourly track frame** baked into the repo. Click 📡 next to any landfall and the loop animates the entire U.S. passage of that storm from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days; Helene '24 shows the eyewall crossing the Big Bend. **No internet required after `git clone`.** Frames not in the local archive transparently fall back to live IEM URLs.
 - **📈 Intensity time-series chart** — inline SVG in every storm panel showing wind (kt) + pressure (mb) over the storm's life, with category-colored dots, dashed pressure line (inverted so deeper storms read higher), Cat 1-5 reference bands, vertical landfall markers, and a hover crosshair tooltip.
 - **🌀 Compare mode** — pin up to 4 storms, see their tracks color-coded on the map, side-by-side stat tables, mini intensity charts. Andrew '92 vs Katrina '05 vs Michael '18 in one view.
@@ -49,7 +49,7 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **Panel lane stabilized** — Storm, statistics, comparison, state, and "on this date" panels now share one fixed responsive side lane with mobile collision handling, so panels no longer overlap controls or each other.
 - **Keyboard-friendly search** — Search results now behave like a proper combobox/listbox with arrow-key navigation, Enter selection, Escape close, active-result highlighting, and clearer empty states.
 - **Resilient loading feedback** — Required data-load failures now surface a calm, actionable error card with retry guidance instead of silently rendering a broken empty map.
-- **Play button visibility** — Track playback controls are now pinned to a sticky header, always visible without requiring scrolling. Gradient background (lavender→blue) with enhanced shadows signals importance.
+- **Inline playback controls** — Track playback now drops down inside the storm side panel beneath the Play/Pause button, replacing the old viewport-wide playback bar that could overlap the map and panels.
 - **Deterministic year picking** — Timeline clicks now select the exact clicked year, drags select ranges, and double-click resets the full 1851–2025 span without competing click/drag events.
 - **State-filtered timeline** — Selecting a state now updates the year timeline to show *only* that state's landfalls, reducing visual noise and improving clarity.
 - **Histogram color intensity** — Category and decade bars now feature colored fills (matching Saffir-Simpson category colors), with opacity scaled to storm count, making patterns immediately recognizable.

@@ -2,6 +2,16 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.3 — Inline playback controls (May 2026)
+
+**Focused playback UX fix for panel overlap and clearer play/pause state.**
+
+### Fixed
+- Moved track playback controls out of the viewport-wide floating bar and into the storm side panel directly beneath the Play/Pause button.
+- Updated the storm-panel Play button so it becomes a Pause button while playback is running and Resume when paused or replayable.
+- Kept playback scrubber, speed, radar sync, restart, metadata, and close controls within the side-panel width so they no longer overlap filters, map content, or the storm panel.
+- Bumped the service worker shell cache to `hm-v1.3.3` so live users receive the inline playback fix.
+
 ## v1.3.2 — Panel and timeline stabilization (May 2026)
 
 **Focused follow-up pass for panel collisions, timeline precision, and non-intrusive year summaries.**
