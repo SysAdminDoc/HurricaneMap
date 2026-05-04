@@ -139,7 +139,6 @@ const els = {
 };
 
 async function boot() {
-  console.log('[boot] Starting');
   // Initialize locale (before any rendering)
   initLocale();
   const savedLocale = getSetting('locale');
@@ -147,7 +146,6 @@ async function boot() {
 
   // Start performance monitoring early
   initPerformanceMonitoring();
-  console.log('[boot] Theme and settings initialized');
   
   applyThemeToRoot();
   applyPaletteToBody();
@@ -155,26 +153,17 @@ async function boot() {
   if (getSetting('highContrast')) {
     document.documentElement.classList.add('high-contrast');
   }
-  console.log('[boot] Initializing map');
   const map = initMap();
-  console.log('[boot] Loading initial data');
   await loadInitial();
-  console.log('[boot] Initial data loaded');
-  console.log('[boot] Populating state filter');
   populateStateFilter();
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
   const restored = applyHashToFilters();
-  console.log('[boot] Syncing filter UI');
   syncFilterUiFromState();
-  console.log('[boot] Applying filters');
   applyFilters();
-  console.log('[boot] Wiring UI');
   wireUI();
-  console.log('[boot] Wiring settings');
   wireSettingsControls();
   // 174-year timeline ribbon along the bottom edge.
-  console.log('[boot] Mounting timeline');
   mountTimeline(getLandfalls(), {
     onYearRangeChange: ({ yearMin, yearMax }) => {
       filters.yearMin = yearMin;
@@ -183,14 +172,12 @@ async function boot() {
       applyFilters();
     },
   });
-  console.log('[boot] Timeline mounted');
   highlightYearRange(filters.yearMin, filters.yearMax);
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
   enableStateClicks(map).catch(() => { /* non-fatal */ });
   // Live NHC active-storm feed — appears only when a storm is active.
   startActiveStormPolling().catch(() => { /* non-fatal */ });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
-  console.log('[boot] Storm count set');
   
   // Initialize glossary (loads data asynchronously, non-blocking)
   initGlossary().catch(() => { /* non-fatal */ });
@@ -208,13 +195,10 @@ async function boot() {
     syncFilterUiFromState();
     applyFilters();
   };
-  console.log('[boot] About to init keyboard');
   initKeyboard();
-  console.log('[boot] Keyboard initialized, fading splash screen');
   
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
-  console.log('[boot] Splash screen fade initiated');
 
   // Re-open the storm encoded in the hash, if any. Done after first render
   // so the marker exists.
@@ -230,7 +214,6 @@ async function boot() {
   }
   // Onboarding disabled — users go straight to the map with no interruption.
   // setTimeout(() => maybeStartOnboarding(), 600);
-  console.log('[boot] Complete!');
 }
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
@@ -244,23 +227,23 @@ function wireSettingsControls() {
   function syncMenu() {
     menu.querySelectorAll('[data-set-unit]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setUnit === getSetting('windUnit'));
-      btn.setAttribute('aria-pressed', String(btn.dataset.setUnit === getSetting('windUnit')));
+      btn.setAttribute('aria-checked', String(btn.dataset.setUnit === getSetting('windUnit')));
     });
     menu.querySelectorAll('[data-set-theme]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setTheme === getSetting('theme'));
-      btn.setAttribute('aria-pressed', String(btn.dataset.setTheme === getSetting('theme')));
+      btn.setAttribute('aria-checked', String(btn.dataset.setTheme === getSetting('theme')));
     });
     menu.querySelectorAll('[data-set-palette]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
-      btn.setAttribute('aria-pressed', String(btn.dataset.setPalette === getSetting('palette')));
+      btn.setAttribute('aria-checked', String(btn.dataset.setPalette === getSetting('palette')));
     });
     menu.querySelectorAll('[data-set-locale]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setLocale === getSetting('locale'));
-      btn.setAttribute('aria-pressed', String(btn.dataset.setLocale === getSetting('locale')));
+      btn.setAttribute('aria-checked', String(btn.dataset.setLocale === getSetting('locale')));
     });
     menu.querySelectorAll('[data-set-damage]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
-      btn.setAttribute('aria-pressed', String(btn.dataset.setDamage === getSetting('damageMode')));
+      btn.setAttribute('aria-checked', String(btn.dataset.setDamage === getSetting('damageMode')));
     });
     const ensembleToggle = menu.querySelector('#toggle-ensemble-tracks');
     if (ensembleToggle) {
@@ -330,6 +313,15 @@ function wireSettingsControls() {
     });
   }
 
+  const replayTour = menu.querySelector('#replay-tour');
+  if (replayTour) {
+    replayTour.addEventListener('click', () => {
+      menu.setAttribute('hidden', '');
+      cog.setAttribute('aria-expanded', 'false');
+      maybeStartOnboarding({ force: true });
+    });
+  }
+
   // Live-react to theme and palette changes — re-stamp the classes.
   document.addEventListener('hm-settings:change', (e) => {
     if (e.detail.key === 'theme') {
@@ -375,6 +367,7 @@ function syncFilterUiFromState() {
     const cat = btn.dataset.cat;
     const on = filters.categories.has(cat);
     btn.classList.toggle('active', on);
+    btn.classList.toggle('on', on);
     btn.setAttribute('aria-pressed', String(on));
   });
   if (els.stateFilter) els.stateFilter.value = filters.state;
@@ -545,6 +538,18 @@ function wireUI() {
       }
     });
   }
+
+  function showNoSearchResults(query) {
+    const safeQuery = escapeHtml(query.trim());
+    els.searchResults.hidden = false;
+    els.searchResults.innerHTML = `
+      <li class="search-empty" role="status">
+        <strong>No storm matches "${safeQuery}"</strong>
+        <span>Try a storm name, state, or year, such as Andrew, Florida, or 2005.</span>
+      </li>
+    `;
+  }
+
   function wireResultClicks() {
     for (const li of els.searchResults.querySelectorAll('li[data-storm-id]')) {
       li.addEventListener('click', () => {
@@ -577,8 +582,7 @@ function wireUI() {
       fuzzy = fuzzyAugment(q, getLandfalls(), results, { limit: 5 });
     }
     if (!results.length && !fuzzy.length) {
-      els.searchResults.hidden = true;
-      els.searchResults.innerHTML = '';
+      showNoSearchResults(q);
       return;
     }
     els.searchResults.hidden = false;
@@ -631,18 +635,11 @@ function wireUI() {
   // Reset
   els.resetFilters.addEventListener('click', () => {
     filters.yearMin = 1851; filters.yearMax = 2025;
-    els.yearMin.value = 1851; els.yearMax.value = 2025;
     filters.categories = new Set(['ts', '1', '2', '3', '4', '5']);
-    for (const btn of els.catBtns) {
-      btn.classList.add('on');
-      btn.setAttribute('aria-pressed', 'true');
-    }
     filters.state = '';
-    els.stateFilter.value = '';
     filters.showTracks = false;
-    els.showTracks.checked = false;
     filters.showHeatmap = false;
-    els.showHeatmap.checked = false;
+    syncFilterUiFromState();
     els.surgeCategory.value = '';
     els.showPopulation.checked = false;
     setSurgeCategory(null);

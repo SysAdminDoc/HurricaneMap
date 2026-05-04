@@ -20,6 +20,10 @@ export async function ensureRadarLoaded() {
 // Performance monitoring: measure Core Web Vitals (LCP, FID, CLS)
 // Called from main.js to track real user metrics
 export function initPerformanceMonitoring() {
+  const debugPerf = new URLSearchParams(window.location.search).has('perf') ||
+    localStorage.getItem('hm-debug-perf') === '1';
+  if (!debugPerf) return;
+
   // Report LCP (Largest Contentful Paint)
   if ('PerformanceObserver' in window) {
     try {
