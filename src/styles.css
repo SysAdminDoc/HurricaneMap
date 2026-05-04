@@ -4920,4 +4920,160 @@ body.timeline-collapsed {
   }
 }
 
+/* Playback contrast fix v1.3.5 */
+.play-anim-btn.is-playing,
+.play-anim-btn.is-paused {
+  color: var(--text) !important;
+  background:
+    linear-gradient(135deg, rgba(49, 50, 68, 0.98), rgba(30, 30, 46, 0.98)) !important;
+  border-color: rgba(250, 179, 135, 0.68) !important;
+  box-shadow:
+    0 0 0 1px rgba(250, 179, 135, 0.22) inset,
+    0 8px 22px rgba(0, 0, 0, 0.32) !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
+}
+
+.play-anim-btn.is-playing:hover,
+.play-anim-btn.is-paused:hover {
+  color: var(--text) !important;
+  background:
+    linear-gradient(135deg, rgba(69, 71, 90, 0.98), rgba(49, 50, 68, 0.98)) !important;
+  border-color: rgba(250, 179, 135, 0.84) !important;
+}
+
+.play-anim-btn.is-playing .play-icon,
+.play-anim-btn.is-paused .play-icon {
+  color: currentColor;
+}
+
+/* Season timelapse dock v1.3.5 */
+.timelapse-controls {
+  position: fixed !important;
+  left: calc(var(--map-left-reserve) + 16px) !important;
+  right: var(--overlay-right-reserve) !important;
+  bottom: calc(var(--overlay-bottom-reserve) + 136px) !important;
+  z-index: 1190 !important;
+  width: min(420px, calc(100vw - var(--map-left-reserve) - var(--overlay-right-reserve) - 32px));
+  max-width: none;
+  margin-inline: auto;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  align-items: center;
+  border-radius: 16px;
+}
+
+.timelapse-controls[hidden] {
+  display: none !important;
+}
+
+.timelapse-header {
+  min-width: 0;
+}
+
+.timelapse-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.timelapse-season {
+  display: block;
+  overflow: hidden;
+  color: var(--subtext);
+  font-size: 11px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timelapse-playback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.timelapse-controls .icon-btn {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid rgba(205, 214, 244, 0.16);
+  background: rgba(30, 30, 46, 0.82);
+  color: var(--text);
+}
+
+.timelapse-controls .timelapse-play {
+  border-color: rgba(166, 227, 161, 0.42);
+  background: rgba(40, 68, 50, 0.86);
+}
+
+.timelapse-progress-bar {
+  position: relative;
+  width: 58px;
+  height: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(205, 214, 244, 0.12);
+  border-radius: 999px;
+  background: rgba(17, 17, 27, 0.72);
+}
+
+.timelapse-progress {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.timelapse-speed-control {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  color: var(--subtext);
+  font-size: 11px;
+}
+
+.timelapse-speed-control label {
+  margin: 0;
+}
+
+.timelapse-speed {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid rgba(205, 214, 244, 0.14);
+  border-radius: 9px;
+  background: rgba(30, 30, 46, 0.92);
+  color: var(--text);
+  font: inherit;
+}
+
+body.side-panel-open .timelapse-controls {
+  right: var(--overlay-right-reserve) !important;
+}
+
+@media (max-width: 860px) {
+  .timelapse-controls {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(var(--overlay-bottom-reserve) + 156px) !important;
+    width: auto;
+  }
+
+  body.side-panel-open .timelapse-controls {
+    display: none !important;
+  }
+}
+
 

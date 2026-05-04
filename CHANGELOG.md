@@ -2,6 +2,16 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.5 — Timelapse dock and playback contrast (May 2026)
+
+**Focused polish fix for unreadable playback state and the oversized season timelapse bar.**
+
+### Fixed
+- Replaced the unstyled full-width season timelapse glass bar with a compact dock that stays above the timeline and outside the side-panel lane.
+- Improved season timelapse labels, controls, progress pill, and speed selector so the dock clearly communicates what it controls.
+- Fixed the active Play/Pause track-animation button contrast so "Pause track animation" stays readable on the dark UI.
+- Bumped the service worker shell cache to `hm-v1.3.5` so live users receive the timelapse and playback contrast fixes.
+
 ## v1.3.4 — Overlay shelf stabilization (May 2026)
 
 **Continued panel-overlap cleanup for global map controls.**
