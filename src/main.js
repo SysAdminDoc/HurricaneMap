@@ -23,7 +23,6 @@ import { recordView, getHistory } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
 import { initGlossary, showGlossary } from './glossary.js';
 import { init as initKeyboard } from './keyboard.js';
-import { maybeShowTimelapseControls } from './timelapse.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
@@ -403,7 +402,6 @@ function applyFilters() {
   setHeatmap(filters.showHeatmap, visible);
   highlightYearRange(filters.yearMin, filters.yearMax);
   refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
-  maybeShowTimelapseControls(filters);
   writeHash();
 }
 

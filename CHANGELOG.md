@@ -2,6 +2,18 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.7 — Overlay cleanup and marker previews (May 2026)
+
+**Focused cleanup for stuck map previews and remaining overlapping playback/season overlays.**
+
+### Fixed
+- Made landfall marker tooltips exclusive so only one marker preview can be open at a time, with cleanup on pointer exit, map movement, clicks, drags, and zooms.
+- Removed the standalone `timelapse-controls` dock from the page; storm playback remains handled by the sidebar playback controls.
+- Repositioned the compact `season-summary` into the open map shelf above the timeline and away from the filter/year range panel.
+- Slightly widened and tightened the left year-range filter row so the Reset button stays inside the panel.
+- Moved the Leaflet zoom control from the bottom overlay stack to a side-panel-aware top-right map lane.
+- Bumped the service worker shell cache to `hm-v1.3.7` so live users receive the overlay cleanup.
+
 ## v1.3.6 — Theme system hardening (May 2026)
 
 **Full theme audit pass for dark, light, system, colorblind, and high-contrast modes.**

@@ -3936,7 +3936,7 @@ kbd {
 
   .year-inputs {
     display: grid;
-    grid-template-columns: 1fr auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) max-content;
   }
 
   .cat-toggles {
@@ -4031,12 +4031,31 @@ body::before {
 }
 
 .filters {
-  width: 304px;
+  width: 320px;
   gap: 14px;
   padding: 16px;
   border-radius: 18px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.year-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.year-inputs input {
+  min-width: 0;
+  padding-inline: 9px;
+  text-align: center;
+}
+
+.year-clear-btn {
+  min-width: 0;
+  padding-inline: 7px;
 }
 
 .filter-row,
@@ -4719,10 +4738,11 @@ body.side-panel-open .timeline-ribbon {
 
 .season-summary {
   position: fixed !important;
-  left: 16px !important;
-  bottom: 132px !important;
-  z-index: 740 !important;
-  width: min(332px, calc(100vw - 32px)) !important;
+  left: calc(var(--map-left-reserve) + 16px) !important;
+  right: var(--overlay-right-reserve) !important;
+  bottom: calc(var(--overlay-bottom-reserve) + 18px) !important;
+  z-index: 1220 !important;
+  width: min(356px, calc(100vw - var(--map-left-reserve) - var(--overlay-right-reserve) - 32px)) !important;
   max-height: 148px !important;
   padding: 10px 12px !important;
   overflow: hidden auto !important;
@@ -4731,8 +4751,8 @@ body.side-panel-open .timeline-ribbon {
 }
 
 body.side-panel-open .season-summary {
-  opacity: 0.78;
-  transform: translateY(6px) scale(0.98);
+  opacity: 0.96;
+  transform: none;
 }
 
 .season-summary header {
@@ -4778,6 +4798,12 @@ body.side-panel-open .season-summary {
 }
 
 @media (max-width: 1120px) {
+  .season-summary {
+    left: 16px !important;
+    right: var(--overlay-right-reserve) !important;
+    width: min(332px, calc(100vw - var(--overlay-right-reserve) - 32px)) !important;
+  }
+
   body.side-panel-open .leaflet-control-container .leaflet-right {
     transform: none;
   }
@@ -4946,136 +4972,6 @@ body.timeline-collapsed {
   color: currentColor;
 }
 
-/* Season timelapse dock v1.3.5 */
-.timelapse-controls {
-  position: fixed !important;
-  left: calc(var(--map-left-reserve) + 16px) !important;
-  right: var(--overlay-right-reserve) !important;
-  bottom: calc(var(--overlay-bottom-reserve) + 136px) !important;
-  z-index: 1190 !important;
-  width: min(420px, calc(100vw - var(--map-left-reserve) - var(--overlay-right-reserve) - 32px));
-  max-width: none;
-  margin-inline: auto;
-  padding: 10px 12px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px 10px;
-  align-items: center;
-  border-radius: 16px;
-}
-
-.timelapse-controls[hidden] {
-  display: none !important;
-}
-
-.timelapse-header {
-  min-width: 0;
-}
-
-.timelapse-header h3 {
-  margin: 0;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: 0.06em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.timelapse-season {
-  display: block;
-  overflow: hidden;
-  color: var(--subtext);
-  font-size: 11px;
-  line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.timelapse-playback {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-.timelapse-controls .icon-btn {
-  width: 30px;
-  height: 30px;
-  min-height: 30px;
-  padding: 0;
-  border: 1px solid rgba(205, 214, 244, 0.16);
-  background: rgba(30, 30, 46, 0.82);
-  color: var(--text);
-}
-
-.timelapse-controls .timelapse-play {
-  border-color: rgba(166, 227, 161, 0.42);
-  background: rgba(40, 68, 50, 0.86);
-}
-
-.timelapse-progress-bar {
-  position: relative;
-  width: 58px;
-  height: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(205, 214, 244, 0.12);
-  border-radius: 999px;
-  background: rgba(17, 17, 27, 0.72);
-}
-
-.timelapse-progress {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--text);
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.timelapse-speed-control {
-  grid-column: 1 / -1;
-  display: inline-flex;
-  align-items: center;
-  justify-self: start;
-  gap: 8px;
-  color: var(--subtext);
-  font-size: 11px;
-}
-
-.timelapse-speed-control label {
-  margin: 0;
-}
-
-.timelapse-speed {
-  height: 28px;
-  padding: 0 8px;
-  border: 1px solid rgba(205, 214, 244, 0.14);
-  border-radius: 9px;
-  background: rgba(30, 30, 46, 0.92);
-  color: var(--text);
-  font: inherit;
-}
-
-body.side-panel-open .timelapse-controls {
-  right: var(--overlay-right-reserve) !important;
-}
-
-@media (max-width: 860px) {
-  .timelapse-controls {
-    left: 10px !important;
-    right: 10px !important;
-    bottom: calc(var(--overlay-bottom-reserve) + 156px) !important;
-    width: auto;
-  }
-
-  body.side-panel-open .timelapse-controls {
-    display: none !important;
-  }
-}
-
 /* Theme system hardening v1.3.6
    Centralized semantic tokens and late overrides for surfaces that had drifted
    toward dark-only rgba values in appended polish layers. */
@@ -5153,7 +5049,6 @@ html.high-contrast {
 .settings-menu,
 .compare-tray,
 .radar-controls,
-.timelapse-controls,
 .season-summary,
 .keyboard-palette,
 .hm-toast,
@@ -5178,7 +5073,6 @@ section.storm-panel.glass {
 .ct-btn,
 .radar-btn,
 .anim-btn,
-.timelapse-controls .icon-btn,
 input[type="number"],
 input[type="search"],
 select,
@@ -5191,7 +5085,6 @@ select,
 .state-storm-row,
 .similar-storm-row,
 .panel-playback-host .anim-controls,
-.timelapse-progress-bar,
 .anim-radar-toggle,
 .ss-stat,
 .ss-tier {
@@ -5209,7 +5102,6 @@ select,
 .ct-btn:hover,
 .radar-btn:hover,
 .anim-btn:hover,
-.timelapse-controls .icon-btn:hover,
 .toggle-row:hover,
 .toggle-row:focus-within,
 .state-storm-row:hover,
@@ -5286,7 +5178,6 @@ select:disabled,
 .search-result-text strong,
 .stat .value,
 .closest-pass-value strong,
-.timelapse-header h3,
 .anim-title,
 .radar-title {
   color: var(--foreground) !important;
@@ -5340,6 +5231,42 @@ html.light-theme body::before {
 .leaflet-control-attribution {
   background: var(--surface-panel) !important;
   color: var(--foreground-muted) !important;
+}
+
+/* Overlay cleanup v1.3.7 */
+.leaflet-top.leaflet-right {
+  top: var(--side-panel-top) !important;
+  right: 16px !important;
+  z-index: 1250;
+}
+
+body.side-panel-open .leaflet-top.leaflet-right {
+  right: calc(var(--side-panel-width) + 32px) !important;
+  transform: none !important;
+}
+
+.leaflet-control-zoom {
+  overflow: hidden;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-theme-lg);
+}
+
+@media (max-width: 1120px) {
+  body.side-panel-open .leaflet-top.leaflet-right {
+    right: 16px !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .leaflet-top.leaflet-right {
+    top: calc(var(--side-panel-top) + 4px) !important;
+    right: 10px !important;
+  }
+
+  body.side-panel-open .leaflet-top.leaflet-right {
+    display: none;
+  }
 }
 
 

@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.3.6-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.3.7-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -53,7 +53,9 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **Inline playback controls** — Track playback now drops down inside the storm side panel beneath the Play/Pause button, replacing the old viewport-wide playback bar that could overlap the map and panels.
 - **Readable playback state** — The active Play/Pause button uses a high-contrast dark active surface with light text so playback state remains legible.
 - **Reserved overlay shelf** — Compare and radar controls now live above the bottom timeline and outside the side-panel lane, reducing collisions between floating controls.
-- **Compact season timelapse dock** — Single-year timelapse controls now appear as a small labeled dock instead of an oversized glass bar across the page.
+- **Season summary shelf** — Single-year season summaries now sit in the open map shelf instead of underneath the filter/year range panel or bottom timeline.
+- **Exclusive marker previews** — Landfall marker previews are now single-owner interactions, so one hover card opens at a time and stale previews are cleared when the pointer leaves the marker.
+- **Cleaner map controls** — The Leaflet zoom control now lives in a side-panel-aware top-right lane, and the year-range Reset button stays inside the left filter panel.
 - **Deterministic year picking** — Timeline clicks now select the exact clicked year, drags select ranges, and double-click resets the full 1851–2025 span without competing click/drag events.
 - **State-filtered timeline** — Selecting a state now updates the year timeline to show *only* that state's landfalls, reducing visual noise and improving clarity.
 - **Histogram color intensity** — Category and decade bars now feature colored fills (matching Saffir-Simpson category colors), with opacity scaled to storm count, making patterns immediately recognizable.

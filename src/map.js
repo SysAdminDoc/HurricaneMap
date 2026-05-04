@@ -9,6 +9,8 @@ let landfallLayer;
 let trackLayer;
 let heatLayer = null;
 let activeMarker = null;
+let hoveredMarker = null;
+let landfallTooltip = null;
 const markersByEventKey = new Map();
 
 function addBasemap(targetMap) {
@@ -57,12 +59,18 @@ export function initMap() {
     attributionControl: true,
   });
 
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map);
 
   addBasemap(map);
 
   landfallLayer = L.layerGroup().addTo(map);
   trackLayer = L.layerGroup().addTo(map);
+
+  map.on('mousemove', (e) => {
+    if (!hoveredMarker) return;
+    if (!isLandfallMarkerTarget(e.originalEvent?.target)) clearHoveredMarker(hoveredMarker);
+  });
+  map.on('mouseout click dragstart zoomstart movestart', () => clearHoveredMarker());
   return map;
 }
 
@@ -75,9 +83,64 @@ function eventKey(lf) {
   return `${lf.storm_id}|${lf.t}|${lf.lat}|${lf.lon}`;
 }
 
+function isLandfallMarkerTarget(target) {
+  return target instanceof Element && Boolean(target.closest('.landfall-marker'));
+}
+
+function resetMarkerStyle(marker) {
+  if (!marker) return;
+  marker.setStyle({
+    weight: 1.2,
+    color: '#0a0f1a',
+    radius: marker._baseRadius || 4,
+  });
+}
+
+function ensureLandfallTooltip() {
+  if (!landfallTooltip) {
+    landfallTooltip = L.tooltip({
+      direction: 'top',
+      offset: [0, -4],
+      permanent: false,
+      sticky: false,
+      opacity: 0.96,
+      className: 'landfall-tooltip',
+    });
+  }
+  return landfallTooltip;
+}
+
+function openLandfallTooltip(marker) {
+  if (!map || !marker) return;
+  ensureLandfallTooltip()
+    .setContent(marker._tooltipText || '')
+    .setLatLng(marker.getLatLng())
+    .addTo(map);
+}
+
+function setHoveredMarker(marker) {
+  if (hoveredMarker && hoveredMarker !== marker) clearHoveredMarker(hoveredMarker);
+  hoveredMarker = marker;
+  if (marker !== activeMarker) {
+    marker.setStyle({ radius: (marker._baseRadius || 4) + 3, weight: 2 });
+    marker.bringToFront();
+  }
+  openLandfallTooltip(marker);
+}
+
+function clearHoveredMarker(marker = hoveredMarker) {
+  if (!marker) return;
+  const isCurrentHover = marker === hoveredMarker;
+  if (isCurrentHover && map && landfallTooltip) map.removeLayer(landfallTooltip);
+  if (marker !== activeMarker) resetMarkerStyle(marker);
+  if (isCurrentHover) hoveredMarker = null;
+}
+
 export function renderLandfalls(landfalls, onSelect) {
+  clearHoveredMarker();
   landfallLayer.clearLayers();
   markersByEventKey.clear();
+  activeMarker = null;
   // Render major hurricanes on top of weaker storms so a TS dot doesn't bury a Cat 5.
   const sorted = [...landfalls].sort((a, b) => a.category - b.category);
   for (const lf of sorted) {
@@ -94,21 +157,15 @@ export function renderLandfalls(landfalls, onSelect) {
     });
     marker._baseRadius = baseRadius;
     const tt = `${lf.year} ${titleCase(lf.name)} — ${shortCat(lf.category)} • ${lf.state}`;
-    marker.bindTooltip(tt, { direction: 'top', offset: [0, -4] });
+    marker._tooltipText = tt;
     // Grow on hover via Leaflet setStyle (NOT CSS transform — see styles.css).
-    marker.on('mouseover', () => {
-      if (marker !== activeMarker) {
-        marker.setStyle({ radius: baseRadius + 3, weight: 2 });
-        marker.bringToFront();
-      }
-    });
+    marker.on('mouseover', () => setHoveredMarker(marker));
     marker.on('mouseout', () => {
-      if (marker !== activeMarker) {
-        marker.setStyle({ radius: baseRadius, weight: 1.2 });
-      }
+      clearHoveredMarker(marker);
     });
     marker.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
+      clearHoveredMarker(marker);
       onSelect(lf, marker);
     });
     marker.addTo(landfallLayer);
@@ -126,6 +183,7 @@ function titleCase(name) {
 }
 
 export function focusLandfall(lf, panTo = true) {
+  clearHoveredMarker();
   const key = eventKey(lf);
   const marker = markersByEventKey.get(key);
   if (activeMarker) {
