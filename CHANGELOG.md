@@ -4,6 +4,29 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.0 — Premium polish pass (2025)
+
+System-level UX/UI refinement layered on top of the existing surfaces. No behavioral changes, no API changes — just a noticeable lift in how the product feels.
+
+- **Token system extended.** New motion (`--hm-ease-standard`, `--hm-ease-emphasized`, `--hm-dur-fast/base/slow`), elevation (`--hm-elev-1..4`), border (`--hm-border-soft/default/strong`), and a single-source-of-truth focus ring (`--hm-focus-ring`).
+- **Universal focus-visible.** All interactive elements now share one calm, properly-offset focus ring — no more drift between buttons, inputs, links, and `[tabindex]` surfaces.
+- **Branded scrollbars.** Slim, lavender→sapphire gradient thumb that brightens on hover. Both Firefox (`scrollbar-width: thin`) and WebKit.
+- **Selection color** matched to the brand palette without being loud.
+- **Header lift.** Subtle elevation-3 shadow + inner top highlight; brand mark gets a soft glow on hover (scale + drop-shadow) for a premium first touchpoint.
+- **Icon buttons normalized.** Consistent hover (translate-y -1px + lavender-tinted bg/border), consistent active (snap back, 60ms), consistent pressed/expanded states via `aria-pressed` / `aria-expanded`.
+- **Storm panel section headings** now lead with a 3px lavender→sapphire accent bar, giving each section a clear, intentional anchor without adding visual noise.
+- **CAT pill** picks up an inner top-highlight + soft drop-shadow so it reads as a real badge rather than a flat chip.
+- **Stat tiles** gain a hover state (slight lavender wash + border lift) and a base elevation-1 shadow — communicates interactivity where it exists and seats them visually where it doesn't.
+- **Search results** animate in with a 200ms fade-down; selected/hovered rows shift right 4px for clearer affordance.
+- **Settings menu** uses the same fade-down + elevation-4 shadow; pill hover gets a 1px lift; `aria-checked` / `data-active` / `.active` all map to the same selected style.
+- **Compare tray chips** lift on hover for consistency with the rest of the system.
+- **Loading screen** now fades out cleanly instead of disappearing abruptly.
+- **Leaflet zoom** picks up the same hover-lift idiom; attribution links use brand lavender.
+- **Timeline ribbon** gets elevation-2 + an inner highlight; selection band picks up a sapphire→lavender gradient with a soft outer glow.
+- **Onboarding overlay** + **info modal** both get smoother entrance animations (fade + subtle scale on the modal card).
+- **Reduced motion** respected: all animations + transitions + hover transforms collapse to ~0ms when the user prefers reduced motion.
+- **Service worker bumped** to `hm-v0.9.0` so the polish reaches every existing PWA install.
+
 ## v0.8.1 — Accessibility 100 / Lighthouse pass (2025)
 
 Closes Phase 6 (10/10) by closing P6.10. Real `npx lighthouse --preset=desktop` run on v0.8.0 produced an Accessibility score of 87. v0.8.1 lands at **100**.

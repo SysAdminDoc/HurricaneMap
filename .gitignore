@@ -34,3 +34,7 @@ build/
 .playwright-mcp/
 smoke-*.png
 test-results/
+
+.tmp-pw/
+.tmp-pid.txt
+audit-*.png
