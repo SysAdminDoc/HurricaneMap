@@ -248,6 +248,16 @@ python scripts/preprocess_hurdat2.py
 
 Then bump the version, update `CHANGELOG.md`, and commit.
 
-## License
+## License & Attribution
 
-MIT — see [LICENSE](LICENSE). HURDAT2 itself is U.S. Government work and is in the public domain.
+**Software:** MIT — see [LICENSE](LICENSE)  
+**Data Sources:** See [LICENSE.md](LICENSE.md) for detailed attribution
+
+This project aggregates data from multiple sources:
+- **HURDAT2 Best-Track Database** — NOAA National Hurricane Center (public domain)
+- **SLOSH Storm Surge Zones** — NOAA NHC (public domain)
+- **NEXRAD Archived Radar** — NOAA / Iowa Environmental Mesonet (public domain)
+- **Population Density** — SEDAC GPWv4, Columbia University (CC BY 4.0)
+- **Storm Impacts** — Wikipedia (CC BY-SA 3.0)
+
+**When using HurricaneMap in research or publications:** Cite NOAA/NHC as the original data source. See [LICENSE.md](LICENSE.md) for full citation formats and per-dataset attribution requirements.
