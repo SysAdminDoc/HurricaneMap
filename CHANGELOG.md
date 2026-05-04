@@ -4,6 +4,19 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.3 — Compare/state panels + impacts card + search polish (2025)
+
+Continued premium polish pass focused on styling the compare and state panels with the same flexbox treatment as storm/stats, impacts block elevated to a proper info card, search results refined with better hover states, and comprehensive focus ring consistency across all interactive surfaces.
+
+- **Compare panel restructured.** Flexbox layout with header (close button), scrollable body with branded slim scrollbar, proper heading hierarchy, compare-row items styled with hover backgrounds, semantic labels and value formatting.
+- **State panel restructured.** Same flexbox treatment as compare; scrollable body with branded scrollbar; proper typography hierarchy and semantic spacing.
+- **Impacts block elevated to info card.** Now a proper card with background tint, subtle border, internal row dividers, semantic label/value styling, source attribution link. Deaths and damage figures with optional inflation adjustment clearly presented.
+- **Search results — premium hover treatment.** Better visual separation from input, branded scrollbar, improved hover/selected states with color depth and indent, focus rings on keyboard navigation, smoother transitions.
+- **Focus ring consistency systemic.** All inputs, selects, buttons, and interactive elements in filter panel + all panels now share a unified `outline: 2px solid #aab7ff` with appropriate offsets and border-radius.
+- **Link styling refined.** Action button links (Wikipedia, YouTube, NOAA, etc.) now properly inherit text color and respect focus-visible for keyboard users.
+- **Small screen optimization.** At `max-height: 750px`, headers and padding shrink slightly to preserve vertical space.
+- **Service worker bumped** to `hm-v0.9.3`.
+
 ## v0.9.2 — Onboarding removal + premium panel compaction (2025)
 
 Removed the onboarding overlay entirely and executed an aggressive premium-polish pass on the detail panels (storm, stats, state, compare) to eliminate internal scrolling and dramatically increase visual refinement.

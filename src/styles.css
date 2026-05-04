@@ -5361,3 +5361,367 @@ section.storm-panel .wf-toggle input {
 /* Disable "replay tour" button since onboarding is removed -- */
 #replay-tour { display: none !important; }
 
+/* ============================================================
+   v0.9.3 — Impacts block + compare/state panels + consistency
+   Continued premium polish: impacts block styled as a proper
+   info card, compare/state panels receive the same treatment
+   as storm/stats, search results hover refinement, button
+   consistency across all surfaces.
+   ============================================================ */
+
+/* Impacts block — info card treatment ----------------------- */
+section.storm-panel .impacts-block {
+  margin: 8px 0 10px;
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(170, 183, 255, 0.03);
+  border: 1px solid rgba(170, 183, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+section.storm-panel .im-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+  line-height: 1.4;
+  border-bottom: 1px solid rgba(170, 183, 255, 0.06);
+}
+section.storm-panel .im-row:last-child { border-bottom: none; }
+section.storm-panel .im-label {
+  font-weight: 600;
+  color: #7a8ba6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 9px;
+  flex: 0 0 auto;
+}
+section.storm-panel .im-value {
+  text-align: right;
+  color: var(--text);
+  font-weight: 600;
+  flex: 1;
+}
+section.storm-panel .im-adj {
+  display: block;
+  font-size: 9px;
+  color: var(--subtext);
+  font-weight: 400;
+  margin-top: 2px;
+}
+section.storm-panel .im-source {
+  padding: 6px 0 0;
+  font-size: 10px;
+  color: #aab7ff;
+  border-top: 1px solid rgba(170, 183, 255, 0.06);
+  margin-top: 2px;
+}
+section.storm-panel .im-source a {
+  color: #aab7ff;
+  text-decoration: none;
+  transition: opacity 120ms ease;
+}
+section.storm-panel .im-source a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Compare panel ================================================ */
+.compare-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+.compare-panel .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 4px 6px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.compare-panel .close-btn:hover {
+  color: var(--text);
+}
+.compare-panel #compare-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 14px;
+}
+.compare-panel #compare-body::-webkit-scrollbar {
+  width: 6px;
+}
+.compare-panel #compare-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+.compare-panel #compare-body::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+.compare-panel h2 {
+  margin: 0;
+  padding: 12px 14px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text);
+  border-bottom: 1px solid rgba(218, 229, 255, 0.08);
+}
+.compare-panel h3 {
+  margin: 10px 0 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.06);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #aab7ff;
+}
+.compare-panel .compare-table {
+  font-size: 10px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.compare-panel .compare-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(170, 183, 255, 0.03);
+  margin-bottom: 4px;
+}
+.compare-panel .compare-row:hover {
+  background: rgba(170, 183, 255, 0.06);
+}
+.compare-panel .compare-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7a8ba6;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+.compare-panel .compare-values {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  justify-content: flex-end;
+}
+.compare-panel .compare-value {
+  text-align: right;
+  color: var(--text);
+  font-weight: 600;
+  flex: 0 1 auto;
+  min-width: 60px;
+}
+
+/* State panel ================================================= */
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+.state-panel .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 4px 6px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.state-panel .close-btn:hover {
+  color: var(--text);
+}
+.state-panel #state-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 14px;
+}
+.state-panel #state-body::-webkit-scrollbar {
+  width: 6px;
+}
+.state-panel #state-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #aab7ff, #64d2ff);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+.state-panel #state-body::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+.state-panel h2 {
+  margin: 0;
+  padding: 12px 14px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--text);
+  border-bottom: 1px solid rgba(218, 229, 255, 0.08);
+}
+.state-panel h3 {
+  margin: 10px 0 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(218, 229, 255, 0.06);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #aab7ff;
+}
+.state-panel p,
+.state-panel li {
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--subtext);
+}
+.state-panel li { margin-left: 16px; margin-bottom: 4px; }
+.state-panel strong { color: var(--text); }
+
+/* Search results — hover + focus refinement ------------------- */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-edge);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  animation: hm-fade-down var(--hm-dur-base) var(--hm-ease-standard) both;
+}
+.search-results::-webkit-scrollbar {
+  width: 5px;
+}
+.search-results::-webkit-scrollbar-thumb {
+  background: rgba(170, 183, 255, 0.3);
+  border-radius: 2px;
+}
+.search-results::-webkit-scrollbar-thumb:hover {
+  background: rgba(170, 183, 255, 0.5);
+}
+.search-results li {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(218, 229, 255, 0.06);
+  font-size: 11px;
+  cursor: pointer;
+  transition:
+    background var(--hm-dur-fast) var(--hm-ease-standard),
+    padding-left var(--hm-dur-fast) var(--hm-ease-standard),
+    color var(--hm-dur-fast) var(--hm-ease-standard);
+  color: var(--subtext);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.search-results li:last-child { border-bottom: none; }
+.search-results li:hover,
+.search-results li[aria-selected="true"] {
+  background: rgba(170, 183, 255, 0.08);
+  color: var(--text);
+  padding-left: 16px;
+}
+.search-results li:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: -2px;
+}
+
+/* Action links in storm panel — consistent styling ----------- */
+section.storm-panel a.action-btn,
+section.storm-panel a.action-btn:visited {
+  color: var(--text);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+section.storm-panel a.action-btn.primary {
+  color: #0f1726;
+}
+section.storm-panel a.action-btn:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Filter panel final polish ================================== */
+aside.filters.glass h2,
+aside.filters.glass h3 {
+  margin: 0;
+  padding: 0;
+}
+aside.filters.glass label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+aside.filters.glass input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: #aab7ff;
+}
+aside.filters.glass input[type="number"]:focus,
+aside.filters.glass input[type="search"]:focus,
+aside.filters.glass select:focus {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+aside.filters.glass .year-inputs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+aside.filters.glass .cat-toggles button:focus-visible {
+  outline: 2px solid #aab7ff;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Reduce visual noise in empty/loading states --------------- */
+section.storm-panel .meta-row[style*="padding:24px"] {
+  padding: 12px 0 !important;
+  font-size: 12px;
+}
+
+/* Small screen refinement ===================================== */
+@media (max-height: 750px) {
+  section.storm-panel h2,
+  .stats-panel h2,
+  .compare-panel h2,
+  .state-panel h2 {
+    padding: 10px 12px 6px;
+    font-size: 12px;
+  }
+  section.storm-panel #panel-body,
+  .stats-panel #stats-body,
+  .compare-panel #compare-body,
+  .state-panel #state-body {
+    padding: 10px 12px;
+  }
+}
