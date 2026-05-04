@@ -30,6 +30,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  background: #070b12;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
                "Helvetica Neue", Arial, sans-serif;
   background: var(--base);
@@ -38,8 +39,10 @@ html, body {
 }
 
 #map {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
   background: var(--base);
 }
@@ -286,15 +289,11 @@ label > input[type="checkbox"] {
   line-height: 1.55;
 }
 
-/* User-tuned storm-panel sizing — taller card, raised slightly to align
-   with the visible viewport and keep the intensity chart, landfall list,
-   and action row all visible without scrolling. Capped at the viewport
-   so the panel never bleeds past the bottom edge while playback controls
-   stay pinned to the viewport. */
+/* User-tuned storm-panel sizing — natural height, capped to the viewport so
+   the playback controls and bottom edge stay visible. The premium-pass block
+   below replaces the hard-coded height with a flexible cap. */
 section.storm-panel.glass {
-  height: 980px;
-  max-height: calc(100vh - 215px);
-  margin-top: -105px;
+  max-height: calc(100vh - 130px);
 }
 
 .close-btn {
@@ -1644,9 +1643,8 @@ a:focus-visible {
 }
 
 section.storm-panel.glass {
-  height: 960px;
-  max-height: calc(100vh - 40px);
-  margin-top: -90px;
+  height: auto;
+  max-height: calc(100vh - 130px);
 }
 
 .close-btn {
@@ -2133,4 +2131,110 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* === Visual polish pass ================================================== */
+
+/* If the dark CartoDB basemap fails and we fall back to standard OSM, render
+   it through a CSS filter so the dark theme survives. Targets only the
+   fallback layer via the className we set in map.js. */
+.basemap-fallback img.leaflet-tile {
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.78) saturate(0.55) contrast(0.95);
+}
+
+/* Soft vignette over the map so the corner glass panels read against a
+   gently darker frame regardless of which basemap loaded. Sits above tiles
+   but below all controls and markers (Leaflet panes start at z-index 200+). */
+#map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 401; /* above tilePane (200), below overlayPane shadow but markers are z-700 in their own stacking context */
+  background:
+    radial-gradient(ellipse at center,
+      rgba(7, 11, 18, 0) 38%,
+      rgba(7, 11, 18, 0.32) 78%,
+      rgba(7, 11, 18, 0.55) 100%);
+}
+
+/* Stronger landfall-marker contrast: dark ring + soft category-tinted glow.
+   Major hurricanes (Cat 3+) get an extra outer halo so they don't get lost
+   in dense Gulf-coast clusters. SVG paths can't take CSS box-shadow but
+   `filter: drop-shadow` works on the parent SVG path. */
+.landfall-marker {
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.55));
+}
+.landfall-major {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7))
+          drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
+}
+
+/* Track lines get a subtle dark halo too, so colored polylines read on a
+   noisy basemap without needing huge stroke weight. */
+.track-line {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.55));
+}
+
+/* Leaflet zoom buttons — the existing override only set background; on the
+   fallback (filtered) basemap they inverted oddly. Pin to dark glass and
+   give them a defined border + radius cluster. */
+.leaflet-control-zoom {
+  border: 1px solid rgba(218, 229, 255, 0.16) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+}
+.leaflet-control-zoom a {
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(218, 229, 255, 0.10) !important;
+}
+.leaflet-control-zoom a:last-child { border-bottom: 0 !important; }
+
+/* Attribution control — round just the visible corner and align color. */
+.leaflet-control-attribution {
+  border-radius: 6px 0 0 0 !important;
+  padding: 2px 8px !important;
+}
+
+/* Title gradient — make sure white start stays readable on glass even when
+   the gradient compresses on small viewports (Safari clips background-clip
+   text otherwise). */
+.title-block h1 {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Subtle scrollbar polish for filter / panel scroll regions on Webkit. */
+.filters::-webkit-scrollbar,
+.storm-panel::-webkit-scrollbar,
+.stats-panel::-webkit-scrollbar,
+.compare-panel::-webkit-scrollbar,
+.state-panel::-webkit-scrollbar,
+.info-card::-webkit-scrollbar { width: 8px; }
+.filters::-webkit-scrollbar-thumb,
+.storm-panel::-webkit-scrollbar-thumb,
+.stats-panel::-webkit-scrollbar-thumb,
+.compare-panel::-webkit-scrollbar-thumb,
+.state-panel::-webkit-scrollbar-thumb,
+.info-card::-webkit-scrollbar-thumb {
+  background: rgba(218, 229, 255, 0.16);
+  border-radius: 999px;
+}
+.filters::-webkit-scrollbar-thumb:hover,
+.storm-panel::-webkit-scrollbar-thumb:hover { background: rgba(218, 229, 255, 0.28); }
+.filters::-webkit-scrollbar-track,
+.storm-panel::-webkit-scrollbar-track { background: transparent; }
+
+/* Filter panel: never let it crowd the legend. Recompute max-height so the
+   28px-bottom legend (≈190px tall) plus a 24px gap is always reserved. */
+.filters {
+  max-height: calc(100vh - 100px - 230px);
+}
+@media (max-height: 760px) {
+  .legend { display: none; }
+  .filters { max-height: calc(100vh - 130px); }
 }

@@ -4,6 +4,17 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Visual audit & resilience pass — v0.2.0
+
+- Hardened the dark basemap loader with a 6-error / 8-second rolling-window threshold so a single transient tile failure no longer collapses the whole map to the OSM fallback.
+- When the OSM fallback does engage, a CSS filter (`invert + hue-rotate + brightness/saturate/contrast`) re-skins it as a dark basemap so the design stays cohesive even without CartoCDN.
+- Boosted landfall marker contrast (deeper outline, higher fill opacity) and added a `landfall-major` glow class for Cat 3+ storms.
+- Brightened state-boundary overlay (color, opacity, weight) and strengthened the hover state so cross-state context reads at a glance.
+- Replaced the fragile `height: 980px; margin-top: -90px` storm-panel hack with `max-height: calc(100vh - 130px)` so the panel scales to any viewport without overflowing.
+- Pinned `#map` to `position: fixed; inset: 0; width: 100vw; height: 100vh` and matched `body` background to `--base` so the map fills the viewport with no contrasting gap on any breakpoint.
+- Polished Leaflet zoom controls, added a subtle radial vignette, drop-shadow glows on markers and tracks, and consistent webkit scrollbar styling across all glass panels.
+- Recomputed the filters panel max-height and hid the legend on short viewports so the legend never crowds the filters at any size.
+
 ### Interface polish pass
 
 - Refined the map chrome with a sharper glass theme, compact header branding, clearer filter/toggle controls, stronger panel hierarchy, and responsive mobile layout fixes.
