@@ -3,7 +3,8 @@
 // count by Saffir tier, total ACE, strongest landfall, deadliest, costliest.
 import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel } from './data.js';
 import { computeACE } from './metrics.js';
-import { getPaletteColor } from './settings.js';
+import { getPaletteColor, getSetting } from './settings.js';
+import { inflateUSD, formatMillionsUSD } from './inflation.js';
 
 const HOST_ID = 'season-summary';
 const MAX_YEARS = 3;
@@ -164,8 +165,15 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     if (impacts) {
       const d = parseDeaths(impacts.deaths);
       const dmg = parseDamageMillions(impacts.damages);
+      let dmgAdj = dmg;
+      // For costliest comparison, prefer real (CPI-adjusted) USD when the
+      // setting is on so a 1900 hurricane can be ranked fairly against 2017.
+      if (dmg != null && getSetting('damageMode') === 'real') {
+        const r = inflateUSD(dmg, s.year);
+        if (r) dmgAdj = r.real;
+      }
       if (d != null && (!deadliest || d > deadliest.value)) deadliest = { storm: s, value: d, raw: impacts.deaths };
-      if (dmg != null && (!costliest || dmg > costliest.value)) costliest = { storm: s, value: dmg, raw: impacts.damages };
+      if (dmg != null && (!costliest || dmgAdj > costliest.value)) costliest = { storm: s, value: dmgAdj, nominal: dmg, raw: impacts.damages };
     }
   }
   const aceCell = host.querySelector('[data-role="ace"] .ss-stat-num');
@@ -186,8 +194,10 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   if (cHost) {
     if (costliest) {
       const n = costliest.storm.name === 'UNNAMED' ? 'Unnamed' : titleCase(costliest.storm.name);
+      const mode = getSetting('damageMode');
       cHost.classList.remove('ss-loading');
-      cHost.innerHTML = `${n} ${costliest.storm.year} <span class="ss-meta">${fmtUSD(costliest.value)} damage</span>`;
+      const adjLabel = mode === 'real' ? `${formatMillionsUSD(costliest.value)} <span class="ss-meta">(2024 USD)</span>` : `${formatMillionsUSD(costliest.value)} <span class="ss-meta">${costliest.storm.year} USD</span>`;
+      cHost.innerHTML = `${n} ${costliest.storm.year} <span class="ss-meta">— ${adjLabel}</span>`;
     } else {
       cHost.classList.remove('ss-loading');
       cHost.innerHTML = '<span class="ss-meta">no impact records</span>';
