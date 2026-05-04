@@ -2224,3 +2224,233 @@ select:disabled {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* Phase 3: Elevation & Depth System */
+.glass {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%, rgba(255, 255, 255, 0.02) 100%);
+  pointer-events: none;
+  border-radius: 14px;
+}
+
+/* Elevation levels for layering */
+.elevation-1 { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+.elevation-2 { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); }
+.elevation-3 { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); }
+.elevation-4 { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
+
+/* Phase 3: Enhanced Focus States */
+input:focus-visible::after,
+select:focus-visible::after,
+textarea:focus-visible::after,
+button:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--lavender);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Phase 3: Stat Tiles Enhancement */
+.stat-grid .stat {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-grid .stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--lavender) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.stat-grid .stat:hover::before {
+  opacity: 1;
+}
+
+/* Phase 3: Better Panel Header */
+.storm-panel h2,
+.stats-panel h2 {
+  position: relative;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.storm-panel h2::after,
+.stats-panel h2::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  width: 40px;
+  background: linear-gradient(90deg, var(--lavender), transparent);
+}
+
+/* Phase 3: Category Button Polish */
+.cat-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.cat-btn:hover::before {
+  opacity: 1;
+}
+
+/* Phase 3: Search Results Polish */
+.search-results {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(170, 183, 255, 0.15);
+}
+
+.search-results li {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.search-results li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--lavender);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.search-results li:hover {
+  background: rgba(170, 183, 255, 0.1);
+}
+
+.search-results li:hover::before {
+  opacity: 1;
+}
+
+/* Phase 3: Checkbox & Toggle Polish */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--lavender);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+  filter: brightness(1.2);
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: 2px;
+}
+
+/* Phase 3: Filter Row Polish */
+.filter-row {
+  transition: all 150ms ease;
+  border-radius: 8px;
+  padding: 8px;
+  margin: -8px;
+}
+
+.filter-row:focus-within {
+  background: rgba(170, 183, 255, 0.05);
+}
+
+/* Phase 3: Link & Interactive Text Styling */
+a, [role="button"] {
+  position: relative;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover, [role="button"]:hover {
+  color: var(--lavender);
+}
+
+a:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Phase 3: Better State Feedback */
+.filter-row--year.active-filter {
+  background: linear-gradient(135deg, rgba(137, 180, 250, 0.12), rgba(137, 180, 250, 0.06));
+  border: 1px solid rgba(137, 180, 250, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(137, 180, 250, 0.2);
+}
+
+/* Phase 3: Reduced Motion Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .glass::before,
+  .stat-grid .stat::before,
+  .storm-panel h2::after,
+  .cat-btn::before,
+  .search-results li::before {
+    display: none;
+  }
+
+  .stat-tile:hover,
+  .stat-group:hover,
+  .cat-btn:hover {
+    transform: none;
+  }
+
+  .stat-tile,
+  .cat-btn,
+  button,
+  input,
+  select {
+    transition: none !important;
+  }
+}
+
+/* Phase 3: Print Styles for Better Rendering */
+@media print {
+  .glass {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+
+  .icon-btn,
+  .text-btn,
+  .cat-btn {
+    border: 1px solid #999;
+  }
+
+  button:disabled {
+    opacity: 1;
+    background: #f0f0f0;
+  }
+}
+
