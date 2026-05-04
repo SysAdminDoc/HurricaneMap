@@ -293,7 +293,9 @@ label > input[type="checkbox"] {
    the playback controls and bottom edge stay visible. The premium-pass block
    below replaces the hard-coded height with a flexible cap. */
 section.storm-panel.glass {
-  max-height: calc(100vh - 130px);
+  top: 8px;
+  bottom: 8px;
+  max-height: calc(100vh - 16px);
 }
 
 .close-btn {
@@ -1643,8 +1645,10 @@ a:focus-visible {
 }
 
 section.storm-panel.glass {
+  top: 8px;
+  bottom: 8px;
   height: auto;
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 16px);
 }
 
 .close-btn {
