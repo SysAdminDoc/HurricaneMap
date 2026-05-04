@@ -822,3 +822,83 @@ export function computeRIRiskScore(targetStorm, allStorms) {
   };
 }
 
+/** Generate a natural-language "biography" of a storm.
+ *  Synthesizes key metrics and events into a 3-4 sentence narrative.
+ *  Returns a string suitable for display in the storm panel.
+ */
+export function generateStormBiography(storm, impacts) {
+  const nameStr = storm.name && storm.name !== 'UNNAMED' ? storm.name : 'an unnamed storm';
+  const yearStr = storm.year || '?';
+  
+  // Determine category descriptor
+  const peakCat = saffirCategory(storm.peak_wind_kt);
+  let catDescriptor = 'tropical depression';
+  if (peakCat >= 1 && peakCat <= 5) {
+    catDescriptor = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'][peakCat - 1] + ' hurricane';
+  } else if (peakCat === 0) {
+    catDescriptor = 'tropical storm';
+  }
+  
+  // Genesis info: month + region estimate
+  const genesisDate = new Date(storm.track[0]?.t || '');
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const genesisMonth = months[genesisDate.getUTCMonth()] || '?';
+  
+  // Estimate region from first track point
+  const firstLat = storm.track[0]?.lat || 0;
+  const firstLon = storm.track[0]?.lon || 0;
+  let region = 'the Atlantic basin';
+  if (firstLon < -100) {
+    if (firstLat > 15) region = 'the eastern Atlantic';
+    else region = 'the central Atlantic';
+  } else if (firstLon < -70) {
+    if (firstLat > 25) region = 'the central Atlantic';
+    else region = 'the Caribbean';
+  } else {
+    region = 'off the African coast';
+  }
+  
+  // Landfall info
+  const landfallStates = storm.us_landfalls ? [...new Set(storm.us_landfalls.map(lf => lf.state))] : [];
+  const landfallStr = landfallStates.length === 0 ? 'did not make landfall' :
+    landfallStates.length === 1 ? `made landfall in ${landfallStates[0]}` :
+    `made ${landfallStates.length} landfalls in ${landfallStates.join(', ')}`;
+  
+  // Impact info
+  const impactInfo = impacts || { deaths: 0, damage_usd_nominal: 0 };
+  const hasImpact = (impactInfo.deaths && impactInfo.deaths > 0) || (impactInfo.damage_usd_nominal && impactInfo.damage_usd_nominal > 0);
+  let impactStr = '';
+  if (hasImpact) {
+    const deathStr = impactInfo.deaths && impactInfo.deaths > 0 ? `caused ${impactInfo.deaths} fatalities` : '';
+    const damageStr = impactInfo.damage_usd_nominal && impactInfo.damage_usd_nominal > 0 ? `caused $${(impactInfo.damage_usd_nominal / 1e9).toFixed(1)}B in damages` : '';
+    const impactParts = [deathStr, damageStr].filter(x => x);
+    impactStr = impactParts.length > 0 ? ` and ${impactParts.join(' and ')}` : '';
+  }
+  
+  // Distinctive features
+  const ri = findRapidIntensification(storm.track);
+  const pf = findPressureFall(storm.track);
+  const features = [];
+  if (ri) features.push(`underwent rapid intensification (+${ri.delta_kt} kt in 24h)`);
+  if (pf) features.push(`experienced explosive deepening (−${pf.drop_mb} mb pressure drop)`);
+  if (storm.us_landfall_count > 2) features.push('impacted multiple states');
+  
+  const featureStr = features.length > 0 ? ` The storm ${features.join(', ')}.` : '';
+  
+  // Assemble biography
+  return `${nameStr.toUpperCase()} (${yearStr}) was a ${catDescriptor} that formed in ${genesisMonth} in ${region} and ${landfallStr}, with peak intensity of ${storm.peak_wind_kt} kt${impactStr}.${featureStr}`;
+}
+
+/** Saffir-Simpson category from peak wind (kt). */
+function saffirCategory(windKt) {
+  if (!windKt) return 0;
+  if (windKt >= 157) return 5;
+  if (windKt >= 130) return 4;
+  if (windKt >= 111) return 3;
+  if (windKt >= 96) return 2;
+  if (windKt >= 83) return 1;
+  if (windKt >= 34) return 0; // tropical storm
+  return -1; // tropical depression
+}
+
+

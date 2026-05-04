@@ -15,7 +15,7 @@ import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
-  computeCityReturnPeriods, findSimilarStorms, computeRIRiskScore,
+  computeCityReturnPeriods, findSimilarStorms, computeRIRiskScore, generateStormBiography,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -129,6 +129,9 @@ function render(storm, landfall, allStorms) {
   const defaultCity = pickDefaultCity(storm);
   const initialApproach = closestApproach(storm.track, defaultCity.lat, defaultCity.lon);
 
+  // Generate storm biography
+  const biography = generateStormBiography(storm, impacts);
+
   body.innerHTML = `
     <div class="storm-panel-header">
       <h2>${escapeHtml(heading)}</h2>
@@ -150,6 +153,10 @@ function render(storm, landfall, allStorms) {
     </div>
 
     ${(riBadge || pfBadge) ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
+
+    <div class="biography-text" style="font-size:14px;line-height:1.6;color:var(--text-secondary);margin:16px 0;font-style:italic;">
+      ${escapeHtml(biography)}
+    </div>
 
     <div class="stat-grid">
       <div class="stat"><div class="label">Peak wind</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
