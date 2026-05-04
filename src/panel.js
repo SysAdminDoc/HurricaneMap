@@ -15,7 +15,7 @@ import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
-  computeCityReturnPeriods,
+  computeCityReturnPeriods, findSimilarStorms,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -164,6 +164,9 @@ function render(storm, landfall, allStorms) {
 
     ${renderImpactsBlock(storm)}
 
+    <h3 class="panel-section-h3">Similar storms</h3>
+    <div class="similar-storms-host" id="similar-storms-host"></div>
+
     <h3 class="panel-section-h3">Time at intensity</h3>
     <div class="dai-host" id="dai-host"></div>
 
@@ -213,6 +216,10 @@ function render(storm, landfall, allStorms) {
 
   // Days-at-intensity stacked horizontal bar.
   renderDaysAtIntensity(document.getElementById('dai-host'), storm.track);
+
+  // Similar storms: compute top-5 neighbors and render.
+  const similarStorms = findSimilarStorms(storm, allStorms, 5);
+  renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
 
   // Chart export buttons (PNG / SVG).
   const pngBtn = document.getElementById('chart-export-png');
@@ -389,6 +396,38 @@ function saffirCat(kt) {
   return 5;
 }
 
+function renderSimilarStorms(host, similarStorms) {
+  if (!host || !Array.isArray(similarStorms) || similarStorms.length === 0) {
+    if (host) host.innerHTML = '<p class="meta-row" style="color:var(--subtext);font-size:13px;">No similar storms found.</p>';
+    return;
+  }
+  const rows = similarStorms.map(s => {
+    const score = (s.similarity_score * 100).toFixed(0);
+    const cat = categoryLabel(saffirCat(s.peak_wind_kt || 0));
+    const cls = categoryClass(saffirCat(s.peak_wind_kt || 0));
+    return `<li class="similar-storm-row">
+      <span class="similar-storm-name">${escapeHtml(s.name || 'Unnamed')} (${s.year})</span>
+      <span class="similar-storm-cat cat-pill ${cls}" title="Peak intensity">${cat}</span>
+      <span class="similar-storm-landfalls" title="Number of U.S. landfalls">${s.landfalls} landfall${s.landfalls !== 1 ? 's' : ''}</span>
+      <span class="similar-storm-score" title="Similarity score: 0-100 higher=more similar">${score}%</span>
+    </li>`;
+  }).join('');
+  host.innerHTML = `<ul class="similar-storms-list">${rows}</ul>`;
+  
+  // Wire clicks to show that storm (find its first landfall in data)
+  host.querySelectorAll('.similar-storm-row').forEach((row, idx) => {
+    row.addEventListener('click', async () => {
+      const similar = similarStorms[idx];
+      await ensureStormsLoaded();
+      const targetStorm = getStorm(similar.storm_id);
+      if (targetStorm && targetStorm.us_landfalls && targetStorm.us_landfalls.length > 0) {
+        showStorm(targetStorm.us_landfalls[0]);
+      }
+    });
+    row.style.cursor = 'pointer';
+  });
+}
+
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -409,7 +448,6 @@ function showToast(msg, tone = 'info') {
   el.setAttribute('role', tone === 'warn' ? 'alert' : 'status');
   el.textContent = msg;
   host.appendChild(el);
-  // Force-reflow then animate in.
   requestAnimationFrame(() => el.classList.add('is-visible'));
   if (_toastTimer) clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => {

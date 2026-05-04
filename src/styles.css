@@ -565,6 +565,61 @@ section.storm-panel.glass {
   color: var(--subtext);
 }
 
+.similar-storms-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.similar-storm-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 10px;
+  background: var(--mantle);
+  border-radius: 8px;
+  border: 1px solid var(--surface0);
+  transition: all 120ms ease;
+  cursor: pointer;
+}
+.similar-storm-row:hover {
+  background: var(--surface0);
+  border-color: var(--lavender);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.similar-storm-name {
+  color: var(--text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.similar-storm-cat {
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 45px;
+}
+.similar-storm-landfalls {
+  color: var(--subtext);
+  font-size: 11px;
+  text-align: right;
+  min-width: 65px;
+}
+.similar-storm-score {
+  color: var(--lavender);
+  font-weight: 600;
+  font-size: 11px;
+  text-align: right;
+  min-width: 40px;
+}
+
 .action-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

@@ -511,3 +511,104 @@ export function daysAtIntensity(track) {
   return buckets;
 }
 
+/** Compute an 8-dimensional vector for a storm for similarity scoring.
+ *  Dimensions: [peak_wind, landfall_count, track_length_km, forward_speed_kmh, RI_delta_kt, ACE, decay_rate, genesis_month]
+ *  All normalized to [0, 1] range using historical min/max from the dataset.
+ *  Used by findSimilarStorms() to find neighbors. */
+export function getStormVector(storm, stats = null) {
+  // Default stats (computed once per app load from all storms)
+  const defaultStats = {
+    wind_max: 185, wind_min: 35,
+    landfalls_max: 7, landfalls_min: 0,
+    track_km_max: 20000, track_km_min: 500,
+    speed_max: 60, speed_min: 2,
+    ri_max: 120, ri_min: 0,
+    ace_max: 100, ace_min: 0,
+    decay_max: 50, decay_min: -5,
+  };
+  const s = stats || defaultStats;
+
+  const peak_wind = storm.peak_wind_kt || 50;
+  const landfall_count = (storm.us_landfalls || []).length;
+  const track_km = storm.track
+    .filter(r => r.lat != null && r.lon != null)
+    .reduce((acc, r, i, arr) => {
+      if (i === 0) return 0;
+      return acc + haversineKm(arr[i - 1].lat, arr[i - 1].lon, r.lat, r.lon);
+    }, 0);
+  
+  const trans = computeTranslationStats(storm.track);
+  const forward_speed = trans ? trans.mean_kmh : 15;
+  
+  const ri = findRapidIntensification(storm.track);
+  const ri_delta = ri ? ri.delta_kt : 0;
+  
+  const ace_data = computeACE(storm.track);
+  const ace = ace_data.value || 0;
+  
+  let decay_rate = 0;
+  if (storm.peak_wind_idx != null && storm.track[storm.peak_wind_idx]) {
+    const peak_t = new Date(storm.track[storm.peak_wind_idx].t).getTime();
+    let final_wind = storm.peak_wind_kt;
+    let final_t = peak_t;
+    for (let i = storm.peak_wind_idx + 1; i < storm.track.length; i++) {
+      if (storm.track[i].wind != null) {
+        final_wind = storm.track[i].wind;
+        final_t = new Date(storm.track[i].t).getTime();
+      }
+    }
+    const days = (final_t - peak_t) / (24 * 3.6e6);
+    decay_rate = (storm.peak_wind_kt - final_wind) / (days + 1);
+  }
+  
+  const genesis_month = storm.genesis_t ? new Date(storm.genesis_t).getUTCMonth() + 1 : 8;
+
+  const normalize = (val, min, max) => Math.max(0, Math.min(1, (val - min) / (max - min)));
+  
+  return [
+    normalize(peak_wind, s.wind_min, s.wind_max),
+    normalize(landfall_count, s.landfalls_min, s.landfalls_max),
+    normalize(track_km, s.track_km_min, s.track_km_max),
+    normalize(forward_speed, s.speed_min, s.speed_max),
+    normalize(ri_delta, s.ri_min, s.ri_max),
+    normalize(ace, s.ace_min, s.ace_max),
+    normalize(decay_rate, s.decay_min, s.decay_max),
+    (genesis_month - 1) / 11,
+  ];
+}
+
+/** Compute cosine similarity between two 8-dimensional vectors. */
+function cosineSimilarity(v1, v2) {
+  if (!v1 || !v2 || v1.length !== v2.length) return 0;
+  let dot = 0, mag1 = 0, mag2 = 0;
+  for (let i = 0; i < v1.length; i++) {
+    dot += v1[i] * v2[i];
+    mag1 += v1[i] * v1[i];
+    mag2 += v2[i] * v2[i];
+  }
+  const denom = Math.sqrt(mag1) * Math.sqrt(mag2);
+  return denom === 0 ? 0 : dot / denom;
+}
+
+/** Find the N most similar storms to a reference storm.
+ *  Returns top-N array of {storm_id, name, year, similarity_score, peak_wind_kt, landfalls}. */
+export function findSimilarStorms(referenceStorm, allStorms, topN = 5) {
+  if (!referenceStorm || !Array.isArray(allStorms) || allStorms.length === 0) return [];
+  
+  const refVector = getStormVector(referenceStorm);
+  const scores = allStorms
+    .filter(s => s.id !== referenceStorm.id)
+    .map(storm => ({
+      storm_id: storm.id,
+      name: storm.name,
+      year: storm.year,
+      peak_wind_kt: storm.peak_wind_kt,
+      landfalls: (storm.us_landfalls || []).length,
+      similarity_score: cosineSimilarity(refVector, getStormVector(storm)),
+    }))
+    .sort((a, b) => b.similarity_score - a.similarity_score)
+    .slice(0, topN);
+  
+  return scores;
+}
+
