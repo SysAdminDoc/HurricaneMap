@@ -13,6 +13,7 @@ const DEFAULTS = {
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   ensembleTracks: false,   // Show GFS/ECMWF forecast ensemble spaghetti tracks
   locale: 'en',            // 'en' | 'es' (English | Spanish)
+  highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
   onboarded: false,
 };
 

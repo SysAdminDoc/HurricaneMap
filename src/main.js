@@ -139,6 +139,10 @@ async function boot() {
   
   applyThemeToRoot();
   applyPaletteToBody();
+  // Apply high-contrast mode if enabled
+  if (getSetting('highContrast')) {
+    document.documentElement.classList.add('high-contrast');
+  }
   const map = initMap();
   await loadInitial();
   populateStateFilter();
@@ -216,6 +220,10 @@ function wireSettingsControls() {
     if (ensembleToggle) {
       ensembleToggle.checked = getSetting('ensembleTracks');
     }
+    const hcToggle = menu.querySelector('#toggle-high-contrast');
+    if (hcToggle) {
+      hcToggle.checked = getSetting('highContrast');
+    }
   }
   syncMenu();
 
@@ -268,6 +276,14 @@ function wireSettingsControls() {
     });
   }
 
+  // High-contrast accessibility toggle
+  const hcToggle = menu.querySelector('#toggle-high-contrast');
+  if (hcToggle) {
+    hcToggle.addEventListener('change', () => {
+      setSetting('highContrast', hcToggle.checked);
+    });
+  }
+
   // Live-react to theme and palette changes — re-stamp the classes.
   document.addEventListener('hm-settings:change', (e) => {
     if (e.detail.key === 'theme') {
@@ -293,6 +309,9 @@ function wireSettingsControls() {
         if (lf) onLandfallClick(lf);
       }
       refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
+    }
+    if (e.detail.key === 'highContrast') {
+      document.documentElement.classList.toggle('high-contrast', getSetting('highContrast'));
     }
   });
 }
