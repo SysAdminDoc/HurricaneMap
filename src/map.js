@@ -8,6 +8,28 @@ let heatLayer = null;
 let activeMarker = null;
 const markersByEventKey = new Map();
 
+function addBasemap(targetMap) {
+  const primaryLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a> | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  });
+  const fallbackLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
+    maxZoom: 19,
+  });
+  let fallbackActive = false;
+
+  primaryLayer.on('tileerror', () => {
+    if (fallbackActive) return;
+    fallbackActive = true;
+    if (targetMap.hasLayer(primaryLayer)) targetMap.removeLayer(primaryLayer);
+    fallbackLayer.addTo(targetMap);
+  });
+
+  primaryLayer.addTo(targetMap);
+}
+
 export function initMap() {
   map = L.map('map', {
     center: [29.5, -84.0],
@@ -19,11 +41,7 @@ export function initMap() {
     attributionControl: true,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a> | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-  }).addTo(map);
+  addBasemap(map);
 
   landfallLayer = L.layerGroup().addTo(map);
   trackLayer = L.layerGroup().addTo(map);
