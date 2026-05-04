@@ -7,6 +7,12 @@ const H = 18;
 const PAD_X = 1;
 const PAD_Y = 2;
 
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[c]);
+}
+
 function tierFromKt(kt) {
   if (kt >= 137) return 5;
   if (kt >= 113) return 4;
@@ -36,7 +42,7 @@ export function buildSparkline(track, opts = {}) {
   const path = pts.map(([x, y], i) => (i === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : `L${x.toFixed(1)},${y.toFixed(1)}`)).join('');
   const area = `${path}L${(PAD_X + innerW).toFixed(1)},${(PAD_Y + innerH).toFixed(1)}L${PAD_X.toFixed(1)},${(PAD_Y + innerH).toFixed(1)}Z`;
   const baselineY = (PAD_Y + innerH).toFixed(1);
-  const title = opts.title || '';
+  const title = opts.title ? escapeHtml(opts.title) : '';
   return `<svg class="storm-spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="${area}" fill="${fill}" fill-opacity="0.32"/>
     <path d="${path}" fill="none" stroke="${fill}" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
