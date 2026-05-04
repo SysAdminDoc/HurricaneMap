@@ -73,7 +73,7 @@ Iteration-7 research replenishment. Phase 5 closed the metrics/share/PWA gaps; P
 - [x] **P8.4 Decade-by-decade trend analysis** — ✅ New table in stats panel with 6 columns: decade, named-storm count, major-hurricane % (Category 3+), ACE total, deadliest storm by decade, costliest storm by decade. Hover reveals death/damage counts. Complements the annual climatology chart.
 - [x] **P8.5 Performance audit and optimization** — ✅ Implemented Core Web Vitals monitoring (LCP, FID, CLS) via PerformanceObserver API. Added will-change CSS hints to frequently-animated elements (icon buttons, charts, action buttons). Built lazy-load infrastructure for radar module. Navigation timing metrics logged to console for performance profiling.
 
-## Phase 9 — Advanced analytics & comparative intelligence (✅ COMPLETE — v1.3.0)
+## Phase 9 — Advanced analytics & comparative intelligence (✅ COMPLETE — v1.3.1)
 
 Focus: Deep statistical analysis, multi-storm comparisons, climate trend detection, and research-oriented features.
 
@@ -82,7 +82,7 @@ Focus: Deep statistical analysis, multi-storm comparisons, climate trend detecti
 - [x] **P9.3 Climate trend overlays** — ✅ New stats-panel chart showing 10-year rolling average of: (1) annual landfall count, (2) annual ACE, (3) avg peak wind at landfall, (4) avg forward speed. Annotated with trend direction (slope via linear regression). Enables analysis of long-term climate patterns.
 - [x] **P9.4 Rapid-intensification risk score** — ✅ Compute per-storm RI likelihood based on HURDAT2 historical precedent: for storms with similar peak wind, genesis month, and first-24h wind gain, what % intensified ≥30kt in next 24h? Surfaced as "RI risk: high/med/low" stat tile in panel with probability and similar-storm count in tooltip.
 - [x] **P9.5 Storm "biography" narrative** — ✅ Auto-generate a 3–4 sentence summary of each storm in plain English: synthesizes peak wind, landfall states, distinctive features (RI, explosive deepening), and impacts into readable narrative displayed in storm panel below the flags.
-- [ ] **P9.6 Batch comparison export** — Select multiple storms → export side-by-side table (intensity, ACE, casualties, damages, dates) as CSV/XLSX with auto-generated comparison narrative. Use case: multi-storm research papers, news briefings.
+- [x] **P9.6 Batch comparison export** — ✅ Select multiple storms → export side-by-side table with metrics (peak wind, pressure, category, landfalls, track points, ACE, forward speed, RI risk) as CSV with auto-generated comparison narratives. Integrates with all existing metrics. CSV file downloads with ISO date in filename. Use case: multi-storm research papers, news briefings.
 
 ### Phase 9 Marginal Enhancements (Low-effort, high-value optimizations)
 
