@@ -72,7 +72,7 @@
   </header>
 
   <aside class="filters glass" id="filters">
-    <div class="filter-row">
+    <div class="filter-row filter-row--year">
       <label>Year range</label>
       <div class="year-inputs">
         <input type="number" id="year-min" min="1851" max="2025" value="1851" aria-label="Earliest year" />
@@ -80,7 +80,7 @@
         <input type="number" id="year-max" min="1851" max="2025" value="2025" aria-label="Latest year" />
       </div>
     </div>
-    <div class="filter-row">
+    <div class="filter-row filter-row--cats">
       <label>Category</label>
       <div class="cat-toggles">
         <button data-cat="ts" class="cat-btn cat-ts on" title="Tropical Storm at landfall">TS</button>
@@ -102,42 +102,52 @@
       <input type="search" id="search-input" placeholder="e.g. Katrina, 2005, Helene…" />
       <ul id="search-results" class="search-results" hidden></ul>
     </div>
-    <div class="filter-row">
-      <label class="toggle-row">
-        <input type="checkbox" id="show-tracks" />
-        <span>Show tracks for visible landfalls</span>
-      </label>
-    </div>
-    <div class="filter-row">
-      <label class="toggle-row">
-        <input type="checkbox" id="show-heatmap" />
-        <span>Density heatmap (weighted by category)</span>
-      </label>
-    </div>
-    <div class="filter-row">
-      <label for="surge-category">Storm surge (SLOSH MOM)</label>
-      <select id="surge-category">
-        <option value="">Off</option>
-        <option value="1">Cat 1 inundation</option>
-        <option value="2">Cat 2 inundation</option>
-        <option value="3">Cat 3 inundation</option>
-        <option value="4">Cat 4 inundation</option>
-        <option value="5">Cat 5 inundation</option>
-      </select>
-    </div>
-    <div class="filter-row">
-      <label class="toggle-row">
-        <input type="checkbox" id="show-population" />
-        <span>Population density (SEDAC GPW 1km)</span>
-      </label>
+    <div class="filter-group" aria-label="Map layers">
+      <div class="filter-group-label">Map layers</div>
+      <div class="filter-layer-grid">
+        <label class="toggle-row">
+          <input type="checkbox" id="show-tracks" />
+          <span>Tracks for visible landfalls</span>
+        </label>
+        <label class="toggle-row">
+          <input type="checkbox" id="show-heatmap" />
+          <span>Density heatmap</span>
+        </label>
+        <label class="toggle-row">
+          <input type="checkbox" id="show-population" />
+          <span>Population density</span>
+        </label>
+        <div class="layer-select">
+          <label for="surge-category" class="layer-select-label">Storm surge</label>
+          <select id="surge-category">
+            <option value="">Off</option>
+            <option value="1">Cat 1</option>
+            <option value="2">Cat 2</option>
+            <option value="3">Cat 3</option>
+            <option value="4">Cat 4</option>
+            <option value="5">Cat 5</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div class="filter-row filter-footer">
       <button id="reset-filters" class="text-btn">Reset filters</button>
       <span class="visible-count" id="visible-count"></span>
     </div>
+    <div class="filter-legend" aria-label="Saffir-Simpson at landfall">
+      <h2 class="legend-heading">Saffir-Simpson at landfall</h2>
+      <ul class="filter-legend-list">
+        <li><span class="dot cat-ts"></span><span>TS · 34-63 kt</span></li>
+        <li><span class="dot cat-1"></span><span>1 · 64-82 kt</span></li>
+        <li><span class="dot cat-2"></span><span>2 · 83-95 kt</span></li>
+        <li><span class="dot cat-3"></span><span>3 · 96-112 kt</span></li>
+        <li><span class="dot cat-4"></span><span>4 · 113-136 kt</span></li>
+        <li><span class="dot cat-5"></span><span>5 · 137+ kt</span></li>
+      </ul>
+    </div>
   </aside>
 
-  <aside class="legend glass">
+  <aside class="legend glass" hidden aria-hidden="true">
     <h2 class="legend-heading">Saffir-Simpson at landfall</h2>
     <ul>
       <li><span class="dot cat-ts"></span><span>Tropical Storm (34-63 kt)</span></li>
