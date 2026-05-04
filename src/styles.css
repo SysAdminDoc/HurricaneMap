@@ -861,6 +861,29 @@ section.storm-panel.glass {
   color: var(--subtext);
   margin: 0 0 14px;
 }
+.cp-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cp-actions .export-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--sapphire), var(--blue));
+  border: 1px solid rgba(48, 163, 247, 0.3);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.cp-actions .export-btn:hover {
+  background: linear-gradient(135deg, var(--blue), var(--sky));
+  border-color: rgba(48, 163, 247, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(48, 163, 247, 0.15);
+}
 .cp-cards {
   display: flex;
   flex-direction: column;
