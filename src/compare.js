@@ -152,8 +152,8 @@ function openComparePanel() {
     compareBody.innerHTML = `
       <div class="cp-empty">
         <h2>Storm comparison</h2>
-        <p>Pin up to 4 storms to compare them side-by-side.</p>
-        <p class="hint">Click any landfall, then hit <strong>📌 Pin to compare</strong> in the storm panel. Pinned storms appear as a tray at the bottom; come back here for the full breakdown.</p>
+        <p>Pin up to four storms to compare their tracks, intensity curves, and landfall metrics side by side.</p>
+        <p class="hint">Open any landfall, choose <strong>Pin to compare</strong> in the storm panel, then return here for the full breakdown.</p>
       </div>
     `;
     syncPanelControls();

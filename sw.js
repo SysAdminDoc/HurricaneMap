@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.0.0';
+const SW_VERSION = 'hm-v1.3.1';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -23,13 +23,18 @@ const SHELL_ASSETS = [
   './src/data.js',
   './src/map.js',
   './src/panel.js',
+  './src/panels.js',
+  './src/stats.js',
+  './src/state.js',
+  './src/on-this-date.js',
+  './src/glossary.js',
+  './src/keyboard.js',
   './src/chart.js',
   './src/chart-export.js',
   './src/animation.js',
   './src/radar.js',
   './src/compare.js',
   './src/windfield.js',
-  './src/panels.js',
   './src/metrics.js',
   './src/settings.js',
   './src/onboarding.js',

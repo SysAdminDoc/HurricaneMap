@@ -40,6 +40,7 @@ const filters = {
 
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
+let activeSearchIndex = -1;
 
 // ---------------- URL hash state (permalinks) ----------------
 // Format: #y=1990-2025&c=3,4,5&s=Florida&t=1&h=0&storm=AL092005
@@ -389,7 +390,11 @@ function populateStateFilter() {
 function applyFilters() {
   const visible = filterLandfalls(getLandfalls(), filters);
   renderLandfalls(visible, onLandfallClick);
-  els.visibleCount.textContent = `${visible.length} visible`;
+  const totalLandfalls = getLandfalls().length;
+  els.visibleCount.textContent = visible.length === totalLandfalls
+    ? `${visible.length.toLocaleString()} landfalls`
+    : `${visible.length.toLocaleString()} of ${totalLandfalls.toLocaleString()}`;
+  updateFilterResetState();
   if (filters.showTracks) {
     redrawTracks(visible);
   } else {
@@ -400,6 +405,25 @@ function applyFilters() {
   refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
   maybeShowTimelapseControls(filters);
   writeHash();
+}
+
+function hasActiveFilters() {
+  return filters.yearMin !== 1851 ||
+    filters.yearMax !== 2025 ||
+    filters.state !== '' ||
+    filters.showTracks ||
+    filters.showHeatmap ||
+    filters.categories.size !== 6 ||
+    !['ts', '1', '2', '3', '4', '5'].every(cat => filters.categories.has(cat)) ||
+    Boolean(els.surgeCategory?.value) ||
+    Boolean(els.showPopulation?.checked);
+}
+
+function updateFilterResetState() {
+  if (!els.resetFilters) return;
+  const active = hasActiveFilters();
+  els.resetFilters.disabled = !active;
+  els.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
 }
 
 let lastTracksKey = '';
@@ -511,10 +535,40 @@ function wireUI() {
     showHistoryDropdown();
   });
 
+  function setSearchOpen(open) {
+    els.searchResults.hidden = !open;
+    els.searchInput.setAttribute('aria-expanded', String(open));
+    if (!open) {
+      activeSearchIndex = -1;
+      els.searchInput.removeAttribute('aria-activedescendant');
+      els.searchResults.querySelectorAll('[aria-selected="true"]').forEach(el => el.setAttribute('aria-selected', 'false'));
+    }
+  }
+
+  function getSearchOptions() {
+    return [...els.searchResults.querySelectorAll('li[data-storm-id]')];
+  }
+
+  function updateActiveSearchOption(nextIndex) {
+    const options = getSearchOptions();
+    if (!options.length) return;
+    activeSearchIndex = (nextIndex + options.length) % options.length;
+    options.forEach((option, index) => {
+      const active = index === activeSearchIndex;
+      option.classList.toggle('is-active', active);
+      option.setAttribute('aria-selected', String(active));
+      if (!option.id) option.id = `search-option-${option.dataset.stormId}-${index}`;
+      if (active) {
+        els.searchInput.setAttribute('aria-activedescendant', option.id);
+        option.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
   function showHistoryDropdown() {
     const history = getHistory();
     if (!history.length) return;
-    els.searchResults.hidden = false;
+    setSearchOpen(true);
     els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
       history.map(h => {
         const name = (h.name === 'UNNAMED') ? 'Unnamed' : titleCase(h.name);
@@ -541,7 +595,7 @@ function wireUI() {
 
   function showNoSearchResults(query) {
     const safeQuery = escapeHtml(query.trim());
-    els.searchResults.hidden = false;
+    setSearchOpen(true);
     els.searchResults.innerHTML = `
       <li class="search-empty" role="status">
         <strong>No storm matches "${safeQuery}"</strong>
@@ -560,11 +614,33 @@ function wireUI() {
           String(x.lat) === li.dataset.lat
         ) || getLandfalls().find(x => x.storm_id === li.dataset.stormId);
         if (lf) onLandfallClick(lf);
-        els.searchResults.hidden = true;
+        setSearchOpen(false);
         els.searchInput.value = '';
       });
     }
   }
+
+  els.searchInput.addEventListener('keydown', (e) => {
+    if (els.searchResults.hidden) return;
+    const options = getSearchOptions();
+    if (!options.length) {
+      if (e.key === 'Escape') setSearchOpen(false);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      updateActiveSearchOption(activeSearchIndex + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      updateActiveSearchOption(activeSearchIndex - 1);
+    } else if (e.key === 'Enter' && activeSearchIndex >= 0) {
+      e.preventDefault();
+      options[activeSearchIndex].click();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setSearchOpen(false);
+    }
+  });
 
   els.searchInput.addEventListener('input', () => {
     const q = els.searchInput.value;
@@ -572,7 +648,7 @@ function wireUI() {
       // Empty query → show history dropdown if any.
       const history = getHistory();
       if (history.length) { showHistoryDropdown(); return; }
-      els.searchResults.hidden = true;
+      setSearchOpen(false);
       els.searchResults.innerHTML = '';
       return;
     }
@@ -585,7 +661,7 @@ function wireUI() {
       showNoSearchResults(q);
       return;
     }
-    els.searchResults.hidden = false;
+    setSearchOpen(true);
     const renderRow = (lf) => {
       const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
       const cat = categoryLabel(lf.category);
@@ -602,11 +678,12 @@ function wireUI() {
       html += fuzzy.map(renderRow).join('');
     }
     els.searchResults.innerHTML = html;
+    updateActiveSearchOption(0);
     backfillSparklines();
     wireResultClicks();
   });
   els.searchInput.addEventListener('blur', () => {
-    setTimeout(() => { els.searchResults.hidden = true; }, 180);
+    setTimeout(() => { setSearchOpen(false); }, 180);
   });
 
   // Tracks toggle
@@ -740,10 +817,14 @@ function titleCase(name) {
 boot().catch(err => {
   console.error('[boot] Boot failed', err);
   const safeMsg = escapeHtml(err.message || 'Unknown error');
-  els.loading.innerHTML = `<p style="color:var(--cat-4);max-width:480px;text-align:center;padding:0 24px;">
-    Failed to load data: ${safeMsg}<br><br>If you opened the file directly, run a local web server first
-    (e.g. <code>python -m http.server</code>) — modern browsers block <code>fetch()</code> from <code>file://</code>.
-  </p>`;
+  els.loading.innerHTML = `
+    <div class="boot-error-state" role="alert">
+      <strong>HurricaneMap could not load its data.</strong>
+      <span>${safeMsg}</span>
+      <span>If this file was opened directly, serve the folder first: <code>python -m http.server 8765</code>.</span>
+      <button class="text-btn boot-retry-btn" type="button">Retry</button>
+    </div>`;
+  els.loading.querySelector('.boot-retry-btn')?.addEventListener('click', () => window.location.reload());
 });
 
 // Register the service worker for offline-first behavior + tile caching.

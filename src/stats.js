@@ -30,7 +30,11 @@ export function toggleStats() {
 function render() {
   const stats = getStats();
   if (!stats) {
-    body.innerHTML = '<p>Stats unavailable.</p>';
+    body.innerHTML = `
+      <div class="panel-empty-state">
+        <strong>Statistics unavailable.</strong>
+        <span>The summary dataset did not load. Refresh the page or verify the data files are being served.</span>
+      </div>`;
     return;
   }
   const stateRows = Object.entries(stats.by_state)
@@ -63,7 +67,7 @@ function render() {
 
   body.innerHTML = `
     <h2 id="stats-panel-title">Statistics</h2>
-    <p style="font-size:12px;color:var(--subtext);margin:0 0 14px;">
+    <p class="stats-summary">
       ${stats.total_storms} U.S.-landfalling storms · ${stats.total_landfall_events} landfall events ·
       ${stats.total_hurricane_landfalls} of those at hurricane strength.
       Coverage: ${stats.year_range[0]}–${stats.year_range[1]}.
@@ -71,40 +75,54 @@ function render() {
 
     <div id="seasonal-outlook-host"></div>
 
-    <h3>Landfalls by state</h3>
-    ${stateBars}
+    <section class="stats-section">
+      <h3>Landfalls by state</h3>
+      ${stateBars}
+    </section>
 
-    <h3>Landfalls by decade</h3>
-    ${decadeBars}
+    <section class="stats-section">
+      <h3>Landfalls by decade</h3>
+      ${decadeBars}
+    </section>
 
-    <h3>Landfalls by category</h3>
-    ${catBars}
+    <section class="stats-section">
+      <h3>Landfalls by category</h3>
+      ${catBars}
+    </section>
 
-    <h3>Annual climatology — ACE, named storms, US landfalls</h3>
-    <div id="climatology-chart" class="clim-host"></div>
+    <section class="stats-section">
+      <h3>Annual climatology — ACE, named storms, US landfalls</h3>
+      <div id="climatology-chart" class="clim-host"></div>
+    </section>
 
-    <h3>Climate trends — 10-year rolling averages</h3>
-    <div id="climate-trends-chart" class="climate-trends-host"></div>
+    <section class="stats-section">
+      <h3>Climate trends — 10-year rolling averages</h3>
+      <div id="climate-trends-chart" class="climate-trends-host"></div>
+    </section>
 
-    <h3>Decade-by-decade trends</h3>
-    <div id="decade-trends-chart" class="dt-host"></div>
+    <section class="stats-section">
+      <h3>Decade-by-decade trends</h3>
+      <div id="decade-trends-chart" class="dt-host"></div>
+    </section>
 
-    <h3>Coastal states with no recorded hurricane landfall</h3>
-    <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
-    <p style="font-size:11px;color:var(--subtext);margin-top:8px;line-height:1.5;">
-      Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
-      Note that 1971-1990 has known gaps in HURDAT2's continental-U.S. landfall marking.
-    </p>
+    <section class="stats-section">
+      <h3>Coastal states with no recorded hurricane landfall</h3>
+      <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
+      <p class="stats-note">
+        Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
+        HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.
+      </p>
+    </section>
   `;
   // Async-render the climatology chart and decade trends after the synchronous stats are mounted.
   const climHost = document.getElementById('climatology-chart');
   if (climHost) renderClimatologyChart(climHost).catch(e => {
-    climHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climatology chart unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+      climHost.innerHTML = `<p class="panel-inline-error">Climatology chart unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
   });
   
   const dtHost = document.getElementById('decade-trends-chart');
   if (dtHost) renderDecadeTrends(dtHost).catch(e => {
-    dtHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Decade trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+    dtHost.innerHTML = `<p class="panel-inline-error">Decade trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
   });
 
   const ctHost = document.getElementById('climate-trends-chart');
@@ -113,9 +131,9 @@ function render() {
       const allStorms = getAllStorms();
       const trends = computeClimateTrends(allStorms);
       if (trends) renderClimateTrendsChart(ctHost, trends);
-      else ctHost.innerHTML = '<p style="color:var(--subtext);font-size:12px;">No trend data available.</p>';
+      else ctHost.innerHTML = '<p class="panel-muted">No trend data available.</p>';
     } catch (e) {
-      ctHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+      ctHost.innerHTML = `<p class="panel-inline-error">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
     }
   }
 
@@ -128,7 +146,6 @@ function render() {
       })
       .catch(e => {
         console.error('Seasonal outlook error:', e);
-        // Silently fail — outlook is optional
         outlookHost.innerHTML = '';
       });
   }
@@ -154,7 +171,7 @@ function coloredBar(label, count, max, cssVar) {
 
 function renderClimateTrendsChart(host, trends) {
   if (!trends || !trends.rolling || trends.rolling.length === 0) {
-    host.innerHTML = '<p style="color:var(--subtext);">No data.</p>';
+    host.innerHTML = '<p class="panel-muted">No rolling trend data available.</p>';
     return;
   }
 
@@ -229,7 +246,7 @@ function renderClimateTrendsChart(host, trends) {
   // Add a small text summary of trends
   const trendDir = (slope) => slope > 0 ? '↑ increasing' : slope < 0 ? '↓ decreasing' : '→ stable';
   const summary = `
-    <p style="font-size:11px;color:var(--subtext);margin:8px 0 0;line-height:1.6;">
+    <p class="trend-summary">
       <strong>Trend direction (10-year rolling avg):</strong><br/>
       Landfalls: ${trendDir(trends.trends.landfalls_slope)} · 
       ACE: ${trendDir(trends.trends.ace_slope)} · 

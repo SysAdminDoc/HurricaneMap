@@ -3,7 +3,7 @@
 
 import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass } from './data.js';
 import { showStorm } from './panel.js';
-import { closePanelsExcept } from './panels.js';
+import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { redraw } from './timeline.js';
 import { escapeHtml } from './html-utils.js';
 
@@ -11,7 +11,10 @@ const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
 const closeBtn = document.getElementById('close-state');
 
-if (closeBtn) closeBtn.addEventListener('click', () => { panel.hidden = true; });
+if (closeBtn) closeBtn.addEventListener('click', () => {
+  panel.hidden = true;
+  syncPanelControls();
+});
 
 let stateBoundariesPromise = null;
 let stateLayer = null;
@@ -75,8 +78,10 @@ export async function openState(stateName) {
   if (!stateLandfalls.length) {
     body.innerHTML = `
       <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
-      <p class="state-empty">No recorded U.S. hurricane or tropical-storm landfalls in HurricaneMap's HURDAT2 dataset for this state.</p>
-      <p class="state-empty hint">${escapeHtml(stateName)} is in our coastal-state list but has never had a Saffir-Simpson Cat 1+ direct landfall on record.</p>
+      <div class="state-empty empty-state">
+        <strong>No recorded landfalls here.</strong>
+        <span>${escapeHtml(stateName)} is in the coastal-state reference set, but HurricaneMap has no HURDAT2 tropical-storm or hurricane landfall events for it.</span>
+      </div>
     `;
     return;
   }
