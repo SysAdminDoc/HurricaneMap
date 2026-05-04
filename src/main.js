@@ -231,6 +231,7 @@ async function boot() {
   // Onboarding disabled — users go straight to the map with no interruption.
   // setTimeout(() => maybeStartOnboarding(), 600);
   console.log('[boot] Complete!');
+}
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
 // the header and re-renders dependent surfaces on change.
