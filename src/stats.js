@@ -1,8 +1,9 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
-import { getStats, getLandfalls } from './data.js';
+import { getStats, getLandfalls, getAllStorms } from './data.js';
 import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
+import { computeClimateTrends } from './metrics.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -78,6 +79,9 @@ function render() {
     <h3>Annual climatology — ACE, named storms, US landfalls</h3>
     <div id="climatology-chart" class="clim-host"></div>
 
+    <h3>Climate trends — 10-year rolling averages</h3>
+    <div id="climate-trends-chart" class="climate-trends-host"></div>
+
     <h3>Decade-by-decade trends</h3>
     <div id="decade-trends-chart" class="dt-host"></div>
 
@@ -98,6 +102,18 @@ function render() {
   if (dtHost) renderDecadeTrends(dtHost).catch(e => {
     dtHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Decade trends unavailable: ${e.message || 'unknown error'}</p>`;
   });
+
+  const ctHost = document.getElementById('climate-trends-chart');
+  if (ctHost) {
+    try {
+      const allStorms = getAllStorms();
+      const trends = computeClimateTrends(allStorms);
+      if (trends) renderClimateTrendsChart(ctHost, trends);
+      else ctHost.innerHTML = '<p style="color:var(--subtext);font-size:12px;">No trend data available.</p>';
+    } catch (e) {
+      ctHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climate trends unavailable: ${e.message || 'unknown error'}</p>`;
+    }
+  }
 }
 
 function bar(label, count, max, suffix = '') {
@@ -116,4 +132,91 @@ function coloredBar(label, count, max, cssVar) {
     <span class="bar"><span class="fill" style="width:${pct}%;background:var(${cssVar})"></span></span>
     <span class="count">${count}</span>
   </div>`;
+}
+
+function renderClimateTrendsChart(host, trends) {
+  if (!trends || !trends.rolling || trends.rolling.length === 0) {
+    host.innerHTML = '<p style="color:var(--subtext);">No data.</p>';
+    return;
+  }
+
+  const data = trends.rolling;
+  const width = 800, height = 280;
+  const margin = { top: 10, right: 20, bottom: 40, left: 50 };
+  const plotW = width - margin.left - margin.right;
+  const plotH = height - margin.top - margin.bottom;
+
+  const years = data.map(d => d.year);
+  const minYear = Math.min(...years);
+  const maxYear = Math.max(...years);
+  const xScale = (year) => ((year - minYear) / (maxYear - minYear)) * plotW;
+
+  const maxLandfalls = Math.max(...data.map(d => d.rolling_avg_landfalls || 0));
+  const maxACE = Math.max(...data.map(d => d.rolling_avg_ace || 0));
+  const maxSpeed = Math.max(...data.map(d => d.rolling_avg_speed || 0));
+
+  const yScaleLF = (val) => plotH - (val / (maxLandfalls || 1)) * plotH * 0.8;
+  const yScaleACE = (val) => plotH - (val / (maxACE || 1)) * plotH * 0.8;
+  const yScaleSpeed = (val) => plotH - (val / (maxSpeed || 1)) * plotH * 0.8;
+
+  // Three polylines: landfalls (blue), ACE (lavender), forward speed (green)
+  const lfPath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleLF(d.rolling_avg_landfalls)}`).join(' L ');
+  const acePath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleACE(d.rolling_avg_ace)}`).join(' L ');
+  const speedPath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleSpeed(d.rolling_avg_speed)}`).join(' L ');
+
+  const svg = `
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="background:var(--mantle);border-radius:8px;border:1px solid var(--surface0);">
+      <defs>
+        <style>
+          .ct-line { fill: none; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+          .ct-landfalls { stroke: var(--sapphire); }
+          .ct-ace { stroke: var(--lavender); }
+          .ct-speed { stroke: var(--cat-1); }
+          .ct-axis { stroke: var(--surface0); stroke-width: 1; }
+          .ct-label { font-size: 11px; fill: var(--subtext); }
+          .ct-title { font-size: 12px; fill: var(--text); font-weight: 600; }
+        </style>
+      </defs>
+      
+      <!-- Y axes -->
+      <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}" class="ct-axis" />
+      <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" class="ct-axis" />
+      
+      <!-- Grid lines for Y -->
+      <line x1="${margin.left}" y1="${margin.top + plotH * 0.5}" x2="${width - margin.right}" y2="${margin.top + plotH * 0.5}" class="ct-axis" opacity="0.2" />
+      
+      <!-- Polylines -->
+      <polyline points="${lfPath}" class="ct-line ct-landfalls" />
+      <polyline points="${acePath}" class="ct-line ct-ace" />
+      <polyline points="${speedPath}" class="ct-line ct-speed" />
+      
+      <!-- Y-axis labels -->
+      <text x="${margin.left - 8}" y="${margin.top + 4}" class="ct-label" text-anchor="end" dominant-baseline="middle">High</text>
+      <text x="${margin.left - 8}" y="${margin.top + plotH}" class="ct-label" text-anchor="end" dominant-baseline="middle">Low</text>
+      
+      <!-- Legend -->
+      <circle cx="${margin.left + 12}" cy="12" r="3" class="ct-landfalls" style="fill:var(--sapphire);" />
+      <text x="${margin.left + 22}" y="16" class="ct-label">Landfalls</text>
+      
+      <circle cx="${margin.left + 120}" cy="12" r="3" style="fill:var(--lavender);" />
+      <text x="${margin.left + 130}" y="16" class="ct-label">ACE</text>
+      
+      <circle cx="${margin.left + 170}" cy="12" r="3" style="fill:var(--cat-1);" />
+      <text x="${margin.left + 180}" y="16" class="ct-label">Forward speed</text>
+    </svg>
+  `;
+
+  host.innerHTML = svg;
+  
+  // Add a small text summary of trends
+  const trendDir = (slope) => slope > 0 ? '↑ increasing' : slope < 0 ? '↓ decreasing' : '→ stable';
+  const summary = `
+    <p style="font-size:11px;color:var(--subtext);margin:8px 0 0;line-height:1.6;">
+      <strong>Trend direction (10-year rolling avg):</strong><br/>
+      Landfalls: ${trendDir(trends.trends.landfalls_slope)} · 
+      ACE: ${trendDir(trends.trends.ace_slope)} · 
+      Speed: ${trendDir(trends.trends.speed_slope)}
+    </p>
+  `;
+  host.innerHTML += summary;
 }

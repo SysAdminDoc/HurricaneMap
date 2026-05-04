@@ -612,3 +612,109 @@ export function findSimilarStorms(referenceStorm, allStorms, topN = 5) {
   return scores;
 }
 
+/** Compute climate trend data for stats panel.
+ *  Returns yearly aggregates (ACE, landfall count, peak wind, forward speed)
+ *  and 10-year rolling averages for visualization.
+ *  Data range: 1851–present. */
+export function computeClimateTrends(allStorms) {
+  if (!Array.isArray(allStorms) || allStorms.length === 0) return null;
+
+  // Group storms by year
+  const byYear = {};
+  for (const storm of allStorms) {
+    if (!storm.year) continue;
+    if (!byYear[storm.year]) {
+      byYear[storm.year] = {
+        year: storm.year,
+        storms: [],
+        us_landfalls: [],
+      };
+    }
+    byYear[storm.year].storms.push(storm);
+    if (Array.isArray(storm.us_landfalls)) {
+      byYear[storm.year].us_landfalls.push(...storm.us_landfalls);
+    }
+  }
+
+  // Compute yearly metrics
+  const yearly = Object.values(byYear)
+    .sort((a, b) => a.year - b.year)
+    .map(year => {
+      let totalACE = 0;
+      let totalWind = 0;
+      let totalSpeed = 0;
+      let speedCount = 0;
+
+      for (const storm of year.storms) {
+        const ace = computeACE(storm.track);
+        totalACE += ace.value;
+        totalWind += storm.peak_wind_kt || 0;
+        const trans = computeTranslationStats(storm.track);
+        if (trans) {
+          totalSpeed += trans.mean_kmh;
+          speedCount++;
+        }
+      }
+
+      return {
+        year: year.year,
+        named_storms: year.storms.length,
+        landfalls: year.us_landfalls.length,
+        major_landfalls: (year.us_landfalls || []).filter(lf => lf.category >= 3).length,
+        avg_peak_wind: year.storms.length > 0 ? totalWind / year.storms.length : 0,
+        avg_forward_speed: speedCount > 0 ? totalSpeed / speedCount : 0,
+        total_ace: totalACE,
+      };
+    });
+
+  // Compute 10-year rolling averages
+  const rolling = yearly.map((year, idx) => {
+    const start = Math.max(0, idx - 4); // center the window (5 years before + current + 4 years after = 10 years)
+    const end = Math.min(yearly.length, idx + 6);
+    const window = yearly.slice(start, end);
+
+    if (window.length === 0) {
+      return { year: year.year, rolling_avg_landfalls: 0, rolling_avg_ace: 0, rolling_avg_speed: 0 };
+    }
+
+    const avg_landfalls = window.reduce((sum, y) => sum + y.landfalls, 0) / window.length;
+    const avg_ace = window.reduce((sum, y) => sum + y.total_ace, 0) / window.length;
+    const avg_speed = window.reduce((sum, y) => sum + y.avg_forward_speed, 0) / window.length;
+
+    return {
+      year: year.year,
+      rolling_avg_landfalls: avg_landfalls,
+      rolling_avg_ace: avg_ace,
+      rolling_avg_speed: avg_speed,
+    };
+  });
+
+  // Compute overall trends (linear regression slope for the 10-year rolling averages)
+  const trends = {
+    landfalls_slope: computeTrendSlope(rolling.map(y => ({ x: y.year, y: y.rolling_avg_landfalls }))),
+    ace_slope: computeTrendSlope(rolling.map(y => ({ x: y.year, y: y.rolling_avg_ace }))),
+    speed_slope: computeTrendSlope(rolling.map(y => ({ x: y.year, y: y.rolling_avg_speed }))),
+  };
+
+  return {
+    yearly,
+    rolling,
+    trends,
+  };
+}
+
+/** Compute linear regression slope for trend analysis. */
+function computeTrendSlope(points) {
+  if (!Array.isArray(points) || points.length < 2) return 0;
+  const n = points.length;
+  const sumX = points.reduce((sum, p) => sum + p.x, 0);
+  const sumY = points.reduce((sum, p) => sum + p.y, 0);
+  const sumXY = points.reduce((sum, p) => sum + p.x * p.y, 0);
+  const sumX2 = points.reduce((sum, p) => sum + p.x * p.x, 0);
+  
+  const denom = n * sumX2 - sumX * sumX;
+  if (denom === 0) return 0;
+  
+  return (n * sumXY - sumX * sumY) / denom;
+}
+
