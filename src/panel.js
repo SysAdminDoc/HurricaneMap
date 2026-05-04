@@ -134,7 +134,7 @@ function render(storm, landfall, allStorms) {
 
   body.innerHTML = `
     <div class="storm-panel-header">
-      <h2>${escapeHtml(heading)}</h2>
+      <h2 id="storm-panel-title">${escapeHtml(heading)}</h2>
       <div class="meta-row">
         <span class="cat-pill ${categoryClass(lfCat)}">${lfLabel} at landfall</span>
         <span>Peak intensity: <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>

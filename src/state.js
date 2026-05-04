@@ -73,7 +73,7 @@ export async function openState(stateName) {
 
   if (!stateLandfalls.length) {
     body.innerHTML = `
-      <h2>${escapeHtml(stateName)}</h2>
+      <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
       <p class="state-empty">No recorded U.S. hurricane or tropical-storm landfalls in HurricaneMap's HURDAT2 dataset for this state.</p>
       <p class="state-empty hint">${escapeHtml(stateName)} is in our coastal-state list but has never had a Saffir-Simpson Cat 1+ direct landfall on record.</p>
     `;
@@ -158,7 +158,7 @@ export async function openState(stateName) {
   const majorCount = stateLandfalls.filter(lf => lf.category >= 3).length;
 
   body.innerHTML = `
-    <h2>${escapeHtml(stateName)}</h2>
+    <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
     <p class="state-sub">Every hurricane and tropical-storm landfall on record (HURDAT2, 1851 onward).</p>
 
     <div class="stat-grid">
