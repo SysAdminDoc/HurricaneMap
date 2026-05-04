@@ -25,6 +25,7 @@ import { initGlossary, showGlossary } from './glossary.js';
 import { init as initKeyboard } from './keyboard.js';
 import { maybeShowTimelapseControls } from './timelapse.js';
 import { exportPublicationCSV } from './export.js';
+import { generateStatisticalReport, downloadReportAsText } from './report.js';
 
 const filters = {
   yearMin: 1851,
@@ -128,6 +129,7 @@ const els = {
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleInfoBtn: document.getElementById('toggle-info'),
   exportBtn: document.getElementById('export-publication'),
+  reportBtn: document.getElementById('generate-report'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   loading: document.getElementById('loading'),
@@ -659,6 +661,14 @@ function wireUI() {
   if (els.exportBtn) {
     els.exportBtn.addEventListener('click', () => {
       exportPublicationCSV(filters);
+    });
+  }
+
+  // Report button
+  if (els.reportBtn) {
+    els.reportBtn.addEventListener('click', () => {
+      const { markdown, title } = generateStatisticalReport(filters);
+      downloadReportAsText(markdown, title);
     });
   }
 
