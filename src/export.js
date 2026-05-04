@@ -1,0 +1,128 @@
+// P12.1 — Publication-ready export: One-click export of filtered dataset as CSV with documentation
+
+import { getLandfalls, filterLandfalls } from './data.js';
+
+export function exportPublicationCSV(filters) {
+  // Get all landfalls and filter them
+  const allLandfalls = getLandfalls();
+  const filtered = filterLandfalls(allLandfalls, filters);
+  
+  // Build CSV with comprehensive headers
+  const headers = [
+    'storm_id',
+    'name',
+    'year',
+    'month',
+    'day',
+    'hour',
+    'latitude',
+    'longitude',
+    'wind_speed_kt',
+    'wind_speed_mph',
+    'pressure_mb',
+    'category',
+    'state',
+  ];
+  
+  const rows = [headers];
+  
+  for (const lf of filtered) {
+    // Ensure defaults for undefined values
+    const windMph = lf.wind ? Math.round(lf.wind * 1.15078) : '';
+    const row = [
+      lf.storm_id || '',
+      lf.name || 'UNNAMED',
+      lf.year || '',
+      lf.month || '',
+      lf.day || '',
+      lf.hour || '0',
+      lf.lat ? lf.lat.toFixed(3) : '',
+      lf.lon ? lf.lon.toFixed(3) : '',
+      lf.wind || '',
+      windMph,
+      lf.pressure || '',
+      lf.category ? (lf.category <= 0 ? 'TS' : String(lf.category)) : 'TS',
+      lf.state || '',
+    ];
+    rows.push(row);
+  }
+  
+  // Build CSV content
+  let csv = rows.map(row => row.map(cell => {
+    // Quote cells with commas or quotes
+    if (typeof cell !== 'string') cell = String(cell);
+    if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+      return `"${cell.replace(/"/g, '""')}"`;
+    }
+    return cell;
+  }).join(',')).join('\n');
+  
+  // Add data dictionary as comments
+  const uniqueStorms = new Set(filtered.map(lf => lf.storm_id)).size;
+  const dataDictionary = `# HurricaneMap Publication-Ready Export
+# Generated: ${new Date().toISOString()}
+# Data source: NOAA NHC HURDAT2 (Public Domain)
+# Attribution: "Data from NOAA National Hurricane Center HURDAT2 best-track database, 1851-present"
+#
+# Data Dictionary:
+# storm_id: 6-character identifier (AALLNNNN: AL=Atlantic, LL=basin, NNNN=sequence, YYYY=year)
+# name: Hurricane or tropical storm name
+# year: Year of occurrence (1851-2025)
+# month: Month (1-12)
+# day: Day of month
+# hour: Hour (UTC, 0-23)
+# latitude: Position latitude (decimal degrees, -90 to 90)
+# longitude: Position longitude (decimal degrees, -180 to 180)
+# wind_speed_kt: Maximum sustained winds (knots)
+# wind_speed_mph: Maximum sustained winds (miles per hour) converted from knots * 1.15078
+# pressure_mb: Central pressure (millibars)
+# category: Saffir-Simpson category (TS, 1-5)
+# state: U.S. state at landfall
+#
+# Methodology:
+# - Landfalls are identified as points where storm track crosses a U.S. state boundary
+# - Category assigned by Saffir-Simpson scale: TS (34-63 kt), 1-5 (64-137+ kt)
+# - Wind speeds converted: mph = knots * 1.15078
+# - Pressure data sparse before 1945; see HURDAT2 documentation
+#
+# Citation:
+# Landsea, C. W., and J. L. Franklin, 2013: The Atlantic Hurricane Database Re-analysis Project:
+# Documentation for the 1851-2012 Alterations and Additions to the Hurdat Version 2 Database.
+# NOAA Technical Memorandum NWS NHC-7.
+#
+# License & Usage:
+# HURDAT2 data is Public Domain (released by NOAA/NHC).
+# This export provided as-is; please cite original HURDAT2 source in publications.
+#
+# Filters applied:
+# - Years: ${filters.yearMin}-${filters.yearMax}
+# - Categories: ${Array.from(filters.categories).sort().join(', ') || 'All'}
+# - State: ${filters.state || 'All'}
+# - Result: ${filtered.length} landfall records from ${uniqueStorms} unique storms
+#
+`;
+  
+  csv = dataDictionary + '\n' + csv;
+  
+  // Download as file
+  const timestamp = new Date().toISOString().split('T')[0];
+  const filename = `HurricaneMap-Export-${timestamp}.csv`;
+  
+  downloadCSV(csv, filename);
+}
+
+function downloadCSV(content, filename) {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+export { exportPublicationCSV };

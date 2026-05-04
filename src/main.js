@@ -24,6 +24,7 @@ import { initPerformanceMonitoring } from './perf.js';
 import { initGlossary, showGlossary } from './glossary.js';
 import { init as initKeyboard } from './keyboard.js';
 import { maybeShowTimelapseControls } from './timelapse.js';
+import { exportPublicationCSV } from './export.js';
 
 const filters = {
   yearMin: 1851,
@@ -126,6 +127,7 @@ const els = {
   toggleStatsBtn: document.getElementById('toggle-stats'),
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleInfoBtn: document.getElementById('toggle-info'),
+  exportBtn: document.getElementById('export-publication'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   loading: document.getElementById('loading'),
@@ -652,6 +654,13 @@ function wireUI() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !els.infoModal.hidden) els.infoModal.hidden = true;
   });
+
+  // Export button
+  if (els.exportBtn) {
+    els.exportBtn.addEventListener('click', () => {
+      exportPublicationCSV(filters);
+    });
+  }
 
   // Glossary modal
   const glossaryBtn = document.getElementById('toggle-glossary');
