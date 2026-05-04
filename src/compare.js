@@ -5,6 +5,7 @@ import { ensureStormsLoaded, getStorm, categoryLabel, categoryClass, ktToMph, fo
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { closePanelsExcept, syncPanelControls } from './panels.js';
+import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
 
 const MAX_PINS = 4;
 
@@ -245,6 +246,9 @@ function renderComparePanel() {
   compareBody.innerHTML = `
     <h2>Comparing ${pinned.length} storm${pinned.length === 1 ? '' : 's'}</h2>
     <p class="cp-hint">Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.</p>
+    <div class="cp-actions">
+      <button class="export-btn" id="cp-export-btn" title="Export comparison as CSV">📥 Export comparison</button>
+    </div>
     <div class="cp-cards">${cards}</div>
     <h3 class="panel-section-h3">Side-by-side</h3>
     <div class="cp-table-wrap">
@@ -254,6 +258,12 @@ function renderComparePanel() {
       </table>
     </div>
   `;
+
+  // Wire up export button
+  const exportBtn = compareBody.querySelector('#cp-export-btn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => exportComparisonCSV(pinned));
+  }
 
   // Render mini intensity chart for each pinned storm.
   for (const p of pinned) {
@@ -285,3 +295,89 @@ function escapeHtml(s) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   })[c]);
 }
+
+/** Export comparison table + narratives as CSV. */
+function exportComparisonCSV(storms) {
+  if (!storms || storms.length === 0) return;
+
+  // Generate header
+  const header = ['Metric', ...storms.map(p => `${titleCase(p.name)} (${p.year})`)].map(escapeCSV).join(',');
+
+  // Generate comparison table rows
+  const rows = [
+    ['Peak wind (kt)', p => p.storm.peak_wind_kt],
+    ['Min pressure (mb)', p => p.storm.min_pres_mb],
+    ['Peak category', p => {
+      const cat = saffirCat(p.storm.peak_wind_kt);
+      return cat === -1 ? 'TS' : cat === 0 ? 'TD' : `Cat ${cat}`;
+    }],
+    ['Landfall category', p => {
+      const cat = p.storm.landfall_max_category;
+      return cat === -1 ? 'TS' : cat === 0 ? 'TD' : cat ? `Cat ${cat}` : '—';
+    }],
+    ['US landfalls', p => p.storm.us_landfall_count],
+    ['Track points', p => p.storm.track.length],
+    ['ACE (10⁴ kt²)', p => {
+      const ace = computeACE(p.storm.track);
+      return typeof ace === 'object' ? ace.value.toFixed(2) : ace.toFixed(2);
+    }],
+    ['Forward speed (km/h)', p => {
+      const trans = computeTranslationStats(p.storm.track);
+      return trans ? trans.mean.toFixed(1) : '—';
+    }],
+    ['RI detected', p => {
+      const ri = findRapidIntensification(p.storm.track);
+      return ri ? `+${ri.gain_kt} kt` : 'No';
+    }],
+    ['RI risk category', p => {
+      const risk = computeRIRiskScore(p.storm, []);
+      return risk ? risk.category : '—';
+    }],
+  ];
+
+  const tableRows = rows.map(([label, fn]) => {
+    const cells = [escapeCSV(label)];
+    for (const p of storms) {
+      try {
+        const val = fn(p);
+        cells.push(escapeCSV(String(val ?? '—')));
+      } catch {
+        cells.push('—');
+      }
+    }
+    return cells.join(',');
+  });
+
+  // Generate narratives
+  const narrativeSection = ['', '', 'COMPARISON NARRATIVES', ...storms.map(p => {
+    const bio = generateStormBiography(p.storm, {});
+    return escapeCSV(`${titleCase(p.name)} (${p.year}): ${bio}`);
+  })];
+
+  // Combine all rows
+  const csvContent = [
+    header,
+    ...tableRows,
+    ...narrativeSection,
+    '',
+    'Data source: NOAA HURDAT2 best-track database',
+    'Generated: ' + new Date().toISOString(),
+  ].join('\n');
+
+  // Trigger download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `HurricaneMap-comparison-${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+}
+
+/** Escape a value for CSV (wrap in quotes if contains comma/quote/newline). */
+function escapeCSV(s) {
+  const str = String(s ?? '');
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
