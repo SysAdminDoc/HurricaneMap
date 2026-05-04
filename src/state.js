@@ -5,6 +5,7 @@ import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClas
 import { showStorm } from './panel.js';
 import { closePanelsExcept } from './panels.js';
 import { redraw } from './timeline.js';
+import { escapeHtml } from './html-utils.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -252,10 +253,4 @@ function wireStateStormRows(container, stateName) {
 function titleCase(name) {
   if (!name || name === 'UNNAMED') return 'Unnamed';
   return name[0].toUpperCase() + name.slice(1).toLowerCase();
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
 }

@@ -35,6 +35,7 @@
 // shows through on the dark basemap.
 
 import { formatTime } from './data.js';
+import { escapeHtml } from './html-utils.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -411,10 +412,4 @@ export class RadarOverlay {
     this.currentDate = null;
     this.localFrames = null;
   }
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
 }
