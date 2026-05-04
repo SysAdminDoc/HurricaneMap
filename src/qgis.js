@@ -1,6 +1,6 @@
 // P12.3 — QGIS layer export: Export filtered storms as GeoJSON ready for QGIS import
 
-import { getLandfalls, getStormDetails, filterLandfalls } from './data.js';
+import { getLandfalls, filterLandfalls } from './data.js';
 
 export function exportQGISGeoJSON(filters) {
   const allLandfalls = filterLandfalls(getLandfalls(), filters);
