@@ -263,6 +263,69 @@
     <p>Charting 174 years of Atlantic and Pacific landfalls…</p>
   </div>
 
+  <!-- Keyboard shortcuts palette -->
+  <dialog id="keyboard-palette" class="keyboard-palette glass" hidden aria-labelledby="palette-title">
+    <div class="palette-content">
+      <div class="palette-header">
+        <h2 id="palette-title">Keyboard Shortcuts</h2>
+        <button class="palette-close icon-btn" title="Close" aria-label="Close shortcuts palette">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.3 5.71a.996.996 0 00-1.41 0L12 10.59 7.11 5.7a.996.996 0 10-1.41 1.41L10.59 12l-4.89 4.89a.996.996 0 101.41 1.41L12 13.41l4.89 4.89a.996.996 0 101.41-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z"/></svg>
+        </button>
+      </div>
+      <div class="palette-shortcuts">
+        <div class="shortcut-group">
+          <h3>Global</h3>
+          <div class="shortcut-row">
+            <kbd>?</kbd>
+            <span>Open this shortcuts palette</span>
+          </div>
+          <div class="shortcut-row">
+            <kbd>Esc</kbd>
+            <span>Close dialogs, clear focus</span>
+          </div>
+        </div>
+        <div class="shortcut-group">
+          <h3>Filters</h3>
+          <div class="shortcut-row">
+            <kbd>Ctrl</kbd> <kbd>M</kbd>
+            <span>Filter to major hurricanes only (Cat 3-5)</span>
+          </div>
+          <div class="shortcut-row">
+            <kbd>Ctrl</kbd> <kbd>T</kbd>
+            <span>Filter to tropical storms only</span>
+          </div>
+        </div>
+        <div class="shortcut-group">
+          <h3>Navigation</h3>
+          <div class="shortcut-row">
+            <kbd>Ctrl</kbd> <kbd>L</kbd>
+            <span>Focus search input</span>
+          </div>
+          <div class="shortcut-row">
+            <kbd>Tab</kbd>
+            <span>Navigate to next interactive element</span>
+          </div>
+          <div class="shortcut-row">
+            <kbd>Shift</kbd> <kbd>Tab</kbd>
+            <span>Navigate to previous interactive element</span>
+          </div>
+        </div>
+        <div class="shortcut-group">
+          <h3>Timeline (when focused)</h3>
+          <div class="shortcut-row">
+            <kbd>←</kbd> <kbd>→</kbd>
+            <span>Step through years</span>
+          </div>
+          <div class="shortcut-row">
+            <kbd>Shift</kbd> <kbd>←</kbd> <kbd>→</kbd>
+            <span>Adjust year range</span>
+          </div>
+        </div>
+      </div>
+      <p class="palette-footer">Keyboard accessibility helps everyone. Learn more in settings.</p>
+    </div>
+  </dialog>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
