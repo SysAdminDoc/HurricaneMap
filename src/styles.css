@@ -2204,26 +2204,7 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* Phase 2: Smooth Loading State */
-.loading {
-  position: relative;
-  pointer-events: none;
-  opacity: 0.7;
-}
 
-.loading::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  animation: shimmer 1.5s infinite;
-  border-radius: inherit;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
 
 /* Phase 3: Elevation & Depth System */
 .glass {
