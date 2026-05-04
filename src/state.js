@@ -4,6 +4,7 @@
 import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass } from './data.js';
 import { showStorm } from './panel.js';
 import { closePanelsExcept } from './panels.js';
+import { redraw } from './timeline.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -67,6 +68,9 @@ export async function openState(stateName) {
   const allLandfalls = getLandfalls();
   const stateLandfalls = allLandfalls.filter(lf => lf.state === stateName);
 
+  // Update timeline to show only this state's storms
+  redraw(stateLandfalls);
+
   if (!stateLandfalls.length) {
     body.innerHTML = `
       <h2>${escapeHtml(stateName)}</h2>
@@ -98,13 +102,17 @@ export async function openState(stateName) {
   const catLabels = ['TS', 'Cat 1', 'Cat 2', 'Cat 3', 'Cat 4', 'Cat 5'];
   const catVarNames = ['--cat-ts', '--cat-1', '--cat-2', '--cat-3', '--cat-4', '--cat-5'];
   const maxCat = Math.max(...catCounts, 1);
-  const catHistogramHtml = catCounts.map((n, i) => `
-    <div class="bar-row">
+  const catHistogramHtml = catCounts.map((n, i) => {
+    const pct = (n / maxCat) * 100;
+    const color = `var(${catVarNames[i]})`;
+    return `
+    <div class="bar-row state-cat-row">
       <span class="label">${catLabels[i]}</span>
-      <span class="bar"><span class="fill" style="width:${(n / maxCat) * 100}%;background:var(${catVarNames[i]})"></span></span>
-      <span class="count">${n}</span>
+      <span class="bar" style="background:rgba(170,183,255,0.06)"><span class="fill" style="width:${pct}%;background:${color};opacity:0.8"></span></span>
+      <span class="count" style="color:${color};font-weight:600">${n}</span>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // By-decade trend
   const decadeCounts = {};
@@ -114,13 +122,16 @@ export async function openState(stateName) {
   }
   const decadeKeys = Object.keys(decadeCounts).sort();
   const maxDec = Math.max(...Object.values(decadeCounts), 1);
-  const decadeHtml = decadeKeys.map(d => `
-    <div class="bar-row">
+  const decadeHtml = decadeKeys.map(d => {
+    const pct = (decadeCounts[d] / maxDec) * 100;
+    return `
+    <div class="bar-row state-decade-row">
       <span class="label">${d}s</span>
-      <span class="bar"><span class="fill" style="width:${(decadeCounts[d] / maxDec) * 100}%;background:linear-gradient(90deg,var(--cat-2),var(--cat-4))"></span></span>
-      <span class="count">${decadeCounts[d]}</span>
+      <span class="bar" style="background:rgba(170,183,255,0.06)"><span class="fill" style="width:${pct}%;background:linear-gradient(90deg,var(--cat-2),var(--cat-4));opacity:0.8"></span></span>
+      <span class="count" style="color:var(--cat-3);font-weight:600">${decadeCounts[d]}</span>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Worst landfalls (top 5 by max category, tiebreak by year)
   const worst = [...stormsHere.values()]
