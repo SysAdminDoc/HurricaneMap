@@ -52,11 +52,13 @@ export function mountTimeline(landfalls, callbacks) {
     </div>
   `;
   document.body.appendChild(host);
+  document.body.classList.toggle('timeline-collapsed', collapsed);
 
   const toggle = host.querySelector('#timeline-toggle');
   toggle.addEventListener('click', () => {
     collapsed = !collapsed;
     host.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('timeline-collapsed', collapsed);
     toggle.setAttribute('aria-expanded', String(!collapsed));
     toggle.title = collapsed ? 'Expand timeline' : 'Collapse timeline';
   });
