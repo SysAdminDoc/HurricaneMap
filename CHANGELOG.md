@@ -4,6 +4,26 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.6 — Microcopy + empty states + design system polish (2025)
+
+Final premium-polish pass completing the comprehensive design system overhaul. Includes refined empty states and error messaging with semantic color coding, improved helper text and placeholder styling, button label consistency, badge styling system, enhanced typography scales, list and table styling, tooltips, accessibility features, and support for density and high-contrast modes. The app now feels cohesive, intentional, and premium across every surface.
+
+- **Empty states refined.** Clear, concise messaging with proper heading hierarchy and color hierarchy; consistent padding and text sizing.
+- **Error/warning/success/info states.** Semantic color-coded message boxes with subtle backgrounds, borders, and icons. Proper contrast and readability across all states.
+- **Helper text and hints.** Consistent sizing and color; automatically hidden when empty.
+- **Badge styling system.** Primary, success, warning, danger variants with consistent padding and typography.
+- **Button label consistency.** All buttons now have consistent font weight, letter-spacing, and sizing across the app.
+- **Typography scale refined.** H1-H6 headings with consistent letter-spacing and weight; utility classes for text sizing (.text-sm, .text-xs) and color (.text-muted, .text-emphasis).
+- **List styling.** Inline and block lists styled consistently; proper margins and padding; hover states for table rows.
+- **Table styling.** Professional table appearance with hover backgrounds, proper borders, and semantic th/td styling.
+- **Tooltip styling.** Data-tooltip attributes with proper positioning and smooth transitions.
+- **Accessibility features.** visually-hidden / sr-only utility class for screen readers; skip-to-main-content link pattern.
+- **Density mode support.** CSS custom properties for compact layouts (body.dense class).
+- **High-contrast mode support.** Enhanced color palette for accessibility (body.high-contrast class).
+- **Selection styling.** Proper selection background and color.
+- **Scrollbar track visibility.** Consistent transparent backgrounds.
+- **Service worker bumped** to `hm-v0.9.6`.
+
 ## v0.9.5 — Season summary + legend + map controls + final polish (2025)
 
 Final premium-polish pass targeting auxiliary surfaces and completing the design system. Season summary card receives improved card styling with hover elevation, map legend refined with interactive item highlighting, zoom controls polished with proper transitions and focus states, and comprehensive refinements to form inputs (checkboxes, selects, text inputs) across all surfaces.
