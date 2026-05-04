@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -72,6 +72,27 @@ The interface has undergone a comprehensive premium-polish pass designed to maxi
 - **Keyboard navigation** — Full support for Escape, Tab, and Enter workflows.
 - **Color contrast** — Maintained throughout all states per WCAG standards.
 - **Reduced motion** — Respected where supported.
+
+## Phase 8: Mobile Optimization & Advanced Features (Latest)
+
+**Mobile-First Responsive Design**
+- **WCAG AAA touch targets** — All interactive elements now meet the 44×44px minimum standard on mobile (720px and below): header icon buttons, Leaflet zoom controls, year inputs, category toggles. Leaflet controls gain rounded corners for better ergonomics.
+- **Improved mobile panel layout** — Panels and filters optimized for small screens with responsive cascading at 720px, 640px, and 430px breakpoints.
+
+**Dark/Light Theme Toggle**
+- **Catppuccin Mocha and Latte** — Switch between dark and light themes via the settings menu. Selection persists to localStorage. Smooth CSS-variable swap without page reload.
+- **All elements theme-aware** — Category colors, backgrounds, text colors, and all UI elements adjust automatically.
+
+**Advanced Storm Comparison**
+- **Diff highlighting in comparison table** — Max values highlighted in green, min values in red/pink. Instantly see which pinned storms stand out on each metric (peak wind, pressure, landfall count, track points, ACE).
+
+**Decade-by-Decade Trend Analysis**
+- **New statistics table** — Six-column analysis by decade: named-storm count, major-hurricane %, ACE total, deadliest storm, and costliest storm. Hover reveals death/damage details. Complements the annual climatology chart.
+
+**Performance Optimizations**
+- **Core Web Vitals monitoring** — Automatic tracking of LCP (Largest Contentful Paint), FID (First Input Delay), and CLS (Cumulative Layout Shift) logged to the browser console.
+- **CSS rendering optimizations** — `will-change` hints on frequently-animated elements (buttons, charts, action controls) reduce layout thrashing.
+- **Lazy-load infrastructure** — Foundation for on-demand loading of non-critical modules (e.g., radar overlay) to reduce initial bundle impact.
 
 ## Quick start
 
