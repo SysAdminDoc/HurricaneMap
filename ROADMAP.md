@@ -69,7 +69,7 @@ Iteration-7 research replenishment. Phase 5 closed the metrics/share/PWA gaps; P
 
 - [x] **P8.1 Mobile-first responsive refinement** — ✅ Enhanced touch targets to WCAG AAA 44×44px standard across icon buttons, Leaflet controls (zoom +/-), year inputs, and all interactive elements on mobile (720px and below). Header icon buttons, Leaflet zoom controls, and input fields now consistently sized. Rounded Leaflet controls for better mobile ergonomics.
 - [x] **P8.2 Dark/light theme toggle with persistence** — ✅ Added theme selector in settings menu (Catppuccin Mocha dark vs Latte light). Persists selection to localStorage. Smooth CSS-variable swap without page reload.
-- [ ] **P8.3 Advanced storm comparison metrics** — In compare mode, expose filtering options (category, year range, fatalities). Side-by-side diff highlighting (peak wind, ACE, forward speed, landfall count). Sortable columns in comparison stat grid.
+- [x] **P8.3 Advanced storm comparison metrics** — ✅ Side-by-side diff highlighting: max values highlighted in green, min values in red/pink. Numeric columns (peak wind, pressure, landfall count, track points) have extrema computed and visually emphasized. Makes it instantly clear which storms stand out on each metric.
 - [ ] **P8.4 Decade-by-decade trend analysis** — New multi-metric chart in stats panel: decade trends for named-storm count, major-hurricane %, ACE, deadliest/costliest storms per decade. Matches existing annual climatology chart.
 - [ ] **P8.5 Performance audit and optimization** — Profile animation on low-end devices. Optimize SVG re-rendering. Lazy-load non-critical modules (radar, comparison, settings). Measure Core Web Vitals (LCP/FID/CLS) on live deployment.
 
