@@ -209,6 +209,7 @@ export function buildExports(storm) {
 
   return {
     csv: { filename: `${baseFilename}.csv`, mime: 'text/csv', body: exportCSV(storm) },
+    csv_publication: { filename: `${baseFilename}-publication.csv`, mime: 'text/csv', body: exportCSVPublication(storm) },
     geojson: { filename: `${baseFilename}.geojson`, mime: 'application/geo+json', body: exportGeoJSON(storm) },
     kml: { filename: `${baseFilename}.kml`, mime: 'application/vnd.google-earth.kml+xml', body: exportKML(storm) },
   };
@@ -230,6 +231,55 @@ function exportCSV(storm) {
     ]);
   }
   return rows.map(r => r.map(csvEscape).join(',')).join('\n');
+}
+
+function exportCSVPublication(storm) {
+  // Publication-ready CSV with metadata header and data dictionary
+  const safeName = storm.name && storm.name !== 'UNNAMED' ? storm.name : 'Unnamed';
+  const headerLines = [
+    `# HurricaneMap Publication Export`,
+    `# Storm: ${safeName} (${storm.year})`,
+    `# Storm ID: ${storm.id}`,
+    `# Export Date: ${new Date().toISOString().split('T')[0]}`,
+    `# Source: NOAA NHC HURDAT2 Atlantic/Eastern Pacific Best Track Database`,
+    `# License: Public domain (NOAA data) | Code: MIT`,
+    `#`,
+    `# DATA DICTIONARY`,
+    `# time_utc: ISO 8601 timestamp of synoptic observation (0/6/12/18 UTC)`,
+    `# lat: Latitude of storm center (decimal degrees, -90 to 90)`,
+    `# lon: Longitude of storm center (decimal degrees, -180 to 180)`,
+    `# wind_kt: Maximum sustained wind speed (knots, from HURDAT2)`,
+    `# pres_mb: Minimum central pressure (millibars; null before 1870s)`,
+    `# status: 'TD'=Tropical Depression, 'TS'=Tropical Storm, 'HU'=Hurricane`,
+    `# category: Saffir-Simpson category (-1=TS, 0=unknown/incomplete, 1-5)`,
+    `# is_landfall: 1 if center crossed U.S. coastline at this observation`,
+    `#`,
+    `# METHODOLOGY`,
+    `# - Wind speed categories use operational Saffir-Simpson thresholds (1971+)`,
+    `# - Pre-1851 storms excluded; data spans 1851-${new Date().getFullYear()}`,
+    `# - Landfalls include both explicit (L marker) and inferred detections`,
+    `# - Pre-aircraft (pre-1944) and pre-satellite (pre-1960s) data are less complete`,
+    `# - For citations and complete methodology, see https://github.com/SysAdminDoc/HurricaneMap`,
+    `#`,
+  ];
+  
+  const rows = [['time_utc', 'lat', 'lon', 'wind_kt', 'pres_mb', 'status', 'category', 'is_landfall']];
+  const lfTimes = new Set((storm.us_landfalls || []).map(lf => lf.t));
+  for (const r of storm.track) {
+    rows.push([
+      r.t,
+      r.lat ?? '',
+      r.lon ?? '',
+      r.wind ?? '',
+      r.pres ?? '',
+      r.status ?? '',
+      saffirCat(r.wind),
+      lfTimes.has(r.t) ? '1' : '0',
+    ]);
+  }
+  
+  const dataLines = rows.map(r => r.map(csvEscape).join(',')).join('\n');
+  return headerLines.join('\n') + dataLines;
 }
 
 function csvEscape(v) {
