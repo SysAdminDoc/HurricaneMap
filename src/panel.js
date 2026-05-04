@@ -22,6 +22,7 @@ import { inflateUSD, formatMillionsUSD } from './inflation.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
+const stickyHeader = document.getElementById('panel-sticky-header');
 const closeBtn = document.getElementById('close-panel');
 
 let animator = null;
@@ -132,7 +133,8 @@ function render(storm, landfall, allStorms) {
   // Generate storm biography
   const biography = generateStormBiography(storm, impacts);
 
-  body.innerHTML = `
+  // Populate the sticky header with title and action buttons
+  stickyHeader.innerHTML = `
     <div class="storm-panel-header">
       <h2 id="storm-panel-title">${escapeHtml(heading)}</h2>
       <div class="meta-row">
@@ -142,7 +144,6 @@ function render(storm, landfall, allStorms) {
         <span>${storm.id}</span>
       </div>
     </div>
-
     <div class="panel-actions-sticky">
       <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
         <span class="play-icon"></span>Play track animation
@@ -151,8 +152,9 @@ function render(storm, landfall, allStorms) {
         <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
       </button>
     </div>
+  `;
 
-    ${(riBadge || pfBadge) ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
+  body.innerHTML = `
 
     <div class="biography-text" style="font-size:14px;line-height:1.6;color:var(--text-secondary);margin:16px 0;font-style:italic;">
       ${escapeHtml(biography)}
