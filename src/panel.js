@@ -451,12 +451,6 @@ function renderSimilarStorms(host, similarStorms) {
   });
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
-}
-
 let _toastTimer = null;
 function showToast(msg, tone = 'info') {
   let host = document.getElementById('hm-toast-host');
