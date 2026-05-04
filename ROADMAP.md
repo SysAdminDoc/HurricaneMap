@@ -84,6 +84,10 @@ Focus: Deep statistical analysis, multi-storm comparisons, climate trend detecti
 - [ ] **P9.5 Storm "biography" narrative** — Auto-generate a 3–4 sentence summary of each storm in plain English: "Hurricane [Name] (year) was a [category] hurricane that formed [month] in the [region] and made [count] landfall(s) in [states], with peak intensity of [wind] and [casualty/damage] impact. The storm [distinctive feature: RI, rapid decay, unusual track, etc.]."
 - [ ] **P9.6 Batch comparison export** — Select multiple storms → export side-by-side table (intensity, ACE, casualties, damages, dates) as CSV/XLSX with auto-generated comparison narrative. Use case: multi-storm research papers, news briefings.
 
+### Phase 9 Marginal Enhancements (Low-effort, high-value optimizations)
+
+- [ ] **P9.7 Pre-computed storm similarity embeddings** — Enhance P9.1 by pre-computing vector embeddings (via OpenAI/HF APIs during data generation) and embedding normalized vectors in `storms.json`. Enables instant similarity lookup without runtime computation. Effort: 1 day. Zero additional UI cost; makes P9.1 feel instantaneous.
+
 ## Phase 10 — Real-time integration & forecasting context
 
 Focus: Live data, model integrations, and predictive context for active seasons.
@@ -114,6 +118,10 @@ Focus: Research-grade export, reproducible analysis, and educational integration
 - [ ] **P12.4 Statistical summary auto-report** — Select a year/state/category filter → auto-generate a one-page markdown report with key stats, charts, and narratives. Render as PDF via client-side or serverless endpoint. Teachers can print for classroom.
 - [ ] **P12.5 Open data license clarity** — Prominently document all data sources (HURDAT2, NOAA, Wikipedia impacts, SEDAC population), their licenses (Public Domain, CC BY, etc.), and attribution requirements. Link from README + data download.
 
+### Phase 12 Marginal Enhancements (Low-effort, niche but valuable)
+
+- [ ] **P12.6 NWS Storm Events integration** — Enrich storm panels with coincident tornado + hail activity via NWS API (open endpoints as of 2025). Expose as "Tornado activity during landfall: N events in [states]" metric. Addresses academic interest in storm + tornado coincidence patterns. Effort: 1–2 days. Risk: Low.
+
 ## Phase 13 — Visualization & 3D exploration (Future / Under Consideration)
 
 Focus: Advanced visualization modes and immersive exploration.
@@ -131,6 +139,11 @@ Focus: Distribution, performance, and sustainability.
 - [ ] **P14.3 Bundle size audit & tree-shaking** — Run modern bundler (Vite, esbuild) to eliminate dead code, split non-critical modules (radar.js, compare.js, animation.js), and enable lazy-loading. Target <100KB gzipped for initial load.
 - [ ] **P14.4 GitHub Pages CDN optimization** — Use Cloudflare Workers to serve HurricaneMap with aggressive caching headers, brotli compression, and image optimization. Measure global latency improvements.
 - [ ] **P14.5 Docker + self-hosted option** — Publish a `Dockerfile` that packages HurricaneMap + a simple Python HTTP server for self-hosting on institutional infrastructure (universities, NWS offices, etc.). Useful for regions with poor internet or intranet-only access.
+
+### Phase 14 Marginal Enhancements (Low-effort, high-value options for v1.3.0+)
+
+- [ ] **P14.6 GOES satellite real-time background** — Integrate real-time GOES reflectivity (AWS Open Data, available since 2025) as an optional overlay for active storms. Live satellite, not just archived NEXRAD. Effort: 2–3 days (AWS S3 polling, image sync). Risk: Medium (data format shifts).
+- [ ] **P14.7 Hourly active-storm polling** — Increase NHC advisory polling from 6-hourly to hourly (or match NHC release cadence). Adds rate-limit handling + user notification. Effort: 1 day. Risk: Low.
 
 ## Tier Placement & Rationale
 
@@ -163,6 +176,8 @@ Focus: Distribution, performance, and sustainability.
 **Iteration 4** (v1.0–v1.1): Phase 8 delivered (mobile responsiveness, dark/light theme, advanced metrics, decade trends, performance). Focus: mobile-first + analytics depth.
 
 **Phase 9 research** (May 2026): Harvested from Tropycal (Python pkg, storm similarity via vector embeddings), Leaflet plugins (3D Cesium, real-time overlays), NHC data endpoints (forecast ensemble APIs), community signals (Reddit r/TropicalWeather, GitHub hurricane-topic repos). See `docs/research/` for full harvest.
+
+**Phase 9 refresh** (May 4, 2026): Second exhaustive research pass (Phase 0–5 methodology) verified Phase 9–14 placement, surfaced 4 marginal enhancements (P14.6 GOES real-time, P14.7 hourly polling, P12.6 NWS events, P9.7 embedding optimization), confirmed no major gaps. All items source-traced to 40+ research URLs (competitors, APIs, community, ecosystem). Documented in `phase1_research` and `phase2_features` SQL tables for audit transparency.
 
 ---
 
