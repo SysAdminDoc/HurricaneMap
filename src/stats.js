@@ -61,7 +61,7 @@ function render() {
     .map(s => `<span class="cold-tag">${s}</span>`).join('');
 
   body.innerHTML = `
-    <h2>Statistics</h2>
+    <h2 id="stats-panel-title">Statistics</h2>
     <p style="font-size:12px;color:var(--subtext);margin:0 0 14px;">
       ${stats.total_storms} U.S.-landfalling storms · ${stats.total_landfall_events} landfall events ·
       ${stats.total_hurricane_landfalls} of those at hurricane strength.

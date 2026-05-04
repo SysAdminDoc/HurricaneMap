@@ -244,7 +244,7 @@ function renderComparePanel() {
   }).join('');
 
   compareBody.innerHTML = `
-    <h2>Comparing ${pinned.length} storm${pinned.length === 1 ? '' : 's'}</h2>
+    <h2 id="compare-panel-title">Comparing ${pinned.length} storm${pinned.length === 1 ? '' : 's'}</h2>
     <p class="cp-hint">Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.</p>
     <div class="cp-actions">
       <button class="export-btn" id="cp-export-btn" title="Export comparison as CSV">📥 Export comparison</button>
