@@ -125,4 +125,4 @@ function downloadCSV(content, filename) {
   document.body.removeChild(link);
 }
 
-export { exportPublicationCSV };
+

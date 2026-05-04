@@ -215,4 +215,4 @@ export function downloadReportAsText(markdown, filename) {
   document.body.removeChild(link);
 }
 
-export { generateStatisticalReport };
+
