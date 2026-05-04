@@ -31,17 +31,17 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 - [x] **P4.4 URL permalinks** — encode filters + opened storm + opened state to `location.hash`; restore on cold load. Format: `#y=2000-2025&c=3,4,5&s=Florida&storm=AL122005`.
 - [x] **P4.5 Track export (CSV / GeoJSON / KML)** — one-click client-side export; CSV for spreadsheets, GeoJSON for QGIS/Mapbox, KML for Google Earth with donut landfall icons.
 
-## Phase 5 — Tier 2 metrics + share (partially shipped in v0.5.0)
+## Phase 5 — Tier 2 metrics + share (✅ shipped in v0.6.0)
 
 - [x] **P5.1 Pressure-fall rate metric** — ✅ v0.5.0. Detects ≥20 mb / 24h drop; surfaced as "📉 Explosive deepening" pill alongside the RI badge. Katrina shows both wind (+50 kt) and pressure (−46 mb) deepening flags.
 - [x] **P5.2 Translation speed (forward speed)** — ✅ v0.5.0. New stat tile shows time-weighted mean km/h with mph in subtitle; tooltip includes peak speed and total stalled-hours (<10 km/h flood-disaster threshold).
-- [ ] **P5.3 Days-at-intensity histogram** — hours spent at TS / Cat-1 / Cat-2 / Cat-3 / Cat-4 / Cat-5; stacked bar in the panel.
-- [ ] **P5.4 First-run onboarding** — 4-step coachmark tour highlighting filters, search, compare-tray, permalink button.
-- [ ] **P5.5 Color-blind palette toggle** — alternate Saffir-Simpson palette using ColorBrewer YlOrRd; persisted in `localStorage`.
-- [ ] **P5.6 Unit toggle (kt / mph / km·h)** — single setting, propagates through panel + chart axis labels.
-- [ ] **P5.7 PWA install** — `manifest.json` + service worker for offline tile + data caching of last-viewed storms.
-- [ ] **P5.8 Timeline ribbon** — 174-year horizontal ribbon at the bottom showing storm density per year, click to jump filter.
-- [ ] **P5.9 PNG / SVG export of intensity chart** — `<canvas>` rasterize for social-media share.
+- [x] **P5.3 Days-at-intensity histogram** — ✅ v0.6.0. Stacked horizontal bar in panel shows hours at TD/TS/Cat-1..5 with percentage labels and total tracked days.
+- [x] **P5.4 First-run onboarding** — ✅ v0.6.0. 4-step coachmark tour with spotlight cutout; localStorage flag prevents re-firing; "Replay welcome tour" available in settings.
+- [x] **P5.5 Color-blind palette toggle** — ✅ v0.6.0. ColorBrewer YlOrRd 7-class sequential palette; CSS-var-driven so map dots, chart bands, panel pills, days-at-intensity bar, and timeline ribbon all swap atomically.
+- [x] **P5.6 Unit toggle (kt / mph / km·h)** — ✅ v0.6.0. Settings menu pill group; persisted to localStorage; propagates to peak-wind stat and closest-pass readout.
+- [x] **P5.7 PWA install** — ✅ v0.6.0. `manifest.webmanifest` + `sw.js` with stale-while-revalidate for HURDAT2 JSON, cache-first for CartoDB/OSM tiles, shell precache on install.
+- [x] **P5.8 Timeline ribbon** — ✅ v0.6.0. 174-year density bar across the bottom of the viewport; bar height = landfalls that year, color = strongest category that year; click sets year filter, drag selects a year range; collapsible.
+- [x] **P5.9 PNG / SVG export of intensity chart** — ✅ v0.6.0. PNG rasterizes the live SVG to canvas at 2× scale with embedded font + Catppuccin background; SVG exports a standalone XML with inline styles.
 - [x] **P5.10 Share button** — ✅ v0.5.0. "🔗 Share view" copies permalink to clipboard with toast confirmation; reusable toast component now available app-wide.
 
 ---

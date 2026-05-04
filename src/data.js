@@ -115,14 +115,11 @@ export function categoryClass(cat) {
   return `cat-${cat}`;
 }
 
+// Palette-aware. Reads the active palette from settings.js so a single user
+// toggle re-themes every dot, track segment, chart bar, and panel pill.
+import { getPaletteColor } from './settings.js';
 export function categoryColor(cat) {
-  const map = {
-    '-1': '#74c7ec', 0: '#74c7ec',
-    1: '#a6e3a1', 2: '#f9e2af',
-    3: '#fab387', 4: '#f38ba8',
-    5: '#cba6f7',
-  };
-  return map[cat] || '#74c7ec';
+  return getPaletteColor(cat);
 }
 
 export function ktToMph(kt) {

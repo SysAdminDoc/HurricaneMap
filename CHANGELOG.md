@@ -4,6 +4,27 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.6.0 — PWA, palette, units, timeline, days-at-intensity, chart export, onboarding (2025)
+
+Closes Phase 5 of the research roadmap. Seven new features land together as a single coherent release: the app is now installable, color-blind-accessible, unit-aware, time-aware (174-year ribbon at the bottom of every view), and shareable (export the intensity chart as PNG/SVG for social media).
+
+- **Days-at-intensity bar (P5.3).** New panel section after closest-pass: stacked horizontal bar showing hours spent at TD / TS / Cat-1 / Cat-2 / Cat-3 / Cat-4 / Cat-5 with day labels and percentage tooltip. Total tracked days printed below. For Katrina you can read at a glance that it spent 1.0 day at Cat-3 and roughly 12 hours at Cat-5 before the Mississippi landfall.
+- **First-run onboarding (P5.4).** 4-step coachmark tour with a spotlight cutout (header → filters → stats button → info button). Skip / Back / Next / ESC keyboard. `localStorage.hm-settings-v1.onboarded` flag prevents re-firing. "Replay welcome tour" button in the new settings menu.
+- **Color-blind palette (P5.5).** ColorBrewer YlOrRd 7-class sequential palette for Saffir-Simpson categories — designed to remain perceptually-ordered for protanopia, deuteranopia, and tritanopia. CSS-var-driven so map dots, the intensity chart bands, panel pills, days-at-intensity bar, and timeline ribbon swap atomically. Toggle via settings cog.
+- **Wind-unit toggle (P5.6).** Settings menu pill group (kt / mph / km·h). Persisted to `localStorage`. Propagates to peak-wind stat (with secondary unit in parens) and closest-pass approach speed. Default remains knots — the operational meteorology unit.
+- **PWA install (P5.7).** `manifest.webmanifest` + new `sw.js` service worker. Stale-while-revalidate for HURDAT2 JSON (works offline once visited), cache-first for CartoDB / OpenStreetMap tiles, shell precache (HTML + every `src/*.js` + styles) on install. Versioned cache name (`hm-v0.6.0`) — old caches are dropped on activate.
+- **174-year timeline ribbon (P5.8).** Persistent horizontal ribbon at the bottom of the viewport (collapsible). One vertical bar per year, height encoded by landfall count, color encoded by strongest category that year. Click → set year filter to that year; drag across multiple years → set range. Highlights currently-active year-range filter visually so the entire historical sweep is always one glance away.
+- **Chart PNG / SVG export (P5.9).** Two new buttons under every storm's intensity-over-time chart. PNG path serializes the live SVG, rasterizes it to canvas at 2× scale with embedded font and Catppuccin background, and saves via `Blob` → object URL. SVG path inlines styles into a standalone XML for vector-perfect Twitter/Mastodon shares.
+- **Settings menu.** New cog button in the header opens a compact glass dropdown with palette / wind-unit / replay-tour controls. Click-outside dismissal. All preferences emit a `hm-settings:change` event so any module (markers, panel, chart, timeline) can react.
+
+### Under the hood
+
+- New modules: `src/settings.js` (typed prefs store + `formatWind` + `applyPaletteToBody`), `src/onboarding.js`, `src/timeline.js`, `src/chart-export.js`, `sw.js`.
+- `src/data.js#categoryColor` now delegates to `getPaletteColor()` so every renderer (Leaflet circles, chart.js bands, panel badges) honors the active palette without re-render branching.
+- `src/metrics.js#daysAtIntensity(track)` computes hour buckets per Saffir tier, honoring observation cadence (3-h vs 6-h) so partial last-segments don't double-count.
+- Service worker registration is gated to `https:` and `localhost` — `file://` and other origins skip silently to avoid console noise during local development.
+- Zero new dependencies. Still pure-static GitHub Pages, ES modules, no build step.
+
 ## v0.5.0 — Pressure-fall, forward speed, share button (2025)
 
 Three more Tier-2 metrics from the research roadmap, plus a long-overdue share button to leverage the v0.4.0 permalinks.

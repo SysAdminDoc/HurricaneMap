@@ -7,14 +7,16 @@ import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
 import { RadarOverlay } from './radar.js';
 import { renderIntensityChart } from './chart.js';
+import { exportChartAsPng, exportChartAsSvg } from './chart-export.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
 import { closePanelsExcept } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
-  findPressureFall, computeTranslationStats, kmhToMph,
+  findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
 } from './metrics.js';
+import { formatWind, getSetting } from './settings.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -129,7 +131,7 @@ function render(storm, landfall) {
     ${(riBadge || pfBadge) ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
 
     <div class="stat-grid">
-      <div class="stat"><div class="label">Peak wind</div><div class="value">${storm.peak_wind_kt} kt <span style="font-size:11px;color:var(--subtext)">(${peakWindMph} mph)</span></div></div>
+      <div class="stat"><div class="label">Peak wind</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
       <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
       <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
       <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
@@ -146,8 +148,15 @@ function render(storm, landfall) {
 
     ${renderImpactsBlock(storm)}
 
+    <h3 class="panel-section-h3">Time at intensity</h3>
+    <div class="dai-host" id="dai-host"></div>
+
     <h3 class="panel-section-h3">Intensity over time</h3>
     <div class="chart-host" id="chart-host"></div>
+    <div class="chart-export-row">
+      <button class="text-btn chart-export-btn" id="chart-export-png" title="Download the intensity chart as a PNG image">⤓ PNG</button>
+      <button class="text-btn chart-export-btn" id="chart-export-svg" title="Download the intensity chart as a vector SVG">⤓ SVG</button>
+    </div>
 
     <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
     <ul class="landfall-list">${landfallsHtml}</ul>
@@ -192,6 +201,25 @@ function render(storm, landfall) {
   // Render the intensity chart inline in the panel. Pass the RI window so
   // the chart can red-tint that segment.
   renderIntensityChart(document.getElementById('chart-host'), storm, { ri });
+
+  // Days-at-intensity stacked horizontal bar.
+  renderDaysAtIntensity(document.getElementById('dai-host'), storm.track);
+
+  // Chart export buttons (PNG / SVG).
+  const pngBtn = document.getElementById('chart-export-png');
+  const svgBtn = document.getElementById('chart-export-svg');
+  if (pngBtn) pngBtn.addEventListener('click', async () => {
+    const svgEl = panel.querySelector('.intensity-svg');
+    try {
+      await exportChartAsPng(svgEl, storm.name);
+      showToast('Chart saved as PNG');
+    } catch { showToast('PNG export failed', 'warn'); }
+  });
+  if (svgBtn) svgBtn.addEventListener('click', () => {
+    const svgEl = panel.querySelector('.intensity-svg');
+    if (exportChartAsSvg(svgEl, storm.name)) showToast('Chart saved as SVG');
+    else showToast('SVG export failed', 'warn');
+  });
 
   // Closest-pass selector — recompute on city change.
   const cityEl = document.getElementById('closest-city');
@@ -318,7 +346,7 @@ function formatClosest(approach) {
   const mi = Math.round(approach.distance_mi);
   const km = Math.round(approach.distance_km);
   const r = approach.track_point;
-  const wind = r.wind != null ? `${r.wind} kt` : '—';
+  const wind = r.wind != null ? formatWind(r.wind) : '—';
   const date = formatTime(r.t);
   return `<strong>${mi.toLocaleString()} mi</strong> <span class="cp-meta-inline">(${km.toLocaleString()} km) · ${wind} · ${date}</span>`;
 }
@@ -480,4 +508,39 @@ function sliderSatelliteUrl(storm) {
   const sector = lfs.length && lfs[0].state === 'Hawaii' ? 'goes-18---full_disk' : 'goes-16---conus';
   // Default to the GeoColor product — most legible, day-and-night.
   return `https://rammb-slider.cira.colostate.edu/?sat=goes-16&sec=${encodeURIComponent(sector.split('---')[1] || 'conus')}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
+}
+
+// Days-at-intensity stacked horizontal bar. Visualizes how many hours of
+// the storm's life were spent in each Saffir-Simpson tier — gives an
+// at-a-glance sense of "long Cat-4 grinder" vs "brief brushing TS".
+function renderDaysAtIntensity(host, track) {
+  if (!host) return;
+  const buckets = daysAtIntensity(track);
+  const order = [
+    { k: 'td', label: 'TD',    cls: 'cat-ts' },
+    { k: 'ts', label: 'TS',    cls: 'cat-ts' },
+    { k: 'c1', label: 'Cat 1', cls: 'cat-1'  },
+    { k: 'c2', label: 'Cat 2', cls: 'cat-2'  },
+    { k: 'c3', label: 'Cat 3', cls: 'cat-3'  },
+    { k: 'c4', label: 'Cat 4', cls: 'cat-4'  },
+    { k: 'c5', label: 'Cat 5', cls: 'cat-5'  },
+  ];
+  const total = order.reduce((s, t) => s + buckets[t.k], 0);
+  if (total <= 0) {
+    host.innerHTML = '<div class="dai-empty">No tier-resolved track data available.</div>';
+    return;
+  }
+  const segs = order.filter(t => buckets[t.k] > 0).map(t => {
+    const hrs = buckets[t.k];
+    const pct = (hrs / total) * 100;
+    const days = hrs / 24;
+    const dayStr = days >= 1 ? `${days.toFixed(1)} d` : `${Math.round(hrs)} h`;
+    return `<div class="dai-seg ${t.cls}" style="flex-basis:${pct}%" title="${t.label}: ${dayStr} (${pct.toFixed(0)}%)" aria-label="${t.label}: ${dayStr}"><span class="dai-seg-label">${pct >= 8 ? `${t.label} · ${dayStr}` : ''}</span></div>`;
+  }).join('');
+  host.innerHTML = `
+    <div class="dai-bar" role="img" aria-label="Days at intensity">${segs}</div>
+    <div class="dai-legend">
+      <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
+    </div>
+  `;
 }

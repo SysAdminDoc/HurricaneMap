@@ -384,3 +384,32 @@ export function computeTranslationStats(track) {
 export function kmhToMph(kmh) {
   return kmh * 0.621371;
 }
+
+/** Days-at-intensity histogram.
+ *  Returns hours spent at each Saffir-Simpson tier across the storm's life.
+ *  Keys: td (depression, <34kt), ts (34-63), c1 (64-82), c2 (83-95),
+ *        c3 (96-112), c4 (113-136), c5 (137+). Hours are floats. */
+export function daysAtIntensity(track) {
+  const buckets = { td: 0, ts: 0, c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 };
+  if (!Array.isArray(track) || track.length < 2) return buckets;
+  function tier(w) {
+    if (w == null) return null;
+    if (w < 34) return 'td';
+    if (w < 64) return 'ts';
+    if (w < 83) return 'c1';
+    if (w < 96) return 'c2';
+    if (w < 113) return 'c3';
+    if (w < 137) return 'c4';
+    return 'c5';
+  }
+  for (let i = 0; i < track.length - 1; i++) {
+    const a = track[i], b = track[i + 1];
+    const ta = tier(a.wind);
+    if (ta == null) continue;
+    const dh = (new Date(b.t).getTime() - new Date(a.t).getTime()) / 3.6e6;
+    if (!Number.isFinite(dh) || dh <= 0 || dh > 24) continue; // guard interpolated L
+    buckets[ta] += dh;
+  }
+  return buckets;
+}
+
