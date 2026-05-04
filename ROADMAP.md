@@ -102,7 +102,7 @@ Focus: Live data, model integrations, and predictive context for active seasons.
 
 Focus: Inclusive design, multi-language support, and expanded user demographics.
 
-- [ ] **P11.1 Full Spanish (ES-LA) localization** — Translate all UI, buttons, panels, tooltips, and chart labels to Spanish (Latin American). Maintain dark/light theme. This is the second-largest Spanish-speaking user base for hurricane tracking.
+- [x] **P11.1 Full Spanish (ES-LA) localization** — Translate all UI, buttons, panels, tooltips, and chart labels to Spanish (Latin American). Maintain dark/light theme. This is the second-largest Spanish-speaking user base for hurricane tracking.
 - [ ] **P11.2 High-contrast accessible theme** — WCAG AAA 7:1 contrast ratio on text; larger fonts; bolder borders; increased visual separation. Toggle via settings. Test with screen readers + keyboard-only users.
 - [ ] **P11.3 Screen reader optimization** — Add semantic `<section>`, `<article>`, `<aside>` landmarks; improve ARIA labels and `aria-describedby` depth; expose all data-driven content via text alternatives; test with NVDA / JAWS.
 - [ ] **P11.4 Keyboard-first workflow** — Full keyboard navigation with visible focus indicators; dedicated keyboard shortcut palette (`?` key); macro shortcuts for common filters (e.g., `Ctrl+M` for "Major hurricanes only"). Audit with keyboard-only users.
