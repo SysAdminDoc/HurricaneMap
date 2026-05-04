@@ -5449,18 +5449,18 @@ section.storm-panel #panel-body::-webkit-scrollbar-thumb:hover {
   opacity: 1;
 }
 
-/* Storm panel header — sticky at top with close button and primary actions */
+/* Storm panel header — no longer sticky inside body, moved to panel-sticky-header */
 section.storm-panel .storm-panel-header {
-  position: sticky;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(24, 24, 37, 0.95);
-  backdrop-filter: blur(4px);
-  margin: -10px -14px 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(170, 183, 255, 0.1);
-  z-index: 20;
+  background: transparent;
+  backdrop-filter: none;
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+  z-index: auto;
 }
 section.storm-panel .storm-panel-header h2 {
   margin: 0 0 6px;
@@ -5476,21 +5476,52 @@ section.storm-panel .storm-panel-header .meta-row {
   margin: 0;
 }
 
-/* Sticky action bar — always visible below header */
-section.storm-panel .panel-actions-sticky {
+/* Sticky header container — keeps title + actions visible when scrolling */
+section.storm-panel #panel-sticky-header {
   position: sticky;
-  top: 66px;
+  top: 0;
   left: 0;
   right: 0;
-  background: rgba(24, 24, 37, 0.95);
+  background: var(--glass-bg);
   backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--glass-edge);
+  z-index: 30;
+  padding: 0;
+  margin: 0;
+}
+
+section.storm-panel #panel-sticky-header .storm-panel-header {
+  padding: 10px 14px 0;
+  margin: 0;
+}
+
+section.storm-panel #panel-sticky-header .panel-actions-sticky {
+  position: static;
+  background: transparent;
+  backdrop-filter: none;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
-  margin: -10px -14px 10px;
-  padding: 8px 14px;
-  border-bottom: 1px solid rgba(170, 183, 255, 0.08);
-  z-index: 20;
+  margin: 6px 14px 10px;
+  padding: 0;
+  border-bottom: none;
+  z-index: auto;
+}
+
+/* Original sticky action bar — for reference if needed elsewhere */
+section.storm-panel .panel-actions-sticky {
+  position: relative;
+  left: 0;
+  right: 0;
+  background: transparent;
+  backdrop-filter: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+  z-index: auto;
 }
 section.storm-panel .close-btn {
   position: absolute;
