@@ -4,6 +4,15 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.5.0 — Pressure-fall, forward speed, share button (2025)
+
+Three more Tier-2 metrics from the research roadmap, plus a long-overdue share button to leverage the v0.4.0 permalinks.
+
+- **Explosive-deepening flag (P5.1).** Detects ≥20 mb pressure drop in any 24-hour window — the operational shorthand for "explosive deepening". Surfaces as an orange/red "📉 Explosive deepening (−XX mb / 24h)" pill alongside the rapid-intensification badge. For Katrina the panel now shows BOTH flags (+50 kt wind / −46 mb pressure), capturing the wind-speed AND pressure-fall sides of the same Aug-28 deepening event. Wilma 2005 (−95 mb / 24h) and Patricia 2015 (−100 mb / 24h) are visible on the chart and in the badge.
+- **Average forward speed (P5.2).** New stat tile computing time-weighted mean translation speed in km/h (and mph). Hover tooltip shows peak forward speed and total stalled-hours (<10 km/h, the conventional flood-disaster threshold for Harvey 2017 / Dorian 2019). Skips track gaps >12 h to avoid spurious teleport-segment speeds.
+- **Share button (P5.10).** "🔗 Share view" button copies the current permalink (filters + opened storm + opened state, encoded in `location.hash`) to the clipboard with a toast confirmation. Falls back to a hidden `<textarea>` + `execCommand('copy')` on non-secure contexts so it works on plain HTTP previews.
+- **Toast component.** New unobtrusive bottom-center toast pattern (220 ms spring-in, 2.2 s dwell, 240 ms fade-out, `role=status`/`role=alert`, full `prefers-reduced-motion` honor) — reusable for future copy/save/restore confirmations.
+
 ## v0.4.0 — Storm metrics + permalinks (2025)
 
 Five Tier-1 features from the research-driven roadmap, all client-side, no new dependencies.

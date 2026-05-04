@@ -13,6 +13,7 @@ import { closePanelsExcept } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
+  findPressureFall, computeTranslationStats, kmhToMph,
 } from './metrics.js';
 
 const panel = document.getElementById('storm-panel');
@@ -99,6 +100,19 @@ function render(storm, landfall) {
     ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">⚡ Rapid intensification (+${ri.delta_kt} kt / 24h)</span>`
     : '';
 
+  const pressureFall = findPressureFall(storm.track);
+  const pfBadge = pressureFall
+    ? `<span class="storm-flag pf-flag" title="Explosive deepening: pressure dropped ${formatNumber(pressureFall.drop_mb, 0)} mb in ${Math.round(pressureFall.hours)}h (${formatTime(pressureFall.from_t)} → ${formatTime(pressureFall.to_t)}). The conventional 'explosive' threshold is ≥20 mb / 24h.">📉 Explosive deepening (−${formatNumber(pressureFall.drop_mb, 0)} mb / 24h)</span>`
+    : '';
+
+  const transStats = computeTranslationStats(storm.track);
+  const transStr = transStats
+    ? `${formatNumber(transStats.mean_kmh, 0)} km/h <span style="font-size:11px;color:var(--subtext)">(${formatNumber(kmhToMph(transStats.mean_kmh), 0)} mph)</span>`
+    : '—';
+  const transTitle = transStats
+    ? `Mean forward speed: ${formatNumber(transStats.mean_kmh, 1)} km/h. Peak: ${formatNumber(transStats.max_kmh, 0)} km/h${transStats.stalled_hours > 0 ? ` · stalled (<10 km/h) for ${formatNumber(transStats.stalled_hours, 0)} h total` : ''}.`
+    : 'Translation speed unavailable — insufficient consecutive obs.';
+
   // Default closest-pass city: prefer one in the storm's first landfall state, else Miami.
   const defaultCity = pickDefaultCity(storm);
   const initialApproach = closestApproach(storm.track, defaultCity.lat, defaultCity.lon);
@@ -112,12 +126,13 @@ function render(storm, landfall) {
       <span>${storm.id}</span>
     </div>
 
-    ${riBadge ? `<div class="storm-flags">${riBadge}</div>` : ''}
+    ${(riBadge || pfBadge) ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
 
     <div class="stat-grid">
       <div class="stat"><div class="label">Peak wind</div><div class="value">${storm.peak_wind_kt} kt <span style="font-size:11px;color:var(--subtext)">(${peakWindMph} mph)</span></div></div>
       <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
       <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
+      <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
       <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
     </div>
 
@@ -152,6 +167,7 @@ function render(storm, landfall) {
       <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
       <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
       <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
+      <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
     </div>
 
     <div class="panel-actions-row">
@@ -191,12 +207,36 @@ function render(storm, landfall) {
 
   // Export menu — generate Blob client-side and trigger a download.
   panel.querySelectorAll('.export-btn').forEach((btn) => {
+    if (btn.id === 'share-btn') return;
     btn.addEventListener('click', () => {
       const kind = btn.dataset.export;
       const exports = buildExports(storm);
       if (exports[kind]) downloadBlob(exports[kind]);
     });
   });
+
+  // Share button — copy the current permalink to the clipboard with a toast.
+  const shareBtn = document.getElementById('share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      const url = window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied to clipboard');
+      } catch {
+        // Fallback for non-secure contexts: use a hidden textarea.
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Link copied to clipboard'); }
+        catch { showToast('Copy failed — select the address bar', 'warn'); }
+        document.body.removeChild(ta);
+      }
+    });
+  }
 
   const playBtn = document.getElementById('play-anim-btn');
   if (playBtn) {
@@ -297,6 +337,29 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   })[c]);
+}
+
+let _toastTimer = null;
+function showToast(msg, tone = 'info') {
+  let host = document.getElementById('hm-toast-host');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'hm-toast-host';
+    host.className = 'hm-toast-host';
+    document.body.appendChild(host);
+  }
+  const el = document.createElement('div');
+  el.className = `hm-toast hm-toast--${tone}`;
+  el.setAttribute('role', tone === 'warn' ? 'alert' : 'status');
+  el.textContent = msg;
+  host.appendChild(el);
+  // Force-reflow then animate in.
+  requestAnimationFrame(() => el.classList.add('is-visible'));
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    el.classList.remove('is-visible');
+    setTimeout(() => el.remove(), 240);
+  }, 2200);
 }
 
 // Wikipedia article URL — best-effort. Tries the standard article naming pattern;

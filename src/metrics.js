@@ -307,3 +307,80 @@ export function downloadBlob({ filename, mime, body }) {
     URL.revokeObjectURL(url);
   }, 250);
 }
+
+/** Find the steepest 24-hour pressure-fall window in a track.
+ *  Returns the window with the largest mb drop ≥ 20 mb, or null if no
+ *  qualifying window exists. Both endpoints must have observed (non-null)
+ *  pressure values — we don't interpolate. The 20 mb / 24h threshold is
+ *  the operational shorthand for "explosive deepening" (Wilma 2005 dropped
+ *  95 mb in 24h; Patricia 2015 dropped 100 mb). */
+export function findPressureFall(track) {
+  if (!Array.isArray(track) || track.length < 2) return null;
+  const PRESSURE_FALL_THRESHOLD_MB = 20;
+  let best = null;
+  for (let i = 0; i < track.length; i++) {
+    if (track[i].pres == null) continue;
+    const t0 = new Date(track[i].t).getTime();
+    const p0 = track[i].pres;
+    for (let j = i + 1; j < track.length; j++) {
+      if (track[j].pres == null) continue;
+      const t1 = new Date(track[j].t).getTime();
+      const dh = (t1 - t0) / 3600000;
+      if (dh > RI_WINDOW_HOURS + 0.5) break;
+      if (dh < RI_WINDOW_HOURS - 0.5) continue;
+      const drop = p0 - track[j].pres;
+      if (drop >= PRESSURE_FALL_THRESHOLD_MB) {
+        if (!best || drop > best.drop_mb) {
+          best = {
+            from_idx: i, to_idx: j,
+            from_t: track[i].t, to_t: track[j].t,
+            from_pres: p0, to_pres: track[j].pres,
+            drop_mb: drop, hours: dh,
+            rate_mb_per_h: drop / dh,
+          };
+        }
+      }
+    }
+  }
+  return best;
+}
+
+/** Compute translation-speed (forward speed) statistics from a track.
+ *  Returns {min, mean, max, stalled_hours, peak_kmh, peak_t} where speeds
+ *  are in km/h between consecutive valid lat/lon obs at synoptic 6-hour
+ *  spacing. "stalled_hours" = total time the storm moved <10 km/h, the
+ *  conventional flood-disaster threshold (Harvey 2017, Dorian 2019). */
+export function computeTranslationStats(track) {
+  if (!Array.isArray(track) || track.length < 2) return null;
+  const speeds = [];
+  let stalledHours = 0;
+  let peak = { kmh: 0, t: null };
+  for (let i = 1; i < track.length; i++) {
+    const a = track[i - 1];
+    const b = track[i];
+    if (a.lat == null || a.lon == null || b.lat == null || b.lon == null) continue;
+    const dh = (new Date(b.t).getTime() - new Date(a.t).getTime()) / 3600000;
+    if (dh <= 0 || dh > 12.5) continue; // skip gaps > ~12h
+    const km = haversineKm(a.lat, a.lon, b.lat, b.lon);
+    const kmh = km / dh;
+    speeds.push({ kmh, hours: dh, t: b.t });
+    if (kmh < 10) stalledHours += dh;
+    if (kmh > peak.kmh) peak = { kmh, t: b.t };
+  }
+  if (speeds.length === 0) return null;
+  const sum = speeds.reduce((acc, s) => acc + s.kmh * s.hours, 0);
+  const totalH = speeds.reduce((acc, s) => acc + s.hours, 0);
+  return {
+    min_kmh: Math.min(...speeds.map(s => s.kmh)),
+    mean_kmh: sum / totalH,
+    max_kmh: peak.kmh,
+    peak_t: peak.t,
+    stalled_hours: stalledHours,
+    sample_count: speeds.length,
+  };
+}
+
+/** km/h → mph helper for display. */
+export function kmhToMph(kmh) {
+  return kmh * 0.621371;
+}
