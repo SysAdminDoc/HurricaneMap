@@ -718,3 +718,107 @@ function computeTrendSlope(points) {
   return (n * sumXY - sumX * sumY) / denom;
 }
 
+/** Compute first-24h wind gain (proxy for rate of development).
+ *  Returns the wind increase within the first 24 hours of track,
+ *  or 0 if track is too short. */
+export function computeFirst24hWindGain(track) {
+  if (!Array.isArray(track) || track.length < 2) return 0;
+  if (track[0].wind == null) return 0;
+  
+  const t0 = new Date(track[0].t).getTime();
+  let maxWind = track[0].wind;
+  
+  for (let i = 1; i < track.length; i++) {
+    if (track[i].wind == null) continue;
+    const ti = new Date(track[i].t).getTime();
+    const dh = (ti - t0) / 3600000;
+    
+    if (dh > 24.5) break;
+    maxWind = Math.max(maxWind, track[i].wind);
+  }
+  
+  return maxWind - track[0].wind;
+}
+
+/** Compute RI risk score for a storm based on historical precedent.
+ *  Compares the target storm to similar storms in the dataset and
+ *  returns the probability that an RI event will occur.
+ *  
+ *  Similarity criteria:
+ *  - Peak wind within ±15 kt
+ *  - Genesis month within ±1 month (cyclical)
+ *  - First 24h wind gain within ±10 kt
+ *  
+ *  Returns { probability: 0-1, category: 'high'|'medium'|'low', similar_count: N, ri_count: M }
+ */
+export function computeRIRiskScore(targetStorm, allStorms) {
+  if (!targetStorm || !Array.isArray(allStorms) || allStorms.length === 0) {
+    return { probability: 0.5, category: 'medium', similar_count: 0, ri_count: 0 };
+  }
+  
+  // Get target storm properties
+  const targetPeakWind = targetStorm.peak_wind_kt || 0;
+  const targetGenesisMonth = new Date(targetStorm.track[0]?.t || '').getUTCMonth();
+  const targetFirst24h = computeFirst24hWindGain(targetStorm.track);
+  
+  // Define similarity bands
+  const WIND_BAND = 15;
+  const MONTH_BAND = 1;
+  const GAIN_BAND = 10;
+  
+  // Circular distance for months (0-11)
+  const monthDist = (m1, m2) => {
+    const d = Math.abs(m1 - m2);
+    return Math.min(d, 12 - d);
+  };
+  
+  // Find similar storms
+  let similarStorms = [];
+  for (const storm of allStorms) {
+    if (storm.id === targetStorm.id) continue;
+    if (!storm.peak_wind_kt || !storm.track || storm.track.length < 2) continue;
+    
+    const peakWind = storm.peak_wind_kt;
+    const genesisMonth = new Date(storm.track[0]?.t || '').getUTCMonth();
+    const first24h = computeFirst24hWindGain(storm.track);
+    
+    // Check similarity criteria (all must match)
+    const windMatch = Math.abs(peakWind - targetPeakWind) <= WIND_BAND;
+    const monthMatch = monthDist(genesisMonth, targetGenesisMonth) <= MONTH_BAND;
+    const gainMatch = Math.abs(first24h - targetFirst24h) <= GAIN_BAND;
+    
+    if (windMatch && monthMatch && gainMatch) {
+      const hadRI = findRapidIntensification(storm.track) !== null;
+      similarStorms.push({ storm_id: storm.id, had_ri: hadRI });
+    }
+  }
+  
+  // Compute probability
+  if (similarStorms.length === 0) {
+    // No similar storms found; use base rate from entire dataset
+    let baseRI = 0;
+    for (const storm of allStorms) {
+      if (storm.track && storm.track.length >= 2) {
+        if (findRapidIntensification(storm.track)) baseRI++;
+      }
+    }
+    const baseProbability = allStorms.length > 0 ? baseRI / allStorms.length : 0.3;
+    return { probability: baseProbability, category: 'medium', similar_count: 0, ri_count: 0 };
+  }
+  
+  const riCount = similarStorms.filter(s => s.had_ri).length;
+  const probability = riCount / similarStorms.length;
+  
+  // Map to category
+  let category = 'low';
+  if (probability > 0.66) category = 'high';
+  else if (probability > 0.33) category = 'medium';
+  
+  return {
+    probability: Math.round(probability * 100) / 100,
+    category,
+    similar_count: similarStorms.length,
+    ri_count: riCount,
+  };
+}
+
