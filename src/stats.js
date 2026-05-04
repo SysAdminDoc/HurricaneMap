@@ -1,6 +1,6 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { getStats, getLandfalls, getAllStorms } from './data.js';
-import { closePanelsExcept, syncPanelControls } from './panels.js';
+import { hidePanel, showPanel } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
 import { computeClimateTrends } from './metrics.js';
@@ -12,19 +12,16 @@ const body = document.getElementById('stats-body');
 const closeBtn = document.getElementById('close-stats');
 
 closeBtn.addEventListener('click', () => {
-  panel.hidden = true;
-  syncPanelControls();
+  hidePanel('stats-panel');
 });
 
 export function toggleStats() {
   if (panel.hidden) {
-    closePanelsExcept('stats-panel');
     render();
-    panel.hidden = false;
+    showPanel('stats-panel');
   } else {
-    panel.hidden = true;
+    hidePanel('stats-panel');
   }
-  syncPanelControls();
 }
 
 function render() {
