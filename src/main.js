@@ -13,6 +13,7 @@ import { setSurgeCategory } from './surge.js';
 import { startActiveStormPolling } from './active.js';
 import { setPopulation } from './population.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
+import { initLocale, setLocale } from './i18n.js';
 import { maybeStartOnboarding } from './onboarding.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
@@ -128,6 +129,11 @@ const els = {
 };
 
 async function boot() {
+  // Initialize locale (before any rendering)
+  initLocale();
+  const savedLocale = getSetting('locale');
+  if (savedLocale) setLocale(savedLocale);
+
   // Start performance monitoring early
   initPerformanceMonitoring();
   
@@ -198,6 +204,10 @@ function wireSettingsControls() {
       btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setPalette === getSetting('palette')));
     });
+    menu.querySelectorAll('[data-set-locale]').forEach(btn => {
+      btn.classList.toggle('on', btn.dataset.setLocale === getSetting('locale'));
+      btn.setAttribute('aria-pressed', String(btn.dataset.setLocale === getSetting('locale')));
+    });
     menu.querySelectorAll('[data-set-damage]').forEach(btn => {
       btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setDamage === getSetting('damageMode')));
@@ -244,6 +254,8 @@ function wireSettingsControls() {
     if (t) { setSetting('theme', t.dataset.setTheme); syncMenu(); return; }
     const p = e.target.closest('[data-set-palette]');
     if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
+    const l = e.target.closest('[data-set-locale]');
+    if (l) { setSetting('locale', l.dataset.setLocale); location.reload(); return; }
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
   });
