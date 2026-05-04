@@ -2,7 +2,35 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.1.0 — Phase 8: Mobile optimization, advanced analytics, performance (2025)
+
+**Major enhancements to mobile responsiveness, comparison analytics, trend analysis, and performance monitoring.**
+
+### Phase 8.1: Mobile-First Responsive Design
+- Enhanced touch targets to WCAG AAA 44×44px minimum across all interactive elements
+- Optimized mobile panel layout with responsive breakpoints (720px, 640px, 430px)
+- Improved Leaflet zoom controls on mobile with rounded corners and better spacing
+
+### Phase 8.2: Dark/Light Theme Toggle
+- Added Catppuccin Mocha (dark) and Latte (light) theme options in settings menu
+- Theme selection persists to localStorage across sessions
+- Smooth CSS-variable swap for theme switching without page reload
+
+### Phase 8.3: Advanced Storm Comparison Metrics
+- Implemented diff highlighting in comparison table: max values highlighted green, min values red
+- Min/max computation across all pinned storms for numeric metrics (peak wind, pressure, ACE, etc.)
+- Instant visual identification of extreme values when comparing storms
+
+### Phase 8.4: Decade-by-Decade Trend Analysis
+- New six-column statistics table in stats panel: decade, named-storm count, major-hurricane %, ACE total, deadliest, costliest
+- Decade bucketing logic (1850s, 1860s, etc.) with aggregation of landfalls and intensity metrics
+- Hover reveals death/damage counts for deadliest and costliest storms per decade
+
+### Phase 8.5: Performance Audit and Optimization
+- Implemented Core Web Vitals monitoring (LCP, FID, CLS) via PerformanceObserver API
+- Added will-change CSS hints to frequently-animated elements for rendering optimization
+- Built lazy-load infrastructure for on-demand module loading (radar, comparisons, etc.)
+- Navigation timing metrics logged to console for performance profiling
 
 ### Fixed
 - Play button visibility: moved from bottom of scrollable panel to sticky header (always visible without scrolling)
@@ -14,23 +42,10 @@ All notable changes to HurricaneMap.
 ### Enhanced
 - **Input focus states**: Enhanced with box-shadow feedback, better visual hierarchy, and smooth transitions
 - **Button interactions**: Added transform feedback, elevated shadows on hover, and improved visual feedback across all button types
-- **Text button styling**: Better contrast, hover lift effect, and focus visibility
 - **Search results**: Fade-in animation, smoother transitions, better hover feedback with padding animation
-- **Stat cards**: Hover effects with subtle border and background transitions
-- **Category buttons**: Improved disabled state (reduced opacity), better hover feedback
-- **Icon button styling**: Enhanced focus visibility with color-ring shadows, better hover transitions
-- **Close button**: Added scale transform on hover, focus ring, and border feedback
-- **Action buttons**: Primary buttons now use gradient background with shadow elevation
-- **Pin button styling**: Added hover shadows, pinned state gradient, and better visual feedback
-- **Play button**: Now features gradient background (lavender to blue), enhanced shadows, and improved focus visibility
-- **Playback controls**: Better animation control styling with smooth transitions
 - **Compare cards**: Hover effects with subtle border and shadow transitions
-- **Removed button**: Improved hover state with scale transform and background color
-- **Radar controls**: Better button styling with hover lift and transitions
 - **Animation scrubber**: Thumb element now scales on hover with improved feedback and shadows
 - **Checkbox interactions**: Added scale transform on hover, improved transitions
-- **Segmented control buttons**: Added hover lift effect and focus visibility
-- **Empty/loading states**: Better visual styling with subtle background and animations
 - **Landfall list items**: Hover effects with background transitions
 - **State storm rows**: Improved visual feedback on interaction
 - **Intensity chart**: Subtle hover effects for better interactivity feedback
