@@ -189,21 +189,56 @@ function renderComparePanel() {
     `;
   }).join('');
 
-  // Side-by-side stat table.
+  // Side-by-side stat table with diff highlighting.
   const rows = [
-    ['Peak wind', p => `${p.storm.peak_wind_kt} kt (${ktToMph(p.storm.peak_wind_kt)} mph)`],
-    ['Min pressure', p => p.storm.min_pres_mb ? `${p.storm.min_pres_mb} mb` : '—'],
-    ['Peak category', p => categoryLabel(saffirCat(p.storm.peak_wind_kt))],
-    ['Landfall (max)', p => categoryLabel(p.storm.landfall_max_category)],
-    ['# US landfalls', p => p.storm.us_landfall_count],
-    ['Track points', p => p.storm.track.length],
-    ['Genesis', p => formatTime(p.storm.track[0].t).split(',')[0]],
-    ['Final', p => formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0]],
-    ['States hit', p => [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', ')],
+    ['Peak wind', p => p.storm.peak_wind_kt, 'number'],
+    ['Min pressure', p => p.storm.min_pres_mb, 'number'],
+    ['Peak category', p => saffirCat(p.storm.peak_wind_kt), 'category'],
+    ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
+    ['# US landfalls', p => p.storm.us_landfall_count, 'number'],
+    ['Track points', p => p.storm.track.length, 'number'],
+    ['Genesis', p => formatTime(p.storm.track[0].t).split(',')[0], 'text'],
+    ['Final', p => formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0], 'text'],
+    ['States hit', p => [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', '), 'text'],
   ];
+
+  // Compute min/max for diff highlighting.
+  const extrema = {};
+  for (const [label, fn, type] of rows) {
+    const values = pinned.map(fn).filter(v => v != null);
+    if (type === 'number' && values.length > 0) {
+      extrema[label] = {
+        max: Math.max(...values),
+        min: Math.min(...values),
+      };
+    }
+  }
+
   const headerCols = pinned.map(p => `<th style="color:${p.color}">${escapeHtml(titleCase(p.name))} ${p.year}</th>`).join('');
-  const tableBody = rows.map(([label, fn]) => {
-    const cells = pinned.map(p => `<td>${escapeHtml(String(fn(p) ?? '—'))}</td>`).join('');
+  const tableBody = rows.map(([label, fn, type]) => {
+    const cells = pinned.map(p => {
+      const val = fn(p);
+      let displayVal = val;
+      if (type === 'category') {
+        displayVal = val == null ? '—' : categoryLabel(val);
+      } else if (type === 'number') {
+        displayVal = val == null ? '—' : String(val);
+      } else {
+        displayVal = escapeHtml(String(val ?? '—'));
+      }
+      
+      // Apply diff highlighting for numeric columns.
+      let highlight = '';
+      if (type === 'number' && extrema[label] && val != null) {
+        if (val === extrema[label].max) {
+          highlight = ' class="cp-cell-max"';
+        } else if (val === extrema[label].min) {
+          highlight = ' class="cp-cell-min"';
+        }
+      }
+      
+      return `<td${highlight}>${displayVal}</td>`;
+    }).join('');
     return `<tr><th>${label}</th>${cells}</tr>`;
   }).join('');
 
