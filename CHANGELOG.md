@@ -2,6 +2,16 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.4 — Overlay shelf stabilization (May 2026)
+
+**Continued panel-overlap cleanup for global map controls.**
+
+### Fixed
+- Moved compare tray and radar controls onto a reserved overlay shelf above the bottom timeline instead of letting them float through the year chart.
+- Added timeline-collapsed body state so the overlay shelf can reclaim space when the timeline is minimized.
+- Kept compare and radar controls outside the side-panel lane on desktop and suppressed them behind active panels on narrow screens.
+- Bumped the service worker shell cache to `hm-v1.3.4` so live users receive the overlay shelf layout fix.
+
 ## v1.3.3 — Inline playback controls (May 2026)
 
 **Focused playback UX fix for panel overlap and clearer play/pause state.**

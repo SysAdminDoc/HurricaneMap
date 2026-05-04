@@ -4843,4 +4843,81 @@ body.side-panel-open .season-summary {
   }
 }
 
+/* Overlay shelf stabilization pass v1.3.4
+   Compare and radar controls share a reserved map shelf above the timeline
+   instead of floating through the chart or the side-panel lane. */
+:root {
+  --map-left-reserve: 344px;
+  --overlay-right-reserve: 16px;
+  --overlay-bottom-reserve: 156px;
+}
+
+body.side-panel-open {
+  --overlay-right-reserve: calc(var(--side-panel-width) + 32px);
+}
+
+body.timeline-collapsed {
+  --overlay-bottom-reserve: 60px;
+}
+
+.compare-tray,
+.radar-controls {
+  position: fixed !important;
+  left: calc(var(--map-left-reserve) + 16px) !important;
+  right: var(--overlay-right-reserve) !important;
+  transform: none !important;
+  width: max-content;
+  max-width: min(560px, calc(100vw - var(--map-left-reserve) - var(--overlay-right-reserve) - 32px)) !important;
+  margin-inline: auto;
+  z-index: 1180 !important;
+}
+
+.compare-tray {
+  bottom: var(--overlay-bottom-reserve) !important;
+}
+
+.radar-controls {
+  bottom: calc(var(--overlay-bottom-reserve) + 64px) !important;
+}
+
+@media (max-width: 1120px) {
+  :root {
+    --map-left-reserve: 16px;
+  }
+
+  body.side-panel-open {
+    --overlay-right-reserve: 442px;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --map-left-reserve: 10px;
+    --overlay-right-reserve: 10px;
+    --overlay-bottom-reserve: 128px;
+  }
+
+  body.timeline-collapsed {
+    --overlay-bottom-reserve: 52px;
+  }
+
+  .compare-tray,
+  .radar-controls {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    margin-inline: 0;
+  }
+
+  .radar-controls {
+    bottom: calc(var(--overlay-bottom-reserve) + 76px) !important;
+  }
+
+  body.side-panel-open .compare-tray,
+  body.side-panel-open .radar-controls {
+    display: none !important;
+  }
+}
+
 
