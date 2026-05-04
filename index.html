@@ -260,8 +260,15 @@
 
   <div class="loading" id="loading">
     <div class="spinner" aria-hidden="true">
-      <span class="spinner-ring"></span>
-      <span class="spinner-ring spinner-ring-2"></span>
+      <svg class="hurricane-icon" viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5">
+        <!-- Outer spiral -->
+        <circle cx="12" cy="12" r="10" opacity="0.3" />
+        <!-- Middle bands -->
+        <ellipse cx="12" cy="12" rx="7" ry="8" opacity="0.5" />
+        <!-- Inner eye with rotation indicator -->
+        <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.8" />
+      </svg>
     </div>
     <p>Charting 174 years of Atlantic and Pacific landfalls…</p>
   </div>
