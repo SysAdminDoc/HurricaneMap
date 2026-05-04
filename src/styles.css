@@ -833,6 +833,19 @@ section.storm-panel.glass {
   margin-top: 8px;
 }
 
+/* Diff highlighting in comparison table */
+.cp-cell-max {
+  background: rgba(166, 227, 161, 0.15) !important;
+  font-weight: 600;
+  color: #a6e3a1;
+}
+
+.cp-cell-min {
+  background: rgba(243, 139, 168, 0.15) !important;
+  font-weight: 600;
+  color: #f38ba8;
+}
+
 .compare-track {
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
 }
