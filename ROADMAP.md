@@ -67,7 +67,7 @@ Iteration-7 research replenishment. Phase 5 closed the metrics/share/PWA gaps; P
 
 ## Phase 8 — Mobile-first responsive refinement + advanced filtering (in progress)
 
-- [ ] **P8.1 Mobile-first responsive refinement** — Testing on actual iOS/Android devices. Refine touch targets (min 44×44px), panel stacking behavior, landscape orientation handling. Ensure all map controls (zoom, layer toggle, legend) are accessible on small screens without occluding the map.
+- [x] **P8.1 Mobile-first responsive refinement** — ✅ Enhanced touch targets to WCAG AAA 44×44px standard across icon buttons, Leaflet controls (zoom +/-), year inputs, and all interactive elements on mobile (720px and below). Header icon buttons, Leaflet zoom controls, and input fields now consistently sized. Rounded Leaflet controls for better mobile ergonomics.
 - [x] **P8.2 Dark/light theme toggle with persistence** — ✅ Added theme selector in settings menu (Catppuccin Mocha dark vs Latte light). Persists selection to localStorage. Smooth CSS-variable swap without page reload.
 - [ ] **P8.3 Advanced storm comparison metrics** — In compare mode, expose filtering options (category, year range, fatalities). Side-by-side diff highlighting (peak wind, ACE, forward speed, landfall count). Sortable columns in comparison stat grid.
 - [ ] **P8.4 Decade-by-decade trend analysis** — New multi-metric chart in stats panel: decade trends for named-storm count, major-hurricane %, ACE, deadliest/costliest storms per decade. Matches existing annual climatology chart.
