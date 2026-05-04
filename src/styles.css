@@ -2556,7 +2556,222 @@ a:focus-visible, [role="button"]:focus-visible {
   .filters {
     padding: 12px 12px;
   }
+}
 
+/* ============================================================================
+   TIMELINE — 174-year ribbon at bottom of viewport
+   ============================================================================ */
+.timeline-ribbon {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  z-index: 800;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--glass-edge);
+  transition: height 200ms ease, padding 200ms ease;
+}
+
+.timeline-ribbon.collapsed {
+  height: 44px;
+}
+
+.timeline-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.timeline-toggle:hover {
+  background: rgba(180, 190, 254, 0.1);
+  border-radius: 8px;
+}
+
+.timeline-toggle:focus-visible {
+  outline: var(--focus-ring);
+  border-radius: 8px;
+}
+
+.timeline-toggle svg {
+  transition: transform 200ms ease;
+}
+
+.timeline-ribbon.collapsed .timeline-toggle svg {
+  transform: rotate(180deg);
+}
+
+.timeline-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  transition: opacity 200ms ease;
+}
+
+.timeline-ribbon.collapsed .timeline-inner {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Timeline axis — the bar chart container */
+.timeline-axis {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5px;
+  background: rgba(30, 30, 46, 0.3);
+  border: 1px solid var(--glass-edge);
+  border-radius: 8px;
+  padding: 4px 2px 2px 2px;
+  cursor: crosshair;
+  user-select: none;
+  transition: background 120ms ease;
+}
+
+.timeline-axis:hover {
+  background: rgba(30, 30, 46, 0.5);
+}
+
+.timeline-axis.dragging {
+  background: rgba(30, 30, 46, 0.6);
+}
+
+/* Year bars */
+.tl-bar {
+  flex: 1;
+  height: 100%;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 80ms ease;
+  opacity: 0.85;
+  min-height: 4px;
+  position: relative;
+}
+
+.tl-bar:hover {
+  opacity: 1;
+  filter: brightness(1.2);
+}
+
+.tl-bar.tl-empty {
+  opacity: 0.3;
+}
+
+.tl-bar.tl-empty:hover {
+  opacity: 0.5;
+}
+
+.tl-bar:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--blue);
+}
+
+/* Selection range highlight */
+.tl-selection {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(180, 190, 254, 0.2);
+  border: 2px solid var(--blue);
+  border-radius: 4px;
+  pointer-events: none;
+  transition: all 80ms ease;
+}
+
+/* Year labels below the timeline */
+.timeline-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--subtext);
+  padding: 0 4px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.timeline-labels span {
+  flex: 1;
+}
+
+/* Responsive timeline */
+@media (max-width: 1200px) {
+  .timeline-ribbon {
+    height: 120px;
+    padding: 6px 10px;
+    gap: 10px;
+  }
+
+  .timeline-ribbon.collapsed {
+    height: 40px;
+  }
+
+  .timeline-toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .timeline-labels {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-ribbon {
+    height: 110px;
+    padding: 6px 8px;
+    gap: 8px;
+  }
+
+  .timeline-ribbon.collapsed {
+    height: 38px;
+  }
+
+  .timeline-labels {
+    font-size: 9px;
+  }
+
+  .tl-bar {
+    min-height: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeline-ribbon {
+    height: 100px;
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .timeline-ribbon.collapsed {
+    height: 36px;
+  }
+
+  .timeline-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .timeline-labels {
+    font-size: 8px;
+  }
+}
   .filter-row {
     gap: 4px;
   }
