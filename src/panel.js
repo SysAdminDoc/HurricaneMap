@@ -190,6 +190,7 @@ function render(storm, landfall, allStorms) {
     <div class="export-row">
       <span class="export-label">Export track:</span>
       <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
+      <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
       <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
       <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
       <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
