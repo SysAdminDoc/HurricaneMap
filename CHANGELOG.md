@@ -11,6 +11,7 @@ All notable changes to HurricaneMap.
 - Added real sort controls to the state deep-dive storm list for newest, strongest, and most-hit storm views.
 - Added a header filter toggle so the filter sheet can collapse into a map-first view, defaulting to collapsed on mobile.
 - Moved track-animation player controls closer to the bottom edge so they block less of the map while playback is running.
+- Tuned the storm detail panel height/top offset and clamped animation-player bottom offset so controls stay lower without disappearing on short viewports.
 
 ### 13-feature analytics roadmap (Phases 1-3) shipped
 
