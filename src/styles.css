@@ -728,6 +728,11 @@ section.storm-panel.glass {
   border-left: 3px solid var(--pin-color, var(--lavender));
   border-radius: 10px;
   padding: 10px 12px 12px;
+  transition: all 120ms ease;
+}
+.cp-card:hover {
+  border-color: rgba(180, 190, 254, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .cp-card-head {
   display: flex;
@@ -746,8 +751,13 @@ section.storm-panel.glass {
   padding: 2px 6px;
   border-radius: 4px;
   line-height: 1;
+  transition: all 120ms ease;
 }
-.cp-remove:hover { color: var(--cat-4); background: var(--surface0); }
+.cp-remove:hover { 
+  color: var(--cat-4); 
+  background: rgba(243, 139, 168, 0.1);
+  transform: scale(1.15);
+}
 .cp-meta {
   display: flex;
   flex-wrap: wrap;
@@ -891,8 +901,14 @@ section.storm-panel.glass {
   font-size: 11px;
   font-weight: 600;
   text-decoration: none;
+  transition: all 120ms ease;
+  cursor: pointer;
 }
-.ab-link:hover { border-color: var(--lavender); background: var(--surface0); }
+.ab-link:hover { 
+  border-color: var(--lavender); 
+  background: var(--surface0);
+  transform: translateY(-1px);
+}
 
 .state-panel h2 {
   margin: 0 0 4px;
@@ -908,9 +924,18 @@ section.storm-panel.glass {
   font-size: 13px;
   color: var(--subtext);
   text-align: center;
-  padding: 12px 0;
+  padding: 24px 12px;
+  background: rgba(180, 190, 254, 0.02);
+  border: 1px solid rgba(180, 190, 254, 0.08);
+  border-radius: 10px;
+  margin: 8px 0;
 }
 .state-empty.hint { font-size: 12px; }
+.state-loading { animation: pulse-subtle 2s ease-in-out infinite; }
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
 
 .state-storm-list {
   list-style: none;
@@ -1214,6 +1239,16 @@ section.storm-panel.glass {
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
+  transition: all 120ms ease;
+}
+.anim-speed:hover {
+  border-color: var(--lavender);
+  background: rgba(180, 190, 254, 0.05);
+}
+.anim-speed:focus {
+  border-color: var(--lavender);
+  background: rgba(180, 190, 254, 0.08);
+  outline: none;
 }
 
 .anim-hud {
@@ -1297,8 +1332,16 @@ section.storm-panel.glass {
   color: var(--text);
   cursor: pointer;
   user-select: none;
+  transition: all 120ms ease;
 }
-.anim-radar-toggle:hover { border-color: var(--lavender); }
+.anim-radar-toggle:hover { 
+  border-color: var(--lavender);
+  background: rgba(180, 190, 254, 0.05);
+}
+.anim-radar-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
 .anim-radar-toggle input { margin: 0; cursor: pointer; }
 .anim-radar-disabled {
   color: var(--overlay);
@@ -1341,6 +1384,11 @@ section.storm-panel.glass {
   background: var(--surface0);
   color: var(--text);
   border-color: var(--lavender);
+  transform: translateY(-1px);
+}
+.radar-quick-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
 }
 
 .radar-controls {
@@ -1392,8 +1440,18 @@ section.storm-panel.glass {
   border-radius: 6px;
   font-size: 11px;
   cursor: pointer;
+  transition: all 120ms ease;
 }
-.radar-btn:hover { background: var(--surface0); border-color: var(--lavender); }
+.radar-btn:hover { 
+  background: var(--surface0); 
+  border-color: var(--lavender);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.radar-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
 .radar-time {
   flex: 1;
   text-align: center;
