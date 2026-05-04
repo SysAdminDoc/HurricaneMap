@@ -145,6 +145,54 @@ export function closestApproach(track, targetLat, targetLon) {
   };
 }
 
+/** Compute empirical return periods for a given city across all historical storms.
+ *  For each category (1, 3, 5), counts the number of storms that made a landfall
+ *  within 50 km (31 mi) of the city at that intensity or stronger, then computes
+ *  the average years between such events.
+ *  Returns { cat1_years, cat3_years, cat5_years } with null for "never" cases.
+ */
+export function computeCityReturnPeriods(city, allStorms) {
+  const RADIUS_KM = 50;
+  const CATEGORIES = { 1: 1, 3: 3, 5: 5 };
+  
+  const landfallsByCategory = { 1: [], 3: [], 5: [] };
+  
+  // Scan all storms for landfalls within radius at each category
+  for (const storm of allStorms) {
+    const landfalls = storm.us_landfalls || [];
+    for (const lf of landfalls) {
+      const dist = haversineKm(lf.lat, lf.lon, city.lat, city.lon);
+      if (dist > RADIUS_KM) continue;
+      const cat = lf.category >= 1 ? lf.category : -1;
+      if (cat >= 1) landfallsByCategory[1].push(storm.year);
+      if (cat >= 3) landfallsByCategory[3].push(storm.year);
+      if (cat >= 5) landfallsByCategory[5].push(storm.year);
+    }
+  }
+  
+  // Compute return periods (years between events)
+  const computeReturnPeriod = (events) => {
+    if (events.length === 0) return null;
+    if (events.length === 1) return null; // Need at least 2 events
+    const sorted = events.sort((a, b) => a - b);
+    const intervals = [];
+    for (let i = 1; i < sorted.length; i++) {
+      intervals.push(sorted[i] - sorted[i - 1]);
+    }
+    const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    return Math.round(mean * 10) / 10; // 1 decimal place
+  };
+  
+  return {
+    cat1_years: computeReturnPeriod(landfallsByCategory[1]),
+    cat3_years: computeReturnPeriod(landfallsByCategory[3]),
+    cat5_years: computeReturnPeriod(landfallsByCategory[5]),
+    cat1_count: landfallsByCategory[1].length,
+    cat3_count: landfallsByCategory[3].length,
+    cat5_count: landfallsByCategory[5].length,
+  };
+}
+
 /** Format a number with thousand-separators + N fixed decimals. */
 export function formatNumber(n, decimals = 0) {
   if (n == null || !Number.isFinite(n)) return '—';

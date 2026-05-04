@@ -1,7 +1,7 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  ktToMph, formatTime, getImpactsFor,
+  ktToMph, formatTime, getImpactsFor, getAllStorms,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -15,6 +15,7 @@ import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
+  computeCityReturnPeriods,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -58,10 +59,12 @@ export async function showStorm(landfall) {
   }
   clearTracks();
   await showTrack(storm.id);
-  render(storm, landfall);
+  const allStorms = getAllStorms();
+  render(storm, landfall, allStorms);
+}
 }
 
-function render(storm, landfall) {
+function render(storm, landfall, allStorms) {
   const niceName = titleCase(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
   const heading = isUnnamed ? `${storm.year} unnamed ${storm.basin === 'EP' ? 'Pacific' : 'Atlantic'} storm` : `${niceName} (${storm.year})`;
@@ -156,6 +159,7 @@ function render(storm, landfall) {
         ${COASTAL_CITIES.map(c => `<option value="${escapeHtml(c.name)}"${c.name === defaultCity.name ? ' selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
       </select>
       <span class="closest-pass-value" id="closest-pass-value">${formatClosest(initialApproach)}</span>
+      <div class="return-periods-row" id="return-periods-row"></div>
     </div>
 
     ${renderImpactsBlock(storm)}
@@ -228,13 +232,19 @@ function render(storm, landfall) {
   // Closest-pass selector — recompute on city change.
   const cityEl = document.getElementById('closest-city');
   const cpValEl = document.getElementById('closest-pass-value');
+  const rpRowEl = document.getElementById('return-periods-row');
   if (cityEl && cpValEl) {
-    cityEl.addEventListener('change', () => {
+    const updateClosestPass = () => {
       const city = COASTAL_CITIES.find(c => c.name === cityEl.value);
       if (!city) return;
       const ap = closestApproach(storm.track, city.lat, city.lon);
+      const rp = computeCityReturnPeriods(city, allStorms);
       cpValEl.innerHTML = formatClosest(ap);
-    });
+      if (rpRowEl) rpRowEl.innerHTML = formatReturnPeriods(rp);
+    };
+    // Compute return periods for the initial city
+    updateClosestPass();
+    cityEl.addEventListener('change', updateClosestPass);
   }
 
   // Export menu — generate Blob client-side and trigger a download.
@@ -353,6 +363,19 @@ function formatClosest(approach) {
   const wind = r.wind != null ? formatWind(r.wind) : '—';
   const date = formatTime(r.t);
   return `<strong>${mi.toLocaleString()} mi</strong> <span class="cp-meta-inline">(${km.toLocaleString()} km) · ${wind} · ${date}</span>`;
+}
+
+function formatReturnPeriods(rp) {
+  if (!rp) return '';
+  const items = [];
+  if (rp.cat5_years) items.push(`Cat 5: ~${rp.cat5_years}y`);
+  else if (rp.cat5_count === 0) items.push('Cat 5: never');
+  if (rp.cat3_years) items.push(`Cat 3+: ~${rp.cat3_years}y`);
+  else if (rp.cat3_count === 0) items.push('Cat 3+: never');
+  if (rp.cat1_years) items.push(`Cat 1+: ~${rp.cat1_years}y`);
+  else if (rp.cat1_count === 0) items.push('Cat 1+: never');
+  if (items.length === 0) return '';
+  return `<span class="return-periods-label">Return period (50 km radius):</span> ${items.join(' • ')}`;
 }
 
 function saffirCat(kt) {
