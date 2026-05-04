@@ -8,7 +8,7 @@ const STORAGE_KEY = 'hm-settings-v1';
 
 const DEFAULTS = {
   windUnit: 'kt',          // 'kt' | 'mph' | 'kmh'
-  theme: 'dark',           // 'dark' (Catppuccin Mocha) | 'light' (Catppuccin Latte)
+  theme: 'dark',           // 'dark' | 'light' | 'system'
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   ensembleTracks: false,   // Show GFS/ECMWF forecast ensemble spaghetti tracks
@@ -18,6 +18,8 @@ const DEFAULTS = {
 };
 
 let _state = null;
+let themeMediaQuery = null;
+let themeMediaListenerAttached = false;
 
 function load() {
   if (_state) return _state;
@@ -45,6 +47,36 @@ export function setSetting(key, value) {
   _state[key] = value;
   save();
   document.dispatchEvent(new CustomEvent('hm-settings:change', { detail: { key, value } }));
+}
+
+function prefersLightTheme() {
+  return typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: light)').matches;
+}
+
+export function getEffectiveTheme() {
+  const theme = getSetting('theme');
+  if (theme === 'system') return prefersLightTheme() ? 'light' : 'dark';
+  return theme === 'light' ? 'light' : 'dark';
+}
+
+function attachSystemThemeListener() {
+  if (themeMediaListenerAttached ||
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function') {
+    return;
+  }
+  themeMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const onSystemThemeChange = () => {
+    if (getSetting('theme') === 'system') applyThemeToRoot();
+  };
+  if (typeof themeMediaQuery.addEventListener === 'function') {
+    themeMediaQuery.addEventListener('change', onSystemThemeChange);
+  } else if (typeof themeMediaQuery.addListener === 'function') {
+    themeMediaQuery.addListener(onSystemThemeChange);
+  }
+  themeMediaListenerAttached = true;
 }
 
 // --- Wind-unit conversion ----------------------------------------------------
@@ -99,10 +131,10 @@ export function applyPaletteToBody() {
 
 // Apply theme to html element root
 export function applyThemeToRoot() {
+  attachSystemThemeListener();
   const theme = getSetting('theme');
-  if (theme === 'light') {
-    document.documentElement.classList.add('light-theme');
-  } else {
-    document.documentElement.classList.remove('light-theme');
-  }
+  const effectiveTheme = getEffectiveTheme();
+  document.documentElement.classList.toggle('light-theme', effectiveTheme === 'light');
+  document.documentElement.dataset.theme = effectiveTheme;
+  document.documentElement.dataset.themeSetting = theme;
 }

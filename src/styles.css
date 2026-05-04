@@ -5076,4 +5076,270 @@ body.side-panel-open .timelapse-controls {
   }
 }
 
+/* Theme system hardening v1.3.6
+   Centralized semantic tokens and late overrides for surfaces that had drifted
+   toward dark-only rgba values in appended polish layers. */
+:root {
+  color-scheme: dark;
+  --background: var(--base);
+  --foreground: var(--text);
+  --foreground-muted: var(--subtext);
+  --foreground-subtle: var(--overlay);
+  --surface-app: rgba(17, 17, 27, 0.94);
+  --surface-panel: rgba(24, 24, 37, 0.92);
+  --surface-elevated: rgba(30, 30, 46, 0.92);
+  --surface-control: rgba(17, 17, 27, 0.72);
+  --surface-control-hover: rgba(180, 190, 254, 0.12);
+  --surface-control-active: rgba(180, 190, 254, 0.18);
+  --surface-danger: rgba(243, 139, 168, 0.16);
+  --surface-warning: rgba(249, 226, 175, 0.14);
+  --surface-success: rgba(166, 227, 161, 0.14);
+  --surface-info: rgba(137, 180, 250, 0.14);
+  --border-subtle: rgba(205, 214, 244, 0.11);
+  --border-strong: rgba(205, 214, 244, 0.20);
+  --border-accent: rgba(180, 190, 254, 0.42);
+  --shadow-theme-lg: 0 18px 60px rgba(0, 0, 0, 0.34);
+  --focus-ring-color: rgba(180, 190, 254, 0.62);
+  --focus-ring-soft: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  --on-accent: #11111b;
+  --disabled-opacity: 0.58;
+  --leaflet-control-bg: rgba(24, 24, 37, 0.92);
+}
+
+html.light-theme {
+  color-scheme: light;
+  --background: var(--base);
+  --foreground: var(--text);
+  --foreground-muted: var(--subtext);
+  --foreground-subtle: var(--overlay);
+  --surface-app: rgba(239, 241, 245, 0.96);
+  --surface-panel: rgba(255, 255, 255, 0.94);
+  --surface-elevated: rgba(246, 248, 252, 0.96);
+  --surface-control: rgba(255, 255, 255, 0.86);
+  --surface-control-hover: rgba(30, 102, 245, 0.09);
+  --surface-control-active: rgba(124, 58, 237, 0.12);
+  --surface-danger: rgba(210, 15, 57, 0.10);
+  --surface-warning: rgba(228, 147, 32, 0.12);
+  --surface-success: rgba(64, 160, 43, 0.10);
+  --surface-info: rgba(30, 102, 245, 0.10);
+  --border-subtle: rgba(76, 79, 105, 0.14);
+  --border-strong: rgba(76, 79, 105, 0.24);
+  --border-accent: rgba(124, 58, 237, 0.40);
+  --shadow-theme-lg: 0 18px 54px rgba(76, 79, 105, 0.18);
+  --focus-ring-color: rgba(124, 58, 237, 0.56);
+  --focus-ring-soft: 0 0 0 3px rgba(124, 58, 237, 0.18);
+  --on-accent: #ffffff;
+  --leaflet-control-bg: rgba(255, 255, 255, 0.94);
+}
+
+html.high-contrast {
+  --surface-app: var(--base);
+  --surface-panel: var(--mantle);
+  --surface-elevated: var(--crust);
+  --surface-control: var(--crust);
+  --surface-control-hover: var(--surface0);
+  --surface-control-active: var(--surface1);
+  --border-subtle: var(--glass-edge);
+  --border-strong: rgba(255, 255, 255, 0.38);
+  --border-accent: currentColor;
+  --focus-ring-color: var(--text);
+  --focus-ring-soft: 0 0 0 4px rgba(255, 255, 255, 0.34);
+  --disabled-opacity: 0.72;
+}
+
+.glass,
+.app-header,
+.filters,
+.settings-menu,
+.compare-tray,
+.radar-controls,
+.timelapse-controls,
+.season-summary,
+.keyboard-palette,
+.hm-toast,
+.storm-panel,
+.stats-panel,
+.compare-panel,
+.state-panel,
+.on-this-date-panel,
+section.storm-panel.glass {
+  background: var(--surface-panel) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--foreground);
+  box-shadow: var(--shadow-theme-lg);
+}
+
+.icon-btn,
+.text-btn,
+.settings-pill,
+.settings-action,
+.action-btn,
+.export-btn,
+.ct-btn,
+.radar-btn,
+.anim-btn,
+.timelapse-controls .icon-btn,
+input[type="number"],
+input[type="search"],
+select,
+.toggle-row,
+.layer-select,
+.stat-grid .stat,
+.closest-pass-row,
+.impacts-block,
+.cp-card,
+.state-storm-row,
+.similar-storm-row,
+.panel-playback-host .anim-controls,
+.timelapse-progress-bar,
+.anim-radar-toggle,
+.ss-stat,
+.ss-tier {
+  background: var(--surface-control) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--foreground) !important;
+}
+
+.icon-btn:hover,
+.text-btn:hover,
+.settings-pill:hover,
+.settings-action:hover,
+.action-btn:hover,
+.export-btn:hover,
+.ct-btn:hover,
+.radar-btn:hover,
+.anim-btn:hover,
+.timelapse-controls .icon-btn:hover,
+.toggle-row:hover,
+.toggle-row:focus-within,
+.state-storm-row:hover,
+.search-results li:hover,
+.cat-btn:not(.on):hover {
+  background: var(--surface-control-hover) !important;
+  border-color: var(--border-accent) !important;
+  color: var(--foreground) !important;
+}
+
+input[type="number"]::placeholder,
+input[type="search"]::placeholder {
+  color: var(--foreground-muted);
+  opacity: 0.82;
+}
+
+input[type="number"]:focus,
+input[type="search"]:focus,
+select:focus,
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: none !important;
+  border-color: var(--focus-ring-color) !important;
+  box-shadow: var(--focus-ring-soft) !important;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+.text-btn:disabled,
+.icon-btn:disabled {
+  opacity: var(--disabled-opacity) !important;
+  color: var(--foreground-subtle) !important;
+  background: var(--surface-elevated) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.settings-pill.on,
+.settings-pill[aria-checked="true"],
+.icon-btn[aria-pressed="true"],
+.icon-btn[aria-expanded="true"]:not(#toggle-filters),
+.ct-btn.primary,
+.action-btn.primary,
+.play-anim-btn:not(.is-playing):not(.is-paused),
+.pin-btn.pinned {
+  color: var(--on-accent) !important;
+  background: linear-gradient(135deg, var(--lavender), var(--sapphire)) !important;
+  border-color: transparent !important;
+}
+
+.search-results,
+.search-results li,
+.panel-empty-state,
+.empty-state,
+.cp-empty,
+.state-empty,
+.search-empty,
+.storm-loading-state,
+.storm-error-state,
+.state-loading {
+  background: var(--surface-elevated) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--foreground-muted) !important;
+}
+
+.panel-empty-state strong,
+.empty-state strong,
+.cp-empty h2,
+.state-empty strong,
+.search-empty strong,
+.storm-error-state strong,
+.search-result-text strong,
+.stat .value,
+.closest-pass-value strong,
+.timelapse-header h3,
+.anim-title,
+.radar-title {
+  color: var(--foreground) !important;
+}
+
+.hm-toast--warn {
+  color: var(--warning) !important;
+  background: var(--surface-warning) !important;
+  border-color: rgba(249, 226, 175, 0.32) !important;
+}
+
+.hm-toast--info,
+.state-loading,
+.storm-loading-state {
+  background: var(--surface-info) !important;
+}
+
+.storm-error-state,
+.boot-error {
+  color: var(--foreground) !important;
+  background: var(--surface-danger) !important;
+  border-color: rgba(243, 139, 168, 0.34) !important;
+}
+
+.storm-panel > header,
+.stats-panel > header,
+.compare-panel > header,
+.state-panel > header,
+.on-this-date-panel > header,
+.panel-sticky-header {
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-app)) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+html.light-theme body::before {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(30, 102, 245, 0.08), transparent 28%),
+    radial-gradient(circle at 86% 24%, rgba(124, 58, 237, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(239, 241, 245, 0.12), rgba(220, 224, 232, 0.28));
+}
+
+.leaflet-control-zoom a,
+.leaflet-control-layers,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--leaflet-control-bg) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.leaflet-control-attribution {
+  background: var(--surface-panel) !important;
+  color: var(--foreground-muted) !important;
+}
+
 
