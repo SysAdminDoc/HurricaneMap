@@ -11,6 +11,9 @@ import { enableStateClicks, openState } from './state.js';
 import { setSurgeCategory } from './surge.js';
 import { startActiveStormPolling } from './active.js';
 import { setPopulation } from './population.js';
+import { applyPaletteToBody, getSetting, setSetting } from './settings.js';
+import { maybeStartOnboarding } from './onboarding.js';
+import { mountTimeline, highlightYearRange } from './timeline.js';
 
 const filters = {
   yearMin: 1851,
@@ -117,6 +120,7 @@ const els = {
 };
 
 async function boot() {
+  applyPaletteToBody();
   const map = initMap();
   await loadInitial();
   populateStateFilter();
@@ -126,6 +130,17 @@ async function boot() {
   syncFilterUiFromState();
   applyFilters();
   wireUI();
+  wireSettingsControls();
+  // 174-year timeline ribbon along the bottom edge.
+  mountTimeline(getLandfalls(), {
+    onYearRangeChange: ({ yearMin, yearMax }) => {
+      filters.yearMin = yearMin;
+      filters.yearMax = yearMax;
+      syncFilterUiFromState();
+      applyFilters();
+    },
+  });
+  highlightYearRange(filters.yearMin, filters.yearMax);
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
   enableStateClicks(map).catch(() => { /* non-fatal */ });
   // Live NHC active-storm feed — appears only when a storm is active.
@@ -146,6 +161,80 @@ async function boot() {
   if (restored && restored.s) {
     setTimeout(() => openState(restored.s), 80);
   }
+  // First-run coachmark tour. Idempotent — only fires if the user hasn't
+  // already dismissed it.
+  setTimeout(() => maybeStartOnboarding(), 600);
+}
+
+// Settings menu — palette + wind unit toggles. Wires to the cog button in
+// the header and re-renders dependent surfaces on change.
+function wireSettingsControls() {
+  const cog = document.getElementById('toggle-settings');
+  const menu = document.getElementById('settings-menu');
+  if (!cog || !menu) return;
+
+  // Reflect current settings into the menu controls.
+  function syncMenu() {
+    menu.querySelectorAll('[data-set-unit]').forEach(btn => {
+      btn.classList.toggle('on', btn.dataset.setUnit === getSetting('windUnit'));
+      btn.setAttribute('aria-pressed', String(btn.dataset.setUnit === getSetting('windUnit')));
+    });
+    menu.querySelectorAll('[data-set-palette]').forEach(btn => {
+      btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
+      btn.setAttribute('aria-pressed', String(btn.dataset.setPalette === getSetting('palette')));
+    });
+  }
+  syncMenu();
+
+  cog.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = menu.hasAttribute('hidden') ? false : true;
+    if (open) {
+      menu.setAttribute('hidden', '');
+      cog.setAttribute('aria-expanded', 'false');
+    } else {
+      menu.removeAttribute('hidden');
+      cog.setAttribute('aria-expanded', 'true');
+      syncMenu();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (menu.hasAttribute('hidden')) return;
+    if (!menu.contains(e.target) && e.target !== cog) {
+      menu.setAttribute('hidden', '');
+      cog.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  menu.addEventListener('click', (e) => {
+    const u = e.target.closest('[data-set-unit]');
+    if (u) { setSetting('windUnit', u.dataset.setUnit); syncMenu(); return; }
+    const p = e.target.closest('[data-set-palette]');
+    if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
+    if (e.target.closest('#replay-tour')) {
+      menu.setAttribute('hidden', '');
+      cog.setAttribute('aria-expanded', 'false');
+      maybeStartOnboarding({ force: true });
+    }
+  });
+
+  // Live-react to palette changes — re-stamp the body class and force a
+  // re-render of map markers + open panels.
+  document.addEventListener('hm-settings:change', (e) => {
+    if (e.detail.key === 'palette') {
+      applyPaletteToBody();
+      applyFilters();
+      // If a storm panel is open, re-open it so its colors refresh too.
+      if (openStormId) {
+        const lf = getLandfalls().find(x => x.storm_id === openStormId);
+        if (lf) onLandfallClick(lf);
+      }
+    }
+    if (e.detail.key === 'windUnit' && openStormId) {
+      const lf = getLandfalls().find(x => x.storm_id === openStormId);
+      if (lf) onLandfallClick(lf);
+    }
+  });
 }
 
 // Reflect the in-memory `filters` state back into the DOM controls. Used
@@ -185,6 +274,7 @@ function applyFilters() {
     clearTracks();
   }
   setHeatmap(filters.showHeatmap, visible);
+  highlightYearRange(filters.yearMin, filters.yearMax);
   writeHash();
 }
 
@@ -391,3 +481,11 @@ boot().catch(err => {
     (e.g. <code>python -m http.server</code>) — modern browsers block <code>fetch()</code> from <code>file://</code>.
   </p>`;
 });
+
+// Register the service worker for offline-first behavior + tile caching.
+// Skipped on file:// (where SW APIs are unavailable) and on insecure origins.
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => { /* non-fatal */ });
+  });
+}

@@ -1,0 +1,93 @@
+// User-preference store. Single source of truth for unit toggle, palette,
+// onboarding state. Backed by localStorage with graceful fallback.
+//
+// Other modules read via getSetting() and react to the
+// "hm-settings:change" custom event when a value flips.
+
+const STORAGE_KEY = 'hm-settings-v1';
+
+const DEFAULTS = {
+  windUnit: 'kt',          // 'kt' | 'mph' | 'kmh'
+  palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
+  onboarded: false,
+};
+
+let _state = null;
+
+function load() {
+  if (_state) return _state;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    _state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+  } catch {
+    _state = { ...DEFAULTS };
+  }
+  return _state;
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); }
+  catch { /* private mode / quota — non-fatal */ }
+}
+
+export function getSetting(key) {
+  return load()[key];
+}
+
+export function setSetting(key, value) {
+  load();
+  if (_state[key] === value) return;
+  _state[key] = value;
+  save();
+  document.dispatchEvent(new CustomEvent('hm-settings:change', { detail: { key, value } }));
+}
+
+// --- Wind-unit conversion ----------------------------------------------------
+// HURDAT2 stores sustained wind in knots. Convert per current setting.
+const WIND_UNIT_LABEL = { kt: 'kt', mph: 'mph', kmh: 'km/h' };
+
+export function formatWind(kt, opts = {}) {
+  if (kt == null) return '—';
+  const u = getSetting('windUnit');
+  let v = kt;
+  if (u === 'mph') v = kt * 1.15078;
+  else if (u === 'kmh') v = kt * 1.852;
+  const rounded = opts.decimals != null
+    ? v.toFixed(opts.decimals)
+    : String(Math.round(v));
+  return opts.suffix === false ? rounded : `${rounded} ${WIND_UNIT_LABEL[u]}`;
+}
+
+export function windUnitLabel() {
+  return WIND_UNIT_LABEL[getSetting('windUnit')];
+}
+
+// --- Saffir-Simpson palette --------------------------------------------------
+// Default = Catppuccin Mocha hues (matches CSS vars in :root).
+// Colorblind-safe = ColorBrewer YlOrRd 7-class sequential — distinguishable
+// under deuteranopia/protanopia/tritanopia, AND ordered by intensity so the
+// color story still reads correctly without distinguishing red from green.
+
+export const PALETTES = {
+  default: {
+    '-1': '#74c7ec', 0: '#74c7ec',
+    1: '#a6e3a1', 2: '#f9e2af', 3: '#fab387',
+    4: '#f38ba8', 5: '#cba6f7',
+  },
+  colorblind: {
+    '-1': '#ffeda0', 0: '#ffeda0',
+    1: '#fed976', 2: '#feb24c', 3: '#fd8d3c',
+    4: '#f03b20', 5: '#bd0026',
+  },
+};
+
+export function getPaletteColor(cat) {
+  const pal = PALETTES[getSetting('palette')] || PALETTES.default;
+  return pal[cat] || pal['-1'];
+}
+
+// Apply the active palette to <body> as a class so CSS rules can also pick it up.
+export function applyPaletteToBody() {
+  const pal = getSetting('palette');
+  document.body.classList.toggle('palette-colorblind', pal === 'colorblind');
+}
