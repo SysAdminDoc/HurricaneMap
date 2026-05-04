@@ -18,6 +18,7 @@ import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
 import { fuzzyAugment } from './fuzzy.js';
 import { recordView, getHistory } from './search-history.js';
+import { initPerformanceMonitoring } from './perf.js';
 
 const filters = {
   yearMin: 1851,
@@ -125,6 +126,9 @@ const els = {
 };
 
 async function boot() {
+  // Start performance monitoring early
+  initPerformanceMonitoring();
+  
   applyThemeToRoot();
   applyPaletteToBody();
   const map = initMap();
