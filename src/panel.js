@@ -325,9 +325,14 @@ function render(storm, landfall, allStorms) {
   const pinBtn = document.getElementById('pin-btn');
   if (pinBtn) {
     pinBtn.addEventListener('click', async () => {
-      const nowPinned = await togglePin(storm);
-      pinBtn.classList.toggle('pinned', nowPinned);
-      pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
+      try {
+        const nowPinned = await togglePin(storm);
+        pinBtn.classList.toggle('pinned', nowPinned);
+        pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
+      } catch (e) {
+        console.error('Failed to toggle pin:', e);
+        showToast('Failed to pin storm', 'warn');
+      }
     });
   }
 

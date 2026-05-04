@@ -236,11 +236,15 @@ function renderStateStormRows(storms) {
 function wireStateStormRows(container, stateName) {
   container.querySelectorAll('.state-storm-row').forEach((row) => {
     row.addEventListener('click', async () => {
-      const sid = row.dataset.stormId;
-      const storm = getStorm(sid);
-      if (!storm || !storm.us_landfalls?.length) return;
-      const lf = storm.us_landfalls.find(l => l.state === stateName) || storm.us_landfalls[0];
-      showStorm({ ...lf, storm_id: sid });
+      try {
+        const sid = row.dataset.stormId;
+        const storm = getStorm(sid);
+        if (!storm || !storm.us_landfalls?.length) return;
+        const lf = storm.us_landfalls.find(l => l.state === stateName) || storm.us_landfalls[0];
+        await showStorm({ ...lf, storm_id: sid });
+      } catch (e) {
+        console.error('Failed to show storm:', e);
+      }
     });
   });
 }
