@@ -4,6 +4,17 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.7.0 — Season summary, fuzzy search, print stylesheet, history dropdown, reduced-motion (2025)
+
+Phase 6 advance — the search box gets smarter, the year filter gets richer, the app prints cleanly, and motion-sensitive users get an honest reduced-motion path.
+
+- **Season summary card (P6.3).** Narrow the year filter to a 1–3 year window and a glassmorphic summary card surfaces beside the legend. Shows total named storms, total US landfalls, total ACE (Accumulated Cyclone Energy), landfall count broken out by Saffir-Simpson tier (TS / C1–C5), strongest landfall, deadliest, and costliest storm. The synchronous half (counts + tiers + strongest) renders instantly; ACE and impact superlatives async-resolve once the storm-track cache warms. Auto-hides outside the 1–3 year window; closable with the × button.
+- **Fuzzy / typo-tolerant search (P6.4).** Type "Catrina" and you'll get Katrina under a "Did you mean…" divider. Levenshtein ≤2 fallback layer activates when the literal substring search returns fewer than 5 hits and the query is 4+ characters. Ranks suggestions by edit-distance ascending, year-recency descending. Caps at 5 fuzzy results so it never shadows literal matches.
+- **Storm-name history dropdown (P6.7).** Focus the empty search box and your last 8 viewed storms surface as a "Recently viewed" dropdown. Same row template as live results — sparklines included, back-filled once the track cache warms. Persists across reloads via `localStorage` (`hm-search-history-v1`).
+- **Print stylesheet (P6.6).** `@media print` rules collapse all chrome (header, legend, leaflet controls, timeline ribbon, FABs, settings menu, onboarding overlay, toasts, season card itself). The map prints as the last-rendered tile snapshot at 60vh; if a storm panel is open it gets promoted below the map at full-width with black-on-white styling and chart `page-break-inside: avoid`. Tile attribution stays visible per OSM/CartoDB licensing.
+- **Reduced-motion full pass (P6.9).** Single `@media (prefers-reduced-motion: reduce)` block at end of styles.css clamps every `animation-duration` and `transition-duration` to 0.01ms (state changes still register) and disables named animations entirely on toasts, onboarding cards, the install prompt, season summary, panel action buttons, search-result rows, tier blocks, legend items, and timeline bars. Brings every v0.6.x surface into compliance — previously only toast and onboarding honored the preference.
+- **Internals.** Three new modules: `src/season.js` (summary card lifecycle + aggregation), `src/fuzzy.js` (Levenshtein), `src/search-history.js` (localStorage-backed view history). All wired through the existing `applyFilters` + search-input handler in `main.js`. Service worker bumped to `hm-v0.7.0`; new modules added to `SHELL_ASSETS` for offline parity.
+
 ## v0.6.1 — Search sparklines + accessibility pass (2025)
 
 A small but focused polish ship on top of v0.6.0. Phase 6 opens with two items.

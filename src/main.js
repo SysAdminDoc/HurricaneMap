@@ -15,6 +15,9 @@ import { applyPaletteToBody, getSetting, setSetting } from './settings.js';
 import { maybeStartOnboarding } from './onboarding.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
+import { refreshSeasonSummary } from './season.js';
+import { fuzzyAugment } from './fuzzy.js';
+import { recordView, getHistory } from './search-history.js';
 
 const filters = {
   yearMin: 1851,
@@ -284,6 +287,7 @@ function applyFilters() {
   }
   setHeatmap(filters.showHeatmap, visible);
   highlightYearRange(filters.yearMin, filters.yearMax);
+  refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
   writeHash();
 }
 
@@ -310,6 +314,7 @@ function onLandfallClick(landfall, marker) {
   focusLandfall(landfall);
   showStorm(landfall);
   openStormId = landfall.storm_id;
+  recordView(landfall);
   writeHash();
 }
 
@@ -361,26 +366,30 @@ function wireUI() {
   // Warm the storms cache as soon as the user focuses the search input so that
   // sparklines can render without a perceptible lag on the first keystroke.
   els.searchInput.addEventListener('focus', () => { ensureStormsLoaded(); }, { once: true });
-  els.searchInput.addEventListener('input', () => {
-    const q = els.searchInput.value;
-    const results = searchStorms(q, getLandfalls());
-    if (!results.length) {
-      els.searchResults.hidden = true;
-      els.searchResults.innerHTML = '';
-      return;
-    }
+  // History dropdown when input is focused with empty value.
+  els.searchInput.addEventListener('focus', () => {
+    if (els.searchInput.value.trim()) return;
+    showHistoryDropdown();
+  });
+
+  function showHistoryDropdown() {
+    const history = getHistory();
+    if (!history.length) return;
     els.searchResults.hidden = false;
-    els.searchResults.innerHTML = results.map(lf => {
-      const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
-      const cat = categoryLabel(lf.category);
-      return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}" role="option" tabindex="-1">
-        <span class="search-result-spark-host" data-storm-id="${lf.storm_id}" aria-hidden="true"></span>
-        <span class="search-result-text"><strong>${lf.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${lf.state}</span></span>
-      </li>`;
-    }).join('');
-    // Back-fill sparklines once the storm tracks are available. Synchronous if
-    // the cache is warm, otherwise the rows still render instantly and the
-    // sparks fade in when ready.
+    els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
+      history.map(h => {
+        const name = (h.name === 'UNNAMED') ? 'Unnamed' : titleCase(h.name);
+        const cat = categoryLabel(h.category);
+        return `<li data-storm-id="${h.storm_id}" data-t="${h.t}" data-lat="${h.lat}" data-lon="${h.lon}" role="option" tabindex="-1">
+          <span class="search-result-spark-host" data-storm-id="${h.storm_id}" aria-hidden="true"></span>
+          <span class="search-result-text"><strong>${h.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${h.state || ''}</span></span>
+        </li>`;
+      }).join('');
+    backfillSparklines();
+    wireResultClicks();
+  }
+
+  function backfillSparklines() {
     ensureStormsLoaded().then(() => {
       for (const host of els.searchResults.querySelectorAll('.search-result-spark-host')) {
         const storm = getStorm(host.dataset.stormId);
@@ -389,18 +398,60 @@ function wireUI() {
         }
       }
     });
-    for (const li of els.searchResults.children) {
+  }
+  function wireResultClicks() {
+    for (const li of els.searchResults.querySelectorAll('li[data-storm-id]')) {
       li.addEventListener('click', () => {
+        // Resolve via getLandfalls so we always click a real, current landfall record.
         const lf = getLandfalls().find(x =>
           x.storm_id === li.dataset.stormId &&
           x.t === li.dataset.t &&
           String(x.lat) === li.dataset.lat
-        );
+        ) || getLandfalls().find(x => x.storm_id === li.dataset.stormId);
         if (lf) onLandfallClick(lf);
         els.searchResults.hidden = true;
         els.searchInput.value = '';
       });
     }
+  }
+
+  els.searchInput.addEventListener('input', () => {
+    const q = els.searchInput.value;
+    if (!q.trim()) {
+      // Empty query → show history dropdown if any.
+      const history = getHistory();
+      if (history.length) { showHistoryDropdown(); return; }
+      els.searchResults.hidden = true;
+      els.searchResults.innerHTML = '';
+      return;
+    }
+    let results = searchStorms(q, getLandfalls());
+    let fuzzy = [];
+    if (results.length < 5) {
+      fuzzy = fuzzyAugment(q, getLandfalls(), results, { limit: 5 });
+    }
+    if (!results.length && !fuzzy.length) {
+      els.searchResults.hidden = true;
+      els.searchResults.innerHTML = '';
+      return;
+    }
+    els.searchResults.hidden = false;
+    const renderRow = (lf) => {
+      const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
+      const cat = categoryLabel(lf.category);
+      return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}" role="option" tabindex="-1">
+        <span class="search-result-spark-host" data-storm-id="${lf.storm_id}" aria-hidden="true"></span>
+        <span class="search-result-text"><strong>${lf.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${lf.state}</span></span>
+      </li>`;
+    };
+    let html = results.map(renderRow).join('');
+    if (fuzzy.length) {
+      html += `<li class="search-section-label" aria-hidden="true">Did you mean…</li>`;
+      html += fuzzy.map(renderRow).join('');
+    }
+    els.searchResults.innerHTML = html;
+    backfillSparklines();
+    wireResultClicks();
   });
   els.searchInput.addEventListener('blur', () => {
     setTimeout(() => { els.searchResults.hidden = true; }, 180);
