@@ -36,6 +36,9 @@
 
 import { formatTime } from './data.js';
 
+// Leaflet is loaded from CDN as a UMD module, available as window.L
+const L = window.L;
+
 const IEM_ROOT = 'https://mesonet.agron.iastate.edu/archive/data';
 const LOCAL_ROOT = 'data/radar';
 const MANIFEST_URL = 'data/radar/manifest.json';

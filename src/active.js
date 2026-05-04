@@ -7,6 +7,9 @@ import { getMap } from './map.js';
 import { renderEnsembleTracks, hideEnsembleTracks, clearEnsembleCache } from './ensemble.js';
 import { getSetting } from './settings.js';
 
+// Leaflet is loaded from CDN as a UMD module, available as window.L
+const L = window.L;
+
 // NHC's CurrentStorms.json doesn't send CORS headers, so route through a
 // public CORS proxy. The endpoint payload is tiny (a few KB even with multiple
 // active storms), and we hit it once on boot + every 10 min after.

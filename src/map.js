@@ -1,6 +1,9 @@
 // Leaflet map + landfall markers + track overlays.
 import { categoryColor, ensureStormsLoaded, getStorm } from './data.js';
 
+// Leaflet is loaded from CDN as a UMD module, available as window.L
+const L = window.L;
+
 let map;
 let landfallLayer;
 let trackLayer;
