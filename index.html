@@ -8,6 +8,9 @@
   <title>HurricaneMap — 174 Years of U.S. Hurricane Landfalls</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/png" href="branding/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="src/styles.css" />
@@ -19,7 +22,7 @@
     <img class="brand-mark" src="branding/favicon.png" alt="" aria-hidden="true" />
     <div class="title-block">
       <h1>HurricaneMap</h1>
-      <p class="subtitle">174 years of U.S. hurricane landfalls — <span id="storm-count">…</span></p>
+      <p class="subtitle">174 years of U.S. landfalls<span class="subtitle-sep" aria-hidden="true">·</span><span class="subtitle-count" id="storm-count">…</span></p>
     </div>
     <div class="header-actions" aria-label="View controls">
       <button class="icon-btn" id="toggle-filters" title="Toggle filters" aria-label="Hide filters" aria-controls="filters" aria-expanded="true">
@@ -176,8 +179,11 @@
   </section>
 
   <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p>Loading 174 years of hurricane data…</p>
+    <div class="spinner" aria-hidden="true">
+      <span class="spinner-ring"></span>
+      <span class="spinner-ring spinner-ring-2"></span>
+    </div>
+    <p>Charting 174 years of Atlantic and Pacific landfalls…</p>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
