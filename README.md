@@ -232,21 +232,34 @@ Scraper flags:
 | `--concurrency N` | 8 | Parallel HTTP fetches |
 | `--dry-run` | off | Print task count + estimated MB without downloading |
 
-## Refreshing the HURDAT2 best-track when NOAA publishes a new season
+## Automated HURDAT2 Refresh (GitHub Actions)
 
-NOAA typically releases the previous season's HURDAT2 update in February. To pull the latest:
+HurricaneMap includes an automated workflow that checks for NOAA HURDAT2 updates **monthly** (every 1st of the month at 00:00 UTC). When new data is detected:
+
+1. **Automatic download** — Latest Atlantic and Eastern Pacific HURDAT2 files are fetched from NOAA
+2. **Change detection** — Files are compared; if new storms or updates exist, preprocessing begins
+3. **Preprocessing** — The data is validated and converted to the internal JSON format
+4. **Pull Request** — A PR is created with the updated files, ready for review and merge
+5. **No auto-merge** — The PR is left for manual review to allow testing before publication
+
+**To trigger manually:** Go to [GitHub Actions → HURDAT2 Auto-Refresh](https://github.com/SysAdminDoc/HurricaneMap/actions/workflows/hurdat2-auto-refresh.yml) and click "Run workflow."
+
+## Manual HURDAT2 Refresh
+
+If you need to update HURDAT2 immediately (or if the automatic workflow hasn't run yet), you can refresh manually:
 
 ```bash
-# Update these URLs with the latest filenames from https://www.nhc.noaa.gov/data/
+# Find the latest filenames at https://www.nhc.noaa.gov/data/hurdat/
+# Example using 2026 season update:
 curl -sSL -o data/hurdat2-atlantic.txt \
-  "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-02272026.txt"
+  "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2026-02272026.txt"
 curl -sSL -o data/hurdat2-nepac.txt \
-  "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-02272026.txt"
+  "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2026-02272026.txt"
 
 python scripts/preprocess_hurdat2.py
 ```
 
-Then bump the version, update `CHANGELOG.md`, and commit.
+Then bump the version, update `CHANGELOG.md`, commit, and create a release.
 
 ## License & Attribution
 
