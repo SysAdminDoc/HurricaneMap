@@ -1043,7 +1043,7 @@ section.storm-panel.glass {
 
 .anim-controls {
   position: absolute;
-  bottom: 24px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
@@ -1053,10 +1053,6 @@ section.storm-panel.glass {
   padding: 8px 12px;
   font-size: 12px;
   max-width: calc(100vw - 32px);
-}
-
-div.anim-controls.glass {
-  margin-bottom: clamp(-130px, calc(385px - 55vh), -16px);
 }
 .anim-btn {
   background: var(--mantle);
@@ -1182,7 +1178,7 @@ div.anim-controls.glass {
 .anim-radar-disabled:hover { border-color: var(--surface0); }
 
 @media (max-width: 720px) {
-  .anim-controls { bottom: 12px; top: auto; flex-wrap: wrap; }
+  .anim-controls { bottom: 8px; top: auto; flex-wrap: wrap; }
   .anim-scrubber { width: 100%; order: 99; }
   .anim-radar-toggle { font-size: 10px; padding: 4px 7px; }
 }
