@@ -12,6 +12,8 @@ let lastVisible = []; // memoize so we don't repaint on identical state
 
 const Y0 = 1851;
 const Y1 = 2025;
+let selectedMin = Y0;
+let selectedMax = Y1;
 
 function catTier(cat) {
   // Return a "intensity rank" 0..6 for color escalation.
@@ -65,36 +67,95 @@ export function mountTimeline(landfalls, callbacks) {
 
 function attachDragInteraction() {
   const axis = host.querySelector('#timeline-axis');
-  let dragStart = null;
-  let dragEnd = null;
+  let pointerState = null;
+
   function yearAt(clientX) {
     const r = axis.getBoundingClientRect();
+    if (!r.width) return Y0;
     const pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
     return Math.round(Y0 + pct * (Y1 - Y0));
   }
-  axis.addEventListener('mousedown', (e) => {
-    dragStart = yearAt(e.clientX);
-    dragEnd = dragStart;
+
+  function eventYearTarget(target) {
+    if (!(target instanceof Element)) return null;
+    const bar = target.closest('.tl-bar');
+    if (!bar || !axis.contains(bar)) return null;
+    const year = Number.parseInt(bar.dataset.year || '', 10);
+    return Number.isFinite(year) ? year : null;
+  }
+
+  axis.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.isPrimary === false) return;
+    const year = yearAt(e.clientX);
+    pointerState = {
+      id: e.pointerId,
+      startX: e.clientX,
+      startYear: year,
+      currentYear: year,
+      targetYear: eventYearTarget(e.target),
+      moved: false,
+    };
     axis.classList.add('dragging');
-    drawSelection(dragStart, dragEnd);
+    try { axis.setPointerCapture(e.pointerId); } catch (_) {}
+    drawSelection(year, year);
+    e.preventDefault();
   });
+
+  axis.addEventListener('pointermove', (e) => {
+    if (!pointerState || e.pointerId !== pointerState.id) return;
+    pointerState.currentYear = yearAt(e.clientX);
+    if (Math.abs(e.clientX - pointerState.startX) > 6) pointerState.moved = true;
+    if (pointerState.moved) drawSelection(pointerState.startYear, pointerState.currentYear);
+  });
+
+  axis.addEventListener('pointerup', (e) => {
+    if (!pointerState || e.pointerId !== pointerState.id) return;
+    const state = pointerState;
+    pointerState = null;
+    axis.classList.remove('dragging');
+    try { axis.releasePointerCapture(e.pointerId); } catch (_) {}
+
+    if (!state.moved) {
+      const y = state.targetYear ?? yearAt(e.clientX);
+      drawSelection(y, y);
+      onChange({ yearMin: y, yearMax: y });
+      return;
+    }
+
+    const a = Math.min(state.startYear, state.currentYear);
+    const b = Math.max(state.startYear, state.currentYear);
+    drawSelection(a, b);
+    onChange({ yearMin: a, yearMax: b });
+  });
+
+  axis.addEventListener('pointercancel', (e) => {
+    if (!pointerState || e.pointerId !== pointerState.id) return;
+    pointerState = null;
+    axis.classList.remove('dragging');
+    drawSelection(selectedMin, selectedMax);
+  });
+
   axis.addEventListener('dblclick', (e) => {
     // Double-click resets to full range (1851-2025)
     e.stopPropagation();
     onChange({ yearMin: Y0, yearMax: Y1 });
   });
-  window.addEventListener('mousemove', (e) => {
-    if (dragStart == null) return;
-    dragEnd = yearAt(e.clientX);
-    drawSelection(dragStart, dragEnd);
-  });
-  window.addEventListener('mouseup', () => {
-    if (dragStart == null) return;
-    const a = Math.min(dragStart, dragEnd);
-    const b = Math.max(dragStart, dragEnd);
-    dragStart = dragEnd = null;
-    axis.classList.remove('dragging');
-    onChange({ yearMin: a, yearMax: b });
+
+  axis.addEventListener('keydown', (e) => {
+    const delta = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+    if (delta) {
+      e.preventDefault();
+      const y = Math.max(Y0, Math.min(Y1, selectedMax + delta));
+      onChange({ yearMin: y, yearMax: y });
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      onChange({ yearMin: Y0, yearMax: Y0 });
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      onChange({ yearMin: Y1, yearMax: Y1 });
+    } else if (e.key === 'Escape') {
+      onChange({ yearMin: Y0, yearMax: Y1 });
+    }
   });
 }
 
@@ -102,6 +163,8 @@ function drawSelection(a, b) {
   const axis = host.querySelector('#timeline-axis');
   const lo = Math.min(a, b);
   const hi = Math.max(a, b);
+  selectedMin = lo;
+  selectedMax = hi;
   let sel = axis.querySelector('.tl-selection');
   if (!sel) {
     sel = document.createElement('div');
@@ -140,6 +203,7 @@ export function redraw(landfalls) {
     bar.type = 'button';
     bar.className = 'tl-bar';
     bar.dataset.year = y;
+    bar.tabIndex = -1;
     bar.title = v ? `${y} — ${v.count} landfall${v.count > 1 ? 's' : ''}` : `${y} — none`;
     bar.setAttribute('aria-label', bar.title);
     if (v) {
@@ -150,9 +214,6 @@ export function redraw(landfalls) {
       bar.style.height = '4%';
       bar.classList.add('tl-empty');
     }
-    bar.addEventListener('click', () => {
-      onChange({ yearMin: y, yearMax: y });
-    });
     axis.appendChild(bar);
   }
 }

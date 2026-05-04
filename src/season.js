@@ -8,6 +8,7 @@ import { inflateUSD, formatMillionsUSD } from './inflation.js';
 
 const HOST_ID = 'season-summary';
 const MAX_YEARS = 3;
+let dismissedRange = null;
 
 function ensureHost() {
   let host = document.getElementById(HOST_ID);
@@ -53,17 +54,29 @@ function fmtDeaths(n) {
 export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const host = ensureHost();
   const span = yearMax - yearMin + 1;
+  const rangeKey = `${yearMin}-${yearMax}`;
   if (span < 1 || span > MAX_YEARS) {
     host.hidden = true;
     host.innerHTML = '';
+    return;
+  }
+  if (dismissedRange === rangeKey) {
+    host.hidden = true;
     return;
   }
   const landfalls = getLandfalls().filter(lf => lf.year >= yearMin && lf.year <= yearMax);
   if (!landfalls.length) {
     host.hidden = false;
     host.innerHTML = `
-      <header><h3>${yearMin === yearMax ? `${yearMin} season` : `${yearMin}–${yearMax}`}</h3></header>
+      <header>
+        <h3>${yearMin === yearMax ? `${yearMin} season` : `${yearMin}–${yearMax}`}</h3>
+        <button class="season-close" type="button" aria-label="Hide season summary">×</button>
+      </header>
       <p class="season-empty">No US landfalls in this range.</p>`;
+    host.querySelector('.season-close').addEventListener('click', () => {
+      dismissedRange = rangeKey;
+      host.hidden = true;
+    });
     return;
   }
   // Gather unique storms.
@@ -143,8 +156,8 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     </dl>
   `;
   host.querySelector('.season-close').addEventListener('click', () => {
+    dismissedRange = rangeKey;
     host.hidden = true;
-    host.dataset.dismissed = 'true';
   });
 
   // Async pass: ACE + impacts lookup once storms are loaded.

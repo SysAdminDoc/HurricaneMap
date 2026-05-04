@@ -2,6 +2,22 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.2 — Panel and timeline stabilization (May 2026)
+
+**Focused follow-up pass for panel collisions, timeline precision, and non-intrusive year summaries.**
+
+### Fixed
+- Replaced competing timeline bar-click and axis-drag handlers with one pointer interaction model so clicking a year selects that exact year and dragging still creates year ranges.
+- Added keyboard handling to the timeline slider for adjacent-year selection, start/end jumps, and full-range reset.
+- Centralized side-panel open/close state so storm, statistics, comparison, state, and "on this date" panels share one managed lane and keep button states in sync.
+- Updated Escape-key panel dismissal to use the shared panel manager instead of hiding every `*-panel` element directly.
+
+### Improved
+- Added a final responsive layout-stabilization layer that constrains managed panels to one fixed right-side lane above the timeline.
+- Made the season summary compact, low-priority, and dismissible per selected range so selecting a year no longer creates a large screen-taking card.
+- Shifted or suppressed competing surfaces on smaller screens when a side panel is open to avoid stacked controls and panel overlap.
+- Bumped the service worker shell cache to `hm-v1.3.2` so live users receive the corrected panel and timeline assets.
+
 ## v1.3.1 — Premium UX refinement pass (May 2026)
 
 **Focused premium-polish pass across panels, search, loading states, accessibility, and visual consistency.**

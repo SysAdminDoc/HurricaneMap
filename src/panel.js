@@ -10,7 +10,7 @@ import { renderIntensityChart } from './chart.js';
 import { exportChartAsPng, exportChartAsSvg } from './chart-export.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
-import { closePanelsExcept } from './panels.js';
+import { hidePanel, showPanel } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
@@ -39,7 +39,7 @@ function getRadar() {
 }
 
 closeBtn.addEventListener('click', () => {
-  panel.hidden = true;
+  hidePanel('storm-panel');
   clearTracks();
   if (animator) animator.stop();
   if (radar) radar.close();
@@ -48,8 +48,7 @@ closeBtn.addEventListener('click', () => {
 });
 
 export async function showStorm(landfall) {
-  closePanelsExcept('storm-panel');
-  panel.hidden = false;
+  showPanel('storm-panel');
   stickyHeader.innerHTML = '';
   body.innerHTML = `
     <div class="storm-loading-state" role="status" aria-live="polite">

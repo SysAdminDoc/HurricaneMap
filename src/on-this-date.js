@@ -3,7 +3,7 @@
 
 import { ensureStormsLoaded, getLandfalls, formatTime, categoryLabel, categoryClass, ktToMph } from './data.js';
 import { showStorm } from './panel.js';
-import { closePanelsExcept, syncPanelControls } from './panels.js';
+import { hidePanel, showPanel } from './panels.js';
 import { formatWind } from './settings.js';
 import { escapeHtml } from './html-utils.js';
 
@@ -12,8 +12,7 @@ const body = document.getElementById('on-this-date-body');
 const closeBtn = document.getElementById('close-on-this-date');
 
 closeBtn.addEventListener('click', () => {
-  panel.hidden = true;
-  syncPanelControls();
+  hidePanel('on-this-date-panel');
 });
 
 /** Compute ISO month-day string (e.g., "09-15" for September 15). */
@@ -72,8 +71,7 @@ function formatCalendarOffset(days) {
 }
 
 export async function showOnThisDate() {
-  closePanelsExcept('on-this-date-panel');
-  panel.hidden = false;
+  showPanel('on-this-date-panel');
   body.innerHTML = '<div class="state-loading">Finding historical landfalls near today...</div>';
   
   await ensureStormsLoaded();

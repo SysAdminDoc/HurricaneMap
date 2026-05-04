@@ -7,6 +7,8 @@
 // - Tab: Navigate interactive elements
 // - Arrow keys: Navigate within panels and timeline
 
+import { closeAllPanels } from './panels.js';
+
 const palette = document.getElementById('keyboard-palette');
 const paletteClose = palette?.querySelector('.palette-close');
 
@@ -150,15 +152,6 @@ function filterTropicalOnly() {
   if (typeof window.filterByMacro === 'function') {
     window.filterByMacro('tropical');
   }
-}
-
-function closeAllPanels() {
-  const panels = document.querySelectorAll(
-    '[id$="-panel"]'
-  );
-  panels.forEach(panel => {
-    panel.hidden = true;
-  });
 }
 
 function isInputFocused() {

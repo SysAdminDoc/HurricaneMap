@@ -3,7 +3,7 @@
 
 import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass } from './data.js';
 import { showStorm } from './panel.js';
-import { closePanelsExcept, syncPanelControls } from './panels.js';
+import { hidePanel, showPanel } from './panels.js';
 import { redraw } from './timeline.js';
 import { escapeHtml } from './html-utils.js';
 
@@ -12,8 +12,7 @@ const body = document.getElementById('state-body');
 const closeBtn = document.getElementById('close-state');
 
 if (closeBtn) closeBtn.addEventListener('click', () => {
-  panel.hidden = true;
-  syncPanelControls();
+  hidePanel('state-panel');
 });
 
 let stateBoundariesPromise = null;
@@ -64,8 +63,7 @@ export async function enableStateClicks(map) {
 }
 
 export async function openState(stateName) {
-  closePanelsExcept('state-panel');
-  panel.hidden = false;
+  showPanel('state-panel');
   body.innerHTML = `<p class="state-loading">Loading ${escapeHtml(stateName)}…</p>`;
   await ensureStormsLoaded();
 
