@@ -159,12 +159,13 @@ function render(storm, landfall, allStorms) {
     </div>
     <div class="panel-actions-sticky">
       <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
-        <span class="play-icon"></span>Play track animation
+        <span class="play-icon" aria-hidden="true"></span><span class="play-label">Play track animation</span>
       </button>
       <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
         <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
       </button>
     </div>
+    <div class="panel-playback-host" id="panel-playback-host" hidden></div>
   `;
 
   body.innerHTML = `
@@ -319,8 +320,42 @@ function render(storm, landfall, allStorms) {
 
   const playBtn = document.getElementById('play-anim-btn');
   if (playBtn) {
-    playBtn.addEventListener('click', () => {
-      getAnimator().play(storm);
+    const playbackHost = document.getElementById('panel-playback-host');
+    const playLabel = playBtn.querySelector('.play-label');
+    const syncPlayButton = (state = {}) => {
+      const isThisStorm = state.stormId === storm.id;
+      const playing = isThisStorm && state.playing;
+      const paused = isThisStorm && (state.paused || state.ended);
+      playBtn.classList.toggle('is-playing', playing);
+      playBtn.classList.toggle('is-paused', paused);
+      playBtn.setAttribute('aria-pressed', String(playing));
+      playBtn.title = playing ? 'Pause track animation' : paused ? 'Resume track animation' : 'Animate the storm traveling its track';
+      if (playLabel) playLabel.textContent = playing ? 'Pause track animation' : paused ? 'Resume track animation' : 'Play track animation';
+    };
+
+    playBtn.addEventListener('click', async () => {
+      const anim = getAnimator();
+      if (anim.isActiveFor(storm.id)) {
+        anim.togglePause();
+        syncPlayButton(anim.getPlaybackState());
+        return;
+      }
+      playBtn.disabled = true;
+      if (playLabel) playLabel.textContent = 'Loading playback...';
+      try {
+        await anim.play(storm, {
+          controlsHost: playbackHost,
+          onStateChange: syncPlayButton,
+          onEnd: () => syncPlayButton(anim.getPlaybackState()),
+        });
+      } catch (e) {
+        console.error('Failed to start track animation:', e);
+        showToast('Track playback failed', 'warn');
+        syncPlayButton({ active: false });
+      } finally {
+        playBtn.disabled = false;
+        syncPlayButton(anim.getPlaybackState());
+      }
     });
   }
 
