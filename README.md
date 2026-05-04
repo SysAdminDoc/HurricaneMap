@@ -41,6 +41,38 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
+## Premium UX/UI Polish (Latest)
+
+The interface has undergone a comprehensive premium-polish pass designed to maximize clarity, usability, and visual cohesion:
+
+**Interaction Refinements**
+- **Play button visibility** — Track playback controls are now pinned to a sticky header, always visible without requiring scrolling. Gradient background (lavender→blue) with enhanced shadows signals importance.
+- **Year filter escape mechanisms** — Multiple ways to reset: Escape key, dedicated clear button (⟲), or double-click the timeline. No more being stuck in year-filtered view.
+- **State-filtered timeline** — Selecting a state now updates the year timeline to show *only* that state's landfalls, reducing visual noise and improving clarity.
+- **Histogram color intensity** — Category and decade bars now feature colored fills (matching Saffir-Simpson category colors), with opacity scaled to storm count, making patterns immediately recognizable.
+
+**Component Polish**
+- **Input focus states** — All inputs, selects, and forms now provide visual feedback with box-shadow rings, color transitions, and smooth 120ms animations.
+- **Button system refinement** — Across all button types: transform feedback (hover lift via `translateY`), elevated shadows, improved contrast, and consistent focus visibility.
+- **Search results** — Fade-in animations, smoother hover feedback with padding animation.
+- **State storm rows** — Hover effects with background transitions for better affordance.
+- **Intensity chart** — Subtle border and shadow feedback on interaction.
+- **Compare cards** — Hover effects with border lightening and shadow elevation.
+- **Animation scrubber** — Thumb element scales on hover with improved box-shadow feedback.
+- **Checkbox interactions** — Scale transform on hover (1.05) for better tactile feedback.
+
+**Visual Hierarchy & Consistency**
+- **Unified transition timing** — All animations use consistent 120ms `ease` or cubic-bezier easing for a cohesive feel.
+- **Shadow elevation system** — 3-level shadow depth (2px/4px, 4px/12px, 6px/16px) creates clear visual hierarchy.
+- **Color palette** — Catppuccin Mocha throughout with semantic color usage (category-specific storm coloring, state-specific histogram fills).
+- **Spacing rhythm** — Consistent 8px grid system respected across all panels, cards, and sections.
+
+**Accessibility Enhancements**
+- **Focus ring visibility** — Subtle but clear `0 0 0 3px` lavender-tinted rings across all interactive elements.
+- **Keyboard navigation** — Full support for Escape, Tab, and Enter workflows.
+- **Color contrast** — Maintained throughout all states per WCAG standards.
+- **Reduced motion** — Respected where supported.
+
 ## Quick start
 
 The map is **already published** on GitHub Pages — open https://sysadmindoc.github.io/HurricaneMap/ and you're done.
