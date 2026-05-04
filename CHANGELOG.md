@@ -4,6 +4,13 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Fixed
+- Play button visibility: moved from bottom of scrollable panel to sticky header (always visible without scrolling)
+- Year filter escape mechanisms: added Escape key handler, clear button (⟲), and double-click timeline reset
+- State-filtered timeline: timeline now updates to show only selected state's landfalls when state panel opens
+- Histogram color intensity: category and decade bars now have colored fills with opacity scaling based on storm count
+- Play button accessibility: workflow now unblocked for users without needing to scroll
+
 ## v1.0.0 — FINAL RELEASE: Complete Premium Design System (2025)
 
 **Production-ready complete premium design system.** This release marks the completion of the comprehensive extreme premium-polish pass. Every surface, interaction, state, and detail has been refined to professional standards.
