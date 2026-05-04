@@ -4,6 +4,22 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.9.5 — Season summary + legend + map controls + final polish (2025)
+
+Final premium-polish pass targeting auxiliary surfaces and completing the design system. Season summary card receives improved card styling with hover elevation, map legend refined with interactive item highlighting, zoom controls polished with proper transitions and focus states, and comprehensive refinements to form inputs (checkboxes, selects, text inputs) across all surfaces.
+
+- **Season summary card elevated.** Improved box-shadow elevation, hover state with increased shadow, refined typography (stat numbers now use tabular figures), tier items have smooth hover transforms with depth.
+- **Legend card polish.** Legend heading styled with uppercase, letter-spaced title; legend items have hover backgrounds with subtle padding adjustments for affordance; legend dots have proper drop shadows.
+- **Map controls refined.** Zoom buttons now have proper hover states with lavender tint and glow effect, focus rings, and smooth transitions. Attribution control receives glassmorphism treatment with proper blur and padding.
+- **Timeline refinements.** Timeline toggle button has hover state; timeline bar elements have smooth hover brightness filter; proper focus-visible rings.
+- **Form inputs system-wide.** All number, search, text, and select inputs now have consistent border, background, and focus styling across the app. Proper placeholder color, hover states, and focus rings with glow effect.
+- **Checkbox + radio consistency.** Input accents unified to lavender, hover state with slight scale-up for affordance, proper focus rings.
+- **Label styling.** Labels now have hover color transitions, proper cursor, and user-select disabled.
+- **Compare tray polish.** Improved spacing, hover backgrounds on items, button styling with proper transitions.
+- **Skeleton/loading animation.** Refined shimmer animation for loading states using background-position technique.
+- **Spacing consistency.** Removed default margins on sections/asides, eliminated duplicate bottom margins.
+- **Service worker bumped** to `hm-v0.9.5`.
+
 ## v0.9.4 — Info panel + settings polish + scrollbar unification (2025)
 
 Continued premium polish pass focused on secondary surfaces and consistency refinements. Info card panel receives branded scrollbar treatment with gradient styling, settings menu buttons refined with hover/active states and proper focus rings, and scrollbar styling unified across the entire application using a lavender-to-sapphire gradient.
