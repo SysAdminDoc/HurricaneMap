@@ -1054,6 +1054,10 @@ section.storm-panel.glass {
   font-size: 12px;
   max-width: calc(100vw - 32px);
 }
+
+div.anim-controls.glass {
+  margin-bottom: clamp(-130px, calc(385px - 55vh), -16px);
+}
 .anim-btn {
   background: var(--mantle);
   border: 1px solid var(--surface0);
@@ -1644,9 +1648,9 @@ a:focus-visible {
 }
 
 section.storm-panel.glass {
-  height: auto;
-  max-height: none;
-  margin-top: 0;
+  height: 960px;
+  max-height: calc(100vh - 40px);
+  margin-top: -90px;
 }
 
 .close-btn {
