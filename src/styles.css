@@ -2015,3 +2015,212 @@ section.storm-panel.glass {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Phase 2: Panel Transitions & Animations */
+.filters,
+.storm-panel,
+.stats-panel,
+.info-modal,
+.glossary-modal,
+.legend {
+  animation: slideInPanel 220ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+@keyframes slideInPanel {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Phase 2: Enhanced Hover States & Transitions */
+.cat-btn {
+  transition: all 120ms ease;
+}
+
+.cat-btn:hover:not(:disabled) {
+  border-color: var(--lavender);
+  background-color: rgba(170, 183, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.cat-btn:active:not(:disabled) {
+  transform: translateY(0);
+  background-color: rgba(170, 183, 255, 0.15);
+}
+
+/* Stat tiles hover elevation */
+.stat-tile,
+.stat-group {
+  transition: all 150ms cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+
+.stat-tile:hover,
+.stat-group:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* List item hover effects */
+.storm-list-item,
+.landfall-row,
+.similar-storm-row {
+  transition: all 100ms ease;
+}
+
+.storm-list-item:hover,
+.landfall-row:hover,
+.similar-storm-row:hover {
+  background-color: rgba(170, 183, 255, 0.06);
+  transform: translateX(2px);
+}
+
+/* Phase 2: Typography Scale Refinement */
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.small-label,
+.label-secondary {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--subtext);
+}
+
+/* Phase 2: Section Separators */
+.section-divider {
+  margin: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 200ms ease;
+}
+
+.section-divider:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Phase 2: Empty State Styling */
+.empty-state,
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--subtext);
+  border-radius: var(--radius-md);
+  background: rgba(170, 183, 255, 0.04);
+}
+
+.empty-state-icon,
+.no-results-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.empty-state-title,
+.no-results-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.empty-state-text,
+.no-results-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Phase 2: Panel Animation Stagger for Multiple Items */
+.storm-list-item,
+.landfall-row {
+  animation: slideInItem 200ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.storm-list-item:nth-child(1),
+.landfall-row:nth-child(1) { animation-delay: 0ms; }
+.storm-list-item:nth-child(2),
+.landfall-row:nth-child(2) { animation-delay: 30ms; }
+.storm-list-item:nth-child(3),
+.landfall-row:nth-child(3) { animation-delay: 60ms; }
+.storm-list-item:nth-child(4),
+.landfall-row:nth-child(4) { animation-delay: 90ms; }
+.storm-list-item:nth-child(5),
+.landfall-row:nth-child(5) { animation-delay: 120ms; }
+.storm-list-item:nth-child(n+6),
+.landfall-row:nth-child(n+6) { animation-delay: 150ms; }
+
+@keyframes slideInItem {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Phase 2: Input Focus Enhancement */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 
+    inset 0 0 0 2px rgba(170, 183, 255, 0.5),
+    0 0 0 3px var(--focus-ring);
+}
+
+/* Phase 2: Button Transition Improvements */
+button {
+  transition: all 100ms ease;
+}
+
+button:active {
+  transition: all 50ms ease;
+}
+
+/* Phase 2: Disabled State Consistency */
+button:disabled,
+input:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Phase 2: Smooth Loading State */
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 1.5s infinite;
+  border-radius: inherit;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
