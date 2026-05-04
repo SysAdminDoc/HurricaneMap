@@ -88,7 +88,7 @@ Focus: Deep statistical analysis, multi-storm comparisons, climate trend detecti
 
 - [ ] **P9.7 Pre-computed storm similarity embeddings** — Enhance P9.1 by pre-computing vector embeddings (via OpenAI/HF APIs during data generation) and embedding normalized vectors in `storms.json`. Enables instant similarity lookup without runtime computation. Effort: 1 day. Zero additional UI cost; makes P9.1 feel instantaneous.
 
-## Phase 10 — Real-time integration & forecasting context (✅ PARTIAL — v1.3.0)
+## Phase 10 — Real-time integration & forecasting context (✅ ADVANCED — v1.3.2)
 
 Focus: Live data, model integrations, and predictive context for active seasons.
 
@@ -96,7 +96,7 @@ Focus: Live data, model integrations, and predictive context for active seasons.
 - [ ] **P10.2 NHC cone of uncertainty render** — Parse official NHC track forecast cone (KML or native API) and overlay as a semi-transparent cone geometry on the map for active storms. Update every 6h in-app via polling. Cone + official track + historical track visual comparison.
 - [x] **P10.3 Seasonal forecast skill metrics** — ✅ Display current NOAA seasonal hurricane outlook (above/below/near-normal) with confidence percentages + historical accuracy (55–72% depending on category). Fetches from NOAA CPC endpoint; displays in stats panel with expandable details on forecast definition and recent examples. Educates users about forecast uncertainty and helps contextualize current seasons.
 - [x] **P10.4 "On this date in history" sidebar** — ✅ When viewing the map, offer a "What happened today in hurricane history?" card showing storms that made landfall within ±7 days of the current calendar date. Sortable by year or magnitude.
-- [ ] **P10.5 Active-season timelapse** — For the current or selected season, offer a play-all button that steps through every 6-hourly track point for all storms in that season at 2× or 4× speed, with real radar background where available. Gives a visceral sense of season intensity.
+- [x] **P10.5 Active-season timelapse** — ✅ For the current or selected season, offer a play-all button that steps through every 6-hourly track point for all storms in that season at 2× or 4× speed. Timelapse controls appear when a single year is selected. Play/pause/stop controls with progress bar. All storm tracks displayed at reduced opacity. Visceral sense of season intensity.
 
 ## Phase 11 — Accessibility & internationalization (✅ COMPLETE — v1.3.1)
 
