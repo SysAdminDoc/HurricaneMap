@@ -3850,3 +3850,57 @@ body:has(.timeline-ribbon.collapsed) .legend { bottom: calc(12px + 28px + 12px);
   .timeline-ribbon { left: 8px; right: 8px; bottom: 8px; height: 64px; }
   .timeline-axis { height: 38px; }
 }
+
+/* v0.6.1 — Search-result sparklines + a11y polish */
+.search-results li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-result-spark-host {
+  flex: 0 0 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  color: var(--subtext, #a6adc8);
+}
+.search-result-spark-host:empty::before {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(180,190,254,0.06), rgba(180,190,254,0.14), rgba(180,190,254,0.06));
+  background-size: 200% 100%;
+  animation: spark-shimmer 1.6s linear infinite;
+}
+@keyframes spark-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+.storm-spark { display: block; overflow: visible; }
+.search-result-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search-result-meta { color: var(--subtext, #a6adc8); }
+
+/* Honor reduced-motion for the shimmer placeholder. */
+@media (prefers-reduced-motion: reduce) {
+  .search-result-spark-host:empty::before { animation: none; }
+}
+
+/* Focus visibility — make every interactive surface in the v0.6.0 panels
+   show a clean focus ring, not just a generic outline. */
+.settings-pill:focus-visible,
+.text-btn:focus-visible,
+#toggle-settings:focus-visible,
+.dai-segment:focus-visible {
+  outline: 2px solid var(--accent, #b4befe);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

@@ -1,7 +1,7 @@
 // HurricaneMap entry point.
 import {
   loadInitial, getLandfalls, getStats, filterLandfalls,
-  searchStorms, categoryLabel,
+  searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
 import { showStorm } from './panel.js';
@@ -14,6 +14,7 @@ import { setPopulation } from './population.js';
 import { applyPaletteToBody, getSetting, setSetting } from './settings.js';
 import { maybeStartOnboarding } from './onboarding.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
+import { buildSparkline } from './sparkline.js';
 
 const filters = {
   yearMin: 1851,
@@ -205,6 +206,14 @@ function wireSettingsControls() {
       cog.setAttribute('aria-expanded', 'false');
     }
   });
+  // ESC closes the settings menu and returns focus to the cog button.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (menu.hasAttribute('hidden')) return;
+    menu.setAttribute('hidden', '');
+    cog.setAttribute('aria-expanded', 'false');
+    cog.focus();
+  });
 
   menu.addEventListener('click', (e) => {
     const u = e.target.closest('[data-set-unit]');
@@ -349,6 +358,9 @@ function wireUI() {
   });
 
   // Search
+  // Warm the storms cache as soon as the user focuses the search input so that
+  // sparklines can render without a perceptible lag on the first keystroke.
+  els.searchInput.addEventListener('focus', () => { ensureStormsLoaded(); }, { once: true });
   els.searchInput.addEventListener('input', () => {
     const q = els.searchInput.value;
     const results = searchStorms(q, getLandfalls());
@@ -361,10 +373,22 @@ function wireUI() {
     els.searchResults.innerHTML = results.map(lf => {
       const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
       const cat = categoryLabel(lf.category);
-      return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}">
-        <strong>${lf.year}</strong> ${name} · <span style="color:var(--subtext)">${cat} ${lf.state}</span>
+      return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}" role="option" tabindex="-1">
+        <span class="search-result-spark-host" data-storm-id="${lf.storm_id}" aria-hidden="true"></span>
+        <span class="search-result-text"><strong>${lf.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${lf.state}</span></span>
       </li>`;
     }).join('');
+    // Back-fill sparklines once the storm tracks are available. Synchronous if
+    // the cache is warm, otherwise the rows still render instantly and the
+    // sparks fade in when ready.
+    ensureStormsLoaded().then(() => {
+      for (const host of els.searchResults.querySelectorAll('.search-result-spark-host')) {
+        const storm = getStorm(host.dataset.stormId);
+        if (storm && storm.track) {
+          host.innerHTML = buildSparkline(storm.track, { title: `${storm.name || 'Storm'} ${storm.year || ''} wind profile` });
+        }
+      }
+    });
     for (const li of els.searchResults.children) {
       li.addEventListener('click', () => {
         const lf = getLandfalls().find(x =>

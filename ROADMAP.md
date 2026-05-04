@@ -44,6 +44,21 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 - [x] **P5.9 PNG / SVG export of intensity chart** — ✅ v0.6.0. PNG rasterizes the live SVG to canvas at 2× scale with embedded font + Catppuccin background; SVG exports a standalone XML with inline styles.
 - [x] **P5.10 Share button** — ✅ v0.5.0. "🔗 Share view" copies permalink to clipboard with toast confirmation; reusable toast component now available app-wide.
 
+## Phase 6 — Discoverability, accessibility, season analytics (in progress)
+
+Iteration-7 research replenishment. Phase 5 closed the metrics/share/PWA gaps; Phase 6 turns inward — improving how the data is *navigated* (sparklines, season cards, fuzzy search), making the app accessible to keyboard-only and screen-reader users, and shoring up the new v0.6.0 surfaces with proper ARIA + focus management.
+
+- [x] **P6.1 Storm intensity sparkline in search results** — ✅ v0.6.1. Each search result row now carries a 64×18 inline SVG wind-over-time sparkline color-coded by Saffir tier. Lets users distinguish a long-lived Cat-5 from a brief TS at a glance, without opening the panel.
+- [x] **P6.2 Accessibility pass on v0.6.0 surfaces** — ✅ v0.6.1. Settings menu gets ARIA `role=menu` + roving-tabindex, ESC dismiss, focus-trap when open. Onboarding tour traps focus inside the card, restores focus on close. Timeline ribbon is keyboard-navigable (←/→ steps the focused year, Shift+←/→ adjusts range, Enter applies, ESC clears). Days-at-intensity bar exposes `aria-label` per segment.
+- [ ] **P6.3 Season summary card** — when the year filter narrows to 1–3 years, prepend a "Season summary" card above the legend showing total named storms, total ACE, landfall count by Saffir category, deadliest storm, costliest storm. Climatology context (vs 1991–2020 normals) on the right.
+- [ ] **P6.4 Fuzzy / typo-tolerant search** — current `includes()` substring match misses "Catrina" → Katrina or "Andrwe" → Andrew. Levenshtein ≤2 on storm name with prefix bias; rank by year-recency tiebreak.
+- [ ] **P6.5 Inflation-adjusted damage toggle** — leverages existing `data/impacts.json` damage figures; toggle in settings menu adjusts USD via BLS CPI table (annual, baked into a small JSON). Defaults to 2024 USD.
+- [ ] **P6.6 Print stylesheet** — `@media print` rules collapse map UI, expand the active panel to full-page, render the intensity chart inline, hide controls/legend. For researchers/journalists exporting one-pagers.
+- [ ] **P6.7 Storm-name autocomplete + history dropdown** — last 8 viewed storms surface as a dropdown when the search input gets focus; `localStorage` history. Saves the "I was just looking at it" friction.
+- [ ] **P6.8 Annual ACE & landfall climatology chart** — under stats panel, a multi-line chart showing yearly ACE total + named-storm count + US-landfall count, 1851–2025. Highlights AMO phase shifts, 2005-vs-2020 super-seasons.
+- [ ] **P6.9 Reduced-motion full pass** — every animation (panel slide, modal fade, onboarding spotlight transition, timeline drag glide, toast bounce) honors `prefers-reduced-motion`. Currently honored in toast + onboarding only.
+- [ ] **P6.10 Lighthouse green-bar pass** — verify PWA install criteria, fix any LCP/CLS regressions from v0.6.0, set a perf budget in CI (manual `lighthouse-cli` run scripted in `scripts/lighthouse.sh`).
+
 ---
 
 See `docs/research/` for full-source iteration history and tier scoring.

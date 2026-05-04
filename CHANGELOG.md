@@ -4,6 +4,19 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.6.1 — Search sparklines + accessibility pass (2025)
+
+A small but focused polish ship on top of v0.6.0. Phase 6 opens with two items.
+
+- **Storm intensity sparklines in search results (P6.1).** Every search result row now carries a 64×18 inline SVG sparkline of the storm's wind-over-time profile, color-coded by peak Saffir-Simpson tier. Long-lived Cat-5s (Allen 1980, Patricia 2015) read instantly as a tall, sustained mound; brief tropical storms read as a short bump. Storm tracks are warmed on search-input focus so the sparks paint as you type. Honors the colorblind palette via the same CSS-var pipeline as the rest of the app.
+- **Accessibility pass on v0.6.0 surfaces (P6.2).** Settings menu now closes on `ESC` and returns focus to the cog button. Search-result list items get `role="option"` for assistive tech. New focus-visible rings on the settings pills, replay-tour button, cog, and days-at-intensity bar segments. Shimmer placeholder for sparklines respects `prefers-reduced-motion`.
+
+### Under the hood
+
+- New `src/sparkline.js` module — pure-SVG, ~50 lines, no deps.
+- `src/data.js#searchStorms` results retain `storm_id` so the sparkline back-fill can look up tracks via the warmed `stormsById` map.
+- Search-result render path is now two-pass: text rows render synchronously (instant), sparklines back-fill from the resolved `ensureStormsLoaded()` promise. The shimmer placeholder fills the gap when the cache is cold.
+
 ## v0.6.0 — PWA, palette, units, timeline, days-at-intensity, chart export, onboarding (2025)
 
 Closes Phase 5 of the research roadmap. Seven new features land together as a single coherent release: the app is now installable, color-blind-accessible, unit-aware, time-aware (174-year ribbon at the bottom of every view), and shareable (export the intensity chart as PNG/SVG for social media).

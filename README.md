@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-0.6.1-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
