@@ -263,6 +263,36 @@
     <p>Charting 174 years of Atlantic and Pacific landfalls…</p>
   </div>
 
+  <!-- Season timelapse controls -->
+  <div id="timelapse-controls" class="timelapse-controls glass" hidden>
+    <div class="timelapse-header">
+      <h3>Season Timelapse</h3>
+      <span class="timelapse-season">0 storms</span>
+    </div>
+    <div class="timelapse-playback">
+      <button class="timelapse-play icon-btn" title="Play timelapse" aria-label="Play season timelapse">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="timelapse-pause icon-btn" title="Pause timelapse" aria-label="Pause season timelapse">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+      </button>
+      <button class="timelapse-stop icon-btn" title="Stop and reset" aria-label="Stop season timelapse">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+      </button>
+      <div class="timelapse-progress-bar">
+        <span class="timelapse-progress">0%</span>
+      </div>
+    </div>
+    <div class="timelapse-speed-control">
+      <label for="timelapse-speed-select">Speed:</label>
+      <select id="timelapse-speed-select" class="timelapse-speed">
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+      </select>
+    </div>
+  </div>
+
   <!-- Keyboard shortcuts palette -->
   <dialog id="keyboard-palette" class="keyboard-palette glass" hidden aria-labelledby="palette-title">
     <div class="palette-content">

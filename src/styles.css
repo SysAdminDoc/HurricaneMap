@@ -8132,6 +8132,141 @@ code {
   border-top: 2px solid var(--text);
 }
 
+/* Timelapse controls ====================================== */
+.timelapse-controls {
+  position: fixed;
+  bottom: 120px;
+  right: 16px;
+  width: 280px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.timelapse-controls[hidden] {
+  display: none;
+}
+
+.timelapse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.timelapse-header h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.timelapse-season {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.timelapse-playback {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.timelapse-playback .icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  background: rgba(170, 183, 255, 0.1);
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.timelapse-playback .icon-btn:hover {
+  background: rgba(170, 183, 255, 0.2);
+}
+
+.timelapse-playback .icon-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.timelapse-progress-bar {
+  flex: 1;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  border: 1px solid rgba(170, 183, 255, 0.1);
+}
+
+.timelapse-progress {
+  font-weight: 500;
+}
+
+.timelapse-speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.timelapse-speed-control label {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.timelapse-speed {
+  flex: 1;
+  padding: 4px 6px;
+  background: rgba(170, 183, 255, 0.06);
+  border: 1px solid rgba(170, 183, 255, 0.2);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.timelapse-speed:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* HC mode timelapse */
+:root.high-contrast .timelapse-controls {
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid var(--text);
+}
+
+:root.high-contrast .timelapse-playback .icon-btn {
+  background: rgba(170, 183, 255, 0.15);
+  border: 2px solid var(--text);
+  font-weight: 600;
+}
+
+:root.high-contrast .timelapse-progress-bar {
+  border: 2px solid var(--text);
+}
+
+:root.high-contrast .timelapse-speed {
+  border: 2px solid var(--text);
+  font-weight: 600;
+}
+
 
 /* Pointer events utilities ================================= */
 .pointer-events-none { pointer-events: none; }
