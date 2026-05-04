@@ -17,6 +17,7 @@ import {
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
+import { inflateUSD, formatMillionsUSD } from './inflation.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -427,7 +428,22 @@ function renderImpactsBlock(storm) {
   if (!im) return '';
   const rows = [];
   if (im.deaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(im.deaths)}</span></div>`);
-  if (im.damages) rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${escapeHtml(im.damages)}</span></div>`);
+  if (im.damages) {
+    const mode = getSetting('damageMode');
+    // Parse leading number, treat as millions USD nominal at year-of-storm.
+    const m = String(im.damages).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+    const nominalM = m ? parseFloat(m[1]) : null;
+    let valueHTML = escapeHtml(im.damages);
+    if (mode === 'real' && nominalM != null && storm.year) {
+      const r = inflateUSD(nominalM, storm.year);
+      if (r) {
+        valueHTML = `${formatMillionsUSD(r.real)} <span class="im-adj">(2024 USD · ${formatMillionsUSD(nominalM)} nominal)</span>`;
+      }
+    } else if (mode === 'nominal' && nominalM != null) {
+      valueHTML = `${formatMillionsUSD(nominalM)} <span class="im-adj">(${storm.year || ''} USD)</span>`;
+    }
+    rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${valueHTML}</span></div>`);
+  }
   if (!rows.length) return '';
   const src = im.wiki_url ? `<a href="${im.wiki_url}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
   return `

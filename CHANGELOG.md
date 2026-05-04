@@ -4,6 +4,14 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v0.8.0 — Inflation-adjusted damages, annual climatology chart (2025)
+
+Two more Phase 6 items, both data-density wins for the comparative-history use case.
+
+- **Inflation-adjusted damage toggle (P6.5).** New "Damage figures" pill group in the settings menu — Nominal vs 2024 USD. Backed by an inline BLS CPI table (1850–2024) in `src/inflation.js`. Storm panel impacts block now shows the adjusted figure with the nominal value as a small parenthetical hint. Season summary's "costliest" superlative ranks fairly across eras when 2024 USD is selected (so the 1900 Galveston hurricane finally wins on real-dollar damage instead of getting buried under modern nominal totals). Defaults to 2024 USD; persists to localStorage and re-renders any open storm panel + season card on change.
+- **Annual climatology chart (P6.8).** New multi-line SVG chart added to the stats panel showing yearly ACE (Accumulated Cyclone Energy), named-storm count (≥34kt peak), and US-landfall count from 1851 to present. Top 3 ACE seasons annotated with vertical guide lines and year labels (2005, 2017, 2020 typically). Multi-color legend matches the existing palette CSS-vars so the colorblind toggle propagates. Computed once on first stats-panel open and cached for the session — reading the full storms-min cache is the heavy step (~3000 storms, sub-second).
+- **Internals.** Two new modules: `src/inflation.js` (CPI table + `inflateUSD()` + `formatMillionsUSD()`) and `src/climatology.js` (per-year aggregation + SVG chart renderer). Both added to SW SHELL_ASSETS. Service worker bumped to `hm-v0.8.0`. New `damageMode` setting added to `DEFAULTS` with `hm-settings:change` event propagation.
+
 ## v0.7.0 — Season summary, fuzzy search, print stylesheet, history dropdown, reduced-motion (2025)
 
 Phase 6 advance — the search box gets smarter, the year filter gets richer, the app prints cleanly, and motion-sensitive users get an honest reduced-motion path.

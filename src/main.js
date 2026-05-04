@@ -187,6 +187,10 @@ function wireSettingsControls() {
       btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setPalette === getSetting('palette')));
     });
+    menu.querySelectorAll('[data-set-damage]').forEach(btn => {
+      btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
+      btn.setAttribute('aria-pressed', String(btn.dataset.setDamage === getSetting('damageMode')));
+    });
   }
   syncMenu();
 
@@ -223,6 +227,8 @@ function wireSettingsControls() {
     if (u) { setSetting('windUnit', u.dataset.setUnit); syncMenu(); return; }
     const p = e.target.closest('[data-set-palette]');
     if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
+    const d = e.target.closest('[data-set-damage]');
+    if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
     if (e.target.closest('#replay-tour')) {
       menu.setAttribute('hidden', '');
       cog.setAttribute('aria-expanded', 'false');
@@ -245,6 +251,14 @@ function wireSettingsControls() {
     if (e.detail.key === 'windUnit' && openStormId) {
       const lf = getLandfalls().find(x => x.storm_id === openStormId);
       if (lf) onLandfallClick(lf);
+    }
+    if (e.detail.key === 'damageMode') {
+      // Re-render storm panel with new damage formatting + refresh season card.
+      if (openStormId) {
+        const lf = getLandfalls().find(x => x.storm_id === openStormId);
+        if (lf) onLandfallClick(lf);
+      }
+      refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
     }
   });
 }

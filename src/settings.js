@@ -9,6 +9,7 @@ const STORAGE_KEY = 'hm-settings-v1';
 const DEFAULTS = {
   windUnit: 'kt',          // 'kt' | 'mph' | 'kmh'
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
+  damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   onboarded: false,
 };
 

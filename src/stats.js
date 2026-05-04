@@ -1,6 +1,7 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { getStats, getLandfalls } from './data.js';
 import { closePanelsExcept, syncPanelControls } from './panels.js';
+import { renderClimatologyChart } from './climatology.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -73,6 +74,9 @@ function render() {
     <h3>Landfalls by category</h3>
     ${catBars}
 
+    <h3>Annual climatology — ACE, named storms, US landfalls</h3>
+    <div id="climatology-chart" class="clim-host"></div>
+
     <h3>Coastal states with no recorded hurricane landfall</h3>
     <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
     <p style="font-size:11px;color:var(--subtext);margin-top:8px;line-height:1.5;">
@@ -80,6 +84,11 @@ function render() {
       Note that 1971-1990 has known gaps in HURDAT2's continental-U.S. landfall marking.
     </p>
   `;
+  // Async-render the climatology chart after the synchronous stats are mounted.
+  const climHost = document.getElementById('climatology-chart');
+  if (climHost) renderClimatologyChart(climHost).catch(e => {
+    climHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climatology chart unavailable: ${e.message || 'unknown error'}</p>`;
+  });
 }
 
 function bar(label, count, max, suffix = '') {
