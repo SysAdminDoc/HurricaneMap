@@ -6,6 +6,7 @@ import {
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
 import { showStorm } from './panel.js';
 import { toggleStats } from './stats.js';
+import { showOnThisDate } from './on-this-date.js';
 import './compare.js';  // wires up the Compare button + pin tray
 import { enableStateClicks, openState } from './state.js';
 import { setSurgeCategory } from './surge.js';
@@ -119,6 +120,7 @@ const els = {
   stormCount: document.getElementById('storm-count'),
   toggleFiltersBtn: document.getElementById('toggle-filters'),
   toggleStatsBtn: document.getElementById('toggle-stats'),
+  toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleInfoBtn: document.getElementById('toggle-info'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
@@ -549,6 +551,9 @@ function wireUI() {
 
   // Stats panel toggle
   els.toggleStatsBtn.addEventListener('click', toggleStats);
+
+  // On this date panel
+  els.toggleOnThisDateBtn.addEventListener('click', showOnThisDate);
 
   // Info modal
   els.toggleInfoBtn.addEventListener('click', () => { els.infoModal.hidden = false; });

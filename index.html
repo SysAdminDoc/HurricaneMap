@@ -31,6 +31,9 @@
       <button class="icon-btn" id="toggle-stats" title="Toggle statistics panel" aria-label="Toggle statistics panel" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 6h2v6h-2v-6zm4-10h2v16h-2V5zm4 4h2v12h-2V9z"/></svg>
       </button>
+      <button class="icon-btn" id="toggle-on-this-date" title="Storms on this date" aria-label="Storms on this date" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3zm0 17H5V9h14v11zm-7-10h-2v5h5v-2h-3z"/></svg>
+      </button>
       <button class="icon-btn" id="toggle-compare" title="Compare pinned storms" aria-label="Compare pinned storms" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
       </button>
@@ -182,6 +185,11 @@
   <section class="state-panel glass" id="state-panel" hidden>
     <button class="close-btn" id="close-state" aria-label="Close state details">×</button>
     <div id="state-body"></div>
+  </section>
+
+  <section class="on-this-date-panel glass" id="on-this-date-panel" hidden>
+    <button class="close-btn" id="close-on-this-date" aria-label="Close on this date">×</button>
+    <div id="on-this-date-body"></div>
   </section>
 
   <section class="info-modal" id="info-modal" hidden>
