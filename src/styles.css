@@ -2242,3 +2242,573 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
   .legend { display: none; }
   .filters { max-height: calc(100vh - 130px); }
 }
+
+/* =========================================================================
+   v0.3.0 — Premium polish pass
+   System-level refinements layered over the existing styling. Touches
+   typography, focus, inputs, glass surfaces, spinner, density, and motion.
+   Intentionally placed last so cascade wins without `!important` abuse.
+   ======================================================================= */
+
+/* --- Type system ----------------------------------------------------------
+   Inter + JetBrains Mono with proper feature settings. cv11 = single-storey
+   `a`, ss03 = curved `l`, tnum = tabular numbers everywhere we show stats.
+   Headings get tighter tracking; body sits at a comfortable 14px / 1.55. */
+:root {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+               monospace;
+  --ring: 0 0 0 2px rgba(116, 199, 236, 0.55);
+  --ring-strong: 0 0 0 2px rgba(180, 190, 254, 0.85);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-fast: 140ms;
+  --t-med: 220ms;
+}
+html, body {
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss03", "ss01", "kern";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.stat .value, .stat-grid .stat .value,
+.tt-time, .landfall-list .when, .intensity-svg .ax-tick,
+.cp-table, .visible-count, .year-inputs input,
+.subtitle-count {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+}
+code, pre, .tt-time, .intensity-svg .ax-tick,
+.landfall-list .when {
+  font-family: var(--font-mono);
+}
+
+/* --- Header refinement ---------------------------------------------------- */
+.app-header,
+header.app-header.glass {
+  padding: 10px 14px 10px 12px;
+  gap: 14px;
+  border-radius: 16px;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.title-block h1 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+.title-block .subtitle {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  color: var(--subtext);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.subtitle-sep {
+  display: inline-block;
+  width: 3px; height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+.subtitle-count {
+  color: var(--text);
+  font-weight: 600;
+}
+.header-actions { gap: 6px; }
+
+/* --- Icon button consistency --------------------------------------------- */
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(218, 229, 255, 0.10);
+  color: var(--subtext);
+  transition: color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              transform var(--t-fast) var(--ease-out);
+}
+.icon-btn:hover {
+  color: #e9efff;
+  background: rgba(180, 190, 254, 0.08);
+  border-color: rgba(180, 190, 254, 0.28);
+  transform: none;
+}
+.icon-btn:active { transform: translateY(1px); }
+.icon-btn[aria-pressed="true"] {
+  color: var(--lavender);
+  background: rgba(180, 190, 254, 0.12);
+  border-color: rgba(180, 190, 254, 0.45);
+}
+
+/* --- Glass surfaces: subtle inner top-highlight + softer edge ------------- */
+.glass {
+  border-color: rgba(218, 229, 255, 0.08);
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+/* --- Filters: nicer rhythm + section feel -------------------------------- */
+.filters {
+  width: 290px;
+  padding: 14px 14px 12px;
+  gap: 12px;
+  border-radius: 16px;
+}
+.filters .filter-row + .filter-row {
+  padding-top: 12px;
+  border-top: 1px solid rgba(218, 229, 255, 0.05);
+}
+.filter-row > label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: #95a3c0;
+}
+.filter-row.filter-footer {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(218, 229, 255, 0.08);
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- Inputs + selects: unified, custom select arrow ---------------------- */
+input[type="number"],
+input[type="search"],
+select {
+  background: rgba(11, 16, 28, 0.78);
+  border: 1px solid rgba(218, 229, 255, 0.12);
+  color: var(--text);
+  padding: 8px 11px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+input[type="search"] {
+  background-image: linear-gradient(rgba(11,16,28,0.78), rgba(11,16,28,0.78));
+  padding-left: 32px;
+  background-repeat: no-repeat;
+  background-position: 10px center, 0 0;
+  background-size: 14px 14px, auto;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2395a3c0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m20 20-3.5-3.5'/></svg>"),
+    linear-gradient(rgba(11,16,28,0.78), rgba(11,16,28,0.78));
+}
+input[type="search"]::-webkit-search-cancel-button { display: none; }
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2395a3c0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  padding-right: 32px;
+}
+input:hover, select:hover { border-color: rgba(218, 229, 255, 0.22); }
+input:focus, select:focus,
+input:focus-visible, select:focus-visible {
+  border-color: var(--lavender);
+  box-shadow: var(--ring-strong);
+}
+
+/* --- Custom checkbox: accessible, themed --------------------------------- */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1px solid rgba(218, 229, 255, 0.28);
+  background: rgba(11, 16, 28, 0.78);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out);
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+input[type="checkbox"]:hover { border-color: rgba(180, 190, 254, 0.55); }
+input[type="checkbox"]:checked {
+  background: var(--lavender);
+  border-color: var(--lavender);
+}
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px; top: 1px;
+  width: 5px; height: 9px;
+  border: solid var(--base);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:focus-visible { box-shadow: var(--ring-strong); }
+
+.toggle-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 500 !important;
+}
+.toggle-row > input[type="checkbox"] { margin: 0; }
+
+/* --- Category buttons: refined off/on states ----------------------------- */
+.cat-btn {
+  background: rgba(11, 16, 28, 0.6);
+  border: 1px solid rgba(218, 229, 255, 0.10);
+  color: #95a3c0;
+  padding: 7px 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              color var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+.cat-btn:hover {
+  border-color: rgba(218, 229, 255, 0.28);
+  color: var(--text);
+  transform: none;
+}
+.cat-btn.on { transform: none; }
+.cat-btn.on.cat-ts { box-shadow: 0 4px 14px rgba(116, 199, 236, 0.30); }
+.cat-btn.on.cat-1  { box-shadow: 0 4px 14px rgba(166, 227, 161, 0.30); }
+.cat-btn.on.cat-2  { box-shadow: 0 4px 14px rgba(249, 226, 175, 0.28); }
+.cat-btn.on.cat-3  { box-shadow: 0 4px 14px rgba(250, 179, 135, 0.32); }
+.cat-btn.on.cat-4  { box-shadow: 0 4px 14px rgba(243, 139, 168, 0.34); }
+.cat-btn.on.cat-5  { box-shadow: 0 4px 14px rgba(203, 166, 247, 0.36); }
+.cat-btn:focus-visible { box-shadow: var(--ring-strong); }
+
+/* --- Buttons: unified text + action ------------------------------------- */
+.text-btn {
+  border-radius: 9px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-color: rgba(218, 229, 255, 0.14);
+  transition: color var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out);
+}
+.text-btn:hover {
+  background: rgba(180, 190, 254, 0.08);
+  border-color: rgba(180, 190, 254, 0.40);
+  color: var(--text);
+}
+.text-btn:focus-visible { box-shadow: var(--ring-strong); }
+.action-btn {
+  border-radius: 9px;
+  border-color: rgba(218, 229, 255, 0.12);
+}
+.action-btn:hover { transform: translateY(-1px); }
+.action-btn:focus-visible { box-shadow: var(--ring-strong); }
+
+/* --- Visible count chip --------------------------------------------------- */
+.visible-count {
+  font-size: 11px;
+  color: var(--subtext);
+  background: rgba(218, 229, 255, 0.06);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* --- Legend: a touch tighter --------------------------------------------- */
+.legend {
+  padding: 12px 14px 14px;
+  border-radius: 16px;
+}
+.legend h3 {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  color: #95a3c0;
+}
+.legend li {
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--subtext);
+}
+.dot {
+  width: 10px; height: 10px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 8px currentColor;
+}
+.dot.cat-ts { color: var(--cat-ts); }
+.dot.cat-1  { color: var(--cat-1); }
+.dot.cat-2  { color: var(--cat-2); }
+.dot.cat-3  { color: var(--cat-3); }
+.dot.cat-4  { color: var(--cat-4); }
+.dot.cat-5  { color: var(--cat-5); }
+
+/* --- Close-btn: bigger touch target, calmer ------------------------------ */
+.close-btn {
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  transition: background var(--t-fast) var(--ease-out),
+              color var(--t-fast) var(--ease-out);
+}
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+.close-btn:focus-visible { box-shadow: var(--ring-strong); outline: none; }
+
+/* --- Stat tiles: numeric weight + subtle gradient ------------------------- */
+.stat-grid .stat {
+  background: linear-gradient(180deg,
+    rgba(218, 229, 255, 0.04),
+    rgba(218, 229, 255, 0.01)),
+    rgba(11, 16, 28, 0.6);
+  border-color: rgba(218, 229, 255, 0.08);
+  border-radius: 11px;
+  padding: 11px 13px;
+}
+.stat .label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #95a3c0;
+}
+.stat .value {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-top: 3px;
+}
+
+/* --- Section headings (h3) inside panels --------------------------------- */
+.panel-section-h3 {
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
+  color: #95a3c0;
+  margin: 18px 0 9px;
+  font-weight: 700;
+}
+
+/* --- Cat pill: bolder, tighter ------------------------------------------- */
+.cat-pill {
+  padding: 3px 9px;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* --- Storm-panel headline: stronger first impression --------------------- */
+.storm-panel h2,
+.state-panel h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #f7fbff 0%, #d6e0f2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* --- Search results: nicer dropdown -------------------------------------- */
+.search-results {
+  background: rgba(11, 16, 28, 0.96);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(218, 229, 255, 0.10);
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+.search-results li {
+  border-bottom: 1px solid rgba(218, 229, 255, 0.05);
+  transition: background var(--t-fast) var(--ease-out);
+}
+.search-results li:hover {
+  background: rgba(180, 190, 254, 0.10);
+}
+
+/* --- Compare tray: sharper chips ----------------------------------------- */
+.compare-tray {
+  border-radius: 14px;
+  padding: 9px 12px;
+  gap: 12px;
+}
+.ct-chip {
+  border-color: rgba(218, 229, 255, 0.12);
+  background: rgba(11, 16, 28, 0.7);
+  padding: 4px 10px;
+  font-weight: 600;
+}
+.ct-chip:hover { border-color: rgba(180, 190, 254, 0.35); }
+.ct-btn { border-radius: 9px; padding: 7px 11px; }
+
+/* --- Loading: smoother + brand-coherent ---------------------------------- */
+.loading {
+  background: radial-gradient(circle at center,
+    rgba(11, 16, 28, 0.0) 0%,
+    rgba(7, 11, 18, 0.6) 50%,
+    var(--base) 100%),
+    var(--base);
+  gap: 22px;
+}
+.loading p {
+  font-size: 13px;
+  color: var(--subtext);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: none;
+  position: relative;
+  animation: none;
+}
+.spinner-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(218, 229, 255, 0.10);
+  border-top-color: var(--lavender);
+  border-right-color: var(--sapphire);
+  animation: spin 1100ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.spinner-ring-2 {
+  inset: 8px;
+  border-width: 2px;
+  border-top-color: var(--sapphire);
+  border-right-color: transparent;
+  animation: spin 1700ms cubic-bezier(0.45, 0, 0.55, 1) infinite reverse;
+  opacity: 0.7;
+}
+
+/* --- Info modal card: lift readability ----------------------------------- */
+.info-card {
+  border-radius: 18px;
+  padding: 28px 30px 26px;
+  line-height: 1.6;
+}
+.info-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+  background: linear-gradient(95deg, var(--lavender), var(--sapphire));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.info-card h3 {
+  font-size: 11.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #95a3c0;
+  margin: 20px 0 8px;
+  font-weight: 700;
+}
+.info-card p { color: var(--subtext); margin: 0 0 8px; }
+.info-card p strong { color: var(--text); }
+.info-card ul { padding-left: 18px; color: var(--subtext); }
+.info-card li { margin-bottom: 4px; }
+.info-card li strong { color: var(--text); }
+.info-card code {
+  background: rgba(180, 190, 254, 0.10);
+  color: var(--lavender);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 0.88em;
+}
+.info-card .meta {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(218, 229, 255, 0.08);
+  font-size: 11.5px;
+  color: #7d8aa6;
+}
+.info-modal {
+  background: rgba(4, 8, 14, 0.78) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* --- Universal focus-visible ring (excludes things we already styled) ---- */
+button:focus-visible,
+a:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-strong);
+  border-radius: 9px;
+}
+
+/* --- Selection + scrollbar consistency ----------------------------------- */
+::selection { background: rgba(180, 190, 254, 0.32); color: #f7fbff; }
+* { scrollbar-color: rgba(218, 229, 255, 0.20) transparent; }
+
+/* --- Leaflet attribution: less visually loud ----------------------------- */
+.leaflet-control-attribution {
+  background: rgba(7, 11, 18, 0.72) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 10px !important;
+  padding: 3px 9px !important;
+  border-radius: 6px 0 0 0 !important;
+  color: #7d8aa6 !important;
+}
+
+/* --- Leaflet zoom: tighter cluster, premium hover ------------------------ */
+.leaflet-control-zoom a {
+  background: rgba(11, 16, 28, 0.85) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: rgba(180, 190, 254, 0.18) !important;
+  color: #f7fbff !important;
+}
+
+/* --- Reduced motion: respect user preference ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hurricane-glyph .hg-spin { animation: none !important; }
+}

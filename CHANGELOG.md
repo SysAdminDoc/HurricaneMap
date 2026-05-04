@@ -4,6 +4,23 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Premium polish pass — v0.3.0
+
+- **Type system.** Adopted Inter (400/500/600/700/800) and JetBrains Mono with `cv11`/`ss03`/`tnum` font features so every numeric stat and timestamp renders in true tabular figures. Headings tightened to -0.015 to -0.02em tracking; body sits at a comfortable 14/1.55.
+- **Header refinement.** Replaced the inline `…` subtitle with a structured `count · count` layout using a tonal bullet separator. Brand mark now has a soft inset highlight + subtle drop shadow.
+- **Filter rhythm.** Each filter row now has a thin tonal divider so the panel reads as discrete sections. Visible-count rendered as a pill chip with tabular numerals. Reset row pinned with a stronger top border.
+- **Custom inputs.** Native browser checkbox / select / search styling replaced with themed equivalents: rounded checkbox with animated check, custom chevron on every `<select>`, built-in magnifier glyph in the search input, all with consistent focus-visible rings.
+- **Universal focus-visible.** Every button, link, input, and toggle now has a clear `--ring-strong` keyboard ring (sapphire/lavender) — accessibility upgrade with no visual cost on mouse use.
+- **Category buttons.** Off-state is calmer (subdued slate); on-state keeps the categorical color but adds a per-category soft drop-shadow glow so the active set reads at a glance without screaming.
+- **Glass surfaces.** Tightened border to `rgba(218, 229, 255, 0.08)` and added a 1px inset top-highlight so panels gain dimension without heavier shadows.
+- **Storm / state panel headlines.** H2s now use a subtle 100→90 luminance gradient for a premium typographic edge.
+- **Cat pill + stat tiles.** Pills bolder with a small shadow; stat tiles now layered with a soft 4% top-gradient.
+- **Loading state.** Spinner upgraded to a dual-ring composition with sapphire/lavender accents counter-rotating; copy reworded to "Charting 174 years of Atlantic and Pacific landfalls…" — more on-brand and calmer.
+- **Info modal.** Card padding bumped to 28/30, headings restructured with proper hierarchy, `<code>` rendered in a lavender-tinted pill, links + meta footer cleaned up. Backdrop now uses `blur(8px)` for proper modal depth.
+- **Leaflet chrome.** Attribution gets a translucent dark glass + 6px blur; zoom buttons match with `rgba(11,16,28,0.85)` glass + lavender hover.
+- **Reduced-motion support.** Full `@media (prefers-reduced-motion: reduce)` block disables animations, transitions, and the spinning hurricane glyph for users who request it.
+- **Selection + scrollbar.** Unified text-selection color to lavender, scrollbar thumb to subtle white with hover lift across every scrollable surface.
+
 ### Visual audit & resilience pass — v0.2.0
 
 - Hardened the dark basemap loader with a 6-error / 8-second rolling-window threshold so a single transient tile failure no longer collapses the whole map to the OSM fallback.
