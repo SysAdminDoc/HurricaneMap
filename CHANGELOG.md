@@ -2,6 +2,52 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.0 — Phase 9-11: Advanced analytics, real-time forecasts, localization (May 2026)
+
+**Major research features, forecast ensemble infrastructure, and Spanish localization foundation.**
+
+### Phase 9.1: Storm Similarity Scoring
+- Implemented 8-dimensional vector-similarity matching for storms
+- Normalized feature space: peak wind (kt), landfall count, track length (km), forward speed (km/h), RI magnitude (kt), ACE, decay rate, genesis month
+- Cosine-distance metric yields [0, 1] similarity score where 1 = identical
+- "Similar storms" widget in storm panel shows top-5 nearest neighbors with similarity % (0-100)
+- Each row displays: storm name/year, peak category pill, landfall count, similarity score
+- Historical basis for coastal risk modeling and storm research
+
+### Phase 9.3: Climate Trend Overlays
+- New stats-panel chart: 10-year centered rolling averages for three metrics
+- Aggregated annually: named-storm count, US-landfall count, mean ACE, mean peak wind at landfall, mean forward speed
+- Linear regression slope analysis: detects trend direction (↑ increasing, ↓ decreasing, → stable)
+- Complements existing climatology chart (raw annual values) with smoothed signal detection
+- Useful for climate change analysis and long-term hurricane pattern shifts
+
+### Phase 10.1: Forecast Ensemble Render Infrastructure
+- Created ensemble.js: forecast track rendering system for GFS, ECMWF, HWRF, HMON models
+- Semi-transparent polyline rendering with model-specific colors (GFS blue, ECMWF green, HWRF yellow)
+- Track caching to avoid re-fetching identical storm ensembles
+- API infrastructure for future integration with NOAA GFS, IEM, or TROPYCAL endpoints
+- Settings toggle: "Forecast ensemble spaghetti (when active)" with localStorage persistence
+- Respects active.js lifecycle: renders only when storms are active and toggle is enabled
+- Currently stub (awaiting real forecast API); ready for production data connection
+
+### Phase 11.1: Spanish (ES-LA) Localization Infrastructure
+- Created i18n.js: comprehensive string management system
+- 100+ translated strings covering: header, navigation, settings, filters, panels, buttons, categories, months
+- Support for: locale detection (navigator.language), localStorage persistence (hm-locale-v1), placeholder substitution
+- Language toggle in settings menu (English / Español) with instant application
+- Browser language auto-detection on first load
+- Ready for UI binding in upcoming phase (translations exist, rendering logic next iteration)
+
+### Enhanced
+- **Settings menu**: Added ensemble toggle checkbox, language toggle buttons (EN/ES)
+- **Active storm tracking**: Integrated with ensemble rendering system; respects settings changes via custom event
+- **CSS styling**: Model-specific ensemble classes (ensemble-gfs, ensemble-ecmwf, ensemble-hwrf) with drop-shadow filters
+
+### Infrastructure
+- **New modules**: ensemble.js (forecast rendering), i18n.js (localization)
+- **Updated modules**: active.js (ensemble integration), metrics.js (similarity + climate trends), panel.js (similarity UI), stats.js (climate trends), settings.js (new settings), main.js (settings wiring)
+- **Routing**: Locale changes trigger page reload to apply all translations synchronously
+
 ## v1.1.0 — Phase 8: Mobile optimization, advanced analytics, performance (2025)
 
 **Major enhancements to mobile responsiveness, comparison analytics, trend analysis, and performance monitoring.**
