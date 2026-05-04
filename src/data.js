@@ -16,12 +16,21 @@ let stormsPromise = null;
 
 export async function loadInitial() {
   const [lf, st, im] = await Promise.all([
-    fetch('data/landfalls.json').then(r => r.json()),
-    fetch('data/stats.json').then(r => r.json()),
-    fetch('data/impacts.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('data/landfalls.json').then(r => r.json()).catch(e => {
+      console.error('Failed to load landfalls:', e);
+      return [];
+    }),
+    fetch('data/stats.json').then(r => r.json()).catch(e => {
+      console.error('Failed to load stats:', e);
+      return { total_storms: 0, total_landfall_events: 0 };
+    }),
+    fetch('data/impacts.json').then(r => r.ok ? r.json() : {}).catch(e => {
+      console.warn('Failed to load impacts (non-critical):', e);
+      return {};
+    }),
   ]);
-  DATA.landfalls = lf;
-  DATA.stats = st;
+  DATA.landfalls = lf || [];
+  DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.impacts = im || {};
   return DATA;
 }
@@ -36,9 +45,20 @@ export function ensureStormsLoaded() {
   stormsPromise = fetch('data/storms.json')
     .then(r => r.json())
     .then(storms => {
+      if (!Array.isArray(storms)) {
+        console.warn('Invalid storms data format, expected array');
+        return DATA;
+      }
       DATA.storms = storms;
       DATA.stormsById = new Map(storms.map(s => [s.id, s]));
       stormsLoaded = true;
+      return DATA;
+    })
+    .catch(e => {
+      console.error('Failed to load storms data:', e);
+      // Return empty storms array to allow app to continue
+      DATA.storms = [];
+      DATA.stormsById = new Map();
       return DATA;
     });
   return stormsPromise;
@@ -71,6 +91,10 @@ export function filterLandfalls(landfalls, filters) {
 }
 
 function categoryAllowed(cat, allowed) {
+  // Validate category is in expected range [-1 (unknown), 0 (TD), TS-5]
+  if (typeof cat !== 'number' || cat < -1 || cat > 5) {
+    return false; // Reject invalid categories
+  }
   if (cat <= 0) return allowed.has('ts');
   return allowed.has(String(cat));
 }

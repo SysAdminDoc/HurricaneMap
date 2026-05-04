@@ -27,6 +27,7 @@ import { maybeShowTimelapseControls } from './timelapse.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
+import { escapeHtml } from './html-utils.js';
 
 const filters = {
   yearMin: 1851,
@@ -567,9 +568,11 @@ function wireUI() {
     const renderRow = (lf) => {
       const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
       const cat = categoryLabel(lf.category);
+      const safeName = escapeHtml(name);
+      const safeState = escapeHtml(lf.state || '');
       return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}" role="option" tabindex="-1">
         <span class="search-result-spark-host" data-storm-id="${lf.storm_id}" aria-hidden="true"></span>
-        <span class="search-result-text"><strong>${lf.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${lf.state}</span></span>
+        <span class="search-result-text"><strong>${lf.year}</strong> ${safeName} <span class="search-result-meta">· ${cat} ${safeState}</span></span>
       </li>`;
     };
     let html = results.map(renderRow).join('');
@@ -722,8 +725,9 @@ function titleCase(name) {
 
 boot().catch(err => {
   console.error('Boot failed', err);
+  const safeMsg = escapeHtml(err.message || 'Unknown error');
   els.loading.innerHTML = `<p style="color:var(--cat-4);max-width:480px;text-align:center;padding:0 24px;">
-    Failed to load data: ${err.message}<br><br>If you opened the file directly, run a local web server first
+    Failed to load data: ${safeMsg}<br><br>If you opened the file directly, run a local web server first
     (e.g. <code>python -m http.server</code>) — modern browsers block <code>fetch()</code> from <code>file://</code>.
   </p>`;
 });

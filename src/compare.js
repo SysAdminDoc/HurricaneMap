@@ -6,6 +6,7 @@ import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
+import { escapeHtml } from './html-utils.js';
 
 const MAX_PINS = 4;
 
@@ -197,10 +198,10 @@ function renderComparePanel() {
     ['Peak category', p => saffirCat(p.storm.peak_wind_kt), 'category'],
     ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
     ['# US landfalls', p => p.storm.us_landfall_count, 'number'],
-    ['Track points', p => p.storm.track.length, 'number'],
-    ['Genesis', p => formatTime(p.storm.track[0].t).split(',')[0], 'text'],
-    ['Final', p => formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0], 'text'],
-    ['States hit', p => [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', '), 'text'],
+    ['Track points', p => p.storm.track?.length || 0, 'number'],
+    ['Genesis', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[0].t).split(',')[0] : '—', 'text'],
+    ['Final', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0] : '—', 'text'],
+    ['States hit', p => p.storm.us_landfalls && p.storm.us_landfalls.length > 0 ? [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', ') : '—', 'text'],
   ];
 
   // Compute min/max for diff highlighting.

@@ -5,6 +5,7 @@ import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
 import { computeClimateTrends } from './metrics.js';
 import { fetchSeasonalOutlook, renderOutlookBanner } from './seasonal-outlook.js';
+import { escapeHtml } from './html-utils.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -98,12 +99,12 @@ function render() {
   // Async-render the climatology chart and decade trends after the synchronous stats are mounted.
   const climHost = document.getElementById('climatology-chart');
   if (climHost) renderClimatologyChart(climHost).catch(e => {
-    climHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climatology chart unavailable: ${e.message || 'unknown error'}</p>`;
+    climHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climatology chart unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
   });
   
   const dtHost = document.getElementById('decade-trends-chart');
   if (dtHost) renderDecadeTrends(dtHost).catch(e => {
-    dtHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Decade trends unavailable: ${e.message || 'unknown error'}</p>`;
+    dtHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Decade trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
   });
 
   const ctHost = document.getElementById('climate-trends-chart');
@@ -114,7 +115,7 @@ function render() {
       if (trends) renderClimateTrendsChart(ctHost, trends);
       else ctHost.innerHTML = '<p style="color:var(--subtext);font-size:12px;">No trend data available.</p>';
     } catch (e) {
-      ctHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climate trends unavailable: ${e.message || 'unknown error'}</p>`;
+      ctHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
     }
   }
 

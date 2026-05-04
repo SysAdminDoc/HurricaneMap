@@ -19,6 +19,7 @@ import {
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
+import { escapeHtml } from './html-utils.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -83,19 +84,21 @@ function render(storm, landfall, allStorms) {
   const reconUrl = reconArchiveUrl(storm);
 
   const radarApi = getRadar();
-  const landfallsHtml = storm.us_landfalls.map((lf, idx) => {
-    const cat = categoryLabel(lf.category);
-    const cls = categoryClass(lf.category);
-    const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
-    const lfWithYear = { ...lf, year: storm.year };
-    const radarBtn = radarApi.available(lfWithYear)
-      ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall — full-storm timeline if scraped offline">📡</button>`
-      : '';
-    return `<li>
-      <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state}${inferred}</span>
-      <span class="when">${formatTime(lf.t)}${radarBtn}</span>
-    </li>`;
-  }).join('');
+  const landfallsHtml = storm.us_landfalls && storm.us_landfalls.length > 0 
+    ? storm.us_landfalls.map((lf, idx) => {
+      const cat = categoryLabel(lf.category);
+      const cls = categoryClass(lf.category);
+      const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
+      const lfWithYear = { ...lf, year: storm.year };
+      const radarBtn = radarApi.available(lfWithYear)
+        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall — full-storm timeline if scraped offline">📡</button>`
+        : '';
+      return `<li>
+        <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state || 'Unknown'}${inferred}</span>
+        <span class="when">${formatTime(lf.t)}${radarBtn}</span>
+      </li>`;
+    }).join('')
+    : '<li><em style="color:var(--text-dim);">No US landfalls on record</em></li>';
 
   const minPres = storm.min_pres_mb ? `${storm.min_pres_mb} mb` : '—';
   const peakWindMph = ktToMph(storm.peak_wind_kt);
