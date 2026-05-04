@@ -106,7 +106,7 @@ Focus: Inclusive design, multi-language support, and expanded user demographics.
 - [x] **P11.2 High-contrast accessible theme** — ✅ WCAG AAA 7:1 contrast ratio on text; larger fonts; bolder borders; increased visual separation. Toggle via settings. Comprehensive CSS variable expansion for dark/light HC modes with enhanced focus indicators (3px outline) and 2px borders on all interactive elements.
 - [ ] **P11.3 Screen reader optimization** — Add semantic `<section>`, `<article>`, `<aside>` landmarks; improve ARIA labels and `aria-describedby` depth; expose all data-driven content via text alternatives; test with NVDA / JAWS.
 - [ ] **P11.4 Keyboard-first workflow** — Full keyboard navigation with visible focus indicators; dedicated keyboard shortcut palette (`?` key); macro shortcuts for common filters (e.g., `Ctrl+M` for "Major hurricanes only"). Audit with keyboard-only users.
-- [ ] **P11.5 Glossary + educational popover** — Add a searchable glossary of meteorological terms (ACE, RI, Saffir-Simpson, landfall, etc.). Expose via icon in panel headers; link from stats tiles; context-driven popover on first mention of each term.
+- [x] **P11.5 Glossary + educational popover** — ✅ Searchable glossary modal with 20 meteorological terms (ACE, RI, Saffir-Simpson, landfall, forward speed, etc.). Integrated via settings menu glossary button with instant substring + definition search. Modal CSS styled in high-contrast mode with 2px borders and increased font weights. Auto-initializes on app boot.
 
 ## Phase 12 — Data science & educational export
 
