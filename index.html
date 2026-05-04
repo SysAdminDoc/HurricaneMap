@@ -111,7 +111,7 @@
 
   <aside class="filters glass" id="filters" role="region" aria-label="Storm filters and search">
     <div class="filter-row filter-row--year">
-      <label>Year range</label>
+      <label for="year-min">Year range</label>
       <div class="year-inputs">
         <input type="number" id="year-min" min="1851" max="2025" value="1851" aria-label="Earliest year" />
         <span>—</span>
@@ -120,15 +120,17 @@
       </div>
     </div>
     <div class="filter-row filter-row--cats">
-      <label id="cat-filter-label">Category</label>
-      <div class="cat-toggles" role="group" aria-labelledby="cat-filter-label">
-        <button data-cat="ts" class="cat-btn cat-ts on" title="Tropical Storm at landfall" aria-label="Tropical Storm (TS) — 34-63 kt">TS</button>
-        <button data-cat="1" class="cat-btn cat-1 on" aria-label="Category 1 — 64-82 kt">1</button>
-        <button data-cat="2" class="cat-btn cat-2 on" aria-label="Category 2 — 83-95 kt">2</button>
-        <button data-cat="3" class="cat-btn cat-3 on" aria-label="Category 3 — 96-112 kt">3</button>
-        <button data-cat="4" class="cat-btn cat-4 on" aria-label="Category 4 — 113-136 kt">4</button>
-        <button data-cat="5" class="cat-btn cat-5 on" aria-label="Category 5 — 137+ kt">5</button>
-      </div>
+      <label>
+        <span>Category</span>
+        <div class="cat-toggles" role="group" aria-label="Category">
+          <button data-cat="ts" class="cat-btn cat-ts on" title="Tropical Storm at landfall" aria-label="Tropical Storm (TS) — 34-63 kt">TS</button>
+          <button data-cat="1" class="cat-btn cat-1 on" aria-label="Category 1 — 64-82 kt">1</button>
+          <button data-cat="2" class="cat-btn cat-2 on" aria-label="Category 2 — 83-95 kt">2</button>
+          <button data-cat="3" class="cat-btn cat-3 on" aria-label="Category 3 — 96-112 kt">3</button>
+          <button data-cat="4" class="cat-btn cat-4 on" aria-label="Category 4 — 113-136 kt">4</button>
+          <button data-cat="5" class="cat-btn cat-5 on" aria-label="Category 5 — 137+ kt">5</button>
+        </div>
+      </label>
     </div>
     <div class="filter-row">
       <label for="state-filter">State</label>
