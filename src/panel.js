@@ -50,13 +50,24 @@ closeBtn.addEventListener('click', () => {
 export async function showStorm(landfall) {
   closePanelsExcept('storm-panel');
   panel.hidden = false;
-  body.innerHTML = '<p class="meta-row" style="padding:24px 0;">Loading storm track…</p>';
+  stickyHeader.innerHTML = '';
+  body.innerHTML = `
+    <div class="storm-loading-state" role="status" aria-live="polite">
+      <span class="storm-loading-dot" aria-hidden="true"></span>
+      <span>Loading storm track and landfall details...</span>
+    </div>
+  `;
   // Stop any running animation when switching storms.
   if (animator) animator.stop();
   await ensureStormsLoaded();
   const storm = getStorm(landfall.storm_id);
   if (!storm) {
-    body.innerHTML = '<p>Could not find storm record.</p>';
+    body.innerHTML = `
+      <div class="storm-error-state" role="alert">
+        <strong>Storm record unavailable.</strong>
+        <span>The map point loaded, but its detailed HURDAT2 track could not be found.</span>
+      </div>
+    `;
     return;
   }
   clearTracks();
@@ -131,6 +142,7 @@ function render(storm, landfall, allStorms) {
   // Default closest-pass city: prefer one in the storm's first landfall state, else Miami.
   const defaultCity = pickDefaultCity(storm);
   const initialApproach = closestApproach(storm.track, defaultCity.lat, defaultCity.lon);
+  const impacts = getImpactsFor(storm.id);
 
   // Generate storm biography
   const biography = generateStormBiography(storm, impacts);
@@ -158,7 +170,7 @@ function render(storm, landfall, allStorms) {
 
   body.innerHTML = `
 
-    <div class="biography-text" style="font-size:14px;line-height:1.6;color:var(--text-secondary);margin:16px 0;font-style:italic;">
+    <div class="biography-text">
       ${escapeHtml(biography)}
     </div>
 
@@ -180,7 +192,7 @@ function render(storm, landfall, allStorms) {
       <div class="return-periods-row" id="return-periods-row"></div>
     </div>
 
-    ${renderImpactsBlock(storm)}
+    ${renderImpactsBlock(storm, impacts)}
 
     <h3 class="panel-section-h3">Similar storms</h3>
     <div class="similar-storms-host" id="similar-storms-host"></div>
@@ -505,8 +517,7 @@ function noaaTcrUrl(storm) {
   return `https://www.nhc.noaa.gov/data/tcr/index.php?season=${storm.year}&basin=atl`;
 }
 
-function renderImpactsBlock(storm) {
-  const im = getImpactsFor(storm.id);
+function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   if (!im) return '';
   const rows = [];
   if (im.deaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(im.deaths)}</span></div>`);

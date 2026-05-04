@@ -39,7 +39,7 @@ function setupGlobalShortcuts() {
       if (searchInput) searchInput.focus();
     }
     // ?: Open shortcuts palette
-    else if (e.key === '?' && !isInputFocused()) {
+    else if ((e.key === '?' || (e.key === '/' && e.shiftKey)) && !isInputFocused()) {
       e.preventDefault();
       openPalette();
     }
@@ -61,6 +61,10 @@ function setupPaletteHandlers() {
   if (paletteClose) {
     paletteClose.addEventListener('click', closePalette);
   }
+
+  palette.addEventListener('click', (e) => {
+    if (e.target === palette) closePalette();
+  });
 
   // Close palette on Escape
   document.addEventListener('keydown', (e) => {
@@ -110,6 +114,11 @@ function setupFocusHighlight() {
 function openPalette() {
   if (!palette) return;
   palette.hidden = false;
+  if (typeof palette.showModal === 'function' && !palette.open) {
+    palette.showModal();
+  } else {
+    palette.setAttribute('open', '');
+  }
   palette.setAttribute('aria-hidden', 'false');
   
   // Focus the close button or first focusable element
@@ -119,6 +128,11 @@ function openPalette() {
 
 function closePalette() {
   if (!palette) return;
+  if (typeof palette.close === 'function' && palette.open) {
+    palette.close();
+  } else {
+    palette.removeAttribute('open');
+  }
   palette.hidden = true;
   palette.setAttribute('aria-hidden', 'true');
 }

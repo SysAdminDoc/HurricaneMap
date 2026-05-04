@@ -148,5 +148,3 @@ export function toggleConeVisibility(visible) {
     coneLayer.setOpacity(0);
   }
 }
-
-export { initConeLayer };
