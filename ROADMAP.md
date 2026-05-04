@@ -2,42 +2,48 @@
 
 Status legend: `[ ]` not started · `[~]` in progress · `[x]` shipped
 
-## Phase 1 — In-app analytics (no new data sources, no new deps beyond what's in `index.html`)
+## Phase 1 — In-app analytics — ✅ SHIPPED
 
-- [x] **P1.1 Intensity time-series chart** — SVG line chart in the storm panel showing wind (kt) and pressure (mb) across the full HURDAT2 track, with vertical markers for each U.S. landfall and a hover tooltip.
-- [x] **P1.2 Storm comparison mode** — pin up to 4 storms into a compare tray; overlays their tracks color-coded by storm and shows a side-by-side intensity chart + stat grid in a dedicated panel.
-- [x] **P1.3 Landfall density heatmap** — toggleable layer that swaps the colored Saffir-Simpson dots for a [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat) heatmap weighted by category, showing where strikes concentrate vs avoid.
-- [x] **P1.4 State deep-dive** — clicking a state polygon (or selecting via the filter) opens a panel with that state's full landfall history: by-category histogram, by-decade trend, deadliest/costliest, every storm sortable.
+- [x] **P1.1 Intensity time-series chart** — wind + pressure across full HURDAT2 track, landfall markers, hover tooltip.
+- [x] **P1.2 Storm comparison mode** — pin up to 4 storms; overlay tracks + side-by-side stat grid.
+- [x] **P1.3 Landfall density heatmap** — Leaflet.heat layer weighted by category.
+- [x] **P1.4 State deep-dive** — per-state history, by-category histogram, by-decade trend.
 
-## Phase 2 — New external data integrations
+## Phase 2 — External data integrations — ✅ SHIPPED
 
-- [x] **P2.1 Storm surge SLOSH MOMs** — pull NHC's [SLOSH Maximum-of-Maximums](https://www.nhc.noaa.gov/nationalsurge/) GIS rasters (Cat 1 through Cat 5) for the U.S. Gulf + East coasts; commit as compressed PNGs with a layer toggle that overlays the inundation band matching the selected storm's landfall category.
-- [x] **P2.2 HRD H*Wind swaths** — scrape the [NOAA HRD H*Wind archive](https://www.aoml.noaa.gov/hrd/data_sub/wind.html) for storms 1994–2013, convert each to a transparent PNG raster, and add a "Wind field" button to the storm panel that overlays the actual analyzed wind field.
-- [x] **P2.3 GOES satellite imagery** — for each storm 2000+, pull GOES IR/visible composites at HURDAT2 6-hourly synoptic times (NCEI archive), bake into `data/satellite/` mirroring the radar layout, and add a "🛰️ Satellite" toggle alongside the radar checkbox.
-- [x] **P2.4 Casualty + damage data** — scrape NHC Tropical Cyclone Reports (where available) and Wikipedia infoboxes for deaths/damage, store in `data/impacts.json`, surface in the storm panel as an "Impacts" subsection.
+- [x] **P2.1 Storm surge SLOSH MOMs** — NHC SLOSH Maximum-of-Maximums Cat 1–5 inundation overlay.
+- [x] **P2.2 HRD H*Wind swaths** — analyzed wind field rasters 1994–2013.
+- [x] **P2.3 GOES satellite imagery** — SLIDER linkout at HURDAT2 synoptic times.
+- [x] **P2.4 Casualty + damage data** — NHC TCR + Wikipedia scrape into `data/impacts.json`.
 
-## Phase 3 — Live data + niche overlays
+## Phase 3 — Live data + niche overlays — ✅ SHIPPED
 
-- [x] **P3.1 Active storm tracking** — pull [NHC `CurrentStorms.json`](https://www.nhc.noaa.gov/CurrentStorms.json) at runtime; if any storms are active, render their cones of uncertainty + advisory tracks in a distinctive style.
-- [x] **P3.2 Spaghetti models** — fetch model tracks (GFS, ECMWF, HMON, HWRF, ensemble means) for active storms via NOMADS or a-deck data; overlay as thin polylines.
-- [x] **P3.3 Tornado activity** — for storms 1995+, pull tornado reports from NOAA Storm Events Database (or Tropycal-equivalent) within the storm's lifetime + state of impact; plot as small markers on the map and list in the storm panel.
-- [x] **P3.4 Population exposure** — overlay U.S. Census block-level population density as a heat layer; for each storm, compute "X million in Cat-N wind zone" using H*Wind swath × population.
-- [x] **P3.5 Aircraft recon** — NHC `/recon/` archive provides flight tracks + dropsonde data; render flight paths on the storm's map view.
+- [x] **P3.1 Active-storm overlay** — NHC current advisory polling, animated track when present.
+- [x] **P3.2 Population exposure** — SEDAC GPW v4 1km density toggle.
+- [x] **P3.3 NEXRAD radar archive** — Iowa Mesonet timelapse for 1995+ landfalls.
+- [x] **P3.4 Track animation** — play-storm-track button with speed control + scrubber.
 
-## UI organization principles
+## Phase 4 — Storm metrics + permalinks — ✅ SHIPPED in v0.4.0
 
-- Keep the **map** as the primary surface; everything else is a glass panel that slides in.
-- The right-side panel becomes **tabbed** — Details · Intensity · Hazards · Radar · Impacts — instead of one long scroll.
-- A small **Layers control** floats bottom-left for global toggles (heatmap, surge, satellite, population).
-- **Compare tray** is a floating bottom-center bar that appears once a storm is pinned.
-- **State deep-dive** opens via clicking a state on the map OR via the existing state filter.
-- Active-storm chrome (Phase 3) only appears when NHC currently has storms — otherwise zero pixels of UI dedicated to it.
+- [x] **P4.1 ACE (Accumulated Cyclone Energy)** — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt; surfaced as a stat tile alongside peak wind / min pressure with NHC-definition tooltip.
+- [x] **P4.2 Rapid-intensification flag** — detect ≥30 kt wind gain in any 24-hour window per NHC definition; pink badge in panel + red overlay segment on the intensity chart with "⚡ RI +XX kt" label.
+- [x] **P4.3 Closest pass to coastal city** — 25 hand-curated U.S. coastal cities (Atlantic + Gulf + Hawaii + Puerto Rico); haversine to nearest track point; auto-defaults to a city in the storm's first landfall state.
+- [x] **P4.4 URL permalinks** — encode filters + opened storm + opened state to `location.hash`; restore on cold load. Format: `#y=2000-2025&c=3,4,5&s=Florida&storm=AL122005`.
+- [x] **P4.5 Track export (CSV / GeoJSON / KML)** — one-click client-side export; CSV for spreadsheets, GeoJSON for QGIS/Mapbox, KML for Google Earth with donut landfall icons.
 
-## Definition of Done per item
+## Phase 5 — Next up (Tier 2/3 from `docs/research/iter-1-scored.md`)
 
-For each item in this roadmap:
-1. Feature actually works end-to-end (smoke test in browser, verify expected output).
-2. UI integrates with the existing dark Catppuccin Mocha + glassmorphism theme.
-3. No regressions in the existing radar / animation / panel features.
-4. README + this ROADMAP + CHANGELOG entries updated.
-5. Auto-commit + push, with one-line status here.
+- [ ] **P5.1 Pressure-fall rate metric** — max mb/hour drop window, quantifies "explosive deepening" beyond the wind-only RI signal (Wilma 2005 dropped 95 mb in 24h).
+- [ ] **P5.2 Translation speed (forward speed)** — km/h between consecutive obs; surface min/mean/max + flag stalled storms (<10 km/h, e.g. Harvey 2017, Dorian 2019).
+- [ ] **P5.3 Days-at-intensity histogram** — hours spent at TS / Cat-1 / Cat-2 / Cat-3 / Cat-4 / Cat-5; stacked bar in the panel.
+- [ ] **P5.4 First-run onboarding** — 4-step coachmark tour highlighting filters, search, compare-tray, permalink button.
+- [ ] **P5.5 Color-blind palette toggle** — alternate Saffir-Simpson palette using ColorBrewer YlOrRd; persisted in `localStorage`.
+- [ ] **P5.6 Unit toggle (kt / mph / km·h)** — single setting, propagates through panel + chart axis labels.
+- [ ] **P5.7 PWA install** — `manifest.json` + service worker for offline tile + data caching of last-viewed storms.
+- [ ] **P5.8 Timeline ribbon** — 174-year horizontal ribbon at the bottom showing storm density per year, click to jump filter.
+- [ ] **P5.9 PNG / SVG export of intensity chart** — `<canvas>` rasterize for social-media share.
+- [ ] **P5.10 Share button** — copies permalink to clipboard + shows toast confirmation.
+
+---
+
+See `docs/research/` for full-source iteration history and tier scoring.

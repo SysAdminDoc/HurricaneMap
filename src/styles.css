@@ -3295,3 +3295,155 @@ a:focus-visible {
   .play-anim-btn:hover,
   .radar-quick-btn:hover { transform: none !important; }
 }
+/* ============================================================
+   v0.4.0 — ACE / RI / closest-pass / exports
+   ============================================================ */
+
+/* Storm flags row (RI badge etc.) — sits between meta-row and stat-grid */
+.storm-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+.storm-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: help;
+  transition: transform var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease);
+}
+.storm-flag.ri-flag {
+  background: linear-gradient(135deg, rgba(243,139,168,0.18), rgba(245,194,231,0.12));
+  color: #f5c2e7;
+  border: 1px solid rgba(243,139,168,0.42);
+  box-shadow: 0 0 0 1px rgba(243,139,168,0.10) inset,
+              0 6px 20px -10px rgba(243,139,168,0.55);
+}
+.storm-flag.ri-flag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(243,139,168,0.22) inset,
+              0 10px 26px -10px rgba(243,139,168,0.65);
+}
+
+/* ACE info marker inside stat label */
+.metric-info {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--subtext);
+  font-size: 10px;
+  opacity: 0.6;
+  cursor: help;
+}
+
+/* ---------- Closest-pass row ---------- */
+.closest-pass-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 18px;
+  padding: 12px 14px;
+  background: rgba(49, 50, 68, 0.42);
+  border: 1px solid var(--border-subtle, rgba(108,112,134,0.22));
+  border-radius: 12px;
+}
+.closest-pass-label {
+  font-size: 12px;
+  color: var(--subtext);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.closest-pass-select {
+  background: rgba(30, 30, 46, 0.85);
+  color: var(--text);
+  border: 1px solid var(--border, rgba(108,112,134,0.32));
+  border-radius: 8px;
+  padding: 6px 28px 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23a6adc8' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  transition: border-color var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-fast) var(--motion-ease);
+}
+.closest-pass-select:hover { border-color: rgba(137,180,250,0.55); }
+.closest-pass-select:focus-visible {
+  outline: none;
+  border-color: var(--blue, #89b4fa);
+  box-shadow: 0 0 0 3px rgba(137,180,250,0.25);
+}
+.closest-pass-value {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.closest-pass-value strong {
+  color: var(--blue, #89b4fa);
+  font-weight: 600;
+}
+.cp-meta-inline {
+  color: var(--subtext);
+  font-size: 11.5px;
+  margin-left: 4px;
+}
+
+/* ---------- Export track row ---------- */
+.export-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 6px;
+  padding: 10px 0;
+  border-top: 1px dashed rgba(108,112,134,0.20);
+  border-bottom: 1px dashed rgba(108,112,134,0.20);
+}
+.export-label {
+  font-size: 11.5px;
+  color: var(--subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-right: 4px;
+}
+.export-btn {
+  background: rgba(49, 50, 68, 0.55);
+  color: var(--text);
+  border: 1px solid rgba(108,112,134,0.32);
+  border-radius: 7px;
+  padding: 5px 11px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all var(--motion-fast) var(--motion-ease);
+}
+.export-btn:hover {
+  background: rgba(137,180,250,0.14);
+  border-color: rgba(137,180,250,0.45);
+  color: #b4befe;
+  transform: translateY(-1px);
+}
+.export-btn:active { transform: translateY(0); }
+.export-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(137,180,250,0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storm-flag.ri-flag:hover,
+  .export-btn:hover { transform: none; }
+}

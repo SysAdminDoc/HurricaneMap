@@ -10,6 +10,10 @@ import { renderIntensityChart } from './chart.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
 import { closePanelsExcept } from './panels.js';
+import {
+  computeACE, findRapidIntensification, closestApproach,
+  COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
+} from './metrics.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -33,6 +37,7 @@ closeBtn.addEventListener('click', () => {
   if (animator) animator.stop();
   if (radar) radar.close();
   hideWindField();
+  document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
 export async function showStorm(landfall) {
@@ -87,6 +92,17 @@ function render(storm, landfall) {
   const minPres = storm.min_pres_mb ? `${storm.min_pres_mb} mb` : '—';
   const peakWindMph = ktToMph(storm.peak_wind_kt);
 
+  const ace = computeACE(storm.track);
+  const aceStr = ace.value > 0 ? formatNumber(ace.value, 1) : '—';
+  const ri = findRapidIntensification(storm.track);
+  const riBadge = ri
+    ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">⚡ Rapid intensification (+${ri.delta_kt} kt / 24h)</span>`
+    : '';
+
+  // Default closest-pass city: prefer one in the storm's first landfall state, else Miami.
+  const defaultCity = pickDefaultCity(storm);
+  const initialApproach = closestApproach(storm.track, defaultCity.lat, defaultCity.lon);
+
   body.innerHTML = `
     <h2>${escapeHtml(heading)}</h2>
     <div class="meta-row">
@@ -96,11 +112,21 @@ function render(storm, landfall) {
       <span>${storm.id}</span>
     </div>
 
+    ${riBadge ? `<div class="storm-flags">${riBadge}</div>` : ''}
+
     <div class="stat-grid">
       <div class="stat"><div class="label">Peak wind</div><div class="value">${storm.peak_wind_kt} kt <span style="font-size:11px;color:var(--subtext)">(${peakWindMph} mph)</span></div></div>
       <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
+      <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
       <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
-      <div class="stat"><div class="label">Track points</div><div class="value">${storm.track.length}</div></div>
+    </div>
+
+    <div class="closest-pass-row" id="closest-pass-row">
+      <label class="closest-pass-label" for="closest-city">Closest pass to</label>
+      <select class="closest-pass-select" id="closest-city">
+        ${COASTAL_CITIES.map(c => `<option value="${escapeHtml(c.name)}"${c.name === defaultCity.name ? ' selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+      <span class="closest-pass-value" id="closest-pass-value">${formatClosest(initialApproach)}</span>
     </div>
 
     ${renderImpactsBlock(storm)}
@@ -119,6 +145,13 @@ function render(storm, landfall) {
       ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
       ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
       ${reconUrl ? `<a class="action-btn" href="${reconUrl}" target="_blank" rel="noopener">✈️ Recon archive</a>` : ''}
+    </div>
+
+    <div class="export-row">
+      <span class="export-label">Export track:</span>
+      <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
+      <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
+      <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
     </div>
 
     <div class="panel-actions-row">
@@ -140,8 +173,30 @@ function render(storm, landfall) {
   `;
   panel.scrollTop = 0;
 
-  // Render the intensity chart inline in the panel.
-  renderIntensityChart(document.getElementById('chart-host'), storm);
+  // Render the intensity chart inline in the panel. Pass the RI window so
+  // the chart can red-tint that segment.
+  renderIntensityChart(document.getElementById('chart-host'), storm, { ri });
+
+  // Closest-pass selector — recompute on city change.
+  const cityEl = document.getElementById('closest-city');
+  const cpValEl = document.getElementById('closest-pass-value');
+  if (cityEl && cpValEl) {
+    cityEl.addEventListener('change', () => {
+      const city = COASTAL_CITIES.find(c => c.name === cityEl.value);
+      if (!city) return;
+      const ap = closestApproach(storm.track, city.lat, city.lon);
+      cpValEl.innerHTML = formatClosest(ap);
+    });
+  }
+
+  // Export menu — generate Blob client-side and trigger a download.
+  panel.querySelectorAll('.export-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const kind = btn.dataset.export;
+      const exports = buildExports(storm);
+      if (exports[kind]) downloadBlob(exports[kind]);
+    });
+  });
 
   const playBtn = document.getElementById('play-anim-btn');
   if (playBtn) {
@@ -179,6 +234,53 @@ function render(storm, landfall) {
 function titleCase(name) {
   if (!name || name === 'UNNAMED') return 'Unnamed';
   return name[0].toUpperCase() + name.slice(1).toLowerCase();
+}
+
+// Map a U.S. state name to a representative city in COASTAL_CITIES so the
+// closest-pass selector defaults to a relevant city for the storm at hand.
+const STATE_TO_CITY = {
+  'Florida': 'Miami, FL',
+  'Texas': 'Galveston, TX',
+  'Louisiana': 'New Orleans, LA',
+  'Mississippi': 'Mobile, AL',
+  'Alabama': 'Mobile, AL',
+  'Georgia': 'Savannah, GA',
+  'South Carolina': 'Charleston, SC',
+  'North Carolina': 'Cape Hatteras, NC',
+  'Virginia': 'Norfolk, VA',
+  'Maryland': 'Norfolk, VA',
+  'Delaware': 'Norfolk, VA',
+  'New Jersey': 'New York, NY',
+  'New York': 'New York, NY',
+  'Connecticut': 'New York, NY',
+  'Rhode Island': 'Boston, MA',
+  'Massachusetts': 'Boston, MA',
+  'New Hampshire': 'Boston, MA',
+  'Maine': 'Boston, MA',
+  'Hawaii': 'Honolulu, HI',
+  'Puerto Rico': 'San Juan, PR',
+};
+
+function pickDefaultCity(storm) {
+  const firstLf = storm.us_landfalls && storm.us_landfalls[0];
+  const cityName = firstLf ? STATE_TO_CITY[firstLf.state] : null;
+  if (cityName) {
+    const c = COASTAL_CITIES.find(x => x.name === cityName);
+    if (c) return c;
+  }
+  return storm.basin === 'EP'
+    ? COASTAL_CITIES.find(x => x.name === 'Honolulu, HI') || COASTAL_CITIES[0]
+    : COASTAL_CITIES[0];
+}
+
+function formatClosest(approach) {
+  if (!approach) return '—';
+  const mi = Math.round(approach.distance_mi);
+  const km = Math.round(approach.distance_km);
+  const r = approach.track_point;
+  const wind = r.wind != null ? `${r.wind} kt` : '—';
+  const date = formatTime(r.t);
+  return `<strong>${mi.toLocaleString()} mi</strong> <span class="cp-meta-inline">(${km.toLocaleString()} km) · ${wind} · ${date}</span>`;
 }
 
 function saffirCat(kt) {
