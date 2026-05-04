@@ -103,6 +103,7 @@ function applyHashToFilters() {
 const els = {
   yearMin: document.getElementById('year-min'),
   yearMax: document.getElementById('year-max'),
+  clearYearFilter: document.getElementById('clear-year-filter'),
   catBtns: document.querySelectorAll('.cat-btn'),
   stateFilter: document.getElementById('state-filter'),
   searchInput: document.getElementById('search-input'),
@@ -346,6 +347,16 @@ function wireUI() {
   els.yearMin.addEventListener('change', onYearChange);
   els.yearMax.addEventListener('change', onYearChange);
 
+  // Clear year filter button
+  if (els.clearYearFilter) {
+    els.clearYearFilter.addEventListener('click', () => {
+      filters.yearMin = 1851;
+      filters.yearMax = 2025;
+      syncFilterUiFromState();
+      applyFilters();
+    });
+  }
+
   // Category toggles
   for (const btn of els.catBtns) {
     btn.setAttribute('aria-pressed', String(btn.classList.contains('on')));
@@ -508,6 +519,18 @@ function wireUI() {
     setSurgeCategory(null);
     setPopulation(false);
     lastTracksKey = '';
+    applyFilters();
+  });
+
+  // Escape key: reset year filter if one is active
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    // Only reset if year filter is active (not full range)
+    if (filters.yearMin === 1851 && filters.yearMax === 2025) return;
+    // Reset to full range
+    filters.yearMin = 1851;
+    filters.yearMax = 2025;
+    syncFilterUiFromState();
     applyFilters();
   });
 

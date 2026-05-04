@@ -78,6 +78,11 @@ function attachDragInteraction() {
     axis.classList.add('dragging');
     drawSelection(dragStart, dragEnd);
   });
+  axis.addEventListener('dblclick', (e) => {
+    // Double-click resets to full range (1851-2025)
+    e.stopPropagation();
+    onChange({ yearMin: Y0, yearMax: Y1 });
+  });
   window.addEventListener('mousemove', (e) => {
     if (dragStart == null) return;
     dragEnd = yearAt(e.clientX);
@@ -112,7 +117,7 @@ function drawSelection(a, b) {
   axis.setAttribute('aria-valuetext', `${lo} to ${hi}`);
 }
 
-function redraw(landfalls) {
+export function redraw(landfalls) {
   if (!host) return;
   // Group landfalls by year — value = { count, peakTier }
   const byYear = new Map();

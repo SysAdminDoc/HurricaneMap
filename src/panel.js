@@ -121,12 +121,23 @@ function render(storm, landfall) {
   const initialApproach = closestApproach(storm.track, defaultCity.lat, defaultCity.lon);
 
   body.innerHTML = `
-    <h2>${escapeHtml(heading)}</h2>
-    <div class="meta-row">
-      <span class="cat-pill ${categoryClass(lfCat)}">${lfLabel} at landfall</span>
-      <span>Peak intensity: <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>
-      <span>${storm.basin === 'EP' ? 'Eastern Pacific basin' : 'Atlantic basin'}</span>
-      <span>${storm.id}</span>
+    <div class="storm-panel-header">
+      <h2>${escapeHtml(heading)}</h2>
+      <div class="meta-row">
+        <span class="cat-pill ${categoryClass(lfCat)}">${lfLabel} at landfall</span>
+        <span>Peak intensity: <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>
+        <span>${storm.basin === 'EP' ? 'Eastern Pacific basin' : 'Atlantic basin'}</span>
+        <span>${storm.id}</span>
+      </div>
+    </div>
+
+    <div class="panel-actions-sticky">
+      <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
+        <span class="play-icon"></span>Play track animation
+      </button>
+      <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
+        <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
+      </button>
     </div>
 
     ${(riBadge || pfBadge) ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
@@ -180,14 +191,6 @@ function render(storm, landfall) {
       <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
     </div>
 
-    <div class="panel-actions-row">
-      <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
-        <span class="play-icon"></span>Play track animation
-      </button>
-      <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
-        <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
-      </button>
-    </div>
     ${radiiCount(storm) > 0 ? `
       <div class="wind-field-row">
         <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
