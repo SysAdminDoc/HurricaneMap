@@ -263,7 +263,7 @@ header.app-header.glass {
   left: 12px;
   z-index: 1500;
   width: 280px;
-  max-height: calc(100vh - 360px);
+  max-height: calc(100vh - 240px);  /* 100px top + 140px timeline = 240px reserved */
   overflow-y: auto;
   padding: 14px 16px;
   display: flex;
@@ -508,7 +508,7 @@ label > input[type="checkbox"] {
   position: absolute;
   top: 110px;
   right: 16px;
-  bottom: 200px;     /* leave room above the stacked bottom control bars */
+  bottom: 160px;     /* leave room for timeline (140px) + padding (20px) */
   z-index: 1000;
   width: 420px;
   max-width: calc(100vw - 32px);
