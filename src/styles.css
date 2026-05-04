@@ -233,6 +233,18 @@ header.app-header.glass {
   cursor: pointer;
   white-space: nowrap;
 }
+
+/* Highlight active year filter */
+.filter-row--year.active-filter {
+  background: rgba(137, 180, 250, 0.08);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(137, 180, 250, 0.3);
+  margin: -6px -6px 0;
+}
+.filter-row--year.active-filter > label {
+  color: var(--blue);
+}
 input[type="number"], input[type="search"], select {
   background: var(--mantle);
   border: 1px solid var(--surface0);

@@ -326,6 +326,10 @@ function wireSettingsControls() {
 function syncFilterUiFromState() {
   if (els.yearMin) els.yearMin.value = String(filters.yearMin);
   if (els.yearMax) els.yearMax.value = String(filters.yearMax);
+  // Highlight year filter row when a non-default year range is selected
+  const yearFilterRow = document.querySelector('.filter-row--year');
+  const isYearFiltered = filters.yearMin > 1851 || filters.yearMax < 2025;
+  if (yearFilterRow) yearFilterRow.classList.toggle('active-filter', isYearFiltered);
   els.catBtns.forEach((btn) => {
     const cat = btn.dataset.cat;
     const on = filters.categories.has(cat);
@@ -409,6 +413,24 @@ function wireUI() {
   };
   els.yearMin.addEventListener('change', onYearChange);
   els.yearMax.addEventListener('change', onYearChange);
+  
+  // Escape key resets year filter to full range
+  els.yearMin.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      filters.yearMin = 1851;
+      filters.yearMax = 2025;
+      syncFilterUiFromState();
+      applyFilters();
+    }
+  });
+  els.yearMax.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      filters.yearMin = 1851;
+      filters.yearMax = 2025;
+      syncFilterUiFromState();
+      applyFilters();
+    }
+  });
 
   // Clear year filter button
   if (els.clearYearFilter) {
