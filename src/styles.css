@@ -289,8 +289,8 @@ label > input[type="checkbox"] {
 /* User-tuned storm-panel sizing — taller card, raised slightly to align
    with the visible viewport and keep the intensity chart, landfall list,
    and action row all visible without scrolling. Capped at the viewport
-   so the panel never bleeds past the bottom edge or the stacked control
-   bars (compare-tray @ 22 / radar @ 86 / animation @ 150). */
+   so the panel never bleeds past the bottom edge while playback controls
+   stay pinned to the viewport. */
 section.storm-panel.glass {
   height: 980px;
   max-height: calc(100vh - 215px);
@@ -1037,16 +1037,16 @@ section.storm-panel.glass {
 
 /* Bottom control bars stack vertically so they don't collide when more than
    one is active. Order from bottom up:
-     24px — animation controls (primary playback, closest to bottom)
+     8px — animation controls (primary playback, fixed to viewport)
      86px — radar controls
      92px — compare tray only while animation controls are open */
 
 .anim-controls {
-  position: absolute;
-  bottom: 8px;
+  position: fixed;
+  bottom: max(8px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1100;
+  z-index: 2400;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1949,7 +1949,7 @@ body:has(.anim-controls:not([hidden])) .compare-tray {
 
   .anim-controls {
     top: auto;
-    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .radar-controls {

@@ -13,6 +13,7 @@ All notable changes to HurricaneMap.
 - Moved track-animation player controls closer to the bottom edge so they block less of the map while playback is running.
 - Tuned the storm detail panel height/top offset and clamped animation-player bottom offset so controls stay lower without disappearing on short viewports.
 - Removed the negative animation-player margin and pinned playback controls to a visible bottom inset.
+- Added an OpenStreetMap basemap fallback for blocked CartoDB tiles and fixed playback controls to the viewport bottom.
 
 ### 13-feature analytics roadmap (Phases 1-3) shipped
 
