@@ -294,12 +294,6 @@ function titleCase(name) {
   return name[0].toUpperCase() + name.slice(1).toLowerCase();
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
-}
-
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {
   if (!storms || storms.length === 0) return;

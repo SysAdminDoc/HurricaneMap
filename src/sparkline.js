@@ -1,17 +1,12 @@
 // Tiny inline sparkline for storm wind-over-time. Designed to live inside
 // search results and other dense UI surfaces. Self-contained SVG, no deps.
 import { getPaletteColor } from './settings.js';
+import { escapeHtml } from './html-utils.js';
 
 const W = 64;
 const H = 18;
 const PAD_X = 1;
 const PAD_Y = 2;
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
-}
 
 function tierFromKt(kt) {
   if (kt >= 137) return 5;

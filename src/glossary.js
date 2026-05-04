@@ -1,3 +1,5 @@
+import { escapeHtml } from './html-utils.js';
+
 // Glossary management — meteorological and hurricane terminology.
 //
 // Glossary data is fetched from data/glossary.json on first use.
@@ -112,15 +114,4 @@ export async function initGlossary() {
 export function showGlossary() {
   const modal = document.getElementById('glossary-modal');
   if (modal) modal.hidden = false;
-}
-
-/** Helper to escape HTML in glossary content. */
-function escapeHtml(s) {
-  if (!s) return '';
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }

@@ -10,6 +10,7 @@
 // tooltip block. Pure SVG, no chart libraries.
 
 import { categoryColor, formatTime } from './data.js';
+import { escapeHtml } from './html-utils.js';
 
 const W = 360;          // total width in CSS px
 const H = 160;          // total height
@@ -31,12 +32,6 @@ function saffir(kt) {
 }
 
 function lerp(a, b, t) { return a + (b - a) * t; }
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[c]);
-}
 
 export function renderIntensityChart(container, storm, opts = {}) {
   if (!container) return;

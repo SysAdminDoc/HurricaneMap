@@ -125,5 +125,3 @@ function stopTimelapse() {
   allTrackPoints = [];
   if (progressLabel) progressLabel.textContent = '0%';
 }
-
-export { maybeShowTimelapseControls };
