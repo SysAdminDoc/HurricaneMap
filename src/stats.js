@@ -4,6 +4,7 @@ import { closePanelsExcept, syncPanelControls } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
 import { computeClimateTrends } from './metrics.js';
+import { fetchSeasonalOutlook, renderOutlookBanner } from './seasonal-outlook.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -67,6 +68,8 @@ function render() {
       Coverage: ${stats.year_range[0]}–${stats.year_range[1]}.
     </p>
 
+    <div id="seasonal-outlook-host"></div>
+
     <h3>Landfalls by state</h3>
     ${stateBars}
 
@@ -113,6 +116,20 @@ function render() {
     } catch (e) {
       ctHost.innerHTML = `<p style="color:var(--text-dim);font-size:12px;">Climate trends unavailable: ${e.message || 'unknown error'}</p>`;
     }
+  }
+
+  // Fetch and render the current NOAA seasonal outlook
+  const outlookHost = document.getElementById('seasonal-outlook-host');
+  if (outlookHost) {
+    fetchSeasonalOutlook()
+      .then(outlook => {
+        outlookHost.innerHTML = renderOutlookBanner(outlook);
+      })
+      .catch(e => {
+        console.error('Seasonal outlook error:', e);
+        // Silently fail — outlook is optional
+        outlookHost.innerHTML = '';
+      });
   }
 }
 
