@@ -202,6 +202,10 @@ function wireSettingsControls() {
       btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
       btn.setAttribute('aria-pressed', String(btn.dataset.setDamage === getSetting('damageMode')));
     });
+    const ensembleToggle = menu.querySelector('#toggle-ensemble-tracks');
+    if (ensembleToggle) {
+      ensembleToggle.checked = getSetting('ensembleTracks');
+    }
   }
   syncMenu();
 
@@ -243,6 +247,14 @@ function wireSettingsControls() {
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
   });
+
+  // Ensemble tracks toggle
+  const ensembleToggle = menu.querySelector('#toggle-ensemble-tracks');
+  if (ensembleToggle) {
+    ensembleToggle.addEventListener('change', () => {
+      setSetting('ensembleTracks', ensembleToggle.checked);
+    });
+  }
 
   // Live-react to theme and palette changes — re-stamp the classes.
   document.addEventListener('hm-settings:change', (e) => {

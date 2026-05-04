@@ -11,6 +11,7 @@ const DEFAULTS = {
   theme: 'dark',           // 'dark' (Catppuccin Mocha) | 'light' (Catppuccin Latte)
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
+  ensembleTracks: false,   // Show GFS/ECMWF forecast ensemble spaghetti tracks
   onboarded: false,
 };
 

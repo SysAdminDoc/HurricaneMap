@@ -1,9 +1,11 @@
 // Active storm tracking — pulls NHC's live CurrentStorms.json feed at boot
 // (and every 10 min thereafter). When storms are active, renders their
 // advisory tracks + cones of uncertainty in a distinctive electric-blue
-// style. Off-season the feature contributes zero pixels.
+// style. Optionally overlays GFS/ECMWF ensemble spaghetti tracks.
 
 import { getMap } from './map.js';
+import { renderEnsembleTracks, hideEnsembleTracks, clearEnsembleCache } from './ensemble.js';
+import { getSetting } from './settings.js';
 
 // NHC's CurrentStorms.json doesn't send CORS headers, so route through a
 // public CORS proxy. The endpoint payload is tiny (a few KB even with multiple
@@ -13,8 +15,18 @@ const REFRESH_MS = 10 * 60 * 1000;  // every 10 minutes
 
 let layerGroup = null;
 let badgeEl = null;
+let lastStorms = null;
 
 export async function startActiveStormPolling() {
+  // Listen for ensemble toggle changes
+  document.addEventListener('hm-settings:change', (e) => {
+    if (e.detail.key === 'ensembleTracks') {
+      if (lastStorms) {
+        renderActive(lastStorms);
+      }
+    }
+  });
+
   await fetchAndRender();
   setInterval(fetchAndRender, REFRESH_MS);
 }
@@ -30,12 +42,14 @@ async function fetchAndRender() {
     return;
   }
   const storms = (data && data.activeStorms) || [];
+  lastStorms = storms;
   ensureBadge(storms.length);
   if (!storms.length) {
     if (layerGroup) {
       getMap().removeLayer(layerGroup);
       layerGroup = null;
     }
+    hideEnsembleTracks();
     return;
   }
   renderActive(storms);
@@ -117,4 +131,13 @@ async function renderActive(storms) {
     }
   }
   layerGroup.addTo(map);
+
+  // Render ensemble tracks if enabled
+  const ensembleEnabled = getSetting('ensembleTracks');
+  if (ensembleEnabled) {
+    await renderEnsembleTracks(storms, true);
+  } else {
+    hideEnsembleTracks();
+  }
 }
+
