@@ -2,17 +2,22 @@
 //
 // Strategy:
 //   - Static shell (HTML/CSS/JS, manifest, favicon)  → cache-first, revalidate.
-//   - HURDAT2 data JSON (storms, landfalls, stats, metadata, optional feeds)
-//     → stale-while-revalidate so users see instant data while we refresh.
+//   - Historical data (JSON/GeoJSON/TXT)              → compressed IndexedDB,
+//     stale-while-revalidate, with CacheStorage fallback.
+//   - Local radar PNGs                                → cache-first on demand;
+//     not preinstalled because the archive is intentionally large.
 //   - Map tiles (CartoDB, OSM)                       → cache-first w/ TTL.
 //   - Everything else                                → network-first, fall back to cache.
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q17';
+const SW_VERSION = 'hm-v1.3.9-q18';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
-const DATA_CACHE = 'hm-data-v1';
+const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
+const RADAR_CACHE = 'hm-radar-v1';
+const DATA_DB = 'hm-offline-data-v2';
+const DATA_STORE = 'responses';
 
 const SHELL_ASSETS = [
   './',
@@ -69,6 +74,20 @@ const SHELL_ASSETS = [
   './branding/logo.png',
 ];
 
+const OFFLINE_DATA_ASSETS = [
+  './data/landfalls.json',
+  './data/storms.json',
+  './data/stats.json',
+  './data/metadata.json',
+  './data/impacts.json',
+  './data/glossary.json',
+  './data/storm-events.json',
+  './data/us-states.geojson',
+  './data/hurdat2-atlantic.txt',
+  './data/hurdat2-nepac.txt',
+  './data/radar/manifest.json',
+];
+
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(SHELL_CACHE);
@@ -79,6 +98,7 @@ self.addEventListener('install', (event) => {
         if (res.ok) await cache.put(url, res);
       } catch { /* offline-first install — ignore */ }
     }));
+    await precacheOfflineData();
   })());
 });
 
@@ -92,7 +112,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.map((k) => {
-      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE) return caches.delete(k);
+      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE) return caches.delete(k);
     }));
     self.clients.claim();
   })());
@@ -106,7 +126,12 @@ function isShell(url) {
 
 function isData(url) {
   if (url.origin !== location.origin) return false;
-  return /\/data\/.+\.(json|geojson)$/.test(url.pathname) || /\.(json|geojson)$/.test(url.pathname);
+  return /\/data\/.+\.(json|geojson|txt)$/.test(url.pathname) || /\.(json|geojson|txt)$/.test(url.pathname);
+}
+
+function isRadarAsset(url) {
+  if (url.origin !== location.origin) return false;
+  return /\/data\/radar\/.+\.png$/.test(url.pathname);
 }
 
 function isTile(url) {
@@ -124,7 +149,9 @@ self.addEventListener('fetch', (event) => {
   if (isShell(url)) {
     event.respondWith(staleWhileRevalidate(req, SHELL_CACHE));
   } else if (isData(url)) {
-    event.respondWith(staleWhileRevalidate(req, DATA_CACHE));
+    event.respondWith(offlineDataWhileRevalidate(req));
+  } else if (isRadarAsset(url)) {
+    event.respondWith(cacheFirst(req, RADAR_CACHE));
   } else if (isTile(url)) {
     event.respondWith(cacheFirst(req, TILE_CACHE));
   }
@@ -152,4 +179,145 @@ async function staleWhileRevalidate(req, cacheName) {
     return res;
   }).catch(() => null);
   return hit || (await refresh) || Response.error();
+}
+
+async function offlineDataWhileRevalidate(req) {
+  const cache = await caches.open(DATA_CACHE);
+  const cached = await readOfflineResponse(req);
+  const cacheHit = cached ? null : await cache.match(req);
+  const refresh = fetch(req).then(async (res) => {
+    if (res && res.status === 200) {
+      await Promise.all([
+        cache.put(req, res.clone()).catch(() => {}),
+        writeOfflineResponse(req, res.clone()).catch(() => {}),
+      ]);
+    }
+    return res;
+  }).catch(() => null);
+  return cached || cacheHit || (await refresh) || Response.error();
+}
+
+async function precacheOfflineData() {
+  const cache = await caches.open(DATA_CACHE);
+  await Promise.all(OFFLINE_DATA_ASSETS.map(async (url) => {
+    try {
+      const req = new Request(url, { cache: 'reload' });
+      const res = await fetch(req);
+      if (!res.ok) return;
+      await Promise.all([
+        cache.put(req, res.clone()).catch(() => {}),
+        writeOfflineResponse(req, res.clone()).catch(() => {}),
+      ]);
+    } catch {
+      /* Keep install resilient when a data sidecar is temporarily unavailable. */
+    }
+  }));
+}
+
+async function readOfflineResponse(req) {
+  let record = null;
+  try {
+    record = await idbGet(cacheKeyFor(req));
+  } catch {
+    return null;
+  }
+  if (!record) return null;
+  try {
+    const body = await inflateBody(record.body, record.encoding);
+    return new Response(body, {
+      status: record.status,
+      statusText: record.statusText,
+      headers: record.headers,
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function writeOfflineResponse(req, res) {
+  const body = await res.arrayBuffer();
+  const packed = await deflateBody(body);
+  await idbPut({
+    key: cacheKeyFor(req),
+    url: req.url,
+    status: res.status,
+    statusText: res.statusText,
+    headers: [...res.headers.entries()],
+    body: packed.body,
+    encoding: packed.encoding,
+    cachedAt: Date.now(),
+  });
+}
+
+function cacheKeyFor(req) {
+  const url = new URL(req.url);
+  return url.pathname.replace(/^\//, '');
+}
+
+async function deflateBody(body) {
+  if (!('CompressionStream' in self)) {
+    return { body, encoding: null };
+  }
+  try {
+    const compressed = await new Response(
+      new Blob([body]).stream().pipeThrough(new CompressionStream('gzip')),
+    ).arrayBuffer();
+    return { body: compressed, encoding: 'gzip' };
+  } catch {
+    return { body, encoding: null };
+  }
+}
+
+async function inflateBody(body, encoding) {
+  if (encoding !== 'gzip') return body;
+  if (!('DecompressionStream' in self)) throw new Error('gzip data cached but DecompressionStream is unavailable');
+  return new Response(
+    new Blob([body]).stream().pipeThrough(new DecompressionStream('gzip')),
+  ).arrayBuffer();
+}
+
+function openDataDb() {
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in self)) {
+      reject(new Error('IndexedDB unavailable'));
+      return;
+    }
+    const request = indexedDB.open(DATA_DB, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(DATA_STORE, { keyPath: 'key' });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openDataDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DATA_STORE, 'readonly');
+    const request = tx.objectStore(DATA_STORE).get(key);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+    tx.oncomplete = () => db.close();
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
+}
+
+async function idbPut(record) {
+  const db = await openDataDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DATA_STORE, 'readwrite');
+    tx.objectStore(DATA_STORE).put(record);
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
 }

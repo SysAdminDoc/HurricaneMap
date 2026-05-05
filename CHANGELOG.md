@@ -20,7 +20,8 @@ All notable changes to HurricaneMap.
 - Added 3D wind-radii cone fans for focused modern storms, rendering 34/50/64 kt asymmetric HURDAT2 quadrants as translucent Cesium cone surfaces.
 - Added a storm-panel estimated population exposure metric for modern landfalling storms, combining HURDAT2 wind-radii geometry near landfall with the bundled state-density index and clear screening-estimate methodology copy.
 - Hardened the HURDAT2 auto-refresh workflow with a tested NOAA directory detector/downloader, safe unchanged-data handling, regenerated-data validation, and a correctly scoped automated pull request.
-- Bumped the service worker shell cache to `hm-v1.3.9-q17` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, 3D wind-cone renderer, and exposure estimator.
+- Added service-worker v2 offline data storage: historical JSON/GeoJSON/TXT datasets are preinstalled into compressed IndexedDB with CacheStorage fallback, while radar PNGs remain cache-first on demand to avoid oversized installs.
+- Bumped the service worker shell cache to `hm-v1.3.9-q18` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, 3D wind-cone renderer, exposure estimator, and offline data store.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 

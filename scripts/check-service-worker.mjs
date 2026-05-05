@@ -17,16 +17,38 @@ if (!/addEventListener\(\s*['"]message['"]/.test(source) || !/SKIP_WAITING/.test
   process.exit(1);
 }
 
-const shellMatch = source.match(/const\s+SHELL_ASSETS\s*=\s*\[([\s\S]*?)\];/);
-if (!shellMatch) {
+const shellAssets = parseAssetArray('SHELL_ASSETS');
+const offlineDataAssets = parseAssetArray('OFFLINE_DATA_ASSETS');
+
+if (!shellAssets) {
   console.error('sw.js does not define SHELL_ASSETS.');
   process.exit(1);
 }
+if (!offlineDataAssets) {
+  console.error('sw.js does not define OFFLINE_DATA_ASSETS.');
+  process.exit(1);
+}
 
-const assetMatches = [...shellMatch[1].matchAll(/['"](\.\/[^'"]*)['"]/g)];
-const assets = assetMatches.map(match => match[1]);
+const assets = [...shellAssets, ...offlineDataAssets];
 const errors = [];
 const seen = new Set();
+
+for (const required of [
+  './data/landfalls.json',
+  './data/storms.json',
+  './data/stats.json',
+  './data/metadata.json',
+  './data/us-states.geojson',
+  './data/radar/manifest.json',
+]) {
+  if (!offlineDataAssets.includes(required)) {
+    errors.push(`OFFLINE_DATA_ASSETS is missing required historical dataset: ${required}`);
+  }
+}
+
+if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/DecompressionStream/.test(source)) {
+  errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
+}
 
 for (const asset of assets) {
   if (seen.has(asset)) {
@@ -54,4 +76,10 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`service worker ok (${versionMatch[1]}, ${assets.length} shell assets)`);
+console.log(`service worker ok (${versionMatch[1]}, ${shellAssets.length} shell assets, ${offlineDataAssets.length} offline data assets)`);
+
+function parseAssetArray(name) {
+  const match = source.match(new RegExp(`const\\s+${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`));
+  if (!match) return null;
+  return [...match[1].matchAll(/['"](\.\/[^'"]*)['"]/g)].map(assetMatch => assetMatch[1]);
+}
