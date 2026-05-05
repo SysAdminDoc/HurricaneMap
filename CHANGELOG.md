@@ -23,6 +23,7 @@ All notable changes to HurricaneMap.
 - Added service-worker v2 offline data storage: historical JSON/GeoJSON/TXT datasets are preinstalled into compressed IndexedDB with CacheStorage fallback, while radar PNGs remain cache-first on demand to avoid oversized installs.
 - Added an esbuild bundle audit with a 100 KB gzipped initial-JS budget and moved non-critical panels, overlays, export/report flows, keyboard help, glossary, and 3D globe code behind dynamic imports.
 - Added a Cloudflare Worker CDN wrapper with route-aware cache headers, edge/browser TTL policy, image optimization hints, deployment docs, and a worker policy test.
+- Added Docker self-hosting support with a non-root Python HTTP server image, healthcheck, `.dockerignore`, self-hosting docs, and static packaging tests.
 - Bumped the service worker shell cache to `hm-v1.3.9-q19` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, 3D wind-cone renderer, exposure estimator, offline data store, and lazy-loading entrypoint.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)

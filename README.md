@@ -155,6 +155,8 @@ The monthly `HURDAT2 Auto-Refresh` GitHub Actions workflow runs the same refresh
 
 Optional edge deployment: [`docs/CLOUDFLARE_CDN.md`](docs/CLOUDFLARE_CDN.md) documents the Cloudflare Worker CDN wrapper, cache policy, image optimization hints, and curl checks for before/after latency validation.
 
+Self-hosting: [`docs/SELF_HOSTING.md`](docs/SELF_HOSTING.md) documents the Docker image, port mapping, healthcheck, and offline/intranet deployment notes.
+
 ## Data Export & Research
 
 **Export filtered data as publication-ready CSV:**
