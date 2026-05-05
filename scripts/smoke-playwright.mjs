@@ -122,6 +122,27 @@ try {
   await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
 
   await page.evaluate(async () => {
+    const updates = await import('/src/sw-updates.js');
+    document.querySelector('#hm-update-prompt')?.remove();
+    window.__swUpdateReload = false;
+    window.__swUpdatePrompt = updates.createUpdatePrompt({
+      onReload: () => { window.__swUpdateReload = true; },
+    });
+    window.__swUpdatePrompt.show();
+  });
+  await page.waitForSelector('#hm-update-prompt.is-visible', { timeout: 5000 });
+  const updatePromptText = await page.textContent('#hm-update-prompt');
+  assert(/Update available/.test(updatePromptText), 'service-worker update prompt title did not render.');
+  assert(/latest map shell and offline cache/.test(updatePromptText), 'service-worker update prompt help copy did not render.');
+  await page.click('#hm-update-prompt .hm-update-dismiss');
+  await page.waitForFunction(() => document.querySelector('#hm-update-prompt')?.hidden, { timeout: 5000 });
+  await page.evaluate(() => window.__swUpdatePrompt.show());
+  await page.click('#hm-update-prompt .hm-update-reload');
+  const reloadClicked = await page.evaluate(() => window.__swUpdateReload);
+  assert(reloadClicked === true, 'service-worker update prompt reload action did not fire.');
+  await page.evaluate(() => window.__swUpdatePrompt.hide());
+
+  await page.evaluate(async () => {
     const data = await import('/src/data.js');
     const panel = await import('/src/panel.js');
     await data.ensureStormsLoaded();

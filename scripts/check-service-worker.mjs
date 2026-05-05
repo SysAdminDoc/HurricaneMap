@@ -12,6 +12,11 @@ if (!versionMatch) {
   process.exit(1);
 }
 
+if (!/addEventListener\(\s*['"]message['"]/.test(source) || !/SKIP_WAITING/.test(source)) {
+  console.error('sw.js must listen for SKIP_WAITING messages so users control update activation.');
+  process.exit(1);
+}
+
 const shellMatch = source.match(/const\s+SHELL_ASSETS\s*=\s*\[([\s\S]*?)\];/);
 if (!shellMatch) {
   console.error('sw.js does not define SHELL_ASSETS.');
