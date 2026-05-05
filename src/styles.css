@@ -1281,19 +1281,50 @@ section.storm-panel.glass {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  max-width: calc(100vw - 32px);
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text);
 }
+.ab-main {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ab-text,
+.ab-status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ab-status {
+  color: var(--subtext);
+  font-size: 10px;
+  font-weight: 650;
+}
 .ab-pulse {
   display: inline-block;
+  flex: 0 0 auto;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #f38ba8;
   box-shadow: 0 0 12px #f38ba8;
   animation: ab-pulse 1.4s ease-in-out infinite;
+}
+.active-badge[data-state="updated"] .ab-pulse,
+.active-badge[data-state="ok"] .ab-pulse {
+  background: var(--success);
+  box-shadow: 0 0 12px rgba(166, 227, 161, 0.78);
+}
+.active-badge[data-state="rate-limit"] .ab-pulse {
+  background: var(--warning);
+  box-shadow: 0 0 12px rgba(249, 226, 175, 0.82);
+}
+.active-badge[data-state="error"] .ab-pulse {
+  background: var(--error);
+  box-shadow: 0 0 12px rgba(243, 139, 168, 0.78);
 }
 @keyframes ab-pulse {
   0%, 100% { opacity: 0.45; transform: scale(0.85); }
@@ -1319,7 +1350,7 @@ section.storm-panel.glass {
 }
 .goes-live-badge {
   position: absolute;
-  top: 54px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
