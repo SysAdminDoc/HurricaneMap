@@ -4,30 +4,15 @@ import {
   searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
-import { showStorm } from './panel.js';
-import { toggleStats } from './stats.js';
-import { showOnThisDate } from './on-this-date.js';
-import './compare.js';  // wires up the Compare button + pin tray
-import { enableStateClicks, openState } from './state.js';
-import { setSurgeCategory } from './surge.js';
-import { startActiveStormPolling } from './active.js';
-import { setPopulation } from './population.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
 import { initLocale, setLocale } from './i18n.js';
-import { maybeStartOnboarding } from './onboarding.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
 import { fuzzyAugment } from './fuzzy.js';
 import { recordView, getHistory } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
-import { initGlossary, showGlossary } from './glossary.js';
-import { init as initKeyboard } from './keyboard.js';
 import { initServiceWorkerUpdates } from './sw-updates.js';
-import { initGlobe3D, openGlobe3D } from './globe3d.js';
-import { exportPublicationCSV } from './export.js';
-import { generateStatisticalReport, downloadReportAsText } from './report.js';
-import { exportQGISGeoJSON } from './qgis.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
@@ -47,6 +32,74 @@ const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_
 let openStormId = null;
 let activeSearchIndex = -1;
 let currentVisibleLandfalls = [];
+
+function deferNonCritical(task) {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => task(), { timeout: 2500 });
+  } else {
+    setTimeout(task, 300);
+  }
+}
+
+function once(loader) {
+  let promise = null;
+  return () => {
+    if (!promise) promise = loader();
+    return promise;
+  };
+}
+
+const loadPanel = once(() => import('./panel.js'));
+const loadStats = once(() => import('./stats.js'));
+const loadOnThisDate = once(() => import('./on-this-date.js'));
+const loadCompare = once(() => import('./compare.js'));
+const loadState = once(() => import('./state.js'));
+const loadActive = once(() => import('./active.js'));
+const loadSurge = once(() => import('./surge.js'));
+const loadPopulation = once(() => import('./population.js'));
+const loadOnboarding = once(() => import('./onboarding.js'));
+const loadGlossary = once(() => import('./glossary.js'));
+const loadKeyboard = once(() => import('./keyboard.js'));
+const loadGlobe3D = once(() => import('./globe3d.js'));
+const loadExport = once(() => import('./export.js'));
+const loadReport = once(() => import('./report.js'));
+const loadQgis = once(() => import('./qgis.js'));
+
+async function showStormLazy(landfall) {
+  const { showStorm } = await loadPanel();
+  return showStorm(landfall);
+}
+
+async function openStateLazy(stateName) {
+  const { openState } = await loadState();
+  return openState(stateName);
+}
+
+async function setSurgeCategoryLazy(category) {
+  const { setSurgeCategory } = await loadSurge();
+  return setSurgeCategory(category);
+}
+
+async function setPopulationLazy(enabled) {
+  const { setPopulation } = await loadPopulation();
+  return setPopulation(enabled);
+}
+
+async function maybeStartOnboardingLazy(options) {
+  const { maybeStartOnboarding } = await loadOnboarding();
+  return maybeStartOnboarding(options);
+}
+
+async function openGlossaryLazy() {
+  const glossary = await loadGlossary();
+  await glossary.initGlossary();
+  glossary.showGlossary();
+}
+
+async function lazyStartActiveStormPolling() {
+  const { startActiveStormPolling } = await loadActive();
+  return startActiveStormPolling();
+}
 
 function writeHash() {
   const newHash = encodeHashState(filters, {
@@ -78,6 +131,7 @@ const els = {
   stormCount: document.getElementById('storm-count'),
   toggleFiltersBtn: document.getElementById('toggle-filters'),
   toggleStatsBtn: document.getElementById('toggle-stats'),
+  toggleCompareBtn: document.getElementById('toggle-compare'),
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleGlobeBtn: document.getElementById('toggle-globe3d'),
   toggleInfoBtn: document.getElementById('toggle-info'),
@@ -221,7 +275,6 @@ async function boot() {
     document.documentElement.classList.add('high-contrast');
   }
   const map = initMap();
-  initGlobe3D();
   await loadInitial();
   syncYearBoundsFromData();
   populateStateFilter();
@@ -247,14 +300,15 @@ async function boot() {
   });
   highlightYearRange(filters.yearMin, filters.yearMax);
   // State polygons (clickable for deep-dive). Lazy — fetches the geojson once.
-  enableStateClicks(map).catch(() => { /* non-fatal */ });
+  deferNonCritical(() => {
+    loadState().then(({ enableStateClicks }) => enableStateClicks(map)).catch(() => { /* non-fatal */ });
+  });
   // Live NHC active-storm feed — appears only when a storm is active.
-  startActiveStormPolling().catch(() => { /* non-fatal */ });
+  deferNonCritical(() => {
+    lazyStartActiveStormPolling();
+  });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
   renderDataProvenance();
-  
-  // Initialize glossary (loads data asynchronously, non-blocking)
-  initGlossary().catch(() => { /* non-fatal */ });
   
   // Initialize keyboard shortcuts and navigation
   // Wire macro filter functions to window
@@ -264,7 +318,9 @@ async function boot() {
       applyFilters();
     }
   };
-  initKeyboard();
+  deferNonCritical(() => {
+    loadKeyboard().then(({ init }) => init()).catch(() => { /* non-fatal */ });
+  });
   
   els.loading.classList.add('fade-out');
   setTimeout(() => { els.loading.style.display = 'none'; }, 420);
@@ -279,10 +335,10 @@ async function boot() {
     }
   }
   if (restored && restored.s) {
-    setTimeout(() => openState(restored.s), 80);
+    setTimeout(() => openStateLazy(restored.s), 80);
   }
   // First-run tour is delayed until the map, filters, and timeline are stable.
-  setTimeout(() => maybeStartOnboarding(), 700);
+  setTimeout(() => maybeStartOnboardingLazy(), 700);
 }
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
@@ -399,7 +455,7 @@ function wireSettingsControls() {
     replayTour.addEventListener('click', () => {
       menu.setAttribute('hidden', '');
       cog.setAttribute('aria-expanded', 'false');
-      maybeStartOnboarding({ force: true });
+      maybeStartOnboardingLazy({ force: true });
     });
   }
 
@@ -522,10 +578,12 @@ async function redrawTracks(visible) {
 
 function onLandfallClick(landfall, marker) {
   focusLandfall(landfall);
-  showStorm(landfall);
   openStormId = landfall.storm_id;
   recordView(landfall);
   writeHash();
+  showStormLazy(landfall).catch((error) => {
+    console.error('Failed to open storm panel:', error);
+  });
 }
 
 document.addEventListener('storm-panel:close', () => {
@@ -586,7 +644,7 @@ function wireUI() {
   els.stateFilter.addEventListener('change', () => {
     filters.state = els.stateFilter.value;
     applyFilters();
-    if (filters.state) openState(filters.state);
+    if (filters.state) openStateLazy(filters.state);
   });
 
   // Search
@@ -765,12 +823,12 @@ function wireUI() {
   // Storm-surge SLOSH MOM tile layer (per category).
   els.surgeCategory.addEventListener('change', () => {
     const v = parseInt(els.surgeCategory.value, 10);
-    setSurgeCategory(Number.isFinite(v) && v > 0 ? v : null);
+    setSurgeCategoryLazy(Number.isFinite(v) && v > 0 ? v : null);
   });
 
   // Population density overlay.
   els.showPopulation.addEventListener('change', () => {
-    setPopulation(els.showPopulation.checked);
+    setPopulationLazy(els.showPopulation.checked);
   });
 
   // Reset
@@ -779,8 +837,8 @@ function wireUI() {
     syncFilterUiFromState();
     els.surgeCategory.value = '';
     els.showPopulation.checked = false;
-    setSurgeCategory(null);
-    setPopulation(false);
+    setSurgeCategoryLazy(null);
+    setPopulationLazy(false);
     lastTracksKey = '';
     applyFilters();
   });
@@ -797,14 +855,29 @@ function wireUI() {
   });
 
   // Stats panel toggle
-  els.toggleStatsBtn.addEventListener('click', toggleStats);
+  els.toggleStatsBtn.addEventListener('click', async () => {
+    const { toggleStats } = await loadStats();
+    toggleStats();
+  });
+
+  // Compare panel is loaded on first use; pinning from a storm panel imports
+  // the same module, so the tray and pinned state stay shared.
+  els.toggleCompareBtn?.addEventListener('click', async () => {
+    const { openComparePanel } = await loadCompare();
+    openComparePanel();
+  });
 
   // On this date panel
-  els.toggleOnThisDateBtn.addEventListener('click', showOnThisDate);
+  els.toggleOnThisDateBtn.addEventListener('click', async () => {
+    const { showOnThisDate } = await loadOnThisDate();
+    showOnThisDate();
+  });
 
   // Opt-in 3D globe view. Cesium loads only when the user opens this mode.
-  els.toggleGlobeBtn?.addEventListener('click', () => {
-    openGlobe3D({ landfalls: currentVisibleLandfalls, focusStormId: openStormId });
+  els.toggleGlobeBtn?.addEventListener('click', async () => {
+    const globe = await loadGlobe3D();
+    globe.initGlobe3D();
+    globe.openGlobe3D({ landfalls: currentVisibleLandfalls, focusStormId: openStormId });
   });
 
   wireMobileActionsMenu();
@@ -824,14 +897,16 @@ function wireUI() {
 
   // Export button
   if (els.exportBtn) {
-    els.exportBtn.addEventListener('click', () => {
+    els.exportBtn.addEventListener('click', async () => {
+      const { exportPublicationCSV } = await loadExport();
       exportPublicationCSV(filters);
     });
   }
 
   // Report button
   if (els.reportBtn) {
-    els.reportBtn.addEventListener('click', () => {
+    els.reportBtn.addEventListener('click', async () => {
+      const { generateStatisticalReport, downloadReportAsText } = await loadReport();
       const { markdown, title } = generateStatisticalReport(filters);
       downloadReportAsText(markdown, title);
     });
@@ -839,7 +914,8 @@ function wireUI() {
 
   // QGIS export button
   if (els.qgisBtn) {
-    els.qgisBtn.addEventListener('click', () => {
+    els.qgisBtn.addEventListener('click', async () => {
+      const { exportQGISGeoJSON } = await loadQgis();
       exportQGISGeoJSON(filters);
     });
   }
@@ -847,7 +923,7 @@ function wireUI() {
   // Glossary modal
   const glossaryBtn = document.getElementById('toggle-glossary');
   if (glossaryBtn) {
-    glossaryBtn.addEventListener('click', showGlossary);
+    glossaryBtn.addEventListener('click', openGlossaryLazy);
   }
 }
 

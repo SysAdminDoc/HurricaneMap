@@ -28,6 +28,7 @@ Thumbs.db
 # Build / dist
 dist/
 build/
+.tmp-bundle/
 *.tgz
 node_modules/
 npm-debug.log*
