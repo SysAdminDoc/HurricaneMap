@@ -17,7 +17,8 @@ All notable changes to HurricaneMap.
 - Added official NHC active-storm cone rendering from the Esri/NHC GeoJSON forecast layers, including observed-track and forecast-track context plus a settings toggle.
 - Added NOAA/NCEI Storm Events tornado and hail aggregates to storm panels, matched to affected states around U.S. landfall windows.
 - Added an opt-in Cesium-powered 3D storm globe with elevated wind-scaled tracks, category coloring, focus/reset controls, and a timeline scrubber for visible selections.
-- Bumped the service worker shell cache to `hm-v1.3.9-q15` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, and 3D globe shell module.
+- Added 3D wind-radii cone fans for focused modern storms, rendering 34/50/64 kt asymmetric HURDAT2 quadrants as translucent Cesium cone surfaces.
+- Bumped the service worker shell cache to `hm-v1.3.9-q16` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, and 3D wind-cone renderer.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 
