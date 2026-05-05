@@ -41,12 +41,13 @@ function assertNumberInRange(value, min, max, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
   readJson('data/impacts.json'),
   readJson('data/glossary.json'),
+  readJson('data/metadata.json'),
 ]);
 
 if (!Array.isArray(landfalls)) fail('data/landfalls.json must contain an array.');
@@ -54,6 +55,7 @@ if (!Array.isArray(storms)) fail('data/storms.json must contain an array.');
 if (!isObject(stats)) fail('data/stats.json must contain an object.');
 if (!isObject(impacts)) fail('data/impacts.json must contain an object.');
 if (!Array.isArray(glossary)) fail('data/glossary.json must contain an array.');
+if (!isObject(metadata)) fail('data/metadata.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
@@ -155,6 +157,78 @@ if (!Array.isArray(stats.year_range) || stats.year_range.length !== 2) {
   const maxYear = Math.max(...years);
   if (stats.year_range[0] !== minYear || stats.year_range[1] !== maxYear) {
     fail(`stats.year_range ${JSON.stringify(stats.year_range)} does not match landfall years [${minYear},${maxYear}].`);
+  }
+}
+
+if (metadata.schema_version !== 1) fail('metadata.schema_version must be 1.');
+if (!validIsoDate(metadata.generated_at_utc)) fail('metadata.generated_at_utc must be an ISO timestamp.');
+if (!isObject(metadata.generator)) {
+  fail('metadata.generator must contain generator details.');
+} else {
+  if (typeof metadata.generator.name !== 'string' || !metadata.generator.name) fail('metadata.generator.name is required.');
+  if (typeof metadata.generator.app_version !== 'string' || !metadata.generator.app_version) fail('metadata.generator.app_version is required.');
+}
+if (!isObject(metadata.coverage)) {
+  fail('metadata.coverage must contain coverage details.');
+} else {
+  if (metadata.coverage.storm_count !== stats.total_storms) {
+    fail(`metadata.coverage.storm_count ${metadata.coverage.storm_count} does not match stats.total_storms ${stats.total_storms}.`);
+  }
+  if (metadata.coverage.landfall_event_count !== stats.total_landfall_events) {
+    fail(`metadata.coverage.landfall_event_count ${metadata.coverage.landfall_event_count} does not match stats.total_landfall_events ${stats.total_landfall_events}.`);
+  }
+  if (metadata.coverage.hurricane_landfall_count !== stats.total_hurricane_landfalls) {
+    fail(`metadata.coverage.hurricane_landfall_count ${metadata.coverage.hurricane_landfall_count} does not match stats.total_hurricane_landfalls ${stats.total_hurricane_landfalls}.`);
+  }
+  if (JSON.stringify(metadata.coverage.year_range) !== JSON.stringify(stats.year_range)) {
+    fail(`metadata.coverage.year_range ${JSON.stringify(metadata.coverage.year_range)} does not match stats.year_range ${JSON.stringify(stats.year_range)}.`);
+  }
+  if (!Array.isArray(metadata.coverage.basins) || !metadata.coverage.basins.includes('AL') || !metadata.coverage.basins.includes('EP')) {
+    fail('metadata.coverage.basins must include AL and EP.');
+  }
+}
+if (!Array.isArray(metadata.sources) || metadata.sources.length < 2) {
+  fail('metadata.sources must contain Atlantic and Eastern Pacific source entries.');
+} else {
+  const seenSources = new Set();
+  for (const [index, source] of metadata.sources.entries()) {
+    const label = `metadata.sources[${index}]`;
+    if (!isObject(source)) {
+      fail(`${label}: source must be an object.`);
+      continue;
+    }
+    if (typeof source.id !== 'string' || !source.id) fail(`${label}.id is required.`);
+    if (seenSources.has(source.id)) fail(`${label}.id is duplicated.`);
+    seenSources.add(source.id);
+    if (typeof source.basin !== 'string' || !source.basin) fail(`${label}.basin is required.`);
+    if (!stats.generated_from?.includes(source.filename)) fail(`${label}.filename ${source.filename} is not listed in stats.generated_from.`);
+    if (typeof source.path !== 'string' || !source.path.startsWith('data/')) fail(`${label}.path must be a data/ path.`);
+    if (!Number.isInteger(source.size_bytes) || source.size_bytes <= 0) fail(`${label}.size_bytes must be positive.`);
+    if (!validIsoDate(source.modified_utc)) fail(`${label}.modified_utc must be an ISO timestamp.`);
+    if (!Number.isInteger(source.storm_count) || source.storm_count <= 0) fail(`${label}.storm_count must be positive.`);
+    if (!Array.isArray(source.storm_year_range) || source.storm_year_range.length !== 2) {
+      fail(`${label}.storm_year_range must be [minYear, maxYear].`);
+    } else if (!source.storm_year_range.every(Number.isInteger)) {
+      fail(`${label}.storm_year_range values must be integers.`);
+    }
+  }
+}
+if (!isObject(metadata.outputs)) {
+  fail('metadata.outputs must describe generated output files.');
+} else {
+  for (const [key, expectedPath] of Object.entries({
+    landfalls: 'data/landfalls.json',
+    storms: 'data/storms.json',
+    stats: 'data/stats.json',
+  })) {
+    const output = metadata.outputs[key];
+    if (!isObject(output)) {
+      fail(`metadata.outputs.${key} must be an object.`);
+      continue;
+    }
+    if (output.path !== expectedPath) fail(`metadata.outputs.${key}.path must be ${expectedPath}.`);
+    if (!Number.isInteger(output.size_bytes) || output.size_bytes <= 0) fail(`metadata.outputs.${key}.size_bytes must be positive.`);
+    if (!validIsoDate(output.modified_utc)) fail(`metadata.outputs.${key}.modified_utc must be an ISO timestamp.`);
   }
 }
 

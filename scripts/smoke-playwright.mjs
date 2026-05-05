@@ -108,6 +108,19 @@ try {
   assert(restored.categories.length === 6 && restored.categories.every(category => category.on && category.pressed === 'true'), 'invalid category hash did not restore default categories');
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
 
+  await page.click('#toggle-info');
+  await page.waitForFunction(() => {
+    const modal = document.querySelector('#info-modal');
+    const text = document.querySelector('#data-provenance-body')?.textContent || '';
+    return modal && !modal.hidden && text.includes('hurdat2-atlantic.txt') && text.includes('1851-2025');
+  }, { timeout: 5000 });
+  const provenanceText = await page.textContent('#data-provenance-body');
+  assert(/596\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
+  assert(/760\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
+  assert(/HurricaneMap 1\.3\.9/.test(provenanceText), 'About provenance did not render the generator app version.');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
+
   await page.evaluate(async () => {
     const data = await import('/src/data.js');
     const panel = await import('/src/panel.js');

@@ -23,7 +23,7 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 ## Quality plan
 
-The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md). It covers regression automation, data contracts, URL state, service-worker update UX, accessibility coverage, visual snapshots, and maintainability work.
+The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md). It covers regression automation, data contracts, URL state, data provenance, service-worker update UX, accessibility coverage, visual snapshots, and maintainability work.
 
 Local verification:
 
@@ -185,6 +185,7 @@ HurricaneMap/
 │   ├── landfalls.json          # flat list, one entry per US landfall event
 │   ├── storms.json             # full track + metadata for every US-landfalling storm
 │   ├── stats.json              # pre-computed stats: by state, decade, category, cold spots
+│   ├── metadata.json           # generated source provenance, coverage, and output metadata
 │   └── radar/                  # archived NEXRAD composites (~512 MB, 1700+ frames)
 │       ├── manifest.json           # storm_id → {landfalls, frames}
 │       ├── Katrina-2005/           # one folder per storm
@@ -232,6 +233,10 @@ A storm's **headline landfall category** is the highest category recorded at *an
 - **Hawaii 1959 Hurricane Dot, 1992 Iniki** etc. are inferred landfalls because HURDAT2's `L` marker convention doesn't apply outside continental U.S. The category is interpolated from the nearest 6-hour position.
 
 ## Data Sources, Licensing & Attribution
+
+### Data build provenance
+
+Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the source HURDAT2 filenames, local source modification dates, source storm-year ranges, output file metadata, generator name, app version, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing.
 
 ### Open Data License Clarity
 
@@ -347,7 +352,7 @@ curl -sSL -o data/hurdat2-nepac.txt \
 python scripts/preprocess_hurdat2.py
 ```
 
-Then bump the version, update `CHANGELOG.md`, commit, and create a release.
+The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.
 
 ## License & Attribution
 
