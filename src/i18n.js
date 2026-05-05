@@ -323,7 +323,12 @@ export function t(key, ...args) {
 
 export function initLocale() {
   // Check localStorage for saved locale preference
-  const saved = localStorage.getItem('hm-locale-v1');
+  let saved = null;
+  try {
+    saved = localStorage.getItem('hm-locale-v1');
+  } catch {
+    saved = null;
+  }
   if (saved === LOCALE_ES) {
     setLocale(LOCALE_ES);
   } else {
@@ -339,6 +344,10 @@ export function initLocale() {
 export function toggleLocale() {
   const newLocale = currentLocale === LOCALE_EN ? LOCALE_ES : LOCALE_EN;
   setLocale(newLocale);
-  localStorage.setItem('hm-locale-v1', newLocale);
+  try {
+    localStorage.setItem('hm-locale-v1', newLocale);
+  } catch {
+    /* private mode / blocked storage — locale still applies for this page */
+  }
   location.reload();
 }

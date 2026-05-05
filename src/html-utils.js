@@ -18,6 +18,23 @@ export function escapeHtml(s) {
 }
 
 /**
+ * Validate an externally supplied URL before inserting it into href/src.
+ * Returns an escaped absolute URL, or an empty string when the protocol is unsafe.
+ */
+export function safeExternalUrl(value, { protocols = ['https:', 'http:'] } = {}) {
+  if (!value) return '';
+  try {
+    const base = typeof window !== 'undefined' && window.location?.href
+      ? window.location.href
+      : 'https://example.invalid/';
+    const url = new URL(String(value), base);
+    return protocols.includes(url.protocol) ? escapeHtml(url.href) : '';
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Format HURDAT2 storm names consistently across UI and exports.
  * Data is usually uppercase; unnamed/blank records need stable fallback copy.
  */
