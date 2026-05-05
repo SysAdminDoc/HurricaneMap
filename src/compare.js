@@ -17,7 +17,6 @@ const MAX_PINS = 4;
 const PIN_COLORS = ['#cba6f7', '#74c7ec', '#fab387', '#a6e3a1'];
 
 const tray = ensureTray();
-const compareBtn = document.getElementById('toggle-compare');
 const comparePanel = document.getElementById('compare-panel');
 const compareBody = document.getElementById('compare-body');
 const compareCloseBtn = document.getElementById('close-compare');
@@ -44,7 +43,6 @@ function ensureTray() {
   return el;
 }
 
-if (compareBtn) compareBtn.addEventListener('click', openComparePanel);
 if (compareCloseBtn) compareCloseBtn.addEventListener('click', () => {
   hidePanel('compare-panel');
 });
@@ -142,7 +140,7 @@ function refreshTray() {
   });
 }
 
-function openComparePanel() {
+export function openComparePanel() {
   showPanel('compare-panel');
   if (!pinned.length) {
     // If user clicks Compare with no pins, show a hint instead of an empty panel.
