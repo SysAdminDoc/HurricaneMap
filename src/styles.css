@@ -3657,7 +3657,7 @@ html.light-theme .panel-sticky-header {
   z-index: 3200;
   display: grid;
   gap: 8px;
-  max-width: min(360px, calc(100vw - 32px));
+  max-width: min(420px, calc(100vw - 32px));
 }
 
 .hm-toast {
@@ -3679,6 +3679,50 @@ html.light-theme .panel-sticky-header {
 
 .hm-toast--warn {
   border-color: rgba(249, 226, 175, 0.34);
+}
+
+.hm-update-prompt {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+.hm-update-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hm-update-copy strong {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.hm-update-copy span {
+  color: var(--subtext);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.hm-update-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hm-update-reload {
+  min-height: 34px;
+  padding-inline: 12px;
+}
+
+.hm-update-dismiss {
+  width: 34px;
+  height: 34px;
 }
 
 .keyboard-palette {
@@ -3977,6 +4021,15 @@ kbd {
     right: 8px;
     left: 8px;
     bottom: 112px;
+  }
+
+  .hm-update-prompt {
+    grid-template-columns: 1fr;
+    width: auto;
+  }
+
+  .hm-update-actions {
+    justify-content: flex-end;
   }
 }
 

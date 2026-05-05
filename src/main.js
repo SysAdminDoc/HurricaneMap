@@ -23,6 +23,7 @@ import { recordView, getHistory } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
 import { initGlossary, showGlossary } from './glossary.js';
 import { init as initKeyboard } from './keyboard.js';
+import { initServiceWorkerUpdates } from './sw-updates.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
@@ -866,10 +867,4 @@ boot().catch(err => {
   els.loading.querySelector('.boot-retry-btn')?.addEventListener('click', () => window.location.reload());
 });
 
-// Register the service worker for offline-first behavior + tile caching.
-// Skipped on file:// (where SW APIs are unavailable) and on insecure origins.
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => { /* non-fatal */ });
-  });
-}
+initServiceWorkerUpdates();

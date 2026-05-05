@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9';
+const SW_VERSION = 'hm-v1.3.9-q7';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -26,6 +26,7 @@ const SHELL_ASSETS = [
   './src/panels.js',
   './src/stats.js',
   './src/state.js',
+  './src/sw-updates.js',
   './src/on-this-date.js',
   './src/glossary.js',
   './src/keyboard.js',
@@ -74,8 +75,13 @@ self.addEventListener('install', (event) => {
         if (res.ok) await cache.put(url, res);
       } catch { /* offline-first install — ignore */ }
     }));
-    self.skipWaiting();
   })());
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {

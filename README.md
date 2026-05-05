@@ -25,6 +25,8 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md). It covers regression automation, data contracts, URL state, data provenance, service-worker update UX, accessibility coverage, visual snapshots, and maintainability work.
 
+The app uses an offline-first service worker. When shell assets change, bump `SW_VERSION` in `sw.js`; installed users will then see an in-app reload prompt instead of silently staying on stale UI.
+
 Local verification:
 
 ```bash
