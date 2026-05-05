@@ -39,6 +39,8 @@ export function maybeStartOnboarding({ force = false } = {}) {
 
 function start() {
   let idx = 0;
+  let finished = false;
+  const previousFocus = document.activeElement;
   const overlay = document.createElement('div');
   overlay.className = 'onb-overlay';
   overlay.setAttribute('role', 'dialog');
@@ -90,7 +92,7 @@ function start() {
       spotlight.style.width = `${r.width + pad * 2}px`;
       spotlight.style.height = `${r.height + pad * 2}px`;
       // Position card relative to spotlight.
-      const cardW = 320;
+      const cardW = Math.min(340, window.innerWidth - 32);
       let cx = r.left + r.width / 2 - cardW / 2;
       let cy = r.bottom + 16;
       const winH = window.innerHeight;
@@ -108,10 +110,34 @@ function start() {
   }
 
   function finish() {
+    if (finished) return;
+    finished = true;
     setSetting('onboarded', true);
     overlay.classList.add('fade-out');
     document.body.classList.remove('onb-active');
-    setTimeout(() => overlay.remove(), 220);
+    window.removeEventListener('resize', place);
+    document.removeEventListener('keydown', trapFocus);
+    setTimeout(() => {
+      overlay.remove();
+      if (previousFocus && typeof previousFocus.focus === 'function') {
+        previousFocus.focus({ preventScroll: true });
+      }
+    }, 220);
+  }
+
+  function trapFocus(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = [...overlay.querySelectorAll('button:not(:disabled), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   nextBtn.addEventListener('click', () => {
@@ -131,5 +157,7 @@ function start() {
     else if (e.key === 'ArrowLeft') prevBtn.click();
   });
   window.addEventListener('resize', place);
+  document.addEventListener('keydown', trapFocus);
   place();
+  nextBtn.focus({ preventScroll: true });
 }

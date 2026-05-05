@@ -56,42 +56,43 @@
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14 12.94a7.49 7.49 0 0 0 .05-.94 7.49 7.49 0 0 0-.05-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.03 7.03 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.48a.5.5 0 0 0 .12.64l2.03 1.58a7.49 7.49 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54a7.03 7.03 0 0 0 1.62-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/></svg>
       </button>
     </div>
-    <div class="settings-menu glass" id="settings-menu" role="menu" aria-label="Settings" hidden>
+    <div class="settings-menu glass" id="settings-menu" role="dialog" aria-modal="false" aria-labelledby="settings-menu-title" hidden>
+      <h2 id="settings-menu-title" class="sr-only">Display settings</h2>
       <div class="settings-row">
         <div class="settings-label">Wind units</div>
-        <div class="settings-pillgroup" role="group" aria-label="Wind unit">
-          <button class="settings-pill" data-set-unit="kt" role="menuitemradio">Knots</button>
-          <button class="settings-pill" data-set-unit="mph" role="menuitemradio">mph</button>
-          <button class="settings-pill" data-set-unit="kmh" role="menuitemradio">km/h</button>
+        <div class="settings-pillgroup" role="radiogroup" aria-label="Wind unit">
+          <button class="settings-pill" data-set-unit="kt" role="radio">Knots</button>
+          <button class="settings-pill" data-set-unit="mph" role="radio">mph</button>
+          <button class="settings-pill" data-set-unit="kmh" role="radio">km/h</button>
         </div>
       </div>
       <div class="settings-row">
         <div class="settings-label">Theme</div>
-        <div class="settings-pillgroup" role="group" aria-label="Theme">
-          <button class="settings-pill" data-set-theme="dark" role="menuitemradio" title="Dark theme (Catppuccin Mocha)">Dark</button>
-          <button class="settings-pill" data-set-theme="light" role="menuitemradio" title="Light theme (Catppuccin Latte)">Light</button>
-          <button class="settings-pill" data-set-theme="system" role="menuitemradio" title="Follow your operating system color scheme">System</button>
+        <div class="settings-pillgroup" role="radiogroup" aria-label="Theme">
+          <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)">Dark</button>
+          <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)">Light</button>
+          <button class="settings-pill" data-set-theme="system" role="radio" title="Follow your operating system color scheme">System</button>
         </div>
       </div>
       <div class="settings-row">
         <div class="settings-label">Color palette</div>
-        <div class="settings-pillgroup" role="group" aria-label="Color palette">
-          <button class="settings-pill" data-set-palette="default" role="menuitemradio">Default</button>
-          <button class="settings-pill" data-set-palette="colorblind" role="menuitemradio" title="ColorBrewer YlOrRd — sequential, distinguishable for deuteranopia/protanopia/tritanopia">Colorblind</button>
+        <div class="settings-pillgroup" role="radiogroup" aria-label="Color palette">
+          <button class="settings-pill" data-set-palette="default" role="radio">Default</button>
+          <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd — sequential, distinguishable for deuteranopia/protanopia/tritanopia">Colorblind</button>
         </div>
       </div>
       <div class="settings-row">
         <div class="settings-label">Language</div>
-        <div class="settings-pillgroup" role="group" aria-label="Language">
-          <button class="settings-pill" data-set-locale="en" role="menuitemradio">English</button>
-          <button class="settings-pill" data-set-locale="es" role="menuitemradio">Español</button>
+        <div class="settings-pillgroup" role="radiogroup" aria-label="Language">
+          <button class="settings-pill" data-set-locale="en" role="radio">English</button>
+          <button class="settings-pill" data-set-locale="es" role="radio">Español</button>
         </div>
       </div>
       <div class="settings-row">
         <div class="settings-label">Damage figures</div>
-        <div class="settings-pillgroup" role="group" aria-label="Damage adjustment">
-          <button class="settings-pill" data-set-damage="nominal" role="menuitemradio" title="Nominal USD at year-of-storm">Nominal</button>
-          <button class="settings-pill" data-set-damage="real" role="menuitemradio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
+        <div class="settings-pillgroup" role="radiogroup" aria-label="Damage adjustment">
+          <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm">Nominal</button>
+          <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
         </div>
       </div>
       <div class="settings-row">
@@ -177,7 +178,7 @@
     </div>
     <div class="filter-row filter-footer">
       <button id="reset-filters" class="text-btn">Reset filters</button>
-      <span class="visible-count" id="visible-count"></span>
+      <span class="visible-count" id="visible-count" role="status" aria-live="polite"></span>
     </div>
     <div class="filter-legend" aria-label="Saffir-Simpson at landfall">
       <h2 class="legend-heading">Saffir-Simpson at landfall</h2>
@@ -270,7 +271,7 @@
     </div>
   </section>
 
-  <div class="loading" id="loading">
+  <div class="loading" id="loading" role="status" aria-live="polite" aria-label="Loading HurricaneMap data">
     <div class="spinner" aria-hidden="true">
       <svg class="hurricane-icon" viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5">
         <!-- Outer spiral -->

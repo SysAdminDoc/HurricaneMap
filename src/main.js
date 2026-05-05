@@ -212,8 +212,8 @@ async function boot() {
   if (restored && restored.s) {
     setTimeout(() => openState(restored.s), 80);
   }
-  // Onboarding disabled — users go straight to the map with no interruption.
-  // setTimeout(() => maybeStartOnboarding(), 600);
+  // First-run tour is delayed until the map, filters, and timeline are stable.
+  setTimeout(() => maybeStartOnboarding(), 700);
 }
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
