@@ -12,8 +12,9 @@
     "test:filter-state": "node scripts/test-filter-state.mjs",
     "test:impact-utils": "node scripts/test-impact-utils.mjs",
     "test:similarity-vectors": "node scripts/test-similarity-vectors.mjs",
+    "test:cone-utils": "node scripts/test-cone-utils.mjs",
     "test:smoke": "node scripts/smoke-playwright.mjs",
-    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:impact-utils && npm run test:similarity-vectors",
+    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:impact-utils && npm run test:similarity-vectors && npm run test:cone-utils",
     "test": "npm run build && npm run test:smoke"
   },
   "devDependencies": {

@@ -4,7 +4,12 @@
 // style. Optionally overlays GFS/ECMWF ensemble spaghetti tracks.
 
 import { getMap } from './map.js';
-import { renderEnsembleTracks, hideEnsembleTracks, clearEnsembleCache } from './ensemble.js';
+import { renderEnsembleTracks, hideEnsembleTracks } from './ensemble.js';
+import {
+  clearOfficialForecastCache,
+  clearOfficialForecastContext,
+  renderOfficialForecastContext,
+} from './cone.js';
 import { getSetting } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
@@ -23,7 +28,7 @@ let lastStorms = null;
 export async function startActiveStormPolling() {
   // Listen for ensemble toggle changes
   document.addEventListener('hm-settings:change', (e) => {
-    if (e.detail.key === 'ensembleTracks') {
+    if (e.detail.key === 'ensembleTracks' || e.detail.key === 'nhcForecastCone') {
       if (lastStorms) {
         renderActive(lastStorms);
       }
@@ -53,6 +58,8 @@ async function fetchAndRender() {
       layerGroup = null;
     }
     hideEnsembleTracks();
+    clearOfficialForecastContext();
+    clearOfficialForecastCache();
     return;
   }
   renderActive(storms);
@@ -134,6 +141,12 @@ async function renderActive(storms) {
     }
   }
   layerGroup.addTo(map);
+
+  const officialConeEnabled = getSetting('nhcForecastCone');
+  await renderOfficialForecastContext(storms, {
+    map,
+    enabled: officialConeEnabled,
+  });
 
   // Render ensemble tracks if enabled
   const ensembleEnabled = getSetting('ensembleTracks');
