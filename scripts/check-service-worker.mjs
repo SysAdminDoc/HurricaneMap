@@ -50,6 +50,12 @@ if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/De
   errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
 }
 
+const radarBranch = source.indexOf('if (isRadarAsset(url))');
+const shellBranch = source.indexOf('if (isShell(url))');
+if (radarBranch < 0 || shellBranch < 0 || radarBranch > shellBranch) {
+  errors.push('fetch handler must route radar PNGs before generic shell/image caching.');
+}
+
 for (const asset of assets) {
   if (seen.has(asset)) {
     errors.push(`Duplicate shell asset: ${asset}`);

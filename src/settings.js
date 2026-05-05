@@ -19,6 +19,22 @@ const DEFAULTS = {
   onboarded: false,
 };
 
+const VALID_VALUES = {
+  windUnit: new Set(['kt', 'mph', 'kmh']),
+  theme: new Set(['dark', 'light', 'system']),
+  palette: new Set(['default', 'colorblind']),
+  damageMode: new Set(['nominal', 'real']),
+  locale: new Set(['en', 'es']),
+};
+
+const BOOLEAN_KEYS = new Set([
+  'nhcForecastCone',
+  'ensembleTracks',
+  'goesRealtime',
+  'highContrast',
+  'onboarded',
+]);
+
 let _state = null;
 let themeMediaQuery = null;
 let themeMediaListenerAttached = false;
@@ -27,7 +43,7 @@ function load() {
   if (_state) return _state;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    _state = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+    _state = raw ? normalizeSettings(JSON.parse(raw)) : { ...DEFAULTS };
   } catch {
     _state = { ...DEFAULTS };
   }
@@ -45,10 +61,13 @@ export function getSetting(key) {
 
 export function setSetting(key, value) {
   load();
-  if (_state[key] === value) return;
-  _state[key] = value;
+  if (!Object.prototype.hasOwnProperty.call(DEFAULTS, key)) return;
+  const nextState = normalizeSettings({ ..._state, [key]: value });
+  const nextValue = nextState[key];
+  if (_state[key] === nextValue) return;
+  _state = nextState;
   save();
-  document.dispatchEvent(new CustomEvent('hm-settings:change', { detail: { key, value } }));
+  document.dispatchEvent(new CustomEvent('hm-settings:change', { detail: { key, value: nextValue } }));
 }
 
 function prefersLightTheme() {
@@ -139,4 +158,16 @@ export function applyThemeToRoot() {
   document.documentElement.classList.toggle('light-theme', effectiveTheme === 'light');
   document.documentElement.dataset.theme = effectiveTheme;
   document.documentElement.dataset.themeSetting = theme;
+}
+
+export function normalizeSettings(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  const next = { ...DEFAULTS };
+  for (const [key, allowed] of Object.entries(VALID_VALUES)) {
+    if (allowed.has(source[key])) next[key] = source[key];
+  }
+  for (const key of BOOLEAN_KEYS) {
+    if (typeof source[key] === 'boolean') next[key] = source[key];
+  }
+  return next;
 }

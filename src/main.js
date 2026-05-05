@@ -704,11 +704,13 @@ function wireUI() {
     setSearchOpen(true);
     els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
       history.map(h => {
-        const name = formatStormName(h.name);
-        const cat = categoryLabel(h.category);
-        return `<li data-storm-id="${h.storm_id}" data-t="${h.t}" data-lat="${h.lat}" data-lon="${h.lon}" role="option" tabindex="-1">
-          <span class="search-result-spark-host" data-storm-id="${h.storm_id}" aria-hidden="true"></span>
-          <span class="search-result-text"><strong>${h.year}</strong> ${name} <span class="search-result-meta">· ${cat} ${h.state || ''}</span></span>
+        const name = escapeHtml(formatStormName(h.name));
+        const cat = escapeHtml(categoryLabel(h.category));
+        const state = escapeHtml(h.state || '');
+        const stormId = escapeHtml(h.storm_id);
+        return `<li data-storm-id="${stormId}" data-t="${escapeHtml(h.t)}" data-lat="${escapeHtml(h.lat)}" data-lon="${escapeHtml(h.lon)}" role="option" tabindex="-1">
+          <span class="search-result-spark-host" data-storm-id="${stormId}" aria-hidden="true"></span>
+          <span class="search-result-text"><strong>${escapeHtml(h.year)}</strong> ${name} <span class="search-result-meta">· ${cat} ${state}</span></span>
         </li>`;
       }).join('');
     backfillSparklines();
@@ -800,9 +802,10 @@ function wireUI() {
       const cat = categoryLabel(lf.category);
       const safeName = escapeHtml(name);
       const safeState = escapeHtml(lf.state || '');
-      return `<li data-storm-id="${lf.storm_id}" data-t="${lf.t}" data-lat="${lf.lat}" data-lon="${lf.lon}" role="option" tabindex="-1">
-        <span class="search-result-spark-host" data-storm-id="${lf.storm_id}" aria-hidden="true"></span>
-        <span class="search-result-text"><strong>${lf.year}</strong> ${safeName} <span class="search-result-meta">· ${cat} ${safeState}</span></span>
+      const safeStormId = escapeHtml(lf.storm_id);
+      return `<li data-storm-id="${safeStormId}" data-t="${escapeHtml(lf.t)}" data-lat="${escapeHtml(lf.lat)}" data-lon="${escapeHtml(lf.lon)}" role="option" tabindex="-1">
+        <span class="search-result-spark-host" data-storm-id="${safeStormId}" aria-hidden="true"></span>
+        <span class="search-result-text"><strong>${escapeHtml(lf.year)}</strong> ${safeName} <span class="search-result-meta">· ${escapeHtml(cat)} ${safeState}</span></span>
       </li>`;
     };
     let html = results.map(renderRow).join('');
@@ -926,8 +929,12 @@ function wireUI() {
   // QGIS export button
   if (els.qgisBtn) {
     els.qgisBtn.addEventListener('click', async () => {
-      const { exportQGISGeoJSON } = await loadQgis();
-      exportQGISGeoJSON(filters);
+      try {
+        const { exportQGISGeoJSON } = await loadQgis();
+        await exportQGISGeoJSON(filters);
+      } catch (error) {
+        console.error('QGIS export failed:', error);
+      }
     });
   }
 

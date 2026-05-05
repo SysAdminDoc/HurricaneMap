@@ -11,7 +11,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q21';
+const SW_VERSION = 'hm-v1.3.9-q22';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -148,12 +148,12 @@ self.addEventListener('fetch', (event) => {
   // Skip extension/devtools/non-http.
   if (!url.protocol.startsWith('http')) return;
 
-  if (isShell(url)) {
+  if (isRadarAsset(url)) {
+    event.respondWith(cacheFirst(req, RADAR_CACHE));
+  } else if (isShell(url)) {
     event.respondWith(staleWhileRevalidate(req, SHELL_CACHE));
   } else if (isData(url)) {
     event.respondWith(offlineDataWhileRevalidate(req));
-  } else if (isRadarAsset(url)) {
-    event.respondWith(cacheFirst(req, RADAR_CACHE));
   } else if (isTile(url)) {
     event.respondWith(cacheFirst(req, TILE_CACHE));
   }

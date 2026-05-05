@@ -36,11 +36,11 @@ export function exportPublicationCSV(filters) {
       lf.month || '',
       lf.day || '',
       lf.hour || '0',
-      lf.lat ? lf.lat.toFixed(3) : '',
-      lf.lon ? lf.lon.toFixed(3) : '',
+      Number.isFinite(lf.lat) ? lf.lat.toFixed(3) : '',
+      Number.isFinite(lf.lon) ? lf.lon.toFixed(3) : '',
       lf.wind || '',
       windMph,
-      lf.pressure || '',
+      lf.pres || '',
       lf.category ? (lf.category <= 0 ? 'TS' : String(lf.category)) : 'TS',
       lf.state || '',
     ];
@@ -48,14 +48,10 @@ export function exportPublicationCSV(filters) {
   }
   
   // Build CSV content
-  let csv = rows.map(row => row.map(cell => {
-    // Quote cells with commas or quotes
-    if (typeof cell !== 'string') cell = String(cell);
-    if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
-      return `"${cell.replace(/"/g, '""')}"`;
-    }
-    return cell;
-  }).join(',')).join('\n');
+  const textColumns = new Set(['storm_id', 'name', 'category', 'state']);
+  let csv = rows.map(row => row.map((cell, index) => csvEscape(cell, {
+    preventFormula: textColumns.has(headers[index]),
+  })).join(',')).join('\n');
   
   // Add data dictionary as comments
   const uniqueStorms = new Set(filtered.map(lf => lf.storm_id)).size;
@@ -123,6 +119,18 @@ function downloadCSV(content, filename) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+export function csvEscape(value, { preventFormula = false } = {}) {
+  let cell = value == null ? '' : String(value);
+  if (preventFormula && /^[\s]*[=+\-@]/.test(cell)) {
+    cell = `'${cell}`;
+  }
+  if (/[",\r\n]/.test(cell)) {
+    return `"${cell.replace(/"/g, '""')}"`;
+  }
+  return cell;
 }
 
 

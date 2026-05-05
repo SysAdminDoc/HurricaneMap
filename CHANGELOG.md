@@ -26,7 +26,8 @@ All notable changes to HurricaneMap.
 - Added Docker self-hosting support with a non-root Python HTTP server image, healthcheck, `.dockerignore`, self-hosting docs, and static packaging tests.
 - Added an opt-in live GOES satellite background for active storms using current NOAA/NESDIS/STAR GeoColor sector images, with Atlantic, Eastern Pacific, and Central Pacific sector selection, a source-linked status badge, and utility coverage.
 - Added adaptive active-storm polling: hourly checks while storms are active, quiet six-hour checks when the feed is empty, exponential retry/backoff for transient failures, explicit 429 handling, and visible badge status with next retry timing.
-- Bumped the service worker shell cache to `hm-v1.3.9-q21` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, 3D wind-cone renderer, exposure estimator, offline data store, lazy-loading entrypoint, live GOES overlay, and active-feed scheduler.
+- Hardened storage, exports, and offline routing by sanitizing persisted search/settings data, routing radar frames through the radar cache before generic shell image handling, exporting full QGIS storm tracks, ranking reports from parsed impact data, and revoking export object URLs.
+- Bumped the service worker shell cache to `hm-v1.3.9-q22` so installed users receive the responsive polish, similarity-vector data path, active-storm cone layer, Storm Events panel metric, 3D globe shell module, 3D wind-cone renderer, exposure estimator, offline data store, lazy-loading entrypoint, live GOES overlay, active-feed scheduler, and export/storage hardening.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 

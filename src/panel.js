@@ -19,7 +19,7 @@ import {
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
-import { escapeHtml, formatStormName } from './html-utils.js';
+import { escapeHtml, formatStormName, safeExternalUrl } from './html-utils.js';
 import {
   ensureExposureDensitiesLoaded,
   estimatePopulationExposure,
@@ -122,7 +122,7 @@ function render(storm, landfall, allStorms) {
         ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">Radar</button>`
         : '';
       return `<li>
-        <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${lf.state || 'Unknown'}${inferred}</span>
+        <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${escapeHtml(lf.state || 'Unknown')}${inferred}</span>
         <span class="when">${formatTime(lf.t)}${radarBtn}</span>
       </li>`;
     }).join('')
@@ -175,7 +175,7 @@ function render(storm, landfall, allStorms) {
         <span class="cat-pill ${categoryClass(lfCat)}">${lfLabel} at landfall</span>
         <span>Peak intensity: <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>
         <span>${storm.basin === 'EP' ? 'Eastern Pacific basin' : 'Atlantic basin'}</span>
-        <span>${storm.id}</span>
+        <span>${escapeHtml(storm.id)}</span>
       </div>
     </div>
     <div class="panel-actions-sticky">
@@ -239,13 +239,13 @@ function render(storm, landfall, allStorms) {
         <ul class="landfall-list">${landfallsHtml}</ul>
 
         <div class="action-row">
-          ${wikiUrl ? `<a class="action-btn primary" href="${wikiUrl}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
-          ${ytUrl ? `<a class="action-btn" href="${ytUrl}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
-          ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
-          ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
-          ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
-          ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
-          ${reconUrl ? `<a class="action-btn" href="${reconUrl}" target="_blank" rel="noopener">✈️ Recon archive</a>` : ''}
+          ${wikiUrl ? `<a class="action-btn primary" href="${escapeHtml(wikiUrl)}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
+          ${ytUrl ? `<a class="action-btn" href="${escapeHtml(ytUrl)}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
+          ${noaaReportUrl ? `<a class="action-btn" href="${escapeHtml(noaaReportUrl)}" target="_blank" rel="noopener">NOAA report</a>` : ''}
+          ${nhcWalletUrl ? `<a class="action-btn" href="${escapeHtml(nhcWalletUrl)}" target="_blank" rel="noopener">NHC archive</a>` : ''}
+          ${sliderUrl ? `<a class="action-btn" href="${escapeHtml(sliderUrl)}" target="_blank" rel="noopener">GOES satellite</a>` : ''}
+          ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" target="_blank" rel="noopener">Tornadoes (NOAA)</a>` : ''}
+          ${reconUrl ? `<a class="action-btn" href="${escapeHtml(reconUrl)}" target="_blank" rel="noopener">Recon archive</a>` : ''}
         </div>
 
         <div class="export-row">
@@ -611,7 +611,8 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
     rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${valueHTML}</span></div>`);
   }
   if (!rows.length) return '';
-  const src = im.wiki_url ? `<a href="${im.wiki_url}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
+  const safeSourceUrl = safeExternalUrl(im.wiki_url);
+  const src = safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
   return `
     <h3 class="panel-section-h3">Impacts</h3>
     <div class="impacts-block">
