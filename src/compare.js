@@ -1,12 +1,12 @@
 // Storm comparison mode — pin up to 4 storms, view their tracks color-coded
 // on the map and side-by-side intensity charts in a comparison panel.
 
-import { ensureStormsLoaded, getStorm, categoryLabel, categoryClass, ktToMph, formatTime } from './data.js';
+import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, formatTime } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { hidePanel, showPanel } from './panels.js';
 import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
-import { escapeHtml } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -117,7 +117,7 @@ function drawTrack(storm, color) {
   if (track.length) {
     L.circleMarker([track[0].lat, track[0].lon], {
       radius: 3, color, fillColor: color, weight: 1, fillOpacity: 0.9,
-    }).bindTooltip(`${titleCase(storm.name)} ${storm.year}`, { direction: 'top' }).addTo(group);
+    }).bindTooltip(`${formatStormName(storm.name)} ${storm.year}`, { direction: 'top' }).addTo(group);
   }
   group.addTo(map);
   return group;
@@ -133,7 +133,7 @@ function refreshTray() {
   chips.innerHTML = pinned.map(p => `
     <span class="ct-chip" style="--pin-color:${p.color}">
       <span class="ct-dot" style="background:${p.color}"></span>
-      <span class="ct-name">${escapeHtml(titleCase(p.name))} ${p.year}</span>
+      <span class="ct-name">${escapeHtml(formatStormName(p.name))} ${p.year}</span>
       <button class="ct-remove" data-id="${p.id}" title="Unpin">×</button>
     </span>
   `).join('');
@@ -174,7 +174,7 @@ function renderComparePanel() {
       <div class="cp-card" style="--pin-color:${p.color}">
         <div class="cp-card-head">
           <span class="cp-swatch" style="background:${p.color}"></span>
-          <h3>${escapeHtml(titleCase(s.name))} (${s.year})</h3>
+          <h3>${escapeHtml(formatStormName(s.name))} (${s.year})</h3>
           <button class="cp-remove" data-id="${s.id}" title="Unpin">×</button>
         </div>
         <div class="cp-meta">
@@ -190,12 +190,12 @@ function renderComparePanel() {
 
   // Side-by-side stat table with diff highlighting.
   const rows = [
-    ['Peak wind', p => p.storm.peak_wind_kt, 'number'],
-    ['Min pressure', p => p.storm.min_pres_mb, 'number'],
+    ['Peak wind', p => p.storm.peak_wind_kt, 'number', 'higher'],
+    ['Min pressure', p => p.storm.min_pres_mb, 'number', 'lower'],
     ['Peak category', p => saffirCat(p.storm.peak_wind_kt), 'category'],
     ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
-    ['# US landfalls', p => p.storm.us_landfall_count, 'number'],
-    ['Track points', p => p.storm.track?.length || 0, 'number'],
+    ['# US landfalls', p => p.storm.us_landfall_count, 'number', 'higher'],
+    ['Track points', p => p.storm.track?.length || 0, 'number', 'higher'],
     ['Genesis', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[0].t).split(',')[0] : '—', 'text'],
     ['Final', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0] : '—', 'text'],
     ['States hit', p => p.storm.us_landfalls && p.storm.us_landfalls.length > 0 ? [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', ') : '—', 'text'],
@@ -203,17 +203,18 @@ function renderComparePanel() {
 
   // Compute min/max for diff highlighting.
   const extrema = {};
-  for (const [label, fn, type] of rows) {
+  for (const [label, fn, type, direction = 'higher'] of rows) {
     const values = pinned.map(fn).filter(v => v != null);
     if (type === 'number' && values.length > 0) {
       extrema[label] = {
         max: Math.max(...values),
         min: Math.min(...values),
+        direction,
       };
     }
   }
 
-  const headerCols = pinned.map(p => `<th style="color:${p.color}">${escapeHtml(titleCase(p.name))} ${p.year}</th>`).join('');
+  const headerCols = pinned.map(p => `<th style="color:${p.color}">${escapeHtml(formatStormName(p.name))} ${p.year}</th>`).join('');
   const tableBody = rows.map(([label, fn, type]) => {
     const cells = pinned.map(p => {
       const val = fn(p);
@@ -229,9 +230,11 @@ function renderComparePanel() {
       // Apply diff highlighting for numeric columns.
       let highlight = '';
       if (type === 'number' && extrema[label] && val != null) {
-        if (val === extrema[label].max) {
+        const preferred = extrema[label].direction === 'lower' ? extrema[label].min : extrema[label].max;
+        const trailing = extrema[label].direction === 'lower' ? extrema[label].max : extrema[label].min;
+        if (val === preferred) {
           highlight = ' class="cp-cell-max"';
-        } else if (val === extrema[label].min) {
+        } else if (val === trailing) {
           highlight = ' class="cp-cell-min"';
         }
       }
@@ -283,17 +286,13 @@ function saffirCat(kt) {
   return 5;
 }
 
-function titleCase(name) {
-  if (!name || name === 'UNNAMED') return 'Unnamed';
-  return name[0].toUpperCase() + name.slice(1).toLowerCase();
-}
-
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {
   if (!storms || storms.length === 0) return;
+  const allStorms = getAllStorms();
 
   // Generate header
-  const header = ['Metric', ...storms.map(p => `${titleCase(p.name)} (${p.year})`)].map(escapeCSV).join(',');
+  const header = ['Metric', ...storms.map(p => `${formatStormName(p.name)} (${p.year})`)].map(escapeCSV).join(',');
 
   // Generate comparison table rows
   const rows = [
@@ -311,18 +310,18 @@ function exportComparisonCSV(storms) {
     ['Track points', p => p.storm.track.length],
     ['ACE (10⁴ kt²)', p => {
       const ace = computeACE(p.storm.track);
-      return typeof ace === 'object' ? ace.value.toFixed(2) : ace.toFixed(2);
+      return formatFixed(ace?.value ?? ace, 2);
     }],
     ['Forward speed (km/h)', p => {
       const trans = computeTranslationStats(p.storm.track);
-      return trans ? trans.mean.toFixed(1) : '—';
+      return trans ? formatFixed(trans.mean_kmh, 1) : '—';
     }],
     ['RI detected', p => {
       const ri = findRapidIntensification(p.storm.track);
-      return ri ? `+${ri.gain_kt} kt` : 'No';
+      return ri ? `+${ri.delta_kt} kt / ${Math.round(ri.hours)}h` : 'No';
     }],
     ['RI risk category', p => {
-      const risk = computeRIRiskScore(p.storm, []);
+      const risk = computeRIRiskScore(p.storm, allStorms);
       return risk ? risk.category : '—';
     }],
   ];
@@ -343,7 +342,7 @@ function exportComparisonCSV(storms) {
   // Generate narratives
   const narrativeSection = ['', '', 'COMPARISON NARRATIVES', ...storms.map(p => {
     const bio = generateStormBiography(p.storm, {});
-    return escapeCSV(`${titleCase(p.name)} (${p.year}): ${bio}`);
+    return escapeCSV(`${formatStormName(p.name)} (${p.year}): ${bio}`);
   })];
 
   // Combine all rows
@@ -359,9 +358,18 @@ function exportComparisonCSV(storms) {
   // Trigger download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
+  const objectUrl = URL.createObjectURL(blob);
+  link.href = objectUrl;
   link.download = `HurricaneMap-comparison-${new Date().toISOString().split('T')[0]}.csv`;
+  link.style.display = 'none';
+  document.body.appendChild(link);
   link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
+
+function formatFixed(value, decimals) {
+  return Number.isFinite(value) ? value.toFixed(decimals) : '—';
 }
 
 /** Escape a value for CSV (wrap in quotes if contains comma/quote/newline). */

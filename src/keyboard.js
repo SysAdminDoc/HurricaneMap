@@ -24,6 +24,7 @@ export function init(applyFiltersFn) {
 
 function setupGlobalShortcuts() {
   document.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented) return;
     // Ctrl/Cmd + M: Major hurricanes only
     if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
       e.preventDefault();
@@ -49,7 +50,8 @@ function setupGlobalShortcuts() {
     else if (e.key === 'Escape') {
       if (palette && !palette.hidden) {
         closePalette();
-      } else {
+        e.preventDefault();
+      } else if (!isBlockingSurfaceOpen()) {
         // Close any open panels
         closeAllPanels();
       }
@@ -70,8 +72,10 @@ function setupPaletteHandlers() {
 
   // Close palette on Escape
   document.addEventListener('keydown', (e) => {
+    if (e.defaultPrevented) return;
     if (e.key === 'Escape' && palette && !palette.hidden) {
       closePalette();
+      e.preventDefault();
     }
   });
 
@@ -160,6 +164,15 @@ function isInputFocused() {
     active instanceof HTMLInputElement ||
     active instanceof HTMLTextAreaElement ||
     active instanceof HTMLSelectElement
+  );
+}
+
+function isBlockingSurfaceOpen() {
+  return Boolean(
+    document.querySelector('#settings-menu:not([hidden])') ||
+    document.querySelector('#info-modal:not([hidden])') ||
+    document.querySelector('#glossary-modal:not([hidden])') ||
+    document.querySelector('.onb-overlay')
   );
 }
 

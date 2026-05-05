@@ -12,6 +12,7 @@
 
 import { categoryColor, formatTime } from './data.js';
 import { getStormRadarFrames } from './radar.js';
+import { formatStormName } from './html-utils.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -468,8 +469,7 @@ function categoryShort(c) {
 }
 
 function formatStormTitle(storm) {
-  const name = (!storm.name || storm.name === 'UNNAMED')
+  return (!storm.name || storm.name === 'UNNAMED')
     ? `${storm.year} unnamed storm`
-    : `${storm.name[0]}${storm.name.slice(1).toLowerCase()} (${storm.year})`;
-  return name;
+    : `${formatStormName(storm.name)} (${storm.year})`;
 }

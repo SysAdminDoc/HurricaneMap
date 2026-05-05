@@ -1,10 +1,16 @@
 // Decade-by-decade trend analysis: named-storm count, major-hurricane %,
 // ACE total, deadliest and costliest storms per decade.
-import { getStats, getLandfalls, ensureStormsLoaded, getStorm } from './data.js';
+import { getStats, getLandfalls, ensureStormsLoaded, getStorm, getImpactsFor } from './data.js';
 import { computeACE } from './metrics.js';
-import { getImpactsFor } from './data.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 let _cache = null;
+
+function parseLeadingNumber(value) {
+  if (value == null) return null;
+  const match = String(value).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+  return match ? Number(match[1]) : null;
+}
 
 // Compute decade-level aggregates with details.
 async function buildDecadeTrends() {
@@ -62,14 +68,16 @@ async function buildDecadeTrends() {
     // ACE
     try {
       const ace = computeACE(s.track);
-      if (Number.isFinite(ace)) bucket.ace += ace;
+      if (Number.isFinite(ace?.value)) bucket.ace += ace.value;
     } catch (e) { /* ignore */ }
 
     // Track deadliest and costliest for later ranking.
     const impacts = getImpactsFor(lf.storm_id);
     if (impacts) {
-      bucket.deathlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, deaths: impacts.deaths || 0 });
-      bucket.costlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, damages: impacts.damages_nominal || 0 });
+      const deaths = parseLeadingNumber(impacts.deaths);
+      const damages = parseLeadingNumber(impacts.damages);
+      if (deaths != null) bucket.deathlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, deaths, rawDeaths: impacts.deaths });
+      if (damages != null) bucket.costlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, damages, rawDamages: impacts.damages });
     }
   }
 
@@ -126,12 +134,12 @@ export async function renderDecadeTrends(host) {
       <td class="dt-ace">${d.ace.toFixed(0)}</td>
       <td class="dt-deadliest">
         ${d.deadliest
-          ? `<span title="Deaths: ${d.deadliest.deaths}">${d.deadliest.name} (${d.deadliest.year})</span>`
+          ? `<span title="Deaths: ${escapeHtml(d.deadliest.rawDeaths)}">${escapeHtml(formatStormName(d.deadliest.name))} (${d.deadliest.year})</span>`
           : '—'}
       </td>
       <td class="dt-costliest">
         ${d.costliest
-          ? `<span title="Damages: $${(d.costliest.damages / 1e6).toFixed(0)}M">${d.costliest.name} (${d.costliest.year})</span>`
+          ? `<span title="Damages: ${escapeHtml(d.costliest.rawDamages)} million USD">${escapeHtml(formatStormName(d.costliest.name))} (${d.costliest.year})</span>`
           : '—'}
       </td>
     </tr>

@@ -5,7 +5,7 @@ import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClas
 import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { redraw } from './timeline.js';
-import { escapeHtml } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -61,7 +61,6 @@ export async function enableStateClicks(map) {
     });
   return stateBoundariesPromise;
 }
-
 export async function openState(stateName) {
   showPanel('state-panel');
   body.innerHTML = `<p class="state-loading">Loading ${escapeHtml(stateName)}…</p>`;
@@ -148,7 +147,7 @@ export async function openState(stateName) {
     return `
       <li class="state-storm-row" data-storm-id="${s.storm_id}">
         <span class="cat-pill ${cls}">${cat}</span>
-        <span class="ssr-name">${escapeHtml(titleCase(s.name))}</span>
+        <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
         <span class="ssr-year">${s.year}</span>
       </li>
     `;
@@ -210,18 +209,16 @@ export async function openState(stateName) {
     });
   });
 }
-
 function sortStateStorms(storms, mode) {
   const sorted = [...storms];
   if (mode === 'strongest') {
-    return sorted.sort((a, b) => b.max_cat - a.max_cat || b.year - a.year || titleCase(a.name).localeCompare(titleCase(b.name)));
+    return sorted.sort((a, b) => b.max_cat - a.max_cat || b.year - a.year || formatStormName(a.name).localeCompare(formatStormName(b.name)));
   }
   if (mode === 'hits') {
     return sorted.sort((a, b) => b.count - a.count || b.max_cat - a.max_cat || b.year - a.year);
   }
-  return sorted.sort((a, b) => b.year - a.year || b.max_cat - a.max_cat || titleCase(a.name).localeCompare(titleCase(b.name)));
+  return sorted.sort((a, b) => b.year - a.year || b.max_cat - a.max_cat || formatStormName(a.name).localeCompare(formatStormName(b.name)));
 }
-
 function renderStateStormRows(storms) {
   return storms.map(s => {
     const cat = categoryLabel(s.max_cat);
@@ -229,14 +226,13 @@ function renderStateStormRows(storms) {
     return `
       <li class="state-storm-row" data-storm-id="${s.storm_id}">
         <span class="cat-pill ${cls}">${cat}</span>
-        <span class="ssr-name">${escapeHtml(titleCase(s.name))}</span>
+        <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
         <span class="ssr-year">${s.year}</span>
         <span class="ssr-count">${s.count} hit${s.count === 1 ? '' : 's'}</span>
       </li>
     `;
   }).join('');
 }
-
 function wireStateStormRows(container, stateName) {
   container.querySelectorAll('.state-storm-row').forEach((row) => {
     row.addEventListener('click', async () => {
@@ -251,9 +247,4 @@ function wireStateStormRows(container, stateName) {
       }
     });
   });
-}
-
-function titleCase(name) {
-  if (!name || name === 'UNNAMED') return 'Unnamed';
-  return name[0].toUpperCase() + name.slice(1).toLowerCase();
 }

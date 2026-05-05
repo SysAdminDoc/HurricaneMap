@@ -3,8 +3,9 @@
 // count by Saffir tier, total ACE, strongest landfall, deadliest, costliest.
 import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel } from './data.js';
 import { computeACE } from './metrics.js';
-import { getPaletteColor, getSetting } from './settings.js';
+import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 const HOST_ID = 'season-summary';
 const MAX_YEARS = 3;
@@ -24,7 +25,6 @@ function ensureHost() {
   main.appendChild(host);
   return host;
 }
-
 // "1,601 total" / "14+" / "1 indirect" / "500000" / "—" → number or null.
 function parseDeaths(s) {
   if (!s) return null;
@@ -38,19 +38,12 @@ function parseDamageMillions(s) {
   const m = String(s).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
   return m ? parseFloat(m[1]) : null;
 }
-function fmtUSD(millions) {
-  if (millions == null) return '—';
-  if (millions >= 1000) return `$${(millions / 1000).toFixed(1)}B`;
-  if (millions >= 1) return `$${millions.toFixed(1)}M`;
-  return `$${(millions * 1000).toFixed(0)}K`;
-}
 function fmtDeaths(n) {
   if (n == null) return '—';
   if (n >= 10000) return `${(n / 1000).toFixed(0)}k`;
   if (n >= 1000) return n.toLocaleString();
   return String(n);
 }
-
 export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const host = ensureHost();
   const span = yearMax - yearMin + 1;
@@ -118,7 +111,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       <span class="ss-tier-label">${t.label}</span>
       <span class="ss-tier-count">${t.count}</span>
     </div>`).join('');
-  const strongestName = strongest && strongest.name !== 'UNNAMED' ? titleCase(strongest.name) : 'Unnamed';
+  const strongestName = strongest ? formatStormName(strongest.name) : 'Unnamed';
 
   host.innerHTML = `
     <header>
@@ -143,7 +136,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     <dl class="ss-superlatives">
       <div>
         <dt>Strongest landfall</dt>
-        <dd>${strongestName} ${strongest.year} <span class="ss-meta">${categoryLabel(strongest.category)} · ${strongest.state}</span></dd>
+        <dd>${escapeHtml(strongestName)} ${strongest.year} <span class="ss-meta">${categoryLabel(strongest.category)} · ${escapeHtml(strongest.state)}</span></dd>
       </div>
       <div data-role="deadliest">
         <dt>Deadliest</dt>
@@ -163,7 +156,6 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   // Async pass: ACE + impacts lookup once storms are loaded.
   await ensureStormsLoaded();
   let totalACE = 0;
-  let resolved = 0;
   let deadliest = null;
   let costliest = null;
   for (const s of stormList) {
@@ -171,7 +163,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     if (storm && storm.track) {
       try {
         const ace = computeACE(storm.track);
-        if (Number.isFinite(ace)) { totalACE += ace; resolved++; }
+        if (Number.isFinite(ace?.value)) totalACE += ace.value;
       } catch (e) { /* ignore single-storm ACE failures */ }
     }
     const impacts = getImpactsFor(s.id);
@@ -195,9 +187,9 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const dHost = host.querySelector('[data-role="deadliest"] dd');
   if (dHost) {
     if (deadliest) {
-      const n = deadliest.storm.name === 'UNNAMED' ? 'Unnamed' : titleCase(deadliest.storm.name);
+      const n = formatStormName(deadliest.storm.name);
       dHost.classList.remove('ss-loading');
-      dHost.innerHTML = `${n} ${deadliest.storm.year} <span class="ss-meta">${fmtDeaths(deadliest.value)} dead</span>`;
+      dHost.innerHTML = `${escapeHtml(n)} ${deadliest.storm.year} <span class="ss-meta">${fmtDeaths(deadliest.value)} dead</span>`;
     } else {
       dHost.classList.remove('ss-loading');
       dHost.innerHTML = '<span class="ss-meta">no impact records</span>';
@@ -206,18 +198,14 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const cHost = host.querySelector('[data-role="costliest"] dd');
   if (cHost) {
     if (costliest) {
-      const n = costliest.storm.name === 'UNNAMED' ? 'Unnamed' : titleCase(costliest.storm.name);
+      const n = formatStormName(costliest.storm.name);
       const mode = getSetting('damageMode');
       cHost.classList.remove('ss-loading');
       const adjLabel = mode === 'real' ? `${formatMillionsUSD(costliest.value)} <span class="ss-meta">(2024 USD)</span>` : `${formatMillionsUSD(costliest.value)} <span class="ss-meta">${costliest.storm.year} USD</span>`;
-      cHost.innerHTML = `${n} ${costliest.storm.year} <span class="ss-meta">— ${adjLabel}</span>`;
+      cHost.innerHTML = `${escapeHtml(n)} ${costliest.storm.year} <span class="ss-meta">— ${adjLabel}</span>`;
     } else {
       cHost.classList.remove('ss-loading');
       cHost.innerHTML = '<span class="ss-meta">no impact records</span>';
     }
   }
-}
-
-function titleCase(s) {
-  return String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 }
