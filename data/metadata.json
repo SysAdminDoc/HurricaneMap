@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-05-05T08:10:17Z",
+  "generator": {
+    "name": "scripts/preprocess_hurdat2.py",
+    "app_version": "1.3.9"
+  },
+  "sources": [
+    {
+      "id": "hurdat2_atlantic",
+      "basin": "AL",
+      "filename": "hurdat2-atlantic.txt",
+      "path": "data/hurdat2-atlantic.txt",
+      "size_bytes": 7082381,
+      "modified_utc": "2026-05-03T15:39:42Z",
+      "storm_count": 2004,
+      "storm_year_range": [
+        1851,
+        2025
+      ]
+    },
+    {
+      "id": "hurdat2_eastern_pacific",
+      "basin": "EP",
+      "filename": "hurdat2-nepac.txt",
+      "path": "data/hurdat2-nepac.txt",
+      "size_bytes": 4083231,
+      "modified_utc": "2026-05-03T15:39:51Z",
+      "storm_count": 1262,
+      "storm_year_range": [
+        1949,
+        2025
+      ]
+    }
+  ],
+  "coverage": {
+    "year_range": [
+      1851,
+      2025
+    ],
+    "storm_count": 596,
+    "landfall_event_count": 760,
+    "hurricane_landfall_count": 374,
+    "basins": [
+      "AL",
+      "EP"
+    ]
+  },
+  "outputs": {
+    "landfalls": {
+      "path": "data/landfalls.json",
+      "size_bytes": 129991,
+      "modified_utc": "2026-05-05T08:10:17Z"
+    },
+    "storms": {
+      "path": "data/storms.json",
+      "size_bytes": 2248714,
+      "modified_utc": "2026-05-05T08:10:17Z"
+    },
+    "stats": {
+      "path": "data/stats.json",
+      "size_bytes": 9001,
+      "modified_utc": "2026-05-05T08:10:17Z"
+    }
+  },
+  "methodology": {
+    "explicit_landfall_marker": "HURDAT2 records with rec_id L inside or near U.S. state polygons.",
+    "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons.",
+    "category_rule": "Saffir-Simpson category is computed from sustained wind in knots at U.S. landfall."
+  }
+}

@@ -2,12 +2,14 @@
 // landfalls.json — flat list of every US landfall event (one per L marker).
 // storms.json    — full track + metadata, keyed by storm id.
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
+// metadata.json  — generated data provenance, coverage, and source details.
 
 const DATA = {
   landfalls: [],
   storms: [],          // populated lazily on first track-render
   stormsById: new Map(),
   stats: null,
+  metadata: null,
   impacts: null,       // storm_id -> { deaths, damages, wiki_title, wiki_url }
 };
 
@@ -29,15 +31,17 @@ async function fetchJson(url, { optional = false, fallback = null } = {}) {
 }
 
 export async function loadInitial() {
-  const [lf, st, im] = await Promise.all([
+  const [lf, st, md, im] = await Promise.all([
     fetchJson('data/landfalls.json'),
     fetchJson('data/stats.json'),
+    fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
   if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
   DATA.landfalls = lf || [];
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
+  DATA.metadata = md && typeof md === 'object' ? md : null;
   DATA.impacts = im || {};
   return DATA;
 }
@@ -84,6 +88,10 @@ export function getLandfalls() {
 
 export function getStats() {
   return DATA.stats;
+}
+
+export function getMetadata() {
+  return DATA.metadata;
 }
 
 // Filter helpers

@@ -9,6 +9,7 @@ import math
 import os
 import sys
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -21,6 +22,10 @@ STATES_GEOJSON = DATA / "us-states.geojson"
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
 OUT_STATS = DATA / "stats.json"
+OUT_METADATA = DATA / "metadata.json"
+
+GENERATOR_NAME = "scripts/preprocess_hurdat2.py"
+METADATA_SCHEMA_VERSION = 1
 
 # Saffir-Simpson categories from sustained wind in knots.
 def saffir_simpson(wind_kt: int) -> int:
@@ -127,6 +132,86 @@ def parse_hurdat2(path: Path, basin_label: str):
             current["track"].append(rec)
         if current:
             yield current
+
+
+def utc_iso(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def file_mtime_utc(path: Path):
+    if not path.exists():
+        return None
+    return utc_iso(datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc))
+
+
+def load_package_version() -> str:
+    package_path = ROOT / "package.json"
+    try:
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+        version = package.get("version")
+        return version if isinstance(version, str) and version else "unknown"
+    except (OSError, json.JSONDecodeError):
+        return "unknown"
+
+
+def create_source_summary(path: Path, basin: str, label: str) -> dict:
+    stat = path.stat() if path.exists() else None
+    return {
+        "id": label,
+        "basin": basin,
+        "filename": path.name,
+        "path": str(path.relative_to(ROOT)).replace(os.sep, "/"),
+        "size_bytes": stat.st_size if stat else None,
+        "modified_utc": file_mtime_utc(path),
+        "storm_count": 0,
+        "storm_year_range": [None, None],
+    }
+
+
+def update_source_summary(summary: dict, storm: dict) -> None:
+    summary["storm_count"] += 1
+    year = storm.get("year")
+    if not isinstance(year, int):
+        return
+    current_min, current_max = summary["storm_year_range"]
+    summary["storm_year_range"] = [
+        year if current_min is None else min(current_min, year),
+        year if current_max is None else max(current_max, year),
+    ]
+
+
+def build_metadata(source_summaries, stats, outputs):
+    output_files = {}
+    for key, path in outputs.items():
+        stat = path.stat() if path.exists() else None
+        output_files[key] = {
+            "path": str(path.relative_to(ROOT)).replace(os.sep, "/"),
+            "size_bytes": stat.st_size if stat else None,
+            "modified_utc": file_mtime_utc(path),
+        }
+
+    return {
+        "schema_version": METADATA_SCHEMA_VERSION,
+        "generated_at_utc": utc_iso(datetime.now(timezone.utc)),
+        "generator": {
+            "name": GENERATOR_NAME,
+            "app_version": load_package_version(),
+        },
+        "sources": source_summaries,
+        "coverage": {
+            "year_range": stats.get("year_range", [None, None]),
+            "storm_count": stats.get("total_storms"),
+            "landfall_event_count": stats.get("total_landfall_events"),
+            "hurricane_landfall_count": stats.get("total_hurricane_landfalls"),
+            "basins": sorted({source["basin"] for source in source_summaries if source.get("basin")}),
+        },
+        "outputs": output_files,
+        "methodology": {
+            "explicit_landfall_marker": "HURDAT2 records with rec_id L inside or near U.S. state polygons.",
+            "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons.",
+            "category_rule": "Saffir-Simpson category is computed from sustained wind in knots at U.S. landfall.",
+        },
+    }
 
 
 def load_states():
@@ -280,13 +365,20 @@ def main():
 
     storms_with_us_landfall = []
     landfall_events = []  # flat list, one per US landfall record
+    source_summaries = []
 
-    for src_path, basin in ((ATL_FILE, "AL"), (EPAC_FILE, "EP")):
+    for src_path, basin, source_id in (
+        (ATL_FILE, "AL", "hurdat2_atlantic"),
+        (EPAC_FILE, "EP", "hurdat2_eastern_pacific"),
+    ):
+        source_summary = create_source_summary(src_path, basin, source_id)
+        source_summaries.append(source_summary)
         if not src_path.exists():
             print(f"WARN: missing {src_path}", file=sys.stderr)
             continue
         print(f"Parsing {src_path.name}...", file=sys.stderr)
         for storm in parse_hurdat2(src_path, basin):
+            update_source_summary(source_summary, storm)
             us_landfalls = []
             for rec in storm["track"]:
                 if rec["rec"] != "L":
@@ -500,11 +592,22 @@ def main():
     OUT_LANDFALLS.write_text(json.dumps(landfall_events, separators=(",", ":")), encoding="utf-8")
     OUT_STORMS.write_text(json.dumps(storms_with_us_landfall, separators=(",", ":")), encoding="utf-8")
     OUT_STATS.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+    metadata = build_metadata(
+        source_summaries,
+        stats,
+        {
+            "landfalls": OUT_LANDFALLS,
+            "storms": OUT_STORMS,
+            "stats": OUT_STATS,
+        },
+    )
+    OUT_METADATA.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
     sz = lambda p: f"{p.stat().st_size / 1024:.1f} KB"
     print(f"Wrote {OUT_LANDFALLS.name} ({sz(OUT_LANDFALLS)})", file=sys.stderr)
     print(f"Wrote {OUT_STORMS.name} ({sz(OUT_STORMS)})", file=sys.stderr)
     print(f"Wrote {OUT_STATS.name} ({sz(OUT_STATS)})", file=sys.stderr)
+    print(f"Wrote {OUT_METADATA.name} ({sz(OUT_METADATA)})", file=sys.stderr)
 
 
 if __name__ == "__main__":

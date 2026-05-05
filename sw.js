@@ -2,7 +2,7 @@
 //
 // Strategy:
 //   - Static shell (HTML/CSS/JS, manifest, favicon)  → cache-first, revalidate.
-//   - HURDAT2 data JSON (storms.json, landfalls.json, impacts.json, stats.json)
+//   - HURDAT2 data JSON (storms, landfalls, stats, metadata, optional feeds)
 //     → stale-while-revalidate so users see instant data while we refresh.
 //   - Map tiles (CartoDB, OSM)                       → cache-first w/ TTL.
 //   - Everything else                                → network-first, fall back to cache.
@@ -32,19 +32,34 @@ const SHELL_ASSETS = [
   './src/chart.js',
   './src/chart-export.js',
   './src/animation.js',
-  './src/radar.js',
+  './src/active.js',
+  './src/climatology.js',
+  './src/cone.js',
   './src/compare.js',
-  './src/windfield.js',
+  './src/decade-trends.js',
+  './src/ensemble.js',
+  './src/export.js',
+  './src/filter-state.js',
+  './src/fuzzy.js',
+  './src/html-utils.js',
+  './src/i18n.js',
+  './src/inflation.js',
   './src/metrics.js',
+  './src/perf.js',
+  './src/population.js',
+  './src/qgis.js',
+  './src/radar.js',
+  './src/report.js',
+  './src/search-history.js',
   './src/settings.js',
   './src/onboarding.js',
   './src/timeline.js',
   './src/sparkline.js',
   './src/season.js',
-  './src/fuzzy.js',
-  './src/search-history.js',
-  './src/inflation.js',
-  './src/climatology.js',
+  './src/seasonal-outlook.js',
+  './src/surge.js',
+  './src/url-state.js',
+  './src/windfield.js',
   './branding/favicon.png',
   './branding/logo.png',
 ];
