@@ -78,6 +78,8 @@ const els = {
   toggleStatsBtn: document.getElementById('toggle-stats'),
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleInfoBtn: document.getElementById('toggle-info'),
+  toggleMobileActionsBtn: document.getElementById('toggle-mobile-actions'),
+  mobileActionsMenu: document.getElementById('mobile-actions-menu'),
   exportBtn: document.getElementById('export-publication'),
   reportBtn: document.getElementById('generate-report'),
   qgisBtn: document.getElementById('export-qgis'),
@@ -784,6 +786,8 @@ function wireUI() {
   // On this date panel
   els.toggleOnThisDateBtn.addEventListener('click', showOnThisDate);
 
+  wireMobileActionsMenu();
+
   // Info modal
   els.toggleInfoBtn.addEventListener('click', () => { els.infoModal.hidden = false; });
   els.closeInfo.addEventListener('click', () => { els.infoModal.hidden = true; });
@@ -824,6 +828,48 @@ function wireUI() {
   if (glossaryBtn) {
     glossaryBtn.addEventListener('click', showGlossary);
   }
+}
+
+function wireMobileActionsMenu() {
+  const trigger = els.toggleMobileActionsBtn;
+  const menu = els.mobileActionsMenu;
+  if (!trigger || !menu) return;
+
+  const closeMenu = ({ restoreFocus = false } = {}) => {
+    menu.dataset.open = 'false';
+    trigger.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) trigger.focus({ preventScroll: true });
+  };
+
+  const openMenu = () => {
+    menu.dataset.open = 'true';
+    trigger.setAttribute('aria-expanded', 'true');
+  };
+
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (menu.dataset.open === 'true') closeMenu();
+    else openMenu();
+  });
+
+  menu.addEventListener('click', (event) => {
+    if (event.target.closest('.icon-btn')) {
+      closeMenu();
+    }
+  }, true);
+
+  document.addEventListener('click', (event) => {
+    if (menu.dataset.open !== 'true') return;
+    if (menu.contains(event.target) || event.target === trigger) return;
+    closeMenu();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (menu.dataset.open !== 'true') return;
+    event.preventDefault();
+    closeMenu({ restoreFocus: true });
+  });
 }
 
 function wireFilterPanel() {
