@@ -136,8 +136,13 @@ To run locally (e.g. after refreshing the HURDAT2 data):
 # Clone
 git clone https://github.com/SysAdminDoc/HurricaneMap.git
 cd HurricaneMap
+npm install
 
-# Refresh the underlying HURDAT2 data when NOAA publishes a new revision.
+# Check NOAA for newer HURDAT2 source files.
+# Use --apply before preprocessing when a new revision is detected.
+node scripts/refresh-hurdat2.mjs --dry-run
+
+# Rebuild derived JSON after raw HURDAT2 data changes.
 # (Already pre-built JSON lives in data/ so you can skip this step entirely.)
 python scripts/preprocess_hurdat2.py
 
@@ -145,6 +150,8 @@ python scripts/preprocess_hurdat2.py
 python -m http.server 8765
 # open http://127.0.0.1:8765/
 ```
+
+The monthly `HURDAT2 Auto-Refresh` GitHub Actions workflow runs the same refresh helper against NOAA's HURDAT2 directory, regenerates `landfalls.json`, `storms.json`, `stats.json`, and `metadata.json` when source files change, validates the app with `npm run build`, and opens a data-update pull request.
 
 ## Data Export & Research
 
@@ -196,6 +203,7 @@ HurricaneMap/
 │       │   └── ...
 │       └── ...
 ├── scripts/
+│   ├── refresh-hurdat2.mjs   # NOAA HURDAT2 detector/downloader for CI refreshes
 │   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
 │   ├── scrape_impacts.py       # Wikipedia impact scraper + normalized fatality/damage fields
 │   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
@@ -232,7 +240,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 
 - **1971–1990 has known gaps in HURDAT2's continental-U.S. landfall marking.** Some real landfalls are missing or under-categorized; the inferred-landfall pass picks up most of them but a few are absent because the 6-hour track doesn't cross a polygon.
 - **Pre-1944** (no aircraft reconnaissance) and **pre-late-1960s** (no satellite) systematically under-sample storm count and bias intensities low — see Landsea & Franklin 2013.
-- **Wind radii** (34/50/64 kt) only present from 2004 onward in HURDAT2; **radius of maximum wind** only from 2021. We store/parse these but don't surface them in the UI.
+- **Wind radii** (34/50/64 kt) only present from 2004 onward in HURDAT2; modern storms use them for 2D swaths, 3D wind cones, and the screening exposure metric. **Radius of maximum wind** only begins in 2021 and remains too sparse for historical comparison.
 - **Hawaii 1959 Hurricane Dot, 1992 Iniki** etc. are inferred landfalls because HURDAT2's `L` marker convention doesn't apply outside continental U.S. The category is interpolated from the nearest 6-hour position.
 
 ## Data Sources, Licensing & Attribution

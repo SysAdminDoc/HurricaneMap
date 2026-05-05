@@ -2,13 +2,18 @@ name: HURDAT2 Auto-Refresh
 
 on:
   schedule:
-    # Run monthly on the 1st at 00:00 UTC (NOAA typically releases in early February)
-    - cron: '0 0 1 * *'
+    # NOAA usually posts final post-season HURDAT2 refreshes in late winter or spring.
+    - cron: '0 6 1 * *'
   workflow_dispatch:
+
+concurrency:
+  group: hurdat2-auto-refresh
+  cancel-in-progress: false
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
       pull-requests: write
@@ -20,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -29,138 +34,74 @@ jobs:
           cache: npm
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Detect latest HURDAT2 filenames from NOAA
-        id: detect
-        run: |
-          # Fetch the NOAA data directory listing
-          # Look for the most recent hurdat2 files
-          echo "Detecting latest HURDAT2 filenames..."
-          
-          # Use curl to fetch and grep for the most recent .txt files
-          NOAA_URL="https://www.nhc.noaa.gov/data/hurdat/"
-          
-          # Get Atlantic filename (hurdat2-1851-YYYY-MMDD.txt pattern)
-          ATLANTIC_FILE=$(curl -s "$NOAA_URL" | grep -oP 'hurdat2-1851-\d{4}-\d{6}\.txt' | sort -V | tail -1)
-          
-          # Get Eastern Pacific filename (hurdat2-nepac-1949-YYYY-MMDD.txt pattern)
-          NEPAC_FILE=$(curl -s "$NOAA_URL" | grep -oP 'hurdat2-nepac-1949-\d{4}-\d{6}\.txt' | sort -V | tail -1)
-          
-          if [ -z "$ATLANTIC_FILE" ] || [ -z "$NEPAC_FILE" ]; then
-            echo "Could not detect latest HURDAT2 filenames"
-            exit 1
-          fi
-          
-          echo "atlantic_file=$ATLANTIC_FILE" >> $GITHUB_OUTPUT
-          echo "nepac_file=$NEPAC_FILE" >> $GITHUB_OUTPUT
-          echo "Atlantic: $ATLANTIC_FILE"
-          echo "Eastern Pacific: $NEPAC_FILE"
+      - name: Detect and download latest NOAA HURDAT2 files
+        id: refresh
+        run: node scripts/refresh-hurdat2.mjs --apply
 
-      - name: Download latest HURDAT2 files
-        env:
-          ATLANTIC_FILE: ${{ steps.detect.outputs.atlantic_file }}
-          NEPAC_FILE: ${{ steps.detect.outputs.nepac_file }}
-        run: |
-          set -e
-          
-          NOAA_URL="https://www.nhc.noaa.gov/data/hurdat/"
-          
-          echo "Downloading $ATLANTIC_FILE..."
-          curl -sSL -o data/hurdat2-atlantic.txt.new "${NOAA_URL}${ATLANTIC_FILE}"
-          
-          echo "Downloading $NEPAC_FILE..."
-          curl -sSL -o data/hurdat2-nepac.txt.new "${NOAA_URL}${NEPAC_FILE}"
-          
-          echo "Downloads complete"
-          ls -lh data/hurdat2-*.txt.new
+      - name: Preprocess refreshed HURDAT2 data
+        if: steps.refresh.outputs.changed == 'true'
+        run: python scripts/preprocess_hurdat2.py
 
-      - name: Compare files and detect changes
-        id: compare
-        run: |
-          CHANGED=false
-          
-          # Compare Atlantic file
-          if ! diff -q data/hurdat2-atlantic.txt data/hurdat2-atlantic.txt.new > /dev/null 2>&1; then
-            echo "Atlantic HURDAT2 has changed"
-            mv data/hurdat2-atlantic.txt.new data/hurdat2-atlantic.txt
-            CHANGED=true
-          else
-            echo "Atlantic HURDAT2 unchanged"
-            rm data/hurdat2-atlantic.txt.new
-          fi
-          
-          # Compare Eastern Pacific file
-          if ! diff -q data/hurdat2-nepac.txt data/hurdat2-nepac.txt.new > /dev/null 2>&1; then
-            echo "Eastern Pacific HURDAT2 has changed"
-            mv data/hurdat2-nepac.txt.new data/hurdat2-nepac.txt
-            CHANGED=true
-          else
-            echo "Eastern Pacific HURDAT2 unchanged"
-            rm data/hurdat2-nepac.txt.new
-          fi
-          
-          if [ "$CHANGED" = true ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Verify regenerated datasets
+        if: steps.refresh.outputs.changed == 'true'
+        run: npm run build
 
-      - name: Preprocess HURDAT2 data
-        if: steps.compare.outputs.changed == 'true'
-        run: |
-          echo "Running HURDAT2 preprocessing..."
-          python scripts/preprocess_hurdat2.py
-          
-          echo "Preprocessing complete"
-          ls -lh data/hurdat2*.json
-
-      - name: Validate generated datasets
-        if: steps.compare.outputs.changed == 'true'
-        run: npm run validate:data
-
-      - name: Check for data differences
-        if: steps.compare.outputs.changed == 'true'
+      - name: Summarize generated diff
+        if: steps.refresh.outputs.changed == 'true'
         id: diff
+        shell: bash
         run: |
-          # Count the number of storms before and after
-          echo "HURDAT2 preprocessing completed"
-          echo "diff_detected=true" >> $GITHUB_OUTPUT
+          {
+            echo 'data_diff<<EOF'
+            git diff --stat -- \
+              data/hurdat2-atlantic.txt \
+              data/hurdat2-nepac.txt \
+              data/landfalls.json \
+              data/storms.json \
+              data/stats.json \
+              data/metadata.json
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Create Pull Request
-        if: steps.compare.outputs.changed == 'true'
+      - name: Create HURDAT2 refresh pull request
+        if: steps.refresh.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: 'chore: Update HURDAT2 data files from NOAA
-
-New Atlantic and/or Eastern Pacific HURDAT2 data detected.
-Preprocessed and ready for release.
-
-Co-authored-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
-          title: 'chore: Update HURDAT2 data from NOAA'
+          branch: chore/hurdat2-refresh
+          delete-branch: true
+          commit-message: 'chore(data): refresh HURDAT2 from NOAA'
+          title: 'chore(data): refresh HURDAT2 from NOAA'
           body: |
             ## HURDAT2 Auto-Refresh
-            
-            New NOAA HURDAT2 data detected and downloaded.
-            
-            **Files updated:**
-            - `data/hurdat2-atlantic.txt`
-            - `data/hurdat2-nepac.txt`
-            - `data/hurdat2-atlantic.json`
-            - `data/hurdat2-nepac.json`
-            
-            **Next steps:**
-            1. Review the changes in this PR
-            2. Run `npm run build` locally to verify no errors
-            3. Test the application to ensure all landfalls render correctly
-            4. Merge when ready, then bump version and create a release
-            
-            Triggered by: HURDAT2 Auto-Refresh workflow
-          branch: chore/hurdat2-refresh-${{ github.run_number }}
-          delete-branch: true
-          labels: 'data-update'
 
-      - name: Notify if no changes
-        if: steps.compare.outputs.changed == 'false'
-        run: |
-          echo "ℹ️ No HURDAT2 updates detected (data current)"
+            NOAA published a newer HURDAT2 source file and this workflow regenerated the derived app datasets.
+
+            Source files detected:
+            - Atlantic: `${{ steps.refresh.outputs.atlantic_file }}` (`changed=${{ steps.refresh.outputs.atlantic_changed }}`)
+            - NE/NC Pacific: `${{ steps.refresh.outputs.nepac_file }}` (`changed=${{ steps.refresh.outputs.nepac_changed }}`)
+
+            Verification run:
+            - `node scripts/refresh-hurdat2.mjs --apply`
+            - `python scripts/preprocess_hurdat2.py`
+            - `npm run build`
+
+            Data diff:
+            ```text
+            ${{ steps.diff.outputs.data_diff }}
+            ```
+
+            Review the generated data diff, then merge when the app preview and quality checks pass.
+          labels: 'data-update'
+          add-paths: |
+            data/hurdat2-atlantic.txt
+            data/hurdat2-nepac.txt
+            data/landfalls.json
+            data/storms.json
+            data/stats.json
+            data/metadata.json
+
+      - name: Report no changes
+        if: steps.refresh.outputs.changed == 'false'
+        run: echo "No HURDAT2 updates detected. Local data already matches NOAA."

@@ -134,7 +134,7 @@ Focus: Advanced visualization modes and immersive exploration.
 
 Focus: Distribution, performance, and sustainability.
 
-- [ ] **P14.1 HURDAT2 auto-refresh pipeline** — Detect when NOAA publishes a new HURDAT2 file; auto-download, parse, diff against `data/storms.json`, and commit + push to GitHub (via CI/CD Actions). Keep the live site evergreen without manual intervention.
+- [x] **P14.1 HURDAT2 auto-refresh pipeline** — ✅ v1.3.9. Added a tested `scripts/refresh-hurdat2.mjs` helper that detects the latest NOAA Atlantic and NE/NC Pacific HURDAT2 files, validates downloaded source text, compares against the canonical raw data files, and writes GitHub Actions outputs. The monthly/manual workflow now downloads only when NOAA changes, regenerates `landfalls.json`, `storms.json`, `stats.json`, and `metadata.json`, runs `npm run build`, and pushes a scoped data-update pull request with a diff summary.
 - [ ] **P14.2 Offline-first service worker v2** — Extend current SW to cache entire `data/` directory on install (IndexedDB + compression). Full offline capability for historical storm lookup; graceful degradation for live data + radar.
 - [ ] **P14.3 Bundle size audit & tree-shaking** — Run modern bundler (Vite, esbuild) to eliminate dead code, split non-critical modules (radar.js, compare.js, animation.js), and enable lazy-loading. Target <100KB gzipped for initial load.
 - [ ] **P14.4 GitHub Pages CDN optimization** — Use Cloudflare Workers to serve HurricaneMap with aggressive caching headers, brotli compression, and image optimization. Measure global latency improvements.
