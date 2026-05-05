@@ -13,7 +13,8 @@ All notable changes to HurricaneMap.
 - Refined first-run tour copy and retargeted the filter step to the Filters button on mobile, avoiding a spotlight on the collapsed offscreen filter panel.
 - Added a mobile More actions popover with text labels for export, report, QGIS, data, glossary, and settings commands.
 - Reflowed desktop Filters, Statistics, Storm Details, and State Details panels so common laptop viewports show their lower controls without panel scrolling.
-- Bumped the service worker shell cache to `hm-v1.3.9-q11` so installed users receive the responsive polish.
+- Embedded precomputed eight-dimensional storm similarity vectors in generated storm data and switched Similar Storms to use them with runtime fallback parity.
+- Bumped the service worker shell cache to `hm-v1.3.9-q12` so installed users receive the responsive polish and similarity-vector data path.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 

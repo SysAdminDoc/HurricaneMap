@@ -86,7 +86,7 @@ Focus: Deep statistical analysis, multi-storm comparisons, climate trend detecti
 
 ### Phase 9 Marginal Enhancements (Low-effort, high-value optimizations)
 
-- [ ] **P9.7 Pre-computed storm similarity embeddings** — Enhance P9.1 by pre-computing vector embeddings (via OpenAI/HF APIs during data generation) and embedding normalized vectors in `storms.json`. Enables instant similarity lookup without runtime computation. Effort: 1 day. Zero additional UI cost; makes P9.1 feel instantaneous.
+- [x] **P9.7 Pre-computed storm similarity embeddings** — ✅ v1.3.9. Precomputes the existing eight-dimensional normalized similarity vector into each generated `storms.json` row, validates the vector contract, and uses embedded vectors for instant nearest-neighbor lookup with runtime fallback parity for older data.
 
 ## Phase 10 — Real-time integration & forecasting context (✅ ADVANCED — v1.3.2)
 

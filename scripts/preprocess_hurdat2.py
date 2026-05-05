@@ -26,6 +26,27 @@ OUT_METADATA = DATA / "metadata.json"
 
 GENERATOR_NAME = "scripts/preprocess_hurdat2.py"
 METADATA_SCHEMA_VERSION = 1
+EARTH_R_KM = 6371.0088
+TS_THRESHOLD_KT = 34
+RI_THRESHOLD_KT = 30
+RI_WINDOW_HOURS = 24
+SIMILARITY_VECTOR_LENGTH = 8
+SIMILARITY_VECTOR_STATS = {
+    "wind_max": 185,
+    "wind_min": 35,
+    "landfalls_max": 7,
+    "landfalls_min": 0,
+    "track_km_max": 20000,
+    "track_km_min": 500,
+    "speed_max": 60,
+    "speed_min": 2,
+    "ri_max": 120,
+    "ri_min": 0,
+    "ace_max": 100,
+    "ace_min": 0,
+    "decay_max": 50,
+    "decay_min": -5,
+}
 
 # Saffir-Simpson categories from sustained wind in knots.
 def saffir_simpson(wind_kt: int) -> int:
@@ -345,6 +366,167 @@ def in_us_bbox(lon: float, lat: float) -> bool:
     return False
 
 
+def parse_track_time(value):
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def haversine_km(lat1, lon1, lat2, lon2) -> float:
+    d_lat = math.radians(lat2 - lat1)
+    d_lon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(d_lon / 2) ** 2
+    )
+    return 2 * EARTH_R_KM * math.asin(min(1, math.sqrt(a)))
+
+
+def compute_track_length_km(track) -> float:
+    points = [
+        rec for rec in track
+        if isinstance(rec.get("lat"), (int, float)) and isinstance(rec.get("lon"), (int, float))
+    ]
+    total = 0.0
+    for idx in range(1, len(points)):
+        a = points[idx - 1]
+        b = points[idx]
+        total += haversine_km(a["lat"], a["lon"], b["lat"], b["lon"])
+    return total
+
+
+def compute_translation_mean_kmh(track):
+    weighted_sum = 0.0
+    total_hours = 0.0
+    for idx in range(1, len(track)):
+        a = track[idx - 1]
+        b = track[idx]
+        if a.get("lat") is None or a.get("lon") is None or b.get("lat") is None or b.get("lon") is None:
+            continue
+        t0 = parse_track_time(a.get("t"))
+        t1 = parse_track_time(b.get("t"))
+        if not t0 or not t1:
+            continue
+        hours = (t1 - t0).total_seconds() / 3600
+        if hours <= 0 or hours > 12.5:
+            continue
+        kmh = haversine_km(a["lat"], a["lon"], b["lat"], b["lon"]) / hours
+        weighted_sum += kmh * hours
+        total_hours += hours
+    return weighted_sum / total_hours if total_hours else None
+
+
+def compute_ace(track) -> float:
+    ace = 0.0
+    for rec in track:
+        wind = rec.get("wind")
+        if wind is None or wind < TS_THRESHOLD_KT:
+            continue
+        t = parse_track_time(rec.get("t"))
+        if not t or t.hour % 6 != 0 or t.minute != 0:
+            continue
+        ace += (wind * wind) / 10000
+    return ace
+
+
+def compute_ri_delta(track) -> int:
+    best = 0
+    for idx, start in enumerate(track):
+        w0 = start.get("wind")
+        if w0 is None:
+            continue
+        t0 = parse_track_time(start.get("t"))
+        if not t0:
+            continue
+        for end in track[idx + 1:]:
+            w1 = end.get("wind")
+            if w1 is None:
+                continue
+            t1 = parse_track_time(end.get("t"))
+            if not t1:
+                continue
+            hours = (t1 - t0).total_seconds() / 3600
+            if hours > RI_WINDOW_HOURS + 0.5:
+                break
+            if hours < RI_WINDOW_HOURS - 0.5:
+                continue
+            delta = w1 - w0
+            if delta >= RI_THRESHOLD_KT:
+                best = max(best, delta)
+    return best
+
+
+def find_peak_wind_index(track):
+    best_idx = None
+    best_wind = -math.inf
+    for idx, rec in enumerate(track):
+        wind = rec.get("wind")
+        if wind is None:
+            continue
+        if wind > best_wind:
+            best_wind = wind
+            best_idx = idx
+    return best_idx
+
+
+def compute_decay_rate(storm_record) -> float:
+    track = storm_record.get("track") or []
+    peak_idx = find_peak_wind_index(track)
+    if peak_idx is None or peak_idx >= len(track):
+        return 0.0
+    peak_time = parse_track_time(track[peak_idx].get("t"))
+    if not peak_time:
+        return 0.0
+    peak_wind = storm_record.get("peak_wind_kt") or track[peak_idx].get("wind") or 0
+    final_wind = peak_wind
+    final_time = peak_time
+    for rec in track[peak_idx + 1:]:
+        if rec.get("wind") is None:
+            continue
+        t = parse_track_time(rec.get("t"))
+        if not t:
+            continue
+        final_wind = rec["wind"]
+        final_time = t
+    days = (final_time - peak_time).total_seconds() / (24 * 3600)
+    return (peak_wind - final_wind) / (days + 1)
+
+
+def genesis_month(track) -> int:
+    for rec in track:
+        t = parse_track_time(rec.get("t"))
+        if t:
+            return t.month
+    return 8
+
+
+def normalize(value, min_value, max_value) -> float:
+    if max_value == min_value:
+        return 0.0
+    return max(0.0, min(1.0, (value - min_value) / (max_value - min_value)))
+
+
+def compute_similarity_vector(storm_record) -> list[float]:
+    track = storm_record.get("track") or []
+    s = SIMILARITY_VECTOR_STATS
+    vector = [
+        normalize(storm_record.get("peak_wind_kt") or 50, s["wind_min"], s["wind_max"]),
+        normalize(len(storm_record.get("us_landfalls") or []), s["landfalls_min"], s["landfalls_max"]),
+        normalize(compute_track_length_km(track), s["track_km_min"], s["track_km_max"]),
+        normalize(compute_translation_mean_kmh(track) or 15, s["speed_min"], s["speed_max"]),
+        normalize(compute_ri_delta(track), s["ri_min"], s["ri_max"]),
+        normalize(compute_ace(track), s["ace_min"], s["ace_max"]),
+        normalize(compute_decay_rate(storm_record), s["decay_min"], s["decay_max"]),
+        (genesis_month(track) - 1) / 11,
+    ]
+    return [round(value, 6) for value in vector]
+
+
 def state_at_point(lon, lat, states):
     """Return state name if (lon, lat) is inside any US state polygon, else None.
     Strict PIP — used for inferred-landfall detection."""
@@ -512,6 +694,7 @@ def main():
                     for r in storm["track"]
                 ],
             }
+            storm_record["similarity_vector"] = compute_similarity_vector(storm_record)
             storms_with_us_landfall.append(storm_record)
             for lf in us_landfalls:
                 landfall_events.append({
