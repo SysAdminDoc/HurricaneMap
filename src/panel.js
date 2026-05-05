@@ -25,6 +25,7 @@ import {
   getRawDamageText,
   getRawFatalityText,
 } from './impact-utils.js';
+import { renderStormEventsSummary } from './storm-events.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -199,6 +200,7 @@ function render(storm, landfall, allStorms) {
         </div>
 
         ${renderImpactsBlock(storm, impacts)}
+        <div class="storm-events-host" id="storm-events-host"></div>
       </section>
 
       <section class="storm-analysis-cluster" aria-label="Storm analysis">
@@ -262,6 +264,7 @@ function render(storm, landfall, allStorms) {
   // Similar storms: compute top-5 neighbors and render.
   const similarStorms = findSimilarStorms(storm, allStorms, 5);
   renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
+  renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
 
   // Chart export buttons (PNG / SVG).
   const pngBtn = document.getElementById('chart-export-png');

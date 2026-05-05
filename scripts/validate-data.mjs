@@ -55,13 +55,14 @@ function assertImpactNumber(value, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
   readJson('data/impacts.json'),
   readJson('data/glossary.json'),
   readJson('data/metadata.json'),
+  readJson('data/storm-events.json'),
 ]);
 
 if (!Array.isArray(landfalls)) fail('data/landfalls.json must contain an array.');
@@ -70,6 +71,7 @@ if (!isObject(stats)) fail('data/stats.json must contain an object.');
 if (!isObject(impacts)) fail('data/impacts.json must contain an object.');
 if (!Array.isArray(glossary)) fail('data/glossary.json must contain an array.');
 if (!isObject(metadata)) fail('data/metadata.json must contain an object.');
+if (!isObject(stormEvents)) fail('data/storm-events.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
@@ -342,6 +344,35 @@ for (const [index, entry] of glossary.entries()) {
   }
   if (typeof entry.term !== 'string' || !entry.term.trim()) fail(`glossary[${index}]: term is required.`);
   if (typeof entry.definition !== 'string' || !entry.definition.trim()) fail(`glossary[${index}]: definition is required.`);
+}
+
+if (stormEvents.schema_version !== 1) fail('storm-events.schema_version must be 1.');
+if (!validIsoDate(stormEvents.generated_at_utc)) fail('storm-events.generated_at_utc must be an ISO timestamp.');
+if (!isObject(stormEvents.source)) fail('storm-events.source must be an object.');
+if (!isObject(stormEvents.methodology)) fail('storm-events.methodology must be an object.');
+if (!isObject(stormEvents.storms)) {
+  fail('storm-events.storms must be an object.');
+} else {
+  for (const [stormId, record] of Object.entries(stormEvents.storms)) {
+    if (!stormsById.has(stormId)) fail(`storm-events references unknown storm id ${stormId}.`);
+    if (!isObject(record)) {
+      fail(`storm-events.${stormId} must be an object.`);
+      continue;
+    }
+    if (!validNonNegativeInteger(record.tornado_count)) fail(`storm-events.${stormId}.tornado_count must be a non-negative integer.`);
+    if (!validNonNegativeInteger(record.hail_count)) fail(`storm-events.${stormId}.hail_count must be a non-negative integer.`);
+    if (!Array.isArray(record.states) || record.states.some(state => typeof state !== 'string' || !state)) {
+      fail(`storm-events.${stormId}.states must be a non-empty string array.`);
+    }
+    if (!isObject(record.state_counts)) fail(`storm-events.${stormId}.state_counts must be an object.`);
+    if (!Array.isArray(record.sample_events)) fail(`storm-events.${stormId}.sample_events must be an array.`);
+    if (record.max_hail_in != null && (!isFiniteNumber(record.max_hail_in) || record.max_hail_in <= 0)) {
+      fail(`storm-events.${stormId}.max_hail_in must be a positive number when present.`);
+    }
+    if (record.strongest_tornado_scale != null && typeof record.strongest_tornado_scale !== 'string') {
+      fail(`storm-events.${stormId}.strongest_tornado_scale must be a string when present.`);
+    }
+  }
 }
 
 if (errors.length) {

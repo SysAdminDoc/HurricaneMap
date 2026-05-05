@@ -120,7 +120,7 @@ Focus: Research-grade export, reproducible analysis, and educational integration
 
 ### Phase 12 Marginal Enhancements (Low-effort, niche but valuable)
 
-- [ ] **P12.6 NWS Storm Events integration** — Enrich storm panels with coincident tornado + hail activity via NWS API (open endpoints as of 2025). Expose as "Tornado activity during landfall: N events in [states]" metric. Addresses academic interest in storm + tornado coincidence patterns. Effort: 1–2 days. Risk: Low.
+- [x] **P12.6 NWS Storm Events integration** — ✅ v1.3.9. Builds a compact `data/storm-events.json` aggregate from NOAA/NCEI Storm Events bulk CSV files entered by NWS offices, matching Tornado/Hail rows by affected state from 24h before to 48h after each U.S. landfall. Storm panels now show "Tornado activity during landfall" and hail counts with strongest/maximum details, sample events, methodology copy, and empty states.
 
 ## Phase 13 — Visualization & 3D exploration (Future / Under Consideration)
 
