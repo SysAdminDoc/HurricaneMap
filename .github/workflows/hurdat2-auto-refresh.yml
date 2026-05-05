@@ -22,6 +22,15 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Node.js dependencies
+        run: npm install
+
       - name: Detect latest HURDAT2 filenames from NOAA
         id: detect
         run: |
@@ -105,6 +114,10 @@ jobs:
           
           echo "Preprocessing complete"
           ls -lh data/hurdat2*.json
+
+      - name: Validate generated datasets
+        if: steps.compare.outputs.changed == 'true'
+        run: npm run validate:data
 
       - name: Check for data differences
         if: steps.compare.outputs.changed == 'true'

@@ -29,6 +29,8 @@ Thumbs.db
 dist/
 build/
 *.tgz
+node_modules/
+npm-debug.log*
 
 # Playwright / dev artifacts
 .playwright-mcp/
