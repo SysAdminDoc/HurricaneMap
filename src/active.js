@@ -10,6 +10,7 @@ import {
   clearOfficialForecastContext,
   renderOfficialForecastContext,
 } from './cone.js';
+import { hideGoesRealtimeContext, renderGoesRealtimeContext } from './goes-realtime.js';
 import { getSetting } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
@@ -26,9 +27,13 @@ let badgeEl = null;
 let lastStorms = null;
 
 export async function startActiveStormPolling() {
-  // Listen for ensemble toggle changes
+  // Listen for active-storm context toggle changes.
   document.addEventListener('hm-settings:change', (e) => {
-    if (e.detail.key === 'ensembleTracks' || e.detail.key === 'nhcForecastCone') {
+    if (
+      e.detail.key === 'ensembleTracks' ||
+      e.detail.key === 'nhcForecastCone' ||
+      e.detail.key === 'goesRealtime'
+    ) {
       if (lastStorms) {
         renderActive(lastStorms);
       }
@@ -58,6 +63,7 @@ async function fetchAndRender() {
       layerGroup = null;
     }
     hideEnsembleTracks();
+    hideGoesRealtimeContext();
     clearOfficialForecastContext();
     clearOfficialForecastCache();
     return;
@@ -147,6 +153,16 @@ async function renderActive(storms) {
     map,
     enabled: officialConeEnabled,
   });
+
+  const goesEnabled = getSetting('goesRealtime');
+  if (goesEnabled) {
+    await renderGoesRealtimeContext(storms, {
+      map,
+      enabled: true,
+    });
+  } else {
+    hideGoesRealtimeContext();
+  }
 
   // Render ensemble tracks if enabled
   const ensembleEnabled = getSetting('ensembleTracks');
