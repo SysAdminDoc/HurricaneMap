@@ -21,6 +21,23 @@ A static, interactive web map that plots **every recorded hurricane and tropical
 
 Click any dot and you get the storm's full track, its peak intensity, every U.S. landfall it made (chronological), and one-click jumps to the Wikipedia article, YouTube footage search, NOAA Tropical Cyclone Report, and the NHC storm wallet.
 
+## Quality plan
+
+The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md). It covers regression automation, data contracts, URL state, service-worker update UX, accessibility coverage, visual snapshots, and maintainability work.
+
+Local verification:
+
+```bash
+npm install
+npm test
+```
+
+Fast non-browser verification:
+
+```bash
+npm run build
+```
+
 ## Highlights
 
 - **596 storms · 760 landfall events · 374 hurricane-strength landfalls** spanning 1851–2025.

@@ -1,0 +1,18 @@
+{
+  "name": "hurricanemap",
+  "version": "1.3.9",
+  "private": true,
+  "type": "module",
+  "description": "Static NOAA HURDAT2 hurricane landfall map.",
+  "scripts": {
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "check:sw": "node scripts/check-service-worker.mjs",
+    "validate:data": "node scripts/validate-data.mjs",
+    "test:smoke": "node scripts/smoke-playwright.mjs",
+    "build": "npm run check:syntax && npm run check:sw && npm run validate:data",
+    "test": "npm run build && npm run test:smoke"
+  },
+  "devDependencies": {
+    "playwright": "1.59.1"
+  }
+}

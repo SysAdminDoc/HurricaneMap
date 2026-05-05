@@ -28,8 +28,10 @@ import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 
-const YEAR_MIN_DEFAULT = 1851;
-const YEAR_MAX_DEFAULT = 2025;
+const YEAR_FALLBACK_MIN = 1851;
+const YEAR_FALLBACK_MAX = 2025;
+let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
+let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;
 const CATEGORY_DEFAULTS = ['ts', '1', '2', '3', '4', '5'];
 const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
 const CATEGORY_HASH_DEFAULT = [...CATEGORY_DEFAULTS].sort().join(',');
@@ -50,14 +52,16 @@ let activeSearchIndex = -1;
 // ---------------- URL hash state (permalinks) ----------------
 // Format: #y=1990-2025&c=3,4,5&s=Florida&t=1&h=0&storm=AL092005
 // Falsy/default values are omitted to keep links short.
-const DEFAULT_HASH = {
-  y: `${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT}`,
-  c: CATEGORY_HASH_DEFAULT,
-  s: '',
-  t: '0',
-  h: '0',
-  storm: '',
-};
+function getDefaultHash() {
+  return {
+    y: `${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT}`,
+    c: CATEGORY_HASH_DEFAULT,
+    s: '',
+    t: '0',
+    h: '0',
+    storm: '',
+  };
+}
 
 function encodeHash() {
   const cur = {
@@ -69,8 +73,9 @@ function encodeHash() {
     storm: openStormId || '',
   };
   const parts = [];
+  const defaults = getDefaultHash();
   for (const k of Object.keys(cur)) {
-    if (cur[k] && cur[k] !== DEFAULT_HASH[k]) {
+    if (cur[k] && cur[k] !== defaults[k]) {
       parts.push(`${k}=${encodeURIComponent(cur[k])}`);
     }
   }
@@ -153,6 +158,36 @@ const els = {
   loading: document.getElementById('loading'),
 };
 
+function syncYearBoundsFromStats() {
+  const range = getStats()?.year_range;
+  if (!Array.isArray(range) || range.length !== 2) return;
+  const [minYear, maxYear] = range.map(Number);
+  if (!Number.isInteger(minYear) || !Number.isInteger(maxYear) || minYear > maxYear) return;
+
+  const wasAtFallback = filters.yearMin === YEAR_FALLBACK_MIN && filters.yearMax === YEAR_FALLBACK_MAX;
+  YEAR_MIN_DEFAULT = minYear;
+  YEAR_MAX_DEFAULT = maxYear;
+  if (wasAtFallback) {
+    filters.yearMin = YEAR_MIN_DEFAULT;
+    filters.yearMax = YEAR_MAX_DEFAULT;
+  }
+  updateYearControlBounds();
+}
+
+function updateYearControlBounds() {
+  if (els.yearMin) {
+    els.yearMin.min = String(YEAR_MIN_DEFAULT);
+    els.yearMin.max = String(YEAR_MAX_DEFAULT);
+  }
+  if (els.yearMax) {
+    els.yearMax.min = String(YEAR_MIN_DEFAULT);
+    els.yearMax.max = String(YEAR_MAX_DEFAULT);
+  }
+  if (els.clearYearFilter) {
+    els.clearYearFilter.title = `Reset to the full ${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT} range`;
+  }
+}
+
 async function boot() {
   // Initialize locale (before any rendering)
   initLocale();
@@ -170,6 +205,7 @@ async function boot() {
   }
   const map = initMap();
   await loadInitial();
+  syncYearBoundsFromStats();
   populateStateFilter();
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
