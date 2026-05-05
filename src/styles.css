@@ -6797,6 +6797,38 @@ html.high-contrast {
   gap: 8px;
 }
 
+.globe3d-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(245, 247, 255, 0.16);
+  border-radius: 10px;
+  color: #f5f7ff;
+  background: rgba(245, 247, 255, 0.09);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.globe3d-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--sapphire);
+}
+
+.globe3d-toggle:focus-within {
+  outline: 2px solid rgba(180, 190, 254, 0.78);
+  outline-offset: 2px;
+}
+
+.globe3d-toggle.is-disabled {
+  opacity: 0.55;
+}
+
 .globe3d-actions .text-btn {
   min-height: 34px;
   color: #f5f7ff;
@@ -6877,8 +6909,23 @@ html.high-contrast .globe3d-topbar {
   }
 
   .globe3d-actions {
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr) 34px;
+    justify-content: stretch;
+    gap: 6px;
+  }
+
+  .globe3d-toggle,
+  .globe3d-actions .text-btn {
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+
+  .globe3d-actions .close-btn {
+    width: 34px;
   }
 
   .globe3d-timeline {

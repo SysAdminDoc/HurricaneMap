@@ -9,9 +9,25 @@ const CESIUM_CSS_URL = `${CESIUM_BASE_URL}Widgets/widgets.css`;
 const MAX_GLOBE_STORMS = 80;
 const MIN_TRACK_HEIGHT_M = 80_000;
 const HEIGHT_PER_KT_M = 2_200;
+const WIND_CONE_POINTS_PER_QUADRANT = 7;
+const NM_PER_DEG_LAT = 60;
+
+const WIND_CONE_THRESHOLDS = [
+  { threshold: 34, offset: 0, baseHeight: 48_000, color: '#74c7ec', alpha: 0.11 },
+  { threshold: 50, offset: 4, baseHeight: 92_000, color: '#fab387', alpha: 0.14 },
+  { threshold: 64, offset: 8, baseHeight: 138_000, color: '#f38ba8', alpha: 0.18 },
+];
+
+const WIND_CONE_QUADRANTS = [
+  { name: 'NE', startBearing: 0, endBearing: 90 },
+  { name: 'SE', startBearing: 90, endBearing: 180 },
+  { name: 'SW', startBearing: 180, endBearing: 270 },
+  { name: 'NW', startBearing: 270, endBearing: 360 },
+];
 
 let cesiumPromise = null;
 let viewer = null;
+let cesiumApi = null;
 let renderedEntities = [];
 let currentDataset = null;
 let previouslyFocused = null;
@@ -26,6 +42,7 @@ const els = typeof document === 'undefined' ? {} : {
   timeLabel: document.getElementById('globe3d-time-label'),
   reset: document.getElementById('globe3d-reset'),
   focus: document.getElementById('globe3d-focus'),
+  windCones: document.getElementById('globe3d-wind-cones'),
   trigger: document.getElementById('toggle-globe3d'),
 };
 
@@ -35,6 +52,11 @@ export function initGlobe3D() {
   els.reset?.addEventListener('click', () => flyToDataset(currentDataset));
   els.focus?.addEventListener('click', () => flyToFocus(currentDataset));
   els.scrubber?.addEventListener('input', () => updateTimeline(Number(els.scrubber.value || 0)));
+  els.windCones?.addEventListener('change', () => {
+    if (!cesiumApi || !currentDataset) return;
+    renderDataset(cesiumApi, currentDataset);
+    updateTimeline(Number(els.scrubber?.value || currentDataset.timeline.length - 1));
+  });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !els.panel.hidden) {
       event.preventDefault();
@@ -67,7 +89,9 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
 
   try {
     const Cesium = await loadCesium();
+    cesiumApi = Cesium;
     ensureViewer(Cesium);
+    configureWindConeControl(dataset);
     renderDataset(Cesium, dataset);
     configureScrubber(dataset);
     updateTimeline(dataset.timeline.length - 1);
@@ -124,6 +148,7 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
 
   const timelineValues = new Set();
   const segments = [];
+  const windCones = [];
   let maxWind = 0;
   for (const storm of selectedStorms) {
     for (let i = 1; i < storm.track.length; i++) {
@@ -151,6 +176,13 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
         ],
       });
     }
+    if (focusStormId || selectedStorms.length === 1) {
+      const layers = buildWindConeLayers(storm);
+      for (const layer of layers) {
+        timelineValues.add(layer.time);
+        windCones.push(layer);
+      }
+    }
   }
 
   const timeline = [...timelineValues].sort((a, b) => a - b);
@@ -158,6 +190,9 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
   for (const segment of segments) {
     segment.startIndex = indexByTime.get(segment.start) ?? 0;
     segment.endIndex = indexByTime.get(segment.end) ?? segment.startIndex;
+  }
+  for (const cone of windCones) {
+    cone.endIndex = indexByTime.get(cone.time) ?? 0;
   }
 
   return {
@@ -169,10 +204,45 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
       peak_wind_kt: storm.peak_wind_kt,
     })),
     segments,
+    windCones,
     timeline,
     maxWind,
     capped: !focusStormId && ids.length >= maxStorms && visibleStormCount > maxStorms,
   };
+}
+
+export function buildWindConeLayers(storm) {
+  if (!storm?.track) return [];
+  const layers = [];
+  for (const point of storm.track) {
+    if (!validTrackPoint(point) || !Array.isArray(point.radii)) continue;
+    if (!['HU', 'TS', 'SS'].includes(point.status)) continue;
+    const time = Date.parse(point.t);
+    if (!Number.isFinite(time)) continue;
+    for (const pass of WIND_CONE_THRESHOLDS) {
+      const quadRadii = point.radii.slice(pass.offset, pass.offset + 4);
+      if (!quadRadii.some(value => Number(value) > 0)) continue;
+      const ring = buildWindConeRing(point.lat, point.lon, quadRadii, pass.baseHeight);
+      if (ring.length < 4) continue;
+      const wind = Number.isFinite(point.wind) ? point.wind : pass.threshold;
+      layers.push({
+        storm_id: storm.id,
+        name: storm.name,
+        year: storm.year,
+        time,
+        threshold: pass.threshold,
+        color: pass.color,
+        alpha: pass.alpha,
+        center: [point.lon, point.lat, getWindConeApexHeightMeters(wind, pass.baseHeight)],
+        ring,
+      });
+    }
+  }
+  return layers;
+}
+
+export function getWindConeApexHeightMeters(windKt, baseHeight = 48_000) {
+  return Math.max(baseHeight + 120_000, getTrackHeightMeters(windKt) + 90_000);
 }
 
 export function getTrackHeightMeters(windKt) {
@@ -198,6 +268,31 @@ function validTrackPoint(point) {
     point.lat <= 90 &&
     point.lon >= -180 &&
     point.lon <= 180;
+}
+
+function buildWindConeRing(lat, lon, quadRadiiNm, baseHeight) {
+  const ring = [];
+  for (let q = 0; q < WIND_CONE_QUADRANTS.length; q++) {
+    const radius = Number(quadRadiiNm[q]) || 0;
+    const { startBearing, endBearing } = WIND_CONE_QUADRANTS[q];
+    if (radius <= 0) {
+      ring.push([lon, lat, baseHeight]);
+      continue;
+    }
+    for (let i = 0; i < WIND_CONE_POINTS_PER_QUADRANT; i++) {
+      const fraction = i / (WIND_CONE_POINTS_PER_QUADRANT - 1);
+      const bearing = startBearing + (endBearing - startBearing) * fraction;
+      ring.push([...offsetByBearing(lat, lon, radius, bearing), baseHeight]);
+    }
+  }
+  return ring;
+}
+
+function offsetByBearing(lat, lon, distNm, bearingDeg) {
+  const br = (bearingDeg * Math.PI) / 180;
+  const dLat = (distNm / NM_PER_DEG_LAT) * Math.cos(br);
+  const dLon = (distNm / NM_PER_DEG_LAT) * Math.sin(br) / Math.max(0.05, Math.cos((lat * Math.PI) / 180));
+  return [lon + dLon, lat + dLat];
 }
 
 function loadCesium() {
@@ -276,8 +371,59 @@ function renderDataset(Cesium, dataset) {
     entity._hmStormId = segment.storm_id;
     renderedEntities.push(entity);
   }
+  if (els.windCones?.checked && dataset.windCones?.length) {
+    renderWindCones(Cesium, dataset);
+  }
   els.panel.dataset.entities = String(renderedEntities.length);
+  els.panel.dataset.windCones = String(dataset.windCones?.length || 0);
   viewer.scene.requestRender();
+}
+
+function renderWindCones(Cesium, dataset) {
+  for (const cone of dataset.windCones || []) {
+    const color = Cesium.Color.fromCssColorString(cone.color).withAlpha(cone.alpha);
+    const outlineColor = Cesium.Color.fromCssColorString(cone.color).withAlpha(Math.min(0.78, cone.alpha + 0.36));
+    const center = cone.center;
+    for (let i = 0; i < cone.ring.length; i++) {
+      const a = cone.ring[i];
+      const b = cone.ring[(i + 1) % cone.ring.length];
+      if (!a || !b) continue;
+      const entity = viewer.entities.add({
+        name: `${formatStormName(cone.name)} ${cone.year} ${cone.threshold} kt wind cone`,
+        polygon: {
+          hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArrayHeights([
+            center[0], center[1], center[2],
+            a[0], a[1], a[2],
+            b[0], b[1], b[2],
+          ])),
+          perPositionHeight: true,
+          material: color,
+          outline: false,
+        },
+        description: `${escapeHtml(formatStormName(cone.name))} ${escapeHtml(cone.year)} · ${escapeHtml(cone.threshold)} kt wind-radii cone`,
+      });
+      entity._hmEndIndex = cone.endIndex;
+      entity._hmStormId = cone.storm_id;
+      entity._hmWindCone = true;
+      renderedEntities.push(entity);
+    }
+
+    const ringPositions = [];
+    for (const point of cone.ring) ringPositions.push(point[0], point[1], point[2]);
+    const outline = viewer.entities.add({
+      name: `${formatStormName(cone.name)} ${cone.year} ${cone.threshold} kt wind-radii outline`,
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArrayHeights([...ringPositions, ...cone.ring[0]]),
+        width: cone.threshold === 64 ? 1.8 : 1.2,
+        material: outlineColor,
+        arcType: Cesium.ArcType.GEODESIC,
+      },
+    });
+    outline._hmEndIndex = cone.endIndex;
+    outline._hmStormId = cone.storm_id;
+    outline._hmWindCone = true;
+    renderedEntities.push(outline);
+  }
 }
 
 function configureScrubber(dataset) {
@@ -290,6 +436,20 @@ function configureScrubber(dataset) {
   els.scrubber.setAttribute('aria-valuemin', '0');
   els.scrubber.setAttribute('aria-valuemax', String(max));
   els.scrubber.setAttribute('aria-valuenow', String(max));
+}
+
+function configureWindConeControl(dataset) {
+  if (!els.windCones) return;
+  const count = dataset.windCones?.length || 0;
+  els.windCones.disabled = count <= 0;
+  els.windCones.checked = count > 0;
+  els.windCones.closest('.globe3d-toggle')?.classList.toggle('is-disabled', count <= 0);
+  els.windCones.closest('.globe3d-toggle')?.setAttribute(
+    'title',
+    count > 0
+      ? `${count.toLocaleString()} wind-radii cone layers available for this storm`
+      : 'Wind-radii cones are available when a focused or single selected storm has 2004+ radii data',
+  );
 }
 
 function updateTimeline(index) {
@@ -332,8 +492,11 @@ function updateSubtitle(dataset) {
   if (!els.subtitle || !dataset) return;
   const stormCount = dataset.storms.length;
   const mode = dataset.focusStormId ? 'focused storm' : 'visible selection';
+  const cones = dataset.windCones?.length
+    ? ` · ${dataset.windCones.length.toLocaleString()} wind-cone layers`
+    : '';
   const cap = dataset.capped ? ' · capped for performance' : '';
-  els.subtitle.textContent = `${stormCount.toLocaleString()} ${stormCount === 1 ? 'storm' : 'storms'} · ${dataset.segments.length.toLocaleString()} elevated segments · ${mode}${cap}`;
+  els.subtitle.textContent = `${stormCount.toLocaleString()} ${stormCount === 1 ? 'storm' : 'storms'} · ${dataset.segments.length.toLocaleString()} elevated segments${cones} · ${mode}${cap}`;
 }
 
 function setStatus(message) {

@@ -204,6 +204,7 @@ try {
     return {
       ready: panel.dataset.ready,
       entities: Number(panel.dataset.entities || 0),
+      windCones: Number(panel.dataset.windCones || 0),
       width: box.width,
       height: box.height,
       status,
@@ -217,9 +218,10 @@ try {
 
   assert(desktop.ready === 'true', '3D globe did not mark itself ready');
   assert(desktop.entities > 0, '3D globe did not create track entities');
+  assert(desktop.windCones > 0, '3D globe did not expose focused storm wind-cone layers');
   assert(desktop.width >= 1000 && desktop.height >= 700, `desktop canvas is too small: ${desktop.width}x${desktop.height}`);
   assert(/3D globe ready/.test(desktop.status), `unexpected globe status: ${desktop.status}`);
-  assert(/elevated segments/.test(desktop.subtitle) && /focused storm/.test(desktop.subtitle), `globe subtitle did not summarize focused tracks: ${desktop.subtitle}`);
+  assert(/elevated segments/.test(desktop.subtitle) && /wind-cone layers/.test(desktop.subtitle) && /focused storm/.test(desktop.subtitle), `globe subtitle did not summarize focused tracks and cones: ${desktop.subtitle}`);
   assert(
     desktopPixels.nonDarkPixels > 50_000 && desktopPixels.variedPixels > 50_000 && desktopPixels.saturatedPixels > 1_000,
     `desktop canvas appears blank or unrendered: ${JSON.stringify({ desktop, desktopPixels })}`,
@@ -255,7 +257,7 @@ try {
   await browser.close();
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
 
-  console.log(`globe3d smoke ok (${Math.round(desktop.width)}x${Math.round(desktop.height)}, ${desktop.entities} entities, ${desktopPixels.variedPixels} varied pixels)`);
+  console.log(`globe3d smoke ok (${Math.round(desktop.width)}x${Math.round(desktop.height)}, ${desktop.entities} entities, ${desktop.windCones} cone layers, ${desktopPixels.variedPixels} varied pixels)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
