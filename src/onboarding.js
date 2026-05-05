@@ -8,25 +8,29 @@ const STEPS = [
   {
     target: '.app-header',
     title: 'Welcome to HurricaneMap',
-    body: '174 years of U.S. hurricane and tropical-storm landfalls — every dot is a real recorded event from NOAA HURDAT2.',
+    body: 'Explore 174 years of U.S. hurricane and tropical-storm landfalls. Every dot is a recorded NOAA HURDAT2 event.',
     placement: 'bottom',
   },
   {
     target: '#filters',
+    mobileTarget: '#toggle-filters',
     title: 'Filter the catalog',
-    body: 'Narrow by year, Saffir-Simpson category, U.S. state, or search a storm by name (Katrina, Helene, Andrew…).',
+    mobileTitle: 'Open filters',
+    body: 'Narrow the map by year, Saffir-Simpson category, U.S. state, or storm name.',
+    mobileBody: 'Tap Filters to open year, category, state, and storm-search controls.',
     placement: 'right',
+    mobilePlacement: 'bottom',
   },
   {
     target: '#toggle-stats',
     title: 'Open the statistics panel',
-    body: 'Decadal trends, top-10 lists, ACE totals, and rapid-intensification counts across the entire dataset.',
+    body: 'Review decadal trends, top storms, ACE totals, and rapid-intensification counts.',
     placement: 'bottom',
   },
   {
     target: '#toggle-info',
     title: 'About the data',
-    body: 'Methodology, coverage gaps, and the radar archive for every storm since 1995. Dive in when you have questions.',
+    body: 'Open source notes, methodology, coverage gaps, and radar archive details when you need provenance.',
     placement: 'bottom',
   },
 ];
@@ -74,8 +78,19 @@ function start() {
   const prevBtn = overlay.querySelector('.onb-prev');
   const skipBtn = overlay.querySelector('.onb-skip');
 
+  function resolveStep(step) {
+    const narrow = window.innerWidth <= 720;
+    return {
+      ...step,
+      target: narrow && step.mobileTarget ? step.mobileTarget : step.target,
+      title: narrow && step.mobileTitle ? step.mobileTitle : step.title,
+      body: narrow && step.mobileBody ? step.mobileBody : step.body,
+      placement: narrow && step.mobilePlacement ? step.mobilePlacement : step.placement,
+    };
+  }
+
   function place() {
-    const step = STEPS[idx];
+    const step = resolveStep(STEPS[idx]);
     const target = document.querySelector(step.target);
     if (!target) {
       // Hide spotlight, center the card.
@@ -94,7 +109,12 @@ function start() {
       // Position card relative to spotlight.
       const cardW = Math.min(340, window.innerWidth - 32);
       let cx = r.left + r.width / 2 - cardW / 2;
-      let cy = r.bottom + 16;
+      let cy = step.placement === 'right' && window.innerWidth > 760
+        ? r.top
+        : r.bottom + 16;
+      if (step.placement === 'right' && window.innerWidth > 760) {
+        cx = r.right + 16;
+      }
       const winH = window.innerHeight;
       if (cy + 200 > winH - 16) cy = Math.max(16, r.top - 220);
       cx = Math.max(16, Math.min(window.innerWidth - cardW - 16, cx));

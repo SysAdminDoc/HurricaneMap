@@ -56,61 +56,73 @@
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.14 12.94a7.49 7.49 0 0 0 .05-.94 7.49 7.49 0 0 0-.05-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.84a.5.5 0 0 0-.5.42l-.36 2.54a7.03 7.03 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.48a.5.5 0 0 0 .12.64l2.03 1.58a7.49 7.49 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54a7.03 7.03 0 0 0 1.62-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/></svg>
       </button>
     </div>
-    <div class="settings-menu glass" id="settings-menu" role="dialog" aria-modal="false" aria-labelledby="settings-menu-title" hidden>
-      <h2 id="settings-menu-title" class="sr-only">Display settings</h2>
-      <div class="settings-row">
-        <div class="settings-label">Wind units</div>
-        <div class="settings-pillgroup" role="radiogroup" aria-label="Wind unit">
-          <button class="settings-pill" data-set-unit="kt" role="radio">Knots</button>
-          <button class="settings-pill" data-set-unit="mph" role="radio">mph</button>
-          <button class="settings-pill" data-set-unit="kmh" role="radio">km/h</button>
+    <div class="settings-menu glass" id="settings-menu" role="dialog" aria-modal="false" aria-labelledby="settings-menu-title" aria-describedby="settings-menu-description" hidden>
+      <div class="settings-menu-header">
+        <h2 id="settings-menu-title">Display settings</h2>
+        <p id="settings-menu-description">Adjust reading, color, and data preferences. Changes stay in this browser.</p>
+      </div>
+      <section class="settings-section" aria-labelledby="settings-reading-title">
+        <h3 id="settings-reading-title">Reading</h3>
+        <div class="settings-row">
+          <div class="settings-label">Wind units</div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Wind unit">
+            <button class="settings-pill" data-set-unit="kt" role="radio">Knots</button>
+            <button class="settings-pill" data-set-unit="mph" role="radio">mph</button>
+            <button class="settings-pill" data-set-unit="kmh" role="radio">km/h</button>
+          </div>
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-label">Theme</div>
-        <div class="settings-pillgroup" role="radiogroup" aria-label="Theme">
-          <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)">Dark</button>
-          <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)">Light</button>
-          <button class="settings-pill" data-set-theme="system" role="radio" title="Follow your operating system color scheme">System</button>
+        <div class="settings-row">
+          <div class="settings-label">Damage figures</div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Damage adjustment">
+            <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm">Nominal</button>
+            <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
+          </div>
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-label">Color palette</div>
-        <div class="settings-pillgroup" role="radiogroup" aria-label="Color palette">
-          <button class="settings-pill" data-set-palette="default" role="radio">Default</button>
-          <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd — sequential, distinguishable for deuteranopia/protanopia/tritanopia">Colorblind</button>
+        <div class="settings-row">
+          <div class="settings-label">Language</div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Language">
+            <button class="settings-pill" data-set-locale="en" role="radio">English</button>
+            <button class="settings-pill" data-set-locale="es" role="radio">Español</button>
+          </div>
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-label">Language</div>
-        <div class="settings-pillgroup" role="radiogroup" aria-label="Language">
-          <button class="settings-pill" data-set-locale="en" role="radio">English</button>
-          <button class="settings-pill" data-set-locale="es" role="radio">Español</button>
+      </section>
+      <section class="settings-section" aria-labelledby="settings-appearance-title">
+        <h3 id="settings-appearance-title">Appearance</h3>
+        <div class="settings-row">
+          <div class="settings-label">Theme</div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Theme">
+            <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)">Dark</button>
+            <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)">Light</button>
+            <button class="settings-pill" data-set-theme="system" role="radio" title="Follow your operating system color scheme">System</button>
+          </div>
         </div>
-      </div>
-      <div class="settings-row">
-        <div class="settings-label">Damage figures</div>
-        <div class="settings-pillgroup" role="radiogroup" aria-label="Damage adjustment">
-          <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm">Nominal</button>
-          <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
+        <div class="settings-row">
+          <div class="settings-label">Color palette</div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Color palette">
+            <button class="settings-pill" data-set-palette="default" role="radio">Default</button>
+            <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd: sequential and distinguishable for common color-vision differences">Colorblind</button>
+          </div>
         </div>
-      </div>
-      <div class="settings-row">
-        <label class="toggle-row">
-          <input type="checkbox" id="toggle-ensemble-tracks" />
-          <span>Forecast ensemble tracks when storms are active</span>
-        </label>
-      </div>
-      <div class="settings-row">
-        <label class="toggle-row">
-          <input type="checkbox" id="toggle-high-contrast" />
-          <span>High-contrast mode</span>
-        </label>
-      </div>
-      <div class="settings-row settings-row--action">
-        <button class="settings-action" id="replay-tour" type="button">Replay welcome tour</button>
-      </div>
-      <div class="settings-meta">Settings save to your browser only — no account required.</div>
+        <div class="settings-row">
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-high-contrast" />
+            <span>High-contrast mode</span>
+          </label>
+        </div>
+      </section>
+      <section class="settings-section" aria-labelledby="settings-assist-title">
+        <h3 id="settings-assist-title">Guidance</h3>
+        <div class="settings-row">
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-ensemble-tracks" />
+            <span>Forecast ensemble tracks when storms are active</span>
+          </label>
+        </div>
+        <div class="settings-row settings-row--action">
+          <button class="settings-action" id="replay-tour" type="button">Replay welcome tour</button>
+        </div>
+      </section>
+      <div class="settings-meta">Saved locally. No account or external profile is used.</div>
     </div>
   </header>
 
