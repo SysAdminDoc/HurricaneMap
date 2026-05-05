@@ -11,7 +11,8 @@ All notable changes to HurricaneMap.
 - Moved mobile map controls and panels below the command surface so zoom controls, panels, filters, and the timeline no longer collide at phone widths.
 - Added visible settings hierarchy with Reading, Appearance, and Guidance groups, clearer local-save copy, and more legible mobile settings layout.
 - Refined first-run tour copy and retargeted the filter step to the Filters button on mobile, avoiding a spotlight on the collapsed offscreen filter panel.
-- Bumped the service worker shell cache to `hm-v1.3.9-q9` so installed users receive the responsive polish.
+- Added a mobile More actions popover with text labels for export, report, QGIS, data, glossary, and settings commands.
+- Bumped the service worker shell cache to `hm-v1.3.9-q10` so installed users receive the responsive polish.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 

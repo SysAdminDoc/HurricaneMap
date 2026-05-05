@@ -5623,7 +5623,7 @@ html.high-contrast {
   }
 }
 
-/* Premium responsive command/settings polish v1.3.9-q9
+/* Premium responsive command/settings polish v1.3.9-q10
    Final layer for mobile command discoverability, settings hierarchy, and map
    control collision without changing the vanilla app architecture. */
 .settings-menu {
@@ -5709,6 +5709,18 @@ html.high-contrast {
   line-height: 1.4;
 }
 
+.mobile-more-btn {
+  display: none !important;
+}
+
+.mobile-actions-menu {
+  display: contents;
+}
+
+.mobile-action-label {
+  display: none;
+}
+
 @media (max-width: 720px) {
   :root {
     --side-panel-top: 138px;
@@ -5784,6 +5796,69 @@ html.high-contrast {
   .header-actions .icon-btn {
     flex: 0 0 44px;
     scroll-snap-align: start;
+  }
+
+  .header-actions:has(.mobile-actions-menu[data-open="true"]) {
+    overflow: visible !important;
+    mask-image: none !important;
+  }
+
+  .mobile-more-btn {
+    display: inline-flex !important;
+  }
+
+  .mobile-actions-menu {
+    position: fixed;
+    top: calc(var(--side-panel-top) + 2px);
+    right: 10px;
+    z-index: 2800;
+    display: grid !important;
+    width: min(282px, calc(100vw - 20px));
+    padding: 8px;
+    gap: 6px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    background: var(--surface-panel);
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top right;
+    transition: opacity 140ms var(--ease-standard), transform 140ms var(--ease-standard), visibility 140ms var(--ease-standard);
+    visibility: hidden;
+  }
+
+  .mobile-actions-menu[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+  }
+
+  .mobile-actions-menu .icon-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    justify-content: flex-start !important;
+    gap: 10px;
+    padding: 0 12px !important;
+    border-radius: 12px !important;
+    scroll-snap-align: none;
+  }
+
+  .mobile-actions-menu .icon-btn::after {
+    display: none !important;
+  }
+
+  .mobile-action-label {
+    display: inline;
+    overflow: hidden;
+    color: currentColor;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .leaflet-top.leaflet-right {
