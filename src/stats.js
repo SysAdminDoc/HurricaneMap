@@ -72,44 +72,54 @@ function render() {
 
     <div id="seasonal-outlook-host"></div>
 
-    <section class="stats-section">
-      <h3>Landfalls by state</h3>
-      ${stateBars}
-    </section>
+    <div class="stats-panel-layout">
+      <div class="stats-panel-column stats-panel-column--counts">
+        <section class="stats-section stats-section--states">
+          <h3>Landfalls by state</h3>
+          ${stateBars}
+        </section>
 
-    <section class="stats-section">
-      <h3>Landfalls by decade</h3>
-      ${decadeBars}
-    </section>
+        <section class="stats-section stats-section--categories">
+          <h3>Landfalls by category</h3>
+          ${catBars}
+        </section>
 
-    <section class="stats-section">
-      <h3>Landfalls by category</h3>
-      ${catBars}
-    </section>
+        <section class="stats-section stats-section--cold">
+          <h3>Coastal states with no recorded hurricane landfall</h3>
+          <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
+          <p class="stats-note">
+            Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
+            HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.
+          </p>
+        </section>
+      </div>
 
-    <section class="stats-section">
-      <h3>Annual climatology — ACE, named storms, US landfalls</h3>
-      <div id="climatology-chart" class="clim-host"></div>
-    </section>
+      <div class="stats-panel-column stats-panel-column--decades">
+        <section class="stats-section stats-section--decades">
+          <h3>Landfalls by decade</h3>
+          ${decadeBars}
+        </section>
+      </div>
 
-    <section class="stats-section">
-      <h3>Climate trends — 10-year rolling averages</h3>
-      <div id="climate-trends-chart" class="climate-trends-host"></div>
-    </section>
+      <div class="stats-panel-column stats-panel-column--charts">
+        <section class="stats-section stats-section--climatology">
+          <h3>Annual climatology — ACE, named storms, US landfalls</h3>
+          <div id="climatology-chart" class="clim-host"></div>
+        </section>
 
-    <section class="stats-section">
-      <h3>Decade-by-decade trends</h3>
-      <div id="decade-trends-chart" class="dt-host"></div>
-    </section>
+        <section class="stats-section stats-section--climate">
+          <h3>Climate trends — 10-year rolling averages</h3>
+          <div id="climate-trends-chart" class="climate-trends-host"></div>
+        </section>
+      </div>
 
-    <section class="stats-section">
-      <h3>Coastal states with no recorded hurricane landfall</h3>
-      <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
-      <p class="stats-note">
-        Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
-        HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.
-      </p>
-    </section>
+      <div class="stats-panel-column stats-panel-column--trend-table">
+        <section class="stats-section stats-section--trend-table">
+          <h3>Decade-by-decade trends</h3>
+          <div id="decade-trends-chart" class="dt-host"></div>
+        </section>
+      </div>
+    </div>
   `;
   // Async-render the climatology chart and decade trends after the synchronous stats are mounted.
   const climHost = document.getElementById('climatology-chart');

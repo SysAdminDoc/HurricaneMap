@@ -5951,3 +5951,708 @@ html.high-contrast {
     max-height: calc(100vh - 150px) !important;
   }
 }
+
+/* Desktop panel fit polish v1.3.9-q11
+   Reflows dense analytical panels into desktop dashboards so common laptop
+   viewports expose the lower controls without panel scrolling. */
+@media (min-width: 1121px) {
+  :root {
+    --desktop-panel-width: min(1040px, calc(100vw - 48px));
+  }
+
+  .filters:not(.collapsed) {
+    bottom: 16px !important;
+    width: min(620px, calc(100vw - 32px)) !important;
+    max-height: calc(100vh - 116px) !important;
+    padding: 12px 14px !important;
+    gap: 8px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+    column-gap: 12px !important;
+    row-gap: 8px !important;
+  }
+
+  .filters .filter-row {
+    margin: 0 !important;
+  }
+
+  body.side-panel-open .filters:not(.collapsed) {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-8px) scale(0.985);
+  }
+
+  #filters > .filter-row--year,
+  #filters > .filter-row:nth-of-type(3),
+  #filters > .filter-row:nth-of-type(4),
+  #filters > .filter-footer {
+    grid-column: 1;
+  }
+
+  #filters > .filter-row--cats,
+  #filters > .filter-group,
+  #filters > .filter-row:nth-of-type(6),
+  #filters > .filter-legend {
+    grid-column: 2;
+  }
+
+  .filters .cat-toggles {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .filters input[type="number"],
+  .filters input[type="search"],
+  .filters select {
+    height: 38px !important;
+  }
+
+  .filters .toggle-row {
+    min-height: 36px !important;
+  }
+
+  .filters .filter-group {
+    gap: 7px !important;
+    padding: 8px !important;
+    margin: -6px !important;
+  }
+
+  .filters .filter-legend {
+    margin-top: 2px !important;
+    padding-top: 8px !important;
+  }
+
+  .filters .filter-legend-list {
+    gap: 5px 10px !important;
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel,
+  section.storm-panel.glass {
+    inset: 88px 16px 16px auto !important;
+    width: var(--desktop-panel-width) !important;
+    max-width: none !important;
+    padding: 14px 16px 16px !important;
+    overflow-y: auto;
+    line-height: 1.42;
+    scrollbar-gutter: auto;
+  }
+
+  body.side-panel-open .leaflet-top.leaflet-right {
+    right: calc(var(--desktop-panel-width) + 32px) !important;
+  }
+
+  body.side-panel-open .timeline-ribbon {
+    right: 16px !important;
+  }
+
+  .storm-panel .panel-sticky-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.34fr);
+    align-items: start;
+    gap: 8px 12px;
+    margin: -14px -16px 10px;
+    padding: 12px 48px 10px 16px;
+  }
+
+  .storm-panel .storm-panel-header {
+    min-width: 0;
+  }
+
+  .storm-panel .storm-panel-header h2 {
+    margin-bottom: 4px !important;
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  .storm-panel .meta-row {
+    gap: 5px 9px;
+    margin-bottom: 0 !important;
+    font-size: 10.5px;
+    line-height: 1.2;
+  }
+
+  .storm-panel .panel-actions-sticky {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    margin-top: 0 !important;
+  }
+
+  .storm-panel .panel-actions-sticky .play-anim-btn,
+  .storm-panel .panel-actions-sticky .pin-btn {
+    min-height: 30px;
+    padding: 5px 8px;
+    font-size: 10.5px;
+    justify-content: center;
+  }
+
+  .storm-panel .panel-playback-host {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  #stats-body {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.46fr) minmax(0, 1fr);
+    gap: 7px 10px;
+    align-items: start;
+  }
+
+  #stats-body > h2 {
+    grid-column: 1;
+    margin: 0 !important;
+  }
+
+  #stats-body > .stats-summary {
+    grid-column: 2;
+    margin: 0 !important;
+    padding: 7px 10px !important;
+    line-height: 1.28;
+  }
+
+  #seasonal-outlook-host {
+    grid-column: 1 / -1;
+  }
+
+  #seasonal-outlook-host:empty {
+    display: none;
+  }
+
+  #stats-body > .stats-panel-layout {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns:
+      minmax(228px, 0.98fr)
+      minmax(206px, 0.86fr)
+      minmax(222px, 0.94fr)
+      minmax(318px, 1.34fr);
+    gap: 7px 9px;
+    align-items: start;
+  }
+
+  .stats-panel-column {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+    align-content: start;
+  }
+
+  .stats-panel-column .stats-section {
+    grid-column: auto !important;
+  }
+
+  .stats-panel .stats-section {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 7px 8px !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 12px;
+    background: var(--surface-control) !important;
+  }
+
+  .stats-panel .stats-section + .stats-section {
+    padding-top: 7px !important;
+  }
+
+  .stats-section--states,
+  .stats-section--categories {
+    grid-column: 1;
+  }
+
+  .stats-section--decades,
+  .stats-section--cold {
+    grid-column: 2;
+  }
+
+  .stats-section--climatology,
+  .stats-section--climate,
+  .stats-section--trend-table {
+    grid-column: 3;
+  }
+
+  .stats-panel h3,
+  .storm-panel .panel-section-h3,
+  .state-panel .panel-section-h3 {
+    margin: 0 0 6px !important;
+    font-size: 9.5px !important;
+    line-height: 1.15;
+  }
+
+  .stats-panel .bar-row,
+  .state-panel .bar-row {
+    min-height: 0 !important;
+    margin-bottom: 2px !important;
+    gap: 5px !important;
+    font-size: 10.5px !important;
+  }
+
+  .stats-panel .stats-section--states,
+  .stats-panel .stats-section--decades {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 1px;
+    align-items: start;
+  }
+
+  .stats-panel .stats-section--states > h3,
+  .stats-panel .stats-section--decades > h3 {
+    grid-column: 1 / -1;
+  }
+
+  .stats-panel .stats-section--states .bar-row,
+  .stats-panel .stats-section--decades .bar-row {
+    display: grid;
+    grid-template-columns: minmax(56px, 72px) minmax(20px, 1fr) 24px;
+    margin-bottom: 1px !important;
+  }
+
+  .stats-panel .bar-row .label,
+  .state-panel .bar-row .label {
+    width: 88px !important;
+  }
+
+  .stats-panel .stats-section--states .bar-row .label,
+  .stats-panel .stats-section--decades .bar-row .label {
+    width: auto !important;
+  }
+
+  .stats-panel .bar-row .bar,
+  .state-panel .bar-row .bar {
+    height: 7px !important;
+  }
+
+  .stats-panel .bar-row .count,
+  .state-panel .bar-row .count {
+    width: 28px !important;
+    font-size: 9.5px !important;
+  }
+
+  .stats-panel .stats-section--states .bar-row .count,
+  .stats-panel .stats-section--decades .bar-row .count {
+    width: 24px !important;
+  }
+
+  .stats-panel .clim-chart-wrap,
+  .stats-panel .climate-trends-host,
+  .stats-panel .dt-table-wrap {
+    max-height: 120px;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-control);
+  }
+
+  .stats-panel .clim-chart,
+  .stats-panel .climate-trends-host svg {
+    display: block;
+    width: 100% !important;
+    height: 114px !important;
+  }
+
+  .stats-panel .dt-host {
+    margin: 0 !important;
+  }
+
+  .stats-panel .dt-table {
+    font-size: 9px !important;
+  }
+
+  .stats-panel .dt-table th,
+  .stats-panel .dt-table td {
+    padding: 2px 3px !important;
+    line-height: 1.05 !important;
+    white-space: nowrap;
+  }
+
+  .stats-panel .stats-section--trend-table .dt-table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .stats-panel .stats-section--trend-table .dt-note {
+    margin-top: 4px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stats-panel .dt-table thead th {
+    font-size: 7.5px !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .stats-panel .dt-deadliest,
+  .stats-panel .dt-costliest {
+    font-size: 8.2px !important;
+  }
+
+  .stats-panel .dt-deadliest span,
+  .stats-panel .dt-costliest span {
+    display: inline-block;
+    max-width: 82px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+
+  .stats-panel .dt-note,
+  .stats-panel .stats-note {
+    margin-top: 4px !important;
+    font-size: 9px !important;
+    line-height: 1.18 !important;
+  }
+
+  .stats-panel .seasonal-outlook-banner {
+    display: grid;
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr) minmax(0, max-content);
+    align-items: center;
+    gap: 6px 10px;
+    padding: 7px 9px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--surface-control);
+  }
+
+  .stats-panel .sob-header,
+  .stats-panel .sob-meta {
+    min-width: 0;
+  }
+
+  .stats-panel .sob-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .stats-panel .sob-meta {
+    font-size: 9.5px;
+    color: var(--subtext);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stats-panel .sob-details {
+    justify-self: end;
+    font-size: 9.5px;
+  }
+
+  .stats-panel .sob-details p {
+    margin: 4px 0 0;
+  }
+
+  .storm-panel-layout {
+    display: grid;
+    grid-template-columns: minmax(250px, 0.95fr) minmax(290px, 1.05fr) minmax(220px, 0.8fr);
+    gap: 8px 10px;
+    align-items: start;
+  }
+
+  .storm-summary-cluster,
+  .storm-analysis-cluster,
+  .storm-resources-cluster {
+    display: grid;
+    min-width: 0;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .storm-panel .biography-text {
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  .storm-panel .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px !important;
+    margin: 0 !important;
+  }
+
+  .storm-panel .stat-grid .stat,
+  .state-panel .stat-grid .stat {
+    padding: 8px 9px !important;
+  }
+
+  .storm-panel .stat .label,
+  .state-panel .stat .label {
+    font-size: 9.5px !important;
+  }
+
+  .storm-panel .stat .value,
+  .state-panel .stat .value {
+    font-size: 18px !important;
+  }
+
+  .storm-panel .closest-pass-row,
+  .storm-panel .impacts-block {
+    padding: 9px 10px !important;
+  }
+
+  .storm-panel .similar-storms-list,
+  .storm-panel .landfall-list,
+  .state-panel .state-storm-list {
+    margin: 0 !important;
+    gap: 5px !important;
+  }
+
+  .storm-panel .similar-storm-row,
+  .storm-panel .landfall-list li,
+  .state-panel .state-storm-row {
+    padding: 6px 8px !important;
+  }
+
+  .storm-panel .dai-host {
+    padding: 0 !important;
+  }
+
+  .storm-panel .chart-host {
+    margin: 0 !important;
+  }
+
+  .storm-panel .intensity-chart {
+    padding: 6px !important;
+  }
+
+  .storm-panel .chart-legend {
+    gap: 7px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .storm-panel .chart-export-row,
+  .storm-panel .action-row,
+  .storm-panel .export-row {
+    gap: 6px !important;
+    margin-top: 0 !important;
+  }
+
+  .storm-panel .action-btn,
+  .storm-panel .export-btn,
+  .storm-panel .chart-export-btn {
+    min-height: 32px !important;
+    padding: 6px 9px !important;
+    font-size: 11px !important;
+  }
+
+  .storm-panel .export-label {
+    flex-basis: 100%;
+    margin-bottom: -2px;
+    font-size: 10px;
+  }
+
+  .storm-panel .wind-field-row {
+    margin-top: 0 !important;
+  }
+
+  #state-body {
+    display: block;
+  }
+
+  #state-body > .state-panel-layout {
+    display: grid;
+    grid-template-columns: minmax(210px, 0.7fr) minmax(260px, 0.86fr) minmax(470px, 1.44fr);
+    gap: 8px 10px;
+    align-items: start;
+  }
+
+  .state-summary-cluster,
+  .state-distribution-cluster,
+  .state-records-cluster {
+    display: grid;
+    min-width: 0;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .state-summary-cluster h2,
+  .state-summary-cluster .state-sub,
+  .state-summary-cluster .stat-grid,
+  .state-section .panel-section-h3,
+  .state-section .state-storm-list,
+  .state-section .state-list-head {
+    grid-column: auto;
+  }
+
+  .state-summary-cluster h2 {
+    margin: 0 !important;
+  }
+
+  .state-summary-cluster .state-sub {
+    margin: 0 !important;
+    line-height: 1.32;
+  }
+
+  .state-summary-cluster .stat-grid {
+    margin: 0 !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .state-panel .state-section {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--surface-control);
+  }
+
+  .state-panel .state-section--decade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+  }
+
+  .state-panel .state-section--decade > h3 {
+    grid-column: 1 / -1;
+  }
+
+  .state-panel .state-section--decade .bar-row {
+    display: grid;
+    grid-template-columns: 52px minmax(24px, 1fr) 24px;
+    margin-bottom: 1px !important;
+  }
+
+  .state-panel .state-section--decade .bar-row .label,
+  .state-panel .state-section--decade .bar-row .count {
+    width: auto !important;
+  }
+
+  .state-panel .state-list-head {
+    margin: 0 0 6px !important;
+    gap: 8px;
+  }
+
+  .state-panel .state-storm-list {
+    margin: 0 !important;
+    gap: 5px !important;
+  }
+
+  .state-panel .state-section--worst .state-storm-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .state-panel .state-section--all-storms #state-storm-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: calc(100vh - 368px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+}
+
+@media (min-width: 1121px) and (max-height: 820px) {
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel,
+  section.storm-panel.glass {
+    inset-block: 72px 6px !important;
+    padding: 11px 14px !important;
+  }
+
+  .stats-panel .clim-chart-wrap,
+  .stats-panel .climate-trends-host,
+  .stats-panel .dt-table-wrap {
+    max-height: 116px;
+  }
+
+  .stats-panel .clim-chart,
+  .stats-panel .climate-trends-host svg {
+    height: 110px !important;
+  }
+
+  #stats-body,
+  #stats-body > .stats-panel-layout,
+  .stats-panel-column {
+    gap: 6px !important;
+  }
+
+  .storm-panel .biography-text {
+    padding-block: 7px !important;
+    line-height: 1.35 !important;
+  }
+
+  .storm-panel .panel-sticky-header {
+    margin-bottom: 8px;
+    padding-block: 10px 8px;
+  }
+
+  .storm-panel .storm-panel-header h2 {
+    font-size: 16px;
+  }
+
+  .storm-panel .meta-row {
+    font-size: 10px;
+  }
+
+  .state-panel .state-section--all-storms #state-storm-list {
+    max-height: calc(100vh - 308px);
+  }
+
+  .storm-panel .stat-grid .stat,
+  .state-panel .stat-grid .stat {
+    padding-block: 6px !important;
+  }
+
+  .storm-panel-layout,
+  .storm-summary-cluster,
+  .storm-analysis-cluster,
+  .storm-resources-cluster {
+    gap: 6px !important;
+  }
+
+  .storm-panel .closest-pass-row,
+  .storm-panel .impacts-block {
+    padding-block: 7px !important;
+  }
+
+  .storm-panel .similar-storm-row,
+  .storm-panel .landfall-list li,
+  .state-panel .state-storm-row {
+    padding-block: 4px !important;
+  }
+
+  .storm-panel .action-btn,
+  .storm-panel .export-btn,
+  .storm-panel .chart-export-btn {
+    min-height: 30px !important;
+    padding-block: 5px !important;
+  }
+
+  .filters:not(.collapsed) {
+    padding: 10px 12px !important;
+    row-gap: 6px !important;
+  }
+
+  .filters input[type="number"],
+  .filters input[type="search"],
+  .filters select {
+    height: 34px !important;
+  }
+
+  .filters .toggle-row {
+    min-height: 32px !important;
+  }
+
+  .filters .cat-btn {
+    min-height: 32px !important;
+  }
+
+  .filters .filter-group {
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+
+  .filters .filter-legend {
+    padding-top: 6px !important;
+  }
+}
