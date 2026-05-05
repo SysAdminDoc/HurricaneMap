@@ -15,9 +15,10 @@
     "test:cone-utils": "node scripts/test-cone-utils.mjs",
     "test:storm-events": "node scripts/test-storm-events.mjs",
     "test:globe3d-utils": "node scripts/test-globe3d-utils.mjs",
+    "test:exposure-utils": "node scripts/test-exposure-utils.mjs",
     "test:smoke": "node scripts/smoke-playwright.mjs",
     "test:globe3d-smoke": "node scripts/smoke-globe3d.mjs",
-    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:impact-utils && npm run test:similarity-vectors && npm run test:cone-utils && npm run test:storm-events && npm run test:globe3d-utils",
+    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:impact-utils && npm run test:similarity-vectors && npm run test:cone-utils && npm run test:storm-events && npm run test:globe3d-utils && npm run test:exposure-utils",
     "test": "npm run build && npm run test:smoke"
   },
   "devDependencies": {

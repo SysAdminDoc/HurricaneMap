@@ -153,6 +153,9 @@ try {
     await panel.showStorm(landfall);
   });
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+  await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
+  const exposureText = await page.textContent('#storm-panel .stat-grid');
+  assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
   await page.click('#toggle-settings');
   await page.waitForFunction(() => !document.querySelector('#settings-menu')?.hidden, { timeout: 5000 });
   await page.keyboard.press('Escape');

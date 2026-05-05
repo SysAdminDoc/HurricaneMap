@@ -21,6 +21,12 @@ import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import {
+  ensureExposureDensitiesLoaded,
+  estimatePopulationExposure,
+  formatExposurePeople,
+  formatExposureTooltip,
+} from './exposure.js';
+import {
   getDamageMillions,
   getRawDamageText,
   getRawFatalityText,
@@ -77,6 +83,13 @@ export async function showStorm(landfall) {
   }
   clearTracks();
   await showTrack(storm.id);
+  if (radiiCount(storm) > 0) {
+    try {
+      await ensureExposureDensitiesLoaded();
+    } catch (error) {
+      console.warn('Population exposure density index unavailable:', error);
+    }
+  }
   const allStorms = getAllStorms();
   render(storm, landfall, allStorms);
 }
@@ -135,6 +148,8 @@ function render(storm, landfall, allStorms) {
   const riRiskTitle = `RI Risk Score: Based on ${riRisk.similar_count} similar historical storms (peak wind ±15kt, genesis month ±1mo, first-24h gain ±10kt). ${riRisk.ri_count} of them experienced RI (≥30kt/24h). Probability: ${Math.round(riRisk.probability * 100)}%.`;
   const riRiskIcon = riRisk.category === 'high' ? '🔴' : riRisk.category === 'medium' ? '🟡' : '🟢';
   const riRiskTile = `<div class="stat" title="${escapeHtml(riRiskTitle)}"><div class="label">RI risk <span class="metric-info">ⓘ</span></div><div class="value">${riRiskIcon} ${riRisk.category === 'high' ? 'High' : riRisk.category === 'medium' ? 'Medium' : 'Low'}</div></div>`;
+  const exposure = estimatePopulationExposure(storm);
+  const exposureTile = renderExposureStatTile(exposure);
 
   const transStats = computeTranslationStats(storm.track);
   const transStr = transStats
@@ -187,6 +202,7 @@ function render(storm, landfall, allStorms) {
           <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
           <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
           <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
+          ${exposureTile}
           ${riRiskTile}
         </div>
 
@@ -463,6 +479,17 @@ function formatReturnPeriods(rp) {
   else if (rp.cat1_count === 0) items.push('Cat 1+: never');
   if (items.length === 0) return '';
   return `<span class="return-periods-label">Return period (50 km radius):</span> ${items.join(' • ')}`;
+}
+
+function renderExposureStatTile(exposure) {
+  if (!exposure?.available) return '';
+  const tooltip = formatExposureTooltip(exposure);
+  return `
+    <div class="stat" title="${escapeHtml(tooltip)}">
+      <div class="label">Est. exposure <span class="metric-info">ⓘ</span></div>
+      <div class="value">${formatExposurePeople(exposure.headline_people)} <span style="font-size:11px;color:var(--subtext)">${escapeHtml(exposure.headline_label)} winds</span></div>
+    </div>
+  `;
 }
 
 function saffirCat(kt) {
