@@ -18,6 +18,16 @@ const KM_TO_MI = 0.621371;
 const RI_THRESHOLD_KT = 30;      // standard NHC RI definition
 const RI_WINDOW_HOURS = 24;
 const TS_THRESHOLD_KT = 34;      // ACE only counts obs ≥ TS-force
+export const STORM_SIMILARITY_VECTOR_LENGTH = 8;
+export const DEFAULT_STORM_VECTOR_STATS = {
+  wind_max: 185, wind_min: 35,
+  landfalls_max: 7, landfalls_min: 0,
+  track_km_max: 20000, track_km_min: 500,
+  speed_max: 60, speed_min: 2,
+  ri_max: 120, ri_min: 0,
+  ace_max: 100, ace_min: 0,
+  decay_max: 50, decay_min: -5,
+};
 
 /** Accumulated Cyclone Energy.
  *  ACE = Σ(v² / 10⁴) over all 6-hourly obs where v ≥ 34 kt.
@@ -519,54 +529,46 @@ export function daysAtIntensity(track) {
 /** Compute an 8-dimensional vector for a storm for similarity scoring.
  *  Dimensions: [peak_wind, landfall_count, track_length_km, forward_speed_kmh, RI_delta_kt, ACE, decay_rate, genesis_month]
  *  All normalized to [0, 1] range using historical min/max from the dataset.
- *  Used by findSimilarStorms() to find neighbors. */
+ *  Used as a fallback when generated data lacks a precomputed vector. */
 export function getStormVector(storm, stats = null) {
-  // Default stats (computed once per app load from all storms)
-  const defaultStats = {
-    wind_max: 185, wind_min: 35,
-    landfalls_max: 7, landfalls_min: 0,
-    track_km_max: 20000, track_km_min: 500,
-    speed_max: 60, speed_min: 2,
-    ri_max: 120, ri_min: 0,
-    ace_max: 100, ace_min: 0,
-    decay_max: 50, decay_min: -5,
-  };
-  const s = stats || defaultStats;
+  const s = stats || DEFAULT_STORM_VECTOR_STATS;
+  const track = Array.isArray(storm?.track) ? storm.track : [];
 
-  const peak_wind = storm.peak_wind_kt || 50;
-  const landfall_count = (storm.us_landfalls || []).length;
-  const track_km = storm.track
+  const peak_wind = storm?.peak_wind_kt || 50;
+  const landfall_count = (storm?.us_landfalls || []).length;
+  const track_km = track
     .filter(r => r.lat != null && r.lon != null)
     .reduce((acc, r, i, arr) => {
       if (i === 0) return 0;
       return acc + haversineKm(arr[i - 1].lat, arr[i - 1].lon, r.lat, r.lon);
     }, 0);
   
-  const trans = computeTranslationStats(storm.track);
+  const trans = computeTranslationStats(track);
   const forward_speed = trans ? trans.mean_kmh : 15;
   
-  const ri = findRapidIntensification(storm.track);
+  const ri = findRapidIntensification(track);
   const ri_delta = ri ? ri.delta_kt : 0;
   
-  const ace_data = computeACE(storm.track);
+  const ace_data = computeACE(track);
   const ace = ace_data.value || 0;
   
   let decay_rate = 0;
-  if (storm.peak_wind_idx != null && storm.track[storm.peak_wind_idx]) {
-    const peak_t = new Date(storm.track[storm.peak_wind_idx].t).getTime();
-    let final_wind = storm.peak_wind_kt;
+  const peakWindIdx = getPeakWindIndex(storm, track);
+  if (peakWindIdx != null && track[peakWindIdx]) {
+    const peak_t = new Date(track[peakWindIdx].t).getTime();
+    let final_wind = peak_wind;
     let final_t = peak_t;
-    for (let i = storm.peak_wind_idx + 1; i < storm.track.length; i++) {
-      if (storm.track[i].wind != null) {
-        final_wind = storm.track[i].wind;
-        final_t = new Date(storm.track[i].t).getTime();
+    for (let i = peakWindIdx + 1; i < track.length; i++) {
+      if (track[i].wind != null) {
+        final_wind = track[i].wind;
+        final_t = new Date(track[i].t).getTime();
       }
     }
     const days = (final_t - peak_t) / (24 * 3.6e6);
-    decay_rate = (storm.peak_wind_kt - final_wind) / (days + 1);
+    decay_rate = (peak_wind - final_wind) / (days + 1);
   }
   
-  const genesis_month = storm.genesis_t ? new Date(storm.genesis_t).getUTCMonth() + 1 : 8;
+  const genesis_month = getGenesisMonth(storm, track);
 
   const normalize = (val, min, max) => Math.max(0, Math.min(1, (val - min) / (max - min)));
   
@@ -580,6 +582,42 @@ export function getStormVector(storm, stats = null) {
     normalize(decay_rate, s.decay_min, s.decay_max),
     (genesis_month - 1) / 11,
   ];
+}
+
+function getPeakWindIndex(storm, track) {
+  if (Number.isInteger(storm?.peak_wind_idx) && track[storm.peak_wind_idx]) return storm.peak_wind_idx;
+  if (!Array.isArray(track) || track.length === 0) return null;
+  let bestIdx = null;
+  let bestWind = -Infinity;
+  for (let i = 0; i < track.length; i++) {
+    const wind = track[i]?.wind;
+    if (wind == null || !Number.isFinite(wind)) continue;
+    if (wind > bestWind) {
+      bestWind = wind;
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
+}
+
+function getGenesisMonth(storm, track) {
+  const sourceTime = storm?.genesis_t || track.find(r => r?.t)?.t;
+  if (!sourceTime) return 8;
+  const month = new Date(sourceTime).getUTCMonth() + 1;
+  return Number.isInteger(month) && month >= 1 && month <= 12 ? month : 8;
+}
+
+function isValidStormVector(vector) {
+  return Array.isArray(vector) &&
+    vector.length === STORM_SIMILARITY_VECTOR_LENGTH &&
+    vector.every(value => Number.isFinite(value));
+}
+
+/** Return the generated normalized vector when available, else compute it. */
+export function getSimilarityVector(storm, stats = null) {
+  return isValidStormVector(storm?.similarity_vector)
+    ? storm.similarity_vector
+    : getStormVector(storm, stats);
 }
 
 /** Compute cosine similarity between two 8-dimensional vectors. */
@@ -600,7 +638,7 @@ function cosineSimilarity(v1, v2) {
 export function findSimilarStorms(referenceStorm, allStorms, topN = 5) {
   if (!referenceStorm || !Array.isArray(allStorms) || allStorms.length === 0) return [];
   
-  const refVector = getStormVector(referenceStorm);
+  const refVector = getSimilarityVector(referenceStorm);
   const scores = allStorms
     .filter(s => s.id !== referenceStorm.id)
     .map(storm => ({
@@ -609,7 +647,7 @@ export function findSimilarStorms(referenceStorm, allStorms, topN = 5) {
       year: storm.year,
       peak_wind_kt: storm.peak_wind_kt,
       landfalls: (storm.us_landfalls || []).length,
-      similarity_score: cosineSimilarity(refVector, getStormVector(storm)),
+      similarity_score: cosineSimilarity(refVector, getSimilarityVector(storm)),
     }))
     .sort((a, b) => b.similarity_score - a.similarity_score)
     .slice(0, topN);

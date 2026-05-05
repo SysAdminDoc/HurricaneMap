@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-05-05T08:10:17Z",
+  "generated_at_utc": "2026-05-05T12:37:33Z",
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.3.9"
@@ -50,17 +50,17 @@
     "landfalls": {
       "path": "data/landfalls.json",
       "size_bytes": 129991,
-      "modified_utc": "2026-05-05T08:10:17Z"
+      "modified_utc": "2026-05-05T12:37:33Z"
     },
     "storms": {
       "path": "data/storms.json",
-      "size_bytes": 2248714,
-      "modified_utc": "2026-05-05T08:10:17Z"
+      "size_bytes": 2300508,
+      "modified_utc": "2026-05-05T12:37:33Z"
     },
     "stats": {
       "path": "data/stats.json",
       "size_bytes": 9001,
-      "modified_utc": "2026-05-05T08:10:17Z"
+      "modified_utc": "2026-05-05T12:37:33Z"
     }
   },
   "methodology": {

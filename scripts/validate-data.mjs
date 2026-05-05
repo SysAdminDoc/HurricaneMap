@@ -94,6 +94,15 @@ for (const storm of storms) {
   if (Array.isArray(storm.us_landfalls) && storm.us_landfall_count !== storm.us_landfalls.length) {
     fail(`${storm.id}: us_landfall_count does not match us_landfalls length.`);
   }
+  if (!Array.isArray(storm.similarity_vector) || storm.similarity_vector.length !== 8) {
+    fail(`${storm.id}: similarity_vector must be an 8-number array.`);
+  } else {
+    for (const [index, value] of storm.similarity_vector.entries()) {
+      if (!isFiniteNumber(value) || value < 0 || value > 1) {
+        fail(`${storm.id}: similarity_vector[${index}] must be finite and normalized to 0..1.`);
+      }
+    }
+  }
   if (Array.isArray(storm.track)) {
     let previousTime = -Infinity;
     for (const [index, point] of storm.track.entries()) {
