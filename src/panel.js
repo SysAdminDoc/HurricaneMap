@@ -174,74 +174,81 @@ function render(storm, landfall, allStorms) {
   `;
 
   body.innerHTML = `
+    <div class="storm-panel-layout">
+      <section class="storm-summary-cluster" aria-label="Storm summary">
+        <div class="biography-text">
+          ${escapeHtml(biography)}
+        </div>
 
-    <div class="biography-text">
-      ${escapeHtml(biography)}
+        <div class="stat-grid">
+          <div class="stat"><div class="label">Peak wind</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
+          <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
+          <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
+          <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
+          <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
+          ${riRiskTile}
+        </div>
+
+        <div class="closest-pass-row" id="closest-pass-row">
+          <label class="closest-pass-label" for="closest-city">Closest pass to</label>
+          <select class="closest-pass-select" id="closest-city">
+            ${COASTAL_CITIES.map(c => `<option value="${escapeHtml(c.name)}"${c.name === defaultCity.name ? ' selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
+          </select>
+          <span class="closest-pass-value" id="closest-pass-value">${formatClosest(initialApproach)}</span>
+          <div class="return-periods-row" id="return-periods-row"></div>
+        </div>
+
+        ${renderImpactsBlock(storm, impacts)}
+      </section>
+
+      <section class="storm-analysis-cluster" aria-label="Storm analysis">
+        <h3 class="panel-section-h3">Similar storms</h3>
+        <div class="similar-storms-host" id="similar-storms-host"></div>
+
+        <h3 class="panel-section-h3">Time at intensity</h3>
+        <div class="dai-host" id="dai-host"></div>
+
+        <h3 class="panel-section-h3">Intensity over time</h3>
+        <div class="chart-host" id="chart-host"></div>
+        <div class="chart-export-row">
+          <button class="text-btn chart-export-btn" id="chart-export-png" title="Download the intensity chart as a PNG image">⤓ PNG</button>
+          <button class="text-btn chart-export-btn" id="chart-export-svg" title="Download the intensity chart as a vector SVG">⤓ SVG</button>
+        </div>
+      </section>
+
+      <section class="storm-resources-cluster" aria-label="Storm resources">
+        <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
+        <ul class="landfall-list">${landfallsHtml}</ul>
+
+        <div class="action-row">
+          ${wikiUrl ? `<a class="action-btn primary" href="${wikiUrl}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
+          ${ytUrl ? `<a class="action-btn" href="${ytUrl}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
+          ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
+          ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
+          ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
+          ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
+          ${reconUrl ? `<a class="action-btn" href="${reconUrl}" target="_blank" rel="noopener">✈️ Recon archive</a>` : ''}
+        </div>
+
+        <div class="export-row">
+          <span class="export-label">Export track:</span>
+          <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
+          <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
+          <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
+          <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
+          <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
+        </div>
+
+        ${radiiCount(storm) > 0 ? `
+          <div class="wind-field-row">
+            <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
+              <input type="checkbox" id="wf-cb">
+              <span>🌬️ Show wind-field swath (${radiiCount(storm)} analyzed records)</span>
+            </label>
+          </div>
+        ` : ''}
+      </section>
     </div>
-
-    <div class="stat-grid">
-      <div class="stat"><div class="label">Peak wind</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
-      <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
-      <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
-      <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
-      <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
-      ${riRiskTile}
-    </div>
-
-    <div class="closest-pass-row" id="closest-pass-row">
-      <label class="closest-pass-label" for="closest-city">Closest pass to</label>
-      <select class="closest-pass-select" id="closest-city">
-        ${COASTAL_CITIES.map(c => `<option value="${escapeHtml(c.name)}"${c.name === defaultCity.name ? ' selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
-      </select>
-      <span class="closest-pass-value" id="closest-pass-value">${formatClosest(initialApproach)}</span>
-      <div class="return-periods-row" id="return-periods-row"></div>
-    </div>
-
-    ${renderImpactsBlock(storm, impacts)}
-
-    <h3 class="panel-section-h3">Similar storms</h3>
-    <div class="similar-storms-host" id="similar-storms-host"></div>
-
-    <h3 class="panel-section-h3">Time at intensity</h3>
-    <div class="dai-host" id="dai-host"></div>
-
-    <h3 class="panel-section-h3">Intensity over time</h3>
-    <div class="chart-host" id="chart-host"></div>
-    <div class="chart-export-row">
-      <button class="text-btn chart-export-btn" id="chart-export-png" title="Download the intensity chart as a PNG image">⤓ PNG</button>
-      <button class="text-btn chart-export-btn" id="chart-export-svg" title="Download the intensity chart as a vector SVG">⤓ SVG</button>
-    </div>
-
-    <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
-    <ul class="landfall-list">${landfallsHtml}</ul>
-
-    <div class="action-row">
-      ${wikiUrl ? `<a class="action-btn primary" href="${wikiUrl}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
-      ${ytUrl ? `<a class="action-btn" href="${ytUrl}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
-      ${noaaReportUrl ? `<a class="action-btn" href="${noaaReportUrl}" target="_blank" rel="noopener">NOAA report</a>` : ''}
-      ${nhcWalletUrl ? `<a class="action-btn" href="${nhcWalletUrl}" target="_blank" rel="noopener">NHC archive</a>` : ''}
-      ${sliderUrl ? `<a class="action-btn" href="${sliderUrl}" target="_blank" rel="noopener">🛰️ GOES satellite</a>` : ''}
-      ${tornadoUrl ? `<a class="action-btn" href="${tornadoUrl}" target="_blank" rel="noopener">🌪️ Tornadoes (NOAA)</a>` : ''}
-      ${reconUrl ? `<a class="action-btn" href="${reconUrl}" target="_blank" rel="noopener">✈️ Recon archive</a>` : ''}
-    </div>
-
-    <div class="export-row">
-      <span class="export-label">Export track:</span>
-      <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
-      <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
-      <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
-      <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
-      <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
-    </div>
-
-    ${radiiCount(storm) > 0 ? `
-      <div class="wind-field-row">
-        <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
-          <input type="checkbox" id="wf-cb">
-          <span>🌬️ Show wind-field swath (${radiiCount(storm)} analyzed records)</span>
-        </label>
-      </div>
-    ` : ''}
   `;
   panel.scrollTop = 0;
 

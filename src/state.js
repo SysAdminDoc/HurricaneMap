@@ -161,36 +161,52 @@ export async function openState(stateName) {
   const majorCount = stateLandfalls.filter(lf => lf.category >= 3).length;
 
   body.innerHTML = `
-    <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
-    <p class="state-sub">Every hurricane and tropical-storm landfall on record (HURDAT2, 1851 onward).</p>
+    <div class="state-panel-layout">
+      <section class="state-summary-cluster" aria-label="State summary">
+        <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
+        <p class="state-sub">Every hurricane and tropical-storm landfall on record (HURDAT2, 1851 onward).</p>
 
-    <div class="stat-grid">
-      <div class="stat"><div class="label">Total events</div><div class="value">${total}</div></div>
-      <div class="stat"><div class="label">Hurricane-strength</div><div class="value">${huCount}</div></div>
-      <div class="stat"><div class="label">Major (Cat 3+)</div><div class="value">${majorCount}</div></div>
-      <div class="stat"><div class="label">Distinct storms</div><div class="value">${storms.length}</div></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="label">Total events</div><div class="value">${total}</div></div>
+          <div class="stat"><div class="label">Hurricane-strength</div><div class="value">${huCount}</div></div>
+          <div class="stat"><div class="label">Major (Cat 3+)</div><div class="value">${majorCount}</div></div>
+          <div class="stat"><div class="label">Distinct storms</div><div class="value">${storms.length}</div></div>
+        </div>
+      </section>
+
+      <section class="state-distribution-cluster" aria-label="State distributions">
+        <section class="state-section state-section--category">
+          <h3 class="panel-section-h3">By category</h3>
+          ${catHistogramHtml}
+        </section>
+
+        <section class="state-section state-section--decade">
+          <h3 class="panel-section-h3">By decade</h3>
+          ${decadeHtml}
+        </section>
+      </section>
+
+      <section class="state-records-cluster" aria-label="State storm records">
+        ${worst.length ? `
+          <section class="state-section state-section--worst">
+            <h3 class="panel-section-h3">Worst on record (top ${worst.length})</h3>
+            <ul class="state-storm-list">${worstHtml}</ul>
+          </section>
+        ` : ''}
+
+        <section class="state-section state-section--all-storms">
+          <div class="state-list-head">
+            <h3 class="panel-section-h3">All storms</h3>
+            <div class="segmented-control state-sort" role="group" aria-label="Sort state storm list">
+              <button class="seg-btn active" type="button" data-sort="newest" aria-pressed="true">Newest</button>
+              <button class="seg-btn" type="button" data-sort="strongest" aria-pressed="false">Strongest</button>
+              <button class="seg-btn" type="button" data-sort="hits" aria-pressed="false">Most hits</button>
+            </div>
+          </div>
+          <ul class="state-storm-list" id="state-storm-list">${fullListHtml}</ul>
+        </section>
+      </section>
     </div>
-
-    <h3 class="panel-section-h3">By category</h3>
-    ${catHistogramHtml}
-
-    <h3 class="panel-section-h3">By decade</h3>
-    ${decadeHtml}
-
-    ${worst.length ? `
-      <h3 class="panel-section-h3">Worst on record (top ${worst.length})</h3>
-      <ul class="state-storm-list">${worstHtml}</ul>
-    ` : ''}
-
-    <div class="state-list-head">
-      <h3 class="panel-section-h3">All storms</h3>
-      <div class="segmented-control state-sort" role="group" aria-label="Sort state storm list">
-        <button class="seg-btn active" type="button" data-sort="newest" aria-pressed="true">Newest</button>
-        <button class="seg-btn" type="button" data-sort="strongest" aria-pressed="false">Strongest</button>
-        <button class="seg-btn" type="button" data-sort="hits" aria-pressed="false">Most hits</button>
-      </div>
-    </div>
-    <ul class="state-storm-list" id="state-storm-list">${fullListHtml}</ul>
   `;
 
   wireStateStormRows(body, stateName);
