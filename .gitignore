@@ -40,3 +40,4 @@ test-results/
 .tmp-pw/
 .tmp-pid.txt
 audit-*.png
+.tmp-stormevents/

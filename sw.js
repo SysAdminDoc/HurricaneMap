@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q13';
+const SW_VERSION = 'hm-v1.3.9-q14';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -59,6 +59,7 @@ const SHELL_ASSETS = [
   './src/sparkline.js',
   './src/season.js',
   './src/seasonal-outlook.js',
+  './src/storm-events.js',
   './src/surge.js',
   './src/url-state.js',
   './src/windfield.js',
