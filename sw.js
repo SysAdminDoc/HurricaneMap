@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q16';
+const SW_VERSION = 'hm-v1.3.9-q17';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -41,6 +41,7 @@ const SHELL_ASSETS = [
   './src/decade-trends.js',
   './src/ensemble.js',
   './src/export.js',
+  './src/exposure.js',
   './src/filter-state.js',
   './src/fuzzy.js',
   './src/html-utils.js',
@@ -105,7 +106,7 @@ function isShell(url) {
 
 function isData(url) {
   if (url.origin !== location.origin) return false;
-  return /\/data\/.+\.json$/.test(url.pathname) || /\.json$/.test(url.pathname);
+  return /\/data\/.+\.(json|geojson)$/.test(url.pathname) || /\.(json|geojson)$/.test(url.pathname);
 }
 
 function isTile(url) {
