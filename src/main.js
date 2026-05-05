@@ -378,6 +378,10 @@ function wireSettingsControls() {
     if (coneToggle) {
       coneToggle.checked = getSetting('nhcForecastCone');
     }
+    const goesToggle = menu.querySelector('#toggle-goes-realtime');
+    if (goesToggle) {
+      goesToggle.checked = getSetting('goesRealtime');
+    }
     const hcToggle = menu.querySelector('#toggle-high-contrast');
     if (hcToggle) {
       hcToggle.checked = getSetting('highContrast');
@@ -439,6 +443,13 @@ function wireSettingsControls() {
   if (coneToggle) {
     coneToggle.addEventListener('change', () => {
       setSetting('nhcForecastCone', coneToggle.checked);
+    });
+  }
+
+  const goesToggle = menu.querySelector('#toggle-goes-realtime');
+  if (goesToggle) {
+    goesToggle.addEventListener('change', () => {
+      setSetting('goesRealtime', goesToggle.checked);
     });
   }
 

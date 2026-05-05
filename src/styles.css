@@ -1311,6 +1311,56 @@ section.storm-panel.glass {
 .official-observed-track {
   stroke-linecap: round;
 }
+.goes-realtime-pane {
+  mix-blend-mode: screen;
+}
+.goes-realtime-image {
+  filter: saturate(1.08) contrast(1.05);
+}
+.goes-live-badge {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  padding: 6px 11px;
+  color: var(--text);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.goes-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--sapphire);
+  box-shadow: 0 0 12px rgba(116, 199, 236, 0.86);
+}
+.goes-live-badge[data-state="loading"] .goes-live-dot {
+  background: var(--yellow);
+  box-shadow: 0 0 12px rgba(249, 226, 175, 0.8);
+}
+.goes-live-badge[data-state="error"] .goes-live-dot,
+.goes-live-badge[data-state="unavailable"] .goes-live-dot {
+  background: var(--red);
+  box-shadow: 0 0 12px rgba(243, 139, 168, 0.78);
+}
+.goes-live-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.goes-source-link {
+  color: var(--sapphire);
+  text-decoration: none;
+}
+.goes-source-link:hover {
+  color: var(--lavender);
+  text-decoration: underline;
+}
 .ensemble-track {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
 }
