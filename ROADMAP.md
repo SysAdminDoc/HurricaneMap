@@ -143,7 +143,7 @@ Focus: Distribution, performance, and sustainability.
 ### Phase 14 Marginal Enhancements (Low-effort, high-value options for v1.3.0+)
 
 - [x] **P14.6 GOES satellite real-time background** — ✅ v1.3.9. Added an opt-in live NOAA/NESDIS/STAR GOES GeoColor background for active storms. The setting renders current Atlantic, Eastern Pacific, and Central Pacific sector imagery behind official NHC advisory geometry, auto-selects sectors from active-storm basin/position metadata, cache-busts on STAR's 10-minute update cadence, and shows a source-linked status badge. Browser implementation intentionally uses STAR's current sector JPEGs instead of raw AWS/Open Data ABI rasters because the static app cannot safely reproject/compose NetCDF science products client-side.
-- [ ] **P14.7 Hourly active-storm polling** — Increase NHC advisory polling from 6-hourly to hourly (or match NHC release cadence). Adds rate-limit handling + user notification. Effort: 1 day. Risk: Low.
+- [x] **P14.7 Hourly active-storm polling** — ✅ v1.3.9. Replaced the fixed active-storm interval with an adaptive scheduler: hourly checks when active storms exist, six-hour quiet checks when the feed is empty, exponential retry/backoff for transient failures, explicit 429 rate-limit handling, and a screen-reader-friendly badge that shows update/retry timing without erasing the last known active-storm layer during temporary feed issues.
 
 ## Tier Placement & Rationale
 

@@ -1,9 +1,15 @@
-// Active storm tracking — pulls NHC's live CurrentStorms.json feed at boot
-// (and every 10 min thereafter). When storms are active, renders their
+// Active storm tracking — pulls NHC's live CurrentStorms.json feed at boot,
+// hourly while storms are active, quieter when the feed is empty, and with
+// explicit backoff when the proxy/NHC path is delayed or rate-limited. When storms are active, renders their
 // advisory tracks + cones of uncertainty in a distinctive electric-blue
 // style. Optionally overlays GFS/ECMWF ensemble spaghetti tracks.
 
 import { getMap } from './map.js';
+import {
+  activeAdvisoryKey,
+  activeFeedStatusText,
+  computeActivePollDelay,
+} from './active-polling.js';
 import { renderEnsembleTracks, hideEnsembleTracks } from './ensemble.js';
 import {
   clearOfficialForecastCache,
@@ -16,17 +22,26 @@ import { getSetting } from './settings.js';
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
-// NHC's CurrentStorms.json doesn't send CORS headers, so route through a
-// public CORS proxy. The endpoint payload is tiny (a few KB even with multiple
-// active storms), and we hit it once on boot + every 10 min after.
+// NHC's CurrentStorms.json doesn't send CORS headers, so route through a public
+// CORS proxy. The endpoint payload is tiny, but the active-season scheduler is
+// intentionally advisory-aware so the app stays polite to NHC/proxy services.
 const CURRENT_URL = 'https://corsproxy.io/?url=' + encodeURIComponent('https://www.nhc.noaa.gov/CurrentStorms.json');
-const REFRESH_MS = 10 * 60 * 1000;  // every 10 minutes
+const REQUEST_TIMEOUT_MS = 12 * 1000;
 
 let layerGroup = null;
 let badgeEl = null;
 let lastStorms = null;
+let lastAdvisoryKey = '';
+let lastSuccessfulFetchAt = null;
+let nextPollAt = null;
+let pollTimer = null;
+let pollingStarted = false;
+let consecutiveFailures = 0;
 
 export async function startActiveStormPolling() {
+  if (pollingStarted) return;
+  pollingStarted = true;
+
   // Listen for active-storm context toggle changes.
   document.addEventListener('hm-settings:change', (e) => {
     if (
@@ -41,27 +56,53 @@ export async function startActiveStormPolling() {
   });
 
   await fetchAndRender();
-  setInterval(fetchAndRender, REFRESH_MS);
 }
 
 async function fetchAndRender() {
-  let data = null;
-  try {
-    const r = await fetch(CURRENT_URL, { cache: 'no-cache' });
-    if (!r.ok) return;
-    data = await r.json();
-  } catch (_) {
-    // Off-season or no internet — silently skip.
+  const result = await fetchCurrentStorms();
+  const storms = result.storms || [];
+  const countForStatus = result.ok ? storms.length : (lastStorms?.length || 0);
+  const state = result.ok ? 'ok' : (result.status === 429 ? 'rate-limit' : 'error');
+
+  if (!result.ok) {
+    consecutiveFailures += 1;
+    const delay = computeActivePollDelay({
+      ok: false,
+      status: result.status,
+      stormCount: countForStatus,
+      failureCount: consecutiveFailures,
+    });
+    scheduleNextPoll(delay);
+    ensureBadge(countForStatus, {
+      state,
+      fetchedAt: lastSuccessfulFetchAt,
+      nextPollAt,
+      status: result.status,
+    });
     return;
   }
-  const storms = (data && data.activeStorms) || [];
+
+  consecutiveFailures = 0;
+  lastSuccessfulFetchAt = Date.now();
   lastStorms = storms;
-  ensureBadge(storms.length);
+  const advisoryKey = activeAdvisoryKey(storms);
+  const advisoryChanged = Boolean(advisoryKey && advisoryKey !== lastAdvisoryKey);
+  lastAdvisoryKey = advisoryKey;
+
+  const delay = computeActivePollDelay({
+    ok: true,
+    stormCount: storms.length,
+  });
+  scheduleNextPoll(delay);
+  ensureBadge(storms.length, {
+    state,
+    fetchedAt: lastSuccessfulFetchAt,
+    nextPollAt,
+    advisoryChanged,
+  });
+
   if (!storms.length) {
-    if (layerGroup) {
-      getMap().removeLayer(layerGroup);
-      layerGroup = null;
-    }
+    clearActiveLayers();
     hideEnsembleTracks();
     hideGoesRealtimeContext();
     clearOfficialForecastContext();
@@ -71,24 +112,95 @@ async function fetchAndRender() {
   renderActive(storms);
 }
 
-function ensureBadge(count) {
+async function fetchCurrentStorms() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(CURRENT_URL, {
+      cache: 'no-cache',
+      signal: controller.signal,
+    });
+    if (response.status === 429) {
+      return { ok: false, status: 429, storms: [] };
+    }
+    if (!response.ok) {
+      return { ok: false, status: response.status || 0, storms: [] };
+    }
+    const data = await response.json();
+    return {
+      ok: true,
+      status: response.status,
+      storms: (data && data.activeStorms) || [],
+    };
+  } catch (error) {
+    return { ok: false, status: 0, storms: [], error };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function scheduleNextPoll(delayMs) {
+  if (pollTimer) clearTimeout(pollTimer);
+  nextPollAt = Date.now() + delayMs;
+  pollTimer = setTimeout(fetchAndRender, delayMs);
+}
+
+function clearActiveLayers() {
+  if (layerGroup) {
+    getMap().removeLayer(layerGroup);
+    layerGroup = null;
+  }
+}
+
+function ensureBadge(count, {
+  state = 'ok',
+  fetchedAt = null,
+  nextPollAt: scheduledAt = null,
+  status = 0,
+  advisoryChanged = false,
+} = {}) {
   if (!badgeEl) {
     badgeEl = document.createElement('div');
     badgeEl.id = 'active-storm-badge';
     badgeEl.className = 'active-badge glass';
+    badgeEl.setAttribute('role', 'status');
+    badgeEl.setAttribute('aria-live', 'polite');
     document.body.appendChild(badgeEl);
   }
-  if (count > 0) {
-    badgeEl.hidden = false;
-    badgeEl.innerHTML = `
-      <span class="ab-pulse"></span>
-      <span class="ab-text">${count} active storm${count === 1 ? '' : 's'}</span>
-      <a class="ab-link" href="https://www.tropicaltidbits.com/storminfo/" target="_blank" rel="noopener" title="Model spaghetti tracks (Tropical Tidbits)">🍝 models</a>
-      <a class="ab-link" href="https://www.trackthetropics.com/" target="_blank" rel="noopener" title="Spaghetti model viewer">tracks</a>
-    `;
-  } else {
+
+  const shouldShow = count > 0 || state === 'error' || state === 'rate-limit';
+  if (!shouldShow) {
     badgeEl.hidden = true;
+    badgeEl.removeAttribute('data-state');
+    return;
   }
+
+  const mainText = count > 0
+    ? `${count} active storm${count === 1 ? '' : 's'}`
+    : (state === 'rate-limit' ? 'Active feed rate-limited' : 'Active feed delayed');
+  const statusText = activeFeedStatusText({
+    state,
+    stormCount: count,
+    fetchedAt,
+    nextPollAt: scheduledAt,
+    status,
+  });
+  const links = count > 0 ? `
+      <a class="ab-link" href="https://www.tropicaltidbits.com/storminfo/" target="_blank" rel="noopener" title="Model spaghetti tracks (Tropical Tidbits)">models</a>
+      <a class="ab-link" href="https://www.trackthetropics.com/" target="_blank" rel="noopener" title="Spaghetti model viewer">tracks</a>
+    ` : '';
+
+  badgeEl.hidden = false;
+  badgeEl.dataset.state = advisoryChanged ? 'updated' : state;
+  badgeEl.setAttribute('aria-label', `${mainText}. ${statusText}`);
+  badgeEl.innerHTML = `
+      <span class="ab-pulse"></span>
+      <span class="ab-main">
+        <span class="ab-text">${mainText}</span>
+        <span class="ab-status">${statusText}</span>
+      </span>
+      ${links}
+    `;
 }
 
 async function renderActive(storms) {
