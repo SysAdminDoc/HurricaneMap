@@ -148,7 +148,9 @@ try {
     await data.ensureStormsLoaded();
     const storm = data.getAllStorms().find(item => item.year === 2005 && String(item.name).toUpperCase() === 'KATRINA');
     if (!storm) throw new Error('Katrina 2005 not found');
-    await panel.showStorm(storm.us_landfalls[0]);
+    const landfall = data.getLandfalls().find(item => item.storm_id === storm.id);
+    if (!landfall) throw new Error('Katrina 2005 landfall not found');
+    await panel.showStorm(landfall);
   });
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
   await page.click('#toggle-settings');
@@ -161,6 +163,22 @@ try {
     yearMax: document.querySelector('#year-max')?.value,
   }));
   assert(afterSettingsEscape.stormPanelHidden === false, 'Escape while settings was open also closed the storm panel.');
+
+  await page.evaluate(async () => {
+    const data = await import('/src/data.js');
+    const panel = await import('/src/panel.js');
+    await data.ensureStormsLoaded();
+    const storm = data.getAllStorms().find(item => item.id === 'AL051960');
+    if (!storm) throw new Error('Donna 1960 not found');
+    const landfall = data.getLandfalls().find(item => item.storm_id === storm.id);
+    if (!landfall) throw new Error('Donna 1960 landfall not found');
+    await panel.showStorm(landfall);
+  });
+  await page.waitForSelector('#storm-panel .impacts-block', { timeout: 10000 });
+  const impactText = await page.textContent('#storm-panel .impacts-block');
+  assert(/Fatalities\s*439/.test(impactText), `normalized fatalities did not render in impact panel: ${impactText}`);
+  assert(/Damage/.test(impactText), `damage row did not render in impact panel: ${impactText}`);
+  assert(!/undefined|NaN/.test(impactText), `impact panel contains invalid text: ${impactText}`);
 
   await page.fill('#year-min', '2005');
   await page.dispatchEvent('#year-min', 'change');

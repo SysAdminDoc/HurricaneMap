@@ -1,3 +1,8 @@
+import {
+  getFatalityCount,
+  getNominalDamageUsd,
+} from './impact-utils.js';
+
 // Derived intensity metrics + spatial queries.
 //
 // All functions here are pure: given a storm's track array (HURDAT2-shaped
@@ -865,15 +870,16 @@ export function generateStormBiography(storm, impacts) {
     `made ${landfallStates.length} landfalls in ${landfallStates.join(', ')}`;
   
   // Impact info
-  const impactInfo = impacts || { deaths: 0, damage_usd_nominal: 0 };
-  const hasImpact = (impactInfo.deaths && impactInfo.deaths > 0) || (impactInfo.damage_usd_nominal && impactInfo.damage_usd_nominal > 0);
-  let impactStr = '';
-  if (hasImpact) {
-    const deathStr = impactInfo.deaths && impactInfo.deaths > 0 ? `caused ${impactInfo.deaths} fatalities` : '';
-    const damageStr = impactInfo.damage_usd_nominal && impactInfo.damage_usd_nominal > 0 ? `caused $${(impactInfo.damage_usd_nominal / 1e9).toFixed(1)}B in damages` : '';
-    const impactParts = [deathStr, damageStr].filter(x => x);
-    impactStr = impactParts.length > 0 ? ` and ${impactParts.join(' and ')}` : '';
+  const fatalities = getFatalityCount(impacts);
+  const damageUsd = getNominalDamageUsd(impacts);
+  const impactParts = [];
+  if (Number.isFinite(fatalities) && fatalities > 0) {
+    impactParts.push(`caused ${fatalities.toLocaleString('en-US')} fatalities`);
   }
+  if (Number.isFinite(damageUsd) && damageUsd > 0) {
+    impactParts.push(`caused ${formatDamageBrief(damageUsd)} in damages`);
+  }
+  const impactStr = impactParts.length > 0 ? ` and ${impactParts.join(' and ')}` : '';
   
   // Distinctive features
   const ri = findRapidIntensification(storm.track);
@@ -887,6 +893,14 @@ export function generateStormBiography(storm, impacts) {
   
   // Assemble biography
   return `${nameStr.toUpperCase()} (${yearStr}) was a ${catDescriptor} that formed in ${genesisMonth} in ${region} and ${landfallStr}, with peak intensity of ${storm.peak_wind_kt} kt${impactStr}.${featureStr}`;
+}
+
+function formatDamageBrief(usd) {
+  if (usd >= 1_000_000_000) {
+    const decimals = usd >= 10_000_000_000 ? 0 : 1;
+    return `$${(usd / 1_000_000_000).toFixed(decimals)}B`;
+  }
+  return `$${(usd / 1_000_000).toFixed(1)}M`;
 }
 
 /** Saffir-Simpson category from peak wind (kt). */

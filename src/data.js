@@ -10,7 +10,7 @@ const DATA = {
   stormsById: new Map(),
   stats: null,
   metadata: null,
-  impacts: null,       // storm_id -> { deaths, damages, wiki_title, wiki_url }
+  impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
 };
 
 let stormsLoaded = false;

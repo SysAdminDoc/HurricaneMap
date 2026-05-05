@@ -3,274 +3,910 @@
     "deaths": "14+",
     "damages": "3.75",
     "wiki_title": "Tropical Storm Alice (1953)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alice_%281953%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alice_%281953%29",
+    "deaths_total": 14,
+    "deaths_min": 14,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 3750000,
+    "damage_millions_usd": 3.75,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL011955": {
     "deaths": "1,601 total",
     "damages": "1110",
     "wiki_title": "Tropical Storm Brenda (1955)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281955%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281955%29",
+    "deaths_total": 1601,
+    "deaths_min": 1601,
+    "deaths_max": 1601,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1110000000,
+    "damage_millions_usd": 1110.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL011959": {
     "deaths": "1 indirect",
     "damages": "500000",
     "wiki_title": "Tropical Storm Arlene (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%281959%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 500000,
+    "damage_millions_usd": 0.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL011966": {
     "deaths": "90 total",
     "damages": "210100000",
     "wiki_title": "Hurricane Alma (1966)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Alma_%281966%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Alma_%281966%29",
+    "deaths_total": 90,
+    "deaths_min": 90,
+    "deaths_max": 90,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 210100000,
+    "damage_millions_usd": 210.1,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL021950": {
     "deaths": "38 direct",
     "damages": "2550000",
     "wiki_title": "Hurricane Baker (1950)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Baker_%281950%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Baker_%281950%29",
+    "deaths_total": 38,
+    "deaths_min": 38,
+    "deaths_max": 38,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2550000,
+    "damage_millions_usd": 2.55,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL021952": {
     "deaths": "3 indirect",
     "damages": "2750000",
     "wiki_title": "Hurricane Able (1952)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Able_%281952%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Able_%281952%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2750000,
+    "damage_millions_usd": 2.75,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL021955": {
     "deaths": "77",
     "damages": "86000000",
     "wiki_title": "Hurricane Connie (1955)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Connie_%281955%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Connie_%281955%29",
+    "deaths_total": 77,
+    "deaths_min": 77,
+    "deaths_max": 77,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 86000000,
+    "damage_millions_usd": 86.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL021957": {
     "deaths": "416",
     "damages": "150000000",
     "wiki_title": "Hurricane Audrey (1957)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Audrey_%281957%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Audrey_%281957%29",
+    "deaths_total": 416,
+    "deaths_min": 416,
+    "deaths_max": 416,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 150000000,
+    "damage_millions_usd": 150.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031953": {
     "deaths": "9",
     "damages": "1300000",
     "wiki_title": "Hurricane Barbara (1953)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Barbara_%281953%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Barbara_%281953%29",
+    "deaths_total": 9,
+    "deaths_min": 9,
+    "deaths_max": 9,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1300000,
+    "damage_millions_usd": 1.3,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031955": {
-    "deaths": "≥184&nbsp;total",
+    "deaths": "≥184 total",
     "damages": "831700000",
     "wiki_title": "Hurricane Diane",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Diane"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Diane",
+    "deaths_total": 184,
+    "deaths_min": 184,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 831700000,
+    "damage_millions_usd": 831.7,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031956": {
     "deaths": "37",
     "damages": "50000000",
     "wiki_title": "Hurricane Betsy (1956)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281956%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281956%29",
+    "deaths_total": 37,
+    "deaths_min": 37,
+    "deaths_max": 37,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 50000000,
+    "damage_millions_usd": 50.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031957": {
-    "deaths": "506&nbsp;direct, 7&nbsp;indirect",
+    "deaths": "506 direct, 7 indirect",
     "damages": "152.5",
     "wiki_title": "Tropical Storm Bertha (1957)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%281957%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%281957%29",
+    "deaths_total": 513,
+    "deaths_min": 513,
+    "deaths_max": 513,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 152500000,
+    "damage_millions_usd": 152.5,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031960": {
     "deaths": "≥1 indirect",
     "damages": "5000000",
     "wiki_title": "Tropical Storm Brenda (1960)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281960%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281960%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 5000000,
+    "damage_millions_usd": 5.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031961": {
     "deaths": "43 direct",
     "damages": "325740000",
     "wiki_title": "Hurricane Carla (1961)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Carla_%281961%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Carla_%281961%29",
+    "deaths_total": 43,
+    "deaths_min": 43,
+    "deaths_max": 43,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 325740000,
+    "damage_millions_usd": 325.74,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031964": {
     "deaths": "None reported",
     "damages": "750000",
     "wiki_title": "Tropical Storm Abby (1964)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Abby_%281964%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Abby_%281964%29",
+    "deaths_total": 0,
+    "deaths_min": 0,
+    "deaths_max": 0,
+    "deaths_qualifier": "zero",
+    "damage_usd_nominal": 750000,
+    "damage_millions_usd": 0.75,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL031965": {
     "deaths": "81",
     "damages": "1419800000+14000000",
     "wiki_title": "Hurricane Betsy (1965)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281965%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281965%29",
+    "deaths_total": 81,
+    "deaths_min": 81,
+    "deaths_max": 81,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1433800000,
+    "damage_millions_usd": 1433.8,
+    "damage_source_units": "usd",
+    "damage_qualifier": "computed_sum",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL041959": {
     "deaths": "6",
     "damages": "75000",
     "wiki_title": "Hurricane Cindy (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281959%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 75000,
+    "damage_millions_usd": 0.075,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL041963": {
-    "deaths": "3&nbsp;direct",
+    "deaths": "3 direct",
     "damages": "12500000",
     "wiki_title": "Hurricane Cindy (1963)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281963%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281963%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 12500000,
+    "damage_millions_usd": 12.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051950": {
     "deaths": "2 indirect",
     "damages": "3300000",
     "wiki_title": "Hurricane Easy (1950)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Easy_%281950%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Easy_%281950%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 3300000,
+    "damage_millions_usd": 3.3,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051954": {
     "deaths": "1,069",
     "damages": "751.6",
     "wiki_title": "Tropical Storm Barbara (1954)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barbara_%281954%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barbara_%281954%29",
+    "deaths_total": 1069,
+    "deaths_min": 1069,
+    "deaths_max": 1069,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 751600000,
+    "damage_millions_usd": 751.6,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051957": {
-    "deaths": "506&nbsp;direct, 7&nbsp;indirect",
+    "deaths": "506 direct, 7 indirect",
     "damages": "152.5",
     "wiki_title": "Tropical Storm Debbie (1957)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281957%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281957%29",
+    "deaths_total": 513,
+    "deaths_min": 513,
+    "deaths_max": 513,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 152500000,
+    "damage_millions_usd": 152.5,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051958": {
     "deaths": "36 direct",
     "damages": "200000",
     "wiki_title": "Hurricane Ella (1958)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ella_%281958%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ella_%281958%29",
+    "deaths_total": 36,
+    "deaths_min": 36,
+    "deaths_max": 36,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 200000,
+    "damage_millions_usd": 0.2,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051959": {
     "damages": "7000000",
     "wiki_title": "Hurricane Debra (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Debra_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Debra_%281959%29",
+    "damage_usd_nominal": 7000000,
+    "damage_millions_usd": 7.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051960": {
     "deaths": "439",
     "damages": "980000000",
     "wiki_title": "Hurricane Donna (1960)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Donna_%281960%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Donna_%281960%29",
+    "deaths_total": 439,
+    "deaths_min": 439,
+    "deaths_max": 439,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 980000000,
+    "damage_millions_usd": 980.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051961": {
     "deaths": "7 indirect",
     "damages": "6000000",
     "wiki_title": "Hurricane Esther (1961)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Esther_%281961%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Esther_%281961%29",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 6000000,
+    "damage_millions_usd": 6.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051964": {
     "deaths": "156 total",
     "damages": "187000000",
     "wiki_title": "Hurricane Cleo (1964)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cleo_%281964%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Cleo_%281964%29",
+    "deaths_total": 156,
+    "deaths_min": 156,
+    "deaths_max": 156,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 187000000,
+    "damage_millions_usd": 187.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL051965": {
     "deaths": "76",
     "damages": "1680",
     "wiki_title": "Tropical Storm Debbie (1965)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281965%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281965%29",
+    "deaths_total": 76,
+    "deaths_min": 76,
+    "deaths_max": 76,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1680000000,
+    "damage_millions_usd": 1680.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL061954": {
     "deaths": "72",
     "damages": "462000000",
     "wiki_title": "Hurricane Carol (1954)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Carol_%281954%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Carol_%281954%29",
+    "deaths_total": 72,
+    "deaths_min": 72,
+    "deaths_max": 72,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 462000000,
+    "damage_millions_usd": 462.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL061957": {
-    "deaths": "506&nbsp;direct, 7&nbsp;indirect",
+    "deaths": "506 direct, 7 indirect",
     "damages": "152.5",
     "wiki_title": "Tropical Storm Esther (1957)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Esther_%281957%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Esther_%281957%29",
+    "deaths_total": 513,
+    "deaths_min": 513,
+    "deaths_max": 513,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 152500000,
+    "damage_millions_usd": 152.5,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL061960": {
     "deaths": "1 indirect",
     "damages": "1500000",
     "wiki_title": "Hurricane Ethel (1960)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ethel_%281960%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ethel_%281960%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1500000,
+    "damage_millions_usd": 1.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL061964": {
     "deaths": "5 total",
     "damages": "280000000",
     "wiki_title": "Hurricane Dora (1964)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dora_%281964%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dora_%281964%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 280000000,
+    "damage_millions_usd": 280.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL071956": {
     "deaths": "15",
     "damages": "24900000",
     "wiki_title": "Hurricane Flossy (1956)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Flossy_%281956%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Flossy_%281956%29",
+    "deaths_total": 15,
+    "deaths_min": 15,
+    "deaths_max": 15,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 24900000,
+    "damage_millions_usd": 24.9,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL081954": {
     "deaths": "29",
     "damages": "42800000",
     "wiki_title": "Hurricane Edna",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Edna"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Edna",
+    "deaths_total": 29,
+    "deaths_min": 29,
+    "deaths_max": 29,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 42800000,
+    "damage_millions_usd": 42.8,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL081955": {
-    "deaths": "7&nbsp;direct",
+    "deaths": "7 direct",
     "damages": "88000000",
     "wiki_title": "Hurricane Ione",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ione"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ione",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 88000000,
+    "damage_millions_usd": 88.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL081959": {
     "deaths": "22 direct",
     "damages": "14000000",
     "wiki_title": "Hurricane Gracie (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gracie_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gracie_%281959%29",
+    "deaths_total": 22,
+    "deaths_min": 22,
+    "deaths_max": 22,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 14000000,
+    "damage_millions_usd": 14.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL091951": {
     "deaths": "276+ overall",
     "damages": "80",
     "wiki_title": "Hurricane How (1951)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_How_%281951%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_How_%281951%29",
+    "deaths_total": 276,
+    "deaths_min": 276,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 80000000,
+    "damage_millions_usd": 80.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL091953": {
     "damages": "200000",
     "wiki_title": "Hurricane Florence (1953)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%281953%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%281953%29",
+    "damage_usd_nominal": 200000,
+    "damage_millions_usd": 0.2,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL091966": {
     "deaths": "1,269",
     "damages": "272500000",
     "wiki_title": "Hurricane Inez (1966)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Inez_%281966%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Inez_%281966%29",
+    "deaths_total": 1269,
+    "deaths_min": 1269,
+    "deaths_max": 1269,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 272500000,
+    "damage_millions_usd": 272.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL101959": {
     "deaths": "58 direct, 6 indirect",
     "damages": "24",
     "wiki_title": "Tropical Storm Irene (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Irene_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Irene_%281959%29",
+    "deaths_total": 64,
+    "deaths_min": 64,
+    "deaths_max": 64,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 24000000,
+    "damage_millions_usd": 24.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL101964": {
     "deaths": "38",
     "damages": "126000000",
     "wiki_title": "Hurricane Hilda (1964)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hilda_%281964%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hilda_%281964%29",
+    "deaths_total": 38,
+    "deaths_min": 38,
+    "deaths_max": 38,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 126000000,
+    "damage_millions_usd": 126.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL111950": {
     "deaths": "11 direct",
     "damages": "32000000",
     "wiki_title": "Hurricane King (1950)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_King_%281950%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_King_%281950%29",
+    "deaths_total": 11,
+    "deaths_min": 11,
+    "deaths_max": 11,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 32000000,
+    "damage_millions_usd": 32.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL111959": {
     "deaths": "58 direct, 6 indirect",
     "damages": "24",
     "wiki_title": "Hurricane Judith (1959)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Judith_%281959%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Judith_%281959%29",
+    "deaths_total": 64,
+    "deaths_min": 64,
+    "deaths_max": 64,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 24000000,
+    "damage_millions_usd": 24.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL111964": {
     "deaths": "7 total",
     "damages": "30000000",
     "wiki_title": "Hurricane Isbell (1964)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Isbell_%281964%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Isbell_%281964%29",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 30000000,
+    "damage_millions_usd": 30.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL121953": {
     "deaths": "14+",
     "damages": "3.75",
     "wiki_title": "Hurricane Hazel (1953)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel_%281953%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel_%281953%29",
+    "deaths_total": 14,
+    "deaths_min": 14,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 3750000,
+    "damage_millions_usd": 3.75,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL131950": {
     "deaths": "93 total",
     "damages": "43.39",
     "wiki_title": "Hurricane Love (1950)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Love_%281950%29"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Love_%281950%29",
+    "deaths_total": 93,
+    "deaths_min": 93,
+    "deaths_max": 93,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 43390000,
+    "damage_millions_usd": 43.39,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   },
   "AL141954": {
     "deaths": "592–1,192",
     "damages": "382000000",
     "wiki_title": "Hurricane Hazel",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel"
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel",
+    "deaths_total": 1192,
+    "deaths_min": 592,
+    "deaths_max": 1192,
+    "deaths_qualifier": "range_high",
+    "damage_usd_nominal": 382000000,
+    "damage_millions_usd": 382.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-05-05T08:30:43Z"
+    }
   }
 }

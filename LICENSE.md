@@ -65,12 +65,12 @@ IEM mirrors and archives NEXRAD reflectivity mosaics from the NWS Radar Data Cen
 
 ### Storm Impacts Data
 
-**Source:** Wikipedia (community-edited)  
-**Entries Covered:** ~46 major hurricanes (deaths, damage, costs)  
-**License:** Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)  
-**Availability:** Displayed in the "Impacts" section of storm detail panels
+- **Source:** Wikipedia (community-edited)
+- **Entries Covered:** ~46 major hurricanes (raw deaths/damage text plus normalized fatality and nominal-USD fields)
+- **License:** Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+- **Availability:** Displayed in the "Impacts" section of storm detail panels
 
-HurricaneMap uses crowd-sourced impacts data from Wikipedia hurricane articles. This data is maintained by the Wikipedia community and may be incomplete or subject to revision.
+HurricaneMap uses crowd-sourced impacts data from Wikipedia hurricane articles. This data is maintained by the Wikipedia community and may be incomplete or subject to revision. Normalized numeric impact fields are best-effort values derived from the raw infobox text; the original source strings remain preserved in `data/impacts.json`.
 
 **Accuracy Note:** Wikipedia impacts figures vary in methodology (e.g., direct vs. total deaths, USD inflation year). Figures are presented as-is for reference; for rigorous analysis, consult peer-reviewed sources or original government reports (NOAA, National Weather Service, insurance agencies).
 

@@ -20,6 +20,11 @@ import {
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import {
+  getDamageMillions,
+  getRawDamageText,
+  getRawFatalityText,
+} from './impact-utils.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -551,13 +556,13 @@ function noaaTcrUrl(storm) {
 function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   if (!im) return '';
   const rows = [];
-  if (im.deaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(im.deaths)}</span></div>`);
-  if (im.damages) {
+  const rawDeaths = getRawFatalityText(im);
+  const rawDamage = getRawDamageText(im);
+  if (rawDeaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(rawDeaths)}</span></div>`);
+  if (rawDamage) {
     const mode = getSetting('damageMode');
-    // Parse leading number, treat as millions USD nominal at year-of-storm.
-    const m = String(im.damages).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
-    const nominalM = m ? parseFloat(m[1]) : null;
-    let valueHTML = escapeHtml(im.damages);
+    const nominalM = getDamageMillions(im);
+    let valueHTML = escapeHtml(rawDamage);
     if (mode === 'real' && nominalM != null && storm.year) {
       const r = inflateUSD(nominalM, storm.year);
       if (r) {

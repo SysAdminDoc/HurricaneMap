@@ -6,6 +6,11 @@ import { computeACE } from './metrics.js';
 import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import {
+  formatFatalityCount,
+  getDamageMillions,
+  getFatalityCount,
+} from './impact-utils.js';
 
 const HOST_ID = 'season-summary';
 const MAX_YEARS = 3;
@@ -24,25 +29,6 @@ function ensureHost() {
   const main = document.querySelector('main') || document.body;
   main.appendChild(host);
   return host;
-}
-// "1,601 total" / "14+" / "1 indirect" / "500000" / "—" → number or null.
-function parseDeaths(s) {
-  if (!s) return null;
-  const m = String(s).replace(/[,\s]/g, '').match(/^(\d+)/);
-  return m ? parseInt(m[1], 10) : null;
-}
-// Damage strings are millions-USD per repo convention but inconsistent.
-// Treat the leading number as millions; "1110" → $1.11B, "3.75" → $3.75M.
-function parseDamageMillions(s) {
-  if (!s) return null;
-  const m = String(s).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
-  return m ? parseFloat(m[1]) : null;
-}
-function fmtDeaths(n) {
-  if (n == null) return '—';
-  if (n >= 10000) return `${(n / 1000).toFixed(0)}k`;
-  if (n >= 1000) return n.toLocaleString();
-  return String(n);
 }
 export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const host = ensureHost();
@@ -168,8 +154,8 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     }
     const impacts = getImpactsFor(s.id);
     if (impacts) {
-      const d = parseDeaths(impacts.deaths);
-      const dmg = parseDamageMillions(impacts.damages);
+      const d = getFatalityCount(impacts);
+      const dmg = getDamageMillions(impacts);
       let dmgAdj = dmg;
       // For costliest comparison, prefer real (CPI-adjusted) USD when the
       // setting is on so a 1900 hurricane can be ranked fairly against 2017.
@@ -177,8 +163,12 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
         const r = inflateUSD(dmg, s.year);
         if (r) dmgAdj = r.real;
       }
-      if (d != null && (!deadliest || d > deadliest.value)) deadliest = { storm: s, value: d, raw: impacts.deaths };
-      if (dmg != null && (!costliest || dmgAdj > costliest.value)) costliest = { storm: s, value: dmgAdj, nominal: dmg, raw: impacts.damages };
+      if (Number.isFinite(d) && d > 0 && (!deadliest || d > deadliest.value)) {
+        deadliest = { storm: s, value: d };
+      }
+      if (Number.isFinite(dmg) && dmg > 0 && Number.isFinite(dmgAdj) && (!costliest || dmgAdj > costliest.value)) {
+        costliest = { storm: s, value: dmgAdj };
+      }
     }
   }
   const aceCell = host.querySelector('[data-role="ace"] .ss-stat-num');
@@ -189,7 +179,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     if (deadliest) {
       const n = formatStormName(deadliest.storm.name);
       dHost.classList.remove('ss-loading');
-      dHost.innerHTML = `${escapeHtml(n)} ${deadliest.storm.year} <span class="ss-meta">${fmtDeaths(deadliest.value)} dead</span>`;
+      dHost.innerHTML = `${escapeHtml(n)} ${deadliest.storm.year} <span class="ss-meta">${formatFatalityCount(deadliest.value)} dead</span>`;
     } else {
       dHost.classList.remove('ss-loading');
       dHost.innerHTML = '<span class="ss-meta">no impact records</span>';

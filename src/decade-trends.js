@@ -3,14 +3,14 @@
 import { getStats, getLandfalls, ensureStormsLoaded, getStorm, getImpactsFor } from './data.js';
 import { computeACE } from './metrics.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import {
+  getDamageMillions,
+  getFatalityCount,
+  getRawDamageText,
+  getRawFatalityText,
+} from './impact-utils.js';
 
 let _cache = null;
-
-function parseLeadingNumber(value) {
-  if (value == null) return null;
-  const match = String(value).replace(/[,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
-  return match ? Number(match[1]) : null;
-}
 
 // Compute decade-level aggregates with details.
 async function buildDecadeTrends() {
@@ -74,10 +74,14 @@ async function buildDecadeTrends() {
     // Track deadliest and costliest for later ranking.
     const impacts = getImpactsFor(lf.storm_id);
     if (impacts) {
-      const deaths = parseLeadingNumber(impacts.deaths);
-      const damages = parseLeadingNumber(impacts.damages);
-      if (deaths != null) bucket.deathlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, deaths, rawDeaths: impacts.deaths });
-      if (damages != null) bucket.costlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, damages, rawDamages: impacts.damages });
+      const deaths = getFatalityCount(impacts);
+      const damages = getDamageMillions(impacts);
+      if (Number.isFinite(deaths) && deaths > 0) {
+        bucket.deathlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, deaths, rawDeaths: getRawFatalityText(impacts) });
+      }
+      if (Number.isFinite(damages) && damages > 0) {
+        bucket.costlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, damages, rawDamages: getRawDamageText(impacts) });
+      }
     }
   }
 
@@ -139,7 +143,7 @@ export async function renderDecadeTrends(host) {
       </td>
       <td class="dt-costliest">
         ${d.costliest
-          ? `<span title="Damages: ${escapeHtml(d.costliest.rawDamages)} million USD">${escapeHtml(formatStormName(d.costliest.name))} (${d.costliest.year})</span>`
+          ? `<span title="Damages: ${escapeHtml(d.costliest.rawDamages)}">${escapeHtml(formatStormName(d.costliest.name))} (${d.costliest.year})</span>`
           : '—'}
       </td>
     </tr>
@@ -165,7 +169,7 @@ export async function renderDecadeTrends(host) {
     </div>
     <p class="dt-note">
       Major hurricane % reflects Category 3+ at peak intensity (≥96 kt).
-      Deadliest/costliest are nominal dollars (not inflation-adjusted).
+      Deadliest/costliest use normalized impact fields from Wikipedia infoboxes.
       Hover over storm names to see details.
     </p>
   `;
