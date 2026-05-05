@@ -2,6 +2,17 @@
 
 All notable changes to HurricaneMap.
 
+## Unreleased — Premium responsive command polish (May 2026)
+
+**Product-quality refinement for mobile command layout, settings hierarchy, and first-run guidance.**
+
+### Improved
+- Reworked the narrow-screen command bar into a compact two-row shell with a horizontally scrollable action rail, preserving 44px touch targets without clipping header actions.
+- Moved mobile map controls and panels below the command surface so zoom controls, panels, filters, and the timeline no longer collide at phone widths.
+- Added visible settings hierarchy with Reading, Appearance, and Guidance groups, clearer local-save copy, and more legible mobile settings layout.
+- Refined first-run tour copy and retargeted the filter step to the Filters button on mobile, avoiding a spotlight on the collapsed offscreen filter panel.
+- Bumped the service worker shell cache to `hm-v1.3.9-q9` so installed users receive the responsive polish.
+
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 
 **Production hardening pass for derived metrics, comparison exports, URL restoration, and global keyboard behavior.**
