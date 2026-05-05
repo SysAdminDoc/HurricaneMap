@@ -28,9 +28,13 @@ import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import {
-  CATEGORY_DEFAULTS, YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
+  YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
   applyHashToFilters, createDefaultFilters, encodeHashState,
 } from './url-state.js';
+import {
+  hasActiveFilters, isYearFiltered, resetPrimaryFilters, resetYearRange,
+  setCategoryMacro, setYearRange, toggleCategory,
+} from './filter-state.js';
 
 let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
 let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;
@@ -163,15 +167,10 @@ async function boot() {
   // Initialize keyboard shortcuts and navigation
   // Wire macro filter functions to window
   window.filterByMacro = (mode) => {
-    if (mode === 'major') {
-      // Major hurricanes only (Cat 3-5)
-      filters.categories = new Set(['3', '4', '5']);
-    } else if (mode === 'tropical') {
-      // Tropical storms only
-      filters.categories = new Set(['ts']);
+    if (setCategoryMacro(filters, mode)) {
+      syncFilterUiFromState();
+      applyFilters();
     }
-    syncFilterUiFromState();
-    applyFilters();
   };
   initKeyboard();
   
@@ -340,8 +339,8 @@ function syncFilterUiFromState() {
   if (els.yearMax) els.yearMax.value = String(filters.yearMax);
   // Highlight year filter row when a non-default year range is selected
   const yearFilterRow = document.querySelector('.filter-row--year');
-  const isYearFiltered = filters.yearMin > YEAR_MIN_DEFAULT || filters.yearMax < YEAR_MAX_DEFAULT;
-  if (yearFilterRow) yearFilterRow.classList.toggle('active-filter', isYearFiltered);
+  const yearActive = isYearFiltered(filters, yearDefaults());
+  if (yearFilterRow) yearFilterRow.classList.toggle('active-filter', yearActive);
   els.catBtns.forEach((btn) => {
     const cat = btn.dataset.cat;
     const on = filters.categories.has(cat);
@@ -384,23 +383,18 @@ function applyFilters() {
   writeHash();
 }
 
-function hasActiveFilters() {
-  return filters.yearMin !== YEAR_MIN_DEFAULT ||
-    filters.yearMax !== YEAR_MAX_DEFAULT ||
-    filters.state !== '' ||
-    filters.showTracks ||
-    filters.showHeatmap ||
-    filters.categories.size !== CATEGORY_DEFAULTS.length ||
-    !CATEGORY_DEFAULTS.every(cat => filters.categories.has(cat)) ||
-    Boolean(els.surgeCategory?.value) ||
-    Boolean(els.showPopulation?.checked);
-}
-
 function updateFilterResetState() {
   if (!els.resetFilters) return;
-  const active = hasActiveFilters();
+  const active = hasActiveFilters(filters, yearDefaults(), {
+    surgeCategory: els.surgeCategory?.value,
+    showPopulation: els.showPopulation?.checked,
+  });
   els.resetFilters.disabled = !active;
   els.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
+}
+
+function yearDefaults() {
+  return { yearMinDefault: YEAR_MIN_DEFAULT, yearMaxDefault: YEAR_MAX_DEFAULT };
 }
 
 let lastTracksKey = '';
@@ -440,12 +434,9 @@ function wireUI() {
 
   // Year inputs
   const onYearChange = () => {
-    const a = parseInt(els.yearMin.value, 10);
-    const b = parseInt(els.yearMax.value, 10);
-    if (!Number.isFinite(a) || !Number.isFinite(b)) return;
-    filters.yearMin = Math.max(YEAR_MIN_DEFAULT, Math.min(a, b));
-    filters.yearMax = Math.min(YEAR_MAX_DEFAULT, Math.max(a, b));
-    applyFilters();
+    if (setYearRange(filters, els.yearMin.value, els.yearMax.value, yearDefaults())) {
+      applyFilters();
+    }
   };
   els.yearMin.addEventListener('change', onYearChange);
   els.yearMax.addEventListener('change', onYearChange);
@@ -453,16 +444,14 @@ function wireUI() {
   // Escape key resets year filter to full range
   els.yearMin.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      filters.yearMin = YEAR_MIN_DEFAULT;
-      filters.yearMax = YEAR_MAX_DEFAULT;
+      resetYearRange(filters, yearDefaults());
       syncFilterUiFromState();
       applyFilters();
     }
   });
   els.yearMax.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      filters.yearMin = YEAR_MIN_DEFAULT;
-      filters.yearMax = YEAR_MAX_DEFAULT;
+      resetYearRange(filters, yearDefaults());
       syncFilterUiFromState();
       applyFilters();
     }
@@ -471,8 +460,7 @@ function wireUI() {
   // Clear year filter button
   if (els.clearYearFilter) {
     els.clearYearFilter.addEventListener('click', () => {
-      filters.yearMin = YEAR_MIN_DEFAULT;
-      filters.yearMax = YEAR_MAX_DEFAULT;
+      resetYearRange(filters, yearDefaults());
       syncFilterUiFromState();
       applyFilters();
     });
@@ -483,14 +471,9 @@ function wireUI() {
     btn.setAttribute('aria-pressed', String(btn.classList.contains('on')));
     btn.addEventListener('click', () => {
       const cat = btn.dataset.cat;
-      if (filters.categories.has(cat)) {
-        filters.categories.delete(cat);
-        btn.classList.remove('on');
-      } else {
-        filters.categories.add(cat);
-        btn.classList.add('on');
-      }
-      btn.setAttribute('aria-pressed', String(filters.categories.has(cat)));
+      const on = toggleCategory(filters, cat);
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', String(on));
       applyFilters();
     });
   }
@@ -688,11 +671,7 @@ function wireUI() {
 
   // Reset
   els.resetFilters.addEventListener('click', () => {
-    filters.yearMin = YEAR_MIN_DEFAULT; filters.yearMax = YEAR_MAX_DEFAULT;
-    filters.categories = new Set(CATEGORY_DEFAULTS);
-    filters.state = '';
-    filters.showTracks = false;
-    filters.showHeatmap = false;
+    resetPrimaryFilters(filters, yearDefaults());
     syncFilterUiFromState();
     els.surgeCategory.value = '';
     els.showPopulation.checked = false;
@@ -708,8 +687,7 @@ function wireUI() {
     if (e.defaultPrevented) return;
     if (document.activeElement !== els.yearMin && document.activeElement !== els.yearMax) return;
     if (filters.yearMin === YEAR_MIN_DEFAULT && filters.yearMax === YEAR_MAX_DEFAULT) return;
-    filters.yearMin = YEAR_MIN_DEFAULT;
-    filters.yearMax = YEAR_MAX_DEFAULT;
+    resetYearRange(filters, yearDefaults());
     syncFilterUiFromState();
     applyFilters();
   });

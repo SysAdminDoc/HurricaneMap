@@ -9,7 +9,7 @@ This plan tracks the quality, reliability, accessibility, and maintainability im
 | ID | Workstream | Target outcome | Status | First build delivered | Next milestone |
 | --- | --- | --- | --- | --- | --- |
 | Q1 | Automated regression coverage | Repeatable boot/search/panel/stats/export/hash/settings coverage for every release. | [~] | `npm test`, `scripts/smoke-playwright.mjs`, and CI workflow. | Add mobile, high-contrast, onboarding, and visual snapshot coverage. |
-| Q2 | Centralized app state and hash parsing | Filter state, URL state, and validation live outside `main.js` with focused tests. | [~] | `src/url-state.js` now owns hash encode/decode/restore logic, with focused Node tests. | Extract the remaining filter-state mutation and reset logic from `main.js`. |
+| Q2 | Centralized app state and hash parsing | Filter state, URL state, and validation live outside `main.js` with focused tests. | [~] | `src/url-state.js` owns hash encode/decode/restore logic; `src/filter-state.js` owns filter reset, year clamp, category, and active-state rules. | Extract remaining DOM event wiring around filters into a controller module. |
 | Q3 | Data contract validation | Data shape drift fails fast before UI metrics silently break. | [~] | `scripts/validate-data.mjs` validates storms, landfalls, stats, impacts, glossary, and cross-file counts. | Move generated metadata and impact parsing into canonical typed artifacts. |
 | Q4 | Normalized impact data | Death/damage rankings and labels use numeric canonical fields plus raw source strings. | [ ] | Current validation guards source shape. | Update `scripts/scrape_impacts.py` to emit parsed numeric fields and provenance. |
 | Q5 | Data-derived season bounds | Year controls and defaults come from generated metadata instead of hard-coded UI constants. | [~] | Filter defaults and year-control bounds now derive from `stats.year_range` at boot. | Move source dates and year bounds into a dedicated `data/metadata.json`. |
@@ -42,6 +42,8 @@ Status: `[~]`
 
 - [x] Extract URL hash decode/encode/validation from `src/main.js`.
 - [x] Add focused tests for default hash omission, malformed percent encoding, invalid categories, invalid states, and open storm/state restoration.
+- [x] Extract filter reset, category macro, category toggle, year clamp, and active-state rules from `src/main.js`.
+- [x] Add focused tests for filter reset, year clamp, category macros/toggles, and active filter detection.
 - [ ] Generate canonical `data/metadata.json` with source dates, year bounds, generator version, and source file names.
 - [x] Derive UI year defaults from generated `stats.year_range`.
 - [ ] Normalize impacts into raw and parsed fields during scraping.
