@@ -24,6 +24,7 @@ import { initPerformanceMonitoring } from './perf.js';
 import { initGlossary, showGlossary } from './glossary.js';
 import { init as initKeyboard } from './keyboard.js';
 import { initServiceWorkerUpdates } from './sw-updates.js';
+import { initGlobe3D, openGlobe3D } from './globe3d.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
@@ -45,6 +46,7 @@ const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
 let activeSearchIndex = -1;
+let currentVisibleLandfalls = [];
 
 function writeHash() {
   const newHash = encodeHashState(filters, {
@@ -77,6 +79,7 @@ const els = {
   toggleFiltersBtn: document.getElementById('toggle-filters'),
   toggleStatsBtn: document.getElementById('toggle-stats'),
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
+  toggleGlobeBtn: document.getElementById('toggle-globe3d'),
   toggleInfoBtn: document.getElementById('toggle-info'),
   toggleMobileActionsBtn: document.getElementById('toggle-mobile-actions'),
   mobileActionsMenu: document.getElementById('mobile-actions-menu'),
@@ -218,6 +221,7 @@ async function boot() {
     document.documentElement.classList.add('high-contrast');
   }
   const map = initMap();
+  initGlobe3D();
   await loadInitial();
   syncYearBoundsFromData();
   populateStateFilter();
@@ -465,6 +469,7 @@ function populateStateFilter() {
 
 function applyFilters() {
   const visible = filterLandfalls(getLandfalls(), filters);
+  currentVisibleLandfalls = visible;
   renderLandfalls(visible, onLandfallClick);
   const totalLandfalls = getLandfalls().length;
   els.visibleCount.textContent = visible.length === totalLandfalls
@@ -796,6 +801,11 @@ function wireUI() {
 
   // On this date panel
   els.toggleOnThisDateBtn.addEventListener('click', showOnThisDate);
+
+  // Opt-in 3D globe view. Cesium loads only when the user opens this mode.
+  els.toggleGlobeBtn?.addEventListener('click', () => {
+    openGlobe3D({ landfalls: currentVisibleLandfalls, focusStormId: openStormId });
+  });
 
   wireMobileActionsMenu();
 

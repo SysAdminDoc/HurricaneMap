@@ -9,7 +9,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q14';
+const SW_VERSION = 'hm-v1.3.9-q15';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v1';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -29,6 +29,7 @@ const SHELL_ASSETS = [
   './src/sw-updates.js',
   './src/on-this-date.js',
   './src/glossary.js',
+  './src/globe3d.js',
   './src/keyboard.js',
   './src/chart.js',
   './src/chart-export.js',
