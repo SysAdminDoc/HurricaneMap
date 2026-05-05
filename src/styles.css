@@ -6726,3 +6726,174 @@ html.high-contrast {
     padding-top: 6px !important;
   }
 }
+
+/* Phase 13: Opt-in 3D globe visualization */
+.globe3d-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  overflow: hidden;
+  color: #f5f7ff;
+  background: #050813;
+}
+
+.globe3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #050813;
+}
+
+.globe3d-canvas .cesium-viewer,
+.globe3d-canvas .cesium-viewer-cesiumWidgetContainer,
+.globe3d-canvas .cesium-widget,
+.globe3d-canvas canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.globe3d-topbar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  gap: 10px 14px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(10, 14, 28, 0.76);
+  border-color: rgba(245, 247, 255, 0.16);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.36);
+}
+
+.globe3d-heading {
+  min-width: 0;
+}
+
+.globe3d-heading h2 {
+  margin: 0 0 3px;
+  font-size: 17px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.globe3d-heading p {
+  margin: 0;
+  color: rgba(245, 247, 255, 0.72);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.globe3d-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.globe3d-actions .text-btn {
+  min-height: 34px;
+  color: #f5f7ff;
+  background: rgba(245, 247, 255, 0.09);
+  border-color: rgba(245, 247, 255, 0.16);
+}
+
+.globe3d-actions .text-btn:hover,
+.globe3d-actions .text-btn:focus-visible {
+  background: rgba(116, 199, 236, 0.17);
+  border-color: rgba(116, 199, 236, 0.42);
+}
+
+.globe3d-actions .close-btn {
+  position: static;
+  color: #f5f7ff;
+  background: rgba(245, 247, 255, 0.09);
+  border-color: rgba(245, 247, 255, 0.16);
+}
+
+.globe3d-timeline {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr) minmax(150px, max-content);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.globe3d-timeline label,
+.globe3d-status {
+  color: rgba(245, 247, 255, 0.68);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.globe3d-timeline input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  accent-color: var(--sapphire);
+}
+
+.globe3d-timeline input[type="range"]:focus-visible {
+  outline: 2px solid rgba(180, 190, 254, 0.78);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+#globe3d-time-label {
+  justify-self: end;
+  color: rgba(245, 247, 255, 0.84);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.globe3d-status {
+  grid-column: 1 / -1;
+  min-height: 16px;
+}
+
+html.high-contrast .globe3d-topbar {
+  background: rgba(0, 0, 0, 0.94);
+  border: 2px solid #ffffff;
+}
+
+@media (max-width: 720px) {
+  .globe3d-topbar {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .globe3d-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .globe3d-timeline {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  #globe3d-time-label {
+    justify-self: start;
+    white-space: normal;
+  }
+}
+
+@media print {
+  .globe3d-panel {
+    display: none !important;
+  }
+}

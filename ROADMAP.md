@@ -126,7 +126,7 @@ Focus: Research-grade export, reproducible analysis, and educational integration
 
 Focus: Advanced visualization modes and immersive exploration.
 
-- [ ] **P13.1 3D track visualization (Cesium.js)** — Opt-in 3D globe mode with: (1) curved storm tracks in 3D space, (2) extrusion height = wind speed, (3) color = category, (4) interactive globe pan/zoom/tilt, (5) timeline scrubber. High-value for education + media. Risk: bundle size (+500KB), maintenance burden.
+- [x] **P13.1 3D track visualization (Cesium.js)** — ✅ v1.3.9. Added an opt-in Cesium globe launched from the header, lazy-loading the 3D engine only on demand. Visible filtered storms render as curved elevated tracks where height scales with wind speed and color maps to Saffir-Simpson category; focused storm mode uses the open storm panel selection. Includes pan/zoom/tilt, focus/reset controls, timeline scrubber, status feedback, responsive overlay controls, utility coverage, and a Playwright canvas-pixel smoke check.
 - [ ] **P13.2 Wind-field swath 3D cone** — For storms with wind-radii data (2004+), render asymmetric 3D cones representing 34/50/64kt wind extent at each track point. Visualize "cone of impact" more intuitively than flat 2D swaths.
 - [ ] **P13.3 Population impact overlay** — Combine wind-field geometry with LandScan population grid to compute estimated population in Cat-1/3/5 winds per track segment. Expose as "Est. exposure: X million in Cat-2+ winds" metric.
 
