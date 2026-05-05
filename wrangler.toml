@@ -1,0 +1,12 @@
+name = "hurricanemap-cdn"
+main = "cloudflare/worker.js"
+compatibility_date = "2026-05-05"
+
+[vars]
+ORIGIN_BASE_URL = "https://sysadmindoc.github.io/HurricaneMap"
+
+[env.production]
+name = "hurricanemap-cdn"
+
+[env.production.vars]
+ORIGIN_BASE_URL = "https://sysadmindoc.github.io/HurricaneMap"

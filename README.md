@@ -153,6 +153,8 @@ python -m http.server 8765
 
 The monthly `HURDAT2 Auto-Refresh` GitHub Actions workflow runs the same refresh helper against NOAA's HURDAT2 directory, regenerates `landfalls.json`, `storms.json`, `stats.json`, and `metadata.json` when source files change, validates the app with `npm run build`, and opens a data-update pull request.
 
+Optional edge deployment: [`docs/CLOUDFLARE_CDN.md`](docs/CLOUDFLARE_CDN.md) documents the Cloudflare Worker CDN wrapper, cache policy, image optimization hints, and curl checks for before/after latency validation.
+
 ## Data Export & Research
 
 **Export filtered data as publication-ready CSV:**
