@@ -18,6 +18,19 @@ export function escapeHtml(s) {
 }
 
 /**
+ * Format HURDAT2 storm names consistently across UI and exports.
+ * Data is usually uppercase; unnamed/blank records need stable fallback copy.
+ */
+export function formatStormName(name, { unnamed = 'Unnamed' } = {}) {
+  if (name == null) return unnamed;
+  const value = String(name).trim();
+  if (!value || value.toUpperCase() === 'UNNAMED') return unnamed;
+  return value
+    .toLowerCase()
+    .replace(/\b([a-z])/g, c => c.toUpperCase());
+}
+
+/**
  * Safely create a text node instead of using innerHTML.
  * Preferred method when you only need to set text content (no HTML).
  */

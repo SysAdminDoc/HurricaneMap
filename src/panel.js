@@ -19,7 +19,7 @@ import {
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
-import { escapeHtml } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -76,7 +76,7 @@ export async function showStorm(landfall) {
 }
 
 function render(storm, landfall, allStorms) {
-  const niceName = titleCase(storm.name);
+  const niceName = formatStormName(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
   const heading = isUnnamed ? `${storm.year} unnamed ${storm.basin === 'EP' ? 'Pacific' : 'Atlantic'} storm` : `${niceName} (${storm.year})`;
   const peakCat = saffirCat(storm.peak_wind_kt);
@@ -390,11 +390,6 @@ function render(storm, landfall, allStorms) {
   }
 }
 
-function titleCase(name) {
-  if (!name || name === 'UNNAMED') return 'Unnamed';
-  return name[0].toUpperCase() + name.slice(1).toLowerCase();
-}
-
 // Map a U.S. state name to a representative city in COASTAL_CITIES so the
 // closest-pass selector defaults to a relevant city for the storm at hand.
 const STATE_TO_CITY = {
@@ -479,7 +474,7 @@ function renderSimilarStorms(host, similarStorms) {
     const cat = categoryLabel(saffirCat(s.peak_wind_kt || 0));
     const cls = categoryClass(saffirCat(s.peak_wind_kt || 0));
     return `<li class="similar-storm-row">
-      <span class="similar-storm-name">${escapeHtml(s.name || 'Unnamed')} (${s.year})</span>
+      <span class="similar-storm-name">${escapeHtml(formatStormName(s.name))} (${s.year})</span>
       <span class="similar-storm-cat cat-pill ${cls}" title="Peak intensity">${cat}</span>
       <span class="similar-storm-landfalls" title="Number of U.S. landfalls">${s.landfalls} landfall${s.landfalls !== 1 ? 's' : ''}</span>
       <span class="similar-storm-score" title="Similarity score: 0-100 higher=more similar">${score}%</span>
@@ -527,7 +522,7 @@ function wikipediaUrl(storm) {
   if (!storm.name || storm.name === 'UNNAMED') {
     return `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(`${storm.year} Atlantic hurricane season`)}`;
   }
-  const name = titleCase(storm.name);
+  const name = formatStormName(storm.name);
   // Most modern named storms: "Hurricane <Name> (YYYY)" or "Tropical Storm <Name> (YYYY)"
   const peakCat = saffirCat(storm.peak_wind_kt);
   const prefix = peakCat >= 1 ? 'Hurricane' : 'Tropical_Storm';
@@ -540,7 +535,7 @@ function wikipediaUrl(storm) {
 function youtubeUrl(storm) {
   const niceName = (!storm.name || storm.name === 'UNNAMED')
     ? `${storm.year} hurricane`
-    : `${titleCase(storm.name)} ${storm.year}`;
+    : `${formatStormName(storm.name)} ${storm.year}`;
   const peakCat = saffirCat(storm.peak_wind_kt);
   const kind = peakCat >= 1 ? 'hurricane' : 'tropical storm';
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${kind} ${niceName} landfall`)}`;
@@ -627,7 +622,7 @@ function reconArchiveUrl(storm) {
   if (storm.basin !== 'AL') return null;
   if (storm.year < 1989) return null;  // Tropical Atlantic archive thins out before this
   if (!storm.name || storm.name === 'UNNAMED') return null;
-  const name = storm.name[0].toUpperCase() + storm.name.slice(1).toLowerCase();
+  const name = formatStormName(storm.name);
   // Tropical Atlantic uses a per-storm storm-archive page indexed by name+year.
   return `https://tropicalatlantic.com/recon/?archive=${storm.year}&storm=${encodeURIComponent(name)}`;
 }

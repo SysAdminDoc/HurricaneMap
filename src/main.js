@@ -26,12 +26,18 @@ import { init as initKeyboard } from './keyboard.js';
 import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
-import { escapeHtml } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
+
+const YEAR_MIN_DEFAULT = 1851;
+const YEAR_MAX_DEFAULT = 2025;
+const CATEGORY_DEFAULTS = ['ts', '1', '2', '3', '4', '5'];
+const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
+const CATEGORY_HASH_DEFAULT = [...CATEGORY_DEFAULTS].sort().join(',');
 
 const filters = {
-  yearMin: 1851,
-  yearMax: 2025,
-  categories: new Set(['ts', '1', '2', '3', '4', '5']),
+  yearMin: YEAR_MIN_DEFAULT,
+  yearMax: YEAR_MAX_DEFAULT,
+  categories: new Set(CATEGORY_DEFAULTS),
   state: '',
   showTracks: false,
   showHeatmap: false,
@@ -45,8 +51,8 @@ let activeSearchIndex = -1;
 // Format: #y=1990-2025&c=3,4,5&s=Florida&t=1&h=0&storm=AL092005
 // Falsy/default values are omitted to keep links short.
 const DEFAULT_HASH = {
-  y: '1851-2025',
-  c: 'ts,1,2,3,4,5',
+  y: `${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT}`,
+  c: CATEGORY_HASH_DEFAULT,
   s: '',
   t: '0',
   h: '0',
@@ -87,7 +93,12 @@ function decodeHash() {
     const eq = pair.indexOf('=');
     if (eq < 0) continue;
     const k = pair.slice(0, eq);
-    const v = decodeURIComponent(pair.slice(eq + 1));
+    let v;
+    try {
+      v = decodeURIComponent(pair.slice(eq + 1));
+    } catch {
+      continue;
+    }
     out[k] = v;
   }
   return out;
@@ -98,13 +109,17 @@ function applyHashToFilters() {
   if (!h) return null;
   if (h.y && /^\d{4}-\d{4}$/.test(h.y)) {
     const [a, b] = h.y.split('-').map(Number);
-    filters.yearMin = Math.max(1851, Math.min(a, b));
-    filters.yearMax = Math.min(2025, Math.max(a, b));
+    filters.yearMin = Math.max(YEAR_MIN_DEFAULT, Math.min(a, b));
+    filters.yearMax = Math.min(YEAR_MAX_DEFAULT, Math.max(a, b));
   }
   if (h.c) {
-    filters.categories = new Set(h.c.split(',').filter(Boolean));
+    const cats = h.c.split(',').filter(cat => VALID_CATEGORIES.has(cat));
+    filters.categories = new Set(cats.length ? cats : CATEGORY_DEFAULTS);
   }
-  if (h.s !== undefined) filters.state = h.s;
+  if (h.s !== undefined) {
+    const knownStates = getStats()?.by_state || {};
+    filters.state = Object.prototype.hasOwnProperty.call(knownStates, h.s) ? h.s : '';
+  }
   if (h.t !== undefined) filters.showTracks = h.t === '1';
   if (h.h !== undefined) filters.showHeatmap = h.h === '1';
   return h;
@@ -279,6 +294,7 @@ function wireSettingsControls() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (menu.hasAttribute('hidden')) return;
+    e.preventDefault();
     menu.setAttribute('hidden', '');
     cog.setAttribute('aria-expanded', 'false');
     cog.focus();
@@ -361,7 +377,7 @@ function syncFilterUiFromState() {
   if (els.yearMax) els.yearMax.value = String(filters.yearMax);
   // Highlight year filter row when a non-default year range is selected
   const yearFilterRow = document.querySelector('.filter-row--year');
-  const isYearFiltered = filters.yearMin > 1851 || filters.yearMax < 2025;
+  const isYearFiltered = filters.yearMin > YEAR_MIN_DEFAULT || filters.yearMax < YEAR_MAX_DEFAULT;
   if (yearFilterRow) yearFilterRow.classList.toggle('active-filter', isYearFiltered);
   els.catBtns.forEach((btn) => {
     const cat = btn.dataset.cat;
@@ -406,13 +422,13 @@ function applyFilters() {
 }
 
 function hasActiveFilters() {
-  return filters.yearMin !== 1851 ||
-    filters.yearMax !== 2025 ||
+  return filters.yearMin !== YEAR_MIN_DEFAULT ||
+    filters.yearMax !== YEAR_MAX_DEFAULT ||
     filters.state !== '' ||
     filters.showTracks ||
     filters.showHeatmap ||
-    filters.categories.size !== 6 ||
-    !['ts', '1', '2', '3', '4', '5'].every(cat => filters.categories.has(cat)) ||
+    filters.categories.size !== CATEGORY_DEFAULTS.length ||
+    !CATEGORY_DEFAULTS.every(cat => filters.categories.has(cat)) ||
     Boolean(els.surgeCategory?.value) ||
     Boolean(els.showPopulation?.checked);
 }
@@ -464,8 +480,8 @@ function wireUI() {
     const a = parseInt(els.yearMin.value, 10);
     const b = parseInt(els.yearMax.value, 10);
     if (!Number.isFinite(a) || !Number.isFinite(b)) return;
-    filters.yearMin = Math.max(1851, Math.min(a, b));
-    filters.yearMax = Math.min(2025, Math.max(a, b));
+    filters.yearMin = Math.max(YEAR_MIN_DEFAULT, Math.min(a, b));
+    filters.yearMax = Math.min(YEAR_MAX_DEFAULT, Math.max(a, b));
     applyFilters();
   };
   els.yearMin.addEventListener('change', onYearChange);
@@ -474,16 +490,16 @@ function wireUI() {
   // Escape key resets year filter to full range
   els.yearMin.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      filters.yearMin = 1851;
-      filters.yearMax = 2025;
+      filters.yearMin = YEAR_MIN_DEFAULT;
+      filters.yearMax = YEAR_MAX_DEFAULT;
       syncFilterUiFromState();
       applyFilters();
     }
   });
   els.yearMax.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      filters.yearMin = 1851;
-      filters.yearMax = 2025;
+      filters.yearMin = YEAR_MIN_DEFAULT;
+      filters.yearMax = YEAR_MAX_DEFAULT;
       syncFilterUiFromState();
       applyFilters();
     }
@@ -492,8 +508,8 @@ function wireUI() {
   // Clear year filter button
   if (els.clearYearFilter) {
     els.clearYearFilter.addEventListener('click', () => {
-      filters.yearMin = 1851;
-      filters.yearMax = 2025;
+      filters.yearMin = YEAR_MIN_DEFAULT;
+      filters.yearMax = YEAR_MAX_DEFAULT;
       syncFilterUiFromState();
       applyFilters();
     });
@@ -569,7 +585,7 @@ function wireUI() {
     setSearchOpen(true);
     els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
       history.map(h => {
-        const name = (h.name === 'UNNAMED') ? 'Unnamed' : titleCase(h.name);
+        const name = formatStormName(h.name);
         const cat = categoryLabel(h.category);
         return `<li data-storm-id="${h.storm_id}" data-t="${h.t}" data-lat="${h.lat}" data-lon="${h.lon}" role="option" tabindex="-1">
           <span class="search-result-spark-host" data-storm-id="${h.storm_id}" aria-hidden="true"></span>
@@ -661,7 +677,7 @@ function wireUI() {
     }
     setSearchOpen(true);
     const renderRow = (lf) => {
-      const name = (lf.name === 'UNNAMED') ? 'Unnamed' : titleCase(lf.name);
+      const name = formatStormName(lf.name);
       const cat = categoryLabel(lf.category);
       const safeName = escapeHtml(name);
       const safeState = escapeHtml(lf.state || '');
@@ -709,8 +725,8 @@ function wireUI() {
 
   // Reset
   els.resetFilters.addEventListener('click', () => {
-    filters.yearMin = 1851; filters.yearMax = 2025;
-    filters.categories = new Set(['ts', '1', '2', '3', '4', '5']);
+    filters.yearMin = YEAR_MIN_DEFAULT; filters.yearMax = YEAR_MAX_DEFAULT;
+    filters.categories = new Set(CATEGORY_DEFAULTS);
     filters.state = '';
     filters.showTracks = false;
     filters.showHeatmap = false;
@@ -723,14 +739,14 @@ function wireUI() {
     applyFilters();
   });
 
-  // Escape key: reset year filter if one is active
+  // Escape resets the year filter only when focus is inside the year controls.
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    // Only reset if year filter is active (not full range)
-    if (filters.yearMin === 1851 && filters.yearMax === 2025) return;
-    // Reset to full range
-    filters.yearMin = 1851;
-    filters.yearMax = 2025;
+    if (e.defaultPrevented) return;
+    if (document.activeElement !== els.yearMin && document.activeElement !== els.yearMax) return;
+    if (filters.yearMin === YEAR_MIN_DEFAULT && filters.yearMax === YEAR_MAX_DEFAULT) return;
+    filters.yearMin = YEAR_MIN_DEFAULT;
+    filters.yearMax = YEAR_MAX_DEFAULT;
     syncFilterUiFromState();
     applyFilters();
   });
@@ -748,7 +764,10 @@ function wireUI() {
     if (e.target === els.infoModal) els.infoModal.hidden = true;
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !els.infoModal.hidden) els.infoModal.hidden = true;
+    if (e.key === 'Escape' && !els.infoModal.hidden) {
+      e.preventDefault();
+      els.infoModal.hidden = true;
+    }
   });
 
   // Export button
@@ -806,10 +825,6 @@ function wireFilterPanel() {
   } else if (mobileQuery.addListener) {
     mobileQuery.addListener(onViewportChange);
   }
-}
-
-function titleCase(name) {
-  return name[0].toUpperCase() + name.slice(1).toLowerCase();
 }
 
 boot().catch(err => {

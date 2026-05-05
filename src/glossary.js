@@ -114,6 +114,7 @@ export async function initGlossary() {
   
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.hidden) {
+      e.preventDefault();
       modal.hidden = true;
       searchInput.value = '';
       renderList();

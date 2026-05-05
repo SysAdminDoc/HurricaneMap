@@ -2,6 +2,19 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.9 — Metrics and interaction hardening (May 2026)
+
+**Production hardening pass for derived metrics, comparison exports, URL restoration, and global keyboard behavior.**
+
+### Fixed
+- Restored ACE values in season summaries, climatology charts, and decade trends by reading the structured metric payload consistently.
+- Fixed comparison CSV export fields for ACE, translation speed, rapid intensification, and RI risk so exports match the live analytics contracts.
+- Validated permalink category and state filters during hash restoration, preventing malformed URLs from creating impossible empty filter states.
+- Routed Escape handling through the active surface first so settings, glossary, and info dialogs close predictably without also resetting filters or panels.
+- Normalized storm-name formatting across panels, map previews, search history, comparison views, animation labels, and state summaries.
+- Rebuilt decade impact rankings from parsed impact data instead of stale field names so deadliest and costliest decade lists remain meaningful.
+- Bumped the service worker shell cache to `hm-v1.3.9` so live users receive the hardening fixes.
+
 ## v1.3.8 — Premium command and onboarding polish (May 2026)
 
 **Focused product-quality pass for the command bar, first-run guidance, responsive filters, and accessibility semantics.**

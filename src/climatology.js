@@ -37,7 +37,7 @@ async function buildClimatology() {
     const bucket = m.get(yr) || (m.set(yr, { ace: 0, named: new Set(), landfalls: 0 }), m.get(yr));
     try {
       const ace = computeACE(s.track);
-      if (Number.isFinite(ace)) bucket.ace += ace;
+      if (Number.isFinite(ace?.value)) bucket.ace += ace.value;
     } catch (e) { /* ignore */ }
     // Named-storm: peak wind >= 34kt
     const peak = s.track.reduce((a, p) => Math.max(a, p.wind || 0), 0);
