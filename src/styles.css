@@ -1241,6 +1241,15 @@ section.storm-panel.glass {
 .active-track, .active-forecast, .active-cone {
   filter: drop-shadow(0 0 6px rgba(137, 180, 250, 0.5));
 }
+.official-cone {
+  mix-blend-mode: screen;
+}
+.official-forecast-track {
+  stroke-linecap: round;
+}
+.official-observed-track {
+  stroke-linecap: round;
+}
 .ensemble-track {
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
 }

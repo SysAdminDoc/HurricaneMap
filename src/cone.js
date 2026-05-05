@@ -1,150 +1,348 @@
-// P10.2 — NHC Cone of Uncertainty: Render official forecast track cones on the map
+// Official NHC forecast context for active storms.
+//
+// Uses Esri/NHC's active-hurricane FeatureServer GeoJSON layers:
+//   2 = Forecast Track, 3 = Observed Track, 4 = Forecast Error Cone.
+// The app already polls CurrentStorms.json frequently; this module caches the
+// GIS payload for six hours unless the active storm identity set changes.
 
-import L from 'leaflet';
+const NHC_FEATURE_SERVICE =
+  'https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/Active_Hurricanes_v1/FeatureServer';
 
-let coneLayer = null;
-let conePolylines = [];
-let lastPolledStorm = null;
+export const NHC_FORECAST_LAYER_IDS = {
+  forecastTrack: 2,
+  observedTrack: 3,
+  cone: 4,
+};
+
+export const NHC_FORECAST_POLL_MS = 6 * 60 * 60 * 1000;
+
+const OUT_FIELDS = [
+  'STORMNAME',
+  'STORMTYPE',
+  'ADVDATE',
+  'ADVISNUM',
+  'STORMNUM',
+  'FCSTPRD',
+  'BASIN',
+  'STORMID',
+];
+
+let forecastLayerGroup = null;
+let forecastLayerMap = null;
+let forecastLayerVisible = true;
+let forecastCache = null;
 let conePollingInterval = null;
 
-const CONE_API = 'https://services1.arcgis.com/hRUr1F8lE8Jz2Ppj/arcgis/rest/services/NHC_Viewable/FeatureServer/1/query';
-const CONE_UPDATE_INTERVAL = 6 * 60 * 60 * 1000; // 6 hours
+export function buildNHCFeatureQueryUrl(layerId, options = {}) {
+  const params = new URLSearchParams({
+    where: options.where || '1=1',
+    outFields: (options.outFields || OUT_FIELDS).join(','),
+    returnGeometry: 'true',
+    f: 'geojson',
+    outSR: '4326',
+  });
+  return `${NHC_FEATURE_SERVICE}/${layerId}/query?${params.toString()}`;
+}
+
+export function activeStormCacheKey(activeStorms) {
+  return (activeStorms || [])
+    .map(storm => [
+      normalizeId(storm?.id),
+      normalizeId(storm?.binNumber),
+      normalizeStormName(storm?.name),
+      storm?.forecastTrack?.advNum || '',
+      storm?.trackCone?.advNum || '',
+      storm?.lastUpdate || '',
+    ].join(':'))
+    .sort()
+    .join('|');
+}
+
+export function buildStormMatcher(activeStorms) {
+  const ids = new Set();
+  const names = new Set();
+  const basinNumbers = new Set();
+
+  for (const storm of activeStorms || []) {
+    const id = normalizeId(storm?.id);
+    const bin = normalizeId(storm?.binNumber);
+    const name = normalizeStormName(storm?.name);
+    if (id) ids.add(id);
+    if (bin) ids.add(bin);
+    if (name) names.add(name);
+
+    for (const key of basinNumberKeysFromId(id)) basinNumbers.add(key);
+  }
+
+  return { ids, names, basinNumbers };
+}
+
+export function featureMatchesActiveStorm(feature, matcher) {
+  if (!matcher || (!matcher.ids.size && !matcher.names.size && !matcher.basinNumbers.size)) {
+    return true;
+  }
+  const props = feature?.properties || {};
+  const stormId = normalizeId(props.STORMID || props.stormid);
+  const stormName = normalizeStormName(props.STORMNAME || props.stormname);
+  const basinNumbers = basinNumberKeysFromFeature(props);
+
+  return (stormId && matcher.ids.has(stormId)) ||
+    (stormName && matcher.names.has(stormName)) ||
+    basinNumbers.some(key => matcher.basinNumbers.has(key));
+}
+
+export function filterFeaturesForActiveStorms(features, activeStorms) {
+  if (!Array.isArray(features) || features.length === 0) return [];
+  const matcher = buildStormMatcher(activeStorms);
+  const matched = features.filter(feature => featureMatchesActiveStorm(feature, matcher));
+  // The active service only exposes active systems. If NHC/Esri changes field
+  // names and our matcher misses, showing all active features is safer than
+  // hiding official forecast context.
+  return matched.length > 0 ? matched : features;
+}
+
+export async function renderOfficialForecastContext(activeStorms, options = {}) {
+  const map = options.map || forecastLayerMap;
+  const enabled = options.enabled !== false;
+  if (!map || !enabled || !Array.isArray(activeStorms) || activeStorms.length === 0) {
+    clearOfficialForecastContext();
+    return { status: 'idle', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+  }
+
+  ensureForecastLayer(map);
+
+  try {
+    const layers = await fetchOfficialForecastLayers(activeStorms, { force: options.force });
+    const coneFeatures = filterFeaturesForActiveStorms(layers.cones, activeStorms);
+    const forecastTrackFeatures = filterFeaturesForActiveStorms(layers.forecastTracks, activeStorms);
+    const observedTrackFeatures = filterFeaturesForActiveStorms(layers.observedTracks, activeStorms);
+
+    forecastLayerGroup.clearLayers();
+    addGeoJsonLayer(coneFeatures, 'cone');
+    addGeoJsonLayer(observedTrackFeatures, 'observedTrack');
+    addGeoJsonLayer(forecastTrackFeatures, 'forecastTrack');
+    setOfficialForecastVisibility(forecastLayerVisible);
+
+    return {
+      status: 'rendered',
+      coneCount: coneFeatures.length,
+      forecastTrackCount: forecastTrackFeatures.length,
+      observedTrackCount: observedTrackFeatures.length,
+    };
+  } catch (error) {
+    console.warn('Failed to fetch official NHC forecast geometry:', error);
+    return { status: 'error', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+  }
+}
+
+export function clearOfficialForecastContext() {
+  if (forecastLayerGroup) forecastLayerGroup.clearLayers();
+}
+
+export function clearOfficialForecastCache() {
+  forecastCache = null;
+}
+
+export function setOfficialForecastVisibility(visible) {
+  forecastLayerVisible = !!visible;
+  setLayerDisplay(forecastLayerGroup, forecastLayerVisible);
+}
 
 export function initConeLayer(map) {
-  // Create a feature group for cone layers
-  coneLayer = L.featureGroup();
-  map.addLayer(coneLayer);
-  coneLayer.bringToBack(); // Behind track lines
+  ensureForecastLayer(map);
 }
 
-export function showConeForStorm(stormId, map) {
-  // Clear existing cones
-  clearCone();
-  
-  // Check if storm is active (born in last 10 days)
-  const now = new Date();
-  const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
-  
-  // For now, only show cones for active storms
-  // This would be enhanced with actual active-storm data from the app
-  if (!isStormRecent(stormId, tenDaysAgo)) {
-    return;
-  }
-  
-  // Fetch and render cone
-  fetchAndRenderCone(stormId, map);
-}
-
-function isStormRecent(stormId, sinceDate) {
-  // Parse storm ID: e.g., "AL092005" -> year 2005
-  const yearMatch = stormId.match(/\d{4}$/);
-  if (!yearMatch) return false;
-  const year = parseInt(yearMatch[0], 10);
-  const currentYear = new Date().getFullYear();
-  
-  // Only show cones for current or very recent season
-  return year === currentYear || year === currentYear - 1;
-}
-
-async function fetchAndRenderCone(stormId, map) {
-  try {
-    // Query NHC GIS server for cone data
-    // Format: e.g., "AL092005" for 2005 Hurricane Katrina
-    const where = `StormNumber='${stormId.substring(0, 2)}${parseInt(stormId.substring(2, 4), 10)}' AND Season=${stormId.substring(4)}`;
-    
-    const response = await fetch(`${CONE_API}?where=${encodeURIComponent(where)}&f=geojson&outSR=4326`);
-    const data = await response.json();
-    
-    if (data.features && data.features.length > 0) {
-      renderConeFeatures(data.features, map);
-      lastPolledStorm = stormId;
-    }
-  } catch (err) {
-    console.warn('Failed to fetch NHC cone data:', err);
-  }
-}
-
-function renderConeFeatures(features, map) {
-  for (const feature of features) {
-    const geom = feature.geometry;
-    if (!geom) continue;
-    
-    if (geom.type === 'Polygon') {
-      renderConePolygon(geom.coordinates, map);
-    } else if (geom.type === 'MultiLineString') {
-      // Render cone outline as connected lines
-      for (const lineCoords of geom.coordinates) {
-        renderConeLine(lineCoords, map);
-      }
-    }
-  }
-}
-
-function renderConePolygon(coords, map) {
-  // coords[0] is the outer ring, coords[1...] are holes
-  const latLngs = coords[0].map(([lon, lat]) => [lat, lon]);
-  
-  const polygon = L.polygon(latLngs, {
-    color: '#FF6B35',
-    weight: 2,
-    opacity: 0.5,
-    fillColor: '#FF6B35',
-    fillOpacity: 0.1,
-    dashArray: '5, 5',
-    lineCap: 'round',
-    lineJoin: 'round',
-  });
-  
-  polygon.bindPopup('NHC Forecast Cone of Uncertainty');
-  coneLayer.addLayer(polygon);
-  conePolylines.push(polygon);
-}
-
-function renderConeLine(coords, map) {
-  const latLngs = coords.map(([lon, lat]) => [lat, lon]);
-  
-  const polyline = L.polyline(latLngs, {
-    color: '#FF6B35',
-    weight: 2,
-    opacity: 0.6,
-    dashArray: '3, 3',
-    lineCap: 'round',
-    lineJoin: 'round',
-  });
-  
-  coneLayer.addLayer(polyline);
-  conePolylines.push(polyline);
+export async function showConeForStorm(stormId, map) {
+  const id = normalizeId(stormId);
+  if (!id) return { status: 'idle', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+  return renderOfficialForecastContext([{ id }], { map, enabled: true, force: true });
 }
 
 export function clearCone() {
+  stopConePolling();
+  clearOfficialForecastContext();
+}
+
+export function startConePolling(stormId, map) {
+  stopConePolling();
+  const storm = { id: stormId };
+  renderOfficialForecastContext([storm], { map, enabled: true, force: true });
+  conePollingInterval = setInterval(() => {
+    renderOfficialForecastContext([storm], { map, enabled: true, force: true });
+  }, NHC_FORECAST_POLL_MS);
+}
+
+export function stopConePolling() {
   if (conePollingInterval) {
     clearInterval(conePollingInterval);
     conePollingInterval = null;
   }
-  
-  for (const poly of conePolylines) {
-    if (coneLayer) coneLayer.removeLayer(poly);
-  }
-  conePolylines = [];
-  lastPolledStorm = null;
-}
-
-export function startConePolling(stormId, map) {
-  // Initial fetch
-  showConeForStorm(stormId, map);
-  
-  // Poll for updates every 6 hours
-  if (conePollingInterval) clearInterval(conePollingInterval);
-  conePollingInterval = setInterval(() => {
-    showConeForStorm(stormId, map);
-  }, CONE_UPDATE_INTERVAL);
 }
 
 export function toggleConeVisibility(visible) {
-  if (!coneLayer) return;
-  if (visible) {
-    coneLayer.setOpacity(1);
-  } else {
-    coneLayer.setOpacity(0);
+  setOfficialForecastVisibility(visible);
+}
+
+async function fetchOfficialForecastLayers(activeStorms, { force = false } = {}) {
+  const now = Date.now();
+  const stormKey = activeStormCacheKey(activeStorms);
+  if (
+    forecastCache &&
+    !force &&
+    forecastCache.stormKey === stormKey &&
+    now - forecastCache.fetchedAt < NHC_FORECAST_POLL_MS
+  ) {
+    return forecastCache.layers;
   }
+
+  const [cones, forecastTracks, observedTracks] = await Promise.all([
+    fetchFeatureLayer(NHC_FORECAST_LAYER_IDS.cone),
+    fetchFeatureLayer(NHC_FORECAST_LAYER_IDS.forecastTrack),
+    fetchFeatureLayer(NHC_FORECAST_LAYER_IDS.observedTrack),
+  ]);
+
+  forecastCache = {
+    fetchedAt: now,
+    stormKey,
+    layers: { cones, forecastTracks, observedTracks },
+  };
+  return forecastCache.layers;
+}
+
+async function fetchFeatureLayer(layerId) {
+  const response = await fetch(buildNHCFeatureQueryUrl(layerId), { cache: 'no-cache' });
+  if (!response.ok) throw new Error(`NHC layer ${layerId} returned ${response.status}`);
+  const data = await response.json();
+  return Array.isArray(data?.features) ? data.features : [];
+}
+
+function ensureForecastLayer(map) {
+  if (forecastLayerGroup && forecastLayerMap === map) return;
+  if (forecastLayerGroup && forecastLayerMap) {
+    forecastLayerMap.removeLayer(forecastLayerGroup);
+  }
+  const L = window.L;
+  forecastLayerMap = map;
+  forecastLayerGroup = L.layerGroup().addTo(map);
+}
+
+function addGeoJsonLayer(features, kind) {
+  if (!forecastLayerGroup || !Array.isArray(features) || features.length === 0) return;
+  const L = window.L;
+  const geoJsonLayer = L.geoJSON(
+    { type: 'FeatureCollection', features },
+    {
+      style: () => layerStyle(kind),
+      onEachFeature: (feature, layer) => {
+        layer.bindTooltip(featureTooltip(feature, kind), { direction: 'top', sticky: true });
+      },
+    },
+  );
+  forecastLayerGroup.addLayer(geoJsonLayer);
+  if (kind === 'cone') geoJsonLayer.bringToBack();
+}
+
+function layerStyle(kind) {
+  if (kind === 'cone') {
+    return {
+      color: '#f9e2af',
+      weight: 1.5,
+      opacity: 0.75,
+      fillColor: '#f9e2af',
+      fillOpacity: 0.13,
+      dashArray: '6 5',
+      lineJoin: 'round',
+      className: 'official-cone active-cone',
+    };
+  }
+  if (kind === 'observedTrack') {
+    return {
+      color: '#89b4fa',
+      weight: 3,
+      opacity: 0.95,
+      lineCap: 'round',
+      lineJoin: 'round',
+      className: 'official-observed-track active-track',
+    };
+  }
+  return {
+    color: '#f9e2af',
+    weight: 2.5,
+    opacity: 0.95,
+    dashArray: '7 5',
+    lineCap: 'round',
+    lineJoin: 'round',
+    className: 'official-forecast-track active-forecast',
+  };
+}
+
+function featureTooltip(feature, kind) {
+  const props = feature?.properties || {};
+  const storm = props.STORMNAME || props.stormname || 'Active storm';
+  const advisory = props.ADVISNUM || props.advisnum;
+  const period = props.FCSTPRD ?? props.fcstprd;
+  const label = kind === 'cone'
+    ? 'NHC forecast cone'
+    : kind === 'observedTrack'
+      ? 'NHC observed track'
+      : 'NHC forecast track';
+  const details = [
+    advisory ? `Advisory ${escapeText(advisory)}` : '',
+    Number.isFinite(Number(period)) ? `${Number(period)}h` : '',
+  ].filter(Boolean).join(' · ');
+  return `${label}: ${escapeText(storm)}${details ? ` (${details})` : ''}`;
+}
+
+function setLayerDisplay(layer, visible) {
+  if (!layer) return;
+  const element = typeof layer.getElement === 'function' ? layer.getElement() : null;
+  if (element) element.style.display = visible ? '' : 'none';
+  if (typeof layer.eachLayer === 'function') {
+    layer.eachLayer(child => setLayerDisplay(child, visible));
+  }
+}
+
+function basinNumberKeysFromId(id) {
+  const match = String(id || '').match(/^([A-Z]{2})(\d{2})(\d{4})$/);
+  if (!match) return [];
+  return basinNumberKeys(match[1], Number(match[2]));
+}
+
+function basinNumberKeysFromFeature(props) {
+  const basin = props.BASIN || props.basin;
+  const number = props.STORMNUM ?? props.stormnum;
+  return basinNumberKeys(basin, Number(number));
+}
+
+function basinNumberKeys(basin, number) {
+  if (!Number.isFinite(number)) return [];
+  const aliases = basinAliases(basin);
+  return aliases.map(alias => `${alias}:${number}`);
+}
+
+function basinAliases(value) {
+  const basin = normalizeId(value);
+  if (!basin) return [];
+  if (basin === 'AL' || basin === 'AT' || basin.includes('ATLANTIC')) return ['AL', 'AT'];
+  if (basin === 'EP' || basin.includes('EASTERNPACIFIC')) return ['EP'];
+  if (basin === 'CP' || basin.includes('CENTRALPACIFIC')) return ['CP'];
+  return [basin];
+}
+
+function normalizeId(value) {
+  return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function normalizeStormName(value) {
+  return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function escapeText(value) {
+  return String(value ?? '').replace(/[<>&"']/g, c => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[c]);
 }

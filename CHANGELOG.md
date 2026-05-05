@@ -14,7 +14,8 @@ All notable changes to HurricaneMap.
 - Added a mobile More actions popover with text labels for export, report, QGIS, data, glossary, and settings commands.
 - Reflowed desktop Filters, Statistics, Storm Details, and State Details panels so common laptop viewports show their lower controls without panel scrolling.
 - Embedded precomputed eight-dimensional storm similarity vectors in generated storm data and switched Similar Storms to use them with runtime fallback parity.
-- Bumped the service worker shell cache to `hm-v1.3.9-q12` so installed users receive the responsive polish and similarity-vector data path.
+- Added official NHC active-storm cone rendering from the Esri/NHC GeoJSON forecast layers, including observed-track and forecast-track context plus a settings toggle.
+- Bumped the service worker shell cache to `hm-v1.3.9-q13` so installed users receive the responsive polish, similarity-vector data path, and active-storm cone layer.
 
 ## v1.3.9 — Metrics and interaction hardening (May 2026)
 

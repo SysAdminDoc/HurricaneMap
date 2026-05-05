@@ -314,6 +314,10 @@ function wireSettingsControls() {
     if (ensembleToggle) {
       ensembleToggle.checked = getSetting('ensembleTracks');
     }
+    const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
+    if (coneToggle) {
+      coneToggle.checked = getSetting('nhcForecastCone');
+    }
     const hcToggle = menu.querySelector('#toggle-high-contrast');
     if (hcToggle) {
       hcToggle.checked = getSetting('highContrast');
@@ -368,6 +372,13 @@ function wireSettingsControls() {
   if (ensembleToggle) {
     ensembleToggle.addEventListener('change', () => {
       setSetting('ensembleTracks', ensembleToggle.checked);
+    });
+  }
+
+  const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
+  if (coneToggle) {
+    coneToggle.addEventListener('change', () => {
+      setSetting('nhcForecastCone', coneToggle.checked);
     });
   }
 
