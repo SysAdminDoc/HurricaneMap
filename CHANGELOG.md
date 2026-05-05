@@ -2,6 +2,20 @@
 
 All notable changes to HurricaneMap.
 
+## v1.3.8 — Premium command and onboarding polish (May 2026)
+
+**Focused product-quality pass for the command bar, first-run guidance, responsive filters, and accessibility semantics.**
+
+### Improved
+- Re-enabled the existing first-run tour after the map stabilizes, with focus trapping, focus restoration, and a refined card treatment.
+- Converted the settings popover from menu semantics to a labeled dialog with proper radio groups for units, theme, palette, language, and damage mode.
+- Added polite status announcements for loading and visible-landfall counts so assistive technology receives meaningful state changes.
+- Added hover/focus command tooltips on desktop while suppressing them when a popover is already open.
+- Tightened mobile command-bar touch targets to 44px and added a horizontal rail treatment for narrow screens.
+- Compacted the filter legend into a two-column desktop layout so it stays visible above the timeline.
+- Hardened high-contrast category chip text color and stabilized search-result active/hover states without layout shift.
+- Bumped the service worker shell cache to `hm-v1.3.8` so live users receive the command and onboarding polish.
+
 ## v1.3.7 — Overlay cleanup and marker previews (May 2026)
 
 **Focused cleanup for stuck map previews and remaining overlapping playback/season overlays.**
