@@ -35,9 +35,23 @@ function validCategory(value) {
   return Number.isInteger(value) && value >= -1 && value <= 5;
 }
 
+function validOptionalString(value) {
+  return value == null || typeof value === 'string';
+}
+
+function validNonNegativeInteger(value) {
+  return Number.isInteger(value) && value >= 0;
+}
+
 function assertNumberInRange(value, min, max, label) {
   if (!isFiniteNumber(value) || value < min || value > max) {
     fail(`${label} must be a finite number in range ${min}..${max}`);
+  }
+}
+
+function assertImpactNumber(value, label) {
+  if (!isFiniteNumber(value) || value < 0) {
+    fail(`${label} must be a finite non-negative number.`);
   }
 }
 
@@ -253,8 +267,63 @@ for (const [key, count] of Object.entries(categoryCounts)) {
   }
 }
 
-for (const stormId of Object.keys(impacts)) {
+for (const [stormId, impact] of Object.entries(impacts)) {
   if (!stormsById.has(stormId)) fail(`impacts.json references unknown storm id ${stormId}.`);
+  if (!isObject(impact)) {
+    fail(`${stormId}: impact row must be an object.`);
+    continue;
+  }
+
+  if (!validOptionalString(impact.deaths)) fail(`${stormId}.deaths must be a string when present.`);
+  if (!validOptionalString(impact.damages)) fail(`${stormId}.damages must be a string when present.`);
+  if (!validOptionalString(impact.wiki_title)) fail(`${stormId}.wiki_title must be a string when present.`);
+  if (!validOptionalString(impact.wiki_url)) fail(`${stormId}.wiki_url must be a string when present.`);
+  if (impact.wiki_url != null && !/^https:\/\/en\.wikipedia\.org\/wiki\//.test(impact.wiki_url)) {
+    fail(`${stormId}.wiki_url must point to an English Wikipedia article.`);
+  }
+
+  if (impact.impact_schema_version !== 1) fail(`${stormId}.impact_schema_version must be 1.`);
+  if (!isObject(impact.impact_provenance)) {
+    fail(`${stormId}.impact_provenance is required.`);
+  } else {
+    if (impact.impact_provenance.source !== 'Wikipedia infobox') fail(`${stormId}.impact_provenance.source must be Wikipedia infobox.`);
+    if (impact.impact_provenance.scraper !== 'scripts/scrape_impacts.py') fail(`${stormId}.impact_provenance.scraper must name scripts/scrape_impacts.py.`);
+    if (!validIsoDate(impact.impact_provenance.parsed_at_utc)) fail(`${stormId}.impact_provenance.parsed_at_utc must be an ISO timestamp.`);
+  }
+
+  if (impact.deaths && impact.deaths_total == null) fail(`${stormId}: deaths text is present but deaths_total is missing.`);
+  if (impact.deaths_total != null) {
+    if (!validNonNegativeInteger(impact.deaths_total)) fail(`${stormId}.deaths_total must be a non-negative integer.`);
+    if (!validNonNegativeInteger(impact.deaths_min)) fail(`${stormId}.deaths_min must be a non-negative integer.`);
+    if (impact.deaths_max != null && !validNonNegativeInteger(impact.deaths_max)) fail(`${stormId}.deaths_max must be a non-negative integer or null.`);
+    if (validNonNegativeInteger(impact.deaths_min) && impact.deaths_min > impact.deaths_total) {
+      fail(`${stormId}.deaths_min must be <= deaths_total.`);
+    }
+    if (validNonNegativeInteger(impact.deaths_max) && impact.deaths_max < impact.deaths_min) {
+      fail(`${stormId}.deaths_max must be >= deaths_min.`);
+    }
+    if (typeof impact.deaths_qualifier !== 'string' || !impact.deaths_qualifier) {
+      fail(`${stormId}.deaths_qualifier is required when deaths_total is present.`);
+    }
+  }
+
+  if (impact.damages && impact.damage_millions_usd == null) fail(`${stormId}: damages text is present but damage_millions_usd is missing.`);
+  if (impact.damage_millions_usd != null || impact.damage_usd_nominal != null) {
+    assertImpactNumber(impact.damage_millions_usd, `${stormId}.damage_millions_usd`);
+    if (!validNonNegativeInteger(impact.damage_usd_nominal)) fail(`${stormId}.damage_usd_nominal must be a non-negative integer.`);
+    if (isFiniteNumber(impact.damage_millions_usd) && validNonNegativeInteger(impact.damage_usd_nominal)) {
+      const expectedUsd = Math.round(impact.damage_millions_usd * 1_000_000);
+      if (Math.abs(expectedUsd - impact.damage_usd_nominal) > 1) {
+        fail(`${stormId}.damage_usd_nominal does not match damage_millions_usd.`);
+      }
+    }
+    if (typeof impact.damage_source_units !== 'string' || !impact.damage_source_units) {
+      fail(`${stormId}.damage_source_units is required when damage is present.`);
+    }
+    if (typeof impact.damage_qualifier !== 'string' || !impact.damage_qualifier) {
+      fail(`${stormId}.damage_qualifier is required when damage is present.`);
+    }
+  }
 }
 
 for (const [index, entry] of glossary.entries()) {

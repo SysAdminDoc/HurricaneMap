@@ -57,7 +57,7 @@ npm run build
 - **🌊 SLOSH MOM storm surge zones** — overlay NHC's Cat 1-5 maximum-of-maximums inundation maps along the U.S. Gulf, East Coast, Caribbean. Powered by NOAA's pre-rendered ArcGIS tiles — picking a category snaps the worst-case envelope into view.
 - **🌬️ Wind-field swaths** — for storms 2004+, a checkbox in the storm panel renders the actual HURDAT2 wind-radii analysis (34/50/64 kt asymmetric quadrants per track point) as overlapping polygons along the path.
 - **🛰️ ✈️ 🍝 🌪️ Quicklinks** — every storm panel links out to GOES satellite imagery (RAMMB SLIDER, 2018+), NOAA Storm Events tornado search filtered to the storm's dates + states, Hurricane Hunters recon archive (Tropical Atlantic mirror), Wikipedia, YouTube footage search, NOAA Tropical Cyclone Reports, and the NHC storm wallet.
-- **⚠️ Impacts data** — deaths and damage figures pulled from Wikipedia infoboxes (46 storms covered so far; rerun `scripts/scrape_impacts.py` to fill in more).
+- **⚠️ Impacts data** — raw Wikipedia infobox deaths/damage text plus normalized numeric fields for fatalities and nominal USD damage (46 storms covered so far; rerun `scripts/scrape_impacts.py` to fill in more).
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map plus quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
@@ -197,6 +197,7 @@ HurricaneMap/
 │       └── ...
 ├── scripts/
 │   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
+│   ├── scrape_impacts.py       # Wikipedia impact scraper + normalized fatality/damage fields
 │   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
 └── examplemap.png          # design reference
 ```
@@ -354,7 +355,7 @@ curl -sSL -o data/hurdat2-nepac.txt \
 python scripts/preprocess_hurdat2.py
 ```
 
-The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.
+The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. Impact rows can be refreshed with `python scripts/scrape_impacts.py`; use `python scripts/scrape_impacts.py --normalize-existing` after source-format fixes that should be applied to the existing `data/impacts.json` without a network scrape. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.
 
 ## License & Attribution
 

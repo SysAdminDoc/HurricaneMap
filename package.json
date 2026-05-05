@@ -10,8 +10,9 @@
     "validate:data": "node scripts/validate-data.mjs",
     "test:url-state": "node scripts/test-url-state.mjs",
     "test:filter-state": "node scripts/test-filter-state.mjs",
+    "test:impact-utils": "node scripts/test-impact-utils.mjs",
     "test:smoke": "node scripts/smoke-playwright.mjs",
-    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state",
+    "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:impact-utils",
     "test": "npm run build && npm run test:smoke"
   },
   "devDependencies": {
