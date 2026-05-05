@@ -27,107 +27,30 @@ import { exportPublicationCSV } from './export.js';
 import { generateStatisticalReport, downloadReportAsText } from './report.js';
 import { exportQGISGeoJSON } from './qgis.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import {
+  CATEGORY_DEFAULTS, YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
+  applyHashToFilters, createDefaultFilters, encodeHashState,
+} from './url-state.js';
 
-const YEAR_FALLBACK_MIN = 1851;
-const YEAR_FALLBACK_MAX = 2025;
 let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
 let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;
-const CATEGORY_DEFAULTS = ['ts', '1', '2', '3', '4', '5'];
-const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
-const CATEGORY_HASH_DEFAULT = [...CATEGORY_DEFAULTS].sort().join(',');
 
-const filters = {
-  yearMin: YEAR_MIN_DEFAULT,
-  yearMax: YEAR_MAX_DEFAULT,
-  categories: new Set(CATEGORY_DEFAULTS),
-  state: '',
-  showTracks: false,
-  showHeatmap: false,
-};
+const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_MAX_DEFAULT });
 
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
 let activeSearchIndex = -1;
 
-// ---------------- URL hash state (permalinks) ----------------
-// Format: #y=1990-2025&c=3,4,5&s=Florida&t=1&h=0&storm=AL092005
-// Falsy/default values are omitted to keep links short.
-function getDefaultHash() {
-  return {
-    y: `${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT}`,
-    c: CATEGORY_HASH_DEFAULT,
-    s: '',
-    t: '0',
-    h: '0',
-    storm: '',
-  };
-}
-
-function encodeHash() {
-  const cur = {
-    y: `${filters.yearMin}-${filters.yearMax}`,
-    c: [...filters.categories].sort().join(','),
-    s: filters.state,
-    t: filters.showTracks ? '1' : '0',
-    h: filters.showHeatmap ? '1' : '0',
-    storm: openStormId || '',
-  };
-  const parts = [];
-  const defaults = getDefaultHash();
-  for (const k of Object.keys(cur)) {
-    if (cur[k] && cur[k] !== defaults[k]) {
-      parts.push(`${k}=${encodeURIComponent(cur[k])}`);
-    }
-  }
-  return parts.length ? '#' + parts.join('&') : '';
-}
-
 function writeHash() {
-  const newHash = encodeHash();
+  const newHash = encodeHashState(filters, {
+    openStormId,
+    yearMinDefault: YEAR_MIN_DEFAULT,
+    yearMaxDefault: YEAR_MAX_DEFAULT,
+  });
   // Avoid re-firing hashchange when nothing actually changed.
   const cur = location.hash || '';
   if (cur === newHash) return;
   history.replaceState(null, '', newHash || location.pathname + location.search);
-}
-
-function decodeHash() {
-  const h = (location.hash || '').replace(/^#/, '');
-  if (!h) return null;
-  const out = {};
-  for (const pair of h.split('&')) {
-    const eq = pair.indexOf('=');
-    if (eq < 0) continue;
-    const k = pair.slice(0, eq);
-    let v;
-    try {
-      v = decodeURIComponent(pair.slice(eq + 1));
-    } catch {
-      continue;
-    }
-    out[k] = v;
-  }
-  return out;
-}
-
-function applyHashToFilters() {
-  const h = decodeHash();
-  if (!h) return null;
-  if (h.y && /^\d{4}-\d{4}$/.test(h.y)) {
-    const [a, b] = h.y.split('-').map(Number);
-    filters.yearMin = Math.max(YEAR_MIN_DEFAULT, Math.min(a, b));
-    filters.yearMax = Math.min(YEAR_MAX_DEFAULT, Math.max(a, b));
-  }
-  if (h.c) {
-    const cats = h.c.split(',').filter(cat => VALID_CATEGORIES.has(cat));
-    filters.categories = new Set(cats.length ? cats : CATEGORY_DEFAULTS);
-  }
-  if (h.s !== undefined) {
-    const knownStates = getStats()?.by_state || {};
-    filters.state = Object.prototype.hasOwnProperty.call(knownStates, h.s) ? h.s : '';
-  }
-  if (h.t !== undefined) filters.showTracks = h.t === '1';
-  if (h.h !== undefined) filters.showHeatmap = h.h === '1';
-  return h;
 }
 
 const els = {
@@ -209,7 +132,11 @@ async function boot() {
   populateStateFilter();
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
-  const restored = applyHashToFilters();
+  const restored = applyHashToFilters(filters, location.hash, {
+    yearMinDefault: YEAR_MIN_DEFAULT,
+    yearMaxDefault: YEAR_MAX_DEFAULT,
+    knownStates: getStats()?.by_state || {},
+  });
   syncFilterUiFromState();
   applyFilters();
   wireUI();
