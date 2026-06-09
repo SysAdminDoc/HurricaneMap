@@ -42,3 +42,7 @@ test-results/
 .tmp-pid.txt
 audit-*.png
 .tmp-stormevents/
+
+# Markdown files local-only (except README)
+*.md
+!README.md
