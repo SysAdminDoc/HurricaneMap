@@ -1,10 +1,40 @@
 self.addEventListener('message', async () => {
   try {
-    const response = await fetch('data/storms.json');
-    if (!response.ok) throw new Error(`storms.json returned ${response.status}`);
-    const storms = await response.json();
+    const storms = typeof DecompressionStream !== 'undefined'
+      ? await fetchGzipped()
+      : await fetchRaw();
     self.postMessage({ ok: true, storms });
   } catch (error) {
     self.postMessage({ ok: false, error: error.message });
   }
 });
+
+async function fetchGzipped() {
+  const response = await fetch('data/storms.json.gz');
+  if (!response.ok) throw new Error(`storms.json.gz returned ${response.status}`);
+  const ds = new DecompressionStream('gzip');
+  const decompressed = response.body.pipeThrough(ds);
+  const reader = decompressed.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const text = new TextDecoder().decode(concat(chunks));
+  return JSON.parse(text);
+}
+
+async function fetchRaw() {
+  const response = await fetch('data/storms.json');
+  if (!response.ok) throw new Error(`storms.json returned ${response.status}`);
+  return response.json();
+}
+
+function concat(arrays) {
+  const total = arrays.reduce((n, a) => n + a.length, 0);
+  const result = new Uint8Array(total);
+  let offset = 0;
+  for (const a of arrays) { result.set(a, offset); offset += a.length; }
+  return result;
+}
