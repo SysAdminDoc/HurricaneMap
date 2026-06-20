@@ -207,4 +207,46 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       cHost.innerHTML = '<span class="ss-meta">no impact records</span>';
     }
   }
+
+  if (yearMin === yearMax) {
+    renderSeasonAnalogs(host, yearMin, stormList.length, landfalls.length, totalACE);
+  }
+}
+
+function renderSeasonAnalogs(host, targetYear, stormCount, lfCount, ace) {
+  const allLf = getLandfalls();
+  const years = new Map();
+  for (const lf of allLf) {
+    if (!years.has(lf.year)) years.set(lf.year, { storms: new Set(), landfalls: 0, ace: 0 });
+    const y = years.get(lf.year);
+    y.storms.add(lf.storm_id);
+    y.landfalls++;
+  }
+  const target = { stormCount, lfCount, ace };
+  const maxStorms = Math.max(...[...years.values()].map(v => v.storms.size), 1);
+  const maxLf = Math.max(...[...years.values()].map(v => v.landfalls), 1);
+  const maxAce = Math.max(ace, 1);
+
+  const scored = [];
+  for (const [yr, v] of years) {
+    if (yr === targetYear) continue;
+    const ds = (v.storms.size - target.stormCount) / maxStorms;
+    const dl = (v.landfalls - target.lfCount) / maxLf;
+    const da = (v.ace - target.ace) / maxAce;
+    const dist = Math.sqrt(ds * ds + dl * dl + da * da);
+    scored.push({ year: yr, storms: v.storms.size, landfalls: v.landfalls, dist });
+  }
+  scored.sort((a, b) => a.dist - b.dist);
+  const top = scored.slice(0, 3);
+  if (!top.length) return;
+
+  const rows = top.map(s => {
+    const pct = Math.max(0, Math.round((1 - s.dist) * 100));
+    return `<li>${s.year} <span class="ss-meta">${s.storms} storms · ${s.landfalls} landfalls · ${pct}% similar</span></li>`;
+  }).join('');
+
+  const el = document.createElement('div');
+  el.className = 'ss-analogs';
+  el.innerHTML = `<h4>Similar seasons</h4><ul>${rows}</ul>`;
+  host.appendChild(el);
 }
