@@ -28,8 +28,8 @@
   <header class="app-header glass">
     <img class="brand-mark" src="branding/favicon.png" alt="" aria-hidden="true" />
     <div class="title-block">
-      <h1>HurricaneMap</h1>
-      <p class="subtitle">174 years of U.S. landfalls<span class="subtitle-sep" aria-hidden="true">·</span><span class="subtitle-count" id="storm-count">…</span></p>
+      <h1 data-i18n="header.title">HurricaneMap</h1>
+      <p class="subtitle"><span data-i18n="header.subtitle">174 years of U.S. landfalls</span><span class="subtitle-sep" aria-hidden="true">·</span><span class="subtitle-count" id="storm-count">…</span></p>
     </div>
     <div class="header-actions" aria-label="View controls">
       <button class="icon-btn" id="toggle-filters" title="Show or hide filters" aria-label="Hide filters" aria-controls="filters" aria-expanded="true">
@@ -79,13 +79,13 @@
     </div>
     <div class="settings-menu glass" id="settings-menu" role="dialog" aria-modal="false" aria-labelledby="settings-menu-title" aria-describedby="settings-menu-description" hidden>
       <div class="settings-menu-header">
-        <h2 id="settings-menu-title">Display settings</h2>
+        <h2 id="settings-menu-title" data-i18n="settings.title">Display settings</h2>
         <p id="settings-menu-description">Adjust reading, color, and data preferences. Changes stay in this browser.</p>
       </div>
       <section class="settings-section" aria-labelledby="settings-reading-title">
         <h3 id="settings-reading-title">Reading</h3>
         <div class="settings-row">
-          <div class="settings-label">Wind units</div>
+          <div class="settings-label" data-i18n="settings.windUnits">Wind units</div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Wind unit">
             <button class="settings-pill" data-set-unit="kt" role="radio">Knots</button>
             <button class="settings-pill" data-set-unit="mph" role="radio">mph</button>
@@ -93,7 +93,7 @@
           </div>
         </div>
         <div class="settings-row">
-          <div class="settings-label">Damage figures</div>
+          <div class="settings-label" data-i18n="settings.damageMode">Damage figures</div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Damage adjustment">
             <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm">Nominal</button>
             <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
@@ -110,7 +110,7 @@
       <section class="settings-section" aria-labelledby="settings-appearance-title">
         <h3 id="settings-appearance-title">Appearance</h3>
         <div class="settings-row">
-          <div class="settings-label">Theme</div>
+          <div class="settings-label" data-i18n="settings.theme">Theme</div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Theme">
             <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)">Dark</button>
             <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)">Light</button>
@@ -118,7 +118,7 @@
           </div>
         </div>
         <div class="settings-row">
-          <div class="settings-label">Color palette</div>
+          <div class="settings-label" data-i18n="settings.palette">Color palette</div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Color palette">
             <button class="settings-pill" data-set-palette="default" role="radio">Default</button>
             <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd: sequential and distinguishable for common color-vision differences">Colorblind</button>
@@ -155,7 +155,7 @@
 
   <aside class="filters glass" id="filters" role="region" aria-label="Storm filters and search">
     <div class="filter-row filter-row--year">
-      <label for="year-min">Year range</label>
+      <label for="year-min" data-i18n="filters.yearRange">Year range</label>
       <div class="year-inputs">
         <input type="number" id="year-min" min="1851" max="2025" value="1851" aria-label="Earliest year" />
         <span>—</span>
@@ -165,7 +165,7 @@
     </div>
     <div class="filter-row filter-row--cats">
       <label>
-        <span>Category</span>
+        <span data-i18n="filters.category">Category</span>
         <div class="cat-toggles" role="group" aria-label="Category">
           <button data-cat="ts" class="cat-btn cat-ts on" title="Tropical Storm at landfall" aria-label="Tropical Storm (TS) — 34-63 kt">TS</button>
           <button data-cat="1" class="cat-btn cat-1 on" aria-label="Category 1 — 64-82 kt">1</button>
@@ -183,12 +183,12 @@
       </select>
     </div>
     <div class="filter-row">
-      <label for="search-input">Search storm</label>
-      <input type="search" id="search-input" placeholder="Search name, year, or state" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" />
+      <label for="search-input" data-i18n="filters.searchStorm">Search storm</label>
+      <input type="search" id="search-input" placeholder="Search name, year, or state" data-i18n-placeholder="filters.searchPlaceholder" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" />
       <ul id="search-results" class="search-results" role="listbox" aria-label="Storm search results" hidden></ul>
     </div>
     <div class="filter-group" aria-label="Map layers">
-      <div class="filter-group-label">Map layers</div>
+      <div class="filter-group-label" data-i18n="filters.mapLayers">Map layers</div>
       <div class="filter-layer-grid">
         <label class="toggle-row">
           <input type="checkbox" id="show-tracks" />
@@ -216,7 +216,7 @@
       </div>
     </div>
     <div class="filter-row filter-footer">
-      <button id="reset-filters" class="text-btn">Reset filters</button>
+      <button id="reset-filters" class="text-btn" data-i18n="filters.resetFilters">Reset filters</button>
       <span class="visible-count" id="visible-count" role="status" aria-live="polite"></span>
     </div>
     <div class="filter-legend" aria-label="Saffir-Simpson at landfall">

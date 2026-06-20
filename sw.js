@@ -11,7 +11,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q23';
+const SW_VERSION = 'hm-v1.3.9-q24';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -120,6 +120,9 @@ self.addEventListener('activate', (event) => {
     await Promise.all(keys.map((k) => {
       if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE) return caches.delete(k);
     }));
+    if (self.registration.navigationPreload) {
+      await self.registration.navigationPreload.enable();
+    }
     self.clients.claim();
   })());
 });
@@ -149,19 +152,17 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Skip extension/devtools/non-http.
   if (!url.protocol.startsWith('http')) return;
 
   if (isRadarAsset(url)) {
     event.respondWith(cacheFirst(req, RADAR_CACHE));
   } else if (isShell(url)) {
-    event.respondWith(staleWhileRevalidate(req, SHELL_CACHE));
+    event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, event.preloadResponse));
   } else if (isData(url)) {
     event.respondWith(offlineDataWhileRevalidate(req));
   } else if (isTile(url)) {
     event.respondWith(cacheFirst(req, TILE_CACHE));
   }
-  // else: network default
 });
 
 async function cacheFirst(req, cacheName) {
@@ -177,10 +178,13 @@ async function cacheFirst(req, cacheName) {
   }
 }
 
-async function staleWhileRevalidate(req, cacheName) {
+async function staleWhileRevalidate(req, cacheName, preloadResponse) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(req);
-  const refresh = fetch(req).then((res) => {
+  const networkFetch = preloadResponse
+    ? preloadResponse.then(r => r || fetch(req)).catch(() => fetch(req))
+    : fetch(req);
+  const refresh = networkFetch.then((res) => {
     if (res && res.status === 200) cache.put(req, res.clone()).catch(() => {});
     return res;
   }).catch(() => null);

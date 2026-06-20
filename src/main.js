@@ -5,7 +5,7 @@ import {
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
-import { initLocale, setLocale } from './i18n.js';
+import { initLocale, setLocale, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
@@ -264,6 +264,7 @@ async function boot() {
   initLocale();
   const savedLocale = getSetting('locale');
   if (savedLocale) setLocale(savedLocale);
+  translateStaticElements();
 
   // Start performance monitoring early
   initPerformanceMonitoring();

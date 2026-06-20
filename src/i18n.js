@@ -339,6 +339,33 @@ export function initLocale() {
   return currentLocale;
 }
 
+export function translateStaticElements() {
+  for (const el of document.querySelectorAll('[data-i18n]')) {
+    const key = el.dataset.i18n;
+    if (!key) continue;
+    const translated = t(key);
+    if (translated !== key) el.textContent = translated;
+  }
+  for (const el of document.querySelectorAll('[data-i18n-title]')) {
+    const key = el.dataset.i18nTitle;
+    if (!key) continue;
+    const translated = t(key);
+    if (translated !== key) el.title = translated;
+  }
+  for (const el of document.querySelectorAll('[data-i18n-placeholder]')) {
+    const key = el.dataset.i18nPlaceholder;
+    if (!key) continue;
+    const translated = t(key);
+    if (translated !== key) el.placeholder = translated;
+  }
+  for (const el of document.querySelectorAll('[data-i18n-aria-label]')) {
+    const key = el.dataset.i18nAriaLabel;
+    if (!key) continue;
+    const translated = t(key);
+    if (translated !== key) el.setAttribute('aria-label', translated);
+  }
+}
+
 export function toggleLocale() {
   const newLocale = currentLocale === LOCALE_EN ? LOCALE_ES : LOCALE_EN;
   setLocale(newLocale);
