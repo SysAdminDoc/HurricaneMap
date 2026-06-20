@@ -442,7 +442,9 @@ export function translateStaticElements() {
 }
 
 export function toggleLocale() {
-  const newLocale = currentLocale === LOCALE_EN ? LOCALE_ES : LOCALE_EN;
+  const cycle = [LOCALE_EN, LOCALE_ES, LOCALE_HT];
+  const idx = cycle.indexOf(currentLocale);
+  const newLocale = cycle[(idx + 1) % cycle.length];
   setLocale(newLocale);
   try {
     localStorage.setItem('hm-locale-v1', newLocale);

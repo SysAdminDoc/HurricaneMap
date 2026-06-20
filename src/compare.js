@@ -1,7 +1,7 @@
 // Storm comparison mode — pin up to 4 storms, view their tracks color-coded
 // on the map and side-by-side intensity charts in a comparison panel.
 
-import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, formatTime } from './data.js';
+import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, formatTime, windToCategory } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { hidePanel, showPanel } from './panels.js';
@@ -163,7 +163,7 @@ function refreshComparePanelIfOpen() {
 function renderComparePanel() {
   const cards = pinned.map(p => {
     const s = p.storm;
-    const peakLabel = categoryLabel(saffirCat(s.peak_wind_kt));
+    const peakLabel = categoryLabel(windToCategory(s.peak_wind_kt));
     const lfLabel = categoryLabel(s.landfall_max_category);
     const lfClass = categoryClass(s.landfall_max_category);
     const minPres = s.min_pres_mb ? `${s.min_pres_mb} mb` : '—';
@@ -190,7 +190,7 @@ function renderComparePanel() {
   const rows = [
     ['Peak wind', p => p.storm.peak_wind_kt, 'number', 'higher'],
     ['Min pressure', p => p.storm.min_pres_mb, 'number', 'lower'],
-    ['Peak category', p => saffirCat(p.storm.peak_wind_kt), 'category'],
+    ['Peak category', p => windToCategory(p.storm.peak_wind_kt), 'category'],
     ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
     ['# US landfalls', p => p.storm.us_landfall_count, 'number', 'higher'],
     ['Track points', p => p.storm.track?.length || 0, 'number', 'higher'],
@@ -274,15 +274,6 @@ function renderComparePanel() {
   });
 }
 
-function saffirCat(kt) {
-  if (kt == null || kt < 34) return 0;
-  if (kt < 64) return -1;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
 
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {
@@ -297,7 +288,7 @@ function exportComparisonCSV(storms) {
     ['Peak wind (kt)', p => p.storm.peak_wind_kt],
     ['Min pressure (mb)', p => p.storm.min_pres_mb],
     ['Peak category', p => {
-      const cat = saffirCat(p.storm.peak_wind_kt);
+      const cat = windToCategory(p.storm.peak_wind_kt);
       return cat === -1 ? 'TS' : cat === 0 ? 'TD' : `Cat ${cat}`;
     }],
     ['Landfall category', p => {

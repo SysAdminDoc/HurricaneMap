@@ -9,7 +9,7 @@
 // Vertical dashed markers at each U.S. landfall + a hover crosshair with a
 // tooltip block. Pure SVG, no chart libraries.
 
-import { categoryColor, formatTime } from './data.js';
+import { categoryColor, formatTime, windToCategory } from './data.js';
 import { escapeHtml } from './html-utils.js';
 
 const W = 360;          // total width in CSS px
@@ -20,16 +20,6 @@ const PH = H - M.top - M.bottom;
 
 const WIND_DOMAIN = [0, 175];           // kt — covers Cat 5 with headroom
 const PRES_DOMAIN = [880, 1015];        // mb — Allen '80 / Wilma '05 lower bound
-
-function saffir(kt) {
-  if (kt == null || kt < 34) return -1;
-  if (kt < 64) return 0;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
@@ -112,7 +102,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
     if (r.wind == null) return '';
     const x = xOf(r.t);
     const y = yWind(r.wind);
-    const c = categoryColor(saffir(r.wind));
+    const c = categoryColor(windToCategory(r.wind));
     return `<circle data-i="${i}" cx="${x}" cy="${y}" r="2.5" fill="${c}" stroke="rgba(0,0,0,0.4)" stroke-width="0.6" class="chart-dot"/>`;
   }).join('');
 
@@ -192,7 +182,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
     cursor.setAttribute('x1', cx);
     cursor.setAttribute('x2', cx);
     cursor.style.display = '';
-    const cat = saffir(r.wind);
+    const cat = windToCategory(r.wind);
     const catLabel = cat <= 0 ? (r.wind != null && r.wind >= 34 ? 'TS' : 'TD') : `Cat ${cat}`;
     tooltip.hidden = false;
     tooltip.innerHTML = `

@@ -1,5 +1,6 @@
 // Tiny inline sparkline for storm wind-over-time. Designed to live inside
 // search results and other dense UI surfaces. Self-contained SVG, no deps.
+import { windToCategory } from './data.js';
 import { getPaletteColor } from './settings.js';
 import { escapeHtml } from './html-utils.js';
 
@@ -7,16 +8,6 @@ const W = 64;
 const H = 18;
 const PAD_X = 1;
 const PAD_Y = 2;
-
-function tierFromKt(kt) {
-  if (kt >= 137) return 5;
-  if (kt >= 113) return 4;
-  if (kt >= 96) return 3;
-  if (kt >= 83) return 2;
-  if (kt >= 64) return 1;
-  if (kt >= 34) return 0; // TS
-  return -1;
-}
 
 export function buildSparkline(track, opts = {}) {
   if (!track || !track.length) return '';
@@ -32,8 +23,8 @@ export function buildSparkline(track, opts = {}) {
     return [x, y, p.wind || 0];
   });
   // Filled path under the curve, color = peak tier of the storm.
-  const peakTier = Math.max(...track.map(p => tierFromKt(p.wind || 0)));
-  const fill = peakTier >= 0 ? getPaletteColor(Math.max(0, peakTier)) : '#7f849c';
+  const peakTier = Math.max(...track.map(p => windToCategory(p.wind || 0)));
+  const fill = peakTier >= 1 ? getPaletteColor(peakTier) : getPaletteColor(-1);
   const path = pts.map(([x, y], i) => (i === 0 ? `M${x.toFixed(1)},${y.toFixed(1)}` : `L${x.toFixed(1)},${y.toFixed(1)}`)).join('');
   const area = `${path}L${(PAD_X + innerW).toFixed(1)},${(PAD_Y + innerH).toFixed(1)}L${PAD_X.toFixed(1)},${(PAD_Y + innerH).toFixed(1)}Z`;
   const baselineY = (PAD_Y + innerH).toFixed(1);

@@ -2,6 +2,7 @@ import {
   getFatalityCount,
   getNominalDamageUsd,
 } from './impact-utils.js';
+import { windToCategory, categoryLabel } from './data.js';
 
 // Derived intensity metrics + spatial queries.
 //
@@ -241,7 +242,7 @@ function exportCSV(storm) {
       r.wind ?? '',
       r.pres ?? '',
       r.status ?? '',
-      saffirCat(r.wind),
+      windToCategory(r.wind),
       lfTimes.has(r.t) ? '1' : '0',
     ]);
   }
@@ -288,7 +289,7 @@ function exportCSVPublication(storm) {
       r.wind ?? '',
       r.pres ?? '',
       r.status ?? '',
-      saffirCat(r.wind),
+      windToCategory(r.wind),
       lfTimes.has(r.t) ? '1' : '0',
     ]);
   }
@@ -330,7 +331,7 @@ function exportGeoJSON(storm) {
           wind_kt: r.wind,
           pres_mb: r.pres,
           status: r.status,
-          category: saffirCat(r.wind),
+          category: windToCategory(r.wind),
         },
         geometry: { type: 'Point', coordinates: [r.lon, r.lat] },
       })),
@@ -396,15 +397,6 @@ function exportKML(storm) {
 `;
 }
 
-function saffirCat(kt) {
-  if (kt == null || kt < 34) return 0;
-  if (kt < 64) return -1;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
 
 /** Trigger a browser download of a string as a file. */
 export function downloadBlob({ filename, mime, body }) {
@@ -874,11 +866,11 @@ export function generateStormBiography(storm, impacts) {
   const yearStr = storm.year || '?';
   
   // Determine category descriptor
-  const peakCat = saffirCategory(storm.peak_wind_kt);
+  const peakCat = windToCategory(storm.peak_wind_kt);
   let catDescriptor = 'tropical depression';
   if (peakCat >= 1 && peakCat <= 5) {
     catDescriptor = ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'][peakCat - 1] + ' hurricane';
-  } else if (peakCat === 0) {
+  } else if (peakCat === -1) {
     catDescriptor = 'tropical storm';
   }
   
@@ -939,18 +931,6 @@ function formatDamageBrief(usd) {
     return `$${(usd / 1_000_000_000).toFixed(decimals)}B`;
   }
   return `$${(usd / 1_000_000).toFixed(1)}M`;
-}
-
-/** Saffir-Simpson category from peak wind (kt). */
-function saffirCategory(windKt) {
-  if (!windKt) return 0;
-  if (windKt >= 137) return 5;
-  if (windKt >= 113) return 4;
-  if (windKt >= 96) return 3;
-  if (windKt >= 83) return 2;
-  if (windKt >= 64) return 1;
-  if (windKt >= 34) return 0;
-  return -1;
 }
 
 

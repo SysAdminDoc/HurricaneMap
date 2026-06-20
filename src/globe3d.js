@@ -1,4 +1,4 @@
-import { ensureStormsLoaded, getAllStorms } from './data.js';
+import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 
 const CESIUM_VERSION = '1.140';
@@ -251,13 +251,7 @@ export function getTrackHeightMeters(windKt) {
 }
 
 export function categoryFromWind(windKt) {
-  if (!Number.isFinite(windKt) || windKt < 34) return -2;
-  if (windKt < 64) return -1;
-  if (windKt < 83) return 1;
-  if (windKt < 96) return 2;
-  if (windKt < 113) return 3;
-  if (windKt < 137) return 4;
-  return 5;
+  return windToCategory(windKt);
 }
 
 function validTrackPoint(point) {
@@ -515,10 +509,5 @@ function formatTimelineDate(value) {
 }
 
 function colorForCategory(cat) {
-  if (cat <= 0) return '#74c7ec';
-  if (cat === 1) return '#a6e3a1';
-  if (cat === 2) return '#f9e2af';
-  if (cat === 3) return '#fab387';
-  if (cat === 4) return '#f38ba8';
-  return '#cba6f7';
+  return categoryColor(cat);
 }

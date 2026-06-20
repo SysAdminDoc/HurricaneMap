@@ -10,23 +10,17 @@
 // runs `BASE_DURATION_MS` wall-clock seconds at 1× speed regardless of whether
 // the storm lasted 3 days or 3 weeks.
 
-import { categoryColor, formatTime } from './data.js';
+import { categoryColor, formatTime, windToCategory, categoryLabel } from './data.js';
 import { getStormRadarFrames } from './radar.js';
 import { formatStormName } from './html-utils.js';
 
-// Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
-const BASE_DURATION_MS = 14000;        // 1× speed = 14 sec total
-const FRAME_INTERPOLATION_STEPS = 4;   // sub-divide each 6h leg for smoothness
+const BASE_DURATION_MS = 14000;
+const FRAME_INTERPOLATION_STEPS = 4;
 
-// Pixel diameter of the eye/spiral glyph at each Saffir-Simpson category.
-// TS = -1 / 0; Cat 1..5 above.
-const GLYPH_PX = { '-1': 38, 0: 32, 1: 50, 2: 66, 3: 84, 4: 102, 5: 124 };
-
-// Wind-field radius in kilometers — order-of-magnitude representative of
-// the radius of TS-force (34 kt) winds for each category.
-const WIND_KM = { '-1': 90, 0: 70, 1: 140, 2: 180, 3: 230, 4: 320, 5: 420 };
+const GLYPH_PX = { 0: 38, '-1': 32, 1: 50, 2: 66, 3: 84, 4: 102, 5: 124 };
+const WIND_KM = { 0: 90, '-1': 70, 1: 140, 2: 180, 3: 230, 4: 320, 5: 420 };
 
 const HURRICANE_SVG = `
 <svg viewBox="-50 -50 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -260,7 +254,7 @@ export class TrackAnimator {
   }
 
   updateGlyph({ lat, lon, wind, status }) {
-    const cat = saffirSimpson(wind);
+    const cat = windToCategory(wind);
     const px = GLYPH_PX[cat];
     const km = WIND_KM[cat];
     const color = categoryColor(cat);
@@ -347,9 +341,9 @@ export class TrackAnimator {
 
   updateControlsHud(sample, t, fromScrub = false) {
     if (!this.controls) return;
-    const cat = saffirSimpson(sample.wind);
+    const cat = windToCategory(sample.wind);
     const wind = sample.wind != null ? Math.round(sample.wind) : null;
-    const meta = `${formatTime(sample.t)} · ${categoryShort(cat)} · ${sample.status} · ${wind ?? '?'} kt`;
+    const meta = `${formatTime(sample.t)} · ${categoryLabel(cat)} · ${sample.status} · ${wind ?? '?'} kt`;
     this.controls.querySelector('.anim-meta').textContent = meta;
     if (!fromScrub) {
       this.controls.querySelector('.anim-scrubber').value = String(Math.round(t * 1000));
@@ -453,20 +447,6 @@ function lerpTime(a, b, f) {
   return new Date(ta + (tb - ta) * f).toISOString();
 }
 
-function saffirSimpson(kt) {
-  if (kt == null || kt < 34) return -1;
-  if (kt < 64) return 0;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
-
-function categoryShort(c) {
-  if (c <= 0) return 'TS';
-  return `Cat ${c}`;
-}
 
 function formatStormTitle(storm) {
   return (!storm.name || storm.name === 'UNNAMED')

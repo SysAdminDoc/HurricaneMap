@@ -1,5 +1,5 @@
 // Leaflet map + landfall markers + track overlays.
-import { categoryColor, ensureStormsLoaded, getStorm } from './data.js';
+import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './data.js';
 import { formatStormName } from './html-utils.js';
 import { prefersReducedMotion } from './settings.js';
 
@@ -283,7 +283,7 @@ function buildIntensitySegments(track) {
   for (let i = 1; i < track.length; i++) {
     const a = track[i - 1];
     const b = track[i];
-    const cat = saffirSimpson(b.wind);
+    const cat = windToCategory(b.wind);
     segs.push({
       coords: [[a.lat, a.lon], [b.lat, b.lon]],
       cat,
@@ -292,15 +292,6 @@ function buildIntensitySegments(track) {
   return segs;
 }
 
-function saffirSimpson(kt) {
-  if (kt == null || kt < 34) return -2; // td
-  if (kt < 64) return -1;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
 
 export function fitToLandfalls(landfalls) {
   if (!landfalls.length) return;

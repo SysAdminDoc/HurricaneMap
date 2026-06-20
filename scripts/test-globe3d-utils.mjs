@@ -40,7 +40,7 @@ assert.ok(capped.storms.length <= 5, 'maxStorms should cap the selected storm co
 assert.ok(capped.segments.length > capped.storms.length, 'capped dataset should still include multi-point tracks');
 assert.equal(capped.windCones.length, 0, 'multi-storm overview should avoid expensive cone meshes');
 
-assert.equal(categoryFromWind(25), -2, 'sub-tropical-depression winds should be below TS');
+assert.equal(categoryFromWind(25), 0, 'sub-tropical-storm winds should map to TD');
 assert.equal(categoryFromWind(34), -1, '34 kt should map to tropical storm');
 assert.equal(categoryFromWind(64), 1, '64 kt should map to category 1');
 assert.equal(categoryFromWind(83), 2, '83 kt should map to category 2');

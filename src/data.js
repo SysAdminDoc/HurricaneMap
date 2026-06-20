@@ -218,7 +218,7 @@ export function searchStorms(query, landfalls) {
   const seen = new Set();
   const out = [];
   for (const lf of landfalls) {
-    const tag = `${lf.name.toLowerCase()} ${lf.year}`;
+    const tag = `${lf.name.toLowerCase()} ${lf.year} ${(lf.state || '').toLowerCase()}`;
     if (!tag.includes(q)) continue;
     if (seen.has(lf.storm_id)) continue;
     seen.add(lf.storm_id);
@@ -245,6 +245,16 @@ export function categoryClass(cat) {
 import { getPaletteColor } from './settings.js';
 export function categoryColor(cat) {
   return getPaletteColor(cat);
+}
+
+export function windToCategory(kt) {
+  if (kt == null || kt < 34) return 0;
+  if (kt < 64) return -1;
+  if (kt < 83) return 1;
+  if (kt < 96) return 2;
+  if (kt < 113) return 3;
+  if (kt < 137) return 4;
+  return 5;
 }
 
 export function ktToMph(kt) {

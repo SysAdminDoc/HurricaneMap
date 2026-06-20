@@ -1,7 +1,7 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  ktToMph, formatTime, getImpactsFor, getAllStorms,
+  ktToMph, formatTime, getImpactsFor, getAllStorms, windToCategory,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -98,7 +98,7 @@ function render(storm, landfall, allStorms) {
   const niceName = formatStormName(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
   const heading = isUnnamed ? `${storm.year} unnamed ${storm.basin === 'EP' ? 'Pacific' : 'Atlantic'} storm` : `${niceName} (${storm.year})`;
-  const peakCat = saffirCat(storm.peak_wind_kt);
+  const peakCat = windToCategory(storm.peak_wind_kt);
   const peakLabel = categoryLabel(peakCat);
   const lfCat = storm.landfall_max_category;
   const lfLabel = categoryLabel(lfCat);
@@ -498,15 +498,6 @@ function renderExposureStatTile(exposure) {
   `;
 }
 
-function saffirCat(kt) {
-  if (kt == null || kt < 34) return 0;
-  if (kt < 64) return -1;
-  if (kt < 83) return 1;
-  if (kt < 96) return 2;
-  if (kt < 113) return 3;
-  if (kt < 137) return 4;
-  return 5;
-}
 
 function renderSimilarStorms(host, similarStorms) {
   if (!host || !Array.isArray(similarStorms) || similarStorms.length === 0) {
@@ -519,8 +510,8 @@ function renderSimilarStorms(host, similarStorms) {
   }
   const rows = similarStorms.map(s => {
     const score = (s.similarity_score * 100).toFixed(0);
-    const cat = categoryLabel(saffirCat(s.peak_wind_kt || 0));
-    const cls = categoryClass(saffirCat(s.peak_wind_kt || 0));
+    const cat = categoryLabel(windToCategory(s.peak_wind_kt || 0));
+    const cls = categoryClass(windToCategory(s.peak_wind_kt || 0));
     return `<li class="similar-storm-row">
       <span class="similar-storm-name">${escapeHtml(formatStormName(s.name))} (${s.year})</span>
       <span class="similar-storm-cat cat-pill ${cls}" title="Peak intensity">${cat}</span>
@@ -572,7 +563,7 @@ function wikipediaUrl(storm) {
   }
   const name = formatStormName(storm.name);
   // Most modern named storms: "Hurricane <Name> (YYYY)" or "Tropical Storm <Name> (YYYY)"
-  const peakCat = saffirCat(storm.peak_wind_kt);
+  const peakCat = windToCategory(storm.peak_wind_kt);
   const prefix = peakCat >= 1 ? 'Hurricane' : 'Tropical_Storm';
   const slug = `${prefix}_${name}_(${storm.year})`;
   // Use Wikipedia search with the article title as query — handles redirects
@@ -584,7 +575,7 @@ function youtubeUrl(storm) {
   const niceName = (!storm.name || storm.name === 'UNNAMED')
     ? `${storm.year} hurricane`
     : `${formatStormName(storm.name)} ${storm.year}`;
-  const peakCat = saffirCat(storm.peak_wind_kt);
+  const peakCat = windToCategory(storm.peak_wind_kt);
   const kind = peakCat >= 1 ? 'hurricane' : 'tropical storm';
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${kind} ${niceName} landfall`)}`;
 }
