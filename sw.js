@@ -61,6 +61,7 @@ const SHELL_ASSETS = [
   './src/radar.js',
   './src/report.js',
   './src/search-history.js',
+  './src/spatial-search.js',
   './src/settings.js',
   './src/onboarding.js',
   './src/timeline.js',

@@ -163,10 +163,17 @@ export function getMetadata() {
 
 export function getEnsoForYear(year) {
   if (!DATA.enso) return null;
-  const oni = DATA.enso[String(year)];
-  if (typeof oni !== 'number') return null;
-  const phase = oni >= 0.5 ? 'El Nino' : oni <= -0.5 ? 'La Nina' : 'Neutral';
-  return { oni, phase };
+  const entry = DATA.enso[String(year)];
+  if (!entry) return null;
+  if (typeof entry === 'number') {
+    const phase = entry >= 0.5 ? 'El Nino' : entry <= -0.5 ? 'La Nina' : 'Neutral';
+    return { oni: entry, phase };
+  }
+  if (typeof entry.oni === 'number') {
+    const LABELS = { 'el-nino': 'El Nino', 'la-nina': 'La Nina', 'neutral': 'Neutral' };
+    return { oni: entry.oni, phase: LABELS[entry.phase] || 'Neutral' };
+  }
+  return null;
 }
 
 // Filter helpers

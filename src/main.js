@@ -65,6 +65,7 @@ const loadExport = once(() => import('./export.js'));
 const loadReport = once(() => import('./report.js'));
 const loadQgis = once(() => import('./qgis.js'));
 const loadTableView = once(() => import('./table-view.js'));
+const loadSpatialSearch = once(() => import('./spatial-search.js'));
 
 async function showStormLazy(landfall) {
   const { showStorm } = await loadPanel();
@@ -310,9 +311,12 @@ async function boot() {
   deferNonCritical(() => {
     loadState().then(({ enableStateClicks }) => enableStateClicks(map)).catch(() => { /* non-fatal */ });
   });
-  // Live NHC active-storm feed — appears only when a storm is active.
   deferNonCritical(() => {
     lazyStartActiveStormPolling();
+  });
+  deferNonCritical(async () => {
+    const { initSpatialSearch } = await loadSpatialSearch();
+    initSpatialSearch((lf) => onLandfallClick(lf, null));
   });
   els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
   renderDataProvenance();
@@ -936,6 +940,16 @@ function wireUI() {
       const tv = await loadTableView();
       if (tv.isOpen()) { tv.hide(); return; }
       tv.show(currentVisibleLandfalls, (lf) => onLandfallClick(lf, null));
+    });
+  }
+
+  const spatialBtn = document.getElementById('toggle-spatial-search');
+  if (spatialBtn) {
+    spatialBtn.addEventListener('click', async () => {
+      const { toggleSpatialMode } = await loadSpatialSearch();
+      const on = toggleSpatialMode();
+      spatialBtn.setAttribute('aria-pressed', String(on));
+      spatialBtn.classList.toggle('active', on);
     });
   }
 
