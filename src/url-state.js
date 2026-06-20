@@ -16,6 +16,7 @@ export function createDefaultFilters({ yearMin = YEAR_FALLBACK_MIN, yearMax = YE
     state: '',
     showTracks: false,
     showHeatmap: false,
+    retiredOnly: false,
   };
 }
 

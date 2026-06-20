@@ -31,6 +31,7 @@ export function resetPrimaryFilters(filters, {
   filters.state = defaults.state;
   filters.showTracks = defaults.showTracks;
   filters.showHeatmap = defaults.showHeatmap;
+  filters.retiredOnly = defaults.retiredOnly;
 }
 
 export function setCategoryMacro(filters, mode) {
@@ -71,6 +72,7 @@ export function hasActivePrimaryFilters(filters, {
     filters.state !== '' ||
     filters.showTracks ||
     filters.showHeatmap ||
+    filters.retiredOnly ||
     filters.categories.size !== CATEGORY_DEFAULTS.length ||
     !CATEGORY_DEFAULTS.every(category => filters.categories.has(category));
 }

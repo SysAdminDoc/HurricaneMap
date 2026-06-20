@@ -124,6 +124,7 @@ const els = {
   filtersPanel: document.getElementById('filters'),
   showTracks: document.getElementById('show-tracks'),
   showHeatmap: document.getElementById('show-heatmap'),
+  showRetiredOnly: document.getElementById('show-retired-only'),
   surgeCategory: document.getElementById('surge-category'),
   showPopulation: document.getElementById('show-population'),
   resetFilters: document.getElementById('reset-filters'),
@@ -510,6 +511,7 @@ function syncFilterUiFromState() {
   if (els.stateFilter) els.stateFilter.value = filters.state;
   if (els.showTracks) els.showTracks.checked = filters.showTracks;
   if (els.showHeatmap) els.showHeatmap.checked = filters.showHeatmap;
+  if (els.showRetiredOnly) els.showRetiredOnly.checked = filters.retiredOnly;
 }
 
 function populateStateFilter() {
@@ -822,6 +824,13 @@ function wireUI() {
     filters.showHeatmap = els.showHeatmap.checked;
     applyFilters();
   });
+
+  if (els.showRetiredOnly) {
+    els.showRetiredOnly.addEventListener('change', () => {
+      filters.retiredOnly = els.showRetiredOnly.checked;
+      applyFilters();
+    });
+  }
 
   // Storm-surge SLOSH MOM tile layer (per category).
   els.surgeCategory.addEventListener('change', () => {

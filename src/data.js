@@ -1,3 +1,29 @@
+// WMO-retired Atlantic hurricane names: name→[years] for quick lookup.
+const RETIRED_LOOKUP = Object.freeze({
+  CAROL:[1954],HAZEL:[1954],CONNIE:[1955],DIANE:[1955],IONE:[1955],JANET:[1955],
+  AUDREY:[1957],DONNA:[1960],CARLA:[1961],HATTIE:[1961],FLORA:[1963],CLEO:[1964],
+  HILDA:[1964],BETSY:[1965],INEZ:[1966],BEULAH:[1967],CAMILLE:[1969],CELIA:[1970],
+  AGNES:[1972],CARMEN:[1974],FIFI:[1974],ELOISE:[1975],ANITA:[1977],DAVID:[1979],
+  FREDERIC:[1979],ALLEN:[1980],ALICIA:[1983],ELENA:[1985],GLORIA:[1985],
+  GILBERT:[1988],JOAN:[1988],HUGO:[1989],DIANA:[1990],KLAUS:[1990],BOB:[1991],
+  ANDREW:[1992],LUIS:[1995],MARILYN:[1995],OPAL:[1995],ROXANNE:[1995],CESAR:[1996],
+  FRAN:[1996],HORTENSE:[1996],GEORGES:[1998],MITCH:[1998],FLOYD:[1999],LENNY:[1999],
+  KEITH:[2000],ALLISON:[2001],IRIS:[2001],MICHELLE:[2001],ISIDORE:[2002],LILI:[2002],
+  FABIAN:[2003],ISABEL:[2003],JUAN:[2003],CHARLEY:[2004],FRANCES:[2004],IVAN:[2004],
+  JEANNE:[2004],DENNIS:[2005],KATRINA:[2005],RITA:[2005],STAN:[2005],WILMA:[2005],
+  DEAN:[2007],FELIX:[2007],NOEL:[2007],GUSTAV:[2008],IKE:[2008],PALOMA:[2008],
+  IGOR:[2010],TOMAS:[2010],IRENE:[2011],SANDY:[2012],INGRID:[2013],ERIKA:[2015],
+  JOAQUIN:[2015],MATTHEW:[2016],OTTO:[2016],HARVEY:[2017],IRMA:[2017],MARIA:[2017],
+  NATE:[2017],FLORENCE:[2018],MICHAEL:[2018],DORIAN:[2019],LORENZO:[2019],
+  LAURA:[2020],ETA:[2020],IOTA:[2020],IDA:[2021],FIONA:[2022],IAN:[2022],
+  IDALIA:[2023],LEE:[2023],BERYL:[2024],HELENE:[2024],MILTON:[2024],
+});
+
+export function isRetired(name, year) {
+  const years = RETIRED_LOOKUP[(name || '').toUpperCase()];
+  return Array.isArray(years) && years.includes(year);
+}
+
 // Data loading + indexes for HurricaneMap.
 // landfalls.json — flat list of every US landfall event (one per L marker).
 // storms.json    — full track + metadata, keyed by storm id.
@@ -101,6 +127,7 @@ export function filterLandfalls(landfalls, filters) {
     if (lf.year < filters.yearMin || lf.year > filters.yearMax) return false;
     if (!categoryAllowed(lf.category, filters.categories)) return false;
     if (filters.state && lf.state !== filters.state) return false;
+    if (filters.retiredOnly && !isRetired(lf.name, lf.year)) return false;
     return true;
   });
 }
