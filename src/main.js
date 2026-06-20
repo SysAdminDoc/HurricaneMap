@@ -396,33 +396,10 @@ function wireSettingsControls() {
   }
   syncMenu();
 
-  cog.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = menu.hasAttribute('hidden') ? false : true;
-    if (open) {
-      menu.setAttribute('hidden', '');
-      cog.setAttribute('aria-expanded', 'false');
-    } else {
-      menu.removeAttribute('hidden');
-      cog.setAttribute('aria-expanded', 'true');
-      syncMenu();
-    }
-  });
-  document.addEventListener('click', (e) => {
-    if (menu.hasAttribute('hidden')) return;
-    if (!menu.contains(e.target) && e.target !== cog) {
-      menu.setAttribute('hidden', '');
-      cog.setAttribute('aria-expanded', 'false');
-    }
-  });
-  // ESC closes the settings menu and returns focus to the cog button.
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (menu.hasAttribute('hidden')) return;
-    e.preventDefault();
-    menu.setAttribute('hidden', '');
-    cog.setAttribute('aria-expanded', 'false');
-    cog.focus();
+  menu.addEventListener('toggle', () => {
+    const open = menu.matches(':popover-open');
+    cog.setAttribute('aria-expanded', String(open));
+    if (open) syncMenu();
   });
 
   menu.addEventListener('click', (e) => {

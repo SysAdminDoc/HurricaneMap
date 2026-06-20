@@ -3566,8 +3566,8 @@ select:focus {
 }
 
 .settings-menu {
-  position: absolute;
-  top: calc(100% + 10px);
+  position: fixed;
+  top: 60px;
   right: 12px;
   z-index: 2600;
   width: min(380px, calc(100vw - 24px));
@@ -3577,7 +3577,10 @@ select:focus {
   gap: 12px;
   font-size: 13px;
   line-height: 1.35;
+  margin: 0;
+  border: none;
 }
+.settings-menu::backdrop { background: transparent; }
 
 .settings-row {
   display: grid;
@@ -7201,3 +7204,8 @@ html.high-contrast .globe3d-topbar {
 .enso-nino { background: #f38ba8; color: #11111b; }
 .enso-nina { background: #74c7ec; color: #11111b; }
 .enso-neutral { background: var(--surface1); color: var(--text); }
+
+.ss-analogs { margin-top: 12px; border-top: 1px solid var(--surface0); padding-top: 8px; }
+.ss-analogs h4 { font-size: 12px; font-weight: 600; color: var(--subtext); margin: 0 0 6px; }
+.ss-analogs ul { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.ss-analogs li { padding: 3px 0; color: var(--text); }
