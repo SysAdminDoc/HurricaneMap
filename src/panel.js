@@ -326,16 +326,22 @@ function render(storm, landfall, allStorms) {
     });
   });
 
-  // Share button — copy the current permalink to the clipboard with a toast.
   const shareBtn = document.getElementById('share-btn');
   if (shareBtn) {
     shareBtn.addEventListener('click', async () => {
       const url = window.location.href;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'HurricaneMap', url });
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+        }
+      }
       try {
         await navigator.clipboard.writeText(url);
         showToast('Link copied to clipboard');
       } catch {
-        // Fallback for non-secure contexts: use a hidden textarea.
         const ta = document.createElement('textarea');
         ta.value = url;
         ta.style.position = 'fixed';
