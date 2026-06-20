@@ -23,7 +23,7 @@ const PRES_DOMAIN = [880, 1015];        // mb — Allen '80 / Wilma '05 lower bo
 
 function saffir(kt) {
   if (kt == null || kt < 34) return -1;
-  if (kt < 64) return -1;
+  if (kt < 64) return 0;
   if (kt < 83) return 1;
   if (kt < 96) return 2;
   if (kt < 113) return 3;

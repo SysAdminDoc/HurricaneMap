@@ -56,6 +56,11 @@ async function performSearch(lat, lon) {
   }).addTo(map);
 
   await ensureStormsLoaded();
+  const peakCatByStorm = new Map();
+  for (const lf of getLandfalls()) {
+    const prev = peakCatByStorm.get(lf.storm_id);
+    if (prev == null || lf.category > prev) peakCatByStorm.set(lf.storm_id, lf.category);
+  }
   const seenStorms = new Set();
   const results = [];
   for (const lf of getLandfalls()) {
@@ -69,9 +74,9 @@ async function performSearch(lat, lon) {
       storm_id: lf.storm_id,
       name: lf.name,
       year: lf.year,
-      category: Math.max(lf.category, ...(getLandfalls().filter(x => x.storm_id === lf.storm_id).map(x => x.category))),
+      category: peakCatByStorm.get(lf.storm_id) ?? lf.category,
       distance_mi: Math.round(ca.distance_mi),
-      wind_at_closest: ca.track_point.wind,
+      wind_at_closest: ca.track_point?.wind ?? null,
     });
   }
   results.sort((a, b) => a.distance_mi - b.distance_mi);

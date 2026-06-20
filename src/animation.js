@@ -455,7 +455,7 @@ function lerpTime(a, b, f) {
 
 function saffirSimpson(kt) {
   if (kt == null || kt < 34) return -1;
-  if (kt < 64) return -1;
+  if (kt < 64) return 0;
   if (kt < 83) return 1;
   if (kt < 96) return 2;
   if (kt < 113) return 3;

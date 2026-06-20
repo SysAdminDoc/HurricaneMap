@@ -222,10 +222,23 @@ function renderSeasonAnalogs(host, targetYear, stormCount, lfCount, ace) {
     y.storms.add(lf.storm_id);
     y.landfalls++;
   }
+  const seenForAce = new Set();
+  for (const lf of allLf) {
+    if (seenForAce.has(lf.storm_id)) continue;
+    seenForAce.add(lf.storm_id);
+    const storm = getStorm(lf.storm_id);
+    if (!storm?.track) continue;
+    const bucket = years.get(lf.year);
+    if (!bucket) continue;
+    try {
+      const a = computeACE(storm.track);
+      if (Number.isFinite(a?.value)) bucket.ace += a.value;
+    } catch { /* skip */ }
+  }
   const target = { stormCount, lfCount, ace };
   const maxStorms = Math.max(...[...years.values()].map(v => v.storms.size), 1);
   const maxLf = Math.max(...[...years.values()].map(v => v.landfalls), 1);
-  const maxAce = Math.max(ace, 1);
+  const maxAce = Math.max(...[...years.values()].map(v => v.ace), ace, 1);
 
   const scored = [];
   for (const [yr, v] of years) {

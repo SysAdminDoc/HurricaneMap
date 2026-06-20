@@ -5,6 +5,7 @@
 // style.
 
 import { getMap } from './map.js';
+import { escapeHtml } from './html-utils.js';
 import {
   activeAdvisoryKey,
   activeFeedStatusText,
@@ -208,8 +209,8 @@ function ensureBadge(count, {
   badgeEl.innerHTML = `
       <span class="ab-pulse"></span>
       <span class="ab-main">
-        <span class="ab-text">${mainText}</span>
-        <span class="ab-status">${statusText}</span>
+        <span class="ab-text">${escapeHtml(mainText)}</span>
+        <span class="ab-status">${escapeHtml(statusText)}</span>
       </span>
       ${links}
     `;
@@ -255,7 +256,7 @@ async function renderActive(storms) {
         radius: 8, color: '#11111b', weight: 2,
         fillColor: '#89b4fa', fillOpacity: 0.95,
       }).bindTooltip(
-        `${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}`,
+        escapeHtml(`${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}`),
         { direction: 'top' },
       ).addTo(layerGroup);
     }

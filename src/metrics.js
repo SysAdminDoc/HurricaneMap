@@ -944,13 +944,13 @@ function formatDamageBrief(usd) {
 /** Saffir-Simpson category from peak wind (kt). */
 function saffirCategory(windKt) {
   if (!windKt) return 0;
-  if (windKt >= 157) return 5;
-  if (windKt >= 130) return 4;
-  if (windKt >= 111) return 3;
-  if (windKt >= 96) return 2;
-  if (windKt >= 83) return 1;
-  if (windKt >= 34) return 0; // tropical storm
-  return -1; // tropical depression
+  if (windKt >= 137) return 5;
+  if (windKt >= 113) return 4;
+  if (windKt >= 96) return 3;
+  if (windKt >= 83) return 2;
+  if (windKt >= 64) return 1;
+  if (windKt >= 34) return 0;
+  return -1;
 }
 
 
