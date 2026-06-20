@@ -105,6 +105,10 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **Screen-reader semantics** — Search, glossary, panels, loading, error, and empty states expose clearer roles, labels, and status messaging.
 - **Color contrast** — Maintained throughout all states per WCAG standards.
 - **Reduced motion** — Respected where supported.
+- **Non-color encoding** — Category markers use distinct dash patterns (solid/dashed/dotted/mixed) in addition to color, satisfying WCAG 1.4.1.
+- **Data table alternative** — "Table view" button renders filtered landfalls as a sortable, keyboard-navigable HTML table (Section 508 compliance).
+- **VPAT published** — See [`docs/VPAT.html`](docs/VPAT.html) for the full WCAG 2.2 AA Voluntary Product Accessibility Template.
+- **Internationalization** — English, Spanish (ES-LA), and Haitian Creole (Kreyòl) locales with browser auto-detection.
 
 ## Phase 8: Mobile Optimization & Advanced Features (Latest)
 
