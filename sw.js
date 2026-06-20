@@ -46,7 +46,6 @@ const SHELL_ASSETS = [
   './src/cone.js',
   './src/compare.js',
   './src/decade-trends.js',
-  './src/ensemble.js',
   './src/export.js',
   './src/exposure.js',
   './src/filter-state.js',

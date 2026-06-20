@@ -1410,12 +1410,6 @@ section.storm-panel.glass {
   color: var(--lavender);
   text-decoration: underline;
 }
-.ensemble-track {
-  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
-}
-.ensemble-gfs { /* GFS — blue */ }
-.ensemble-ecmwf { /* ECMWF — green */ }
-.ensemble-hwrf { /* HWRF — yellow */ }
 .ab-link {
   background: var(--mantle);
   border: 1px solid var(--surface0);

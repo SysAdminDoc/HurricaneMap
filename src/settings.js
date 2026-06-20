@@ -12,7 +12,6 @@ const DEFAULTS = {
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   nhcForecastCone: true,   // Show official NHC forecast cone/track for active storms
-  ensembleTracks: false,   // Show GFS/ECMWF forecast ensemble spaghetti tracks
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' (English | Spanish)
   highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
@@ -29,7 +28,6 @@ const VALID_VALUES = {
 
 const BOOLEAN_KEYS = new Set([
   'nhcForecastCone',
-  'ensembleTracks',
   'goesRealtime',
   'highContrast',
   'onboarded',

@@ -370,10 +370,6 @@ function wireSettingsControls() {
       btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
       btn.setAttribute('aria-checked', String(btn.dataset.setDamage === getSetting('damageMode')));
     });
-    const ensembleToggle = menu.querySelector('#toggle-ensemble-tracks');
-    if (ensembleToggle) {
-      ensembleToggle.checked = getSetting('ensembleTracks');
-    }
     const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
     if (coneToggle) {
       coneToggle.checked = getSetting('nhcForecastCone');
@@ -430,14 +426,6 @@ function wireSettingsControls() {
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
   });
-
-  // Ensemble tracks toggle
-  const ensembleToggle = menu.querySelector('#toggle-ensemble-tracks');
-  if (ensembleToggle) {
-    ensembleToggle.addEventListener('change', () => {
-      setSetting('ensembleTracks', ensembleToggle.checked);
-    });
-  }
 
   const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
   if (coneToggle) {

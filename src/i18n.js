@@ -28,7 +28,6 @@ export const STRINGS = {
     'settings.damageMode': 'Damage figures',
     'settings.damageModeNominal': 'Nominal',
     'settings.damageMode2024': '2024 USD',
-    'settings.ensembleTracks': 'Forecast ensemble spaghetti (when active)',
     'settings.replayTour': 'Replay welcome tour',
     'settings.meta': 'Settings save to your browser only — no account required.',
 
@@ -172,7 +171,6 @@ export const STRINGS = {
     'settings.damageMode': 'Cifras de daños',
     'settings.damageModeNominal': 'Nominal',
     'settings.damageMode2024': 'USD 2024',
-    'settings.ensembleTracks': 'Pronóstico ensemble (cuando hay tormentas activas)',
     'settings.replayTour': 'Reproducir gira de bienvenida',
     'settings.meta': 'La configuración se guarda solo en tu navegador — no se requiere cuenta.',
 

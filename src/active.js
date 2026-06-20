@@ -2,7 +2,7 @@
 // hourly while storms are active, quieter when the feed is empty, and with
 // explicit backoff when the proxy/NHC path is delayed or rate-limited. When storms are active, renders their
 // advisory tracks + cones of uncertainty in a distinctive electric-blue
-// style. Optionally overlays GFS/ECMWF ensemble spaghetti tracks.
+// style.
 
 import { getMap } from './map.js';
 import {
@@ -10,7 +10,6 @@ import {
   activeFeedStatusText,
   computeActivePollDelay,
 } from './active-polling.js';
-import { renderEnsembleTracks, hideEnsembleTracks } from './ensemble.js';
 import {
   clearOfficialForecastCache,
   clearOfficialForecastContext,
@@ -43,7 +42,6 @@ export async function startActiveStormPolling() {
   // Listen for active-storm context toggle changes.
   document.addEventListener('hm-settings:change', (e) => {
     if (
-      e.detail.key === 'ensembleTracks' ||
       e.detail.key === 'nhcForecastCone' ||
       e.detail.key === 'goesRealtime'
     ) {
@@ -101,7 +99,6 @@ async function fetchAndRender() {
 
   if (!storms.length) {
     clearActiveLayers();
-    hideEnsembleTracks();
     hideGoesRealtimeContext();
     clearOfficialForecastContext();
     clearOfficialForecastCache();
@@ -282,12 +279,5 @@ async function renderActive(storms) {
     hideGoesRealtimeContext();
   }
 
-  // Render ensemble tracks if enabled
-  const ensembleEnabled = getSetting('ensembleTracks');
-  if (ensembleEnabled) {
-    await renderEnsembleTracks(storms, true);
-  } else {
-    hideEnsembleTracks();
-  }
 }
 
