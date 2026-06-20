@@ -24,7 +24,7 @@ const VALID_VALUES = {
   theme: new Set(['dark', 'light', 'system']),
   palette: new Set(['default', 'colorblind']),
   damageMode: new Set(['nominal', 'real']),
-  locale: new Set(['en', 'es']),
+  locale: new Set(['en', 'es', 'ht']),
 };
 
 const BOOLEAN_KEYS = new Set([

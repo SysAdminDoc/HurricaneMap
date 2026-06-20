@@ -1,8 +1,10 @@
-// Internationalization (i18n) — Spanish (ES-LA) + English (EN) support
+// Internationalization (i18n) — English, Spanish (ES-LA), Haitian Creole
 // Single source of truth for all user-facing strings.
 
 const LOCALE_EN = 'en';
 const LOCALE_ES = 'es';
+const LOCALE_HT = 'ht';
+const SUPPORTED_LOCALES = new Set([LOCALE_EN, LOCALE_ES, LOCALE_HT]);
 
 export const STRINGS = {
   en: {
@@ -291,12 +293,88 @@ export const STRINGS = {
     'about.github': 'GitHub',
     'about.privacy': 'Todo el procesamiento de datos ocurre en tu navegador. Sin rastreo, sin cuentas, sin servidores.',
   },
+  ht: {
+    'header.title': 'HurricaneMap',
+    'header.subtitle': '174 ane siklòn ki frape Etazini',
+    'header.btn.settings': 'Paramèt',
+    'header.btn.info': 'Enfòmasyon',
+    'header.btn.stats': 'Estatistik',
+    'header.btn.compare': 'Konpare',
+    'header.btn.onthisdate': 'Jou sa a',
+    'header.btn.filters': 'Filtè',
+    'settings.title': 'Paramèt',
+    'settings.windUnits': 'Inite van',
+    'settings.theme': 'Tèm',
+    'settings.themeDark': 'Fonse',
+    'settings.themeLight': 'Klè',
+    'settings.palette': 'Palèt koulè',
+    'settings.paletteDefault': 'Pa defo',
+    'settings.paletteColorblind': 'Pou je ki pa wè koulè',
+    'settings.damageMode': 'Chif domaj',
+    'settings.damageModeNominal': 'Nominal',
+    'settings.damageMode2024': 'USD 2024',
+    'settings.replayTour': 'Rejwe vizit byenveni',
+    'settings.meta': 'Paramèt yo sove nan navigatè w sèlman — pa bezwen kont.',
+    'filters.title': 'Filtè',
+    'filters.yearRange': 'Ane',
+    'filters.category': 'Kategori',
+    'filters.categoryTS': 'Tanpèt twopikal lè li touche tè',
+    'filters.state': 'Eta',
+    'filters.searchStorm': 'Chèche siklòn',
+    'filters.searchPlaceholder': 'pa egz. Katrina, 2005, Helene…',
+    'filters.mapLayers': 'Kouch kat la',
+    'filters.tracksForVisibleLandfalls': 'Chemen siklòn vizib yo',
+    'filters.landfall': 'Pwen kote siklòn touche tè',
+    'filters.heatmap': 'Kat chalè',
+    'filters.population': 'Dansite popilasyon',
+    'filters.stormSurge': 'Vag tanpèt (SLOSH MOMs)',
+    'filters.resetFilters': 'Remèt filtè yo',
+    'panel.title': 'Detay siklòn',
+    'panel.close': 'Fèmen',
+    'panel.track': 'Chemen',
+    'panel.intensity': 'Entansite',
+    'panel.peakWind': 'Van maksimòm',
+    'panel.minPressure': 'Presyon minimòm',
+    'panel.formed': 'Fòme',
+    'panel.dissipated': 'Disparèt',
+    'panel.landfalls': 'Touche tè Etazini',
+    'panel.ACE': 'Enèji siklòn akimile',
+    'panel.impacts': 'Enpak',
+    'panel.similarStorms': 'Siklòn ki sanble',
+    'panel.playTrack': 'Jwe chemen',
+    'panel.pauseTrack': 'Poz chemen',
+    'panel.exportTrack': 'Ekspòte chemen',
+    'stats.title': 'Estatistik',
+    'stats.landfalls': 'Touche tè',
+    'stats.strongest': 'Pi fò',
+    'stats.deadliest': 'Pi mòtèl',
+    'stats.costliest': 'Pi chè',
+    'compare.title': 'Konpare siklòn',
+    'compare.noStorms': 'Pa gen siklòn tache. Klike sou ikòn epeng nan yon panno siklòn pou ajoute.',
+    'btn.clearYearFilter': 'Remèt',
+    'btn.share': '🔗 Pataje vi',
+    'status.loading': 'Chajman…',
+    'status.noResults': 'Pa jwenn siklòn',
+    'toast.copiedLink': 'Kopye nan plas-papye',
+    'category.ts': 'Tanpèt twopikal',
+    'category.1': 'Kategori 1',
+    'category.2': 'Kategori 2',
+    'category.3': 'Kategori 3',
+    'category.4': 'Kategori 4',
+    'category.5': 'Kategori 5',
+    'about.title': 'Konsènan HurricaneMap',
+    'about.description': 'HurricaneMap se yon atlas entèaktif 174 ane siklòn ki frape Etazini (1851–2025) soti nan HURDAT2.',
+    'about.dataSource': 'Sous done: Sant Nasyonal Siklòn HURDAT2',
+    'about.version': 'Vèsyon {0}',
+    'about.github': 'GitHub',
+    'about.privacy': 'Tout tretman done fèt nan navigatè w. Pa gen swivi, pa gen kont, pa gen sèvè.',
+  },
 };
 
 let currentLocale = LOCALE_EN;
 
 export function setLocale(locale) {
-  if (locale === LOCALE_ES || locale === LOCALE_EN) {
+  if (SUPPORTED_LOCALES.has(locale)) {
     currentLocale = locale;
     document.documentElement.lang = locale;
     document.dispatchEvent(new CustomEvent('hm-locale:change', { detail: { locale } }));
@@ -320,21 +398,18 @@ export function t(key, ...args) {
 }
 
 export function initLocale() {
-  // Check localStorage for saved locale preference
   let saved = null;
   try {
     saved = localStorage.getItem('hm-locale-v1');
   } catch {
     saved = null;
   }
-  if (saved === LOCALE_ES) {
-    setLocale(LOCALE_ES);
+  if (SUPPORTED_LOCALES.has(saved)) {
+    setLocale(saved);
   } else {
-    // Otherwise, check browser language
-    const browserLang = navigator.language || navigator.userLanguage;
-    if (browserLang.startsWith('es')) {
-      setLocale(LOCALE_ES);
-    }
+    const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    if (browserLang.startsWith('ht') || browserLang === 'fr-ht') setLocale(LOCALE_HT);
+    else if (browserLang.startsWith('es')) setLocale(LOCALE_ES);
   }
   return currentLocale;
 }
