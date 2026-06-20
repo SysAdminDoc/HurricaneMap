@@ -11,7 +11,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q22';
+const SW_VERSION = 'hm-v1.3.9-q23';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -74,6 +74,11 @@ const SHELL_ASSETS = [
   './src/windfield.js',
   './branding/favicon.png',
   './branding/logo.png',
+  './vendor/leaflet.css',
+  './vendor/leaflet.js',
+  './vendor/leaflet-heat.js',
+  './fonts/inter-latin.woff2',
+  './fonts/jetbrains-mono-latin.woff2',
 ];
 
 const OFFLINE_DATA_ASSETS = [
