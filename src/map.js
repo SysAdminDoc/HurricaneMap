@@ -102,6 +102,13 @@ function radiusForCategory(cat) {
   return 4 + cat * 1.4;
 }
 
+function dashForCategory(cat) {
+  if (cat <= 0) return null;
+  if (cat <= 2) return '4 3';
+  if (cat <= 4) return '2 2';
+  return '1 2 1 2';
+}
+
 function eventKey(lf) {
   return `${lf.storm_id}|${lf.t}|${lf.lat}|${lf.lon}`;
 }
@@ -169,14 +176,17 @@ export function renderLandfalls(landfalls, onSelect) {
   for (const lf of sorted) {
     const baseRadius = radiusForCategory(lf.category);
     const isMajor = lf.category >= 3;
+    const dash = dashForCategory(lf.category);
+    const tierClass = lf.category <= 0 ? 'tier-ts' : lf.category <= 2 ? 'tier-minor' : lf.category <= 4 ? 'tier-major' : 'tier-cat5';
     const marker = L.circleMarker([lf.lat, lf.lon], {
       radius: baseRadius,
       color: '#0a0f1a',
-      weight: 1.6,
+      weight: isMajor ? 2.2 : 1.6,
       opacity: 0.95,
       fillColor: categoryColor(lf.category),
       fillOpacity: 0.92,
-      className: isMajor ? 'landfall-marker landfall-major' : 'landfall-marker',
+      dashArray: dash,
+      className: `landfall-marker ${tierClass}${isMajor ? ' landfall-major' : ''}`,
     });
     marker._baseRadius = baseRadius;
     const tt = `${lf.year} ${formatStormName(lf.name, { unnamed: 'Unnamed storm' })} — ${shortCat(lf.category)} • ${lf.state}`;

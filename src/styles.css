@@ -526,6 +526,9 @@ label > input[type="checkbox"] {
 .dot.cat-3  { background: var(--cat-3); }
 .dot.cat-4  { background: var(--cat-4); }
 .dot.cat-5  { background: var(--cat-5); }
+.dot.dot-dashed { border: 2px dashed rgba(0,0,0,0.7); box-shadow: none; }
+.dot.dot-dotted { border: 2px dotted rgba(0,0,0,0.7); box-shadow: none; }
+.dot.dot-mixed { border: 2px double rgba(0,0,0,0.7); box-shadow: none; }
 
 /* All right-side mode-panels share the same slot (mutually exclusive — only
    one open at a time, managed by panels.js). Storm panel is the primary;
