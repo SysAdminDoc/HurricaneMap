@@ -7188,3 +7188,16 @@ html.high-contrast .globe3d-topbar {
 .cat-pill.cat-3 { background: var(--cat-3); color: #11111b; }
 .cat-pill.cat-4 { background: var(--cat-4); color: #11111b; }
 .cat-pill.cat-5 { background: var(--cat-5); color: #11111b; }
+
+.enso-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.enso-nino { background: #f38ba8; color: #11111b; }
+.enso-nina { background: #74c7ec; color: #11111b; }
+.enso-neutral { background: var(--surface1); color: var(--text); }

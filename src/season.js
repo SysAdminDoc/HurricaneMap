@@ -1,7 +1,7 @@
 // Season summary card. Surfaces when the year filter narrows to a small
 // window (1-3 years). Shows total named storms touching the US, landfall
 // count by Saffir tier, total ACE, strongest landfall, deadliest, costliest.
-import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel } from './data.js';
+import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel, getEnsoForYear } from './data.js';
 import { computeACE } from './metrics.js';
 import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -99,9 +99,18 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     </div>`).join('');
   const strongestName = strongest ? formatStormName(strongest.name) : 'Unnamed';
 
+  let ensoBadge = '';
+  if (yearMin === yearMax) {
+    const enso = getEnsoForYear(yearMin);
+    if (enso) {
+      const cls = enso.phase === 'El Nino' ? 'enso-nino' : enso.phase === 'La Nina' ? 'enso-nina' : 'enso-neutral';
+      ensoBadge = `<span class="enso-badge ${cls}" title="ONI ${enso.oni >= 0 ? '+' : ''}${enso.oni.toFixed(1)}">${escapeHtml(enso.phase)}</span>`;
+    }
+  }
+
   host.innerHTML = `
     <header>
-      <h3>${titleSpan}</h3>
+      <h3>${titleSpan}${ensoBadge}</h3>
       <button class="season-close" type="button" aria-label="Hide season summary">×</button>
     </header>
     <div class="ss-stats">
