@@ -158,6 +158,12 @@ export function applyThemeToRoot() {
   document.documentElement.dataset.themeSetting = theme;
 }
 
+export function prefersReducedMotion() {
+  return typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export function normalizeSettings(raw) {
   const source = raw && typeof raw === 'object' ? raw : {};
   const next = { ...DEFAULTS };

@@ -1,6 +1,7 @@
 // Leaflet map + landfall markers + track overlays.
 import { categoryColor, ensureStormsLoaded, getStorm } from './data.js';
 import { formatStormName } from './html-utils.js';
+import { prefersReducedMotion } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -219,7 +220,10 @@ export function focusLandfall(lf, panTo = true) {
       radius: (marker._baseRadius || 6) + 4,
     });
     if (panTo) {
-      map.flyTo([lf.lat, lf.lon], Math.max(map.getZoom(), 7), { duration: 0.6 });
+      const target = [lf.lat, lf.lon];
+      const zoom = Math.max(map.getZoom(), 7);
+      if (prefersReducedMotion()) map.setView(target, zoom);
+      else map.flyTo(target, zoom, { duration: 0.6 });
     }
   }
 }

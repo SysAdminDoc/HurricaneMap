@@ -187,6 +187,10 @@
       <input type="search" id="search-input" placeholder="Search name, year, or state" data-i18n-placeholder="filters.searchPlaceholder" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" />
       <ul id="search-results" class="search-results" role="listbox" aria-label="Storm search results" hidden></ul>
     </div>
+    <label class="toggle-row retired-toggle" title="Show only storms whose names were retired by the WMO due to exceptional damage or loss of life">
+      <input type="checkbox" id="show-retired-only" />
+      <span>Retired names only</span>
+    </label>
     <div class="filter-group" aria-label="Map layers">
       <div class="filter-group-label" data-i18n="filters.mapLayers">Map layers</div>
       <div class="filter-layer-grid">
