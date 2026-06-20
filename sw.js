@@ -70,6 +70,7 @@ const SHELL_ASSETS = [
   './src/storm-events.js',
   './src/storms-worker.js',
   './src/surge.js',
+  './src/table-view.js',
   './src/url-state.js',
   './src/windfield.js',
   './branding/favicon.png',

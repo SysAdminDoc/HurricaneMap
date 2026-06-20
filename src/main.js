@@ -64,6 +64,7 @@ const loadGlobe3D = once(() => import('./globe3d.js'));
 const loadExport = once(() => import('./export.js'));
 const loadReport = once(() => import('./report.js'));
 const loadQgis = once(() => import('./qgis.js'));
+const loadTableView = once(() => import('./table-view.js'));
 
 async function showStormLazy(landfall) {
   const { showStorm } = await loadPanel();
@@ -141,6 +142,7 @@ const els = {
   exportBtn: document.getElementById('export-publication'),
   reportBtn: document.getElementById('generate-report'),
   qgisBtn: document.getElementById('export-qgis'),
+  tableViewBtn: document.getElementById('toggle-table-view'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
@@ -952,7 +954,14 @@ function wireUI() {
     });
   }
 
-  // Glossary modal
+  if (els.tableViewBtn) {
+    els.tableViewBtn.addEventListener('click', async () => {
+      const tv = await loadTableView();
+      if (tv.isOpen()) { tv.hide(); return; }
+      tv.show(currentVisibleLandfalls, (lf) => onLandfallClick(lf, null));
+    });
+  }
+
   const glossaryBtn = document.getElementById('toggle-glossary');
   if (glossaryBtn) {
     glossaryBtn.addEventListener('click', openGlossaryLazy);
