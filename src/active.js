@@ -155,6 +155,13 @@ function clearActiveLayers() {
   }
 }
 
+function updateAppBadge(count) {
+  try {
+    if (count > 0 && navigator.setAppBadge) navigator.setAppBadge(count);
+    else if (navigator.clearAppBadge) navigator.clearAppBadge();
+  } catch { /* not installed as PWA or API unavailable */ }
+}
+
 function ensureBadge(count, {
   state = 'ok',
   fetchedAt = null,
@@ -170,6 +177,8 @@ function ensureBadge(count, {
     badgeEl.setAttribute('aria-live', 'polite');
     document.body.appendChild(badgeEl);
   }
+
+  updateAppBadge(count);
 
   const shouldShow = count > 0 || state === 'error' || state === 'rate-limit';
   if (!shouldShow) {

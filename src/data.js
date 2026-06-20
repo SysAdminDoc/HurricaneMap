@@ -16,9 +16,10 @@ const DATA = {
 let stormsLoaded = false;
 let stormsPromise = null;
 
-async function fetchJson(url, { optional = false, fallback = null } = {}) {
+async function fetchJson(url, { optional = false, fallback = null, priority } = {}) {
   try {
-    const response = await fetch(url);
+    const init = priority ? { priority } : {};
+    const response = await fetch(url, init);
     if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
     return await response.json();
   } catch (error) {
@@ -32,8 +33,8 @@ async function fetchJson(url, { optional = false, fallback = null } = {}) {
 
 export async function loadInitial() {
   const [lf, st, md, im] = await Promise.all([
-    fetchJson('data/landfalls.json'),
-    fetchJson('data/stats.json'),
+    fetchJson('data/landfalls.json', { priority: 'high' }),
+    fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
   ]);

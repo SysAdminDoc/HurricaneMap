@@ -54,15 +54,20 @@ export function initPerformanceMonitoring() {
       clsObserver.observe({ entryTypes: ['layout-shift'] });
     } catch (e) { /* CLS not available */ }
 
-    // Report FID (First Input Delay) — modern replacement is INP
     try {
-      const fidObserver = new PerformanceObserver(list => {
+      let worstInp = 0;
+      const inpObserver = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
-          console.log('[Perf] FID:', entry.processingDuration, 'ms');
+          if (!entry.interactionId) continue;
+          const duration = entry.duration;
+          if (duration > worstInp) {
+            worstInp = duration;
+            console.log('[Perf] INP:', worstInp, 'ms');
+          }
         }
       });
-      fidObserver.observe({ entryTypes: ['first-input'] });
-    } catch (e) { /* FID not available */ }
+      inpObserver.observe({ type: 'event', buffered: true, durationThreshold: 16 });
+    } catch (e) { /* INP not available */ }
   }
 
   // Navigation timing
