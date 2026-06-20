@@ -62,6 +62,27 @@ export function initMap() {
 
   L.control.zoom({ position: 'topright' }).addTo(map);
 
+  const FullscreenControl = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd() {
+      const btn = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      const a = L.DomUtil.create('a', 'leaflet-fullscreen-btn', btn);
+      a.href = '#';
+      a.role = 'button';
+      a.title = 'Toggle fullscreen';
+      a.setAttribute('aria-label', 'Toggle fullscreen');
+      a.innerHTML = '⛶';
+      L.DomEvent.disableClickPropagation(btn);
+      L.DomEvent.on(a, 'click', (e) => {
+        L.DomEvent.preventDefault(e);
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen().catch(() => {});
+      });
+      return btn;
+    },
+  });
+  new FullscreenControl().addTo(map);
+
   addBasemap(map);
 
   landfallLayer = L.layerGroup().addTo(map);
