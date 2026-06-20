@@ -1,8 +1,11 @@
 self.addEventListener('message', async () => {
   try {
-    const storms = typeof DecompressionStream !== 'undefined'
-      ? await fetchGzipped()
-      : await fetchRaw();
+    let storms;
+    if (typeof DecompressionStream !== 'undefined') {
+      try { storms = await fetchGzipped(); } catch { storms = await fetchRaw(); }
+    } else {
+      storms = await fetchRaw();
+    }
     self.postMessage({ ok: true, storms });
   } catch (error) {
     self.postMessage({ ok: false, error: error.message });

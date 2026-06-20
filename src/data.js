@@ -37,6 +37,7 @@ const DATA = {
   stats: null,
   metadata: null,
   impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
+  enso: null,          // year (string) -> ONI value
 };
 
 let stormsLoaded = false;
@@ -58,11 +59,12 @@ async function fetchJson(url, { optional = false, fallback = null, priority } = 
 }
 
 export async function loadInitial() {
-  const [lf, st, md, im] = await Promise.all([
+  const [lf, st, md, im, enso] = await Promise.all([
     fetchJson('data/landfalls.json', { priority: 'high' }),
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
+    fetchJson('data/enso.json', { optional: true, fallback: null }),
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
   if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
@@ -70,6 +72,7 @@ export async function loadInitial() {
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;
   DATA.impacts = im || {};
+  DATA.enso = enso && typeof enso === 'object' ? enso : null;
   return DATA;
 }
 
@@ -90,12 +93,33 @@ function loadStormsViaWorker() {
   });
 }
 
+async function fetchStormsCompressed() {
+  if (typeof DecompressionStream !== 'function') return fetchJson('data/storms.json');
+  try {
+    const res = await fetch('data/storms.json.gz');
+    if (!res.ok) throw new Error(res.status);
+    const ds = new DecompressionStream('gzip');
+    const reader = res.body.pipeThrough(ds).getReader();
+    const chunks = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+    const total = chunks.reduce((n, a) => n + a.length, 0);
+    const merged = new Uint8Array(total);
+    let off = 0;
+    for (const c of chunks) { merged.set(c, off); off += c.length; }
+    return JSON.parse(new TextDecoder().decode(merged));
+  } catch { return fetchJson('data/storms.json'); }
+}
+
 export function ensureStormsLoaded() {
   if (stormsLoaded) return Promise.resolve(DATA);
   if (stormsPromise) return stormsPromise;
   const loader = typeof Worker !== 'undefined'
-    ? loadStormsViaWorker().then(storms => storms || fetchJson('data/storms.json'))
-    : fetchJson('data/storms.json');
+    ? loadStormsViaWorker().then(storms => storms || fetchStormsCompressed())
+    : fetchStormsCompressed();
   stormsPromise = loader
     .then(storms => {
       if (!Array.isArray(storms)) {
@@ -135,6 +159,14 @@ export function getStats() {
 
 export function getMetadata() {
   return DATA.metadata;
+}
+
+export function getEnsoForYear(year) {
+  if (!DATA.enso) return null;
+  const oni = DATA.enso[String(year)];
+  if (typeof oni !== 'number') return null;
+  const phase = oni >= 0.5 ? 'El Nino' : oni <= -0.5 ? 'La Nina' : 'Neutral';
+  return { oni, phase };
 }
 
 // Filter helpers
