@@ -189,11 +189,19 @@ export function renderLandfalls(landfalls, onSelect) {
     marker.on('click', (e) => {
       L.DomEvent.stopPropagation(e);
       clearHoveredMarker(marker);
+      announceToLiveRegion(tt);
       onSelect(lf, marker);
     });
     marker.addTo(landfallLayer);
     markersByEventKey.set(eventKey(lf), marker);
   }
+}
+
+function announceToLiveRegion(text) {
+  const el = document.getElementById('map-announce');
+  if (!el) return;
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = text; });
 }
 
 function shortCat(c) {
