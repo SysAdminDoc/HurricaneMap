@@ -77,10 +77,26 @@ export function getImpactsFor(stormId) {
   return DATA.impacts?.[stormId] || null;
 }
 
+function loadStormsViaWorker() {
+  return new Promise((resolve) => {
+    const worker = new Worker('src/storms-worker.js');
+    worker.addEventListener('message', (e) => {
+      worker.terminate();
+      if (e.data.ok && Array.isArray(e.data.storms)) resolve(e.data.storms);
+      else resolve(null);
+    });
+    worker.addEventListener('error', () => { worker.terminate(); resolve(null); });
+    worker.postMessage('load');
+  });
+}
+
 export function ensureStormsLoaded() {
   if (stormsLoaded) return Promise.resolve(DATA);
   if (stormsPromise) return stormsPromise;
-  stormsPromise = fetchJson('data/storms.json')
+  const loader = typeof Worker !== 'undefined'
+    ? loadStormsViaWorker().then(storms => storms || fetchJson('data/storms.json'))
+    : fetchJson('data/storms.json');
+  stormsPromise = loader
     .then(storms => {
       if (!Array.isArray(storms)) {
         throw new Error('storms.json did not contain an array');
