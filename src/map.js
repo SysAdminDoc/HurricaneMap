@@ -197,7 +197,7 @@ export function renderLandfalls(landfalls, onSelect) {
   }
 }
 
-function announceToLiveRegion(text) {
+export function announceToLiveRegion(text) {
   const el = document.getElementById('map-announce');
   if (!el) return;
   el.textContent = '';

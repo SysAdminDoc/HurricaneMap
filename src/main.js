@@ -3,7 +3,7 @@ import {
   loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
   searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
-import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap } from './map.js';
+import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
 import { initLocale, setLocale, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange } from './timeline.js';
@@ -544,9 +544,11 @@ function applyFilters() {
   currentVisibleLandfalls = visible;
   renderLandfalls(visible, onLandfallClick);
   const totalLandfalls = getLandfalls().length;
-  els.visibleCount.textContent = visible.length === totalLandfalls
+  const countText = visible.length === totalLandfalls
     ? `${visible.length.toLocaleString()} landfalls`
     : `${visible.length.toLocaleString()} of ${totalLandfalls.toLocaleString()}`;
+  els.visibleCount.textContent = countText;
+  announceToLiveRegion(`Showing ${countText}`);
   updateFilterResetState();
   if (filters.showTracks) {
     redrawTracks(visible);

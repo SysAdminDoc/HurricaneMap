@@ -16,7 +16,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL011955": {
@@ -36,7 +36,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL011959": {
@@ -56,7 +56,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL011966": {
@@ -76,7 +76,67 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL011968": {
+    "deaths": "6 indirect",
+    "damages": "450000",
+    "wiki_title": "Hurricane Abby (1968)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Abby_%281968%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 450000,
+    "damage_millions_usd": 0.45,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL011994": {
+    "deaths": "33 total",
+    "damages": "1030000000",
+    "wiki_title": "Tropical Storm Alberto (1994)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alberto_%281994%29",
+    "deaths_total": 33,
+    "deaths_min": 33,
+    "deaths_max": 33,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1030000000,
+    "damage_millions_usd": 1030.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL011995": {
+    "deaths": "1 direct",
+    "damages": "1700000",
+    "wiki_title": "Hurricane Allison (1995)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Allison_%281995%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1700000,
+    "damage_millions_usd": 1.7,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL021950": {
@@ -96,7 +156,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL021952": {
@@ -116,7 +176,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL021955": {
@@ -136,7 +196,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL021957": {
@@ -156,7 +216,147 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021970": {
+    "deaths": "1",
+    "damages": "500000",
+    "wiki_title": "Tropical Storm Becky (1970)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Becky_%281970%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 500000,
+    "damage_millions_usd": 0.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021972": {
+    "deaths": "128 direct",
+    "damages": "2100000000",
+    "wiki_title": "Hurricane Agnes",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Agnes",
+    "deaths_total": 128,
+    "deaths_min": 128,
+    "deaths_max": 128,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2100000000,
+    "damage_millions_usd": 2100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021985": {
+    "deaths": "5 indirect",
+    "damages": "20000000",
+    "wiki_title": "Hurricane Bob (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281985%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 20000000,
+    "damage_millions_usd": 20.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021986": {
+    "deaths": "5",
+    "damages": "42000000",
+    "wiki_title": "Hurricane Bonnie (1986)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Bonnie_%281986%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 42000000,
+    "damage_millions_usd": 42.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021988": {
+    "deaths": "1 direct",
+    "damages": "3000000",
+    "wiki_title": "Tropical Storm Beryl (1988)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%281988%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 3000000,
+    "damage_millions_usd": 3.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021989": {
+    "deaths": "11 direct",
+    "damages": "560000000",
+    "wiki_title": "Tropical Storm Allison (1989)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Allison_%281989%29",
+    "deaths_total": 11,
+    "deaths_min": 11,
+    "deaths_max": 11,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 560000000,
+    "damage_millions_usd": 560.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL021993": {
+    "deaths": "26 direct",
+    "damages": "60800000",
+    "wiki_title": "Tropical Storm Arlene (1993)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%281993%29",
+    "deaths_total": 26,
+    "deaths_min": 26,
+    "deaths_max": 26,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 60800000,
+    "damage_millions_usd": 60.8,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031953": {
@@ -176,7 +376,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031955": {
@@ -196,7 +396,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031956": {
@@ -216,7 +416,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031957": {
@@ -236,7 +436,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031960": {
@@ -256,7 +456,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031961": {
@@ -276,7 +476,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031964": {
@@ -296,7 +496,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL031965": {
@@ -316,7 +516,107 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL031968": {
+    "deaths": "| damage = 2700000",
+    "damages": "2700000",
+    "wiki_title": "Tropical Storm Candy (1968)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Candy_%281968%29",
+    "deaths_total": 2700000,
+    "deaths_min": 2700000,
+    "deaths_max": 2700000,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2700000,
+    "damage_millions_usd": 2.7,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL031983": {
+    "deaths": "21",
+    "damages": "3000000000",
+    "wiki_title": "Hurricane Alicia (1983)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Alicia_%281983%29",
+    "deaths_total": 21,
+    "deaths_min": 21,
+    "deaths_max": 21,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 3000000000,
+    "damage_millions_usd": 3000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL031988": {
+    "deaths": "6",
+    "damages": "2200000",
+    "wiki_title": "Tropical Storm Chris (1988)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chris_%281988%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2200000,
+    "damage_millions_usd": 2.2,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL031991": {
+    "deaths": "18",
+    "damages": "1470000000",
+    "wiki_title": "Hurricane Bob (1991)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281991%29",
+    "deaths_total": 18,
+    "deaths_min": 18,
+    "deaths_max": 18,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1470000000,
+    "damage_millions_usd": 1470.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL031994": {
+    "deaths": "5 total",
+    "damages": "74220000",
+    "wiki_title": "Tropical Storm Beryl (1994)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%281994%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 74220000,
+    "damage_millions_usd": 74.22,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL041959": {
@@ -336,7 +636,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL041963": {
@@ -356,7 +656,178 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041970": {
+    "deaths": "28",
+    "damages": "930000000",
+    "wiki_title": "Hurricane Celia (1970)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Celia_%281970%29",
+    "deaths_total": 28,
+    "deaths_min": 28,
+    "deaths_max": 28,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 930000000,
+    "damage_millions_usd": 930.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041978": {
+    "deaths": "33 direct",
+    "damages": "110000000",
+    "wiki_title": "Tropical Storm Amelia (1978)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Amelia_%281978%29",
+    "deaths_total": 33,
+    "deaths_min": 33,
+    "deaths_max": 33,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 110000000,
+    "damage_millions_usd": 110.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041979": {
+    "deaths": "1",
+    "damages": "20000000",
+    "wiki_title": "Hurricane Bob (1979)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281979%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 20000000,
+    "damage_millions_usd": 20.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041980": {
+    "deaths": "281",
+    "damages": "1570000000",
+    "wiki_title": "Hurricane Allen (1980)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Allen_%281980%29",
+    "deaths_total": 281,
+    "deaths_min": 281,
+    "deaths_max": 281,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1570000000,
+    "damage_millions_usd": 1570.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041983": {
+    "damages": null,
+    "wiki_title": "Hurricane Barry (1983)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Barry_%281983%29",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041985": {
+    "deaths": "5",
+    "damages": "100000000",
+    "wiki_title": "Hurricane Danny (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Danny_%281985%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 100000000,
+    "damage_millions_usd": 100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041989": {
+    "deaths": "13 direct",
+    "damages": "100000000",
+    "wiki_title": "Hurricane Chantal (1989)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Chantal_%281989%29",
+    "deaths_total": 13,
+    "deaths_min": 13,
+    "deaths_max": 13,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 100000000,
+    "damage_millions_usd": 100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041992": {
+    "deaths": "65 total",
+    "damages": "27300000000",
+    "wiki_title": "Hurricane Andrew (1992)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Andrew_%281992%29",
+    "deaths_total": 65,
+    "deaths_min": 65,
+    "deaths_max": 65,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 27300000000,
+    "damage_millions_usd": 27300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL041995": {
+    "deaths": "1 indirect",
+    "damages": "500000",
+    "wiki_title": "Tropical Storm Dean (1995)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dean_%281995%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 500000,
+    "damage_millions_usd": 0.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051950": {
@@ -376,7 +847,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051954": {
@@ -396,7 +867,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051957": {
@@ -416,7 +887,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051958": {
@@ -436,7 +907,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051959": {
@@ -451,7 +922,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051960": {
@@ -471,7 +942,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051961": {
@@ -491,7 +962,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051964": {
@@ -511,7 +982,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL051965": {
@@ -531,7 +1002,82 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL051982": {
+    "damages": "2000000",
+    "wiki_title": "Tropical Storm Chris (1982)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chris_%281982%29",
+    "damage_usd_nominal": 2000000,
+    "damage_millions_usd": 2.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL051985": {
+    "deaths": "9",
+    "damages": "1300000000",
+    "wiki_title": "Hurricane Elena",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Elena",
+    "deaths_total": 9,
+    "deaths_min": 9,
+    "deaths_max": 9,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1300000000,
+    "damage_millions_usd": 1300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL051986": {
+    "deaths": "15",
+    "damages": "15000000",
+    "wiki_title": "Hurricane Charley (1986)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Charley_%281986%29",
+    "deaths_total": 15,
+    "deaths_min": 15,
+    "deaths_max": 15,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 15000000,
+    "damage_millions_usd": 15.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL051995": {
+    "deaths": "16 (6 direct, 10 indirect)",
+    "damages": "700000000",
+    "wiki_title": "Hurricane Erin (1995)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Erin_%281995%29",
+    "deaths_total": 22,
+    "deaths_min": 22,
+    "deaths_max": 22,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 700000000,
+    "damage_millions_usd": 700.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL061954": {
@@ -551,7 +1097,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL061957": {
@@ -571,7 +1117,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL061960": {
@@ -591,7 +1137,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL061964": {
@@ -611,7 +1157,53 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL061977": {
+    "damages": "13000000",
+    "wiki_title": "Hurricane Babe (1977)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Babe_%281977%29",
+    "damage_usd_nominal": 13000000,
+    "damage_millions_usd": 13.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL061979": {
+    "deaths": "2 direct, 6 indirect",
+    "damages": "750000000",
+    "wiki_title": "Tropical Storm Claudette (1979)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%281979%29",
+    "deaths_total": 8,
+    "deaths_min": 8,
+    "deaths_max": 8,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 750000000,
+    "damage_millions_usd": 750.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL061983": {
+    "damages": null,
+    "wiki_title": "Tropical Storm Dean (1983)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dean_%281983%29",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL071956": {
@@ -631,7 +1223,63 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL071976": {
+    "deaths": "12",
+    "damages": "100000000",
+    "wiki_title": "Hurricane Belle (1976)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Belle_%281976%29",
+    "deaths_total": 12,
+    "deaths_min": 12,
+    "deaths_max": 12,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 100000000,
+    "damage_millions_usd": 100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL071988": {
+    "deaths": "1 direct",
+    "damages": "2900000",
+    "wiki_title": "Hurricane Florence (1988)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%281988%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2900000,
+    "damage_millions_usd": 2.9,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL071992": {
+    "deaths": "2 direct",
+    "damages": null,
+    "wiki_title": "Tropical Storm Danielle (1992)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danielle_%281992%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL081954": {
@@ -651,7 +1299,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL081955": {
@@ -671,7 +1319,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL081959": {
@@ -691,7 +1339,23 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL081976": {
+    "deaths": "4",
+    "damages": null,
+    "wiki_title": "Tropical Storm Dottie (1976)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dottie_%281976%29",
+    "deaths_total": 4,
+    "deaths_min": 4,
+    "deaths_max": 4,
+    "deaths_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL091951": {
@@ -711,7 +1375,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL091953": {
@@ -726,7 +1390,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL091966": {
@@ -746,7 +1410,87 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL091969": {
+    "deaths": ">348 total",
+    "damages": "1420000000",
+    "wiki_title": "Hurricane Camille (1969)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Camille_%281969%29",
+    "deaths_total": 348,
+    "deaths_min": 348,
+    "deaths_max": 348,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1420000000,
+    "damage_millions_usd": 1420.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL091971": {
+    "deaths": "7 direct",
+    "damages": "147600000",
+    "wiki_title": "Tropical Storm Doria (1971)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Doria_%281971%29",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 147600000,
+    "damage_millions_usd": 147.6,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL091979": {
+    "deaths": "2,078 total",
+    "damages": "1540000000",
+    "wiki_title": "Hurricane David (1979)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_David_%281979%29",
+    "deaths_total": 2078,
+    "deaths_min": 2078,
+    "deaths_max": 2078,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1540000000,
+    "damage_millions_usd": 1540.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL091985": {
+    "deaths": "14",
+    "damages": "900000000",
+    "wiki_title": "Hurricane Gloria",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gloria",
+    "deaths_total": 14,
+    "deaths_min": 14,
+    "deaths_max": 14,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 900000000,
+    "damage_millions_usd": 900.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL101959": {
@@ -766,7 +1510,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL101964": {
@@ -786,7 +1530,107 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL101973": {
+    "deaths": "2 direct, 3 indirect",
+    "damages": "6000000",
+    "wiki_title": "Tropical Storm Delia (1973)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Delia_%281973%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 6000000,
+    "damage_millions_usd": 6.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL101974": {
+    "deaths": "8",
+    "damages": "162000000",
+    "wiki_title": "Hurricane Carmen (1974)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Carmen_%281974%29",
+    "deaths_total": 8,
+    "deaths_min": 8,
+    "deaths_max": 8,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 162000000,
+    "damage_millions_usd": 162.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL101981": {
+    "deaths": "3",
+    "damages": "28500000",
+    "wiki_title": "Hurricane Dennis (1981)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dennis_%281981%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 28500000,
+    "damage_millions_usd": 28.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL101984": {
+    "deaths": "3 indirect",
+    "damages": "65500000",
+    "wiki_title": "Hurricane Diana (1984)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Diana_%281984%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 65500000,
+    "damage_millions_usd": 65.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL101985": {
+    "deaths": "60 total",
+    "damages": "4520",
+    "wiki_title": "Tropical Storm Henri (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Henri_%281985%29",
+    "deaths_total": 60,
+    "deaths_min": 60,
+    "deaths_max": 60,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 4520000000,
+    "damage_millions_usd": 4520.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL111950": {
@@ -806,7 +1650,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL111959": {
@@ -826,7 +1670,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL111964": {
@@ -846,7 +1690,107 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL111971": {
+    "deaths": "2 indirect",
+    "damages": "30200000",
+    "wiki_title": "Hurricane Fern (1971)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Fern_%281971%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 30200000,
+    "damage_millions_usd": 30.2,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL111979": {
+    "deaths": "12",
+    "damages": "1770000000",
+    "wiki_title": "Hurricane Frederic",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Frederic",
+    "deaths_total": 12,
+    "deaths_min": 12,
+    "deaths_max": 12,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1770000000,
+    "damage_millions_usd": 1770.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL111980": {
+    "deaths": "3 direct",
+    "damages": "25000000",
+    "wiki_title": "Tropical Storm Danielle (1980)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danielle_%281980%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 25000000,
+    "damage_millions_usd": 25.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL111985": {
+    "deaths": "60 total",
+    "damages": "4520",
+    "wiki_title": "Tropical Storm Isabel (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Isabel_%281985%29",
+    "deaths_total": 60,
+    "deaths_min": 60,
+    "deaths_max": 60,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 4520000000,
+    "damage_millions_usd": 4520.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL111989": {
+    "deaths": "107 (67 direct, 40 indirect)",
+    "damages": "11000000000",
+    "wiki_title": "Hurricane Hugo (1989)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hugo_%281989%29",
+    "deaths_total": 174,
+    "deaths_min": 174,
+    "deaths_max": 174,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 11000000000,
+    "damage_millions_usd": 11000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL121953": {
@@ -866,7 +1810,67 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL121985": {
+    "deaths": "12",
+    "damages": "1500000000",
+    "wiki_title": "Hurricane Juan (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Juan_%281985%29",
+    "deaths_total": 12,
+    "deaths_min": 12,
+    "deaths_max": 12,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1500000000,
+    "damage_millions_usd": 1500.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL121988": {
+    "deaths": "None reported",
+    "damages": "7300000",
+    "wiki_title": "Tropical Storm Keith (1988)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Keith_%281988%29",
+    "deaths_total": 0,
+    "deaths_min": 0,
+    "deaths_max": 0,
+    "deaths_qualifier": "zero",
+    "damage_usd_nominal": 7300000,
+    "damage_millions_usd": 7.3,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL121994": {
+    "deaths": "1,152",
+    "damages": "594000000",
+    "wiki_title": "Hurricane Gordon (1994)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gordon_%281994%29",
+    "deaths_total": 1152,
+    "deaths_min": 1152,
+    "deaths_max": 1152,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 594000000,
+    "damage_millions_usd": 594.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL131950": {
@@ -886,7 +1890,107 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL131967": {
+    "deaths": "59 direct",
+    "damages": "234600000",
+    "wiki_title": "Hurricane Beulah (1967)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Beulah_%281967%29",
+    "deaths_total": 59,
+    "deaths_min": 59,
+    "deaths_max": 59,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 234600000,
+    "damage_millions_usd": 234.6,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL131971": {
+    "deaths": "37 direct",
+    "damages": "25400000",
+    "wiki_title": "Hurricane Edith (1971)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Edith_%281971%29",
+    "deaths_total": 37,
+    "deaths_min": 37,
+    "deaths_max": 37,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 25400000,
+    "damage_millions_usd": 25.4,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL131975": {
+    "deaths": "80 direct",
+    "damages": "560000000",
+    "wiki_title": "Hurricane Eloise (1975)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Eloise_%281975%29",
+    "deaths_total": 80,
+    "deaths_min": 80,
+    "deaths_max": 80,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 560000000,
+    "damage_millions_usd": 560.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL131985": {
+    "deaths": "15 total",
+    "damages": "700000000",
+    "wiki_title": "Hurricane Kate (1985)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Kate_%281985%29",
+    "deaths_total": 15,
+    "deaths_min": 15,
+    "deaths_max": 15,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 700000000,
+    "damage_millions_usd": 700.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL131987": {
+    "deaths": "1 reported",
+    "damages": "500000",
+    "wiki_title": "Hurricane Floyd (1987)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Floyd_%281987%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 500000,
+    "damage_millions_usd": 0.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   },
   "AL141954": {
@@ -906,7 +2010,182 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-05-05T08:30:43Z"
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL141967": {
+    "deaths": "3",
+    "damages": "150000",
+    "wiki_title": "Hurricane Doria (1967)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Doria_%281967%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 150000,
+    "damage_millions_usd": 0.15,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL141968": {
+    "deaths": "11",
+    "damages": "18700000",
+    "wiki_title": "Hurricane Gladys (1968)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gladys_%281968%29",
+    "deaths_total": 11,
+    "deaths_min": 11,
+    "deaths_max": 11,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 18700000,
+    "damage_millions_usd": 18.7,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL141971": {
+    "deaths": "1 direct",
+    "damages": "10000000",
+    "wiki_title": "Hurricane Ginger (1971)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ginger_%281971%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 10000000,
+    "damage_millions_usd": 10.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL141989": {
+    "deaths": "3 direct",
+    "damages": "70000000",
+    "wiki_title": "Hurricane Jerry (1989)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Jerry_%281989%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 70000000,
+    "damage_millions_usd": 70.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL151981": {
+    "deaths": "14 total",
+    "damages": "88.7",
+    "wiki_title": "Hurricane Gert (1981)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gert_%281981%29",
+    "deaths_total": 14,
+    "deaths_min": 14,
+    "deaths_max": 14,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 88700000,
+    "damage_millions_usd": 88.7,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL151984": {
+    "deaths": "1 indirect",
+    "damages": "1000000",
+    "wiki_title": "Tropical Storm Isidore (1984)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Isidore_%281984%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1000000,
+    "damage_millions_usd": 1.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL161969": {
+    "damages": "3500000",
+    "wiki_title": "Hurricane Gerda (1969)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gerda_%281969%29",
+    "damage_usd_nominal": 3500000,
+    "damage_millions_usd": 3.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL171995": {
+    "deaths": "63 total",
+    "damages": "4700000000",
+    "wiki_title": "Hurricane Opal (1995)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Opal_%281995%29",
+    "deaths_total": 63,
+    "deaths_min": 63,
+    "deaths_max": 63,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 4700000000,
+    "damage_millions_usd": 4700.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
+    }
+  },
+  "AL241969": {
+    "deaths": "535 total",
+    "damages": "1495",
+    "wiki_title": "Tropical Storm Jenny (1969)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Jenny_%281969%29",
+    "deaths_total": 535,
+    "deaths_min": 535,
+    "deaths_max": 535,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1495000000,
+    "damage_millions_usd": 1495.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-20T02:48:25Z"
     }
   }
 }
