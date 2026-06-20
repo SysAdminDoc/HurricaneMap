@@ -550,6 +550,18 @@ label > input[type="checkbox"] {
   padding: 18px 22px 22px;
   font-size: 13px;
   line-height: 1.55;
+  container-type: inline-size;
+  container-name: side-panel;
+}
+
+@container side-panel (max-width: 360px) {
+  .stat-grid { grid-template-columns: 1fr !important; }
+  .panel-section-h3 { font-size: 11px; }
+  .landfall-list-item { padding: 6px 4px; }
+}
+@container side-panel (max-width: 300px) {
+  .compare-row { flex-direction: column; }
+  .cat-pill { font-size: 10px; padding: 1px 4px; }
 }
 
 /* User-tuned storm-panel sizing — natural height, capped to the viewport so
