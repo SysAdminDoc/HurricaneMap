@@ -2357,14 +2357,6 @@ section.storm-panel.glass {
   animation: spinSmooth 2.5s cubic-bezier(0.4, 0.0, 0.2, 1.0) infinite;
 }
 
-/* Enhanced reduced-motion support */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
 
 /* Phase 2: Panel Transitions & Animations */
 .filters,
@@ -2740,30 +2732,6 @@ a:focus-visible, [role="button"]:focus-visible {
   box-shadow: inset 0 0 0 1px rgba(137, 180, 250, 0.2);
 }
 
-/* Phase 3: Reduced Motion Enhancements */
-@media (prefers-reduced-motion: reduce) {
-  .glass::before,
-  .stat-grid .stat::before,
-  .storm-panel h2::after,
-  .cat-btn::before,
-  .search-results li::before {
-    display: none;
-  }
-
-  .stat-tile:hover,
-  .stat-group:hover,
-  .cat-btn:hover {
-    transform: none;
-  }
-
-  .stat-tile,
-  .cat-btn,
-  button,
-  input,
-  select {
-    transition: none !important;
-  }
-}
 
 /* Phase 3: Print Styles for Better Rendering */
 @media print {
@@ -4282,16 +4250,6 @@ kbd {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .storm-loading-dot,
-  .hurricane-icon,
-  .onb-spotlight,
-  .onb-overlay,
-  .hm-toast {
-    animation: none !important;
-    transition: none !important;
-  }
-}
 
 /* ==========================================================================
    Premium polish pass v1.3.1
@@ -5194,16 +5152,6 @@ body.side-panel-open .season-summary {
 
   .season-summary {
     display: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.side-panel-open .leaflet-control-container .leaflet-right,
-  body.side-panel-open .filters,
-  body.side-panel-open .timeline-ribbon,
-  body.side-panel-open .season-summary {
-    transition: none !important;
-    transform: none !important;
   }
 }
 
@@ -7139,9 +7087,16 @@ html.high-contrast .globe3d-topbar {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .hurricane-glyph { animation: none !important; }
-  .ab-pulse { animation: none !important; }
-  .loading .spinner { animation: none !important; }
+  .hurricane-glyph, .ab-pulse, .loading .spinner,
+  .storm-loading-dot, .hurricane-icon, .onb-spotlight,
+  .onb-overlay, .hm-toast { animation: none !important; }
+  .glass::before, .stat-grid .stat::before,
+  .storm-panel h2::after, .cat-btn::before,
+  .search-results li::before { display: none; }
+  body.side-panel-open .leaflet-control-container .leaflet-right,
+  body.side-panel-open .filters,
+  body.side-panel-open .timeline-ribbon,
+  body.side-panel-open .season-summary { transform: none !important; }
 }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
   animation-duration: 0.01ms !important;
