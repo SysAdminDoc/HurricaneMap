@@ -42,4 +42,8 @@ assert.equal(imageOptions.image.format, 'auto', 'image requests should opt into 
 const radarOptions = cloudflareFetchOptions('/data/radar/Katrina-2005/t_200508291200.png', cachePolicyFor('/data/radar/Katrina-2005/t_200508291200.png'));
 assert.equal(radarOptions.image, undefined, 'radar frames should not be transformed because coordinates depend on exact rasters');
 
+// Verify NHC proxy route is declared
+import workerModule from '../cloudflare/worker.js';
+assert.equal(typeof workerModule.fetch, 'function', 'worker should export a fetch handler');
+
 console.log('cloudflare worker policy ok');

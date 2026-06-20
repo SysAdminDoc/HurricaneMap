@@ -23,6 +23,16 @@ const POLICIES = {
   },
 };
 
+const NHC_PROXY_ALLOWLIST = {
+  '/nhc/CurrentStorms.json': 'https://www.nhc.noaa.gov/CurrentStorms.json',
+};
+
+const NHC_POLICY = {
+  browser: 'public, max-age=60, stale-while-revalidate=300',
+  edge: 'public, s-maxage=120, stale-while-revalidate=600',
+  edgeTtl: 120,
+};
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
@@ -30,6 +40,12 @@ export default {
     }
 
     const requestUrl = new URL(request.url);
+
+    const nhcTarget = NHC_PROXY_ALLOWLIST[requestUrl.pathname];
+    if (nhcTarget) {
+      return handleNhcProxy(nhcTarget, request, ctx);
+    }
+
     const originUrl = originUrlFor(requestUrl, env);
     const policy = cachePolicyFor(requestUrl.pathname);
     const cacheKey = new Request(originUrl.href, request);
@@ -50,6 +66,36 @@ export default {
     return tagCacheStatus(finalResponse, 'MISS');
   },
 };
+
+async function handleNhcProxy(targetUrl, request, ctx) {
+  const cache = caches.default;
+  const cacheKey = new Request(targetUrl, request);
+
+  const cached = await cache.match(cacheKey);
+  if (cached) return addCorsHeaders(tagCacheStatus(cached, 'HIT'));
+
+  const response = await fetch(targetUrl, {
+    headers: { 'User-Agent': 'HurricaneMap/1.0 (https://github.com/SysAdminDoc/HurricaneMap)' },
+    cf: { cacheEverything: true, cacheTtl: NHC_POLICY.edgeTtl },
+  });
+
+  const finalResponse = applyResponseHeaders(response, NHC_POLICY);
+  if (finalResponse.ok) {
+    ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
+  }
+  return addCorsHeaders(tagCacheStatus(finalResponse, 'MISS'));
+}
+
+function addCorsHeaders(response) {
+  const headers = new Headers(response.headers);
+  headers.set('Access-Control-Allow-Origin', '*');
+  headers.set('Access-Control-Allow-Methods', 'GET, HEAD');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 export function classifyAsset(pathname) {
   const path = normalizePath(pathname);

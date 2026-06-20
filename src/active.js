@@ -19,13 +19,11 @@ import {
 import { hideGoesRealtimeContext, renderGoesRealtimeContext } from './goes-realtime.js';
 import { getSetting } from './settings.js';
 
-// Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
-// NHC's CurrentStorms.json doesn't send CORS headers, so route through a public
-// CORS proxy. The endpoint payload is tiny, but the active-season scheduler is
-// intentionally advisory-aware so the app stays polite to NHC/proxy services.
-const CURRENT_URL = 'https://corsproxy.io/?url=' + encodeURIComponent('https://www.nhc.noaa.gov/CurrentStorms.json');
+const NHC_DIRECT = 'https://www.nhc.noaa.gov/CurrentStorms.json';
+const NHC_CF_PROXY = '/nhc/CurrentStorms.json';
+const NHC_FALLBACK = 'https://corsproxy.io/?url=' + encodeURIComponent(NHC_DIRECT);
 const REQUEST_TIMEOUT_MS = 12 * 1000;
 
 let layerGroup = null;
@@ -112,26 +110,34 @@ async function fetchAndRender() {
   renderActive(storms);
 }
 
+function resolveProxyUrl() {
+  try {
+    const origin = new URL(location.origin);
+    if (origin.hostname === 'localhost' || origin.hostname === '127.0.0.1') {
+      return NHC_FALLBACK;
+    }
+  } catch { /* fall through */ }
+  return NHC_CF_PROXY;
+}
+
+async function tryFetch(url, signal) {
+  const response = await fetch(url, { cache: 'no-cache', signal });
+  if (response.status === 429) return { ok: false, status: 429, storms: [] };
+  if (!response.ok) return { ok: false, status: response.status || 0, storms: [] };
+  const data = await response.json();
+  return { ok: true, status: response.status, storms: (data && data.activeStorms) || [] };
+}
+
 async function fetchCurrentStorms() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch(CURRENT_URL, {
-      cache: 'no-cache',
-      signal: controller.signal,
-    });
-    if (response.status === 429) {
-      return { ok: false, status: 429, storms: [] };
-    }
-    if (!response.ok) {
-      return { ok: false, status: response.status || 0, storms: [] };
-    }
-    const data = await response.json();
-    return {
-      ok: true,
-      status: response.status,
-      storms: (data && data.activeStorms) || [],
-    };
+    const primaryUrl = resolveProxyUrl();
+    try {
+      return await tryFetch(primaryUrl, controller.signal);
+    } catch { /* primary failed, try fallback */ }
+    const fallbackUrl = primaryUrl === NHC_CF_PROXY ? NHC_FALLBACK : NHC_CF_PROXY;
+    return await tryFetch(fallbackUrl, controller.signal);
   } catch (error) {
     return { ok: false, status: 0, storms: [], error };
   } finally {
