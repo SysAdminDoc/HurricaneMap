@@ -276,6 +276,9 @@ async function boot() {
   if (getSetting('highContrast')) {
     document.documentElement.classList.add('high-contrast');
   }
+  if (getSetting('reducedMotion')) {
+    document.documentElement.classList.add('reduce-motion');
+  }
   const map = initMap();
   await loadInitial();
   syncYearBoundsFromData();
@@ -384,6 +387,10 @@ function wireSettingsControls() {
     if (hcToggle) {
       hcToggle.checked = getSetting('highContrast');
     }
+    const rmToggle = menu.querySelector('#toggle-reduced-motion');
+    if (rmToggle) {
+      rmToggle.checked = getSetting('reducedMotion');
+    }
   }
   syncMenu();
 
@@ -443,11 +450,18 @@ function wireSettingsControls() {
     });
   }
 
-  // High-contrast accessibility toggle
   const hcToggle = menu.querySelector('#toggle-high-contrast');
   if (hcToggle) {
     hcToggle.addEventListener('change', () => {
       setSetting('highContrast', hcToggle.checked);
+    });
+  }
+
+  const rmToggle = menu.querySelector('#toggle-reduced-motion');
+  if (rmToggle) {
+    rmToggle.addEventListener('change', () => {
+      setSetting('reducedMotion', rmToggle.checked);
+      document.documentElement.classList.toggle('reduce-motion', rmToggle.checked);
     });
   }
 

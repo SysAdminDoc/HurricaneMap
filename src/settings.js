@@ -15,6 +15,7 @@ const DEFAULTS = {
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' (English | Spanish)
   highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
+  reducedMotion: false,    // In-app override: reduce animations independent of OS setting
   onboarded: false,
 };
 
@@ -30,6 +31,7 @@ const BOOLEAN_KEYS = new Set([
   'nhcForecastCone',
   'goesRealtime',
   'highContrast',
+  'reducedMotion',
   'onboarded',
 ]);
 
@@ -159,6 +161,7 @@ export function applyThemeToRoot() {
 }
 
 export function prefersReducedMotion() {
+  if (getSetting('reducedMotion')) return true;
   return typeof window !== 'undefined' &&
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
