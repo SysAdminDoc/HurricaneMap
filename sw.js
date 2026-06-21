@@ -11,7 +11,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q24';
+const SW_VERSION = 'hm-v1.3.9-q25';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -71,6 +71,7 @@ const SHELL_ASSETS = [
   './src/storm-events.js',
   './src/storms-worker.js',
   './src/sst.js',
+  './src/svg-export.js',
   './src/surge.js',
   './src/table-view.js',
   './src/url-state.js',

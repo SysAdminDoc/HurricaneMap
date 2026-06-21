@@ -255,6 +255,7 @@ function render(storm, landfall, allStorms) {
           <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
           <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
           <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
+          <button class="export-btn" data-export="svg_map" title="SVG track map — publication-quality vector graphic">SVG map</button>
           <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
         </div>
 
@@ -321,8 +322,13 @@ function render(storm, landfall, allStorms) {
   // Export menu — generate Blob client-side and trigger a download.
   panel.querySelectorAll('.export-btn').forEach((btn) => {
     if (btn.id === 'share-btn') return;
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const kind = btn.dataset.export;
+      if (kind === 'svg_map') {
+        const { exportTrackSVG } = await import('./svg-export.js');
+        await exportTrackSVG(storm.id);
+        return;
+      }
       const exports = buildExports(storm);
       if (exports[kind]) downloadBlob(exports[kind]);
     });
