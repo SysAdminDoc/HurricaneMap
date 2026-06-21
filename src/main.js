@@ -854,13 +854,18 @@ function wireUI() {
   }
 
   // Reset
-  els.resetFilters.addEventListener('click', () => {
+  els.resetFilters.addEventListener('click', async () => {
     resetPrimaryFilters(filters, yearDefaults());
     syncFilterUiFromState();
     els.surgeCategory.value = '';
     els.showPopulation.checked = false;
     setSurgeCategoryLazy(null);
     setPopulationLazy(false);
+    if (els.showSST?.checked) {
+      els.showSST.checked = false;
+      const { setSSTVisible } = await loadSST();
+      setSSTVisible(false);
+    }
     lastTracksKey = '';
     applyFilters();
   });

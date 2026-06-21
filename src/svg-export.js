@@ -1,5 +1,5 @@
 import { ensureStormsLoaded, getStorm, categoryColor, categoryLabel, windToCategory } from './data.js';
-import { formatStormName } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 
 const SVG_W = 800;
 const SVG_H = 500;
@@ -43,8 +43,9 @@ function buildTrackSegments(track, bounds) {
 }
 
 function buildLandfallDots(storm, bounds) {
-  if (!storm.landfalls) return [];
-  return storm.landfalls.map(lf => {
+  const lfs = storm.us_landfalls || storm.landfalls || [];
+  if (!lfs.length) return [];
+  return lfs.map(lf => {
     const [cx, cy] = project(lf.lat, lf.lon, bounds);
     const cat = windToCategory(lf.wind);
     return { cx, cy, color: categoryColor(cat), label: categoryLabel(lf.category ?? cat) };
@@ -79,7 +80,7 @@ export async function exportTrackSVG(stormId) {
   const legend = buildLegend();
 
   const name = formatStormName(storm.name);
-  const title = `${name} (${storm.year})`;
+  const title = escapeHtml(`${name} (${storm.year})`);
 
   const trackLines = segs.map(s =>
     `<line x1="${s.x1.toFixed(1)}" y1="${s.y1.toFixed(1)}" x2="${s.x2.toFixed(1)}" y2="${s.y2.toFixed(1)}" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round"/>`

@@ -35,7 +35,7 @@ export const DEFAULT_STORM_VECTOR_STATS = {
  *  Returned in 10⁴ kt² units (the conventional "ACE units"); typical
  *  Atlantic season is ~100, a major hurricane alone is ~10-30. */
 export function computeACE(track) {
-  if (!Array.isArray(track) || track.length === 0) return 0;
+  if (!Array.isArray(track) || track.length === 0) return { value: 0, obs_count: 0 };
   let ace = 0;
   let count = 0;
   for (const r of track) {
@@ -562,7 +562,7 @@ export function getStormVector(storm, stats = null) {
   
   const genesis_month = getGenesisMonth(storm, track);
 
-  const normalize = (val, min, max) => Math.max(0, Math.min(1, (val - min) / (max - min)));
+  const normalize = (val, min, max) => max === min ? 0 : Math.max(0, Math.min(1, (val - min) / (max - min)));
   
   return [
     normalize(peak_wind, s.wind_min, s.wind_max),
@@ -877,21 +877,16 @@ export function generateStormBiography(storm, impacts) {
   // Genesis info: month + region estimate
   const genesisDate = new Date(storm.track[0]?.t || '');
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const genesisMonth = months[genesisDate.getUTCMonth()] || '?';
-  
-  // Estimate region from first track point
+  const genesisMonth = Number.isNaN(genesisDate.getTime()) ? '?' : (months[genesisDate.getUTCMonth()] || '?');
+
   const firstLat = storm.track[0]?.lat || 0;
   const firstLon = storm.track[0]?.lon || 0;
   let region = 'the Atlantic basin';
-  if (firstLon < -100) {
-    if (firstLat > 15) region = 'the eastern Atlantic';
-    else region = 'the central Atlantic';
-  } else if (firstLon < -70) {
-    if (firstLat > 25) region = 'the central Atlantic';
-    else region = 'the Caribbean';
-  } else {
-    region = 'off the African coast';
-  }
+  if (firstLon < -100) region = 'the Gulf of Mexico';
+  else if (firstLon < -70 && firstLat < 25) region = 'the Caribbean';
+  else if (firstLon < -70) region = 'the western Atlantic';
+  else if (firstLon < -30) region = 'the central Atlantic';
+  else region = 'off the African coast';
   
   // Landfall info
   const landfallStates = storm.us_landfalls ? [...new Set(storm.us_landfalls.map(lf => lf.state))] : [];

@@ -248,7 +248,7 @@ export function categoryColor(cat) {
 }
 
 export function windToCategory(kt) {
-  if (kt == null || kt < 34) return 0;
+  if (kt == null || !Number.isFinite(kt) || kt < 34) return 0;
   if (kt < 64) return -1;
   if (kt < 83) return 1;
   if (kt < 96) return 2;

@@ -100,7 +100,7 @@ function render(storm, landfall, allStorms) {
   const heading = isUnnamed ? `${storm.year} unnamed ${storm.basin === 'EP' ? 'Pacific' : 'Atlantic'} storm` : `${niceName} (${storm.year})`;
   const peakCat = windToCategory(storm.peak_wind_kt);
   const peakLabel = categoryLabel(peakCat);
-  const lfCat = storm.landfall_max_category;
+  const lfCat = storm.landfall_max_category ?? -1;
   const lfLabel = categoryLabel(lfCat);
 
   const wikiUrl = wikipediaUrl(storm);
@@ -201,7 +201,7 @@ function render(storm, landfall, allStorms) {
           <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
           <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
           <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
-          <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count}</div></div>
+          <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count ?? 0}</div></div>
           ${exposureTile}
           ${riRiskTile}
         </div>
@@ -733,15 +733,14 @@ function renderDaysAtIntensity(host, track) {
   `;
 }
 
-let rainfallCache = null;
-async function loadRainfall() {
-  if (rainfallCache) return rainfallCache;
-  try {
-    const res = await fetch('./data/rainfall.json');
-    if (!res.ok) return null;
-    rainfallCache = await res.json();
-  } catch { rainfallCache = null; }
-  return rainfallCache;
+let rainfallPromise = null;
+function loadRainfall() {
+  if (!rainfallPromise) {
+    rainfallPromise = fetch('./data/rainfall.json')
+      .then(res => res.ok ? res.json() : null)
+      .catch(() => null);
+  }
+  return rainfallPromise;
 }
 
 async function renderRainfallBlock(host, storm) {

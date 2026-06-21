@@ -123,6 +123,7 @@ export class TrackAnimator {
   }
 
   async play(storm, { onEnd, controlsHost, onStateChange } = {}) {
+    if (!storm.track?.length) return;
     this.stop({ silent: true });
     this.storm = storm;
     this.densifiedTrack = this.densify(storm.track);

@@ -117,6 +117,11 @@ html.light-theme {
   --blue:    #1e66f5;
   --lavender:#7c3aed;
   --sapphire:#04a5e5;
+  --sky:     #04a5e5;
+  --peach:   #fe640b;
+  --yellow:  #df8e1d;
+  --red:     #d20f39;
+  --green:   #40a02b;
 
   --cat-ts:  #04a5e5;  /* sapphire */
   --cat-1:   #40a02b;  /* green */
@@ -1154,15 +1159,15 @@ section.storm-panel.glass {
 
 /* Diff highlighting in comparison table */
 .cp-cell-max {
-  background: rgba(166, 227, 161, 0.15) !important;
+  background: color-mix(in srgb, var(--green) 15%, transparent) !important;
   font-weight: 600;
-  color: #a6e3a1;
+  color: var(--green);
 }
 
 .cp-cell-min {
-  background: rgba(243, 139, 168, 0.15) !important;
+  background: color-mix(in srgb, var(--red) 15%, transparent) !important;
   font-weight: 600;
-  color: #f38ba8;
+  color: var(--red);
 }
 
 .compare-track {
@@ -1376,8 +1381,8 @@ section.storm-panel.glass {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f38ba8;
-  box-shadow: 0 0 12px #f38ba8;
+  background: var(--error);
+  box-shadow: 0 0 12px var(--error);
   animation: ab-pulse 1.4s ease-in-out infinite;
 }
 .active-badge[data-state="updated"] .ab-pulse,
@@ -2247,8 +2252,8 @@ section.storm-panel.glass {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #f38ba8;
-  box-shadow: 0 0 8px #f38ba8;
+  background: var(--error);
+  box-shadow: 0 0 8px var(--error);
   animation: radar-pip 1.4s ease-in-out infinite;
 }
 @keyframes radar-pip {
@@ -3782,9 +3787,9 @@ html.light-theme .panel-sticky-header {
 
 .hm-toast {
   padding: 10px 12px;
-  border: 1px solid rgba(205, 214, 244, 0.14);
+  border: 1px solid var(--glass-edge);
   border-radius: 10px;
-  background: rgba(24, 24, 37, 0.92);
+  background: var(--glass-bg);
   color: var(--text);
   box-shadow: var(--shadow-md);
   opacity: 0;
@@ -7020,6 +7025,12 @@ html.high-contrast .globe3d-topbar {
 .sp-list li:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
 .sp-name { font-weight: 600; }
 .sp-meta { font-size: 11px; color: var(--subtext); }
+
+.panel-info-card { padding: 12px; border: 1px solid var(--surface1); border-radius: 10px; background: var(--surface0); margin-top: 8px; }
+.info-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--subtext); margin-bottom: 4px; }
+.info-card-value { font-size: 15px; font-weight: 600; color: var(--text); }
+.info-card-source { font-size: 11px; color: var(--subtext); margin-top: 6px; }
+.info-card-source a { color: var(--sapphire); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

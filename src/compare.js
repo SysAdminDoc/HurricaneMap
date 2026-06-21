@@ -99,7 +99,7 @@ export function clearAll() {
 function drawTrack(storm, color) {
   const map = getMap();
   const group = L.layerGroup();
-  const track = storm.track;
+  const track = storm.track || [];
   for (let i = 1; i < track.length; i++) {
     const a = track[i - 1];
     const b = track[i];
@@ -167,7 +167,7 @@ function renderComparePanel() {
     const lfLabel = categoryLabel(s.landfall_max_category);
     const lfClass = categoryClass(s.landfall_max_category);
     const minPres = s.min_pres_mb ? `${s.min_pres_mb} mb` : '—';
-    const states = [...new Set(s.us_landfalls.map(lf => lf.state))].join(' · ');
+    const states = [...new Set((s.us_landfalls || []).map(lf => lf.state))].join(' · ');
     return `
       <div class="cp-card" style="--pin-color:${p.color}">
         <div class="cp-card-head">
@@ -287,10 +287,7 @@ function exportComparisonCSV(storms) {
   const rows = [
     ['Peak wind (kt)', p => p.storm.peak_wind_kt],
     ['Min pressure (mb)', p => p.storm.min_pres_mb],
-    ['Peak category', p => {
-      const cat = windToCategory(p.storm.peak_wind_kt);
-      return cat === -1 ? 'TS' : cat === 0 ? 'TD' : `Cat ${cat}`;
-    }],
+    ['Peak category', p => categoryLabel(windToCategory(p.storm.peak_wind_kt))],
     ['Landfall category', p => {
       const cat = p.storm.landfall_max_category;
       return cat === -1 ? 'TS' : cat === 0 ? 'TD' : cat ? `Cat ${cat}` : '—';

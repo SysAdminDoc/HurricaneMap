@@ -9,7 +9,7 @@ export async function loadStormEvents() {
         if (!response.ok) throw new Error(`Storm Events data returned ${response.status}`);
         return response.json();
       })
-      .catch(() => null);
+      .catch(() => { stormEventsPromise = null; return null; });
   }
   return stormEventsPromise;
 }

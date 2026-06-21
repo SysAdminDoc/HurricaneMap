@@ -35,7 +35,7 @@ const seen = new Set();
 
 for (const required of [
   './data/landfalls.json',
-  './data/storms.json',
+  './data/storms.json.gz',
   './data/stats.json',
   './data/metadata.json',
   './data/us-states.geojson',
