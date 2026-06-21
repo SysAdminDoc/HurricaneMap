@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11111b" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cesium.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu; connect-src 'self' https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io https://cesium.com https://*.cesium.com; font-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cesium.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://coastwatch.pfeg.noaa.gov; connect-src 'self' https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io https://cesium.com https://*.cesium.com; font-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
   <meta name="description" content="HurricaneMap — Interactive map of every U.S. hurricane landfall on record (1851-present), built from NOAA's HURDAT2 best-track database." />
   <meta property="og:title" content="HurricaneMap — 174 Years of U.S. Hurricane Landfalls" />
   <meta property="og:description" content="Interactive map of 596 storms and 760 landfall events drawn from NOAA's HURDAT2 database (1851-2025). Track animation, archived NEXRAD radar, storm comparison, and publication-ready exports." />
@@ -222,6 +222,10 @@
         <label class="toggle-row">
           <input type="checkbox" id="show-population" />
           <span>Population density</span>
+        </label>
+        <label class="toggle-row">
+          <input type="checkbox" id="show-sst" />
+          <span>Sea surface temp (SST)</span>
         </label>
         <div class="layer-select">
           <label for="surge-category" class="layer-select-label">Storm surge</label>

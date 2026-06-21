@@ -66,6 +66,7 @@ const loadReport = once(() => import('./report.js'));
 const loadQgis = once(() => import('./qgis.js'));
 const loadTableView = once(() => import('./table-view.js'));
 const loadSpatialSearch = once(() => import('./spatial-search.js'));
+const loadSST = once(() => import('./sst.js'));
 
 async function showStormLazy(landfall) {
   const { showStorm } = await loadPanel();
@@ -129,6 +130,7 @@ const els = {
   showRetiredOnly: document.getElementById('show-retired-only'),
   surgeCategory: document.getElementById('surge-category'),
   showPopulation: document.getElementById('show-population'),
+  showSST: document.getElementById('show-sst'),
   resetFilters: document.getElementById('reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
@@ -842,6 +844,14 @@ function wireUI() {
   els.showPopulation.addEventListener('change', () => {
     setPopulationLazy(els.showPopulation.checked);
   });
+
+  // Sea surface temperature overlay.
+  if (els.showSST) {
+    els.showSST.addEventListener('change', async () => {
+      const { setSSTVisible } = await loadSST();
+      setSSTVisible(els.showSST.checked);
+    });
+  }
 
   // Reset
   els.resetFilters.addEventListener('click', () => {

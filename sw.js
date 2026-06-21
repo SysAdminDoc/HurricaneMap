@@ -70,6 +70,7 @@ const SHELL_ASSETS = [
   './src/seasonal-outlook.js',
   './src/storm-events.js',
   './src/storms-worker.js',
+  './src/sst.js',
   './src/surge.js',
   './src/table-view.js',
   './src/url-state.js',
