@@ -255,11 +255,49 @@ try {
   assert(/RI risk category,[^\n]*(low|medium|high)/i.test(csv), 'comparison export did not include RI risk categories.');
 
   await context.close();
-  await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce})`);
+  // Mobile viewport pass (430x900)
+  const mobileContext = await browser.newContext({
+    viewport: { width: 430, height: 900 },
+    serviceWorkers: 'block',
+  });
+  await mobileContext.addInitScript(() => {
+    localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
+  });
+  const mobilePage = await mobileContext.newPage();
+  const mobileErrors = [];
+  mobilePage.on('pageerror', error => mobileErrors.push(error.message));
+
+  await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await mobilePage.waitForFunction(() => {
+    const loading = document.querySelector('#loading');
+    const visible = document.querySelector('#visible-count')?.textContent || '';
+    return loading && loading.style.display === 'none' && /landfalls/.test(visible);
+  }, { timeout: 20000 });
+
+  const mobileState = await mobilePage.evaluate(() => ({
+    visible: document.querySelector('#visible-count')?.textContent || '',
+    filtersHidden: document.querySelector('#filters')?.hidden || document.querySelector('#filters')?.offsetWidth === 0,
+    mapVisible: document.querySelector('#map')?.offsetWidth > 0,
+  }));
+  assert(/landfalls/.test(mobileState.visible), `mobile: visible-count did not render: ${mobileState.visible}`);
+  assert(mobileState.mapVisible, 'mobile: map is not visible');
+
+  await mobilePage.click('#toggle-filters');
+  await mobilePage.waitForFunction(() => {
+    const filters = document.querySelector('#filters');
+    return filters && !filters.hidden && filters.offsetWidth > 0;
+  }, { timeout: 5000 });
+  await mobilePage.click('#toggle-filters');
+
+  await mobileContext.close();
+  if (mobileErrors.length) throw new Error(`mobile page errors: ${mobileErrors.join(' | ')}`);
+
+  await browser.close();
+
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

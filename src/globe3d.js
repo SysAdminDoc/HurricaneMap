@@ -12,11 +12,13 @@ const HEIGHT_PER_KT_M = 2_200;
 const WIND_CONE_POINTS_PER_QUADRANT = 7;
 const NM_PER_DEG_LAT = 60;
 
-const WIND_CONE_THRESHOLDS = [
-  { threshold: 34, offset: 0, baseHeight: 48_000, color: '#74c7ec', alpha: 0.11 },
-  { threshold: 50, offset: 4, baseHeight: 92_000, color: '#fab387', alpha: 0.14 },
-  { threshold: 64, offset: 8, baseHeight: 138_000, color: '#f38ba8', alpha: 0.18 },
-];
+function getWindConeThresholds() {
+  return [
+    { threshold: 34, offset: 0, baseHeight: 48_000, color: categoryColor(-1), alpha: 0.11 },
+    { threshold: 50, offset: 4, baseHeight: 92_000, color: categoryColor(3), alpha: 0.14 },
+    { threshold: 64, offset: 8, baseHeight: 138_000, color: categoryColor(4), alpha: 0.18 },
+  ];
+}
 
 const WIND_CONE_QUADRANTS = [
   { name: 'NE', startBearing: 0, endBearing: 90 },
@@ -219,7 +221,7 @@ export function buildWindConeLayers(storm) {
     if (!['HU', 'TS', 'SS'].includes(point.status)) continue;
     const time = Date.parse(point.t);
     if (!Number.isFinite(time)) continue;
-    for (const pass of WIND_CONE_THRESHOLDS) {
+    for (const pass of getWindConeThresholds()) {
       const quadRadii = point.radii.slice(pass.offset, pass.offset + 4);
       if (!quadRadii.some(value => Number(value) > 0)) continue;
       const ring = buildWindConeRing(point.lat, point.lon, quadRadii, pass.baseHeight);
@@ -336,7 +338,8 @@ function ensureViewer(Cesium) {
     timeline: false,
     shouldAnimate: false,
   });
-  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#0c1322');
+  const globeBg = getComputedStyle(document.documentElement).getPropertyValue('--globe-bg').trim() || '#050813';
+  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString(globeBg);
   viewer.scene.globe.showGroundAtmosphere = true;
   viewer.scene.skyAtmosphere.show = true;
   viewer.scene.requestRenderMode = true;

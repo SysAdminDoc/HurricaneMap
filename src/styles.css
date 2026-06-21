@@ -2411,27 +2411,10 @@ section.storm-panel.glass {
   background-color: rgba(170, 183, 255, 0.15);
 }
 
-/* Stat tiles hover elevation */
-.stat-tile,
-.stat-group {
-  transition: all 150ms cubic-bezier(0.2, 0.6, 0.3, 1);
-}
-
-.stat-tile:hover,
-.stat-group:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-}
-
-/* List item hover effects */
-.storm-list-item,
-.landfall-row,
 .similar-storm-row {
   transition: all 100ms ease;
 }
 
-.storm-list-item:hover,
-.landfall-row:hover,
 .similar-storm-row:hover {
   background-color: rgba(170, 183, 255, 0.06);
   transform: translateX(2px);
@@ -2449,29 +2432,8 @@ h3 {
   font-weight: 600;
 }
 
-.small-label,
-.label-secondary {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  color: var(--subtext);
-}
-
-/* Phase 2: Section Separators */
-.section-divider {
-  margin: 16px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 200ms ease;
-}
-
-.section-divider:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
 /* Phase 2: Empty State Styling */
-.empty-state,
-.no-results {
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2483,46 +2445,25 @@ h3 {
   background: rgba(170, 183, 255, 0.04);
 }
 
-.empty-state-icon,
-.no-results-icon {
+.empty-state-icon {
   width: 48px;
   height: 48px;
   margin-bottom: 16px;
   opacity: 0.4;
 }
 
-.empty-state-title,
-.no-results-title {
+.empty-state-title {
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
 }
 
-.empty-state-text,
-.no-results-text {
+.empty-state-text {
   font-size: 14px;
   line-height: 1.5;
 }
 
-/* Phase 2: Panel Animation Stagger for Multiple Items */
-.storm-list-item,
-.landfall-row {
-  animation: slideInItem 200ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-
-.storm-list-item:nth-child(1),
-.landfall-row:nth-child(1) { animation-delay: 0ms; }
-.storm-list-item:nth-child(2),
-.landfall-row:nth-child(2) { animation-delay: 30ms; }
-.storm-list-item:nth-child(3),
-.landfall-row:nth-child(3) { animation-delay: 60ms; }
-.storm-list-item:nth-child(4),
-.landfall-row:nth-child(4) { animation-delay: 90ms; }
-.storm-list-item:nth-child(5),
-.landfall-row:nth-child(5) { animation-delay: 120ms; }
-.storm-list-item:nth-child(n+6),
-.landfall-row:nth-child(n+6) { animation-delay: 150ms; }
 
 @keyframes slideInItem {
   from {
@@ -2579,11 +2520,6 @@ select:disabled {
   border-radius: 14px;
 }
 
-/* Elevation levels for layering */
-.elevation-1 { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
-.elevation-2 { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); }
-.elevation-3 { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); }
-.elevation-4 { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
 
 /* Phase 3: Enhanced Focus States */
 input:focus-visible::after,
@@ -3131,10 +3067,6 @@ a:focus-visible, [role="button"]:focus-visible {
     height: 44px; /* WCAG AAA touch target */
   }
 
-  .stat-tile,
-  .stat-group {
-    padding: 12px;
-  }
 
   .text-btn {
     font-size: 12px;
@@ -3263,10 +3195,7 @@ a:focus-visible, [role="button"]:focus-visible {
     background: inherit;
   }
 
-  .stat-tile:hover,
-  .stat-group:hover {
-    transform: none;
-  }
+
 
   .cat-btn:hover:not(:disabled) {
     background: inherit;
@@ -3304,13 +3233,6 @@ a:focus-visible, [role="button"]:focus-visible {
     backdrop-filter: blur(16px) saturate(140%);
   }
 
-  .shadow,
-  .shadow-sm,
-  .shadow-md,
-  .shadow-lg,
-  .shadow-xl {
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.1));
-  }
 }
 
 /* Phase 4: Light Mode Only Features */
@@ -6841,8 +6763,8 @@ html.high-contrast {
   inset: 0;
   z-index: 3200;
   overflow: hidden;
-  color: #f5f7ff;
-  background: #050813;
+  color: var(--globe-text, #f5f7ff);
+  background: var(--globe-bg, #050813);
 }
 
 .globe3d-canvas {
@@ -6850,7 +6772,7 @@ html.high-contrast {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: #050813;
+  background: var(--globe-bg, #050813);
 }
 
 .globe3d-canvas .cesium-viewer,
@@ -6913,7 +6835,7 @@ html.high-contrast {
   padding: 7px 10px;
   border: 1px solid rgba(245, 247, 255, 0.16);
   border-radius: 10px;
-  color: #f5f7ff;
+  color: var(--globe-text, #f5f7ff);
   background: rgba(245, 247, 255, 0.09);
   font-size: 12px;
   font-weight: 800;
@@ -6939,7 +6861,7 @@ html.high-contrast {
 
 .globe3d-actions .text-btn {
   min-height: 34px;
-  color: #f5f7ff;
+  color: var(--globe-text, #f5f7ff);
   background: rgba(245, 247, 255, 0.09);
   border-color: rgba(245, 247, 255, 0.16);
 }
@@ -6952,7 +6874,7 @@ html.high-contrast {
 
 .globe3d-actions .close-btn {
   position: static;
-  color: #f5f7ff;
+  color: var(--globe-text, #f5f7ff);
   background: rgba(245, 247, 255, 0.09);
   border-color: rgba(245, 247, 255, 0.16);
 }
