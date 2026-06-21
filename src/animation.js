@@ -443,8 +443,10 @@ function lerpNum(a, b, f) {
 }
 
 function lerpTime(a, b, f) {
+  if (!a || !b) return a || b || '';
   const ta = new Date(a).getTime();
   const tb = new Date(b).getTime();
+  if (!Number.isFinite(ta) || !Number.isFinite(tb)) return a || b || '';
   return new Date(ta + (tb - ta) * f).toISOString();
 }
 

@@ -13,7 +13,7 @@ const DEFAULTS = {
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   nhcForecastCone: true,   // Show official NHC forecast cone/track for active storms
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
-  locale: 'en',            // 'en' | 'es' (English | Spanish)
+  locale: 'en',            // 'en' | 'es' | 'ht'
   highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
   reducedMotion: false,    // In-app override: reduce animations independent of OS setting
   onboarded: false,

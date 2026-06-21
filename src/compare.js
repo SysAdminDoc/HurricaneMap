@@ -289,22 +289,19 @@ function exportComparisonCSV(storms) {
     ['Peak wind (kt)', p => p.storm.peak_wind_kt],
     ['Min pressure (mb)', p => p.storm.min_pres_mb],
     ['Peak category', p => categoryLabel(windToCategory(p.storm.peak_wind_kt))],
-    ['Landfall category', p => {
-      const cat = p.storm.landfall_max_category;
-      return cat === -1 ? 'TS' : cat === 0 ? 'TD' : cat ? `Cat ${cat}` : '—';
-    }],
-    ['US landfalls', p => p.storm.us_landfall_count],
-    ['Track points', p => p.storm.track.length],
+    ['Landfall category', p => categoryLabel(p.storm.landfall_max_category ?? -1)],
+    ['US landfalls', p => p.storm.us_landfall_count ?? 0],
+    ['Track points', p => p.storm.track?.length ?? 0],
     ['ACE (10⁴ kt²)', p => {
-      const ace = computeACE(p.storm.track);
-      return formatFixed(ace?.value ?? ace, 2);
+      const ace = computeACE(p.storm.track || []);
+      return formatFixed(ace.value, 2);
     }],
     ['Forward speed (km/h)', p => {
-      const trans = computeTranslationStats(p.storm.track);
+      const trans = computeTranslationStats(p.storm.track || []);
       return trans ? formatFixed(trans.mean_kmh, 1) : '—';
     }],
     ['RI detected', p => {
-      const ri = findRapidIntensification(p.storm.track);
+      const ri = findRapidIntensification(p.storm.track || []);
       return ri ? `+${ri.delta_kt} kt / ${Math.round(ri.hours)}h` : 'No';
     }],
     ['RI risk category', p => {

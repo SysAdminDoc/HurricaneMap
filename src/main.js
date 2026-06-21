@@ -552,6 +552,7 @@ function updateFilterResetState() {
   const active = hasActiveFilters(filters, yearDefaults(), {
     surgeCategory: els.surgeCategory?.value,
     showPopulation: els.showPopulation?.checked,
+    showSST: els.showSST?.checked,
   });
   els.resetFilters.disabled = !active;
   els.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
@@ -850,6 +851,7 @@ function wireUI() {
     els.showSST.addEventListener('change', async () => {
       const { setSSTVisible } = await loadSST();
       setSSTVisible(els.showSST.checked);
+      updateFilterResetState();
     });
   }
 

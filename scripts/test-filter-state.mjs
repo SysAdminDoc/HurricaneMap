@@ -62,6 +62,8 @@ function cats(filters) {
   assert.equal(hasActiveFilters(filters, defaults), false);
   assert.equal(hasActiveFilters(filters, defaults, { surgeCategory: '3' }), true);
   assert.equal(hasActiveFilters(filters, defaults, { showPopulation: true }), true);
+  assert.equal(hasActiveFilters(filters, defaults, { showSST: true }), true);
+  assert.equal(hasActiveFilters(filters, defaults, { showSST: false }), false);
   filters.state = 'Florida';
   assert.equal(hasActivePrimaryFilters(filters, defaults), true);
 }

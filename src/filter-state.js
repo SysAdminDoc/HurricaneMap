@@ -80,8 +80,10 @@ export function hasActivePrimaryFilters(filters, {
 export function hasActiveFilters(filters, defaults, {
   surgeCategory = '',
   showPopulation = false,
+  showSST = false,
 } = {}) {
   return hasActivePrimaryFilters(filters, defaults) ||
     Boolean(surgeCategory) ||
-    Boolean(showPopulation);
+    Boolean(showPopulation) ||
+    Boolean(showSST);
 }
