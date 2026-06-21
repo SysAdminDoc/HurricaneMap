@@ -28,6 +28,22 @@
   border: 0;
 }
 
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--crust, #11111b);
+  color: var(--text, #cdd6f4);
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip-to-content:focus {
+  top: 0;
+}
+
 /* HurricaneMap — Catppuccin Mocha + glassmorphism */
 :root {
   --base:   #11111b;

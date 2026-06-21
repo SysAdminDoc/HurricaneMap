@@ -272,6 +272,7 @@ async function boot() {
 
   // Start performance monitoring early
   initPerformanceMonitoring();
+  if (navigator.storage?.persist) navigator.storage.persist();
   
   applyThemeToRoot();
   applyPaletteToBody();

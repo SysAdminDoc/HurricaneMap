@@ -304,6 +304,8 @@ function loadCesium() {
 
     const script = document.createElement('script');
     script.src = CESIUM_JS_URL;
+    script.integrity = 'sha384-/3CCvBqqAcykK60EtXn9ML5N8PZKuC/s0Tfsr2CI0HpXU/XPW0iUeOodmYfrQxN1';
+    script.crossOrigin = 'anonymous';
     script.async = true;
     script.onload = () => window.Cesium ? resolve(window.Cesium) : reject(new Error('Cesium global missing'));
     script.onerror = () => {
