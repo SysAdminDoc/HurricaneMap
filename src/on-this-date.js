@@ -6,6 +6,7 @@ import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { formatWind } from './settings.js';
 import { escapeHtml } from './html-utils.js';
+import { t } from './i18n.js';
 
 const panel = document.getElementById('on-this-date-panel');
 const body = document.getElementById('on-this-date-body');
@@ -93,10 +94,10 @@ export async function showOnThisDate() {
   if (matchingLandfalls.length === 0) {
     body.innerHTML = `
       <div class="otd-content">
-        <h2>On this date in history</h2>
+        <h2>${t('onthisdate.title')}</h2>
         <div class="empty-state">
-          <strong>No nearby landfall anniversaries.</strong>
-          <span>No recorded U.S. hurricane or tropical-storm landfalls fall within seven calendar days of today (${todayMonthDay}).</span>
+          <strong>${t('onthisdate.empty')}</strong>
+          <span>${t('onthisdate.emptyDetail', todayMonthDay)}</span>
         </div>
       </div>
     `;
@@ -105,8 +106,8 @@ export async function showOnThisDate() {
   
   const html = `
     <div class="otd-content">
-      <h2>On this date in history</h2>
-      <p class="otd-meta">Recorded U.S. landfalls within seven calendar days of ${todayMonthDay}.</p>
+      <h2>${t('onthisdate.title')}</h2>
+      <p class="otd-meta">${t('onthisdate.meta', todayMonthDay)}</p>
       <ul class="otd-list">
         ${matchingLandfalls.map(lf => {
           const cat = categoryLabel(lf.category);

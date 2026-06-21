@@ -1,4 +1,5 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
+import { t } from './i18n.js';
 import { getStats, getLandfalls, getAllStorms } from './data.js';
 import { hidePanel, showPanel } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
@@ -63,7 +64,7 @@ function render() {
     .map(s => `<span class="cold-tag">${s}</span>`).join('');
 
   body.innerHTML = `
-    <h2 id="stats-panel-title">Statistics</h2>
+    <h2 id="stats-panel-title">${t('stats.title')}</h2>
     <p class="stats-summary">
       ${stats.total_storms} U.S.-landfalling storms · ${stats.total_landfall_events} landfall events ·
       ${stats.total_hurricane_landfalls} of those at hurricane strength.
@@ -103,19 +104,19 @@ function render() {
 
       <div class="stats-panel-column stats-panel-column--charts">
         <section class="stats-section stats-section--climatology">
-          <h3>Annual climatology — ACE, named storms, US landfalls</h3>
+          <h3>${t('stats.climatologyChart')} — ACE, named storms, US landfalls</h3>
           <div id="climatology-chart" class="clim-host"></div>
         </section>
 
         <section class="stats-section stats-section--climate">
-          <h3>Climate trends — 10-year rolling averages</h3>
+          <h3>${t('stats.climateTrends')} — 10-year rolling averages</h3>
           <div id="climate-trends-chart" class="climate-trends-host"></div>
         </section>
       </div>
 
       <div class="stats-panel-column stats-panel-column--trend-table">
         <section class="stats-section stats-section--trend-table">
-          <h3>Decade-by-decade trends</h3>
+          <h3>${t('stats.decadeTrends')}</h3>
           <div id="decade-trends-chart" class="dt-host"></div>
         </section>
       </div>

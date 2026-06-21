@@ -3280,6 +3280,11 @@ html.light-theme {
   --surface-sunken: rgba(255, 255, 255, 0.64);
   --surface-raised: rgba(255, 255, 255, 0.78);
 }
+html.light-theme .info-modal,
+html.light-theme .glossary-modal,
+html.light-theme .onb-overlay {
+  background: rgba(76, 79, 105, 0.38);
+}
 
 [hidden] {
   display: none !important;
@@ -7001,30 +7006,6 @@ html.high-contrast .globe3d-topbar {
 .table-view-table tbody tr:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
 .table-view-count { font-size: 11px; color: var(--subtext); margin-top: 6px; }
 
-/* Spatial search ("storms near me") */
-.spatial-results {
-  position: fixed; bottom: 180px; left: 16px; z-index: 1100;
-  width: 340px; max-width: calc(100vw - 32px); max-height: 50vh;
-  padding: 14px; overflow-y: auto; font-size: 13px;
-}
-.sp-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.sp-header h3 { margin: 0 0 4px; font-size: 14px; font-weight: 700; }
-.sp-controls { display: flex; gap: 6px; margin-bottom: 8px; }
-.sp-radius-btn {
-  background: var(--surface0); border: 1px solid var(--surface1); color: var(--text);
-  padding: 3px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
-}
-.sp-radius-btn.active { background: var(--lavender); color: var(--base); border-color: var(--lavender); }
-.sp-count { font-size: 11px; color: var(--subtext); margin-bottom: 6px; }
-.sp-list { list-style: none; padding: 0; margin: 0; }
-.sp-list li {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 4px; border-bottom: 1px solid var(--surface0); cursor: pointer;
-}
-.sp-list li:hover { background: rgba(180, 190, 254, 0.08); }
-.sp-list li:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
-.sp-name { font-weight: 600; }
-.sp-meta { font-size: 11px; color: var(--subtext); }
 
 .panel-info-card { padding: 12px; border: 1px solid var(--surface1); border-radius: 10px; background: var(--surface0); margin-top: 8px; }
 .info-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--subtext); margin-bottom: 4px; }

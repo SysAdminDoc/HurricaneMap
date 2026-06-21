@@ -6,6 +6,7 @@ import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { redraw } from './timeline.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { t } from './i18n.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -76,7 +77,7 @@ export async function openState(stateName) {
     body.innerHTML = `
       <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
       <div class="state-empty empty-state">
-        <strong>No recorded landfalls here.</strong>
+        <strong>${t('state.noLandfalls')}</strong>
         <span>${escapeHtml(stateName)} is in the coastal-state reference set, but HurricaneMap has no HURDAT2 tropical-storm or hurricane landfall events for it.</span>
       </div>
     `;

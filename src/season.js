@@ -6,6 +6,7 @@ import { computeACE } from './metrics.js';
 import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { t } from './i18n.js';
 import {
   formatFatalityCount,
   getDamageMillions,
@@ -124,21 +125,21 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       </div>
       <div class="ss-stat" data-role="ace">
         <span class="ss-stat-num">…</span>
-        <span class="ss-stat-lbl">total ACE</span>
+        <span class="ss-stat-lbl">${t('stats.totalACE')}</span>
       </div>
     </div>
     <div class="ss-tiers" role="list">${tierHTML}</div>
     <dl class="ss-superlatives">
       <div>
-        <dt>Strongest landfall</dt>
+        <dt>${t('stats.strongest')}</dt>
         <dd>${escapeHtml(strongestName)} ${strongest.year} <span class="ss-meta">${categoryLabel(strongest.category)} · ${escapeHtml(strongest.state)}</span></dd>
       </div>
       <div data-role="deadliest">
-        <dt>Deadliest</dt>
+        <dt>${t('stats.deadliest')}</dt>
         <dd class="ss-loading">resolving…</dd>
       </div>
       <div data-role="costliest">
-        <dt>Costliest</dt>
+        <dt>${t('stats.costliest')}</dt>
         <dd class="ss-loading">resolving…</dd>
       </div>
     </dl>

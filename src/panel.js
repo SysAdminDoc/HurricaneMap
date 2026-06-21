@@ -20,6 +20,7 @@ import {
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName, safeExternalUrl } from './html-utils.js';
+import { t } from './i18n.js';
 import {
   ensureExposureDensitiesLoaded,
   estimatePopulationExposure,
@@ -180,7 +181,7 @@ function render(storm, landfall, allStorms) {
     </div>
     <div class="panel-actions-sticky">
       <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
-        <span class="play-icon" aria-hidden="true"></span><span class="play-label">Play track animation</span>
+        <span class="play-icon" aria-hidden="true"></span><span class="play-label">${t('panel.playTrack')}</span>
       </button>
       <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
         <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
@@ -197,11 +198,11 @@ function render(storm, landfall, allStorms) {
         </div>
 
         <div class="stat-grid">
-          <div class="stat"><div class="label">Peak wind</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
-          <div class="stat"><div class="label">Min pressure</div><div class="value">${minPres}</div></div>
+          <div class="stat"><div class="label">${t('panel.peakWind')}</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
+          <div class="stat"><div class="label">${t('panel.minPressure')}</div><div class="value">${minPres}</div></div>
           <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
           <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
-          <div class="stat"><div class="label">U.S. landfalls</div><div class="value">${storm.us_landfall_count ?? 0}</div></div>
+          <div class="stat"><div class="label">${t('panel.landfalls')}</div><div class="value">${storm.us_landfall_count ?? 0}</div></div>
           ${exposureTile}
           ${riRiskTile}
         </div>
@@ -221,10 +222,10 @@ function render(storm, landfall, allStorms) {
       </section>
 
       <section class="storm-analysis-cluster" aria-label="Storm analysis">
-        <h3 class="panel-section-h3">Similar storms</h3>
+        <h3 class="panel-section-h3">${t('panel.similarStorms')}</h3>
         <div class="similar-storms-host" id="similar-storms-host"></div>
 
-        <h3 class="panel-section-h3">Time at intensity</h3>
+        <h3 class="panel-section-h3">${t('panel.daysAtIntensity')}</h3>
         <div class="dai-host" id="dai-host"></div>
 
         <h3 class="panel-section-h3">Intensity over time</h3>
@@ -250,7 +251,7 @@ function render(storm, landfall, allStorms) {
         </div>
 
         <div class="export-row">
-          <span class="export-label">Export track:</span>
+          <span class="export-label">${t('panel.exportTrack')}:</span>
           <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
           <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
           <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
@@ -374,8 +375,8 @@ function render(storm, landfall, allStorms) {
       playBtn.classList.toggle('is-playing', playing);
       playBtn.classList.toggle('is-paused', paused);
       playBtn.setAttribute('aria-pressed', String(playing));
-      playBtn.title = playing ? 'Pause track animation' : paused ? 'Resume track animation' : 'Animate the storm traveling its track';
-      if (playLabel) playLabel.textContent = playing ? 'Pause track animation' : paused ? 'Resume track animation' : 'Play track animation';
+      playBtn.title = playing ? t('panel.pauseTrack') : paused ? 'Resume track animation' : 'Animate the storm traveling its track';
+      if (playLabel) playLabel.textContent = playing ? t('panel.pauseTrack') : paused ? 'Resume track animation' : t('panel.playTrack');
     };
 
     playBtn.addEventListener('click', async () => {
@@ -619,7 +620,7 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   const safeSourceUrl = safeExternalUrl(im.wiki_url);
   const src = safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
   return `
-    <h3 class="panel-section-h3">Impacts</h3>
+    <h3 class="panel-section-h3">${t('panel.impacts')}</h3>
     <div class="impacts-block">
       ${rows.join('')}
       <div class="im-source">${src}</div>
@@ -726,7 +727,7 @@ function renderDaysAtIntensity(host, track) {
     return `<div class="dai-seg ${t.cls}" style="flex-basis:${pct}%" title="${t.label}: ${dayStr} (${pct.toFixed(0)}%)" aria-label="${t.label}: ${dayStr}"><span class="dai-seg-label">${pct >= 8 ? `${t.label} · ${dayStr}` : ''}</span></div>`;
   }).join('');
   host.innerHTML = `
-    <div class="dai-bar" role="img" aria-label="Days at intensity">${segs}</div>
+    <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}">${segs}</div>
     <div class="dai-legend">
       <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
     </div>

@@ -1,4 +1,5 @@
 import { escapeHtml } from './html-utils.js';
+import { t } from './i18n.js';
 
 // Glossary management — meteorological and hurricane terminology.
 //
@@ -59,10 +60,10 @@ export async function initGlossary() {
   modal.innerHTML = `
     <div class="glossary-content">
       <div class="glossary-header">
-        <h2 id="glossary-title">Meteorology glossary</h2>
+        <h2 id="glossary-title">${t('glossary.title')}</h2>
         <button class="close-btn" id="close-glossary" title="Close glossary" aria-label="Close glossary">×</button>
       </div>
-      <input type="search" id="glossary-search" class="glossary-search" placeholder="Search terms or definitions" aria-label="Search glossary" />
+      <input type="search" id="glossary-search" class="glossary-search" placeholder="${t('glossary.searchPlaceholder')}" aria-label="${t('glossary.title')}" />
       <div id="glossary-list" class="glossary-list"></div>
     </div>
   `;
@@ -77,7 +78,7 @@ export async function initGlossary() {
     if (!items.length) {
       glossaryList.innerHTML = `
         <div class="empty-state glossary-empty">
-          <strong>No glossary match.</strong>
+          <strong>${t('glossary.noResults')}</strong>
           <span>Try a broader term such as wind, pressure, eyewall, surge, or ACE.</span>
         </div>`;
       return;

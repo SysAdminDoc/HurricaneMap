@@ -1,6 +1,7 @@
 // Storm comparison mode — pin up to 4 storms, view their tracks color-coded
 // on the map and side-by-side intensity charts in a comparison panel.
 
+import { t } from './i18n.js';
 import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, formatTime, windToCategory } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
@@ -132,7 +133,7 @@ function refreshTray() {
     <span class="ct-chip" style="--pin-color:${p.color}">
       <span class="ct-dot" style="background:${p.color}"></span>
       <span class="ct-name">${escapeHtml(formatStormName(p.name))} ${p.year}</span>
-      <button class="ct-remove" data-id="${p.id}" title="Unpin">×</button>
+      <button class="ct-remove" data-id="${p.id}" title="${t('compare.unpin')}">×</button>
     </span>
   `).join('');
   chips.querySelectorAll('.ct-remove').forEach(b => {
@@ -146,7 +147,7 @@ export function openComparePanel() {
     // If user clicks Compare with no pins, show a hint instead of an empty panel.
     compareBody.innerHTML = `
       <div class="cp-empty">
-        <h2>Storm comparison</h2>
+        <h2>${t('compare.title')}</h2>
         <p>Pin up to four storms to compare their tracks, intensity curves, and landfall metrics side by side.</p>
         <p class="hint">Open any landfall, choose <strong>Pin to compare</strong> in the storm panel, then return here for the full breakdown.</p>
       </div>
@@ -173,7 +174,7 @@ function renderComparePanel() {
         <div class="cp-card-head">
           <span class="cp-swatch" style="background:${p.color}"></span>
           <h3>${escapeHtml(formatStormName(s.name))} (${s.year})</h3>
-          <button class="cp-remove" data-id="${s.id}" title="Unpin">×</button>
+          <button class="cp-remove" data-id="${s.id}" title="${t('compare.unpin')}">×</button>
         </div>
         <div class="cp-meta">
           <span class="cat-pill ${lfClass}">${lfLabel} at landfall</span>
@@ -243,10 +244,10 @@ function renderComparePanel() {
   }).join('');
 
   compareBody.innerHTML = `
-    <h2 id="compare-panel-title">Comparing ${pinned.length} storm${pinned.length === 1 ? '' : 's'}</h2>
+    <h2 id="compare-panel-title">${t('compare.title')}</h2>
     <p class="cp-hint">Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.</p>
     <div class="cp-actions">
-      <button class="export-btn" id="cp-export-btn" title="Export comparison as CSV">📥 Export comparison</button>
+      <button class="export-btn" id="cp-export-btn" title="Export comparison as CSV">📥 ${t('btn.exportCSV')}</button>
     </div>
     <div class="cp-cards">${cards}</div>
     <h3 class="panel-section-h3">Side-by-side</h3>

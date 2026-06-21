@@ -1,5 +1,7 @@
 // NOAA/NCEI Storm Events summary for hurricane landfall windows.
 
+import { t } from './i18n.js';
+
 let stormEventsPromise = null;
 
 export async function loadStormEvents() {
@@ -27,15 +29,15 @@ export function renderStormEventsHtml(storm, record, metadata = {}) {
 
   if (unavailable) {
     return emptyBlock(
-      'Storm Events near landfall',
-      'NOAA Storm Events records begin in 1950, so tornado and hail coincidence data is unavailable for this storm.',
+      t('stormevents.title'),
+      t('stormevents.unavailable'),
       source,
     );
   }
 
   if (!record || (!record.tornado_count && !record.hail_count)) {
     return emptyBlock(
-      'Storm Events near landfall',
+      t('stormevents.title'),
       `No tornado or hail reports were found in affected states from ${before}h before to ${after}h after U.S. landfall.`,
       source,
     );
@@ -47,7 +49,7 @@ export function renderStormEventsHtml(storm, record, metadata = {}) {
   const strongest = record.strongest_tornado_scale ? ` · strongest ${escapeHtml(record.strongest_tornado_scale)}` : '';
 
   return `
-    <h3 class="panel-section-h3">Storm Events near landfall</h3>
+    <h3 class="panel-section-h3">${t('stormevents.title')}</h3>
     <div class="storm-events-block">
       <div class="se-row">
         <span class="se-label">Tornado activity during landfall</span>

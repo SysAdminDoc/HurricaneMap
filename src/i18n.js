@@ -142,6 +142,35 @@ export const STRINGS = {
     'month.11': 'November',
     'month.12': 'December',
 
+    // On this date
+    'onthisdate.title': 'On this date in history',
+    'onthisdate.meta': 'Recorded U.S. landfalls within seven calendar days of {0}.',
+    'onthisdate.empty': 'No nearby landfall anniversaries.',
+    'onthisdate.emptyDetail': 'No recorded U.S. hurricane or tropical-storm landfalls fall within seven calendar days of today ({0}).',
+
+    // State panel
+    'state.title': 'State Details',
+    'state.noLandfalls': 'No landfalls on record for this state.',
+
+    // Glossary
+    'glossary.title': 'Glossary',
+    'glossary.searchPlaceholder': 'Search terms…',
+    'glossary.noResults': 'No matching terms.',
+
+    // Onboarding
+    'onboarding.welcome': 'Welcome to HurricaneMap',
+    'onboarding.welcomeBody': 'Explore 174 years of U.S. hurricane and tropical-storm landfalls. Every dot is a recorded NOAA HURDAT2 event.',
+    'onboarding.filters': 'Filter the catalog',
+    'onboarding.filtersBody': 'Narrow the map by year, Saffir-Simpson category, U.S. state, or storm name.',
+    'onboarding.stats': 'Open the statistics panel',
+    'onboarding.statsBody': 'Review decadal trends, top storms, ACE totals, and rapid-intensification counts.',
+    'onboarding.about': 'About the data',
+    'onboarding.aboutBody': 'Open source notes, methodology, coverage gaps, and radar archive details when you need provenance.',
+
+    // Storm events
+    'stormevents.title': 'Storm Events near landfall',
+    'stormevents.unavailable': 'NOAA Storm Events records begin in 1950, so tornado and hail coincidence data is unavailable for this storm.',
+
     // About / info modal
     'about.title': 'About HurricaneMap',
     'about.description': 'HurricaneMap is an interactive 174-year atlas of U.S. hurricane landfalls (1851–2025) from HURDAT2, enhanced with advanced analytics, live active-storm tracking, and climate trend analysis.',
@@ -285,6 +314,35 @@ export const STRINGS = {
     'month.11': 'Noviembre',
     'month.12': 'Diciembre',
 
+    // On this date
+    'onthisdate.title': 'Esta fecha en la historia',
+    'onthisdate.meta': 'Tocamientos registrados dentro de siete días calendario de {0}.',
+    'onthisdate.empty': 'Sin aniversarios de tocamiento cercanos.',
+    'onthisdate.emptyDetail': 'Ningún tocamiento registrado cae dentro de siete días calendario de hoy ({0}).',
+
+    // State panel
+    'state.title': 'Detalles del estado',
+    'state.noLandfalls': 'Sin tocamientos registrados para este estado.',
+
+    // Glossary
+    'glossary.title': 'Glosario',
+    'glossary.searchPlaceholder': 'Buscar términos…',
+    'glossary.noResults': 'Sin resultados.',
+
+    // Onboarding
+    'onboarding.welcome': 'Bienvenido a HurricaneMap',
+    'onboarding.welcomeBody': 'Explora 174 años de huracanes y tormentas tropicales que azotaron Estados Unidos. Cada punto es un evento HURDAT2 de la NOAA.',
+    'onboarding.filters': 'Filtrar el catálogo',
+    'onboarding.filtersBody': 'Filtra el mapa por año, categoría Saffir-Simpson, estado de EE.UU. o nombre del huracán.',
+    'onboarding.stats': 'Panel de estadísticas',
+    'onboarding.statsBody': 'Revisa tendencias por década, los huracanes más fuertes, totales de ACE y conteos de intensificación rápida.',
+    'onboarding.about': 'Acerca de los datos',
+    'onboarding.aboutBody': 'Notas de código abierto, metodología, brechas de cobertura y detalles del archivo de radar.',
+
+    // Storm events
+    'stormevents.title': 'Eventos meteorológicos cerca del tocamiento',
+    'stormevents.unavailable': 'Los registros de eventos comienzan en 1950; datos de tornado y granizo no están disponibles para este huracán.',
+
     // About / info modal
     'about.title': 'Acerca de HurricaneMap',
     'about.description': 'HurricaneMap es un atlas interactivo de 174 años de huracanes que azotaron Estados Unidos (1851–2025) desde HURDAT2, mejorado con análisis avanzado, seguimiento de tormentas activas en tiempo real y análisis de tendencias climáticas.',
@@ -362,6 +420,22 @@ export const STRINGS = {
     'category.3': 'Kategori 3',
     'category.4': 'Kategori 4',
     'category.5': 'Kategori 5',
+    'onthisdate.title': 'Jou sa a nan istwa',
+    'onthisdate.empty': 'Pa gen anivèsè siklòn tou pre.',
+    'state.title': 'Detay eta',
+    'state.noLandfalls': 'Pa gen siklòn anrejistre pou eta sa a.',
+    'glossary.title': 'Glosè',
+    'glossary.noResults': 'Pa jwenn rezilta.',
+    'onboarding.welcome': 'Byenveni nan HurricaneMap',
+    'onboarding.welcomeBody': 'Eksplore 174 ane siklòn ki frape Etazini. Chak pwen se yon evènman HURDAT2 NOAA.',
+    'onboarding.filters': 'Filtre katalòg la',
+    'onboarding.filtersBody': 'Filtre kat la pa ane, kategori Saffir-Simpson, eta, oswa non siklòn.',
+    'onboarding.stats': 'Panno estatistik',
+    'onboarding.statsBody': 'Gade tandans pa deseni, siklòn pi fò yo, total ACE.',
+    'onboarding.about': 'Konsènan done yo',
+    'onboarding.aboutBody': 'Nòt metòd, twou nan kouvèti, ak detay achiv rada.',
+    'stormevents.title': 'Evènman tanpèt bò kote siklòn touche tè',
+    'stormevents.unavailable': 'Dosye NOAA kòmanse nan 1950; done tònad pa disponib pou siklòn sa a.',
     'about.title': 'Konsènan HurricaneMap',
     'about.description': 'HurricaneMap se yon atlas entèaktif 174 ane siklòn ki frape Etazini (1851–2025) soti nan HURDAT2.',
     'about.dataSource': 'Sous done: Sant Nasyonal Siklòn HURDAT2',

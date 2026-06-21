@@ -3,37 +3,40 @@
 // in localStorage via settings.js.
 
 import { getSetting, setSetting } from './settings.js';
+import { t } from './i18n.js';
 
-const STEPS = [
-  {
-    target: '.app-header',
-    title: 'Welcome to HurricaneMap',
-    body: 'Explore 174 years of U.S. hurricane and tropical-storm landfalls. Every dot is a recorded NOAA HURDAT2 event.',
-    placement: 'bottom',
-  },
-  {
-    target: '#filters',
-    mobileTarget: '#toggle-filters',
-    title: 'Filter the catalog',
-    mobileTitle: 'Open filters',
-    body: 'Narrow the map by year, Saffir-Simpson category, U.S. state, or storm name.',
-    mobileBody: 'Tap Filters to open year, category, state, and storm-search controls.',
-    placement: 'right',
-    mobilePlacement: 'bottom',
-  },
-  {
-    target: '#toggle-stats',
-    title: 'Open the statistics panel',
-    body: 'Review decadal trends, top storms, ACE totals, and rapid-intensification counts.',
-    placement: 'bottom',
-  },
-  {
-    target: '#toggle-info',
-    title: 'About the data',
-    body: 'Open source notes, methodology, coverage gaps, and radar archive details when you need provenance.',
-    placement: 'bottom',
-  },
-];
+function getSteps() {
+  return [
+    {
+      target: '.app-header',
+      title: t('onboarding.welcome'),
+      body: t('onboarding.welcomeBody'),
+      placement: 'bottom',
+    },
+    {
+      target: '#filters',
+      mobileTarget: '#toggle-filters',
+      title: t('onboarding.filters'),
+      mobileTitle: t('onboarding.filters'),
+      body: t('onboarding.filtersBody'),
+      mobileBody: t('onboarding.filtersBody'),
+      placement: 'right',
+      mobilePlacement: 'bottom',
+    },
+    {
+      target: '#toggle-stats',
+      title: t('onboarding.stats'),
+      body: t('onboarding.statsBody'),
+      placement: 'bottom',
+    },
+    {
+      target: '#toggle-info',
+      title: t('onboarding.about'),
+      body: t('onboarding.aboutBody'),
+      placement: 'bottom',
+    },
+  ];
+}
 
 export function maybeStartOnboarding({ force = false } = {}) {
   if (!force && getSetting('onboarded')) return;
@@ -42,6 +45,7 @@ export function maybeStartOnboarding({ force = false } = {}) {
 }
 
 function start() {
+  const STEPS = getSteps();
   let idx = 0;
   let finished = false;
   const previousFocus = document.activeElement;

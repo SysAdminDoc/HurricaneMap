@@ -11,7 +11,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.3.9-q26';
+const SW_VERSION = 'hm-v1.3.9-q27';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE = 'hm-data-v2';
 const TILE_CACHE = 'hm-tiles-v1';
@@ -168,7 +168,7 @@ self.addEventListener('fetch', (event) => {
   } else if (isData(url)) {
     event.respondWith(offlineDataWhileRevalidate(req));
   } else if (isTile(url)) {
-    event.respondWith(cacheFirst(req, TILE_CACHE));
+    event.respondWith(staleWhileRevalidate(req, TILE_CACHE));
   }
 });
 
