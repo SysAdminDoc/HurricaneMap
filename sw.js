@@ -94,6 +94,7 @@ const OFFLINE_DATA_ASSETS = [
   './data/impacts.json',
   './data/glossary.json',
   './data/storm-events.json',
+  './data/rainfall.json',
   './data/us-states.geojson',
   './data/hurdat2-atlantic.txt',
   './data/hurdat2-nepac.txt',

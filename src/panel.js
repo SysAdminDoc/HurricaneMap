@@ -217,6 +217,7 @@ function render(storm, landfall, allStorms) {
 
         ${renderImpactsBlock(storm, impacts)}
         <div class="storm-events-host" id="storm-events-host"></div>
+        <div class="rainfall-host" id="rainfall-host"></div>
       </section>
 
       <section class="storm-analysis-cluster" aria-label="Storm analysis">
@@ -281,6 +282,7 @@ function render(storm, landfall, allStorms) {
   const similarStorms = findSimilarStorms(storm, allStorms, 5);
   renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
+  renderRainfallBlock(document.getElementById('rainfall-host'), storm);
 
   // Chart export buttons (PNG / SVG).
   const pngBtn = document.getElementById('chart-export-png');
@@ -721,6 +723,32 @@ function renderDaysAtIntensity(host, track) {
     <div class="dai-bar" role="img" aria-label="Days at intensity">${segs}</div>
     <div class="dai-legend">
       <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
+    </div>
+  `;
+}
+
+let rainfallCache = null;
+async function loadRainfall() {
+  if (rainfallCache) return rainfallCache;
+  try {
+    const res = await fetch('./data/rainfall.json');
+    if (!res.ok) return null;
+    rainfallCache = await res.json();
+  } catch { rainfallCache = null; }
+  return rainfallCache;
+}
+
+async function renderRainfallBlock(host, storm) {
+  if (!host) return;
+  const data = await loadRainfall();
+  if (!data) return;
+  const rec = data[storm.id];
+  if (!rec) return;
+  host.innerHTML = `
+    <div class="panel-info-card">
+      <div class="info-card-label">Peak rainfall (WPC)</div>
+      <div class="info-card-value">${rec.peak_inches}" at ${escapeHtml(rec.station)}</div>
+      <div class="info-card-source">Source: <a href="https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html" target="_blank" rel="noopener">NOAA WPC TC Rainfall</a></div>
     </div>
   `;
 }
