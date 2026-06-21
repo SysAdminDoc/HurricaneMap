@@ -31,19 +31,31 @@ export function closePanelsExcept(keepId = null) {
   setPanelState();
 }
 
+function withTransition(fn) {
+  if (document.startViewTransition) {
+    document.startViewTransition(fn);
+  } else {
+    fn();
+  }
+}
+
 /** Show one side panel and hide all others. */
 export function showPanel(id) {
-  closePanelsExcept(id);
-  const el = getPanel(id);
-  if (el) el.hidden = false;
-  setPanelState();
+  withTransition(() => {
+    closePanelsExcept(id);
+    const el = getPanel(id);
+    if (el) el.hidden = false;
+    setPanelState();
+  });
 }
 
 /** Hide one side panel without reopening any previous surface. */
 export function hidePanel(id) {
-  const el = getPanel(id);
-  if (el) el.hidden = true;
-  setPanelState();
+  withTransition(() => {
+    const el = getPanel(id);
+    if (el) el.hidden = true;
+    setPanelState();
+  });
 }
 
 export function closeAllPanels() {

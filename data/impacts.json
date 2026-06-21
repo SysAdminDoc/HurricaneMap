@@ -16,7 +16,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011955": {
@@ -36,7 +36,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011959": {
@@ -56,7 +56,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011966": {
@@ -76,7 +76,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011968": {
@@ -96,7 +96,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011994": {
@@ -116,7 +116,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011995": {
@@ -136,7 +136,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL011996": {
@@ -156,7 +156,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL012001": {
@@ -176,7 +176,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL012005": {
@@ -196,7 +196,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL012006": {
@@ -216,7 +216,87 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL012013": {
+    "deaths": "1 direct, 3 indirect",
+    "damages": "86000",
+    "wiki_title": "Tropical Storm Andrea (2013)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Andrea_%282013%29",
+    "deaths_total": 4,
+    "deaths_min": 4,
+    "deaths_max": 4,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 86000,
+    "damage_millions_usd": 0.086,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL012014": {
+    "deaths": "2 indirect",
+    "damages": "39500000",
+    "wiki_title": "Hurricane Arthur (2014)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Arthur_%282014%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 39500000,
+    "damage_millions_usd": 39.5,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL012015": {
+    "deaths": "1 direct, 1 indirect",
+    "damages": "$20,000 (2015 USD)",
+    "wiki_title": "Tropical Storm Ana (2015)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Ana_%282015%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 20000,
+    "damage_millions_usd": 0.02,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL012018": {
+    "deaths": "18 total",
+    "damages": "125000000",
+    "wiki_title": "Tropical Storm Alberto (2018)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alberto_%282018%29",
+    "deaths_total": 18,
+    "deaths_min": 18,
+    "deaths_max": 18,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 125000000,
+    "damage_millions_usd": 125.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021950": {
@@ -236,7 +316,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021952": {
@@ -256,7 +336,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021955": {
@@ -276,7 +356,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021957": {
@@ -296,7 +376,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021970": {
@@ -316,7 +396,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021972": {
@@ -336,7 +416,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021985": {
@@ -356,7 +436,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021986": {
@@ -376,7 +456,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021988": {
@@ -396,7 +476,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021989": {
@@ -416,7 +496,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021993": {
@@ -436,7 +516,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021996": {
@@ -456,7 +536,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL021998": {
@@ -476,7 +556,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL022002": {
@@ -496,7 +576,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL022004": {
@@ -516,7 +596,107 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022007": {
+    "deaths": "1 direct, 2 indirect",
+    "damages": "118000",
+    "wiki_title": "Tropical Storm Barry (2007)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barry_%282007%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 118000,
+    "damage_millions_usd": 0.118,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022012": {
+    "deaths": "1 direct, 2 indirect",
+    "damages": "148000",
+    "wiki_title": "Tropical Storm Beryl (2012)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%282012%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 148000,
+    "damage_millions_usd": 0.148,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022015": {
+    "deaths": "8 direct, 1 indirect",
+    "damages": "100000000",
+    "wiki_title": "Tropical Storm Bill (2015)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bill_%282015%29",
+    "deaths_total": 9,
+    "deaths_min": 9,
+    "deaths_max": 9,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 100000000,
+    "damage_millions_usd": 100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022016": {
+    "deaths": "2 direct",
+    "damages": "640000",
+    "wiki_title": "Tropical Storm Bonnie (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bonnie_%282016%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 640000,
+    "damage_millions_usd": 0.64,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022019": {
+    "deaths": "3 total",
+    "damages": "600000000",
+    "wiki_title": "Hurricane Barry (2019)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Barry_%282019%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 600000000,
+    "damage_millions_usd": 600.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031953": {
@@ -536,7 +716,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031955": {
@@ -556,7 +736,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031956": {
@@ -576,7 +756,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031957": {
@@ -596,7 +776,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031960": {
@@ -616,7 +796,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031961": {
@@ -636,7 +816,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031964": {
@@ -656,7 +836,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031965": {
@@ -676,7 +856,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031968": {
@@ -696,7 +876,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031983": {
@@ -716,7 +896,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031988": {
@@ -736,7 +916,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031991": {
@@ -756,7 +936,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031994": {
@@ -776,7 +956,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031998": {
@@ -796,7 +976,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL031999": {
@@ -816,7 +996,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL032001": {
@@ -836,7 +1016,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL032003": {
@@ -856,7 +1036,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL032004": {
@@ -876,7 +1056,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL032005": {
@@ -896,7 +1076,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL032006": {
@@ -916,7 +1096,67 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL032010": {
+    "deaths": "1 total",
+    "damages": "1360000",
+    "wiki_title": "Tropical Storm Bonnie (2010)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bonnie_%282010%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1360000,
+    "damage_millions_usd": 1.36,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL032016": {
+    "deaths": "6 total",
+    "damages": "1040000",
+    "wiki_title": "Tropical Storm Colin (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Colin_%282016%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1040000,
+    "damage_millions_usd": 1.04,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL032017": {
+    "deaths": "2 direct; 1 indirect",
+    "damages": "25000000",
+    "wiki_title": "Tropical Storm Cindy (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Cindy_%282017%29",
+    "deaths_total": 3,
+    "deaths_min": 3,
+    "deaths_max": 3,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 25000000,
+    "damage_millions_usd": 25.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041959": {
@@ -936,7 +1176,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041963": {
@@ -956,7 +1196,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041970": {
@@ -976,7 +1216,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041978": {
@@ -996,7 +1236,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041979": {
@@ -1016,7 +1256,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041980": {
@@ -1036,7 +1276,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041983": {
@@ -1047,7 +1287,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041985": {
@@ -1067,7 +1307,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041989": {
@@ -1087,7 +1327,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041992": {
@@ -1107,7 +1347,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL041995": {
@@ -1127,7 +1367,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL042003": {
@@ -1147,7 +1387,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL042005": {
@@ -1167,7 +1407,87 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL042008": {
+    "deaths": "21",
+    "damages": "1600000000",
+    "wiki_title": "Hurricane Dolly (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dolly_%282008%29",
+    "deaths_total": 21,
+    "deaths_min": 21,
+    "deaths_max": 21,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1600000000,
+    "damage_millions_usd": 1600.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL042009": {
+    "deaths": "2 direct",
+    "damages": "350000",
+    "wiki_title": "Tropical Storm Claudette (2009)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%282009%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 350000,
+    "damage_millions_usd": 0.35,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL042011": {
+    "deaths": "118 total",
+    "damages": "17438",
+    "wiki_title": "Tropical Storm Don (2011)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Don_%282011%29",
+    "deaths_total": 118,
+    "deaths_min": 118,
+    "deaths_max": 118,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 17438,
+    "damage_millions_usd": 0.017438,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL042012": {
+    "deaths": "5 direct, 3 indirect",
+    "damages": "250000000",
+    "wiki_title": "Tropical Storm Debby (2012)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debby_%282012%29",
+    "deaths_total": 8,
+    "deaths_min": 8,
+    "deaths_max": 8,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 250000000,
+    "damage_millions_usd": 250.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051950": {
@@ -1187,7 +1507,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051954": {
@@ -1207,7 +1527,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051957": {
@@ -1227,7 +1547,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051958": {
@@ -1247,7 +1567,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051959": {
@@ -1262,7 +1582,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051960": {
@@ -1282,7 +1602,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051961": {
@@ -1302,7 +1622,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051964": {
@@ -1322,7 +1642,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051965": {
@@ -1342,7 +1662,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051982": {
@@ -1357,7 +1677,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051985": {
@@ -1377,7 +1697,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051986": {
@@ -1397,7 +1717,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051995": {
@@ -1417,7 +1737,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051997": {
@@ -1437,7 +1757,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051998": {
@@ -1457,7 +1777,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL051999": {
@@ -1477,7 +1797,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL052002": {
@@ -1497,7 +1817,67 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL052007": {
+    "deaths": "16 direct",
+    "damages": "66800000",
+    "wiki_title": "Tropical Storm Erin (2007)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Erin_%282007%29",
+    "deaths_total": 16,
+    "deaths_min": 16,
+    "deaths_max": 16,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 66800000,
+    "damage_millions_usd": 66.8,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL052008": {
+    "deaths": "6 direct",
+    "damages": "1100000",
+    "wiki_title": "Tropical Storm Edouard (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Edouard_%282008%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1100000,
+    "damage_millions_usd": 1.1,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL052019": {
+    "deaths": "84 (77 direct, 7 indirect)",
+    "damages": "5080000000",
+    "wiki_title": "Hurricane Dorian (2019)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dorian_%282019%29",
+    "deaths_total": 161,
+    "deaths_min": 161,
+    "deaths_max": 161,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 5080000000,
+    "damage_millions_usd": 5080.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061954": {
@@ -1517,7 +1897,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061957": {
@@ -1537,7 +1917,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061960": {
@@ -1557,7 +1937,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061964": {
@@ -1577,7 +1957,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061977": {
@@ -1592,7 +1972,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061979": {
@@ -1612,7 +1992,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061983": {
@@ -1623,7 +2003,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061996": {
@@ -1643,7 +2023,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL061998": {
@@ -1663,7 +2043,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL062002": {
@@ -1678,7 +2058,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL062004": {
@@ -1698,7 +2078,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL062006": {
@@ -1718,7 +2098,67 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL062008": {
+    "deaths": "36 (13 direct, 23 indirect)",
+    "damages": "560000000",
+    "wiki_title": "Tropical Storm Fay (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fay_%282008%29",
+    "deaths_total": 49,
+    "deaths_min": 49,
+    "deaths_max": 49,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 560000000,
+    "damage_millions_usd": 560.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL062017": {
+    "deaths": "None reported",
+    "damages": "10000000",
+    "wiki_title": "Tropical Storm Emily (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Emily_%282017%29",
+    "deaths_total": 0,
+    "deaths_min": 0,
+    "deaths_max": 0,
+    "deaths_qualifier": "zero",
+    "damage_usd_nominal": 10000000,
+    "damage_millions_usd": 10.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL062018": {
+    "deaths": "54 (24 direct, 30 indirect)",
+    "damages": "24230000000",
+    "wiki_title": "Hurricane Florence (2018)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%282018%29",
+    "deaths_total": 78,
+    "deaths_min": 78,
+    "deaths_max": 78,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 24230000000,
+    "damage_millions_usd": 24230.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071956": {
@@ -1738,7 +2178,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071976": {
@@ -1758,7 +2198,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071988": {
@@ -1778,7 +2218,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071992": {
@@ -1794,7 +2234,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071998": {
@@ -1814,7 +2254,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL072004": {
@@ -1834,7 +2274,62 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL072007": {
+    "deaths": "1 indirect",
+    "wiki_title": "Tropical Storm Gabrielle (2007)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Gabrielle_%282007%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL072008": {
+    "deaths": "153 (112 direct, 41 indirect)",
+    "damages": "8310000000",
+    "wiki_title": "Hurricane Gustav (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Gustav_%282008%29",
+    "deaths_total": 265,
+    "deaths_min": 265,
+    "deaths_max": 265,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 8310000000,
+    "damage_millions_usd": 8310.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL072018": {
+    "deaths": "3 direct, 1 indirect",
+    "damages": "$200–250 million (2018 USD)",
+    "wiki_title": "Tropical Storm Gordon (2018)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Gordon_%282018%29",
+    "deaths_total": 4,
+    "deaths_min": 4,
+    "deaths_max": 4,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 200000000,
+    "damage_millions_usd": 200.0,
+    "damage_source_units": "usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081954": {
@@ -1854,7 +2349,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081955": {
@@ -1874,7 +2369,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081959": {
@@ -1894,7 +2389,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081976": {
@@ -1910,7 +2405,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081996": {
@@ -1930,7 +2425,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081998": {
@@ -1950,7 +2445,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081999": {
@@ -1970,7 +2465,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL082001": {
@@ -1990,7 +2485,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL082004": {
@@ -2010,7 +2505,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL082008": {
+    "deaths": "~537 total",
+    "damages": "160000000",
+    "wiki_title": "Hurricane Hanna (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hanna_%282008%29",
+    "deaths_total": 537,
+    "deaths_min": 537,
+    "deaths_max": 537,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 160000000,
+    "damage_millions_usd": 160.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091951": {
@@ -2030,7 +2545,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091953": {
@@ -2045,7 +2560,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091966": {
@@ -2065,7 +2580,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091969": {
@@ -2085,7 +2600,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091971": {
@@ -2105,7 +2620,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091979": {
@@ -2125,7 +2640,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL091985": {
@@ -2145,7 +2660,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL092002": {
@@ -2165,7 +2680,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL092004": {
@@ -2185,7 +2700,127 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092007": {
+    "deaths": "1 indirect",
+    "damages": "50000000",
+    "wiki_title": "Hurricane Humberto (2007)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Humberto_%282007%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 50000000,
+    "damage_millions_usd": 50.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092008": {
+    "deaths": "214",
+    "damages": "38000000000",
+    "wiki_title": "Hurricane Ike (2008)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ike_%282008%29",
+    "deaths_total": 214,
+    "deaths_min": 214,
+    "deaths_max": 214,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 38000000000,
+    "damage_millions_usd": 38000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092011": {
+    "deaths": "58 (49 direct, 9 indirect)",
+    "damages": "14200000000",
+    "wiki_title": "Hurricane Irene (2011)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Irene_%282011%29",
+    "deaths_total": 107,
+    "deaths_min": 107,
+    "deaths_max": 107,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 14200000000,
+    "damage_millions_usd": 14200.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092012": {
+    "deaths": "41",
+    "damages": "3840000000",
+    "wiki_title": "Hurricane Isaac (2012)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Isaac_%282012%29",
+    "deaths_total": 41,
+    "deaths_min": 41,
+    "deaths_max": 41,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 3840000000,
+    "damage_millions_usd": 3840.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092016": {
+    "deaths": "4 direct, 1 indirect",
+    "damages": "550000000",
+    "wiki_title": "Hurricane Hermine (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hermine_%282016%29",
+    "deaths_total": 5,
+    "deaths_min": 5,
+    "deaths_max": 5,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 550000000,
+    "damage_millions_usd": 550.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092017": {
+    "deaths": "107",
+    "damages": "125000000000",
+    "wiki_title": "Hurricane Harvey (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Harvey_%282017%29",
+    "deaths_total": 107,
+    "deaths_min": 107,
+    "deaths_max": 107,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 125000000000,
+    "damage_millions_usd": 125000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101959": {
@@ -2205,7 +2840,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101964": {
@@ -2225,7 +2860,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101973": {
@@ -2245,7 +2880,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101974": {
@@ -2265,7 +2900,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101981": {
@@ -2285,7 +2920,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101984": {
@@ -2305,7 +2940,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101985": {
@@ -2325,7 +2960,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101996": {
@@ -2345,7 +2980,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL101999": {
@@ -2365,7 +3000,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL102002": {
@@ -2385,7 +3020,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL102010": {
+    "deaths": "52 direct, 50 indirect, 100 presumed dead",
+    "damages": "740000000",
+    "wiki_title": "Tropical Storm Hermine (2010)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%282010%29",
+    "deaths_total": 102,
+    "deaths_min": 102,
+    "deaths_max": 102,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 740000000,
+    "damage_millions_usd": 740.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111950": {
@@ -2405,7 +3060,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111959": {
@@ -2425,7 +3080,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111964": {
@@ -2445,7 +3100,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111971": {
@@ -2465,7 +3120,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111979": {
@@ -2485,7 +3140,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111980": {
@@ -2505,7 +3160,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111985": {
@@ -2525,7 +3180,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111989": {
@@ -2545,7 +3200,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL111995": {
@@ -2565,7 +3220,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL112000": {
@@ -2585,7 +3240,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL112003": {
@@ -2605,7 +3260,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL112004": {
@@ -2625,7 +3280,42 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL112016": {
+    "damages": "6130000",
+    "wiki_title": "Tropical Storm Julia (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Julia_%282016%29",
+    "damage_usd_nominal": 6130000,
+    "damage_millions_usd": 6.13,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL112017": {
+    "deaths": "134 total",
+    "damages": "77155000000",
+    "wiki_title": "Hurricane Irma (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Irma_%282017%29",
+    "deaths_total": 134,
+    "deaths_min": 134,
+    "deaths_max": 134,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 77155000000,
+    "damage_millions_usd": 77155.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL121953": {
@@ -2645,7 +3335,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL121985": {
@@ -2665,7 +3355,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL121988": {
@@ -2685,7 +3375,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL121994": {
@@ -2705,7 +3395,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL122000": {
@@ -2725,7 +3415,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL122002": {
@@ -2745,7 +3435,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL122003": {
@@ -2765,7 +3455,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL122005": {
@@ -2785,7 +3475,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131950": {
@@ -2805,7 +3495,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131967": {
@@ -2825,7 +3515,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131971": {
@@ -2845,7 +3535,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131975": {
@@ -2865,7 +3555,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131985": {
@@ -2885,7 +3575,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131987": {
@@ -2905,7 +3595,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131998": {
@@ -2925,7 +3615,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL131999": {
@@ -2945,7 +3635,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL132002": {
@@ -2965,7 +3655,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL132003": {
@@ -2985,7 +3675,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL132011": {
+    "deaths": "18 total",
+    "damages": "2800000000",
+    "wiki_title": "Tropical Storm Lee (2011)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Lee_%282011%29",
+    "deaths_total": 18,
+    "deaths_min": 18,
+    "deaths_max": 18,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 2800000000,
+    "damage_millions_usd": 2800.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL141954": {
@@ -3005,7 +3715,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL141967": {
@@ -3025,7 +3735,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL141968": {
@@ -3045,7 +3755,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL141971": {
@@ -3065,7 +3775,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL141989": {
@@ -3085,7 +3795,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL142004": {
@@ -3105,7 +3815,47 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL142016": {
+    "deaths": "731 total",
+    "damages": "16470000000",
+    "wiki_title": "Hurricane Matthew (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Matthew_%282016%29",
+    "deaths_total": 731,
+    "deaths_min": 731,
+    "deaths_max": 731,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 16470000000,
+    "damage_millions_usd": 16470.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL142018": {
+    "deaths": "74 (31 direct, 43 indirect)",
+    "damages": "25500000000",
+    "wiki_title": "Hurricane Michael (2018)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Michael_%282018%29",
+    "deaths_total": 105,
+    "deaths_min": 105,
+    "deaths_max": 105,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 25500000000,
+    "damage_millions_usd": 25500.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL151981": {
@@ -3125,7 +3875,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL151984": {
@@ -3145,7 +3895,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL152017": {
+    "deaths": "3,059 total",
+    "damages": "91606000000",
+    "wiki_title": "Hurricane Maria (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Maria_%282017%29",
+    "deaths_total": 3059,
+    "deaths_min": 3059,
+    "deaths_max": 3059,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 91606000000,
+    "damage_millions_usd": 91606.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL161969": {
@@ -3160,7 +3930,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL162017": {
+    "deaths": "48",
+    "damages": "787000000",
+    "wiki_title": "Hurricane Nate (2017)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Nate_%282017%29",
+    "deaths_total": 48,
+    "deaths_min": 48,
+    "deaths_max": 48,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 787000000,
+    "damage_millions_usd": 787.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL171995": {
@@ -3180,7 +3970,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL172007": {
+    "deaths": "40 direct",
+    "damages": "45000000",
+    "wiki_title": "Tropical Storm Olga (2007)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Olga_%282007%29",
+    "deaths_total": 40,
+    "deaths_min": 40,
+    "deaths_max": 40,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 45000000,
+    "damage_millions_usd": 45.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL182005": {
@@ -3200,7 +4010,27 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL182012": {
+    "deaths": "254",
+    "damages": "68680000000",
+    "wiki_title": "Hurricane Sandy (2012)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Sandy_%282012%29",
+    "deaths_total": 254,
+    "deaths_min": 254,
+    "deaths_max": 254,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 68680000000,
+    "damage_millions_usd": 68680.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL222005": {
@@ -3220,7 +4050,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL241969": {
@@ -3240,7 +4070,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL252005": {
@@ -3260,7 +4090,7 @@
     "impact_provenance": {
       "source": "Wikipedia infobox",
       "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-20T03:18:19Z"
+      "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   }
 }
