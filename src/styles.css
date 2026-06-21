@@ -4901,6 +4901,7 @@ body.side-panel-open .leaflet-control-container .leaflet-right {
 .compare-panel,
 .state-panel,
 .on-this-date-panel,
+.table-view-panel,
 section.storm-panel.glass {
   position: fixed !important;
   inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) auto !important;
@@ -4918,7 +4919,8 @@ section.storm-panel.glass {
 .stats-panel[hidden],
 .compare-panel[hidden],
 .state-panel[hidden],
-.on-this-date-panel[hidden] {
+.on-this-date-panel[hidden],
+.table-view-panel[hidden] {
   display: none !important;
 }
 
@@ -5078,6 +5080,7 @@ body.side-panel-open .season-summary {
   .compare-panel,
   .state-panel,
   .on-this-date-panel,
+  .table-view-panel,
   section.storm-panel.glass {
     inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) var(--side-panel-gap) !important;
     width: auto !important;

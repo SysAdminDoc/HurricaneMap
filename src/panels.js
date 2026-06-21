@@ -1,7 +1,7 @@
 // Side-panel manager. Every analytical/details surface uses one lane so panels
 // never stack or fight for viewport space.
 
-const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel'];
+const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel', 'table-view-panel', 'spatial-results'];
 const PANEL_BUTTONS = {
   'stats-panel': 'toggle-stats',
   'compare-panel': 'toggle-compare',
