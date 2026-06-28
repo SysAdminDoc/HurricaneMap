@@ -12,9 +12,5 @@ server.log
 npm-debug.log*
 .tmp-pid.txt
 example.png
-CLAUDE.md
-CODEX_CHANGELOG.md
-.claude
-.codex
 __pycache__
 *.pyc
