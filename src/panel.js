@@ -10,7 +10,7 @@ import { renderIntensityChart } from './chart.js';
 import { exportChartAsPng, exportChartAsSvg } from './chart-export.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
-import { hidePanel, showPanel } from './panels.js';
+import { hidePanel, minimizePanel, restorePanel, showPanel } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
@@ -43,6 +43,23 @@ let animator = null;
 function getAnimator() {
   if (!animator) animator = new TrackAnimator(getMap());
   return animator;
+}
+
+let playbackAutoMinimized = false;
+
+function enterPlaybackMapMode() {
+  if (!panel || panel.hidden) return;
+  playbackAutoMinimized = !panel.classList.contains('minimized');
+  minimizePanel('storm-panel');
+  document.body.classList.add('track-playback-active');
+}
+
+function leavePlaybackMapMode({ restore = false } = {}) {
+  document.body.classList.remove('track-playback-active');
+  if (restore && playbackAutoMinimized && panel && !panel.hidden) {
+    restorePanel('storm-panel');
+  }
+  playbackAutoMinimized = false;
 }
 
 let radar = null;
@@ -378,12 +395,14 @@ function render(storm, landfall, allStorms) {
 
   const playBtn = document.getElementById('play-anim-btn');
   if (playBtn) {
-    const playbackHost = document.getElementById('panel-playback-host');
     const playLabel = playBtn.querySelector('.play-label');
     const syncPlayButton = (state = {}) => {
       const isThisStorm = state.stormId === storm.id;
+      const activeForThisStorm = isThisStorm && state.active;
       const playing = isThisStorm && state.playing;
       const paused = isThisStorm && (state.paused || state.ended);
+      document.body.classList.toggle('track-playback-active', activeForThisStorm);
+      if (!activeForThisStorm) leavePlaybackMapMode({ restore: true });
       playBtn.classList.toggle('is-playing', playing);
       playBtn.classList.toggle('is-paused', paused);
       playBtn.setAttribute('aria-pressed', String(playing));
@@ -401,8 +420,8 @@ function render(storm, landfall, allStorms) {
       playBtn.disabled = true;
       if (playLabel) playLabel.textContent = 'Loading playback...';
       try {
+        enterPlaybackMapMode();
         await anim.play(storm, {
-          controlsHost: playbackHost,
           onStateChange: syncPlayButton,
           onEnd: () => syncPlayButton(anim.getPlaybackState()),
         });

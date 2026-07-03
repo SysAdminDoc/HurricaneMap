@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.1-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -48,7 +48,7 @@ npm run build
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).
 - **Multi-state tracking** for storms like Andrew (FL → FL → LA), Charley (FL → FL → SC → SC), Hugo (PR → PR → SC), Katrina (FL → LA → LA).
 - Per-segment **intensity-coloured tracks** — you can see exactly where a storm intensified, peaked, and weakened.
-- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Playback controls live inside the storm side panel beneath the Play/Pause button, including radar sync, speed, restart, and scrubber controls.
+- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Starting playback collapses the storm panel to a restore tab and promotes radar sync, speed, restart, close, and scrubber controls into a compact map dock.
 - **📡 Archived NEXRAD radar — full-storm timeline, offline-capable** — every storm from August 1995 onward ships with **every in-coverage 6-hourly track frame** baked into the repo. Click 📡 next to any landfall and the loop animates the entire U.S. passage of that storm from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days; Helene '24 shows the eyewall crossing the Big Bend. **No internet required after `git clone`.** Frames not in the local archive transparently fall back to live IEM URLs.
 - **Live GOES satellite background** — when active storms exist, an opt-in setting overlays current NOAA/NESDIS/STAR GOES GeoColor sectors behind the official advisory track/cone. Atlantic, Eastern Pacific, and Central Pacific active storms automatically choose the closest live sector; see [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md).
 - **📈 Intensity time-series chart** — inline SVG in every storm panel showing wind (kt) + pressure (mb) over the storm's life, with category-colored dots, dashed pressure line (inverted so deeper storms read higher), Cat 1-5 reference bands, vertical landfall markers, and a hover crosshair tooltip.
@@ -62,6 +62,13 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.4.2 — Playback map-first layout (July 2026)
+
+- **Playback clears the map.** Starting a storm track now automatically collapses the details window to a restore tab so the animated storm path stays visible.
+- **Orderly playback dock.** Animation controls now live in a compact fixed map dock with restart, close, speed, radar sync, and scrubber controls arranged for desktop and phone viewports.
+- **Less vertical clutter.** The timeline, season summary, compare tray, and standalone radar controls are suppressed while track playback is active.
+- **Regression coverage.** Smoke tests now verify the playback layout in desktop and mobile viewports across dark, light, and high-contrast themes.
 
 ## What's new in v1.4.1 — Map-first overlay polish (July 2026)
 
@@ -91,7 +98,7 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **Panel lane stabilized** — Storm, statistics, comparison, state, and "on this date" panels now share one fixed responsive side lane with mobile collision handling, so panels no longer overlap controls or each other.
 - **Keyboard-friendly search** — Search results now behave like a proper combobox/listbox with arrow-key navigation, Enter selection, Escape close, active-result highlighting, and clearer empty states.
 - **Resilient loading feedback** — Required data-load failures now surface a calm, actionable error card with retry guidance instead of silently rendering a broken empty map.
-- **Inline playback controls** — Track playback now drops down inside the storm side panel beneath the Play/Pause button, replacing the old viewport-wide playback bar that could overlap the map and panels.
+- **Map-first playback controls** — Track playback now collapses the storm panel to a restore tab and uses a compact fixed map dock, keeping the animated path visible while controls stay orderly.
 - **Readable playback state** — The active Play/Pause button uses a high-contrast dark active surface with light text so playback state remains legible.
 - **Reserved overlay shelf** — Compare and radar controls now live above the bottom timeline and outside the side-panel lane, reducing collisions between floating controls.
 - **Season summary shelf** — Single-year season summaries now sit in the open map shelf instead of underneath the filter/year range panel or bottom timeline.

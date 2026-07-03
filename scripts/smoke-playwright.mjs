@@ -168,6 +168,89 @@ async function assertSidePanelLayout(page, label) {
   }
 }
 
+async function assertPlaybackMapMode(page, label) {
+  await page.click('#play-anim-btn');
+  await page.waitForFunction(() => {
+    const panel = document.querySelector('#storm-panel');
+    const controls = document.querySelector('.anim-controls');
+    return document.body.classList.contains('track-playback-active') &&
+      panel?.classList.contains('minimized') &&
+      controls &&
+      !controls.hidden &&
+      getComputedStyle(controls).display !== 'none';
+  }, { timeout: 10000 });
+  await page.waitForTimeout(220);
+
+  const layout = await page.evaluate(() => {
+    const rectFor = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (
+        element.hidden ||
+        style.display === 'none' ||
+        style.visibility === 'hidden' ||
+        Number(style.opacity) === 0 ||
+        rect.width <= 0 ||
+        rect.height <= 0
+      ) {
+        return null;
+      }
+      return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      };
+    };
+    const pointInside = (point, rect) => rect &&
+      point.x >= rect.left &&
+      point.x <= rect.right &&
+      point.y >= rect.top &&
+      point.y <= rect.bottom;
+    const viewport = { width: innerWidth, height: innerHeight };
+    const mapCenter = { x: viewport.width / 2, y: viewport.height / 2 };
+    const panel = document.querySelector('#storm-panel');
+    return {
+      viewport,
+      bodyPlayback: document.body.classList.contains('track-playback-active'),
+      panelMinimized: !!panel?.classList.contains('minimized'),
+      panel: rectFor('#storm-panel'),
+      restore: rectFor('#storm-panel .panel-restore-bar'),
+      controls: rectFor('.anim-controls'),
+      timeline: rectFor('#timeline-ribbon'),
+      map: rectFor('#map'),
+      centerCoveredByPanel: pointInside(mapCenter, rectFor('#storm-panel')),
+      centerCoveredByControls: pointInside(mapCenter, rectFor('.anim-controls')),
+    };
+  });
+
+  assert(layout.bodyPlayback, `${label}: body did not enter playback map mode`);
+  assert(layout.panelMinimized, `${label}: storm panel was not minimized during playback`);
+  assert(layout.panel, `${label}: minimized storm restore tab did not render`);
+  assert(layout.controls, `${label}: playback controls did not render on the map`);
+  assert(layout.map, `${label}: map disappeared during playback`);
+  assert(!layout.timeline, `${label}: timeline still competes with playback controls`);
+  assert(layout.panel.width <= Math.min(260, layout.viewport.width - 16), `${label}: restore tab is too wide (${layout.panel.width}px)`);
+  assert(layout.panel.height <= 72, `${label}: minimized panel is too tall (${layout.panel.height}px)`);
+  assert(layout.controls.left >= -0.5, `${label}: playback controls escape left edge`);
+  assert(layout.controls.right <= layout.viewport.width + 0.5, `${label}: playback controls escape right edge`);
+  assert(layout.controls.bottom <= layout.viewport.height + 0.5, `${label}: playback controls escape bottom edge`);
+  assert(layout.controls.height <= layout.viewport.height * 0.42, `${label}: playback controls consume too much vertical space (${layout.controls.height}px)`);
+  assert(!rectsIntersect(layout.controls, layout.restore), `${label}: playback controls overlap the restore tab`);
+  assert(!layout.centerCoveredByPanel, `${label}: minimized panel covers the map center`);
+  assert(!layout.centerCoveredByControls, `${label}: playback controls cover the map center`);
+
+  await page.click('.anim-close');
+  await page.waitForFunction(() => (
+    !document.body.classList.contains('track-playback-active') &&
+    !document.querySelector('#storm-panel')?.classList.contains('minimized')
+  ), { timeout: 5000 });
+}
+
 async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   const context = await browser.newContext({
     viewport: { width: scenario.width, height: scenario.height },
@@ -189,6 +272,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     await waitForAppReady(page);
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, scenario.label);
+    if (scenario.playback) await assertPlaybackMapMode(page, scenario.label);
     if (pageErrors.length) throw new Error(`${scenario.label}: page errors: ${pageErrors.join(' | ')}`);
   } finally {
     await context.close();
@@ -425,6 +509,7 @@ try {
       await runPanelLayoutScenario(browser, baseUrl, {
         ...viewport,
         ...theme,
+        playback: viewport.width === 1120 || viewport.width === 430,
         label: `panel layout ${viewport.width}x${viewport.height} ${theme.name}`,
       });
     }
@@ -432,7 +517,7 @@ try {
 
   await browser.close();
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok, panel layout matrix ok)`);
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok, panel layout/playback matrix ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

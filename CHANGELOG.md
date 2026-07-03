@@ -2,6 +2,13 @@
 
 All notable changes to HurricaneMap.
 
+## v1.4.2 - Playback map-first layout (July 2026)
+
+- Collapsed the storm details panel automatically when track playback starts so the animated track and map remain visible.
+- Moved animation controls out of the storm panel into a compact fixed map dock with responsive desktop/mobile wrapping.
+- Hid competing bottom overlays during playback, including the timeline, season summary, compare tray, and standalone radar controls.
+- Added smoke coverage for the playback layout across dark, light, and high-contrast themes in desktop and mobile viewports.
+
 ## v1.4.1 - Map-first overlay polish (July 2026)
 
 - Changed filters to start collapsed and behave as a bounded, scrollable map drawer instead of a default overlapping window.

@@ -7521,3 +7521,146 @@ body.filters-open .timeline-toggle {
     text-overflow: ellipsis;
   }
 }
+
+/* Track playback map-first mode v1.4.2
+   Playback is a map task, not a side-panel reading task. Starting a track
+   collapses the storm panel to its restore tab, hides competing bottom shelves,
+   and promotes the animation controls to a compact fixed map dock. */
+body.track-playback-active .season-summary,
+body.track-playback-active .compare-tray,
+body.track-playback-active .radar-controls,
+body.track-playback-active .timeline-ribbon {
+  display: none !important;
+}
+
+body.track-playback-active .storm-panel.minimized {
+  inset: var(--side-panel-top) var(--side-panel-gap) auto auto !important;
+  z-index: 2200;
+  width: fit-content !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  max-width: calc(100vw - 24px) !important;
+  overflow: hidden !important;
+}
+
+body.track-playback-active .storm-panel.minimized .panel-restore-bar {
+  min-height: 42px;
+  padding: 9px 14px;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) {
+  position: fixed !important;
+  top: auto !important;
+  bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(720px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: min(34vh, 280px);
+  overflow: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-panel) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 12px;
+  box-shadow: var(--shadow-theme-lg);
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-btn {
+  width: auto;
+  min-width: 44px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-scrubber {
+  flex: 1 1 220px;
+  min-width: 160px;
+  width: auto;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-speed,
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar-toggle {
+  min-height: 32px;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-hud {
+  flex: 1 1 230px;
+  min-width: 180px;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-title,
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  body.track-playback-active .storm-panel.minimized {
+    inset: calc(var(--side-panel-top) + 2px) 8px auto auto !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) {
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    max-height: min(36vh, 300px);
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-btn {
+    min-width: 42px;
+    height: 32px;
+    padding: 0 9px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-close {
+    margin-left: auto;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-scrubber {
+    order: 3;
+    flex: 1 0 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-hud {
+    order: 4;
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar-toggle {
+    order: 5;
+    max-width: 100%;
+  }
+}
+
+/* Storm-panel chrome refinement v1.4.2
+   The injected minimize/close controls are absolute-positioned at the panel
+   edge; reserve that lane in the sticky storm header so action buttons never
+   render underneath them. */
+.storm-panel .panel-sticky-header {
+  padding-right: 96px !important;
+}
+
+.storm-panel .panel-min-btn {
+  z-index: 4;
+}
+
+@media (max-width: 720px) {
+  .storm-panel .panel-sticky-header {
+    padding-right: 86px !important;
+  }
+}
