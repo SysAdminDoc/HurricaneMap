@@ -2,6 +2,15 @@
 
 All notable changes to HurricaneMap.
 
+## v1.4.3 - Premium layout and settings polish (July 2026)
+
+- Compressed mobile playback chrome so the map remains the primary surface: the header collapses to a compact identity strip, the storm panel stays as a small edge restore tab, and playback controls render as a bounded command dock.
+- Reworked settings into a clearer preference surface with helper copy, stronger grouping, localized strings, right-anchored desktop placement, and scroll-safe mobile drawer constraints.
+- Normalized repeated control geometry away from fully rounded pills into the app's 4/6/8/10/12px radius scale across chips, badges, toggles, swatches, segmented controls, toasts, and playback controls.
+- Made search no-results render as an inline empty state so high-contrast and narrow layouts present clear recovery guidance instead of a hidden dropdown.
+- Tightened loading, missing-record, boot-error, and update-prompt copy so degraded states explain what is happening and how to recover.
+- Extended smoke coverage to assert settings layout, mobile playback header compression, compact playback docks, and oversized-radius regressions across dark, light, and high-contrast themes.
+
 ## v1.4.2 - Playback map-first layout (July 2026)
 
 - Collapsed the storm details panel automatically when track playback starts so the animated track and map remain visible.

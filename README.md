@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -62,6 +62,14 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.4.3 - Premium layout and settings polish (July 2026)
+
+- **Playback gives the map priority.** On phones, active track playback now collapses the header to a compact identity strip, keeps the storm panel as a small edge restore tab, and holds the controls in a bounded dock.
+- **Settings feel intentional.** Preferences now include concise helper copy, localized labels, right-anchored desktop placement, and scroll-safe mobile drawer constraints.
+- **Cleaner component system.** Chips, badges, toggles, swatches, segmented controls, toasts, and playback controls now use the same 4/6/8/10/12px radius scale instead of mixed pill shapes.
+- **States are clearer.** Search no-results, loading, missing-record, boot-error, and update-prompt copy now give calm recovery guidance in dark, light, and high-contrast themes.
+- **Regression coverage.** Smoke tests now assert settings layout, mobile playback header compression, compact playback docks, and oversized-radius regressions across supported themes.
 
 ## What's new in v1.4.2 — Playback map-first layout (July 2026)
 
