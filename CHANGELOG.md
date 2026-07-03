@@ -2,6 +2,11 @@
 
 All notable changes to HurricaneMap.
 
+## v1.4.6 - Desktop panel fit (July 2026)
+
+- Lowered the desktop analytical panel lane and tightened the shelf gutter from 12px to 6px so the right panel uses the available space above the season/timeline shelf.
+- Added smoke coverage that asserts side panels leave a compact 4-8px gutter above the bottom shelf instead of floating too high.
+
 ## v1.4.5 - Desktop shelf alignment (July 2026)
 
 - Moved the season summary into the desktop bottom shelf, positioned to the left of the timeline with matching height, baseline, radius, and surface treatment.
