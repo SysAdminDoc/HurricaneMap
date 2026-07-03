@@ -88,7 +88,10 @@ export function closePanelsExcept(keepId = null) {
 
 function withTransition(fn) {
   if (document.startViewTransition) {
-    document.startViewTransition(fn);
+    // Rapid open/close skips the previous transition; its finished promise
+    // rejects and logs "Transition was skipped" as an unhandled rejection.
+    const transition = document.startViewTransition(fn);
+    transition.finished.catch(() => {});
   } else {
     fn();
   }
