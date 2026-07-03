@@ -52,3 +52,7 @@ AGENTS.md
 .ai/
 PROJECT_CONTEXT.md
 CONTINUATION_PROMPT.md
+
+# Runtime logs
+server.log
+*.log
