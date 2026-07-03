@@ -302,6 +302,81 @@ async function assertSettingsSurface(page, label) {
   await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
 }
 
+async function assertDesktopPanelSystem(page, label) {
+  const assertPanelFit = async (selector, name) => {
+    const layout = await page.evaluate((panelSelector) => {
+      const rectFor = (selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return null;
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        if (
+          element.hidden ||
+          style.display === 'none' ||
+          style.visibility === 'hidden' ||
+          Number(style.opacity) === 0 ||
+          rect.width <= 0 ||
+          rect.height <= 0
+        ) {
+          return null;
+        }
+        return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
+      };
+      const panel = document.querySelector(panelSelector);
+      const panelRect = rectFor(panelSelector);
+      const children = [...document.querySelectorAll(`${panelSelector} .state-summary-cluster, ${panelSelector} .state-distribution-cluster, ${panelSelector} .state-records-cluster, ${panelSelector} .storm-summary-cluster, ${panelSelector} .storm-analysis-cluster, ${panelSelector} .storm-resources-cluster, ${panelSelector} .stats-panel-column`)]
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return { className: String(element.className || ''), left: rect.left, right: rect.right, width: rect.width };
+        });
+      return {
+        viewport: { width: innerWidth, height: innerHeight },
+        panel: panelRect,
+        clientWidth: panel?.clientWidth || 0,
+        scrollWidth: panel?.scrollWidth || 0,
+        children,
+        fullBleedHeader: !!document.querySelector(`${panelSelector} .panel-sticky-header, ${panelSelector} .table-view-header`),
+        seasonSummary: rectFor('.season-summary'),
+      };
+    }, selector);
+    assert(layout.panel, `${label}: ${name} did not render`);
+    assert(layout.panel.width >= 520, `${label}: ${name} is too narrow for desktop (${layout.panel.width}px)`);
+    assert(layout.panel.right <= layout.viewport.width + 0.5, `${label}: ${name} escapes right edge`);
+    if (!layout.fullBleedHeader) {
+      assert(layout.scrollWidth <= layout.clientWidth + 2, `${label}: ${name} has clipped horizontal overflow (${layout.scrollWidth}px > ${layout.clientWidth}px)`);
+    }
+    assert(!layout.seasonSummary, `${label}: season summary still competes with open ${name}`);
+    for (const child of layout.children) {
+      assert(child.left >= layout.panel.left - 1, `${label}: ${name} child escapes left edge (${child.className})`);
+      assert(child.right <= layout.panel.right + 1, `${label}: ${name} child escapes right edge (${child.className})`);
+    }
+  };
+
+  await assertPanelFit('#storm-panel', 'storm panel');
+
+  await page.evaluate(async () => {
+    const state = await import('/src/state.js');
+    await state.openState('Florida');
+  });
+  await page.waitForFunction(() => !document.querySelector('#state-panel')?.hidden && /Florida/.test(document.querySelector('#state-panel')?.textContent || ''), { timeout: 10000 });
+  await assertPanelFit('#state-panel', 'state panel');
+  const stateRows = await page.evaluate(() => [...document.querySelectorAll('#state-panel .state-storm-row')].map(row => ({
+    role: row.getAttribute('role'),
+    tabIndex: row.getAttribute('tabindex'),
+    label: row.getAttribute('aria-label') || '',
+  })).slice(0, 12));
+  assert(stateRows.length >= 5, `${label}: state panel did not render enough storm rows`);
+  assert(stateRows.every(row => row.role === 'button' && row.tabIndex === '0' && /^Open .+ storm details/.test(row.label)), `${label}: state rows are not keyboard-accessible buttons`);
+  await page.focus('#state-panel .state-storm-row');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden && /Storm details/.test(document.querySelector('#storm-panel')?.textContent || ''), { timeout: 10000 });
+  await assertPanelFit('#storm-panel', 'storm panel after keyboard state selection');
+
+  await page.click('#toggle-stats');
+  await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+  await assertPanelFit('#stats-panel', 'statistics panel');
+}
+
 async function assertPremiumChrome(page, label) {
   const offenders = await page.evaluate(() => {
     const selectors = [
@@ -362,6 +437,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, scenario.label);
     await assertSettingsSurface(page, scenario.label);
+    if (scenario.desktopPanelAudit) await assertDesktopPanelSystem(page, scenario.label);
     if (scenario.playback) await assertPlaybackMapMode(page, scenario.label);
     await assertPremiumChrome(page, scenario.label);
     if (pageErrors.length) throw new Error(`${scenario.label}: page errors: ${pageErrors.join(' | ')}`);
@@ -584,6 +660,8 @@ try {
   if (mobileErrors.length) throw new Error(`mobile page errors: ${mobileErrors.join(' | ')}`);
 
   const panelLayoutViewports = [
+    { width: 1440, height: 960, desktopPanelAudit: true },
+    { width: 1280, height: 900, desktopPanelAudit: true },
     { width: 1120, height: 820 },
     { width: 860, height: 820 },
     { width: 720, height: 900 },
@@ -601,6 +679,7 @@ try {
         ...viewport,
         ...theme,
         playback: viewport.width === 1120 || viewport.width === 430,
+        desktopPanelAudit: !!viewport.desktopPanelAudit,
         label: `panel layout ${viewport.width}x${viewport.height} ${theme.name}`,
       });
     }
