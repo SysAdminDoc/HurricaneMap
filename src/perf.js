@@ -17,7 +17,7 @@ export async function ensureRadarLoaded() {
   return lazyModules.radar || null;
 }
 
-// Performance monitoring: measure Core Web Vitals (LCP, FID, CLS)
+// Performance monitoring: measure Core Web Vitals (LCP, INP, CLS)
 // Called from main.js to track real user metrics
 export function initPerformanceMonitoring() {
   let storedDebug = false;

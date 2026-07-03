@@ -24,7 +24,10 @@ export function generateStatisticalReport(filters) {
 
   const monthCounts = {};
   for (let m = 1; m <= 12; m++) monthCounts[m] = 0;
-  filtered.forEach(lf => { monthCounts[lf.month] = (monthCounts[lf.month] || 0) + 1; });
+  filtered.forEach(lf => {
+    const m = landfallMonth(lf);
+    if (m) monthCounts[m] = (monthCounts[m] || 0) + 1;
+  });
 
   const stateCounts = {};
   filtered.forEach(lf => {
@@ -73,8 +76,8 @@ ${title}
 ${formatMonthChart(monthCounts, filtered.length)}
 
 ### Date Range
-- **Earliest:** ${earliestLandfall ? `${monthName(earliestLandfall.month)} ${earliestLandfall.day}, ${earliestLandfall.year}` : 'N/A'}
-- **Latest:** ${latestLandfall ? `${monthName(latestLandfall.month)} ${latestLandfall.day}, ${latestLandfall.year}` : 'N/A'}
+- **Earliest:** ${formatLandfallDate(earliestLandfall)}
+- **Latest:** ${formatLandfallDate(latestLandfall)}
 
 ---
 
@@ -147,6 +150,25 @@ function buildFilterTitle(filters) {
 function monthName(m) {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return months[m - 1] || '';
+}
+
+// Landfall records carry only the ISO timestamp `t`; derive calendar fields.
+function landfallDateUTC(lf) {
+  if (!lf?.t) return null;
+  const when = new Date(lf.t);
+  return Number.isNaN(when.getTime()) ? null : when;
+}
+
+function landfallMonth(lf) {
+  const when = landfallDateUTC(lf);
+  return when ? when.getUTCMonth() + 1 : null;
+}
+
+function formatLandfallDate(lf) {
+  if (!lf) return 'N/A';
+  const when = landfallDateUTC(lf);
+  if (!when) return String(lf.year ?? 'N/A');
+  return `${monthName(when.getUTCMonth() + 1)} ${when.getUTCDate()}, ${lf.year}`;
 }
 
 function formatMonthChart(counts, total) {

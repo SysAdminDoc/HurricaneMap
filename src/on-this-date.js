@@ -114,8 +114,8 @@ export async function showOnThisDate() {
           const cls = categoryClass(lf.category);
           const wind = formatWind(lf.wind);
           const date = formatTime(lf.t);
-          const stormName = lf.storm_name && lf.storm_name !== 'UNNAMED'
-            ? lf.storm_name
+          const stormName = lf.name && lf.name !== 'UNNAMED'
+            ? lf.name
             : `${lf.year} unnamed`;
           const daysFromToday = calendarDistanceDays(lf.t, todayMonthDay);
           return `

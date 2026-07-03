@@ -29,13 +29,17 @@ export function exportPublicationCSV(filters) {
   for (const lf of filtered) {
     // Ensure defaults for undefined values
     const windMph = lf.wind ? Math.round(lf.wind * 1.15078) : '';
+    // Landfall records carry only the ISO timestamp `t` — derive the
+    // documented month/day/hour columns from it.
+    const when = lf.t ? new Date(lf.t) : null;
+    const validWhen = when && !Number.isNaN(when.getTime());
     const row = [
       lf.storm_id || '',
       lf.name || 'UNNAMED',
       lf.year || '',
-      lf.month || '',
-      lf.day || '',
-      lf.hour || '0',
+      validWhen ? when.getUTCMonth() + 1 : '',
+      validWhen ? when.getUTCDate() : '',
+      validWhen ? when.getUTCHours() : '',
       Number.isFinite(lf.lat) ? lf.lat.toFixed(3) : '',
       Number.isFinite(lf.lon) ? lf.lon.toFixed(3) : '',
       lf.wind || '',

@@ -461,7 +461,8 @@ export function getLocale() {
 
 export function t(key, ...args) {
   const strings = STRINGS[currentLocale] || STRINGS[LOCALE_EN];
-  let str = strings[key] || key;
+  // Partial locales (ht) fall back to English before exposing the raw key.
+  let str = strings[key] || STRINGS[LOCALE_EN][key] || key;
 
   // Simple substitution for numbered placeholders: {0}, {1}, etc.
   for (let i = 0; i < args.length; i++) {

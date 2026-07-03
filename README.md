@@ -58,7 +58,7 @@ npm run build
 - **🌊 SLOSH MOM storm surge zones** — overlay NHC's Cat 1-5 maximum-of-maximums inundation maps along the U.S. Gulf, East Coast, Caribbean. Powered by NOAA's pre-rendered ArcGIS tiles — picking a category snaps the worst-case envelope into view.
 - **🌬️ Wind-field swaths** — for storms 2004+, a checkbox in the storm panel renders the actual HURDAT2 wind-radii analysis (34/50/64 kt asymmetric quadrants per track point) as overlapping polygons along the path.
 - **🛰️ ✈️ 🍝 🌪️ Quicklinks** — every storm panel links out to GOES satellite imagery (RAMMB SLIDER, 2018+), NOAA Storm Events tornado search filtered to the storm's dates + states, Hurricane Hunters recon archive (Tropical Atlantic mirror), Wikipedia, YouTube footage search, NOAA Tropical Cyclone Reports, and the NHC storm wallet.
-- **⚠️ Impacts data** — raw Wikipedia infobox deaths/damage text plus normalized numeric fields for fatalities and nominal USD damage (46 storms covered so far; rerun `scripts/scrape_impacts.py` to fill in more).
+- **⚠️ Impacts data** — raw Wikipedia infobox deaths/damage text plus normalized numeric fields for fatalities and nominal USD damage (208 storms covered so far; rerun `scripts/scrape_impacts.py` to fill in more).
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
@@ -127,7 +127,7 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **New statistics table** — Six-column analysis by decade: named-storm count, major-hurricane %, ACE total, deadliest storm, and costliest storm. Hover reveals death/damage details. Complements the annual climatology chart.
 
 **Performance Optimizations**
-- **Core Web Vitals monitoring** — Automatic tracking of LCP (Largest Contentful Paint), FID (First Input Delay), and CLS (Cumulative Layout Shift) logged to the browser console.
+- **Core Web Vitals monitoring** — Opt-in (`?perf` or `hm-debug-perf`) tracking of LCP (Largest Contentful Paint), INP (Interaction to Next Paint), and CLS (Cumulative Layout Shift) logged to the browser console.
 - **CSS rendering optimizations** — `will-change` hints on frequently-animated elements (buttons, charts, action controls) reduce layout thrashing.
 - **Lazy-load infrastructure** — Foundation for on-demand loading of non-critical modules (e.g., radar overlay) to reduce initial bundle impact.
 
@@ -181,7 +181,7 @@ Perfect for:
 - Geographic & statistical software (ArcGIS, R, Python, QGIS)
 - Spreadsheet analysis (Excel, Google Sheets)
 
-See [LICENSE.md](LICENSE.md#how-to-cite-hurriranemap) for citation formats.
+See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 
 ## Project layout
 

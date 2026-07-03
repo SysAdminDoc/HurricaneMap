@@ -142,7 +142,10 @@ function isShell(url) {
 
 function isData(url) {
   if (url.origin !== location.origin) return false;
-  return /\/data\/.+\.(json|geojson|txt)$/.test(url.pathname) || /\.(json|geojson|txt)$/.test(url.pathname);
+  // Only the generated /data/ bundle counts as offline data. Matching every
+  // same-origin .json would also capture live feeds like /nhc/CurrentStorms.json
+  // and serve them stale-first, defeating their no-cache polling.
+  return /\/data\/.+\.(json|geojson|txt)(\.gz)?$/.test(url.pathname);
 }
 
 function isRadarAsset(url) {

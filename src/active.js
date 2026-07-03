@@ -126,20 +126,33 @@ async function tryFetch(url, signal) {
   return { ok: true, status: response.status, storms: (data && data.activeStorms) || [] };
 }
 
-async function fetchCurrentStorms() {
+async function tryFetchWithTimeout(url) {
+  // Per-attempt controller: a hung primary must not consume the fallback's
+  // abort budget too.
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const primaryUrl = resolveProxyUrl();
-    try {
-      return await tryFetch(primaryUrl, controller.signal);
-    } catch { /* primary failed, try fallback */ }
-    const fallbackUrl = primaryUrl === NHC_CF_PROXY ? NHC_FALLBACK : NHC_CF_PROXY;
-    return await tryFetch(fallbackUrl, controller.signal);
-  } catch (error) {
-    return { ok: false, status: 0, storms: [], error };
+    return await tryFetch(url, controller.signal);
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function fetchCurrentStorms() {
+  const primaryUrl = resolveProxyUrl();
+  const fallbackUrl = primaryUrl === NHC_CF_PROXY ? NHC_FALLBACK : NHC_CF_PROXY;
+  let primary = null;
+  try {
+    primary = await tryFetchWithTimeout(primaryUrl);
+    // Honor rate-limit backoff without hammering the fallback.
+    if (primary.ok || primary.status === 429) return primary;
+  } catch { /* primary threw — fall through to fallback */ }
+  // Hosts without the Cloudflare /nhc/ route (e.g. GitHub Pages) return 404
+  // here rather than throwing, so non-ok results must also trigger fallback.
+  try {
+    return await tryFetchWithTimeout(fallbackUrl);
+  } catch (error) {
+    return primary || { ok: false, status: 0, storms: [], error };
   }
 }
 

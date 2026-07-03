@@ -68,6 +68,9 @@ export function buildQGISGeoJSON({
   }
 
   for (const lf of filteredLandfalls) {
+    // Landfall records carry only the ISO timestamp `t`; derive calendar fields.
+    const when = lf.t ? new Date(lf.t) : null;
+    const validWhen = when && !Number.isNaN(when.getTime());
     features.push({
       type: 'Feature',
       geometry: {
@@ -78,9 +81,10 @@ export function buildQGISGeoJSON({
         storm_id: lf.storm_id,
         name: lf.name || 'UNNAMED',
         year: lf.year,
-        month: lf.month,
-        day: lf.day,
-        hour: lf.hour || 0,
+        time_utc: lf.t || null,
+        month: validWhen ? when.getUTCMonth() + 1 : null,
+        day: validWhen ? when.getUTCDate() : null,
+        hour: validWhen ? when.getUTCHours() : null,
         latitude: roundNumber(lf.lat, 3),
         longitude: roundNumber(lf.lon, 3),
         wind_speed_kt: Number.isFinite(lf.wind) ? lf.wind : null,

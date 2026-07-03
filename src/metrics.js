@@ -295,7 +295,7 @@ function exportCSVPublication(storm) {
   }
   
   const dataLines = rows.map(r => r.map(csvEscape).join(',')).join('\n');
-  return headerLines.join('\n') + dataLines;
+  return headerLines.join('\n') + '\n' + dataLines;
 }
 
 function csvEscape(v) {

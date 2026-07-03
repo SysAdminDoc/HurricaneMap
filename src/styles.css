@@ -3461,6 +3461,11 @@ select:focus {
   margin: 0;
   border: none;
 }
+/* The unconditional display:flex above overrides the UA's
+   [popover]:not(:popover-open) { display: none } rule, which keeps the CLOSED
+   settings menu rendered — exposed to screen readers and intercepting clicks
+   over the filter panel. Re-assert the closed state. */
+.settings-menu:not(:popover-open) { display: none; }
 .settings-menu::backdrop { background: transparent; }
 
 .settings-row {

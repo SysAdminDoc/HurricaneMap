@@ -454,7 +454,9 @@ function wireSettingsControls() {
   const replayTour = menu.querySelector('#replay-tour');
   if (replayTour) {
     replayTour.addEventListener('click', () => {
-      menu.setAttribute('hidden', '');
+      if (typeof menu.hidePopover === 'function') {
+        try { menu.hidePopover(); } catch { /* already closed */ }
+      }
       cog.setAttribute('aria-expanded', 'false');
       maybeStartOnboardingLazy({ force: true });
     });

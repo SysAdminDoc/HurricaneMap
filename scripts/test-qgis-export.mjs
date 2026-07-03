@@ -2,13 +2,12 @@ import assert from 'node:assert/strict';
 
 import { buildQGISGeoJSON } from '../src/qgis.js';
 
+// Fixture mirrors the production landfall shape: calendar fields are derived
+// from the ISO timestamp `t` (records carry no month/day/hour fields).
 const landfalls = [{
   storm_id: 'AL122005',
   name: 'KATRINA',
   year: 2005,
-  month: 8,
-  day: 29,
-  hour: 11,
   t: '2005-08-29T11:10:00Z',
   lat: 29.3,
   lon: -89.6,
@@ -55,5 +54,9 @@ const point = geojson.features.find(feature => feature.properties.feature_type =
 assert.equal(point.geometry.type, 'Point');
 assert.equal(point.properties.pressure_mb, 920);
 assert.equal(point.properties.category, '3');
+assert.equal(point.properties.time_utc, '2005-08-29T11:10:00Z');
+assert.equal(point.properties.month, 8);
+assert.equal(point.properties.day, 29);
+assert.equal(point.properties.hour, 11);
 
 console.log('qgis export ok');

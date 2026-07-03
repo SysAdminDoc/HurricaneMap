@@ -12,8 +12,10 @@ self.addEventListener('message', async () => {
   }
 });
 
+// Relative fetches resolve against this worker's own URL (/src/), so the
+// data directory one level up must be addressed explicitly.
 async function fetchGzipped() {
-  const response = await fetch('data/storms.json.gz');
+  const response = await fetch(new URL('../data/storms.json.gz', self.location.href));
   if (!response.ok) throw new Error(`storms.json.gz returned ${response.status}`);
   const ds = new DecompressionStream('gzip');
   const decompressed = response.body.pipeThrough(ds);
@@ -29,7 +31,7 @@ async function fetchGzipped() {
 }
 
 async function fetchRaw() {
-  const response = await fetch('data/storms.json');
+  const response = await fetch(new URL('../data/storms.json', self.location.href));
   if (!response.ok) throw new Error(`storms.json returned ${response.status}`);
   return response.json();
 }
