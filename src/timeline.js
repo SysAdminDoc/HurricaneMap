@@ -96,6 +96,10 @@ function attachDragInteraction() {
       currentYear: year,
       targetYear: eventYearTarget(e.target),
       moved: false,
+      // Snapshot before drawSelection() mutates selectedMin/Max — this is
+      // what pointercancel must restore.
+      prevMin: selectedMin,
+      prevMax: selectedMax,
     };
     axis.classList.add('dragging');
     try { axis.setPointerCapture(e.pointerId); } catch (_) {}
@@ -132,9 +136,13 @@ function attachDragInteraction() {
 
   axis.addEventListener('pointercancel', (e) => {
     if (!pointerState || e.pointerId !== pointerState.id) return;
+    const state = pointerState;
     pointerState = null;
     axis.classList.remove('dragging');
-    drawSelection(selectedMin, selectedMax);
+    // Restore the pre-gesture selection (drawSelection already overwrote
+    // selectedMin/Max at pointerdown); the filters never changed, so the
+    // ribbon must not show the collapsed single-year tap.
+    drawSelection(state.prevMin, state.prevMax);
   });
 
   axis.addEventListener('dblclick', (e) => {

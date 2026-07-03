@@ -510,35 +510,6 @@ label > input[type="checkbox"] {
 }
 
 /* Legend — bottom-left, aligned with the filters/header column */
-.legend {
-  position: absolute;
-  bottom: 30px;
-  left: 12px;
-  z-index: 1000;
-  padding: 12px 16px;
-  font-size: 12px;
-}
-.legend .legend-heading {
-  margin: 0 0 8px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--subtext);
-}
-.legend ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.legend li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .dot {
   display: inline-block;
   width: 12px;
@@ -2284,7 +2255,6 @@ label > input[type="checkbox"] {
 /* Responsive */
 @media (max-width: 720px) {
   .filters { width: calc(100% - 32px); top: auto; bottom: 16px; }
-  .legend { display: none; }
   .app-header { width: calc(100% - 32px); }
 }
 
@@ -2360,9 +2330,6 @@ label > input[type="checkbox"] {
 .stats-panel,
 .info-modal,
 .glossary-modal,
-.legend {
-  animation: slideInPanel 220ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
 
 @keyframes slideInPanel {
   from {
@@ -2445,16 +2412,6 @@ h3 {
 }
 
 
-@keyframes slideInItem {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Phase 2: Input Focus Enhancement */
 input:focus-visible,
@@ -2765,9 +2722,6 @@ a:focus-visible, [role="button"]:focus-visible {
     max-height: 180px;
   }
 
-  .legend {
-    display: none;
-  }
 
   .stat-grid {
     grid-template-columns: 1fr;
@@ -3058,9 +3012,6 @@ a:focus-visible, [role="button"]:focus-visible {
     max-height: calc(100vh - 200px);
   }
 
-  .legend {
-    display: none;
-  }
 }
 
 /* Phase 4: Large Screens (Desktop+) */
@@ -3069,9 +3020,6 @@ a:focus-visible, [role="button"]:focus-visible {
     width: 340px;
   }
 
-  .legend {
-    width: 200px;
-  }
 
   .app-header {
     max-width: 720px;
@@ -3128,9 +3076,6 @@ a:focus-visible, [role="button"]:focus-visible {
     bottom: 8px;
   }
 
-  .legend {
-    bottom: 8px;
-  }
 
 }
 
@@ -5361,7 +5306,7 @@ select:disabled,
 }
 
 .storm-error-state,
-.boot-error {
+.boot-error-state {
   color: var(--foreground) !important;
   background: var(--surface-danger) !important;
   border-color: rgba(243, 139, 168, 0.34) !important;
@@ -7340,4 +7285,32 @@ html.light-theme .basemap-fallback {
   font-size: 11px;
   line-height: 1.5;
   color: var(--subtext);
+}
+
+/* Rapid-intensification / explosive-deepening flags — the badges were built
+   in panel.js but dropped from the template in a layout rewrite. */
+.storm-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.storm-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: help;
+}
+.storm-flag.ri-flag {
+  background: var(--surface-warning);
+  color: var(--warning);
+  border: 1px solid var(--border-subtle);
+}
+.storm-flag.pf-flag {
+  background: var(--surface-danger);
+  color: var(--error);
+  border: 1px solid var(--border-subtle);
 }

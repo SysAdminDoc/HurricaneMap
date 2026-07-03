@@ -173,17 +173,20 @@ export function computeCityReturnPeriods(city, allStorms) {
   
   const landfallsByCategory = { 1: [], 3: [], 5: [] };
   
-  // Scan all storms for landfalls within radius at each category
+  // Scan all storms for landfalls within radius at each category. One event
+  // per storm per tier — multi-landfall loopers (Keys/Gulf) otherwise push
+  // duplicate years, creating zero-length intervals that deflate the mean.
   for (const storm of allStorms) {
     const landfalls = storm.us_landfalls || [];
+    let best = 0;
     for (const lf of landfalls) {
       const dist = haversineKm(lf.lat, lf.lon, city.lat, city.lon);
       if (dist > RADIUS_KM) continue;
-      const cat = lf.category >= 1 ? lf.category : -1;
-      if (cat >= 1) landfallsByCategory[1].push(storm.year);
-      if (cat >= 3) landfallsByCategory[3].push(storm.year);
-      if (cat >= 5) landfallsByCategory[5].push(storm.year);
+      if (lf.category >= 1 && lf.category > best) best = lf.category;
     }
+    if (best >= 1) landfallsByCategory[1].push(storm.year);
+    if (best >= 3) landfallsByCategory[3].push(storm.year);
+    if (best >= 5) landfallsByCategory[5].push(storm.year);
   }
   
   // Compute return periods (years between events)
@@ -671,6 +674,16 @@ export function computeClimateTrends(allStorms) {
     }
   }
 
+  // Densify the year axis: zero-storm seasons must appear as zeros, or the
+  // "10-year" rolling windows below span 10 data points rather than 10
+  // calendar years, biasing the averages and distorting regression spacing.
+  const yearsPresent = Object.keys(byYear).map(Number);
+  const minYear = Math.min(...yearsPresent);
+  const maxYear = Math.max(...yearsPresent);
+  for (let y = minYear; y <= maxYear; y++) {
+    if (!byYear[y]) byYear[y] = { year: y, storms: [], us_landfalls: [] };
+  }
+
   // Compute yearly metrics
   const yearly = Object.values(byYear)
     .sort((a, b) => a.year - b.year)
@@ -714,7 +727,12 @@ export function computeClimateTrends(allStorms) {
 
     const avg_landfalls = window.reduce((sum, y) => sum + y.landfalls, 0) / window.length;
     const avg_ace = window.reduce((sum, y) => sum + y.total_ace, 0) / window.length;
-    const avg_speed = window.reduce((sum, y) => sum + y.avg_forward_speed, 0) / window.length;
+    // Forward speed only exists for seasons with storms — zero-filled seasons
+    // are absence of data, not 0 km/h, so exclude them from this average.
+    const speedYears = window.filter(y => y.named_storms > 0 && y.avg_forward_speed > 0);
+    const avg_speed = speedYears.length
+      ? speedYears.reduce((sum, y) => sum + y.avg_forward_speed, 0) / speedYears.length
+      : 0;
 
     return {
       year: year.year,

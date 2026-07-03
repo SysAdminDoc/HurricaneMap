@@ -3,8 +3,8 @@ import {
   loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
   searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
-import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
-import { applyPaletteToBody, applyThemeToRoot, getSetting, invalidatePaletteCache, setSetting } from './settings.js';
+import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
+import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
 import { initLocale, setLocale, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
@@ -110,7 +110,7 @@ function writeHash() {
     yearMinDefault: YEAR_MIN_DEFAULT,
     yearMaxDefault: YEAR_MAX_DEFAULT,
   });
-  // Avoid re-firing hashchange when nothing actually changed.
+  // Skip the no-op replaceState when nothing actually changed.
   const cur = location.hash || '';
   if (cur === newHash) return;
   history.replaceState(null, '', newHash || location.pathname + location.search);
@@ -266,10 +266,12 @@ function renderDataProvenance() {
 }
 
 async function boot() {
-  // Initialize locale (before any rendering)
+  // Initialize locale (before any rendering). Browser-language detection in
+  // initLocale() only holds when the user hasn't explicitly picked a language
+  // — the settings default ('en') is always truthy and previously reverted
+  // first-time Spanish/Creole visitors to English unconditionally.
   initLocale();
-  const savedLocale = getSetting('locale');
-  if (savedLocale) setLocale(savedLocale);
+  if (hasStoredSetting('locale')) setLocale(getSetting('locale'));
   translateStaticElements();
 
   // Start performance monitoring early

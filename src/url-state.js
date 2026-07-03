@@ -31,6 +31,7 @@ export function encodeHashState(filters, {
     s: '',
     t: '0',
     h: '0',
+    r: '0',
     storm: '',
   };
   const current = {
@@ -39,6 +40,7 @@ export function encodeHashState(filters, {
     s: filters.state,
     t: filters.showTracks ? '1' : '0',
     h: filters.showHeatmap ? '1' : '0',
+    r: filters.retiredOnly ? '1' : '0',
     storm: openStormId || '',
   };
   const parts = [];
@@ -80,8 +82,12 @@ export function restoreFiltersFromHash(hash, currentFilters, {
   const next = cloneFilters(currentFilters);
   if (decoded.y && /^\d{4}-\d{4}$/.test(decoded.y)) {
     const [a, b] = decoded.y.split('-').map(Number);
-    next.yearMin = Math.max(yearMinDefault, Math.min(a, b));
-    next.yearMax = Math.min(yearMaxDefault, Math.max(a, b));
+    // Clamp each endpoint into bounds AFTER ordering — clamping lo with max()
+    // and hi with min() inverts the range when both fall outside the bounds
+    // on the same side (e.g. a stale #y=2100-2200 permalink → empty map).
+    const clamp = (v) => Math.max(yearMinDefault, Math.min(yearMaxDefault, v));
+    next.yearMin = clamp(Math.min(a, b));
+    next.yearMax = clamp(Math.max(a, b));
   }
   if (decoded.c) {
     const categories = decoded.c.split(',').filter(category => VALID_CATEGORIES.has(category));
@@ -92,6 +98,7 @@ export function restoreFiltersFromHash(hash, currentFilters, {
   }
   if (decoded.t !== undefined) next.showTracks = decoded.t === '1';
   if (decoded.h !== undefined) next.showHeatmap = decoded.h === '1';
+  if (decoded.r !== undefined) next.retiredOnly = decoded.r === '1';
 
   return { decoded, filters: next };
 }
@@ -104,6 +111,7 @@ export function applyHashToFilters(filters, hash, options = {}) {
   filters.state = restored.state;
   filters.showTracks = restored.showTracks;
   filters.showHeatmap = restored.showHeatmap;
+  filters.retiredOnly = restored.retiredOnly;
   return decoded;
 }
 
@@ -115,6 +123,7 @@ function cloneFilters(filters) {
     state: filters.state || '',
     showTracks: Boolean(filters.showTracks),
     showHeatmap: Boolean(filters.showHeatmap),
+    retiredOnly: Boolean(filters.retiredOnly),
   };
 }
 

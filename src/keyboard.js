@@ -1,22 +1,19 @@
 // Keyboard navigation & shortcuts
 // - ? key opens shortcuts palette
 // - Ctrl+M: Major hurricanes only filter
-// - Ctrl+T: Tropical storms only filter
-// - Ctrl+L: Focus search input
 // - Escape: Close panels / clear focus
 // - Tab: Navigate interactive elements
 // - Arrow keys: Navigate within panels and timeline
+//
+// Ctrl+T (new tab) and Ctrl+L (omnibox) are browser-reserved in every major
+// browser and never reach page content — do not bind them.
 
 import { closeAllPanels } from './panels.js';
 
 const palette = document.getElementById('keyboard-palette');
 const paletteClose = palette?.querySelector('.palette-close');
 
-// Reference to global filter state and apply function (wired by main.js)
-let applyFilters = null;
-
-export function init(applyFiltersFn) {
-  applyFilters = applyFiltersFn;
+export function init() {
   setupGlobalShortcuts();
   setupPaletteHandlers();
   setupFocusHighlight();
@@ -29,17 +26,6 @@ function setupGlobalShortcuts() {
     if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
       e.preventDefault();
       filterMajorOnly();
-    }
-    // Ctrl/Cmd + T: Tropical storms only
-    else if ((e.ctrlKey || e.metaKey) && e.key === 't') {
-      e.preventDefault();
-      filterTropicalOnly();
-    }
-    // Ctrl/Cmd + L: Focus search
-    else if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
-      e.preventDefault();
-      const searchInput = document.getElementById('search-input');
-      if (searchInput) searchInput.focus();
     }
     // ?: Open shortcuts palette
     else if ((e.key === '?' || (e.key === '/' && e.shiftKey)) && !isInputFocused()) {
@@ -151,13 +137,6 @@ function filterMajorOnly() {
   }
 }
 
-function filterTropicalOnly() {
-  // Filter to Tropical Storm only
-  if (typeof window.filterByMacro === 'function') {
-    window.filterByMacro('tropical');
-  }
-}
-
 function isInputFocused() {
   const active = document.activeElement;
   return (
@@ -168,21 +147,15 @@ function isInputFocused() {
 }
 
 function isBlockingSurfaceOpen() {
+  // The settings menu is a popover — it never carries the hidden attribute,
+  // so it must be tested with :popover-open (the old :not([hidden]) check
+  // matched permanently and blocked Escape from ever closing panels).
   return Boolean(
-    document.querySelector('#settings-menu:not([hidden])') ||
+    document.querySelector('#settings-menu:popover-open') ||
     document.querySelector('#info-modal:not([hidden])') ||
     document.querySelector('#glossary-modal:not([hidden])') ||
     document.querySelector('.onb-overlay')
   );
-}
-
-function showToast(message, type = 'info') {
-  // Use existing toast infrastructure if available
-  if (window.showToast) {
-    window.showToast(message, type);
-  } else {
-    console.info(message);
-  }
 }
 
 export { openPalette, closePalette };

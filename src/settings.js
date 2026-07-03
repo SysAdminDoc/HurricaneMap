@@ -59,6 +59,20 @@ export function getSetting(key) {
   return load()[key];
 }
 
+/** True only when the user has explicitly persisted this key (vs. the
+ *  built-in default). Lets boot code distinguish "user chose English" from
+ *  "nothing chosen yet" so browser-language detection can apply. */
+export function hasStoredSetting(key) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && Object.prototype.hasOwnProperty.call(parsed, key);
+  } catch {
+    return false;
+  }
+}
+
 export function setSetting(key, value) {
   load();
   if (!Object.prototype.hasOwnProperty.call(DEFAULTS, key)) return;

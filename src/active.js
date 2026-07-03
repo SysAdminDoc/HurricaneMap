@@ -16,7 +16,7 @@ import {
   clearOfficialForecastContext,
   renderOfficialForecastContext,
 } from './cone.js';
-import { hideGoesRealtimeContext, renderGoesRealtimeContext } from './goes-realtime.js';
+import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
 import { getSetting } from './settings.js';
 
 const L = window.L;
@@ -262,8 +262,15 @@ async function renderActive(storms) {
         className: 'active-forecast',
       }).addTo(layerGroup);
     }
-    // Current position marker.
-    const cur = bestTrackPts[bestTrackPts.length - 1] || advisoryPts[0];
+    // Current position marker. NHC's real CurrentStorms.json carries the
+    // position as latitudeNumeric/longitudeNumeric (or "25.5N" strings) on
+    // the storm object, not as track arrays — fall back to the same
+    // normalizer the GOES overlay uses so an active storm always gets a dot.
+    let cur = bestTrackPts[bestTrackPts.length - 1] || advisoryPts[0];
+    if (!cur) {
+      const point = latestStormPoint(s);
+      if (point) cur = [point.lat, point.lon];
+    }
     if (cur) {
       L.circleMarker(cur, {
         radius: 8, color: '#11111b', weight: 2,

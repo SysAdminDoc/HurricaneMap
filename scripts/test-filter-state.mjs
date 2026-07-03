@@ -25,6 +25,13 @@ function cats(filters) {
   assert.equal(setYearRange(filters, 'bad', '2020', defaults), false);
   assert.equal(filters.yearMin, 1851);
   assert.equal(filters.yearMax, 2025);
+  // Both endpoints beyond the same bound clamp instead of inverting.
+  assert.equal(setYearRange(filters, '2100', '2200', defaults), true);
+  assert.equal(filters.yearMin, 2025);
+  assert.equal(filters.yearMax, 2025);
+  assert.equal(setYearRange(filters, '1700', '1800', defaults), true);
+  assert.equal(filters.yearMin, 1851);
+  assert.equal(filters.yearMax, 1851);
 }
 
 {

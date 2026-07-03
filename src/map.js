@@ -119,11 +119,10 @@ function isLandfallMarkerTarget(target) {
 
 function resetMarkerStyle(marker) {
   if (!marker) return;
-  marker.setStyle({
-    weight: 1.2,
-    color: '#0a0f1a',
-    radius: marker._baseRadius || 4,
-  });
+  // Restore the exact creation style — hardcoded constants here drifted from
+  // renderLandfalls (e.g. a major hurricane's 2.2 border became 1.2 after the
+  // first hover and never came back).
+  marker.setStyle(marker._baseStyle || { weight: 1.2, color: '#0a0f1a', radius: marker._baseRadius || 4 });
 }
 
 function ensureLandfallTooltip() {
@@ -182,13 +181,21 @@ export function renderLandfalls(landfalls, onSelect) {
       radius: baseRadius,
       color: '#0a0f1a',
       weight: isMajor ? 2.2 : 1.6,
-      opacity: 0.95,
+      // Matches setHeatmap(false)'s restore value, which runs after every
+      // filter pass — a higher creation value would only last one frame.
+      opacity: 0.6,
       fillColor: categoryColor(lf.category),
       fillOpacity: 0.92,
       dashArray: dash,
       className: `landfall-marker ${tierClass}${isMajor ? ' landfall-major' : ''}`,
     });
     marker._baseRadius = baseRadius;
+    marker._baseStyle = {
+      radius: baseRadius,
+      color: '#0a0f1a',
+      weight: isMajor ? 2.2 : 1.6,
+      opacity: 0.6,
+    };
     const tt = `${lf.year} ${formatStormName(lf.name, { unnamed: 'Unnamed storm' })} — ${shortCat(lf.category)} • ${lf.state}`;
     marker._tooltipText = tt;
     // Grow on hover via Leaflet setStyle (NOT CSS transform — see styles.css).
@@ -223,11 +230,7 @@ export function focusLandfall(lf, panTo = true) {
   const key = eventKey(lf);
   const marker = markersByEventKey.get(key);
   if (activeMarker) {
-    activeMarker.setStyle({
-      weight: 1.5,
-      color: '#070b12',
-      radius: activeMarker._baseRadius,
-    });
+    resetMarkerStyle(activeMarker);
   }
   if (marker) {
     activeMarker = marker;
@@ -300,12 +303,6 @@ function buildIntensitySegments(track) {
   return segs;
 }
 
-
-export function fitToLandfalls(landfalls) {
-  if (!landfalls.length) return;
-  const bounds = L.latLngBounds(landfalls.map(l => [l.lat, l.lon]));
-  map.fitBounds(bounds, { padding: [40, 40] });
-}
 
 /** Density heatmap toggle. Each landfall becomes a heat point with intensity
  *  weighted by Saffir-Simpson category (TS=0.4 → Cat 5=1.0). When the heatmap

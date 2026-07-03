@@ -223,9 +223,9 @@
           <input type="checkbox" id="show-population" />
           <span>Population density</span>
         </label>
-        <label class="toggle-row">
+        <label class="toggle-row" title="NOAA satellite sea-surface temperature snapshot from September 1, 2024 — the peak of the most recent complete season, not live data">
           <input type="checkbox" id="show-sst" />
-          <span>Sea surface temp (SST)</span>
+          <span>Sea surface temp (Sep 2024)</span>
         </label>
         <div class="layer-select">
           <label for="surge-category" class="layer-select-label">Storm surge</label>
@@ -255,18 +255,6 @@
         <li><span class="dot cat-5 dot-mixed" title="Mixed dash = Cat 5"></span><span>5 · 137+ kt</span></li>
       </ul>
     </div>
-  </aside>
-
-  <aside class="legend glass" hidden aria-label="Saffir-Simpson wind scale reference — Category definitions and wind speed ranges">
-    <h2 class="legend-heading">Saffir-Simpson at landfall</h2>
-    <ul>
-      <li><span class="dot cat-ts"></span><span>Tropical Storm (34-63 kt)</span></li>
-      <li><span class="dot cat-1"></span><span>Category 1 (64-82 kt)</span></li>
-      <li><span class="dot cat-2"></span><span>Category 2 (83-95 kt)</span></li>
-      <li><span class="dot cat-3"></span><span>Category 3 (96-112 kt) — major</span></li>
-      <li><span class="dot cat-4"></span><span>Category 4 (113-136 kt)</span></li>
-      <li><span class="dot cat-5"></span><span>Category 5 (137+ kt)</span></li>
-    </ul>
   </aside>
 
   <section class="storm-panel glass" id="storm-panel" hidden role="region" aria-labelledby="storm-panel-title" aria-label="Storm details">
@@ -416,17 +404,9 @@
             <kbd>Ctrl</kbd> <kbd>M</kbd>
             <span>Filter to major hurricanes only (Cat 3-5)</span>
           </div>
-          <div class="shortcut-row">
-            <kbd>Ctrl</kbd> <kbd>T</kbd>
-            <span>Filter to tropical storms only</span>
-          </div>
         </div>
         <div class="shortcut-group">
           <h3>Navigation</h3>
-          <div class="shortcut-row">
-            <kbd>Ctrl</kbd> <kbd>L</kbd>
-            <span>Focus search input</span>
-          </div>
           <div class="shortcut-row">
             <kbd>Tab</kbd>
             <span>Navigate to next interactive element</span>

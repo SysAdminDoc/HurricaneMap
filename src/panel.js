@@ -207,6 +207,8 @@ function render(storm, landfall, allStorms) {
           ${escapeHtml(biography)}
         </div>
 
+        ${riBadge || pfBadge ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}
+
         <div class="stat-grid">
           <div class="stat"><div class="label">${t('panel.peakWind')}</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
           <div class="stat"><div class="label">${t('panel.minPressure')}</div><div class="value">${minPres}</div></div>
@@ -704,9 +706,12 @@ function sliderSatelliteUrl(storm) {
   // SLIDER takes Unix seconds and a sector. CONUS sector is the right scale
   // for U.S. landfalls; tropical-atlantic for storms still over open ocean.
   const unix = Math.floor(ts.getTime() / 1000);
-  const sector = lfs.length && lfs[0].state === 'Hawaii' ? 'goes-18---full_disk' : 'goes-16---conus';
+  // GOES-16 (East) cannot see Hawaii — Pacific landfalls need GOES-18 full disk.
+  const isHawaii = lfs.length && lfs[0].state === 'Hawaii';
+  const sat = isHawaii ? 'goes-18' : 'goes-16';
+  const sec = isHawaii ? 'full_disk' : 'conus';
   // Default to the GeoColor product — most legible, day-and-night.
-  return `https://rammb-slider.cira.colostate.edu/?sat=goes-16&sec=${encodeURIComponent(sector.split('---')[1] || 'conus')}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
+  return `https://rammb-slider.cira.colostate.edu/?sat=${sat}&sec=${sec}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
 }
 
 // Days-at-intensity stacked horizontal bar. Visualizes how many hours of

@@ -7,8 +7,12 @@ export function setYearRange(filters, yearMin, yearMax, {
   const a = Number.parseInt(yearMin, 10);
   const b = Number.parseInt(yearMax, 10);
   if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-  filters.yearMin = Math.max(yearMinDefault, Math.min(a, b));
-  filters.yearMax = Math.min(yearMaxDefault, Math.max(a, b));
+  // Clamp each endpoint into bounds AFTER ordering — the previous max()/min()
+  // split inverted the range (yearMin > yearMax → empty map) when both typed
+  // values fell outside the bounds on the same side (e.g. 2100/2200).
+  const clamp = (v) => Math.max(yearMinDefault, Math.min(yearMaxDefault, v));
+  filters.yearMin = clamp(Math.min(a, b));
+  filters.yearMax = clamp(Math.max(a, b));
   return true;
 }
 

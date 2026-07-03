@@ -79,4 +79,32 @@ function cats(filters) {
   assert.deepEqual(cats(filters), ['1', '2']);
 }
 
+// Both endpoints out of bounds on the same side must clamp, not invert.
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const { filters: restored } = restoreFiltersFromHash('#y=2100-2200', filters, {
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+  });
+  assert.equal(restored.yearMin, 2025);
+  assert.equal(restored.yearMax, 2025);
+  const { filters: below } = restoreFiltersFromHash('#y=1700-1800', filters, {
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+  });
+  assert.equal(below.yearMin, 1851);
+  assert.equal(below.yearMax, 1851);
+}
+
+// retiredOnly round-trips through the hash.
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  filters.retiredOnly = true;
+  const hash = encodeHashState(filters, { yearMinDefault: 1851, yearMaxDefault: 2025 });
+  assert.equal(hash, '#r=1');
+  const fresh = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  applyHashToFilters(fresh, hash, { yearMinDefault: 1851, yearMaxDefault: 2025 });
+  assert.equal(fresh.retiredOnly, true);
+}
+
 console.log('url state ok');
