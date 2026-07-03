@@ -221,6 +221,8 @@ async function assertPlaybackMapMode(page, label) {
       panel: rectFor('#storm-panel'),
       restore: rectFor('#storm-panel .panel-restore-bar'),
       controls: rectFor('.anim-controls'),
+      header: rectFor('.app-header'),
+      headerActions: rectFor('.header-actions'),
       timeline: rectFor('#timeline-ribbon'),
       map: rectFor('#map'),
       centerCoveredByPanel: pointInside(mapCenter, rectFor('#storm-panel')),
@@ -243,12 +245,99 @@ async function assertPlaybackMapMode(page, label) {
   assert(!rectsIntersect(layout.controls, layout.restore), `${label}: playback controls overlap the restore tab`);
   assert(!layout.centerCoveredByPanel, `${label}: minimized panel covers the map center`);
   assert(!layout.centerCoveredByControls, `${label}: playback controls cover the map center`);
+  if (layout.viewport.width <= 720) {
+    assert(layout.header && layout.header.height <= 70, `${label}: mobile playback header is too tall (${layout.header?.height}px)`);
+    assert(!layout.headerActions, `${label}: mobile playback still shows secondary header actions`);
+    assert(layout.controls.height <= 140, `${label}: mobile playback dock is too tall (${layout.controls.height}px)`);
+  }
 
   await page.click('.anim-close');
   await page.waitForFunction(() => (
     !document.body.classList.contains('track-playback-active') &&
     !document.querySelector('#storm-panel')?.classList.contains('minimized')
   ), { timeout: 5000 });
+}
+
+async function assertSettingsSurface(page, label) {
+  await page.evaluate(() => {
+    const menu = document.querySelector('#settings-menu');
+    if (menu && !menu.matches(':popover-open')) menu.showPopover();
+  });
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+  const layout = await page.evaluate(() => {
+    const menu = document.querySelector('#settings-menu');
+    const rect = menu?.getBoundingClientRect();
+    const style = menu ? getComputedStyle(menu) : null;
+    const focusables = [...document.querySelectorAll('#settings-menu button, #settings-menu label.toggle-row')].map(element => {
+      const r = element.getBoundingClientRect();
+      return { text: (element.textContent || element.getAttribute('aria-label') || '').trim(), width: r.width, height: r.height };
+    });
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      menu: rect ? {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      } : null,
+      position: style?.position || '',
+      overflowY: style?.overflowY || '',
+      helperCount: document.querySelectorAll('#settings-menu .settings-help, #settings-menu .settings-toggle-copy small').length,
+      focusables,
+    };
+  });
+  assert(layout.menu, `${label}: settings menu did not render`);
+  assert(layout.position === 'fixed', `${label}: settings menu position is ${layout.position}, expected fixed`);
+  assert(/auto|scroll/.test(layout.overflowY), `${label}: settings menu overflow-y is ${layout.overflowY}`);
+  assert(layout.menu.left >= -0.5, `${label}: settings menu escapes left edge`);
+  assert(layout.menu.top >= -0.5, `${label}: settings menu escapes top edge`);
+  assert(layout.menu.right <= layout.viewport.width + 0.5, `${label}: settings menu escapes right edge`);
+  assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
+  assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
+  assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
+  const cramped = layout.focusables.filter(item => item.height < 34);
+  assert(!cramped.length, `${label}: settings controls are too small: ${cramped.map(item => `${item.text}:${item.height}`).join(', ')}`);
+  await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
+}
+
+async function assertPremiumChrome(page, label) {
+  const offenders = await page.evaluate(() => {
+    const selectors = [
+      'button',
+      '[role="button"]',
+      '.cat-pill',
+      '.storm-flag',
+      '.visible-count',
+      '.ct-chip',
+      '.cold-tag',
+      '.dai-bar',
+      '.segmented-control',
+      '.ss-tier',
+      '.onb-step',
+      '.hm-toast',
+      '.settings-menu',
+      '.search-empty',
+      '.panel-restore-bar',
+      '.anim-controls',
+      '.anim-radar-toggle',
+    ].join(',');
+    return [...document.querySelectorAll(selectors)].filter(element => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      if (rect.width <= 0 || rect.height <= 0 || style.display === 'none' || style.visibility === 'hidden') return false;
+      if (element.closest('.leaflet-control-container')) return false;
+      const radius = Number.parseFloat(style.borderTopLeftRadius || '0');
+      return Number.isFinite(radius) && radius > 12;
+    }).slice(0, 20).map(element => ({
+      tag: element.tagName.toLowerCase(),
+      className: String(element.className || ''),
+      text: (element.textContent || element.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 60),
+      radius: getComputedStyle(element).borderTopLeftRadius,
+    }));
+  });
+  assert(!offenders.length, `${label}: oversized rounded controls remain: ${JSON.stringify(offenders)}`);
 }
 
 async function runPanelLayoutScenario(browser, baseUrl, scenario) {
@@ -272,7 +361,9 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     await waitForAppReady(page);
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, scenario.label);
+    await assertSettingsSurface(page, scenario.label);
     if (scenario.playback) await assertPlaybackMapMode(page, scenario.label);
+    await assertPremiumChrome(page, scenario.label);
     if (pageErrors.length) throw new Error(`${scenario.label}: page errors: ${pageErrors.join(' | ')}`);
   } finally {
     await context.close();
@@ -342,7 +433,7 @@ try {
   await page.waitForSelector('#hm-update-prompt.is-visible', { timeout: 5000 });
   const updatePromptText = await page.textContent('#hm-update-prompt');
   assert(/Update available/.test(updatePromptText), 'service-worker update prompt title did not render.');
-  assert(/latest map shell and offline cache/.test(updatePromptText), 'service-worker update prompt help copy did not render.');
+  assert(/newest map shell and offline data cache/.test(updatePromptText), 'service-worker update prompt help copy did not render.');
   await page.click('#hm-update-prompt .hm-update-dismiss');
   await page.waitForFunction(() => document.querySelector('#hm-update-prompt')?.hidden, { timeout: 5000 });
   await page.evaluate(() => window.__swUpdatePrompt.show());
