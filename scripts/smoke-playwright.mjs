@@ -140,7 +140,7 @@ async function assertSidePanelLayout(page, label) {
       panel: rectFor('#storm-panel'),
       header: rectFor('.app-header'),
       filters: rectFor('#filters'),
-      timeline: rectFor('#timeline-ribbon'),
+      timeline: rectFor('.timeline-ribbon'),
       zoom: rectFor('.leaflet-control-zoom'),
       panelPosition: panelStyle?.position || '',
       panelOverflowY: panelStyle?.overflowY || '',
@@ -223,7 +223,7 @@ async function assertPlaybackMapMode(page, label) {
       controls: rectFor('.anim-controls'),
       header: rectFor('.app-header'),
       headerActions: rectFor('.header-actions'),
-      timeline: rectFor('#timeline-ribbon'),
+      timeline: rectFor('.timeline-ribbon'),
       map: rectFor('#map'),
       centerCoveredByPanel: pointInside(mapCenter, rectFor('#storm-panel')),
       centerCoveredByControls: pointInside(mapCenter, rectFor('.anim-controls')),
@@ -303,6 +303,21 @@ async function assertSettingsSurface(page, label) {
 }
 
 async function assertDesktopPanelSystem(page, label) {
+  await page.evaluate(async () => {
+    const season = await import('/src/season.js');
+    await season.refreshSeasonSummary({ yearMin: 2020, yearMax: 2020 });
+  });
+  await page.waitForFunction(() => {
+    const summary = document.querySelector('#season-summary');
+    const timeline = document.querySelector('.timeline-ribbon');
+    return document.body.classList.contains('season-summary-visible') &&
+      summary &&
+      !summary.hidden &&
+      timeline &&
+      getComputedStyle(summary).display !== 'none' &&
+      getComputedStyle(timeline).display !== 'none';
+  }, { timeout: 10000 });
+
   const assertPanelFit = async (selector, name) => {
     const layout = await page.evaluate((panelSelector) => {
       const rectFor = (selector) => {
@@ -336,6 +351,7 @@ async function assertDesktopPanelSystem(page, label) {
         scrollWidth: panel?.scrollWidth || 0,
         children,
         fullBleedHeader: !!document.querySelector(`${panelSelector} .panel-sticky-header, ${panelSelector} .table-view-header`),
+        timeline: rectFor('.timeline-ribbon'),
         seasonSummary: rectFor('.season-summary'),
       };
     }, selector);
@@ -345,7 +361,15 @@ async function assertDesktopPanelSystem(page, label) {
     if (!layout.fullBleedHeader) {
       assert(layout.scrollWidth <= layout.clientWidth + 2, `${label}: ${name} has clipped horizontal overflow (${layout.scrollWidth}px > ${layout.clientWidth}px)`);
     }
-    assert(!layout.seasonSummary, `${label}: season summary still competes with open ${name}`);
+    assert(layout.timeline, `${label}: timeline shelf did not render with ${name}`);
+    assert(layout.seasonSummary, `${label}: season summary did not render in the desktop shelf with ${name}`);
+    assert(!rectsIntersect(layout.panel, layout.timeline), `${label}: ${name} overlaps the timeline shelf`);
+    assert(!rectsIntersect(layout.panel, layout.seasonSummary), `${label}: ${name} overlaps the season shelf`);
+    assert(Math.abs(layout.seasonSummary.top - layout.timeline.top) <= 2, `${label}: season shelf top is not aligned with timeline (${layout.seasonSummary.top} vs ${layout.timeline.top})`);
+    assert(Math.abs(layout.seasonSummary.bottom - layout.timeline.bottom) <= 2, `${label}: season shelf bottom is not aligned with timeline (${layout.seasonSummary.bottom} vs ${layout.timeline.bottom})`);
+    assert(layout.seasonSummary.right <= layout.timeline.left - 8, `${label}: season shelf is not left of timeline`);
+    assert(layout.timeline.right <= layout.panel.left - 8, `${label}: timeline shelf does not reserve space before ${name}`);
+    assert(layout.seasonSummary.height <= 150, `${label}: season shelf is too tall (${layout.seasonSummary.height}px)`);
     for (const child of layout.children) {
       assert(child.left >= layout.panel.left - 1, `${label}: ${name} child escapes left edge (${child.className})`);
       assert(child.right <= layout.panel.right + 1, `${label}: ${name} child escapes right edge (${child.className})`);
