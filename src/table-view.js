@@ -1,6 +1,7 @@
 import { categoryLabel } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { formatWind } from './settings.js';
+import { showPanel, hidePanel } from './panels.js';
 
 const panel = document.getElementById('table-view-panel');
 const body = document.getElementById('table-view-body');
@@ -16,11 +17,13 @@ export function show(landfalls, onSelect) {
   lastData = landfalls;
   onSelectCb = onSelect;
   render(landfalls);
-  if (panel) panel.hidden = false;
+  // Route through the shared panel manager so the exclusive side-panel lane
+  // holds (no stacking on stats/storm panels) and layout offsets stay synced.
+  showPanel('table-view-panel');
 }
 
 export function hide() {
-  if (panel) panel.hidden = true;
+  hidePanel('table-view-panel');
 }
 
 export function isOpen() {
@@ -82,7 +85,10 @@ function sortRows(rows, col, dir) {
   return rows.sort((a, b) => {
     let va = a[col], vb = b[col];
     if (col === 'name') { va = (va || '').toLowerCase(); vb = (vb || '').toLowerCase(); }
-    if (va == null) return 1; if (vb == null) return -1;
+    // Consistent comparator for null cells (pre-1870s pressure rows): equal
+    // nulls compare 0, and null placement follows the sort direction.
+    if (va == null && vb == null) return 0;
+    if (va == null) return m; if (vb == null) return -m;
     return va < vb ? -m : va > vb ? m : 0;
   });
 }

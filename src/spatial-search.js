@@ -2,6 +2,7 @@ import { ensureStormsLoaded, getStorm, getLandfalls, categoryLabel } from './dat
 import { closestApproach, kmToMi } from './metrics.js';
 import { getMap } from './map.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { showPanel, hidePanel } from './panels.js';
 
 const L = window.L;
 
@@ -32,6 +33,9 @@ export function toggleSpatialMode() {
   const map = getMap();
   map.getContainer().style.cursor = active ? 'crosshair' : '';
   if (!active) clearSearch();
+  // Keep the header toggle in sync even when mode is exited from the results
+  // panel's close button rather than the toolbar.
+  document.dispatchEvent(new CustomEvent('spatial-mode:change', { detail: { active } }));
   return active;
 }
 
@@ -39,7 +43,7 @@ export function isSpatialActive() { return active; }
 
 export function clearSearch() {
   if (circle) { getMap().removeLayer(circle); circle = null; }
-  if (panelEl) { panelEl.hidden = true; }
+  if (panelEl && !panelEl.hidden) hidePanel('spatial-results');
 }
 
 async function performSearch(lat, lon) {
@@ -88,17 +92,26 @@ function renderResults(results, lat, lon) {
     panelEl = document.createElement('div');
     panelEl.id = 'spatial-results';
     panelEl.className = 'spatial-results glass';
+    panelEl.hidden = true;
     panelEl.setAttribute('role', 'region');
     panelEl.setAttribute('aria-label', 'Nearby storm search results');
+    // Results render into a child body so the panel manager's injected chrome
+    // (minimize button / restore tab) on the root survives re-renders.
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'sp-body';
+    panelEl.appendChild(bodyEl);
     document.body.appendChild(panelEl);
   }
+  const spBody = panelEl.querySelector('.sp-body');
 
   const radiusBtns = RADIUS_OPTIONS.map(r =>
     `<button class="sp-radius-btn${r === currentRadius ? ' active' : ''}" data-km="${r.km}">${r.label}</button>`
   ).join('');
 
-  panelEl.hidden = false;
-  panelEl.innerHTML = `
+  // Route through the shared panel manager: results claim the exclusive side
+  // lane instead of stacking on top of whatever panel was already open.
+  showPanel('spatial-results');
+  spBody.innerHTML = `
     <div class="sp-header">
       <h3>Storms near ${lat.toFixed(2)}, ${lon.toFixed(2)}</h3>
       <button class="close-btn" aria-label="Close spatial search">×</button>
@@ -115,12 +128,12 @@ function renderResults(results, lat, lon) {
     </ul>
   `;
 
-  panelEl.querySelector('.close-btn').addEventListener('click', () => {
+  spBody.querySelector('.close-btn').addEventListener('click', () => {
     clearSearch();
     toggleSpatialMode();
   });
 
-  panelEl.querySelectorAll('.sp-radius-btn').forEach(btn => {
+  spBody.querySelectorAll('.sp-radius-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       currentRadius = RADIUS_OPTIONS.find(r => r.km === Number(btn.dataset.km)) || RADIUS_OPTIONS[1];
       performSearch(lat, lon);
@@ -128,7 +141,7 @@ function renderResults(results, lat, lon) {
   });
 
   if (onSelectStorm) {
-    panelEl.querySelectorAll('li[data-sid]').forEach(li => {
+    spBody.querySelectorAll('li[data-sid]').forEach(li => {
       const handler = () => {
         const lf = getLandfalls().find(x => x.storm_id === li.dataset.sid);
         if (lf) onSelectStorm(lf);

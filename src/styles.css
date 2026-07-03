@@ -4838,6 +4838,7 @@ body.side-panel-open .leaflet-control-container .leaflet-right {
 .state-panel,
 .on-this-date-panel,
 .table-view-panel,
+.spatial-results,
 section.storm-panel.glass {
   position: fixed !important;
   inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) auto !important;
@@ -4856,7 +4857,8 @@ section.storm-panel.glass {
 .compare-panel[hidden],
 .state-panel[hidden],
 .on-this-date-panel[hidden],
-.table-view-panel[hidden] {
+.table-view-panel[hidden],
+.spatial-results[hidden] {
   display: none !important;
 }
 
@@ -7055,13 +7057,8 @@ html.high-contrast .globe3d-topbar {
 .ss-analogs li { padding: 3px 0; color: var(--text); }
 
 .spatial-results {
-  position: fixed;
-  top: 60px;
-  right: 0;
-  bottom: 0;
-  width: min(400px, 100vw);
-  z-index: 1200;
-  overflow-y: auto;
+  /* Geometry comes from the shared side-panel lane rule; only surface
+     treatment lives here. */
   padding: 16px;
 }
 .sp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
@@ -7092,3 +7089,87 @@ html.high-contrast .globe3d-topbar {
 .sp-list li:focus { outline: 2px solid var(--lavender); outline-offset: -2px; }
 .sp-name { color: var(--text); font-weight: 500; }
 .sp-meta { color: var(--subtext); font-size: 11px; }
+
+/* Panel chrome — shared minimize/restore affordance (panels.js).
+   Minimizing collapses the active side panel to a slim tab at the map edge so
+   the map is fully visible; the tab restores the panel in place. A minimized
+   panel does not count as "open" for layout offsets (side-panel-open). */
+.panel-min-btn {
+  position: absolute;
+  top: 8px;
+  right: 52px;
+  min-width: 34px;
+  min-height: 34px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--subtext);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 120ms ease;
+  z-index: 3;
+}
+.panel-min-btn:hover {
+  color: var(--text);
+  background: var(--surface-control);
+}
+.panel-min-btn:focus-visible {
+  border-color: var(--focus-ring-color);
+  box-shadow: var(--focus-ring-soft);
+}
+
+/* Table view keeps its own header row — nudge the injected minimize button so
+   it lines up with that header's close button instead of overlapping the
+   title. */
+.table-view-panel .panel-min-btn {
+  top: 14px;
+}
+
+.side-panel .panel-restore-bar {
+  display: none;
+}
+
+.side-panel.minimized {
+  inset: var(--side-panel-top) var(--side-panel-gap) auto auto !important;
+  /* Panels are container-query containers (inline-size), which zeroes their
+     intrinsic width — reset containment so the tab can shrink-wrap its label. */
+  container-type: normal !important;
+  contain: none !important;
+  width: fit-content !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.side-panel.minimized > *:not(.panel-restore-bar) {
+  display: none !important;
+}
+
+.side-panel.minimized .panel-restore-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.side-panel.minimized .panel-restore-bar:hover {
+  background: var(--surface-control);
+}
+.side-panel.minimized .panel-restore-bar:focus-visible {
+  border-color: var(--focus-ring-color);
+  box-shadow: var(--focus-ring-soft);
+}
+.panel-restore-icon {
+  font-size: 14px;
+  color: var(--subtext);
+}

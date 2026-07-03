@@ -6,7 +6,7 @@ import {
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
 import { initLocale, setLocale, translateStaticElements } from './i18n.js';
-import { mountTimeline, highlightYearRange } from './timeline.js';
+import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
 import { fuzzyAugment } from './fuzzy.js';
@@ -527,6 +527,20 @@ function populateStateFilter() {
   }
 }
 
+// The bottom timeline scopes to the state filter (all years, one state) so
+// bars stay meaningful while a state is selected — and restores to the full
+// dataset when the state clears or its deep-dive panel closes.
+let timelineScopeKey = null;
+
+function refreshTimelineScope(force = false) {
+  const key = filters.state || '';
+  if (!force && key === timelineScopeKey) return;
+  timelineScopeKey = key;
+  const scoped = key ? getLandfalls().filter(lf => lf.state === key) : getLandfalls();
+  redrawTimeline(scoped);
+  highlightYearRange(filters.yearMin, filters.yearMax);
+}
+
 function applyFilters() {
   const visible = filterLandfalls(getLandfalls(), filters);
   currentVisibleLandfalls = visible;
@@ -544,6 +558,7 @@ function applyFilters() {
     clearTracks();
   }
   setHeatmap(filters.showHeatmap, visible);
+  refreshTimelineScope();
   highlightYearRange(filters.yearMin, filters.yearMax);
   refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
   writeHash();
@@ -967,11 +982,22 @@ function wireUI() {
   if (spatialBtn) {
     spatialBtn.addEventListener('click', async () => {
       const { toggleSpatialMode } = await loadSpatialSearch();
-      const on = toggleSpatialMode();
+      toggleSpatialMode();
+    });
+    // Synced via event so exits from the results panel's × (which also turns
+    // the mode off) can't leave the toolbar button stuck pressed.
+    document.addEventListener('spatial-mode:change', (e) => {
+      const on = Boolean(e.detail?.active);
       spatialBtn.setAttribute('aria-pressed', String(on));
       spatialBtn.classList.toggle('active', on);
     });
   }
+
+  // The state deep-dive rescopes the bottom timeline to one state; restore the
+  // filter-driven scope whenever that panel goes away.
+  document.addEventListener('hm-panel:hidden', (e) => {
+    if (e.detail?.id === 'state-panel') refreshTimelineScope(true);
+  });
 
   const glossaryBtn = document.getElementById('toggle-glossary');
   if (glossaryBtn) {
