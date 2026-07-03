@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { appendFile, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -118,19 +118,10 @@ export async function refreshHurdat2Files(options = {}) {
     });
   }
 
-  const changed = results.some(result => result.changed);
-  await writeGithubOutputs({
-    changed: String(changed),
-    atlantic_file: latest.atlantic.file,
-    nepac_file: latest.nepac.file,
-    atlantic_changed: String(results.find(result => result.key === 'atlantic')?.changed || false),
-    nepac_changed: String(results.find(result => result.key === 'nepac')?.changed || false),
-  });
-
   return {
     sourceUrl,
     apply,
-    changed,
+    changed: results.some(result => result.changed),
     results,
   };
 }
@@ -163,7 +154,7 @@ function revisionSortKey(token) {
 async function fetchText(url) {
   const res = await fetch(url, {
     headers: {
-      'user-agent': 'HurricaneMap HURDAT2 refresh workflow',
+      'user-agent': 'HurricaneMap HURDAT2 refresh helper',
     },
   });
   if (!res.ok) {
@@ -185,15 +176,6 @@ function validateHurdatText(text, target, minBytes, file) {
 
 function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
-}
-
-async function writeGithubOutputs(outputs) {
-  const outputPath = process.env.GITHUB_OUTPUT;
-  if (!outputPath) return;
-  const body = Object.entries(outputs)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('\n') + '\n';
-  await appendFile(outputPath, body, 'utf8');
 }
 
 function parseArgs(argv) {
@@ -222,8 +204,7 @@ function printHelp() {
 
 Detects the latest NOAA HURDAT2 Atlantic and NE/NC Pacific text files,
 downloads them, compares them with data/hurdat2-*.txt, and writes canonical
-local files when --apply is supplied. GitHub Actions outputs are written when
-GITHUB_OUTPUT is set.`);
+local files when --apply is supplied.`);
 }
 
 async function main() {

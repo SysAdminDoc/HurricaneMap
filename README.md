@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.3.9-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.3.10-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -156,7 +156,7 @@ python -m http.server 8765
 # open http://127.0.0.1:8765/
 ```
 
-The monthly `HURDAT2 Auto-Refresh` GitHub Actions workflow runs the same refresh helper against NOAA's HURDAT2 directory, regenerates `landfalls.json`, `storms.json`, `stats.json`, and `metadata.json` when source files change, validates the app with `npm run build`, and opens a data-update pull request.
+Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directory locally. When source files change, rerun with `--apply`, rebuild derived JSON with `python scripts/preprocess_hurdat2.py`, then validate with `npm test`.
 
 Optional edge deployment: [`docs/CLOUDFLARE_CDN.md`](docs/CLOUDFLARE_CDN.md) documents the Cloudflare Worker CDN wrapper, cache policy, image optimization hints, and curl checks for before/after latency validation.
 
@@ -214,7 +214,7 @@ HurricaneMap/
 │       │   └── ...
 │       └── ...
 ├── scripts/
-│   ├── refresh-hurdat2.mjs   # NOAA HURDAT2 detector/downloader for CI refreshes
+│   ├── refresh-hurdat2.mjs   # NOAA HURDAT2 detector/downloader for local refreshes
 │   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
 │   ├── scrape_impacts.py       # Wikipedia impact scraper + normalized fatality/damage fields
 │   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
@@ -347,25 +347,19 @@ Scraper flags:
 | `--concurrency N` | 8 | Parallel HTTP fetches |
 | `--dry-run` | off | Print task count + estimated MB without downloading |
 
-## Automated HURDAT2 Refresh (GitHub Actions)
-
-HurricaneMap includes an automated workflow that checks for NOAA HURDAT2 updates **monthly** (every 1st of the month at 00:00 UTC). When new data is detected:
-
-1. **Automatic download** — Latest Atlantic and Eastern Pacific HURDAT2 files are fetched from NOAA
-2. **Change detection** — Files are compared; if new storms or updates exist, preprocessing begins
-3. **Preprocessing** — The data is validated and converted to the internal JSON format
-4. **Pull Request** — A PR is created with the updated files, ready for review and merge
-5. **No auto-merge** — The PR is left for manual review to allow testing before publication
-
-**To trigger manually:** Go to [GitHub Actions → HURDAT2 Auto-Refresh](https://github.com/SysAdminDoc/HurricaneMap/actions/workflows/hurdat2-auto-refresh.yml) and click "Run workflow."
-
 ## Manual HURDAT2 Refresh
 
-If you need to update HURDAT2 immediately (or if the automatic workflow hasn't run yet), you can refresh manually:
+Check for NOAA HURDAT2 updates locally, then apply and rebuild when a newer source file is available:
 
 ```bash
+# Check current NOAA filenames and whether local files differ.
+node scripts/refresh-hurdat2.mjs --dry-run
+
+# Apply detected updates when changes are available.
+node scripts/refresh-hurdat2.mjs --apply
+
 # Find the latest filenames at https://www.nhc.noaa.gov/data/hurdat/
-# Example using 2026 season update:
+# Manual fallback example using a 2026 season update:
 curl -sSL -o data/hurdat2-atlantic.txt \
   "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2026-02272026.txt"
 curl -sSL -o data/hurdat2-nepac.txt \

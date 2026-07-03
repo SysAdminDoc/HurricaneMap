@@ -73,6 +73,126 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+async function waitForAppReady(page) {
+  await page.waitForFunction(() => {
+    const loading = document.querySelector('#loading');
+    const visible = document.querySelector('#visible-count')?.textContent || '';
+    return loading && loading.style.display === 'none' && /landfalls/.test(visible);
+  }, { timeout: 20000 });
+}
+
+async function openKatrinaPanel(page) {
+  await page.evaluate(async () => {
+    const data = await import('/src/data.js');
+    const panel = await import('/src/panel.js');
+    await data.ensureStormsLoaded();
+    const storm = data.getAllStorms().find(item => item.year === 2005 && String(item.name).toUpperCase() === 'KATRINA');
+    if (!storm) throw new Error('Katrina 2005 not found');
+    const landfall = data.getLandfalls().find(item => item.storm_id === storm.id);
+    if (!landfall) throw new Error('Katrina 2005 landfall not found');
+    await panel.showStorm(landfall);
+  });
+  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+}
+
+function rectsIntersect(a, b) {
+  return a && b &&
+    a.left < b.right &&
+    a.right > b.left &&
+    a.top < b.bottom &&
+    a.bottom > b.top;
+}
+
+async function assertSidePanelLayout(page, label) {
+  await page.waitForTimeout(260);
+  const layout = await page.evaluate(() => {
+    const rectFor = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (
+        element.hidden ||
+        style.display === 'none' ||
+        style.visibility === 'hidden' ||
+        style.pointerEvents === 'none' ||
+        Number(style.opacity) === 0 ||
+        rect.width <= 0 ||
+        rect.height <= 0
+      ) {
+        return null;
+      }
+      return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      };
+    };
+    const panel = document.querySelector('#storm-panel');
+    const panelStyle = panel ? getComputedStyle(panel) : null;
+    return {
+      viewport: { width: innerWidth, height: innerHeight },
+      panel: rectFor('#storm-panel'),
+      header: rectFor('.app-header'),
+      filters: rectFor('#filters'),
+      timeline: rectFor('#timeline-ribbon'),
+      zoom: rectFor('.leaflet-control-zoom'),
+      panelPosition: panelStyle?.position || '',
+      panelOverflowY: panelStyle?.overflowY || '',
+      theme: document.documentElement.dataset.theme || 'dark',
+      highContrast: document.documentElement.classList.contains('high-contrast'),
+    };
+  });
+
+  assert(layout.panel, `${label}: storm panel did not render`);
+  assert(layout.panelPosition === 'fixed', `${label}: panel position is ${layout.panelPosition}, expected fixed`);
+  assert(/auto|scroll/.test(layout.panelOverflowY), `${label}: panel overflow-y is ${layout.panelOverflowY}`);
+  assert(layout.panel.width >= 280, `${label}: panel is too narrow (${layout.panel.width}px)`);
+  assert(layout.panel.height >= 220, `${label}: panel is too short (${layout.panel.height}px)`);
+  assert(layout.panel.left >= -0.5, `${label}: panel escapes left edge (${layout.panel.left}px)`);
+  assert(layout.panel.top >= -0.5, `${label}: panel escapes top edge (${layout.panel.top}px)`);
+  assert(layout.panel.right <= layout.viewport.width + 0.5, `${label}: panel escapes right edge (${layout.panel.right}px > ${layout.viewport.width}px)`);
+  assert(layout.panel.bottom <= layout.viewport.height + 0.5, `${label}: panel escapes bottom edge (${layout.panel.bottom}px > ${layout.viewport.height}px)`);
+  for (const [name, rect] of Object.entries({
+    header: layout.header,
+    filters: layout.filters,
+    timeline: layout.timeline,
+    zoom: layout.zoom,
+  })) {
+    assert(!rectsIntersect(layout.panel, rect), `${label}: panel overlaps ${name}`);
+  }
+}
+
+async function runPanelLayoutScenario(browser, baseUrl, scenario) {
+  const context = await browser.newContext({
+    viewport: { width: scenario.width, height: scenario.height },
+    serviceWorkers: 'block',
+  });
+  await context.addInitScript((settings) => {
+    localStorage.setItem('hm-settings-v1', JSON.stringify(settings));
+  }, {
+    onboarded: true,
+    theme: scenario.theme,
+    highContrast: scenario.highContrast,
+    locale: 'en',
+  });
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await openKatrinaPanel(page);
+    await assertSidePanelLayout(page, scenario.label);
+    if (pageErrors.length) throw new Error(`${scenario.label}: page errors: ${pageErrors.join(' | ')}`);
+  } finally {
+    await context.close();
+  }
+}
+
 try {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -87,11 +207,7 @@ try {
   page.on('pageerror', error => pageErrors.push(error.message));
 
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => {
-    const loading = document.querySelector('#loading');
-    const visible = document.querySelector('#visible-count')?.textContent || '';
-    return loading && loading.style.display === 'none' && /landfalls/.test(visible);
-  }, { timeout: 20000 });
+  await waitForAppReady(page);
 
   const restored = await page.evaluate(() => ({
     hash: location.hash,
@@ -117,7 +233,7 @@ try {
   const provenanceText = await page.textContent('#data-provenance-body');
   assert(/596\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
   assert(/760\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
-  assert(/HurricaneMap 1\.3\.9/.test(provenanceText), 'About provenance did not render the generator app version.');
+  assert(/HurricaneMap 1\.3\.10/.test(provenanceText), 'About provenance did not render the generator app version.');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
 
@@ -142,17 +258,7 @@ try {
   assert(reloadClicked === true, 'service-worker update prompt reload action did not fire.');
   await page.evaluate(() => window.__swUpdatePrompt.hide());
 
-  await page.evaluate(async () => {
-    const data = await import('/src/data.js');
-    const panel = await import('/src/panel.js');
-    await data.ensureStormsLoaded();
-    const storm = data.getAllStorms().find(item => item.year === 2005 && String(item.name).toUpperCase() === 'KATRINA');
-    if (!storm) throw new Error('Katrina 2005 not found');
-    const landfall = data.getLandfalls().find(item => item.storm_id === storm.id);
-    if (!landfall) throw new Error('Katrina 2005 landfall not found');
-    await panel.showStorm(landfall);
-  });
-  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+  await openKatrinaPanel(page);
   await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
@@ -271,11 +377,7 @@ try {
   mobilePage.on('pageerror', error => mobileErrors.push(error.message));
 
   await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
-  await mobilePage.waitForFunction(() => {
-    const loading = document.querySelector('#loading');
-    const visible = document.querySelector('#visible-count')?.textContent || '';
-    return loading && loading.style.display === 'none' && /landfalls/.test(visible);
-  }, { timeout: 20000 });
+  await waitForAppReady(mobilePage);
 
   const mobileState = await mobilePage.evaluate(() => ({
     visible: document.querySelector('#visible-count')?.textContent || '',
@@ -295,9 +397,31 @@ try {
   await mobileContext.close();
   if (mobileErrors.length) throw new Error(`mobile page errors: ${mobileErrors.join(' | ')}`);
 
+  const panelLayoutViewports = [
+    { width: 1120, height: 820 },
+    { width: 860, height: 820 },
+    { width: 720, height: 900 },
+    { width: 640, height: 900 },
+    { width: 430, height: 900 },
+  ];
+  const panelLayoutThemes = [
+    { name: 'dark', theme: 'dark', highContrast: false },
+    { name: 'light', theme: 'light', highContrast: false },
+    { name: 'high-contrast', theme: 'dark', highContrast: true },
+  ];
+  for (const viewport of panelLayoutViewports) {
+    for (const theme of panelLayoutThemes) {
+      await runPanelLayoutScenario(browser, baseUrl, {
+        ...viewport,
+        ...theme,
+        label: `panel layout ${viewport.width}x${viewport.height} ${theme.name}`,
+      });
+    }
+  }
+
   await browser.close();
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok)`);
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok, panel layout matrix ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
