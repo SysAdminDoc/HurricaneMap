@@ -106,6 +106,7 @@ export function showPanel(id) {
       ensurePanelChrome(el);
       el.classList.remove('minimized');
       el.hidden = false;
+      document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id } }));
     }
     setPanelState();
   });

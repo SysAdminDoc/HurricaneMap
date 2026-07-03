@@ -22,6 +22,7 @@ import {
   hasActiveFilters, isYearFiltered, resetPrimaryFilters, resetYearRange,
   setCategoryMacro, setYearRange, toggleCategory,
 } from './filter-state.js';
+import { closeAllPanels } from './panels.js';
 
 let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
 let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;
@@ -1071,19 +1072,26 @@ function wireFilterPanel() {
 
   const setCollapsed = (collapsed) => {
     els.filtersPanel.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('filters-open', !collapsed);
     els.toggleFiltersBtn.setAttribute('aria-expanded', String(!collapsed));
     els.toggleFiltersBtn.setAttribute('aria-label', collapsed ? 'Show filters' : 'Hide filters');
     els.toggleFiltersBtn.title = collapsed ? 'Show filters' : 'Hide filters';
   };
 
-  setCollapsed(mobileQuery.matches);
+  setCollapsed(true);
   els.toggleFiltersBtn.addEventListener('click', () => {
     userChanged = true;
-    setCollapsed(!els.filtersPanel.classList.contains('collapsed'));
+    const nextCollapsed = !els.filtersPanel.classList.contains('collapsed');
+    if (!nextCollapsed) closeAllPanels();
+    setCollapsed(nextCollapsed);
+  });
+
+  document.addEventListener('hm-panel:shown', () => {
+    setCollapsed(true);
   });
 
   const onViewportChange = () => {
-    if (!userChanged) setCollapsed(mobileQuery.matches);
+    if (!userChanged) setCollapsed(true);
   };
   if (mobileQuery.addEventListener) {
     mobileQuery.addEventListener('change', onViewportChange);

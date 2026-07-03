@@ -1,10 +1,12 @@
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const metadata = JSON.parse(await readFile(path.join(root, 'data/metadata.json'), 'utf8'));
+const expectedGeneratorVersion = metadata.generator?.app_version || '';
 
 let chromium;
 try {
@@ -194,7 +196,11 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
 }
 
 try {
-  const browser = await chromium.launch({ headless: true });
+  const launchOptions = { headless: true };
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  }
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
     serviceWorkers: 'block',
@@ -233,7 +239,10 @@ try {
   const provenanceText = await page.textContent('#data-provenance-body');
   assert(/596\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
   assert(/760\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
-  assert(/HurricaneMap 1\.3\.10/.test(provenanceText), 'About provenance did not render the generator app version.');
+  assert(
+    expectedGeneratorVersion && provenanceText.includes(`HurricaneMap ${expectedGeneratorVersion}`),
+    'About provenance did not render the generator app version.',
+  );
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
 
@@ -263,9 +272,9 @@ try {
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
   await page.click('#toggle-settings');
-  await page.waitForFunction(() => !document.querySelector('#settings-menu')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => document.querySelector('#settings-menu')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   const afterSettingsEscape = await page.evaluate(() => ({
     stormPanelHidden: document.querySelector('#storm-panel')?.hidden,
     yearMin: document.querySelector('#year-min')?.value,
@@ -289,6 +298,8 @@ try {
   assert(/Damage/.test(impactText), `damage row did not render in impact panel: ${impactText}`);
   assert(!/undefined|NaN/.test(impactText), `impact panel contains invalid text: ${impactText}`);
 
+  await page.click('#toggle-filters');
+  await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), { timeout: 5000 });
   await page.fill('#year-min', '2005');
   await page.dispatchEvent('#year-min', 'change');
   await page.fill('#year-max', '2005');

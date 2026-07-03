@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.4.1-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -10,9 +10,9 @@
 >
 > **Live demo:** https://sysadmindoc.github.io/HurricaneMap/
 
-<img width="2068" height="916" alt="2026-05-04 14_13_25-Greenshot" src="https://github.com/user-attachments/assets/98ca87c4-3cbf-494b-b655-f06d23dfe26e" />
+<img width="2068" height="916" alt="HurricaneMap map-first dark layout" src="example.png" />
 <br>
-<img width="2402" height="1118" alt="2026-05-03 12_30_10-Greenshot" src="https://github.com/user-attachments/assets/846e6a97-5494-4165-a9ab-b59f5555f4be" />
+<img width="2402" height="1118" alt="HurricaneMap storm panel with map-preserving lane" src="examplemap.png" />
 
 
 ## What this is
@@ -62,6 +62,13 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.4.1 — Map-first overlay polish (July 2026)
+
+- **Map-first overlays.** Filters now start collapsed, open as a bounded scroll drawer, and collapse the active side panel instead of stacking over it.
+- **Cleaner panel lanes.** Storm, stats, table, compare, and state panels stay in a right-side lane with map controls and the timeline pushed out of their way.
+- **Mobile vertical space.** The phone layout keeps the header tighter, shortens the filter drawer, hides map controls while filters are open, and leaves more map visible.
+- **Smoke coverage.** Browser smoke tests now verify the panel layout matrix through an installed Chrome fallback when Playwright's managed browser is unavailable.
 
 ## What's new in v1.4.0 — Deep audit pass (July 2026)
 

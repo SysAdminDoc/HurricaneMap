@@ -7314,3 +7314,210 @@ html.light-theme .basemap-fallback {
   color: var(--error);
   border: 1px solid var(--border-subtle);
 }
+
+/* Map-first overlay polish v1.4.1
+   Filters, panels, and the timeline should never compete as full windows.
+   The map remains the primary canvas; controls open as bounded drawers. */
+:root {
+  --map-first-filter-width: clamp(320px, 27vw, 420px);
+  --map-first-panel-width: clamp(380px, 28vw, 460px);
+  --map-first-header-width: min(980px, calc(100vw - 24px));
+}
+
+.app-header {
+  width: auto !important;
+  max-width: var(--map-first-header-width) !important;
+  min-height: 0 !important;
+  border-radius: 12px !important;
+}
+
+.title-block {
+  min-width: 170px;
+  flex: 0 1 270px;
+}
+
+.title-block .subtitle {
+  max-width: 100% !important;
+}
+
+.header-actions {
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 2px;
+  scroll-padding-inline: 8px;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.header-actions .icon-btn {
+  flex: 0 0 var(--button-height);
+}
+
+.filters.collapsed {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+@media (min-width: 721px) {
+  .app-header {
+    gap: 10px !important;
+    padding: 8px 12px !important;
+  }
+
+  .brand-mark {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+  }
+
+  .title-block h1 {
+    font-size: 22px !important;
+    line-height: 1.08 !important;
+  }
+
+  .title-block .subtitle {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+.filters:not(.collapsed) {
+  top: 92px !important;
+  bottom: auto !important;
+  width: min(var(--map-first-filter-width), calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: min(620px, calc(100vh - 124px)) !important;
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: column !important;
+  align-content: stretch !important;
+  gap: 9px !important;
+  padding: 12px !important;
+  overflow: hidden auto !important;
+  overscroll-behavior: contain;
+  border-radius: 12px !important;
+}
+
+.filters:not(.collapsed) > * {
+  grid-column: auto !important;
+}
+
+.filters .filter-row,
+.filters .filter-group {
+  margin: 0 !important;
+}
+
+.filters .filter-group {
+  padding: 9px !important;
+}
+
+.filters .filter-legend {
+  margin-top: 0 !important;
+  padding-top: 8px !important;
+}
+
+body.filters-open .season-summary,
+body.filters-open .compare-tray,
+body.filters-open .radar-controls {
+  display: none !important;
+}
+
+body.filters-open .timeline-ribbon {
+  left: auto !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  width: 52px !important;
+  height: 52px !important;
+  max-height: 52px !important;
+  padding: 4px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  opacity: 0.94;
+}
+
+body.filters-open .timeline-ribbon .timeline-inner {
+  display: none !important;
+}
+
+body.filters-open .timeline-toggle {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+@media (min-width: 1121px) {
+  :root {
+    --desktop-panel-width: var(--map-first-panel-width);
+    --side-panel-width: var(--map-first-panel-width);
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel,
+  .table-view-panel,
+  .spatial-results,
+  section.storm-panel.glass {
+    inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) auto !important;
+    width: min(var(--map-first-panel-width), calc(100vw - 368px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    padding: 14px 16px 16px !important;
+    overflow: hidden auto !important;
+  }
+
+  body.side-panel-open .timeline-ribbon {
+    right: calc(var(--map-first-panel-width) + 32px) !important;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1120px) {
+  body.side-panel-open .leaflet-top.leaflet-right {
+    right: 442px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --map-first-header-width: calc(100vw - 16px);
+  }
+
+  .app-header {
+    border-radius: 12px !important;
+  }
+
+  .filters:not(.collapsed) {
+    top: var(--side-panel-top) !important;
+    left: 8px !important;
+    width: calc(100vw - 16px) !important;
+    max-height: min(460px, calc(100vh - var(--side-panel-top) - 96px)) !important;
+  }
+
+  body.filters-open .timeline-ribbon {
+    right: 8px !important;
+    bottom: 8px !important;
+  }
+
+  body.filters-open .leaflet-top.leaflet-right,
+  body.filters-open .leaflet-top.leaflet-right .leaflet-control {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(8px) !important;
+  }
+
+  .title-block .subtitle [data-i18n="header.subtitle"],
+  .title-block .subtitle .subtitle-sep {
+    display: none !important;
+  }
+
+  .title-block .subtitle-count {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

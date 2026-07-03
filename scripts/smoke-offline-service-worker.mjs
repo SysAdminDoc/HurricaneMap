@@ -65,7 +65,11 @@ function assert(condition, message) {
 }
 
 try {
-  const browser = await chromium.launch({ headless: true });
+  const launchOptions = { headless: true };
+  if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+  }
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({
     viewport: { width: 1280, height: 860 },
     serviceWorkers: 'allow',
@@ -113,13 +117,16 @@ try {
   });
   for (const required of [
     'data/landfalls.json',
-    'data/storms.json',
     'data/stats.json',
     'data/us-states.geojson',
     'data/hurdat2-atlantic.txt',
   ]) {
     assert(offlineKeys.includes(required), `offline IndexedDB store missing ${required}`);
   }
+  assert(
+    offlineKeys.includes('data/storms.json.gz') || offlineKeys.includes('data/storms.json'),
+    'offline IndexedDB store missing storms bundle',
+  );
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
