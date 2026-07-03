@@ -7173,3 +7173,171 @@ html.high-contrast .globe3d-topbar {
   font-size: 14px;
   color: var(--subtext);
 }
+
+/* ==========================================================================
+   Theme correctness pass — colorblind palette wiring, climatology chart,
+   high-contrast/light contrast repairs, focus visibility, basemap fallback.
+   ========================================================================== */
+
+/* Colorblind palette (ColorBrewer YlOrRd). Previously only the JS marker
+   palette switched; the CSS --cat-* tokens driving the legend dots, category
+   buttons, pills, DAI segments, and timeline bars never changed, so enabling
+   the accessibility palette made the legend contradict the map. */
+body.palette-colorblind {
+  --cat-ts: #ffeda0;
+  --cat-1:  #fed976;
+  --cat-2:  #feb24c;
+  --cat-3:  #fd8d3c;
+  --cat-4:  #f03b20;
+  --cat-5:  #bd0026;
+}
+/* YlOrRd's light steps read with dark ink; the deep-red end needs white. */
+body.palette-colorblind .cat-pill.cat-5,
+body.palette-colorblind .cat-btn.on.cat-5 {
+  color: #ffffff !important;
+}
+
+/* Category ink. The hardcoded #11111b on pills defeated the --on-category
+   token: high-contrast darkens the category hues (cat-5 #330099 → 1.4:1 with
+   dark ink), and light theme's cat-4/#d20f39 and cat-5/#8839ef sit below
+   4.5:1 with dark ink as well. */
+.cat-pill.cat-ts,
+.cat-pill.cat-1,
+.cat-pill.cat-2,
+.cat-pill.cat-3,
+.cat-pill.cat-4,
+.cat-pill.cat-5 {
+  color: var(--on-category);
+}
+html.light-theme .cat-pill.cat-4,
+html.light-theme .cat-pill.cat-5,
+html.light-theme .cat-btn.on.cat-4,
+html.light-theme .cat-btn.on.cat-5,
+html.light-theme .dai-seg.cat-4,
+html.light-theme .dai-seg.cat-5 {
+  color: #ffffff !important;
+}
+
+/* High-contrast dark never overrode --on-accent, leaving #11111b ink on the
+   darkened accent gradient (1.4-2.4:1) for pressed toggles, active settings
+   pills, and the Play button. */
+html.high-contrast {
+  --on-accent: #ffffff;
+}
+
+/* Accent gradient endpoints as a token: light theme's #04a5e5 sapphire only
+   reaches 2.8:1 under white text, so light mode uses a deeper azure. */
+:root {
+  --accent-grad: linear-gradient(135deg, var(--lavender), var(--sapphire));
+}
+html.light-theme {
+  --accent-grad: linear-gradient(135deg, #7c3aed, #0969da);
+}
+.settings-pill.on,
+.settings-pill[aria-checked="true"],
+.icon-btn[aria-pressed="true"],
+.icon-btn[aria-expanded="true"]:not(#toggle-filters),
+.ct-btn.primary,
+.action-btn.primary,
+.play-anim-btn:not(.is-playing):not(.is-paused),
+.pin-btn.pinned {
+  background: var(--accent-grad) !important;
+}
+/* .seg-btn.active was missing from the accent token list entirely: it used
+   color: var(--base), which turns black-on-dark in high contrast. */
+.seg-btn.active {
+  background: var(--accent-grad) !important;
+  color: var(--on-accent) !important;
+}
+
+/* Focus visibility: the light-theme glow blended to ~1.3:1 on white, and
+   high-contrast light inherited a *white* glow on a white page. Opaque-enough
+   rings restore the WCAG 3:1 non-text minimum. */
+html.light-theme {
+  --focus-ring-color: #6d28d9;
+  --focus-ring-soft: 0 0 0 3px rgba(109, 40, 217, 0.75);
+}
+html.light-theme.high-contrast {
+  --focus-ring-color: #000000;
+  --focus-ring-soft: 0 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+/* High-contrast dark used --overlay (#404040) as dim TEXT (~1.9:1 on black) —
+   unchecked category buttons, section headings, search section labels. */
+html.high-contrast:not(.light-theme) {
+  --text-dim: #a6a6a6;
+  --foreground-subtle: #a6a6a6;
+}
+
+/* The OSM fallback basemap swap promised a darkening filter that never
+   existed: without it a CARTO outage floods the dark UI with full-brightness
+   tiles and washes out the screen-blended radar overlay. */
+.basemap-fallback {
+  filter: invert(1) hue-rotate(180deg) brightness(0.75) contrast(0.9) saturate(0.65);
+}
+html.light-theme .basemap-fallback {
+  filter: none;
+}
+
+/* Climatology chart: every clim-* class was unstyled — SVG paths default to
+   stroke:none and text to black fill, so the whole "Annual climatology"
+   section rendered as an empty box in every theme. Mirrors the inline styles
+   of the sibling climate-trends chart (stats.js .ct-*). */
+.clim-loading {
+  color: var(--subtext);
+  font-size: 12px;
+  padding: 10px 0;
+}
+.clim-line {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.clim-ace { stroke: var(--lavender); }
+.clim-named { stroke: var(--sapphire); }
+.clim-landfalls { stroke: var(--peach); }
+.clim-axis,
+.clim-tick-line {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.clim-marker {
+  stroke: var(--border-accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.clim-tick,
+.clim-marker-label {
+  fill: var(--subtext);
+  font-size: 10px;
+}
+.clim-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--subtext);
+}
+.clim-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.clim-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+.clim-swatch.clim-ace { background: var(--lavender); }
+.clim-swatch.clim-named { background: var(--sapphire); }
+.clim-swatch.clim-landfalls { background: var(--peach); }
+.clim-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--subtext);
+}

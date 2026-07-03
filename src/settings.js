@@ -139,7 +139,36 @@ export const PALETTES = {
   },
 };
 
+// Marker colors resolve from the live --cat-* CSS variables so the map always
+// matches the legend across dark/light/high-contrast themes AND the colorblind
+// palette (all of which override those tokens in CSS). The raw PALETTES table
+// remains the fallback for non-DOM contexts (tests) and pre-boot calls.
+let cssPaletteCache = null;
+
+export function invalidatePaletteCache() {
+  cssPaletteCache = null;
+}
+
+function resolveCssPalette() {
+  if (typeof document === 'undefined' || !document.body) return null;
+  const cs = getComputedStyle(document.body);
+  const read = (name) => (cs.getPropertyValue(name) || '').trim();
+  const ts = read('--cat-ts');
+  if (!ts) return null;
+  return {
+    '-1': ts,
+    0: ts,
+    1: read('--cat-1') || ts,
+    2: read('--cat-2') || ts,
+    3: read('--cat-3') || ts,
+    4: read('--cat-4') || ts,
+    5: read('--cat-5') || ts,
+  };
+}
+
 export function getPaletteColor(cat) {
+  if (!cssPaletteCache) cssPaletteCache = resolveCssPalette();
+  if (cssPaletteCache) return cssPaletteCache[cat] ?? cssPaletteCache['-1'];
   const pal = PALETTES[getSetting('palette')] || PALETTES.default;
   return pal[cat] || pal['-1'];
 }
@@ -148,6 +177,7 @@ export function getPaletteColor(cat) {
 export function applyPaletteToBody() {
   const pal = getSetting('palette');
   document.body.classList.toggle('palette-colorblind', pal === 'colorblind');
+  invalidatePaletteCache();
 }
 
 // Apply theme to html element root
@@ -158,6 +188,15 @@ export function applyThemeToRoot() {
   document.documentElement.classList.toggle('light-theme', effectiveTheme === 'light');
   document.documentElement.dataset.theme = effectiveTheme;
   document.documentElement.dataset.themeSetting = theme;
+  invalidatePaletteCache();
+  syncThemeColorMeta(effectiveTheme);
+}
+
+// Keep the browser-chrome color in step with the active theme; the static
+// #11111b meta otherwise leaves dark chrome over the light UI on mobile.
+function syncThemeColorMeta(effectiveTheme) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', effectiveTheme === 'light' ? '#eff1f5' : '#11111b');
 }
 
 export function prefersReducedMotion() {

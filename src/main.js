@@ -4,7 +4,7 @@ import {
   searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, fitToLandfalls, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
-import { applyPaletteToBody, applyThemeToRoot, getSetting, setSetting } from './settings.js';
+import { applyPaletteToBody, applyThemeToRoot, getSetting, invalidatePaletteCache, setSetting } from './settings.js';
 import { initLocale, setLocale, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
@@ -348,8 +348,18 @@ async function boot() {
       setTimeout(() => onLandfallClick(lf), 60);
     }
   }
-  if (restored && restored.s) {
+  // Only open the state panel for a state the hash validator actually
+  // accepted — a crafted #s=Bogus otherwise opens an empty panel for a state
+  // the filter engine just rejected.
+  if (restored && restored.s && filters.state === restored.s) {
     setTimeout(() => openStateLazy(restored.s), 80);
+  }
+  // PWA launcher shortcuts use bare hash tokens (manifest.webmanifest).
+  const bareHash = (location.hash || '').replace(/^#/, '');
+  if (bareHash === 'stats') {
+    setTimeout(() => document.getElementById('toggle-stats')?.click(), 120);
+  } else if (bareHash === 'compare') {
+    setTimeout(() => document.getElementById('toggle-compare')?.click(), 120);
   }
   // First-run tour is delayed until the map, filters, and timeline are stable.
   setTimeout(() => maybeStartOnboardingLazy(), 700);
@@ -466,6 +476,9 @@ function wireSettingsControls() {
   document.addEventListener('hm-settings:change', (e) => {
     if (e.detail.key === 'theme') {
       applyThemeToRoot();
+      // Marker colors resolve from the theme's --cat-* tokens — repaint so
+      // the map matches the re-themed legend.
+      applyFilters();
     }
     if (e.detail.key === 'palette') {
       applyPaletteToBody();
@@ -490,6 +503,8 @@ function wireSettingsControls() {
     }
     if (e.detail.key === 'highContrast') {
       document.documentElement.classList.toggle('high-contrast', getSetting('highContrast'));
+      invalidatePaletteCache();
+      applyFilters();
     }
   });
 }
