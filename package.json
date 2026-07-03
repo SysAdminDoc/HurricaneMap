@@ -1,6 +1,6 @@
 {
   "name": "hurricanemap",
-  "version": "1.3.10",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "description": "Static NOAA HURDAT2 hurricane landfall map.",
