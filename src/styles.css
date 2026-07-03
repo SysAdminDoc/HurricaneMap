@@ -514,7 +514,7 @@ label > input[type="checkbox"] {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: 4px;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 .dot.cat-ts { background: var(--cat-ts); }
@@ -598,7 +598,7 @@ label > input[type="checkbox"] {
 .cat-pill {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
   color: var(--base);
@@ -941,7 +941,7 @@ label > input[type="checkbox"] {
   padding: 4px 8px;
   background: var(--mantle);
   border: 1px solid var(--surface0);
-  border-radius: 999px;
+  border-radius: 8px;
   font-size: 11px;
   color: var(--text);
   transition: all 100ms ease;
@@ -953,7 +953,7 @@ label > input[type="checkbox"] {
 .ct-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 4px;
   flex-shrink: 0;
 }
 .ct-name { font-weight: 600; }
@@ -1053,7 +1053,7 @@ label > input[type="checkbox"] {
   margin-bottom: 6px;
 }
 .cp-card-head h3 { margin: 0; font-size: 14px; font-weight: 700; flex: 1; }
-.cp-swatch { width: 10px; height: 10px; border-radius: 50%; }
+.cp-swatch { width: 10px; height: 10px; border-radius: 4px; }
 .cp-remove {
   background: transparent;
   border: none;
@@ -1337,7 +1337,7 @@ label > input[type="checkbox"] {
   flex: 0 0 auto;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 4px;
   background: var(--error);
   box-shadow: 0 0 12px var(--error);
   animation: ab-pulse 1.4s ease-in-out infinite;
@@ -1396,7 +1396,7 @@ label > input[type="checkbox"] {
 .goes-live-dot {
   width: 7px;
   height: 7px;
-  border-radius: 999px;
+  border-radius: 4px;
   background: var(--sapphire);
   box-shadow: 0 0 12px rgba(116, 199, 236, 0.86);
 }
@@ -1636,7 +1636,7 @@ label > input[type="checkbox"] {
   color: var(--subtext);
   font-size: 10px;
   padding: 3px 7px;
-  border-radius: 999px;
+  border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -1917,7 +1917,7 @@ label > input[type="checkbox"] {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
-  border-radius: 50%;
+  border-radius: 6px;
   background: var(--lavender);
   cursor: pointer;
   border: 2px solid var(--mantle);
@@ -1931,7 +1931,7 @@ label > input[type="checkbox"] {
 .anim-scrubber::-moz-range-thumb {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: 6px;
   background: var(--lavender);
   cursor: pointer;
   border: 2px solid var(--mantle);
@@ -2199,7 +2199,7 @@ label > input[type="checkbox"] {
   display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 4px;
   background: var(--error);
   box-shadow: 0 0 8px var(--error);
   animation: radar-pip 1.4s ease-in-out infinite;
@@ -3363,7 +3363,7 @@ select:focus {
 .visible-count {
   padding: 4px 8px;
   border: 1px solid rgba(205, 214, 244, 0.10);
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(180, 190, 254, 0.06);
   white-space: nowrap;
 }
@@ -3597,7 +3597,7 @@ html.light-theme .panel-sticky-header {
   width: 34px;
   height: 34px;
   justify-self: center;
-  border-radius: 50%;
+  border-radius: 8px;
   border: 3px solid rgba(180, 190, 254, 0.18);
   border-top-color: var(--lavender);
   animation: spin 0.9s linear infinite;
@@ -4387,7 +4387,7 @@ section.storm-panel.glass {
 
 .radar-quick-btn {
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -4520,7 +4520,7 @@ section.storm-panel.glass {
   min-height: 30px;
   overflow: hidden;
   border: 1px solid rgba(205, 214, 244, 0.11);
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--surface-sunken);
 }
 
@@ -4554,14 +4554,14 @@ section.storm-panel.glass {
   gap: 4px;
   padding: 4px;
   border: 1px solid rgba(205, 214, 244, 0.10);
-  border-radius: 999px;
+  border-radius: 10px;
   background: var(--surface-sunken);
 }
 
 .seg-btn {
   min-height: 30px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px;
   background: transparent;
   color: var(--subtext);
   padding: 5px 9px;
@@ -4661,7 +4661,7 @@ section.storm-panel.glass {
   gap: 5px;
   padding: 4px 7px;
   border: 1px solid rgba(205, 214, 244, 0.09);
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--surface-sunken);
 }
 
@@ -4672,7 +4672,7 @@ section.storm-panel.glass {
 .ss-tier-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 4px;
 }
 
 .ss-superlatives {
@@ -5497,7 +5497,7 @@ html.high-contrast {
 .on-this-date-panel::-webkit-scrollbar-thumb,
 .settings-menu::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
-  border-radius: 999px;
+  border-radius: 8px;
   background: rgba(180, 190, 254, 0.28);
   background-clip: padding-box;
 }
@@ -5542,7 +5542,7 @@ html.high-contrast {
   min-height: 24px;
   padding: 3px 8px;
   border: 1px solid var(--border-subtle);
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--surface-control);
 }
 
@@ -6792,7 +6792,7 @@ html.high-contrast {
 .globe3d-timeline input[type="range"]:focus-visible {
   outline: 2px solid rgba(180, 190, 254, 0.78);
   outline-offset: 4px;
-  border-radius: 999px;
+  border-radius: 8px;
 }
 
 #globe3d-time-label {
@@ -7388,7 +7388,9 @@ html.light-theme .basemap-fallback {
 
 .filters:not(.collapsed) {
   top: 92px !important;
+  left: 12px !important;
   bottom: auto !important;
+  transform: none !important;
   width: min(var(--map-first-filter-width), calc(100vw - 24px)) !important;
   max-width: calc(100vw - 24px) !important;
   max-height: min(620px, calc(100vh - 124px)) !important;
@@ -7662,5 +7664,360 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-meta 
 @media (max-width: 720px) {
   .storm-panel .panel-sticky-header {
     padding-right: 86px !important;
+  }
+}
+
+/* Premium cohesion pass v1.4.3
+   Final layout layer for map-first playback, compact mobile chrome, settings
+   readability, and non-pill component geometry. */
+:root {
+  --hm-radius-xs: 4px;
+  --hm-radius-sm: 6px;
+  --hm-radius-md: 8px;
+  --hm-radius-lg: 10px;
+  --hm-radius-xl: 12px;
+}
+
+.cat-pill,
+.storm-flag,
+.radar-quick-btn,
+.visible-count,
+.ct-chip,
+.cold-tag,
+.enso-badge,
+.ss-tier,
+.search-section-label,
+.onb-step,
+.hm-toast,
+.hm-update-prompt {
+  border-radius: var(--hm-radius-sm) !important;
+}
+
+.settings-pill,
+.settings-action,
+.seg-btn,
+.mobile-actions-menu .icon-btn,
+.panel-restore-bar,
+.anim-btn,
+.anim-speed,
+.anim-radar-toggle,
+.timeline-toggle,
+.text-btn,
+.action-btn,
+.export-btn,
+.radar-btn {
+  border-radius: var(--hm-radius-md) !important;
+}
+
+.settings-menu,
+.filters:not(.collapsed),
+.storm-panel,
+.stats-panel,
+.compare-panel,
+.state-panel,
+.on-this-date-panel,
+.table-view-panel,
+.spatial-results,
+.boot-error-state,
+.storm-loading-state,
+.storm-error-state,
+.search-empty,
+.panel-empty-state,
+.empty-state,
+.cp-empty,
+.state-empty,
+.mobile-actions-menu,
+.anim-controls:not(.anim-controls-inline) {
+  border-radius: var(--hm-radius-xl) !important;
+}
+
+.dot,
+.ct-dot,
+.cp-swatch,
+.ab-pulse,
+.goes-live-dot,
+.radar-pip,
+.ss-tier-dot {
+  border-radius: var(--hm-radius-xs) !important;
+}
+
+.settings-menu {
+  top: 92px !important;
+  left: auto !important;
+  right: 12px !important;
+  max-height: min(760px, calc(100vh - 108px)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.settings-label-stack {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-help {
+  margin: 0;
+  color: var(--foreground-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.settings-toggle-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-toggle-copy small {
+  color: var(--foreground-muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.settings-menu .toggle-row {
+  align-items: start;
+  padding: 8px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--hm-radius-md);
+  transition: background 140ms var(--ease-standard), border-color 140ms var(--ease-standard);
+}
+
+.settings-menu .toggle-row:hover {
+  background: var(--surface-control);
+  border-color: var(--border-subtle);
+}
+
+.settings-menu .toggle-row:has(input:focus-visible),
+.settings-pill:focus-visible,
+.settings-action:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.settings-menu .toggle-row input {
+  margin-top: 3px;
+}
+
+.search-empty,
+.storm-loading-state,
+.storm-error-state,
+.boot-error-state {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.search-results.search-results--empty {
+  position: static !important;
+  max-height: none !important;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+
+.search-results.search-results--empty .search-empty {
+  display: grid !important;
+  min-height: 92px;
+  padding: 14px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background: var(--surface-elevated) !important;
+}
+
+.search-results.search-results--empty .search-empty::before {
+  display: none !important;
+}
+
+.storm-loading-state {
+  background:
+    linear-gradient(135deg, rgba(180, 190, 254, 0.08), rgba(116, 199, 236, 0.04)),
+    var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+}
+
+.storm-loading-dot {
+  border-radius: var(--hm-radius-md) !important;
+}
+
+.hm-update-reload {
+  min-width: 88px;
+}
+
+body.track-playback-active .app-header {
+  opacity: 0.96;
+}
+
+body.track-playback-active .storm-panel.minimized {
+  width: auto !important;
+}
+
+body.track-playback-active .storm-panel.minimized .panel-restore-bar {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
+  align-items: center;
+  gap: 8px;
+  max-width: min(228px, calc(100vw - 16px));
+  min-height: 38px;
+  padding: 8px 11px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-theme-md);
+}
+
+body.track-playback-active .storm-panel.minimized .panel-restore-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) {
+  display: grid !important;
+  grid-template-columns: auto auto minmax(160px, 1fr) auto auto auto;
+  grid-template-areas:
+    "toggle restart scrub speed radar close"
+    "hud hud hud hud hud hud";
+  align-items: center;
+  justify-content: stretch;
+  gap: 7px 8px;
+  max-height: none;
+  overflow: hidden;
+  padding: 8px 10px;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) [data-act="toggle"] { grid-area: toggle; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) [data-act="restart"] { grid-area: restart; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-scrubber { grid-area: scrub; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-speed { grid-area: speed; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar-toggle { grid-area: radar; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-close { grid-area: close; }
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-hud {
+  grid-area: hud;
+  min-width: 0;
+  padding-top: 0;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-scrubber {
+  min-width: 0;
+  width: 100%;
+}
+
+body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar-toggle {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  body.track-playback-active {
+    --side-panel-top: 76px;
+    --side-panel-bottom: 118px;
+  }
+
+  body.track-playback-active .app-header {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    grid-template-areas: "brand title" !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+
+  body.track-playback-active .brand-mark {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  body.track-playback-active .title-block h1 {
+    font-size: 19px !important;
+  }
+
+  body.track-playback-active .title-block .subtitle {
+    display: none !important;
+  }
+
+  body.track-playback-active .header-actions {
+    display: none !important;
+  }
+
+  .settings-menu {
+    top: calc(var(--side-panel-top) + 8px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-height: calc(100vh - var(--side-panel-top) - 24px) !important;
+  }
+
+  body.track-playback-active .storm-panel.minimized {
+    inset: var(--side-panel-top) 8px auto auto !important;
+  }
+
+  body.track-playback-active .storm-panel.minimized .panel-restore-bar {
+    max-width: min(208px, calc(100vw - 16px));
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) {
+    width: calc(100vw - 16px);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "toggle scrub close"
+      "hud hud hud"
+      "restart speed radar";
+    gap: 6px;
+    padding: 7px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-btn {
+    min-width: 40px;
+    height: 32px;
+    padding-inline: 9px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) [data-act="restart"] {
+    width: 100%;
+    min-width: 0;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-speed,
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar-toggle {
+    min-height: 32px;
+    justify-self: stretch;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-hud {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-header {
+    border-radius: var(--hm-radius-xl) !important;
+  }
+
+  .settings-menu {
+    max-height: calc(100vh - var(--side-panel-top) - 24px) !important;
+  }
+
+  .settings-help,
+  .settings-toggle-copy small {
+    font-size: 10.5px;
+  }
+
+  body.track-playback-active .anim-controls:not(.anim-controls-inline) {
+    bottom: max(6px, env(safe-area-inset-bottom)) !important;
   }
 }

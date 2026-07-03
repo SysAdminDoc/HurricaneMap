@@ -88,7 +88,7 @@ export async function showStorm(landfall) {
   body.innerHTML = `
     <div class="storm-loading-state" role="status" aria-live="polite">
       <span class="storm-loading-dot" aria-hidden="true"></span>
-      <span>Loading storm track and landfall details...</span>
+      <span>Loading track, landfalls, and impact context...</span>
     </div>
   `;
   // Stop any running animation and drop the previous storm's overlays when
@@ -102,7 +102,7 @@ export async function showStorm(landfall) {
     body.innerHTML = `
       <div class="storm-error-state" role="alert">
         <strong>Storm record unavailable.</strong>
-        <span>The map point loaded, but its detailed HURDAT2 track could not be found.</span>
+        <span>The selected map point loaded, but its detailed HURDAT2 track is missing from this data bundle.</span>
       </div>
     `;
     return;

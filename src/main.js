@@ -702,6 +702,7 @@ function wireUI() {
     els.searchInput.setAttribute('aria-expanded', String(open));
     if (!open) {
       activeSearchIndex = -1;
+      els.searchResults.classList.remove('search-results--empty');
       els.searchInput.removeAttribute('aria-activedescendant');
       els.searchResults.querySelectorAll('[aria-selected="true"]').forEach(el => el.setAttribute('aria-selected', 'false'));
     }
@@ -730,7 +731,7 @@ function wireUI() {
   function showHistoryDropdown() {
     const history = getHistory();
     if (!history.length) return;
-    setSearchOpen(true);
+    els.searchResults.classList.remove('search-results--empty');
     els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
       history.map(h => {
         const name = escapeHtml(formatStormName(h.name));
@@ -742,6 +743,7 @@ function wireUI() {
           <span class="search-result-text"><strong>${escapeHtml(h.year)}</strong> ${name} <span class="search-result-meta">· ${cat} ${state}</span></span>
         </li>`;
       }).join('');
+    setSearchOpen(true);
     backfillSparklines();
     wireResultClicks();
   }
@@ -759,13 +761,14 @@ function wireUI() {
 
   function showNoSearchResults(query) {
     const safeQuery = escapeHtml(query.trim());
-    setSearchOpen(true);
+    els.searchResults.classList.add('search-results--empty');
     els.searchResults.innerHTML = `
       <li class="search-empty" role="status">
         <strong>No storm matches "${safeQuery}"</strong>
-        <span>Try a storm name, state, or year, such as Andrew, Florida, or 2005.</span>
+        <span>Search by storm name, state, or year, such as Andrew, Florida, or 2005.</span>
       </li>
     `;
+    setSearchOpen(true);
   }
 
   function wireResultClicks() {
@@ -825,6 +828,7 @@ function wireUI() {
       showNoSearchResults(q);
       return;
     }
+    els.searchResults.classList.remove('search-results--empty');
     setSearchOpen(true);
     const renderRow = (lf) => {
       const name = formatStormName(lf.name);
@@ -1107,7 +1111,7 @@ boot().catch(err => {
     <div class="boot-error-state" role="alert">
       <strong>HurricaneMap could not load its data.</strong>
       <span>${safeMsg}</span>
-      <span>If this file was opened directly, serve the folder first: <code>python -m http.server 8765</code>.</span>
+      <span>Run the app from a local web server so the browser can read the data files: <code>python -m http.server 8765</code>.</span>
       <button class="text-btn boot-retry-btn" type="button">Retry</button>
     </div>`;
   els.loading.querySelector('.boot-retry-btn')?.addEventListener('click', () => window.location.reload());

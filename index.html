@@ -90,12 +90,15 @@
     <div class="settings-menu glass" id="settings-menu" role="dialog" aria-labelledby="settings-menu-title" aria-describedby="settings-menu-description" popover>
       <div class="settings-menu-header">
         <h2 id="settings-menu-title" data-i18n="settings.title">Display settings</h2>
-        <p id="settings-menu-description">Adjust reading, color, and data preferences. Changes stay in this browser.</p>
+        <p id="settings-menu-description" data-i18n="settings.description">Tune units, accessibility, and live-storm layers. Changes stay on this device.</p>
       </div>
       <section class="settings-section" aria-labelledby="settings-reading-title">
         <h3 id="settings-reading-title">Reading</h3>
         <div class="settings-row">
-          <div class="settings-label" data-i18n="settings.windUnits">Wind units</div>
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.windUnits">Wind units</div>
+            <p class="settings-help" data-i18n="settings.windHelp">Used in panels, charts, and exports.</p>
+          </div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Wind unit">
             <button class="settings-pill" data-set-unit="kt" role="radio">Knots</button>
             <button class="settings-pill" data-set-unit="mph" role="radio">mph</button>
@@ -103,14 +106,20 @@
           </div>
         </div>
         <div class="settings-row">
-          <div class="settings-label" data-i18n="settings.damageMode">Damage figures</div>
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.damageMode">Damage figures</div>
+            <p class="settings-help" data-i18n="settings.damageHelp">Compare historical losses either as reported or CPI-adjusted.</p>
+          </div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Damage adjustment">
-            <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm">Nominal</button>
-            <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages">2024 USD</button>
+            <button class="settings-pill" data-set-damage="nominal" role="radio" title="Nominal USD at year-of-storm" data-i18n="settings.damageModeNominal">Nominal</button>
+            <button class="settings-pill" data-set-damage="real" role="radio" title="CPI-adjusted to 2024 USD using BLS annual averages" data-i18n="settings.damageMode2024">2024 USD</button>
           </div>
         </div>
         <div class="settings-row">
-          <div class="settings-label">Language</div>
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.language">Language</div>
+            <p class="settings-help" data-i18n="settings.languageHelp">Updates interface labels without changing data.</p>
+          </div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Language">
             <button class="settings-pill" data-set-locale="en" role="radio">English</button>
             <button class="settings-pill" data-set-locale="es" role="radio">Español</button>
@@ -121,52 +130,58 @@
       <section class="settings-section" aria-labelledby="settings-appearance-title">
         <h3 id="settings-appearance-title">Appearance</h3>
         <div class="settings-row">
-          <div class="settings-label" data-i18n="settings.theme">Theme</div>
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.theme">Theme</div>
+            <p class="settings-help" data-i18n="settings.themeHelp">Choose the map chrome that fits your lighting.</p>
+          </div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Theme">
-            <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)">Dark</button>
-            <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)">Light</button>
-            <button class="settings-pill" data-set-theme="system" role="radio" title="Follow your operating system color scheme">System</button>
+            <button class="settings-pill" data-set-theme="dark" role="radio" title="Dark theme (Catppuccin Mocha)" data-i18n="settings.themeDark">Dark</button>
+            <button class="settings-pill" data-set-theme="light" role="radio" title="Light theme (Catppuccin Latte)" data-i18n="settings.themeLight">Light</button>
+            <button class="settings-pill" data-set-theme="system" role="radio" title="Follow your operating system color scheme" data-i18n="settings.themeSystem">System</button>
           </div>
         </div>
         <div class="settings-row">
-          <div class="settings-label" data-i18n="settings.palette">Color palette</div>
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.palette">Color palette</div>
+            <p class="settings-help" data-i18n="settings.paletteHelp">Keeps category color meaning consistent across the map and panels.</p>
+          </div>
           <div class="settings-pillgroup" role="radiogroup" aria-label="Color palette">
-            <button class="settings-pill" data-set-palette="default" role="radio">Default</button>
-            <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd: sequential and distinguishable for common color-vision differences">Colorblind</button>
+            <button class="settings-pill" data-set-palette="default" role="radio" data-i18n="settings.paletteDefault">Default</button>
+            <button class="settings-pill" data-set-palette="colorblind" role="radio" title="ColorBrewer YlOrRd: sequential and distinguishable for common color-vision differences" data-i18n="settings.paletteColorblind">Colorblind</button>
           </div>
         </div>
         <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-high-contrast" />
-            <span>High-contrast mode</span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.highContrast">High-contrast mode</span><small data-i18n="settings.highContrastHelp">Strengthens text, borders, and focus outlines.</small></span>
           </label>
         </div>
         <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-reduced-motion" />
-            <span>Reduce motion</span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.reduceMotion">Reduce motion</span><small data-i18n="settings.reduceMotionHelp">Keeps state changes clear with less animation.</small></span>
           </label>
         </div>
       </section>
       <section class="settings-section" aria-labelledby="settings-assist-title">
-        <h3 id="settings-assist-title">Guidance</h3>
+        <h3 id="settings-assist-title" data-i18n="settings.liveAids">Live storm aids</h3>
         <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-nhc-forecast-cone" />
-            <span>Official NHC cone and forecast track when storms are active</span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.nhcCone">NHC forecast cone and track</span><small data-i18n="settings.nhcConeHelp">Appears only when official active-storm geometry is available.</small></span>
           </label>
         </div>
         <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-goes-realtime" />
-            <span>Live GOES satellite background for active storms</span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.goesLayer">GOES satellite backdrop</span><small data-i18n="settings.goesLayerHelp">Adds live imagery behind active storms when tiles are reachable.</small></span>
           </label>
         </div>
         <div class="settings-row settings-row--action">
-          <button class="settings-action" id="replay-tour" type="button">Replay welcome tour</button>
+          <button class="settings-action" id="replay-tour" type="button" data-i18n="settings.replayTour">Replay welcome tour</button>
         </div>
       </section>
-      <div class="settings-meta">Saved locally. No account or external profile is used.</div>
+      <div class="settings-meta" data-i18n="settings.meta">Saved on this device. No account, tracking profile, or cloud sync.</div>
     </div>
   </header>
 

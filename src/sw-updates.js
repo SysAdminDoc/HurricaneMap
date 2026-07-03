@@ -33,10 +33,10 @@ export function createUpdatePrompt({
     prompt.innerHTML = `
       <div class="hm-update-copy">
         <strong>Update available</strong>
-        <span>Reload to use the latest map shell and offline cache.</span>
+        <span>Refresh to use the newest map shell and offline data cache.</span>
       </div>
       <div class="hm-update-actions">
-        <button class="text-btn hm-update-reload" type="button">Reload</button>
+        <button class="text-btn hm-update-reload" type="button">Refresh</button>
         <button class="icon-btn hm-update-dismiss" type="button" aria-label="Dismiss update prompt">×</button>
       </div>`;
     prompt.hidden = true;
