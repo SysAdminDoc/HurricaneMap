@@ -100,9 +100,15 @@ function addCorsHeaders(response) {
 export function classifyAsset(pathname) {
   const path = normalizePath(pathname);
   if (path === '/' || path.endsWith('/index.html') || !/\.[a-z0-9]+$/i.test(path)) return 'html';
+  // Radar frames are timestamp-addressed — genuinely immutable.
   if (/^\/data\/radar\/.+\.png$/i.test(path)) return 'immutable';
-  if (/^\/data\/.+\.(json|geojson|txt)$/i.test(path)) return 'data';
-  if (/\.(png|jpg|jpeg|webp|avif|svg|ico)$/i.test(path)) return 'immutable';
+  // storms.json.gz refreshes with every HURDAT2 revision like its siblings;
+  // the .gz suffix must not fall through to the shell TTL.
+  if (/^\/data\/.+\.(json|geojson|txt)(\.gz)?$/i.test(path)) return 'data';
+  // Branding/screenshot images live at stable, un-fingerprinted paths — a
+  // year-long immutable would pin stale logos in returning browsers forever.
+  if (/\.(png|jpg|jpeg|webp|avif|svg|ico)$/i.test(path)) return 'shell';
+  if (/\.(woff2|ttf|otf)$/i.test(path)) return 'immutable';
   if (/\.(js|css|webmanifest)$/i.test(path)) return 'shell';
   return 'shell';
 }

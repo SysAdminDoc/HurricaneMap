@@ -15,12 +15,14 @@ assert.equal(classifyAsset('/data/storms.json'), 'data', 'generated JSON data sh
 assert.equal(classifyAsset('/data/us-states.geojson'), 'data', 'GeoJSON data should use data caching');
 assert.equal(classifyAsset('/data/hurdat2-atlantic.txt'), 'data', 'raw HURDAT2 text should use data caching');
 assert.equal(classifyAsset('/data/radar/Katrina-2005/t_200508291200.png'), 'immutable', 'local radar frames should use immutable on-demand caching');
-assert.equal(classifyAsset('/branding/logo.png'), 'immutable', 'branding image should use immutable image caching');
+assert.equal(classifyAsset('/data/storms.json.gz'), 'data', 'compressed storms bundle refreshes with HURDAT2 revisions — data TTL, not shell');
+assert.equal(classifyAsset('/branding/logo.png'), 'shell', 'branding images live at stable un-fingerprinted paths — immutable would pin stale logos for a year');
+assert.equal(classifyAsset('/fonts/inter-latin.woff2'), 'immutable', 'vendored fonts are content-stable and safe to cache immutably');
 
 assert.match(cachePolicyFor('/').edge, /s-maxage=300/, 'HTML should have a short edge TTL');
 assert.match(cachePolicyFor('/src/main.js').edge, /s-maxage=86400/, 'shell assets should have a one-day edge TTL');
 assert.match(cachePolicyFor('/data/storms.json').edge, /s-maxage=21600/, 'data should have a moderate edge TTL');
-assert.match(cachePolicyFor('/branding/logo.png').browser, /immutable/, 'images should have immutable browser caching');
+assert.match(cachePolicyFor('/data/storms.json.gz').edge, /s-maxage=21600/, 'compressed data should share the data edge TTL');
 
 const origin = originUrlFor(new URL('https://map.example.com/data/storms.json?x=1'), {
   ORIGIN_BASE_URL: 'https://sysadmindoc.github.io/HurricaneMap',

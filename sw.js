@@ -6,7 +6,8 @@
 //     stale-while-revalidate, with CacheStorage fallback.
 //   - Local radar PNGs                                → cache-first on demand;
 //     not preinstalled because the archive is intentionally large.
-//   - Map tiles (CartoDB, OSM)                       → cache-first w/ TTL.
+//   - Map tiles (CartoDB, OSM)                       → stale-while-revalidate,
+//     capped at TILE_CACHE_MAX_ENTRIES (oldest evicted first).
 //   - Everything else                                → network-first, fall back to cache.
 //
 // Bump SW_VERSION on every release to flush the static shell.
@@ -167,13 +168,26 @@ self.addEventListener('fetch', (event) => {
   if (isRadarAsset(url)) {
     event.respondWith(cacheFirst(req, RADAR_CACHE));
   } else if (isShell(url)) {
-    event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, event.preloadResponse));
+    event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, event));
   } else if (isData(url)) {
-    event.respondWith(offlineDataWhileRevalidate(req));
+    event.respondWith(offlineDataWhileRevalidate(req, event));
   } else if (isTile(url)) {
-    event.respondWith(staleWhileRevalidate(req, TILE_CACHE));
+    event.respondWith(staleWhileRevalidate(req, TILE_CACHE, event));
   }
 });
+
+// Keep the tile cache bounded — without a cap it grows with every pan/zoom
+// for the life of the origin. Eviction is insertion-order (oldest first).
+const TILE_CACHE_MAX_ENTRIES = 600;
+
+async function trimCache(cacheName, maxEntries) {
+  try {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    if (keys.length <= maxEntries) return;
+    await Promise.all(keys.slice(0, keys.length - maxEntries).map(key => cache.delete(key)));
+  } catch { /* best-effort */ }
+}
 
 async function cacheFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
@@ -188,20 +202,27 @@ async function cacheFirst(req, cacheName) {
   }
 }
 
-async function staleWhileRevalidate(req, cacheName, preloadResponse) {
+async function staleWhileRevalidate(req, cacheName, event) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(req);
+  const preloadResponse = event?.preloadResponse;
   const networkFetch = preloadResponse
     ? preloadResponse.then(r => r || fetch(req)).catch(() => fetch(req))
     : fetch(req);
-  const refresh = networkFetch.then((res) => {
-    if (res && res.status === 200) cache.put(req, res.clone()).catch(() => {});
+  const refresh = networkFetch.then(async (res) => {
+    if (res && res.status === 200) {
+      await cache.put(req, res.clone()).catch(() => {});
+      if (cacheName === TILE_CACHE) await trimCache(TILE_CACHE, TILE_CACHE_MAX_ENTRIES);
+    }
     return res;
   }).catch(() => null);
+  // Without waitUntil the SW can be terminated before the background
+  // revalidation writes complete, silently losing the refresh.
+  if (event && typeof event.waitUntil === 'function') event.waitUntil(refresh);
   return hit || (await refresh) || Response.error();
 }
 
-async function offlineDataWhileRevalidate(req) {
+async function offlineDataWhileRevalidate(req, event) {
   const cache = await caches.open(DATA_CACHE);
   const cached = await readOfflineResponse(req);
   const cacheHit = cached ? null : await cache.match(req);
@@ -214,6 +235,7 @@ async function offlineDataWhileRevalidate(req) {
     }
     return res;
   }).catch(() => null);
+  if (event && typeof event.waitUntil === 'function') event.waitUntil(refresh);
   return cached || cacheHit || (await refresh) || Response.error();
 }
 
