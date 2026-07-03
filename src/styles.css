@@ -8333,10 +8333,11 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   :root {
     --desktop-shelf-bottom: 16px;
     --desktop-shelf-height: 136px;
-    --desktop-shelf-gap: 12px;
+    --desktop-shelf-gap: 6px;
     --desktop-shelf-left: 16px;
     --desktop-shelf-right: 16px;
     --desktop-season-width: clamp(272px, 21vw, 320px);
+    --desktop-panel-top: 94px;
     --side-panel-bottom: calc(var(--desktop-shelf-bottom) + var(--desktop-shelf-height) + var(--desktop-shelf-gap));
   }
 
@@ -8353,7 +8354,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   .table-view-panel,
   .spatial-results,
   section.storm-panel.glass {
-    inset: 88px 16px var(--side-panel-bottom) auto !important;
+    inset: var(--desktop-panel-top) 16px var(--side-panel-bottom) auto !important;
   }
 
   .timeline-ribbon {
