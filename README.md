@@ -63,7 +63,19 @@ npm run build
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
-## Premium UX/UI Polish (Latest)
+## What's new in v1.4.0 — Deep audit pass (July 2026)
+
+A full engineering and product audit landed ~40 verified fixes plus a panel-management upgrade:
+
+- **Panel minimize-to-tab** — every side panel (storm, statistics, comparison, state, table view, spatial results) now has a minimize button that collapses it to a slim restore tab at the map edge, so the map, timeline, and zoom controls reclaim the full viewport. Panels also strictly share one exclusive lane — no more stacking or overlap.
+- **Offline storm data actually works** — the compressed storms bundle was precached but unservable, and the storms web worker had never loaded (wrong fetch paths). Storm tracks and panels now work offline, parsed off the main thread.
+- **Active-storm tracking fixed on GitHub Pages** — the live NHC feed was permanently dead on the canonical deployment (proxy 404 never triggered the fallback) and was being served stale-first by the service worker.
+- **Colorblind palette reaches the whole UI** — the legend, category buttons, pills, and timeline bars now switch with the map markers instead of contradicting them; marker colors resolve from the live theme tokens across dark/light/high-contrast.
+- **Exports repaired** — publication CSV date columns, the statistical report's By-Month chart, and QGIS GeoJSON time attributes all derive correctly from landfall timestamps now.
+- **Contrast repairs** — high-contrast and light themes meet WCAG minimums on accent controls, category pills, dim text, and focus rings; the climatology chart (previously invisible in every theme) renders.
+- **Honest data labeling** — the sea-surface-temperature overlay is labeled as the September 2024 snapshot it is.
+
+## Premium UX/UI Polish
 
 The interface has undergone a premium-polish pass focused on clarity, trust, accessibility, and a more cohesive product feel:
 
@@ -110,7 +122,7 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **VPAT published** — See [`docs/VPAT.html`](docs/VPAT.html) for the full WCAG 2.2 AA Voluntary Product Accessibility Template.
 - **Internationalization** — English, Spanish (ES-LA), and Haitian Creole (Kreyòl) locales with browser auto-detection.
 
-## Phase 8: Mobile Optimization & Advanced Features (Latest)
+## Phase 8: Mobile Optimization & Advanced Features
 
 **Mobile-First Responsive Design**
 - **WCAG AAA touch targets** — All interactive elements now meet the 44×44px minimum standard on mobile (720px and below): header icon buttons, Leaflet zoom controls, year inputs, category toggles. Leaflet controls gain rounded corners for better ergonomics.
