@@ -2,6 +2,14 @@
 
 All notable changes to HurricaneMap.
 
+## v1.4.5 - Desktop shelf alignment (July 2026)
+
+- Moved the season summary into the desktop bottom shelf, positioned to the left of the timeline with matching height, baseline, radius, and surface treatment.
+- Reserved bottom-shelf space for desktop side panels so storm, state, stats, comparison, table, and spatial panels stop above the season/timeline row instead of competing with it.
+- Kept service-worker update toasts out of the side-panel lane when panels are open.
+- Added a body-level season-summary visibility state so shelf layout only shifts when the card is actually rendered.
+- Fixed smoke coverage to inspect the real `.timeline-ribbon` element and assert shelf alignment, panel spacing, and no-overlap behavior across desktop themes.
+
 ## v1.4.4 - Desktop panel refinement (July 2026)
 
 - Rebalanced desktop side panels into a wider bounded inspector lane so storm, state, stats, comparison, table, and spatial panels have enough room without swallowing the map.

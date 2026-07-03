@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.4.5-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -62,6 +62,13 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.4.5 - Desktop shelf alignment (July 2026)
+
+- **Season and timeline align.** The 2020 season card now sits inline to the left of the timeline as part of one bottom shelf instead of floating above it.
+- **Panels reserve real space.** Desktop side panels now stop above the bottom shelf, leaving a clean gap and keeping the map readable.
+- **Cleaner update feedback.** Toasts move into the map lane when a side panel is open instead of covering the details panel.
+- **Regression coverage.** Smoke tests now assert the actual timeline selector, shelf alignment, panel spacing, and no-overlap behavior across themes and desktop viewports.
 
 ## What's new in v1.4.4 - Desktop panel refinement (July 2026)
 
