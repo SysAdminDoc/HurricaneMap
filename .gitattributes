@@ -1,0 +1,11 @@
+# Normalize source to LF; leave data payloads and vendored files untouched.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
+*.gz binary
+
+data/** -text
+vendor/** -text
