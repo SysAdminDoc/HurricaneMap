@@ -17,6 +17,11 @@ const HOST_ID = 'season-summary';
 const MAX_YEARS = 3;
 let dismissedRange = null;
 
+function setSeasonSummaryVisible(host, visible) {
+  host.hidden = !visible;
+  document.body.classList.toggle('season-summary-visible', visible);
+}
+
 function ensureHost() {
   let host = document.getElementById(HOST_ID);
   if (host) return host;
@@ -25,7 +30,7 @@ function ensureHost() {
   host.className = 'season-summary glass';
   host.setAttribute('role', 'complementary');
   host.setAttribute('aria-label', 'Season summary');
-  host.hidden = true;
+  setSeasonSummaryVisible(host, false);
   // Mount adjacent to the legend at the bottom-left of the map.
   const main = document.querySelector('main') || document.body;
   main.appendChild(host);
@@ -42,17 +47,17 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const span = yearMax - yearMin + 1;
   const rangeKey = `${yearMin}-${yearMax}`;
   if (span < 1 || span > MAX_YEARS) {
-    host.hidden = true;
+    setSeasonSummaryVisible(host, false);
     host.innerHTML = '';
     return;
   }
   if (dismissedRange === rangeKey) {
-    host.hidden = true;
+    setSeasonSummaryVisible(host, false);
     return;
   }
   const landfalls = getLandfalls().filter(lf => lf.year >= yearMin && lf.year <= yearMax);
   if (!landfalls.length) {
-    host.hidden = false;
+    setSeasonSummaryVisible(host, true);
     host.innerHTML = `
       <header>
         <h3>${yearMin === yearMax ? `${yearMin} season` : `${yearMin}–${yearMax}`}</h3>
@@ -61,7 +66,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       <p class="season-empty">No US landfalls in this range.</p>`;
     host.querySelector('.season-close').addEventListener('click', () => {
       dismissedRange = rangeKey;
-      host.hidden = true;
+      setSeasonSummaryVisible(host, false);
     });
     return;
   }
@@ -88,7 +93,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   }
 
   // Render the synchronous part immediately, then back-fill ACE + impacts.
-  host.hidden = false;
+  setSeasonSummaryVisible(host, true);
   const titleSpan = yearMin === yearMax ? `${yearMin} season` : `${yearMin}–${yearMax} seasons`;
   const tierBlocks = [
     { label: 'TS', count: tierCounts.ts, color: 'var(--cat-ts)' },
@@ -152,7 +157,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   `;
   host.querySelector('.season-close').addEventListener('click', () => {
     dismissedRange = rangeKey;
-    host.hidden = true;
+    setSeasonSummaryVisible(host, false);
   });
 
   // Async pass: ACE + impacts lookup once storms are loaded.

@@ -8324,3 +8324,194 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     grid-column: auto;
   }
 }
+
+/* Desktop bottom shelf alignment v1.4.5
+   The season summary and timeline are one map shelf, not separate floating
+   windows. Keep that shelf left of the analytical panel so the map, timeline,
+   and details panel read as one intentional desktop workspace. */
+@media (min-width: 1121px) {
+  :root {
+    --desktop-shelf-bottom: 16px;
+    --desktop-shelf-height: 136px;
+    --desktop-shelf-gap: 12px;
+    --desktop-shelf-left: 16px;
+    --desktop-shelf-right: 16px;
+    --desktop-season-width: clamp(272px, 21vw, 320px);
+    --side-panel-bottom: calc(var(--desktop-shelf-bottom) + var(--desktop-shelf-height) + var(--desktop-shelf-gap));
+  }
+
+  body.side-panel-open {
+    --desktop-shelf-right: calc(var(--map-first-panel-width) + 32px);
+    --overlay-right-reserve: var(--desktop-shelf-right);
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel,
+  .table-view-panel,
+  .spatial-results,
+  section.storm-panel.glass {
+    inset: 88px 16px var(--side-panel-bottom) auto !important;
+  }
+
+  .timeline-ribbon {
+    left: var(--map-left-reserve) !important;
+    right: var(--desktop-shelf-right) !important;
+    bottom: var(--desktop-shelf-bottom) !important;
+    height: var(--desktop-shelf-height) !important;
+    min-height: 0 !important;
+    max-height: var(--desktop-shelf-height) !important;
+    box-sizing: border-box !important;
+    padding: 8px 10px !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: var(--hm-radius-xl) !important;
+    background: color-mix(in srgb, var(--surface-panel) 95%, transparent) !important;
+    box-shadow: var(--shadow-theme-lg) !important;
+  }
+
+  body.side-panel-open .timeline-ribbon {
+    right: var(--desktop-shelf-right) !important;
+    max-width: none !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .timeline-ribbon {
+    left: calc(var(--desktop-shelf-left) + var(--desktop-season-width) + var(--desktop-shelf-gap)) !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary:not([hidden]) {
+    display: grid !important;
+    left: var(--desktop-shelf-left) !important;
+    right: auto !important;
+    bottom: var(--desktop-shelf-bottom) !important;
+    width: var(--desktop-season-width) !important;
+    height: var(--desktop-shelf-height) !important;
+    max-height: var(--desktop-shelf-height) !important;
+    box-sizing: border-box !important;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    gap: 7px !important;
+    padding: 10px 11px !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border-strong) !important;
+    border-radius: var(--hm-radius-xl) !important;
+    background: color-mix(in srgb, var(--surface-panel) 95%, transparent) !important;
+    box-shadow: var(--shadow-theme-lg) !important;
+    z-index: 820 !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary header {
+    min-height: 24px;
+    margin: 0 !important;
+    align-items: center;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary h3 {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 6px;
+    font-size: 13px !important;
+    line-height: 1.15;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-close {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    border-radius: var(--hm-radius-md);
+    background: var(--surface-control);
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-close:hover {
+    background: var(--surface-control-hover);
+    color: var(--text);
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin: 0 !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-stat {
+    min-width: 0;
+    min-height: 42px;
+    padding: 6px 7px !important;
+    border-radius: var(--hm-radius-lg) !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-stat-num {
+    font-size: 15px !important;
+    line-height: 1.05;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-stat-lbl {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-tiers {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 5px !important;
+    margin: 0 !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-tier {
+    justify-content: center;
+    min-width: 0;
+    padding: 4px 5px !important;
+    border-radius: var(--hm-radius-md) !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-tier-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--hm-radius-sm);
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-superlatives {
+    min-height: 0;
+    margin: 0 !important;
+    gap: 4px !important;
+    overflow: hidden;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-superlatives > div {
+    grid-template-columns: 74px minmax(0, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-superlatives > div:not(:first-child) {
+    display: none !important;
+  }
+
+  body.side-panel-open.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary:not([hidden]) {
+    display: grid !important;
+  }
+
+  body.side-panel-open .hm-toast-host {
+    right: calc(var(--desktop-shelf-right) + 12px);
+    bottom: calc(var(--desktop-shelf-bottom) + var(--desktop-shelf-height) + 16px);
+  }
+}
+
+@media (min-width: 1121px) and (max-width: 1280px) {
+  :root {
+    --desktop-season-width: clamp(248px, 22vw, 284px);
+  }
+
+  body.season-summary-visible:not(.filters-open):not(.track-playback-active) .season-summary .ss-tier-label {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 860px) {
+  :root {
+    --side-panel-bottom: 132px;
+  }
+}
