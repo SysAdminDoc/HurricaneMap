@@ -246,12 +246,20 @@ export function focusLandfall(lf, panTo = true) {
   }
 }
 
+// Generation token: clearTracks() invalidates every showTrack() still awaiting
+// the lazy storms.json load, so stale continuations can't repaint tracks that
+// were cleared (toggle-off or storm-switch during the 2 MB first load).
+let trackGeneration = 0;
+
 export function clearTracks() {
+  trackGeneration++;
   trackLayer.clearLayers();
 }
 
 export async function showTrack(stormId, opts = {}) {
+  const generation = trackGeneration;
   await ensureStormsLoaded();
+  if (generation !== trackGeneration) return null;
   const storm = getStorm(stormId);
   if (!storm) return null;
   const segments = buildIntensitySegments(storm.track);

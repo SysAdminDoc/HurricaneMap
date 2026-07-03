@@ -164,6 +164,8 @@ export class RadarOverlay {
     this.stormId = null;
     this.localFrames = null;     // sorted array of {ts, date, url} for full-storm loop
     this.animTimer = null;
+    this.loopPending = false;    // online loop probe in flight
+    this.session = 0;            // bumped on show()/close() to cancel stale awaits
   }
 
   available(landfall) {
@@ -175,8 +177,13 @@ export class RadarOverlay {
    *  `storm` is the full storm record (from storms.json) so we can pan the
    *  map along the storm's track during the loop. */
   async show(storm, lfIdx) {
+    // The remote walkback below can spend seconds in HEAD probes; if the user
+    // closes radar or opens another landfall meanwhile, this session token
+    // stops the stale continuation from resurrecting the overlay.
+    const session = ++this.session;
     this.stopAnimation();
     await loadManifest();
+    if (session !== this.session) return;
     this.storm = storm;
     this.stormId = storm.id;
     const lf = storm.us_landfalls[lfIdx];
@@ -214,6 +221,7 @@ export class RadarOverlay {
       // Fall back to remote walkback.
       const target = new Date(this.landfall.t);
       frame = await findRemoteNearest(this.region, target);
+      if (session !== this.session) return;
       if (!frame) {
         this.setStatus('No archived radar found within ±1 hour of landfall.');
         return;
@@ -305,16 +313,19 @@ export class RadarOverlay {
       return;
     }
     // Online stepper: 5-min steps.
+    const session = this.session;
     const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
     const url = buildIemUrl(this.region, next);
     this.setStatus('Loading…');
     try {
       const r = await fetch(url, { method: 'HEAD' });
+      if (session !== this.session) return;
       if (!r.ok) {
         this.setStatus(`No frame at ${formatTime(next.toISOString())}`);
         return;
       }
     } catch (_) {
+      if (session !== this.session) return;
       this.setStatus(`Failed to load ${formatTime(next.toISOString())}`);
       return;
     }
@@ -344,12 +355,15 @@ export class RadarOverlay {
 
   async toggleLoop() {
     const btn = this.controls?.querySelector('[data-act="loop"]');
-    if (this.animTimer) {
+    if (this.animTimer || this.loopPending) {
+      // Second click while running OR while the online probe is still in
+      // flight means "stop" — without the pending flag, two probes could
+      // finish and start two intervals, only one of which is stoppable.
       this.stopAnimation();
-      if (btn) btn.textContent = '▶▶';
       return;
     }
 
+    const session = this.session;
     let frames = [];
 
     // Prefer the full-storm local frame list when available.
@@ -357,10 +371,12 @@ export class RadarOverlay {
       frames = this.localFrames;
     } else {
       // Online mode: probe ±30 min around the landfall in 5-min steps.
+      this.loopPending = true;
       this.setStatus('Building loop (probing IEM)…');
       const t0 = new Date(this.landfall.t);
       const start = new Date(t0.getTime() - 30 * 60 * 1000);
       for (let m = 0; m <= 60; m += 5) {
+        if (session !== this.session || !this.loopPending) return;
         const d = roundToMinutes(new Date(start.getTime() + m * 60 * 1000), 5);
         const u = buildIemUrl(this.region, d);
         try {
@@ -368,6 +384,8 @@ export class RadarOverlay {
           if (r.ok) frames.push({ ts: dateToStamp(d), date: d, url: u });
         } catch (_) { /* skip */ }
       }
+      if (session !== this.session || !this.loopPending) return;
+      this.loopPending = false;
     }
 
     if (!frames.length) {
@@ -391,6 +409,7 @@ export class RadarOverlay {
   }
 
   stopAnimation() {
+    this.loopPending = false;
     if (this.animTimer) {
       clearInterval(this.animTimer);
       this.animTimer = null;
@@ -400,6 +419,7 @@ export class RadarOverlay {
   }
 
   close() {
+    this.session++;
     this.stopAnimation();
     if (this.overlay) {
       this.map.removeLayer(this.overlay);

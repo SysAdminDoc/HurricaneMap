@@ -155,7 +155,11 @@ export class TrackAnimator {
     // Pull this storm's local radar frames so we can paint reflectivity into
     // the animation in lockstep with the simulated UTC clock. Returns null if
     // the storm has no offline radar (e.g. pre-1995 storms or post-2025).
+    // The animator can be stopped or restarted for another storm while this
+    // await is in flight (first manifest.json fetch) — bail if so, or the
+    // stale continuation rebuilds controls and overwrites radar frames.
     const radar = await getStormRadarFrames(storm.id);
+    if (this.storm !== storm || !this.marker) return;
     if (radar) {
       this.radarFrames = radar.frames;
       this.radarBounds = radar.bounds;
@@ -238,9 +242,12 @@ export class TrackAnimator {
   }
 
   sampleAt(t) {
+    // Single-point tracks (a handful of 1860s storms) have no segment to
+    // interpolate — return the lone fix directly instead of indexing [-1].
+    if (this.densifiedTrack.length === 1) return this.densifiedTrack[0];
     const n = this.densifiedTrack.length - 1;
     const idx = t * n;
-    const i = Math.min(n - 1, Math.floor(idx));
+    const i = Math.max(0, Math.min(n - 1, Math.floor(idx)));
     const f = idx - i;
     const a = this.densifiedTrack[i];
     const b = this.densifiedTrack[i + 1];
@@ -332,6 +339,19 @@ export class TrackAnimator {
     const scrub = el.querySelector('.anim-scrubber');
     scrub.addEventListener('input', (e) => {
       const t = parseInt(e.target.value, 10) / 1000;
+      // Scrubbing back after the animation ended (rAF chain stopped) must not
+      // leave a zombie "neither playing nor paused" state — land in an
+      // explicit pause so the toggle button resumes with a single click.
+      if (!this.rafId && !this.paused && this.elapsed >= this.duration) {
+        this.paused = true;
+        const btn = this.controls?.querySelector('[data-act="toggle"]');
+        if (btn) {
+          btn.textContent = 'Play';
+          btn.title = 'Resume playback';
+          btn.setAttribute('aria-label', btn.title);
+        }
+        this.emitState();
+      }
       this.elapsed = t * this.duration;
       // While scrubbing we want the visual to update immediately, even paused.
       const sample = this.sampleAt(t);

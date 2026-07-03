@@ -60,7 +60,12 @@ closeBtn.addEventListener('click', () => {
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
+let showStormSeq = 0;
+
 export async function showStorm(landfall) {
+  // Sequence guard: rapid marker clicks interleave across the awaits below
+  // (storms.json / exposure-index loads); only the latest click may render.
+  const seq = ++showStormSeq;
   showPanel('storm-panel');
   stickyHeader.innerHTML = '';
   body.innerHTML = `
@@ -69,9 +74,12 @@ export async function showStorm(landfall) {
       <span>Loading storm track and landfall details...</span>
     </div>
   `;
-  // Stop any running animation when switching storms.
+  // Stop any running animation and drop the previous storm's overlays when
+  // switching storms — the wind-field swath otherwise outlives its checkbox.
   if (animator) animator.stop();
+  hideWindField();
   await ensureStormsLoaded();
+  if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
   if (!storm) {
     body.innerHTML = `
@@ -84,12 +92,14 @@ export async function showStorm(landfall) {
   }
   clearTracks();
   await showTrack(storm.id);
+  if (seq !== showStormSeq) return;
   if (radiiCount(storm) > 0) {
     try {
       await ensureExposureDensitiesLoaded();
     } catch (error) {
       console.warn('Population exposure density index unavailable:', error);
     }
+    if (seq !== showStormSeq) return;
   }
   const allStorms = getAllStorms();
   render(storm, landfall, allStorms);

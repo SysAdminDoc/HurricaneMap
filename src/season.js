@@ -31,7 +31,13 @@ function ensureHost() {
   main.appendChild(host);
   return host;
 }
+let refreshSeq = 0;
+
 export async function refreshSeasonSummary({ yearMin, yearMax }) {
+  // Timeline clicks fire this on every filter change; overlapping calls
+  // interleave across the storms.json await and write stale ACE/analog blocks
+  // into the newer card. Only the latest call may finish the async pass.
+  const seq = ++refreshSeq;
   const host = ensureHost();
   const span = yearMax - yearMin + 1;
   const rangeKey = `${yearMin}-${yearMax}`;
@@ -151,6 +157,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
 
   // Async pass: ACE + impacts lookup once storms are loaded.
   await ensureStormsLoaded();
+  if (seq !== refreshSeq) return;
   let totalACE = 0;
   let deadliest = null;
   let costliest = null;
@@ -259,6 +266,8 @@ function renderSeasonAnalogs(host, targetYear, stormCount, lfCount, ace) {
     return `<li>${s.year} <span class="ss-meta">${s.storms} storms · ${s.landfalls} landfalls · ${pct}% similar</span></li>`;
   }).join('');
 
+  // Replace, never stack — a stale refresh may have appended one already.
+  host.querySelector('.ss-analogs')?.remove();
   const el = document.createElement('div');
   el.className = 'ss-analogs';
   el.innerHTML = `<h4>Similar seasons</h4><ul>${rows}</ul>`;

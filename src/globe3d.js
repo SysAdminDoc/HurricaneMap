@@ -48,8 +48,14 @@ const els = typeof document === 'undefined' ? {} : {
   trigger: document.getElementById('toggle-globe3d'),
 };
 
+let wired = false;
+
 export function initGlobe3D() {
   if (!els.panel) return;
+  // Called on every globe-button click — wire listeners exactly once, or each
+  // open stacks duplicate handlers (N wind-cone rebuilds, N Escape handlers).
+  if (wired) return;
+  wired = true;
   els.close?.addEventListener('click', closeGlobe3D);
   els.reset?.addEventListener('click', () => flyToDataset(currentDataset));
   els.focus?.addEventListener('click', () => flyToFocus(currentDataset));

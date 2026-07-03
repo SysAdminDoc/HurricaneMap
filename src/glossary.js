@@ -74,7 +74,7 @@ export async function initGlossary() {
   const glossaryList = document.getElementById('glossary-list');
   const closeBtn = document.getElementById('close-glossary');
   
-  const renderList = (items = glossaryData) => {
+  const renderList = (items = glossaryData || []) => {
     if (!items.length) {
       glossaryList.innerHTML = `
         <div class="empty-state glossary-empty">
@@ -95,7 +95,7 @@ export async function initGlossary() {
   
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.trim();
-    const results = query ? searchGlossary(query) : glossaryData;
+    const results = query ? searchGlossary(query) : (glossaryData || []);
     renderList(results);
   });
   

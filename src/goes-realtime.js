@@ -45,6 +45,9 @@ export const GOES_SECTORS = Object.freeze({
 let goesLayerGroup = null;
 let goesLayerMap = null;
 let statusEl = null;
+// Bumped whenever layers are cleared so late image load/error events from a
+// removed overlay can't resurrect the status badge.
+let goesRenderGeneration = 0;
 
 export async function renderGoesRealtimeContext(activeStorms, options = {}) {
   const map = options.map || goesLayerMap;
@@ -62,7 +65,7 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
   }
 
   ensureGoesLayer(map);
-  goesLayerGroup.clearLayers();
+  clearGoesLayers();
   updateGoesStatus('loading', sectorIds, options.now);
 
   const L = window.L;
@@ -81,8 +84,13 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
         attribution: 'NOAA/NESDIS/STAR GOES',
       },
     );
-    overlay.once('load', () => updateGoesStatus('ready', sectorIds, now));
-    overlay.once('error', () => updateGoesStatus('error', sectorIds, now));
+    const generation = goesRenderGeneration;
+    overlay.once('load', () => {
+      if (generation === goesRenderGeneration) updateGoesStatus('ready', sectorIds, now);
+    });
+    overlay.once('error', () => {
+      if (generation === goesRenderGeneration) updateGoesStatus('error', sectorIds, now);
+    });
     overlay.addTo(goesLayerGroup);
   }
 
@@ -95,6 +103,7 @@ export function hideGoesRealtimeContext() {
 }
 
 export function clearGoesLayers() {
+  goesRenderGeneration++;
   if (goesLayerGroup) goesLayerGroup.clearLayers();
 }
 

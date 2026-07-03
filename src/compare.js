@@ -158,7 +158,11 @@ export function openComparePanel() {
 }
 
 function refreshComparePanelIfOpen() {
-  if (comparePanel && !comparePanel.hidden && pinned.length) renderComparePanel();
+  if (!comparePanel || comparePanel.hidden) return;
+  // Removing the final pin from inside the panel must not leave the stale
+  // card behind — fall back to the same hint state openComparePanel() shows.
+  if (pinned.length) renderComparePanel();
+  else openComparePanel();
 }
 
 function renderComparePanel() {
