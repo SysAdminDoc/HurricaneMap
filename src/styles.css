@@ -8021,3 +8021,306 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     bottom: max(6px, env(safe-area-inset-bottom)) !important;
   }
 }
+
+/* Desktop panel system refinement v1.4.4
+   Desktop reading panels need enough width for charts and rows to breathe, but
+   the map should remain the primary workspace. This layer replaces the narrow
+   v1.4.3 panel lane with a bounded inspector width and normalizes the dense
+   storm/state/stats internals to avoid clipped dashboard columns. */
+@media (min-width: 1121px) {
+  :root {
+    --map-first-panel-width: clamp(560px, 39vw, 640px);
+    --desktop-panel-width: var(--map-first-panel-width);
+    --side-panel-width: var(--map-first-panel-width);
+    --hm-panel-gap: 12px;
+  }
+
+  .storm-panel,
+  .stats-panel,
+  .compare-panel,
+  .state-panel,
+  .on-this-date-panel,
+  .table-view-panel,
+  .spatial-results,
+  section.storm-panel.glass {
+    inset: 88px 16px 22px auto !important;
+    width: min(var(--map-first-panel-width), calc(100vw - 392px)) !important;
+    max-width: calc(100vw - 32px) !important;
+    box-sizing: border-box !important;
+    padding: 16px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-gutter: stable;
+    line-height: 1.45;
+    background: color-mix(in srgb, var(--surface-panel) 96%, transparent) !important;
+    border: 1px solid var(--border-strong) !important;
+    box-shadow: var(--shadow-theme-lg) !important;
+  }
+
+  body.side-panel-open .season-summary {
+    display: none !important;
+  }
+
+  body.side-panel-open .timeline-ribbon {
+    right: calc(var(--map-first-panel-width) + 32px) !important;
+    max-width: calc(100vw - var(--map-left-reserve) - var(--map-first-panel-width) - 56px) !important;
+  }
+
+  body.side-panel-open .leaflet-top.leaflet-right {
+    right: calc(var(--map-first-panel-width) + 32px) !important;
+  }
+
+  .panel-min-btn,
+  .close-btn {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .panel-min-btn {
+    right: 54px;
+  }
+
+  .storm-panel .panel-sticky-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.45fr) !important;
+    gap: 10px 12px !important;
+    margin: -16px -16px var(--hm-panel-gap) !important;
+    padding: 14px 94px 12px 16px !important;
+  }
+
+  .storm-panel .storm-panel-header h2 {
+    font-size: 19px !important;
+    line-height: 1.14 !important;
+    margin-bottom: 5px !important;
+  }
+
+  .storm-panel .meta-row {
+    margin-bottom: 0 !important;
+    gap: 6px 10px !important;
+    line-height: 1.25 !important;
+  }
+
+  .storm-panel-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) !important;
+    gap: var(--hm-panel-gap) !important;
+    align-items: start;
+  }
+
+  .storm-summary-cluster,
+  .storm-analysis-cluster,
+  .storm-resources-cluster {
+    gap: var(--hm-panel-gap) !important;
+    min-width: 0;
+  }
+
+  .storm-resources-cluster {
+    grid-column: 1 / -1;
+  }
+
+  .storm-panel .stat-grid,
+  .state-panel .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  .storm-panel .stat-grid .stat,
+  .state-panel .stat-grid .stat {
+    min-height: 64px;
+    padding: 10px 12px !important;
+  }
+
+  .storm-panel .panel-section-h3,
+  .state-panel .panel-section-h3,
+  .stats-panel h3 {
+    margin: 0 0 8px !important;
+    color: var(--foreground-subtle);
+    font-size: 10px !important;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.15;
+  }
+
+  #state-body > .state-panel-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr) !important;
+    gap: var(--hm-panel-gap) !important;
+    align-items: start;
+  }
+
+  .state-summary-cluster,
+  .state-distribution-cluster,
+  .state-records-cluster {
+    display: grid;
+    gap: var(--hm-panel-gap) !important;
+    min-width: 0;
+    align-content: start;
+  }
+
+  .state-summary-cluster h2 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    line-height: 1.1;
+  }
+
+  .state-summary-cluster .state-sub {
+    margin: 0 !important;
+    color: var(--foreground-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .state-records-cluster {
+    grid-column: 1 / -1;
+  }
+
+  .state-panel .state-section,
+  .stats-panel .stats-section {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 11px 12px !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--hm-radius-xl) !important;
+    background: var(--surface-control) !important;
+  }
+
+  .state-panel .state-section--decade {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 2px 10px;
+  }
+
+  .state-panel .state-section--decade > h3 {
+    grid-column: 1 / -1;
+  }
+
+  .state-panel .bar-row,
+  .stats-panel .bar-row {
+    display: grid;
+    grid-template-columns: minmax(54px, 72px) minmax(0, 1fr) 28px;
+    gap: 7px !important;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .state-panel .bar-row .label,
+  .state-panel .bar-row .count,
+  .stats-panel .bar-row .label,
+  .stats-panel .bar-row .count {
+    width: auto !important;
+  }
+
+  .state-panel .state-section--worst .state-storm-list,
+  .state-panel .state-section--all-storms #state-storm-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    margin: 0 !important;
+  }
+
+  .state-panel .state-section--all-storms #state-storm-list {
+    max-height: min(330px, calc(100vh - 500px)) !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+
+  .state-panel .state-list-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px !important;
+    align-items: center;
+    margin: 0 0 8px !important;
+  }
+
+  .state-panel .state-sort {
+    justify-self: end;
+  }
+
+  .state-storm-row {
+    min-width: 0;
+    min-height: 38px;
+    padding: 7px 9px !important;
+    border-color: var(--border-subtle);
+    background: var(--surface-sunken);
+  }
+
+  .state-storm-row:hover {
+    transform: none !important;
+    background: var(--surface-control-hover);
+    border-color: var(--border-accent);
+  }
+
+  .state-storm-row:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring-soft);
+  }
+
+  .ssr-name,
+  .ssr-year,
+  .ssr-count {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #stats-body {
+    display: block !important;
+  }
+
+  #stats-body > h2 {
+    margin: 0 0 8px !important;
+    font-size: 20px;
+  }
+
+  #stats-body > .stats-summary {
+    margin: 0 0 var(--hm-panel-gap) !important;
+    padding: 10px 12px !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--hm-radius-xl);
+    background: var(--surface-control);
+    color: var(--foreground-muted);
+  }
+
+  #stats-body > .stats-panel-layout {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: var(--hm-panel-gap) !important;
+    align-items: start;
+  }
+
+  .stats-panel-column {
+    display: grid;
+    gap: var(--hm-panel-gap) !important;
+    min-width: 0;
+  }
+
+  .stats-panel .clim-chart-wrap,
+  .stats-panel .climate-trends-host,
+  .stats-panel .dt-table-wrap {
+    max-height: none !important;
+    overflow: auto !important;
+  }
+}
+
+@media (min-width: 1121px) and (max-width: 1280px) {
+  :root {
+    --map-first-panel-width: clamp(520px, 43vw, 580px);
+  }
+
+  .storm-panel-layout,
+  #state-body > .state-panel-layout,
+  #stats-body > .stats-panel-layout,
+  .state-panel .state-section--worst .state-storm-list,
+  .state-panel .state-section--all-storms #state-storm-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .state-records-cluster,
+  .storm-resources-cluster {
+    grid-column: auto;
+  }
+}

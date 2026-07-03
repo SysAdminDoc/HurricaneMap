@@ -145,8 +145,9 @@ export async function openState(stateName) {
   const worstHtml = worst.map(s => {
     const cat = categoryLabel(s.max_cat);
     const cls = categoryClass(s.max_cat);
+    const stormLabel = `${formatStormName(s.name)} ${s.year}`;
     return `
-      <li class="state-storm-row" data-storm-id="${s.storm_id}">
+      <li class="state-storm-row" data-storm-id="${s.storm_id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(stormLabel)} storm details">
         <span class="cat-pill ${cls}">${cat}</span>
         <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
         <span class="ssr-year">${s.year}</span>
@@ -240,8 +241,9 @@ function renderStateStormRows(storms) {
   return storms.map(s => {
     const cat = categoryLabel(s.max_cat);
     const cls = categoryClass(s.max_cat);
+    const stormLabel = `${formatStormName(s.name)} ${s.year}`;
     return `
-      <li class="state-storm-row" data-storm-id="${s.storm_id}">
+      <li class="state-storm-row" data-storm-id="${s.storm_id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(stormLabel)} storm details">
         <span class="cat-pill ${cls}">${cat}</span>
         <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
         <span class="ssr-year">${s.year}</span>
@@ -252,7 +254,7 @@ function renderStateStormRows(storms) {
 }
 function wireStateStormRows(container, stateName) {
   container.querySelectorAll('.state-storm-row').forEach((row) => {
-    row.addEventListener('click', async () => {
+    const openRowStorm = async () => {
       try {
         const sid = row.dataset.stormId;
         const storm = getStorm(sid);
@@ -262,6 +264,12 @@ function wireStateStormRows(container, stateName) {
       } catch (e) {
         console.error('Failed to show storm:', e);
       }
+    };
+    row.addEventListener('click', openRowStorm);
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openRowStorm();
     });
   });
 }
