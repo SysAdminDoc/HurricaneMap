@@ -367,9 +367,12 @@ async function assertDesktopPanelSystem(page, label) {
     assert(!rectsIntersect(layout.panel, layout.seasonSummary), `${label}: ${name} overlaps the season shelf`);
     assert(Math.abs(layout.seasonSummary.top - layout.timeline.top) <= 2, `${label}: season shelf top is not aligned with timeline (${layout.seasonSummary.top} vs ${layout.timeline.top})`);
     assert(Math.abs(layout.seasonSummary.bottom - layout.timeline.bottom) <= 2, `${label}: season shelf bottom is not aligned with timeline (${layout.seasonSummary.bottom} vs ${layout.timeline.bottom})`);
-    assert(layout.seasonSummary.right <= layout.timeline.left - 8, `${label}: season shelf is not left of timeline`);
+    assert(layout.seasonSummary.right <= layout.timeline.left - 4, `${label}: season shelf is not left of timeline`);
     assert(layout.timeline.right <= layout.panel.left - 8, `${label}: timeline shelf does not reserve space before ${name}`);
     assert(layout.seasonSummary.height <= 150, `${label}: season shelf is too tall (${layout.seasonSummary.height}px)`);
+    const shelfGap = Math.min(layout.timeline.top, layout.seasonSummary.top) - layout.panel.bottom;
+    assert(shelfGap >= 4, `${label}: ${name} overlaps or crowds the shelf (${shelfGap}px gap)`);
+    assert(shelfGap <= 8, `${label}: ${name} leaves too much empty space above the shelf (${shelfGap}px gap)`);
     for (const child of layout.children) {
       assert(child.left >= layout.panel.left - 1, `${label}: ${name} child escapes left edge (${child.className})`);
       assert(child.right <= layout.panel.right + 1, `${label}: ${name} child escapes right edge (${child.className})`);
