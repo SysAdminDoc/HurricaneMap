@@ -2,6 +2,14 @@
 
 All notable changes to HurricaneMap.
 
+## v1.4.4 - Desktop panel refinement (July 2026)
+
+- Rebalanced desktop side panels into a wider bounded inspector lane so storm, state, stats, comparison, table, and spatial panels have enough room without swallowing the map.
+- Reworked storm, state, and statistics panel internals into two-column desktop grids that avoid clipped legacy dashboard columns and keep section spacing consistent.
+- Hid the season summary while an analytical panel is open, reducing competing floating windows on desktop.
+- Made state storm rows keyboard-accessible with button semantics, focus states, and Enter/Space activation.
+- Extended smoke coverage to assert desktop panel width, no clipped panel internals, hidden competing shelves, state-row accessibility, and stats/state/storm panel fit across themes.
+
 ## v1.4.3 - Premium layout and settings polish (July 2026)
 
 - Compressed mobile playback chrome so the map remains the primary surface: the header collapses to a compact identity strip, the storm panel stays as a small edge restore tab, and playback controls render as a bounded command dock.

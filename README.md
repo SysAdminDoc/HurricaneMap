@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -62,6 +62,14 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.4.4 - Desktop panel refinement (July 2026)
+
+- **Desktop panels breathe.** Analytical panels now use a wider but bounded inspector lane so charts, records, and controls are readable without covering the whole map.
+- **State and stats panels are orderly.** Legacy dashboard columns were reshaped into stable two-column desktop grids that do not clip or push content offscreen.
+- **Less window clutter.** The season summary now hides while a side panel is open, leaving one primary reading surface plus the map.
+- **Keyboard-accessible state rows.** State storm records now expose button semantics, focus states, and Enter/Space activation.
+- **Regression coverage.** Smoke tests now prove desktop panel fit, state-row accessibility, hidden competing shelves, and storm/state/stats layout across themes.
 
 ## What's new in v1.4.3 - Premium layout and settings polish (July 2026)
 
