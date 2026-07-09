@@ -33,12 +33,42 @@ export function getSeasonalSkillMetrics() {
 }
 
 export async function fetchSeasonalOutlook() {
-  return {
+  const base = {
     category: 'see-official',
     confidence: null,
     source: 'NOAA Climate Prediction Center',
     url: CPC_URL,
   };
+  // Static editorial snapshot of the current season's published outlooks
+  // (data/outlook.json). Refresh it when NOAA/CSU issue updates; a stale or
+  // missing file degrades to the link-only banner.
+  try {
+    const response = await fetch('data/outlook.json');
+    if (response.ok) {
+      const data = await response.json();
+      if (data && Number.isInteger(data.season) && Array.isArray(data.sources)) {
+        base.current = data;
+      }
+    }
+  } catch { /* offline or missing — link-only banner */ }
+  return base;
+}
+
+function renderCurrentSeasonRows(current) {
+  const rows = current.sources.map(source => `
+    <div class="sob-row">
+      <a class="sob-agency" href="${source.url}" target="_blank" rel="noopener">${source.agency}</a>
+      <span class="sob-numbers">${source.named} named · ${source.hurricanes} hurricanes · ${source.majors} major</span>
+      <span class="sob-issued">${source.probability ? `${source.probability} · ` : ''}issued ${source.issued}</span>
+    </div>`).join('');
+  return `
+    <div class="sob-current">
+      <div class="sob-headline">
+        <strong>${current.season} ${current.basin}: ${current.headline}</strong>
+        <span class="sob-enso">${current.enso}</span>
+      </div>
+      ${rows}
+    </div>`;
 }
 
 export function renderOutlookBanner(outlook) {
@@ -56,6 +86,7 @@ export function renderOutlookBanner(outlook) {
         <span class="sob-label">SEASONAL OUTLOOK</span>
         <span class="sob-source">NOAA CPC</span>
       </div>
+      ${outlook.current ? renderCurrentSeasonRows(outlook.current) : ''}
       <div class="sob-meta">
         <a href="${CPC_URL}" target="_blank" rel="noopener">View current NOAA CPC seasonal hurricane outlook →</a>
       </div>
