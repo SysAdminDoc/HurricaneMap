@@ -14,7 +14,8 @@
     { "src": "branding/logo-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
-    { "src": "example.png", "sizes": "2068x916", "type": "image/png", "form_factor": "wide", "label": "Hurricane landfall map with Catppuccin dark theme" }
+    { "src": "example.png", "sizes": "2068x916", "type": "image/png", "form_factor": "wide", "label": "Hurricane landfall map with Catppuccin dark theme" },
+    { "src": "branding/screenshot-narrow.png", "sizes": "860x1864", "type": "image/png", "form_factor": "narrow", "label": "Mobile landfall map with year timeline" }
   ],
   "shortcuts": [
     { "name": "Statistics", "url": "./#stats", "description": "View hurricane statistics and trends" },
