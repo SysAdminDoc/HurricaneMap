@@ -235,6 +235,14 @@ export const STRINGS = {
     'impacts.ncei': 'Billion-dollar disaster',
     'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
     'impacts.deaths': 'deaths',
+
+    // Tropical watches/warnings (2026 NHC cone standard)
+    'alerts.legendTitle': 'Coastal & inland alerts',
+    'alerts.huWarning': 'Hurricane Warning',
+    'alerts.huWatch': 'Hurricane Watch',
+    'alerts.tsWarning': 'Tropical Storm Warning',
+    'alerts.tsWatch': 'Tropical Storm Watch',
+    'alerts.huWatchTsWarning': 'Hurricane Watch + Tropical Storm Warning',
   },
   es: {
     // Header & navigation
@@ -464,6 +472,14 @@ export const STRINGS = {
     'impacts.ncei': 'Desastre de mil millones',
     'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
     'impacts.deaths': 'muertes',
+
+    // Tropical watches/warnings (2026 NHC cone standard)
+    'alerts.legendTitle': 'Alertas costeras e interiores',
+    'alerts.huWarning': 'Aviso de huracán',
+    'alerts.huWatch': 'Vigilancia de huracán',
+    'alerts.tsWarning': 'Aviso de tormenta tropical',
+    'alerts.tsWatch': 'Vigilancia de tormenta tropical',
+    'alerts.huWatchTsWarning': 'Vigilancia de huracán + Aviso de tormenta tropical',
   },
   ht: {
     'header.title': 'HurricaneMap',
@@ -672,6 +688,14 @@ export const STRINGS = {
     'impacts.ncei': 'Dezas plizyè milya dola',
     'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
     'impacts.deaths': 'moun ki mouri',
+
+    // Tropical watches/warnings (2026 NHC cone standard)
+    'alerts.legendTitle': 'Alèt kotyè ak enteryè',
+    'alerts.huWarning': 'Avètisman siklòn',
+    'alerts.huWatch': 'Siveyans siklòn',
+    'alerts.tsWarning': 'Avètisman tanpèt twopikal',
+    'alerts.tsWatch': 'Siveyans tanpèt twopikal',
+    'alerts.huWatchTsWarning': 'Siveyans siklòn + Avètisman tanpèt twopikal',
   },
 };
 

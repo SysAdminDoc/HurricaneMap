@@ -44,6 +44,7 @@ const SHELL_ASSETS = [
   './src/animation.js',
   './src/active.js',
   './src/active-polling.js',
+  './src/alerts.js',
   './src/climatology.js',
   './src/cone.js',
   './src/compare.js',

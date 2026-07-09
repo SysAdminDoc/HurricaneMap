@@ -8516,3 +8516,53 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     --side-panel-bottom: 132px;
   }
 }
+
+/* Tropical watch/warning overlay (2026 NHC cone standard) */
+.tropical-alert-legend {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--text);
+}
+.tropical-alert-legend[hidden] { display: none !important; }
+.tal-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.tal-list {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tal-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tal-swatch {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.tal-swatch--huWarning { background: #e64553; }
+.tal-swatch--huWatch { background: #f5a8d3; }
+.tal-swatch--tsWarning { background: #4c8ce6; }
+.tal-swatch--tsWatch { background: #f9e2af; }
+.tal-swatch--huWatchTsWarning {
+  background: repeating-linear-gradient(45deg, #f5a8d3 0 4px, #4c8ce6 4px 8px);
+}

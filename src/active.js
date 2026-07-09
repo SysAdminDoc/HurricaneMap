@@ -17,6 +17,7 @@ import {
   renderOfficialForecastContext,
 } from './cone.js';
 import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
+import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
 import { getSetting } from './settings.js';
 
 const L = window.L;
@@ -103,6 +104,7 @@ async function fetchAndRender() {
     hideGoesRealtimeContext();
     clearOfficialForecastContext();
     clearOfficialForecastCache();
+    clearTropicalAlerts();
     return;
   }
   renderActive(storms);
@@ -295,6 +297,13 @@ async function renderActive(storms) {
 
   const officialConeEnabled = getSetting('nhcForecastCone');
   await renderOfficialForecastContext(storms, {
+    map,
+    enabled: officialConeEnabled,
+  });
+
+  // 2026 cone standard: coastal + inland tropical watches/warnings travel
+  // with the official cone toggle.
+  await renderTropicalAlerts(storms, {
     map,
     enabled: officialConeEnabled,
   });

@@ -562,6 +562,50 @@ try {
   assert(/Loading track/.test(localeStrings.before), `EN dynamic string wrong: ${localeStrings.before}`);
   assert(localeStrings.es !== localeStrings.before && /Cargando/.test(localeStrings.es), `ES dynamic string did not switch: ${localeStrings.es}`);
   assert(localeStrings.ht !== localeStrings.before && /chaje/.test(localeStrings.ht), `HT dynamic string did not switch: ${localeStrings.ht}`);
+
+  // 2026 cone parity: watch/warning overlay renders zone polygons, the
+  // pink/blue hatch pattern, and its legend — exercised against stubbed
+  // api.weather.gov responses since active storms are rare in test runs.
+  const alertOverlay = await page.evaluate(async () => {
+    const alerts = await import('/src/alerts.js');
+    const { getMap } = await import('/src/map.js');
+    const realFetch = window.fetch;
+    window.fetch = async (url, init) => {
+      const u = String(url);
+      if (u.includes('/alerts/active')) {
+        return new Response(JSON.stringify({ features: [
+          { properties: { event: 'Hurricane Warning', geocode: { UGC: ['FLZ151'] } }, geometry: null },
+          { properties: { event: 'Hurricane Watch', geocode: { UGC: ['FLZ052'] } }, geometry: null },
+          { properties: { event: 'Tropical Storm Warning', geocode: { UGC: ['FLZ052'] } }, geometry: null },
+        ] }), { status: 200 });
+      }
+      if (u.includes('/zones/forecast/FLZ151')) {
+        return new Response(JSON.stringify({ geometry: { type: 'Polygon', coordinates: [[[-82, 27], [-81, 27], [-81, 28], [-82, 27]]] } }), { status: 200 });
+      }
+      if (u.includes('/zones/forecast/FLZ052')) {
+        return new Response(JSON.stringify({ geometry: { type: 'GeometryCollection', geometries: [{ type: 'Polygon', coordinates: [[[-83, 28], [-82, 28], [-82, 29], [-83, 28]]] }] } }), { status: 200 });
+      }
+      return realFetch(url, init);
+    };
+    try {
+      const result = await alerts.renderTropicalAlerts([{ id: 'AL012026', name: 'TEST' }], { map: getMap(), enabled: true });
+      const legend = document.querySelector('#tropical-alert-legend');
+      const snapshot = {
+        ...result,
+        paths: document.querySelectorAll('path.tropical-alert').length,
+        hatch: !!document.querySelector('#hm-ww-hatch'),
+        legendText: legend && !legend.hidden ? legend.textContent : '',
+      };
+      alerts.clearTropicalAlerts();
+      return snapshot;
+    } finally {
+      window.fetch = realFetch;
+    }
+  });
+  assert(alertOverlay.status === 'rendered' && alertOverlay.zoneCount === 2, `watch/warning overlay did not render: ${JSON.stringify(alertOverlay)}`);
+  assert(alertOverlay.paths >= 2, `expected zone polygons in the SVG pane, got ${alertOverlay.paths}`);
+  assert(alertOverlay.hatch, 'pink/blue hatch pattern was not installed in the map SVG defs');
+  assert(/Hurricane Warning/.test(alertOverlay.legendText) && /Hurricane Watch \+ Tropical Storm Warning/.test(alertOverlay.legendText), `alert legend incomplete: ${alertOverlay.legendText}`);
   // Synthetic ErrorEvent exercises the listener + toast without registering
   // as a real uncaught error (which would trip the pageerror assertions).
   await page.evaluate(() => {

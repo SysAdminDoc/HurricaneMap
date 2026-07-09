@@ -61,6 +61,7 @@ npm run build
 - **⚠️ Impacts data** — raw Wikipedia infobox deaths/damage text plus normalized numeric fields for fatalities and nominal USD damage (208 storms covered so far; rerun `scripts/scrape_impacts.py` to fill in more).
 - **💰 Billion-dollar disasters** — 65 landfalling storms joined to NOAA NCEI's U.S. Billion-Dollar Weather and Climate Disasters record (1980–2024, CPI-adjusted to 2024 USD, official death tolls). The NCEI product was retired in May 2025, so the dataset is frozen and ships with the repo (`scripts/build_billions.py`).
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears at the top with cone-of-uncertainty + advisory tracks rendered on the map, an optional live GOES satellite backdrop, hourly active-season feed checks, retry/backoff status, and quicklinks to spaghetti-model viewers (Tropical Tidbits, Track The Tropics).
+- **⚠️ 2026 cone standard: coastal + inland watches/warnings** — matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
