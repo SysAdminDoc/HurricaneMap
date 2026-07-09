@@ -27,6 +27,7 @@ const SHELL_ASSETS = [
   './src/styles.css',
   './src/main.js',
   './src/data.js',
+  './src/errors.js',
   './src/map.js',
   './src/panel.js',
   './src/panels.js',

@@ -195,6 +195,9 @@ export const STRINGS = {
     'about.version': 'Version {0}',
     'about.github': 'GitHub',
     'about.privacy': 'All data processing happens in your browser. No tracking, no accounts, no servers.',
+
+    // Errors
+    'error.unexpected': 'Something went wrong — a feature may be unavailable. Check the browser console for details.',
   },
   es: {
     // Header & navigation
@@ -384,6 +387,9 @@ export const STRINGS = {
     'about.version': 'Versión {0}',
     'about.github': 'GitHub',
     'about.privacy': 'Todo el procesamiento de datos ocurre en tu navegador. Sin rastreo, sin cuentas, sin servidores.',
+
+    // Errors
+    'error.unexpected': 'Algo salió mal — una función puede no estar disponible. Revisa la consola del navegador para más detalles.',
   },
   ht: {
     'header.title': 'HurricaneMap',
@@ -493,6 +499,9 @@ export const STRINGS = {
     'about.version': 'Vèsyon {0}',
     'about.github': 'GitHub',
     'about.privacy': 'Tout tretman done fèt nan navigatè w. Pa gen swivi, pa gen kont, pa gen sèvè.',
+
+    // Errors
+    'error.unexpected': 'Gen yon bagay ki pa mache — yon fonksyon ka pa disponib. Gade konsòl navigatè a pou plis detay.',
   },
 };
 

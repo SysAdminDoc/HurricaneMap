@@ -545,6 +545,19 @@ try {
   assert(reloadClicked === true, 'service-worker update prompt reload action did not fire.');
   await page.evaluate(() => window.__swUpdatePrompt.hide());
 
+  const errorSurfaceInstalled = await page.evaluate(() => window.__hmErrorSurface === true);
+  assert(errorSurfaceInstalled, 'global error surface was not installed at boot.');
+  // Synthetic ErrorEvent exercises the listener + toast without registering
+  // as a real uncaught error (which would trip the pageerror assertions).
+  await page.evaluate(() => {
+    window.dispatchEvent(new ErrorEvent('error', { message: 'hm-smoke-synthetic-error', filename: 'smoke.js' }));
+  });
+  await page.waitForFunction(() => {
+    const toast = document.querySelector('.hm-toast--warn.is-visible');
+    return !!toast && /Something went wrong/.test(toast.textContent || '');
+  }, { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('.hm-toast--warn'), { timeout: 10000 });
+
   await openKatrinaPanel(page);
   await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
   const exposureText = await page.textContent('#storm-panel .stat-grid');

@@ -23,6 +23,9 @@ import {
   setCategoryMacro, setYearRange, toggleCategory,
 } from './filter-state.js';
 import { closeAllPanels } from './panels.js';
+import { initGlobalErrorSurface } from './errors.js';
+
+initGlobalErrorSurface();
 
 let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
 let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;
