@@ -64,6 +64,7 @@ export const STRINGS = {
     'filters.heatmap': 'Landfall heatmap',
     'filters.population': 'Population density',
     'filters.stormSurge': 'Storm surge (SLOSH MOMs)',
+    'filters.sst': 'Sea surface temp (latest)',
     'filters.resetFilters': 'Reset filters',
 
     // Storm panel
@@ -301,6 +302,7 @@ export const STRINGS = {
     'filters.heatmap': 'Mapa de calor de tocamientos',
     'filters.population': 'Densidad de población',
     'filters.stormSurge': 'Marea de tormenta (MOMs SLOSH)',
+    'filters.sst': 'Temp. superficial del mar (más reciente)',
     'filters.resetFilters': 'Restablecer filtros',
 
     // Storm panel
@@ -533,6 +535,7 @@ export const STRINGS = {
     'filters.heatmap': 'Kat chalè',
     'filters.population': 'Dansite popilasyon',
     'filters.stormSurge': 'Vag tanpèt (SLOSH MOMs)',
+    'filters.sst': 'Tanperati sifas lanmè (dènye)',
     'filters.resetFilters': 'Remèt filtè yo',
     'panel.title': 'Detay siklòn',
     'panel.close': 'Fèmen',
