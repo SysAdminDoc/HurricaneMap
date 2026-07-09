@@ -94,6 +94,7 @@ const OFFLINE_DATA_ASSETS = [
   './data/stats.json',
   './data/metadata.json',
   './data/impacts.json',
+  './data/billions.json',
   './data/glossary.json',
   './data/storm-events.json',
   './data/rainfall.json',

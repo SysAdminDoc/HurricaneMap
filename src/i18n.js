@@ -198,6 +198,11 @@ export const STRINGS = {
 
     // Errors
     'error.unexpected': 'Something went wrong — a feature may be unavailable. Check the browser console for details.',
+
+    // NCEI billion-dollar disasters
+    'impacts.ncei': 'Billion-dollar disaster',
+    'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
+    'impacts.deaths': 'deaths',
   },
   es: {
     // Header & navigation
@@ -390,6 +395,11 @@ export const STRINGS = {
 
     // Errors
     'error.unexpected': 'Algo salió mal — una función puede no estar disponible. Revisa la consola del navegador para más detalles.',
+
+    // NCEI billion-dollar disasters
+    'impacts.ncei': 'Desastre de mil millones',
+    'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
+    'impacts.deaths': 'muertes',
   },
   ht: {
     'header.title': 'HurricaneMap',
@@ -502,6 +512,11 @@ export const STRINGS = {
 
     // Errors
     'error.unexpected': 'Gen yon bagay ki pa mache — yon fonksyon ka pa disponib. Gade konsòl navigatè a pou plis detay.',
+
+    // NCEI billion-dollar disasters
+    'impacts.ncei': 'Dezas plizyè milya dola',
+    'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
+    'impacts.deaths': 'moun ki mouri',
   },
 };
 

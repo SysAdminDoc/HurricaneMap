@@ -37,6 +37,7 @@ const DATA = {
   stats: null,
   metadata: null,
   impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
+  billions: null,      // storm_id -> NCEI billion-dollar disaster event (frozen at 2024)
   enso: null,          // year (string) -> ONI value
 };
 
@@ -59,11 +60,12 @@ async function fetchJson(url, { optional = false, fallback = null, priority } = 
 }
 
 export async function loadInitial() {
-  const [lf, st, md, im, enso] = await Promise.all([
+  const [lf, st, md, im, bn, enso] = await Promise.all([
     fetchJson('data/landfalls.json', { priority: 'high' }),
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
+    fetchJson('data/billions.json', { optional: true, fallback: {} }),
     fetchJson('data/enso.json', { optional: true, fallback: null }),
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
@@ -72,12 +74,18 @@ export async function loadInitial() {
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;
   DATA.impacts = im || {};
+  DATA.billions = bn || {};
   DATA.enso = enso && typeof enso === 'object' ? enso : null;
   return DATA;
 }
 
 export function getImpactsFor(stormId) {
   return DATA.impacts?.[stormId] || null;
+}
+
+export function getBillionsFor(stormId) {
+  if (!stormId || stormId === '_meta') return null;
+  return DATA.billions?.[stormId] || null;
 }
 
 function loadStormsViaWorker() {

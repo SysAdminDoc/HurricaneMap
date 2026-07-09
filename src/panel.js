@@ -1,7 +1,7 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  ktToMph, formatTime, getImpactsFor, getAllStorms, windToCategory,
+  ktToMph, formatTime, getImpactsFor, getBillionsFor, getAllStorms, windToCategory,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -628,33 +628,45 @@ function noaaTcrUrl(storm) {
 }
 
 function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
-  if (!im) return '';
   const rows = [];
-  const rawDeaths = getRawFatalityText(im);
-  const rawDamage = getRawDamageText(im);
-  if (rawDeaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(rawDeaths)}</span></div>`);
-  if (rawDamage) {
-    const mode = getSetting('damageMode');
-    const nominalM = getDamageMillions(im);
-    let valueHTML = escapeHtml(rawDamage);
-    if (mode === 'real' && nominalM != null && storm.year) {
-      const r = inflateUSD(nominalM, storm.year);
-      if (r) {
-        valueHTML = `${formatMillionsUSD(r.real)} <span class="im-adj">(2024 USD · ${formatMillionsUSD(nominalM)} nominal)</span>`;
+  const sources = [];
+  if (im) {
+    const rawDeaths = getRawFatalityText(im);
+    const rawDamage = getRawDamageText(im);
+    if (rawDeaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(rawDeaths)}</span></div>`);
+    if (rawDamage) {
+      const mode = getSetting('damageMode');
+      const nominalM = getDamageMillions(im);
+      let valueHTML = escapeHtml(rawDamage);
+      if (mode === 'real' && nominalM != null && storm.year) {
+        const r = inflateUSD(nominalM, storm.year);
+        if (r) {
+          valueHTML = `${formatMillionsUSD(r.real)} <span class="im-adj">(2024 USD · ${formatMillionsUSD(nominalM)} nominal)</span>`;
+        }
+      } else if (mode === 'nominal' && nominalM != null) {
+        valueHTML = `${formatMillionsUSD(nominalM)} <span class="im-adj">(${storm.year || ''} USD)</span>`;
       }
-    } else if (mode === 'nominal' && nominalM != null) {
-      valueHTML = `${formatMillionsUSD(nominalM)} <span class="im-adj">(${storm.year || ''} USD)</span>`;
+      rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${valueHTML}</span></div>`);
     }
-    rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${valueHTML}</span></div>`);
+    if (rows.length) {
+      const safeSourceUrl = safeExternalUrl(im.wiki_url);
+      sources.push(safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia');
+    }
+  }
+  const billions = getBillionsFor(storm.id);
+  if (billions && Number.isFinite(billions.cost_cpi_musd)) {
+    const deaths = Number.isFinite(billions.deaths)
+      ? ` · ${billions.deaths.toLocaleString()} ${t('impacts.deaths')}`
+      : '';
+    rows.push(`<div class="im-row"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${formatMillionsUSD(billions.cost_cpi_musd)} <span class="im-adj">(2024 USD${deaths})</span></span></div>`);
+    sources.push(`<a href="https://www.ncei.noaa.gov/access/billions/" target="_blank" rel="noopener">${t('impacts.nceiSource')}</a>`);
   }
   if (!rows.length) return '';
-  const safeSourceUrl = safeExternalUrl(im.wiki_url);
-  const src = safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia';
   return `
     <h3 class="panel-section-h3">${t('panel.impacts')}</h3>
     <div class="impacts-block">
       ${rows.join('')}
-      <div class="im-source">${src}</div>
+      <div class="im-source">${sources.join(' · ')}</div>
     </div>
   `;
 }

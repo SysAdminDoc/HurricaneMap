@@ -55,7 +55,7 @@ function assertImpactNumber(value, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
@@ -63,6 +63,7 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents] = awa
   readJson('data/glossary.json'),
   readJson('data/metadata.json'),
   readJson('data/storm-events.json'),
+  readJson('data/billions.json'),
 ]);
 
 if (!Array.isArray(landfalls)) fail('data/landfalls.json must contain an array.');
@@ -72,6 +73,7 @@ if (!isObject(impacts)) fail('data/impacts.json must contain an object.');
 if (!Array.isArray(glossary)) fail('data/glossary.json must contain an array.');
 if (!isObject(metadata)) fail('data/metadata.json must contain an object.');
 if (!isObject(stormEvents)) fail('data/storm-events.json must contain an object.');
+if (!isObject(billions)) fail('data/billions.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
@@ -276,6 +278,23 @@ for (const [key, count] of Object.entries(categoryCounts)) {
   if (stats.by_category?.[key] !== count) {
     fail(`stats.by_category.${key} ${stats.by_category?.[key]} does not match computed count ${count}.`);
   }
+}
+
+for (const [stormId, event] of Object.entries(billions)) {
+  if (stormId === '_meta') {
+    if (!isObject(event) || typeof event.source !== 'string') fail('billions.json _meta must record its source.');
+    continue;
+  }
+  if (!stormsById.has(stormId)) fail(`billions.json references unknown storm id ${stormId}.`);
+  if (!isObject(event)) {
+    fail(`${stormId}: billions row must be an object.`);
+    continue;
+  }
+  if (typeof event.event !== 'string' || !event.event) fail(`${stormId}: billions event name is required.`);
+  if (!isFiniteNumber(event.cost_cpi_musd) || event.cost_cpi_musd < 1000) fail(`${stormId}: billions cost_cpi_musd must be >= 1000 (billion-dollar threshold, millions USD).`);
+  if (!isFiniteNumber(event.cost_nominal_musd) || event.cost_nominal_musd <= 0) fail(`${stormId}: billions cost_nominal_musd must be a positive number.`);
+  if (!validNonNegativeInteger(event.deaths)) fail(`${stormId}: billions deaths must be a non-negative integer.`);
+  if (!validIsoDate(event.begin) || !validIsoDate(event.end)) fail(`${stormId}: billions begin/end must be ISO dates.`);
 }
 
 for (const [stormId, impact] of Object.entries(impacts)) {
