@@ -17,6 +17,29 @@ try {
   process.exit(1);
 }
 
+let AxeBuilder;
+try {
+  ({ AxeBuilder } = await import('@axe-core/playwright'));
+} catch (error) {
+  console.error('@axe-core/playwright is required for npm run test:smoke. Run npm install first.');
+  console.error(error.message || error);
+  process.exit(1);
+}
+
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
+// Known-accepted axe rule ids (e.g. unavoidable map-canvas noise). Currently
+// empty — new violations should be fixed, not allowlisted, unless they come
+// from Leaflet internals we cannot control.
+const AXE_ALLOWLIST = new Set([]);
+
+async function assertNoAxeViolations(page, label, include = null) {
+  let builder = new AxeBuilder({ page }).withTags(AXE_TAGS);
+  if (include) builder = builder.include(include);
+  const results = await builder.analyze();
+  const violations = results.violations.filter(violation => !AXE_ALLOWLIST.has(violation.id));
+  assert(!violations.length, `${label}: axe violations: ${violations.map(v => `${v.id} (${v.impact}, ${v.nodes.length} nodes, first: ${v.nodes[0]?.target?.[0]})`).join(' | ')}`);
+}
+
 const mime = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
@@ -617,8 +640,11 @@ try {
   }, { timeout: 5000 });
   await page.waitForFunction(() => !document.querySelector('.hm-toast--warn'), { timeout: 10000 });
 
+  await assertNoAxeViolations(page, 'main view (WCAG 2.2 AA)');
+
   await openKatrinaPanel(page);
   await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
+  await assertNoAxeViolations(page, 'storm panel (WCAG 2.2 AA)', '#storm-panel');
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
   const impactsText = await page.textContent('#storm-panel .impacts-block');

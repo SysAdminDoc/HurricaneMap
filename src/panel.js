@@ -767,15 +767,22 @@ function renderDaysAtIntensity(host, track) {
     host.innerHTML = '<div class="dai-empty">No tier-resolved track data available.</div>';
     return;
   }
-  const segs = order.filter(t => buckets[t.k] > 0).map(t => {
-    const hrs = buckets[t.k];
+  const parts = order.filter(tier => buckets[tier.k] > 0).map(tier => {
+    const hrs = buckets[tier.k];
     const pct = (hrs / total) * 100;
     const days = hrs / 24;
     const dayStr = days >= 1 ? `${days.toFixed(1)} d` : `${Math.round(hrs)} h`;
-    return `<div class="dai-seg ${t.cls}" style="flex-basis:${pct}%" title="${t.label}: ${dayStr} (${pct.toFixed(0)}%)" aria-label="${t.label}: ${dayStr}"><span class="dai-seg-label">${pct >= 8 ? `${t.label} · ${dayStr}` : ''}</span></div>`;
-  }).join('');
+    return { tier, pct, dayStr };
+  });
+  // Segments are presentational children of the role="img" bar — aria-label
+  // on a generic div is prohibited (WCAG 4.1.2); the per-tier breakdown goes
+  // on the bar's own label instead.
+  const segs = parts.map(({ tier, pct, dayStr }) =>
+    `<div class="dai-seg ${tier.cls}" style="flex-basis:${pct}%" title="${tier.label}: ${dayStr} (${pct.toFixed(0)}%)"><span class="dai-seg-label">${pct >= 8 ? `${tier.label} · ${dayStr}` : ''}</span></div>`,
+  ).join('');
+  const daiBreakdown = parts.map(({ tier, dayStr }) => `${tier.label} ${dayStr}`).join(', ');
   host.innerHTML = `
-    <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}">${segs}</div>
+    <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}: ${daiBreakdown}">${segs}</div>
     <div class="dai-legend">
       <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
     </div>

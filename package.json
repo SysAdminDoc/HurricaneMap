@@ -37,6 +37,7 @@
     "test": "npm run build && npm run test:smoke && npm run test:offline-smoke && npm run test:globe3d-smoke"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "esbuild": "^0.25.12",
     "playwright": "^1.61.1"
   }

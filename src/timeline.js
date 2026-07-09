@@ -209,13 +209,13 @@ export function redraw(landfalls) {
   axis.innerHTML = '';
   for (let y = Y0; y <= Y1; y++) {
     const v = byYear.get(y);
-    const bar = document.createElement('button');
-    bar.type = 'button';
+    // Presentational: pointer/keyboard interaction lives on the axis, which
+    // exposes role="slider" — nested interactive children fail WCAG 4.1.2.
+    const bar = document.createElement('div');
     bar.className = 'tl-bar';
     bar.dataset.year = y;
-    bar.tabIndex = -1;
     bar.title = v ? `${y} — ${v.count} landfall${v.count > 1 ? 's' : ''}` : `${y} — none`;
-    bar.setAttribute('aria-label', bar.title);
+    bar.setAttribute('aria-hidden', 'true');
     if (v) {
       const h = Math.max(8, (v.count / maxCount) * 100);
       bar.style.height = `${h}%`;
