@@ -1,6 +1,6 @@
 // Leaflet map + landfall markers + track overlays.
 import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './data.js';
-import { formatStormName } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 import { prefersReducedMotion } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
@@ -142,7 +142,9 @@ function ensureLandfallTooltip() {
 function openLandfallTooltip(marker) {
   if (!map || !marker) return;
   ensureLandfallTooltip()
-    .setContent(marker._tooltipText || '')
+    // Tooltip content is HTML to Leaflet — escape so a poisoned data bundle
+    // (storm name / state string) can't become markup (CVE-2025-69993 class).
+    .setContent(escapeHtml(marker._tooltipText || ''))
     .setLatLng(marker.getLatLng())
     .addTo(map);
 }

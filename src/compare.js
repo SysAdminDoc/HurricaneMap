@@ -116,7 +116,7 @@ function drawTrack(storm, color) {
   if (track.length) {
     L.circleMarker([track[0].lat, track[0].lon], {
       radius: 3, color, fillColor: color, weight: 1, fillOpacity: 0.9,
-    }).bindTooltip(`${formatStormName(storm.name)} ${storm.year}`, { direction: 'top' }).addTo(group);
+    }).bindTooltip(escapeHtml(`${formatStormName(storm.name)} ${storm.year}`), { direction: 'top' }).addTo(group);
   }
   group.addTo(map);
   return group;
