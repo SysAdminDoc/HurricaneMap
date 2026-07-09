@@ -366,7 +366,9 @@ Every preprocessing run writes `data/metadata.json` alongside the generated land
 
 ## Refreshing the radar archive
 
-Radar PNGs in `data/radar/` come from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/). They're committed to the repo so the tool works offline, but you can re-scrape them at any time:
+Radar PNGs in `data/radar/` come from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/). They're committed to the repo so the tool works offline, but you can re-scrape them at any time.
+
+> **Size budget:** GitHub Pages hard-caps published sites at **1 GB** and the tracked tree is already ~520 MB (radar ~500 MB). `npm run build` fails above a 900 MB guard (`scripts/check-pages-size.mjs`) — if you densify the radar archive past that, serve the frames from the Cloudflare worker CDN ([docs/CLOUDFLARE_CDN.md](docs/CLOUDFLARE_CDN.md)) instead of committing them.
 
 ```bash
 # Default — every covered landfall + every in-coverage TS+ track point
