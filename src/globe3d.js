@@ -1,7 +1,7 @@
 import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 
-const CESIUM_VERSION = '1.140';
+const CESIUM_VERSION = '1.143';
 const CESIUM_BASE_URL = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/`;
 const CESIUM_JS_URL = `${CESIUM_BASE_URL}Cesium.js`;
 const CESIUM_CSS_URL = `${CESIUM_BASE_URL}Widgets/widgets.css`;
@@ -307,12 +307,15 @@ function loadCesium() {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = CESIUM_CSS_URL;
+      // Recompute BOTH hashes when bumping CESIUM_VERSION (see CLAUDE.md).
+      link.integrity = 'sha384-ghEeMdcWWzRv/BPeUcX835vcKDGrxvROXisl/Btpv3GeekBUXTSPVcFJpI1Tcrgp';
+      link.crossOrigin = 'anonymous';
       document.head.appendChild(link);
     }
 
     const script = document.createElement('script');
     script.src = CESIUM_JS_URL;
-    script.integrity = 'sha384-/3CCvBqqAcykK60EtXn9ML5N8PZKuC/s0Tfsr2CI0HpXU/XPW0iUeOodmYfrQxN1';
+    script.integrity = 'sha384-6pySA8bzGAn2+aYh8KWmvzl5DRnspbScFYUbrFcu2ayckTxx8gyn+/WNvNbPM9iG';
     script.crossOrigin = 'anonymous';
     script.async = true;
     script.onload = () => window.Cesium ? resolve(window.Cesium) : reject(new Error('Cesium global missing'));

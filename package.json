@@ -30,7 +30,7 @@
     "test:offline-smoke": "node scripts/smoke-offline-service-worker.mjs",
     "test:globe3d-smoke": "node scripts/smoke-globe3d.mjs",
     "build": "npm run check:syntax && npm run check:sw && npm run validate:data && npm run test:url-state && npm run test:filter-state && npm run test:settings && npm run test:search-history && npm run test:impact-utils && npm run test:report-export && npm run test:qgis-export && npm run test:similarity-vectors && npm run test:cone-utils && npm run test:storm-events && npm run test:globe3d-utils && npm run test:exposure-utils && npm run test:hurdat2-refresh && npm run test:goes-realtime && npm run test:active-polling && npm run test:bundle-audit && npm run test:cdn-worker && npm run test:dockerfile",
-    "test": "npm run build && npm run test:smoke && npm run test:offline-smoke"
+    "test": "npm run build && npm run test:smoke && npm run test:offline-smoke && npm run test:globe3d-smoke"
   },
   "devDependencies": {
     "esbuild": "^0.25.12",
