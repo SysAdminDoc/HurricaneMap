@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 const UPDATE_PROMPT_ID = 'hm-update-prompt';
 const TOAST_HOST_ID = 'hm-toast-host';
 
@@ -29,15 +31,15 @@ export function createUpdatePrompt({
     prompt.className = 'hm-toast hm-toast--info hm-update-prompt';
     prompt.setAttribute('role', 'status');
     prompt.setAttribute('aria-live', 'polite');
-    prompt.setAttribute('aria-label', 'Update available');
+    prompt.setAttribute('aria-label', t('sw.updateTitle'));
     prompt.innerHTML = `
       <div class="hm-update-copy">
-        <strong>Update available</strong>
-        <span>Refresh to use the newest map shell and offline data cache.</span>
+        <strong>${t('sw.updateTitle')}</strong>
+        <span>${t('sw.updateBody')}</span>
       </div>
       <div class="hm-update-actions">
-        <button class="text-btn hm-update-reload" type="button">Refresh</button>
-        <button class="icon-btn hm-update-dismiss" type="button" aria-label="Dismiss update prompt">×</button>
+        <button class="text-btn hm-update-reload" type="button">${t('sw.updateRefresh')}</button>
+        <button class="icon-btn hm-update-dismiss" type="button" aria-label="${t('sw.updateDismiss')}">×</button>
       </div>`;
     prompt.hidden = true;
   }

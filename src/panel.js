@@ -88,7 +88,7 @@ export async function showStorm(landfall) {
   body.innerHTML = `
     <div class="storm-loading-state" role="status" aria-live="polite">
       <span class="storm-loading-dot" aria-hidden="true"></span>
-      <span>Loading track, landfalls, and impact context...</span>
+      <span>${t('panel.loading')}</span>
     </div>
   `;
   // Stop any running animation and drop the previous storm's overlays when
@@ -101,8 +101,8 @@ export async function showStorm(landfall) {
   if (!storm) {
     body.innerHTML = `
       <div class="storm-error-state" role="alert">
-        <strong>Storm record unavailable.</strong>
-        <span>The selected map point loaded, but its detailed HURDAT2 track is missing from this data bundle.</span>
+        <strong>${t('panel.errorTitle')}</strong>
+        <span>${t('panel.errorDetail')}</span>
       </div>
     `;
     return;
@@ -125,7 +125,9 @@ export async function showStorm(landfall) {
 function render(storm, landfall, allStorms) {
   const niceName = formatStormName(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
-  const heading = isUnnamed ? `${storm.year} unnamed ${storm.basin === 'EP' ? 'Pacific' : 'Atlantic'} storm` : `${niceName} (${storm.year})`;
+  const heading = isUnnamed
+    ? t(storm.basin === 'EP' ? 'panel.unnamedPacific' : 'panel.unnamedAtlantic', storm.year)
+    : `${niceName} (${storm.year})`;
   const peakCat = windToCategory(storm.peak_wind_kt);
   const peakLabel = categoryLabel(peakCat);
   const lfCat = storm.landfall_max_category ?? -1;
@@ -322,13 +324,13 @@ function render(storm, landfall, allStorms) {
     const svgEl = panel.querySelector('.intensity-svg');
     try {
       await exportChartAsPng(svgEl, storm.name);
-      showToast('Chart saved as PNG');
-    } catch { showToast('PNG export failed', 'warn'); }
+      showToast(t('toast.chartSavedPNG'));
+    } catch { showToast(t('toast.exportFailedPNG'), 'warn'); }
   });
   if (svgBtn) svgBtn.addEventListener('click', () => {
     const svgEl = panel.querySelector('.intensity-svg');
-    if (exportChartAsSvg(svgEl, storm.name)) showToast('Chart saved as SVG');
-    else showToast('SVG export failed', 'warn');
+    if (exportChartAsSvg(svgEl, storm.name)) showToast(t('toast.chartSavedSVG'));
+    else showToast(t('toast.exportFailedSVG'), 'warn');
   });
 
   // Closest-pass selector — recompute on city change.
@@ -378,7 +380,7 @@ function render(storm, landfall, allStorms) {
       }
       try {
         await navigator.clipboard.writeText(url);
-        showToast('Link copied to clipboard');
+        showToast(t('toast.linkCopied'));
       } catch {
         const ta = document.createElement('textarea');
         ta.value = url;
@@ -386,8 +388,8 @@ function render(storm, landfall, allStorms) {
         ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
-        try { document.execCommand('copy'); showToast('Link copied to clipboard'); }
-        catch { showToast('Copy failed — select the address bar', 'warn'); }
+        try { document.execCommand('copy'); showToast(t('toast.linkCopied')); }
+        catch { showToast(t('toast.copyFailed'), 'warn'); }
         document.body.removeChild(ta);
       }
     });
@@ -427,7 +429,7 @@ function render(storm, landfall, allStorms) {
         });
       } catch (e) {
         console.error('Failed to start track animation:', e);
-        showToast('Track playback failed', 'warn');
+        showToast(t('toast.playbackFailed'), 'warn');
         syncPlayButton({ active: false });
       } finally {
         playBtn.disabled = false;
@@ -453,7 +455,7 @@ function render(storm, landfall, allStorms) {
         pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
       } catch (e) {
         console.error('Failed to toggle pin:', e);
-        showToast('Failed to pin storm', 'warn');
+        showToast(t('toast.pinFailed'), 'warn');
       }
     });
   }
@@ -633,7 +635,7 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   if (im) {
     const rawDeaths = getRawFatalityText(im);
     const rawDamage = getRawDamageText(im);
-    if (rawDeaths) rows.push(`<div class="im-row"><span class="im-label">Fatalities</span><span class="im-value">${escapeHtml(rawDeaths)}</span></div>`);
+    if (rawDeaths) rows.push(`<div class="im-row"><span class="im-label">${t('impacts.fatalities')}</span><span class="im-value">${escapeHtml(rawDeaths)}</span></div>`);
     if (rawDamage) {
       const mode = getSetting('damageMode');
       const nominalM = getDamageMillions(im);
@@ -646,11 +648,11 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
       } else if (mode === 'nominal' && nominalM != null) {
         valueHTML = `${formatMillionsUSD(nominalM)} <span class="im-adj">(${storm.year || ''} USD)</span>`;
       }
-      rows.push(`<div class="im-row"><span class="im-label">Damage</span><span class="im-value">${valueHTML}</span></div>`);
+      rows.push(`<div class="im-row"><span class="im-label">${t('impacts.damage')}</span><span class="im-value">${valueHTML}</span></div>`);
     }
     if (rows.length) {
       const safeSourceUrl = safeExternalUrl(im.wiki_url);
-      sources.push(safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">Source: Wikipedia</a>` : 'Source: Wikipedia');
+      sources.push(safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">${t('impacts.wikiSource')}</a>` : t('impacts.wikiSource'));
     }
   }
   const billions = getBillionsFor(storm.id);

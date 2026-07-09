@@ -5,7 +5,7 @@ import {
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
-import { initLocale, setLocale, translateStaticElements } from './i18n.js';
+import { initLocale, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
@@ -1112,10 +1112,10 @@ boot().catch(err => {
   const safeMsg = escapeHtml(err.message || 'Unknown error');
   els.loading.innerHTML = `
     <div class="boot-error-state" role="alert">
-      <strong>HurricaneMap could not load its data.</strong>
+      <strong>${t('boot.errorTitle')}</strong>
       <span>${safeMsg}</span>
-      <span>Run the app from a local web server so the browser can read the data files: <code>python -m http.server 8765</code>.</span>
-      <button class="text-btn boot-retry-btn" type="button">Retry</button>
+      <span>${t('boot.errorHint')}<code>python -m http.server 8765</code>.</span>
+      <button class="text-btn boot-retry-btn" type="button">${t('boot.retry')}</button>
     </div>`;
   els.loading.querySelector('.boot-retry-btn')?.addEventListener('click', () => window.location.reload());
 });

@@ -192,12 +192,44 @@ export const STRINGS = {
     'about.title': 'About HurricaneMap',
     'about.description': 'HurricaneMap is an interactive 174-year atlas of U.S. hurricane landfalls (1851–2025) from HURDAT2, enhanced with advanced analytics, live active-storm tracking, and climate trend analysis.',
     'about.dataSource': 'Data source: National Hurricane Center HURDAT2',
-    'about.version': 'Version {0}',
     'about.github': 'GitHub',
     'about.privacy': 'All data processing happens in your browser. No tracking, no accounts, no servers.',
 
     // Errors
     'error.unexpected': 'Something went wrong — a feature may be unavailable. Check the browser console for details.',
+
+    // Storm panel dynamic states
+    'panel.loading': 'Loading track, landfalls, and impact context...',
+    'panel.errorTitle': 'Storm record unavailable.',
+    'panel.errorDetail': 'The selected map point loaded, but its detailed HURDAT2 track is missing from this data bundle.',
+    'panel.unnamedAtlantic': '{0} unnamed Atlantic storm',
+    'panel.unnamedPacific': '{0} unnamed Pacific storm',
+
+    // Impacts labels
+    'impacts.fatalities': 'Fatalities',
+    'impacts.damage': 'Damage',
+    'impacts.wikiSource': 'Source: Wikipedia',
+
+    // Toasts
+    'toast.chartSavedPNG': 'Chart saved as PNG',
+    'toast.chartSavedSVG': 'Chart saved as SVG',
+    'toast.exportFailedPNG': 'PNG export failed',
+    'toast.exportFailedSVG': 'SVG export failed',
+    'toast.linkCopied': 'Link copied to clipboard',
+    'toast.copyFailed': 'Copy failed — select the address bar',
+    'toast.playbackFailed': 'Track playback failed',
+    'toast.pinFailed': 'Failed to pin storm',
+
+    // Boot failure
+    'boot.errorTitle': 'HurricaneMap could not load its data.',
+    'boot.errorHint': 'Run the app from a local web server so the browser can read the data files: ',
+    'boot.retry': 'Retry',
+
+    // Service-worker update prompt
+    'sw.updateTitle': 'Update available',
+    'sw.updateBody': 'Refresh to use the newest map shell and offline data cache.',
+    'sw.updateRefresh': 'Refresh',
+    'sw.updateDismiss': 'Dismiss update prompt',
 
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Billion-dollar disaster',
@@ -389,12 +421,44 @@ export const STRINGS = {
     'about.title': 'Acerca de HurricaneMap',
     'about.description': 'HurricaneMap es un atlas interactivo de 174 años de huracanes que azotaron Estados Unidos (1851–2025) desde HURDAT2, mejorado con análisis avanzado, seguimiento de tormentas activas en tiempo real y análisis de tendencias climáticas.',
     'about.dataSource': 'Fuente de datos: Centro Nacional de Huracanes HURDAT2',
-    'about.version': 'Versión {0}',
     'about.github': 'GitHub',
     'about.privacy': 'Todo el procesamiento de datos ocurre en tu navegador. Sin rastreo, sin cuentas, sin servidores.',
 
     // Errors
     'error.unexpected': 'Algo salió mal — una función puede no estar disponible. Revisa la consola del navegador para más detalles.',
+
+    // Storm panel dynamic states
+    'panel.loading': 'Cargando trayectoria, tocamientos y contexto de impactos...',
+    'panel.errorTitle': 'Registro del huracán no disponible.',
+    'panel.errorDetail': 'El punto seleccionado cargó, pero su trayectoria detallada de HURDAT2 no está en este paquete de datos.',
+    'panel.unnamedAtlantic': 'Tormenta atlántica sin nombre de {0}',
+    'panel.unnamedPacific': 'Tormenta del Pacífico sin nombre de {0}',
+
+    // Impacts labels
+    'impacts.fatalities': 'Víctimas mortales',
+    'impacts.damage': 'Daños',
+    'impacts.wikiSource': 'Fuente: Wikipedia',
+
+    // Toasts
+    'toast.chartSavedPNG': 'Gráfico guardado como PNG',
+    'toast.chartSavedSVG': 'Gráfico guardado como SVG',
+    'toast.exportFailedPNG': 'Falló la exportación PNG',
+    'toast.exportFailedSVG': 'Falló la exportación SVG',
+    'toast.linkCopied': 'Enlace copiado al portapapeles',
+    'toast.copyFailed': 'Falló la copia — selecciona la barra de direcciones',
+    'toast.playbackFailed': 'Falló la reproducción de la trayectoria',
+    'toast.pinFailed': 'No se pudo fijar el huracán',
+
+    // Boot failure
+    'boot.errorTitle': 'HurricaneMap no pudo cargar sus datos.',
+    'boot.errorHint': 'Ejecuta la app desde un servidor web local para que el navegador pueda leer los archivos de datos: ',
+    'boot.retry': 'Reintentar',
+
+    // Service-worker update prompt
+    'sw.updateTitle': 'Actualización disponible',
+    'sw.updateBody': 'Actualiza para usar la versión más reciente del mapa y la caché de datos sin conexión.',
+    'sw.updateRefresh': 'Actualizar',
+    'sw.updateDismiss': 'Descartar aviso de actualización',
 
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Desastre de mil millones',
@@ -506,12 +570,103 @@ export const STRINGS = {
     'about.title': 'Konsènan HurricaneMap',
     'about.description': 'HurricaneMap se yon atlas entèaktif 174 ane siklòn ki frape Etazini (1851–2025) soti nan HURDAT2.',
     'about.dataSource': 'Sous done: Sant Nasyonal Siklòn HURDAT2',
-    'about.version': 'Vèsyon {0}',
     'about.github': 'GitHub',
     'about.privacy': 'Tout tretman done fèt nan navigatè w. Pa gen swivi, pa gen kont, pa gen sèvè.',
 
+    // Storm panel metrics
+    'panel.track_km': 'Longè trajè a',
+    'panel.forwardSpeed': 'Vitès deplasman',
+    'panel.rapidIntensification': 'Entansifikasyon rapid',
+    'panel.explosiveDeepening': 'Apwofondisman eksplozif',
+    'panel.daysAtIntensity': 'Jou nan entansite sa a',
+    'panel.closestApproach': 'Pwen ki pi pre kòt la',
+    'panel.casualties': 'Viktim',
+    'panel.damages': 'Dega',
+    'panel.speed': 'Vitès',
+
+    // Statistics
+    'stats.seasonSummary': 'Rezime sezon an',
+    'stats.namedStorms': 'Tanpèt ki gen non',
+    'stats.majors': 'Majè (Kat 3+)',
+    'stats.totalACE': 'ACE total',
+    'stats.climatologyChart': 'Klimatoloji anyèl',
+    'stats.decadeTrends': 'Tandans pa deseni',
+    'stats.climateTrends': 'Tandans klimatik',
+
+    // Compare
+    'compare.pin': 'Epengle',
+    'compare.unpin': 'Retire',
+    'compare.selectUpTo4': 'Chwazi jiska 4 siklòn pou konpare',
+
+    // Buttons & status
+    'btn.exportCSV': 'CSV',
+    'btn.exportGeoJSON': 'GeoJSON',
+    'btn.exportKML': 'KML',
+    'btn.exportPNG': 'PNG',
+    'btn.exportSVG': 'SVG',
+    'btn.showMoreResults': 'Montre plis',
+    'btn.recentlyViewed': 'Gade dènyèman',
+    'status.stormCount': 'siklòn · {0} fwa yo touche tè',
+    'status.visibleCount': '{0} vizib',
+    'status.activeStorms': '{0} siklòn aktif',
+    'toast.exportedFile': 'Telechaje {0}',
+    'category.-1': 'Ekstratwopikal',
+    'category.0': 'Soutwopikal',
+
+    // Months
+    'month.1': 'Janvye',
+    'month.2': 'Fevriye',
+    'month.3': 'Mas',
+    'month.4': 'Avril',
+    'month.5': 'Me',
+    'month.6': 'Jen',
+    'month.7': 'Jiyè',
+    'month.8': 'Out',
+    'month.9': 'Septanm',
+    'month.10': 'Oktòb',
+    'month.11': 'Novanm',
+    'month.12': 'Desanm',
+
+    // On this date / glossary
+    'onthisdate.meta': 'Fwa siklòn touche tè Ozetazini nan sèt jou kalandriye {0}.',
+    'onthisdate.emptyDetail': 'Pa gen okenn siklòn oswa tanpèt twopikal ki touche tè Ozetazini nan sèt jou kalandriye jodi a ({0}).',
+    'glossary.searchPlaceholder': 'Chèche tèm…',
+
     // Errors
     'error.unexpected': 'Gen yon bagay ki pa mache — yon fonksyon ka pa disponib. Gade konsòl navigatè a pou plis detay.',
+
+    // Storm panel dynamic states
+    'panel.loading': 'Ap chaje trajè, pwen kote li touche tè, ak kontèks enpak...',
+    'panel.errorTitle': 'Dosye siklòn nan pa disponib.',
+    'panel.errorDetail': 'Pwen ou chwazi a chaje, men trajè detaye HURDAT2 li a pa nan pakè done sa a.',
+    'panel.unnamedAtlantic': 'Tanpèt Atlantik san non nan {0}',
+    'panel.unnamedPacific': 'Tanpèt Pasifik san non nan {0}',
+
+    // Impacts labels
+    'impacts.fatalities': 'Viktim',
+    'impacts.damage': 'Dega',
+    'impacts.wikiSource': 'Sous: Wikipedya',
+
+    // Toasts
+    'toast.chartSavedPNG': 'Graf anrejistre kòm PNG',
+    'toast.chartSavedSVG': 'Graf anrejistre kòm SVG',
+    'toast.exportFailedPNG': 'Ekspòtasyon PNG echwe',
+    'toast.exportFailedSVG': 'Ekspòtasyon SVG echwe',
+    'toast.linkCopied': 'Lyen an kopye',
+    'toast.copyFailed': 'Kopi a echwe — chwazi bar adrès la',
+    'toast.playbackFailed': 'Lekti trajè a echwe',
+    'toast.pinFailed': 'Nou pa t ka epengle siklòn nan',
+
+    // Boot failure
+    'boot.errorTitle': 'HurricaneMap pa t kapab chaje done li yo.',
+    'boot.errorHint': 'Egzekite app la sou yon sèvè web lokal pou navigatè a ka li fichye done yo: ',
+    'boot.retry': 'Eseye ankò',
+
+    // Service-worker update prompt
+    'sw.updateTitle': 'Gen yon mizajou disponib',
+    'sw.updateBody': 'Rafrechi pou itilize dènye vèsyon kat la ak done offline yo.',
+    'sw.updateRefresh': 'Rafrechi',
+    'sw.updateDismiss': 'Inyore mizajou a',
 
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Dezas plizyè milya dola',
@@ -548,19 +703,11 @@ export function t(key, ...args) {
 }
 
 export function initLocale() {
-  let saved = null;
-  try {
-    saved = localStorage.getItem('hm-locale-v1');
-  } catch {
-    saved = null;
-  }
-  if (SUPPORTED_LOCALES.has(saved)) {
-    setLocale(saved);
-  } else {
-    const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    if (browserLang.startsWith('ht') || browserLang === 'fr-ht') setLocale(LOCALE_HT);
-    else if (browserLang.startsWith('es')) setLocale(LOCALE_ES);
-  }
+  // Explicit picks persist via the settings store (main.js applies them after
+  // this call); here we only auto-detect from the browser language.
+  const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  if (browserLang.startsWith('ht') || browserLang === 'fr-ht') setLocale(LOCALE_HT);
+  else if (browserLang.startsWith('es')) setLocale(LOCALE_ES);
   return currentLocale;
 }
 
@@ -589,17 +736,4 @@ export function translateStaticElements() {
     const translated = t(key);
     if (translated !== key) el.setAttribute('aria-label', translated);
   }
-}
-
-export function toggleLocale() {
-  const cycle = [LOCALE_EN, LOCALE_ES, LOCALE_HT];
-  const idx = cycle.indexOf(currentLocale);
-  const newLocale = cycle[(idx + 1) % cycle.length];
-  setLocale(newLocale);
-  try {
-    localStorage.setItem('hm-locale-v1', newLocale);
-  } catch {
-    /* private mode / blocked storage — locale still applies for this page */
-  }
-  location.reload();
 }

@@ -547,6 +547,21 @@ try {
 
   const errorSurfaceInstalled = await page.evaluate(() => window.__hmErrorSurface === true);
   assert(errorSurfaceInstalled, 'global error surface was not installed at boot.');
+
+  // Locale switching must reach dynamic strings, not just data-i18n statics.
+  const localeStrings = await page.evaluate(async () => {
+    const i18n = await import('/src/i18n.js');
+    const before = i18n.t('panel.loading');
+    i18n.setLocale('es');
+    const es = i18n.t('panel.loading');
+    i18n.setLocale('ht');
+    const ht = i18n.t('panel.loading');
+    i18n.setLocale('en');
+    return { before, es, ht };
+  });
+  assert(/Loading track/.test(localeStrings.before), `EN dynamic string wrong: ${localeStrings.before}`);
+  assert(localeStrings.es !== localeStrings.before && /Cargando/.test(localeStrings.es), `ES dynamic string did not switch: ${localeStrings.es}`);
+  assert(localeStrings.ht !== localeStrings.before && /chaje/.test(localeStrings.ht), `HT dynamic string did not switch: ${localeStrings.ht}`);
   // Synthetic ErrorEvent exercises the listener + toast without registering
   // as a real uncaught error (which would trip the pageerror assertions).
   await page.evaluate(() => {
