@@ -18,6 +18,7 @@ import {
 } from './cone.js';
 import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
 import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
+import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
 
 const L = window.L;
@@ -105,6 +106,8 @@ async function fetchAndRender() {
     clearOfficialForecastContext();
     clearOfficialForecastCache();
     clearTropicalAlerts();
+    clearPeakSurge();
+    clearPeakSurgeCache();
     return;
   }
   renderActive(storms);
@@ -304,6 +307,13 @@ async function renderActive(storms) {
   // 2026 cone standard: coastal + inland tropical watches/warnings travel
   // with the official cone toggle.
   await renderTropicalAlerts(storms, {
+    map,
+    enabled: officialConeEnabled,
+  });
+
+  // Peak Storm Surge forecast (published during surge watches/warnings;
+  // empty otherwise) — same toggle as the official cone context.
+  await renderPeakSurge(storms, {
     map,
     enabled: officialConeEnabled,
   });
