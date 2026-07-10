@@ -8603,3 +8603,75 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   color: var(--subtext);
   font-size: 10px;
 }
+
+/* Tide-gauge panel section */
+.tides-block {
+  display: grid;
+  gap: 8px;
+}
+.tide-legend {
+  display: flex;
+  gap: 10px;
+  font-size: 10.5px;
+  color: var(--subtext);
+}
+.tide-key::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin-right: 4px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+.tide-key--observed::before { background: #74c7ec; }
+.tide-key--predicted::before { background: #9399b2; }
+.tide-key--landfall::before { background: #f38ba8; }
+.tide-station {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface0, rgba(49, 50, 68, 0.55));
+}
+.tide-station-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 11.5px;
+  margin-bottom: 4px;
+}
+.tide-km {
+  color: var(--subtext);
+  font-size: 10px;
+  flex: 0 0 auto;
+}
+.tide-chart {
+  width: 100%;
+  height: 78px;
+  display: block;
+}
+.tide-chart .tide-observed {
+  fill: none;
+  stroke: #74c7ec;
+  stroke-width: 1.8;
+}
+.tide-chart .tide-predicted {
+  fill: none;
+  stroke: #9399b2;
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+}
+.tide-chart .tide-landfall-line {
+  stroke: #f38ba8;
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+.tide-peak {
+  font-size: 10.5px;
+  color: var(--subtext);
+  margin-top: 3px;
+}
+.tide-empty {
+  font-size: 11px;
+  color: var(--subtext);
+}

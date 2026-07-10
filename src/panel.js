@@ -250,6 +250,7 @@ function render(storm, landfall, allStorms) {
         ${renderImpactsBlock(storm, impacts)}
         <div class="storm-events-host" id="storm-events-host"></div>
         <div class="rainfall-host" id="rainfall-host"></div>
+        <div class="tides-host" id="tides-host"></div>
       </section>
 
       <section class="storm-analysis-cluster" aria-label="Storm analysis">
@@ -316,6 +317,9 @@ function render(storm, landfall, allStorms) {
   renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
+  import('./tides.js')
+    .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
+    .catch(() => { /* tide gauges are optional context */ });
 
   // Chart export buttons (PNG / SVG).
   const pngBtn = document.getElementById('chart-export-png');

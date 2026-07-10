@@ -237,6 +237,18 @@ export const STRINGS = {
     'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
     'impacts.deaths': 'deaths',
 
+    // Tide gauges
+    'tides.title': 'Tide gauges (NOAA CO-OPS)',
+    'tides.load': 'Load water levels around landfall',
+    'tides.loading': 'Fetching water levels…',
+    'tides.empty': 'No nearby tide-gauge records for this storm.',
+    'tides.observed': 'Observed',
+    'tides.predicted': 'Predicted tide',
+    'tides.landfall': 'Landfall',
+    'tides.peakResidual': 'Peak surge residual',
+    'tides.chartLabel': 'Observed vs predicted water level around landfall',
+    'tides.source': 'Source: NOAA Tides & Currents',
+
     // Tropical watches/warnings (2026 NHC cone standard)
     'alerts.legendTitle': 'Coastal & inland alerts',
     'alerts.huWarning': 'Hurricane Warning',
@@ -475,6 +487,18 @@ export const STRINGS = {
     'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
     'impacts.deaths': 'muertes',
 
+    // Tide gauges
+    'tides.title': 'Mareógrafos (NOAA CO-OPS)',
+    'tides.load': 'Cargar niveles de agua cerca del tocamiento',
+    'tides.loading': 'Obteniendo niveles de agua…',
+    'tides.empty': 'No hay registros de mareógrafos cercanos para este huracán.',
+    'tides.observed': 'Observado',
+    'tides.predicted': 'Marea prevista',
+    'tides.landfall': 'Tocamiento',
+    'tides.peakResidual': 'Residuo máximo de marejada',
+    'tides.chartLabel': 'Nivel de agua observado vs previsto cerca del tocamiento',
+    'tides.source': 'Fuente: NOAA Tides & Currents',
+
     // Tropical watches/warnings (2026 NHC cone standard)
     'alerts.legendTitle': 'Alertas costeras e interiores',
     'alerts.huWarning': 'Aviso de huracán',
@@ -691,6 +715,18 @@ export const STRINGS = {
     'impacts.ncei': 'Dezas plizyè milya dola',
     'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
     'impacts.deaths': 'moun ki mouri',
+
+    // Tide gauges
+    'tides.title': 'Estasyon mare (NOAA CO-OPS)',
+    'tides.load': 'Chaje nivo dlo bò kote li touche tè',
+    'tides.loading': 'Ap chache nivo dlo…',
+    'tides.empty': 'Pa gen done estasyon mare tou pre pou siklòn sa a.',
+    'tides.observed': 'Obsève',
+    'tides.predicted': 'Mare prevwa',
+    'tides.landfall': 'Touche tè',
+    'tides.peakResidual': 'Pi gwo diferans vag tanpèt',
+    'tides.chartLabel': 'Nivo dlo obsève vs prevwa bò kote li touche tè',
+    'tides.source': 'Sous: NOAA Tides & Currents',
 
     // Tropical watches/warnings (2026 NHC cone standard)
     'alerts.legendTitle': 'Alèt kotyè ak enteryè',
