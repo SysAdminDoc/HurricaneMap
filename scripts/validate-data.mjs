@@ -267,6 +267,11 @@ for (const [state, count] of landfallCountsByState.entries()) {
     fail(`stats.by_state missing ${state}.`);
   } else if (stateStats.total !== count) {
     fail(`stats.by_state.${state}.total ${stateStats.total} does not match landfall count ${count}.`);
+  } else if (Array.isArray(stateStats.by_cat)) {
+    const bucketSum = stateStats.by_cat.reduce((sum, value) => sum + value, 0);
+    if (bucketSum !== stateStats.total) {
+      fail(`stats.by_state.${state} by_cat sums to ${bucketSum}, expected total ${stateStats.total}.`);
+    }
   }
 }
 
