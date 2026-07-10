@@ -105,18 +105,24 @@ def parse_timezone_offset(value):
 
 
 def parse_event_time(row):
-    yearmonth = str(row.get("BEGIN_YEARMONTH") or "")
-    if len(yearmonth) != 6:
+    # One malformed source row must not raise mid-run and discard hours of
+    # accumulated download work — skip it (callers treat None as skip).
+    try:
+        yearmonth = str(row.get("BEGIN_YEARMONTH") or "")
+        if len(yearmonth) != 6:
+            return None
+        begin_day = int(row.get("BEGIN_DAY") or 1)
+        begin_time = str(row.get("BEGIN_TIME") or "0").zfill(4)
+        year = int(yearmonth[:4])
+        month = int(yearmonth[4:])
+        hour = int(begin_time[:-2] or "0")
+        minute = int(begin_time[-2:])
+        offset = parse_timezone_offset(row.get("CZ_TIMEZONE"))
+        local_tz = timezone(timedelta(hours=offset))
+        return datetime(year, month, begin_day, hour, minute, tzinfo=local_tz).astimezone(timezone.utc)
+    except (ValueError, TypeError, OverflowError):
+        print(f"  skipping malformed event row: {row.get('EVENT_ID') or row.get('BEGIN_YEARMONTH')!r}", file=sys.stderr)
         return None
-    begin_day = int(row.get("BEGIN_DAY") or 1)
-    begin_time = str(row.get("BEGIN_TIME") or "0").zfill(4)
-    year = int(yearmonth[:4])
-    month = int(yearmonth[4:])
-    hour = int(begin_time[:-2] or "0")
-    minute = int(begin_time[-2:])
-    offset = parse_timezone_offset(row.get("CZ_TIMEZONE"))
-    local_tz = timezone(timedelta(hours=offset))
-    return datetime(year, month, begin_day, hour, minute, tzinfo=local_tz).astimezone(timezone.utc)
 
 
 def aggregate_event(record, row, event_time, state_name):

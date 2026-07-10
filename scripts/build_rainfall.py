@@ -46,8 +46,14 @@ def build_name_year_index(storms):
     return idx
 
 def parse_storm_key(raw_storm, raw_year):
-    raw = raw_storm.strip()
-    year = int(raw_year.strip().strip('"'))
+    # Skip-and-continue on malformed rows — one bad Year value must not
+    # abort the whole run (a (None, None) key never matches the index).
+    try:
+        raw = raw_storm.strip()
+        year = int(raw_year.strip().strip('"'))
+    except (ValueError, TypeError, AttributeError):
+        print(f"  skipping malformed rainfall row: {raw_storm!r}/{raw_year!r}", file=sys.stderr)
+        return None, None
     m = re.match(r'^(.+?)\s+\d{4}$', raw)
     if m:
         name = m.group(1).strip().upper()

@@ -238,7 +238,7 @@ def collect_targets(args) -> list:
     return targets
 
 
-def scrape_one(task) -> dict:
+def scrape_one(task, force=False) -> dict:
     meta, target, region, product, kind, lf_idx = task
     sub = meta["dir"]
 
@@ -269,7 +269,7 @@ def scrape_one(task) -> dict:
         "lf_idx": lf_idx,
     }
 
-    if dest.exists():
+    if dest.exists() and not force:
         record["skipped"] = True
         return record
     url = build_url(region, product, found)
@@ -333,7 +333,7 @@ def main():
     started = time.time()
 
     with ThreadPoolExecutor(max_workers=args.concurrency) as ex:
-        futures = [ex.submit(scrape_one, t) for t in targets]
+        futures = [ex.submit(scrape_one, t, args.force) for t in targets]
         for fut in as_completed(futures):
             res = fut.result()
             if res.get("missing"):

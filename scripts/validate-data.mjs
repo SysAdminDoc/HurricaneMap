@@ -121,7 +121,9 @@ for (const storm of storms) {
       previousTime = currentTime;
       assertNumberInRange(point.lat, -90, 90, `${label}.lat`);
       assertNumberInRange(point.lon, -180, 180, `${label}.lon`);
-      if (!isFiniteNumber(point.wind)) fail(`${label}.wind must be numeric.`);
+      // The preprocessor emits null for HURDAT2's -99 missing-wind sentinel
+      // (preprocess_hurdat2.py rec["wind"]) — same contract as pres.
+      if (point.wind != null && !isFiniteNumber(point.wind)) fail(`${label}.wind must be numeric or null.`);
       if (point.pres != null && !isFiniteNumber(point.pres)) fail(`${label}.pres must be numeric or null.`);
       if (typeof point.status !== 'string') fail(`${label}.status must be a string.`);
     }
@@ -148,7 +150,7 @@ for (const [index, landfall] of landfalls.entries()) {
   if (!validIsoDate(landfall.t)) fail(`${label}: invalid timestamp.`);
   assertNumberInRange(landfall.lat, -90, 90, `${label}.lat`);
   assertNumberInRange(landfall.lon, -180, 180, `${label}.lon`);
-  if (!isFiniteNumber(landfall.wind)) fail(`${label}: wind must be numeric.`);
+  if (landfall.wind != null && !isFiniteNumber(landfall.wind)) fail(`${label}: wind must be numeric or null.`);
   if (landfall.pres != null && !isFiniteNumber(landfall.pres)) fail(`${label}: pres must be numeric or null.`);
   if (!validCategory(landfall.category)) fail(`${label}: invalid category.`);
   if (typeof landfall.state !== 'string' || !landfall.state) fail(`${label}: state must be a non-empty string.`);
@@ -277,6 +279,49 @@ for (const [year, count] of landfallCountsByYear.entries()) {
 for (const [key, count] of Object.entries(categoryCounts)) {
   if (stats.by_category?.[key] !== count) {
     fail(`stats.by_category.${key} ${stats.by_category?.[key]} does not match computed count ${count}.`);
+  }
+}
+
+// Decade roll-up must match the landfall list it claims to summarize:
+// totals recompute from landfalls.json, and each decade's category buckets
+// must sum to its total.
+if (isObject(stats.by_decade)) {
+  const decadeCounts = {};
+  for (const landfall of landfalls) {
+    const decade = String(Math.floor(landfall.year / 10) * 10);
+    decadeCounts[decade] = (decadeCounts[decade] || 0) + 1;
+  }
+  for (const [decade, entry] of Object.entries(stats.by_decade)) {
+    if (!isObject(entry) || !Array.isArray(entry.by_cat)) {
+      fail(`stats.by_decade.${decade} must be {total, by_cat[]}.`);
+      continue;
+    }
+    if (decadeCounts[decade] !== entry.total) {
+      fail(`stats.by_decade.${decade}.total ${entry.total} does not match computed count ${decadeCounts[decade] ?? 0}.`);
+    }
+    const bucketSum = entry.by_cat.reduce((sum, count) => sum + count, 0);
+    if (bucketSum !== entry.total) {
+      fail(`stats.by_decade.${decade} by_cat sums to ${bucketSum}, expected total ${entry.total}.`);
+    }
+  }
+}
+
+// Category must be derivable from the landfall wind. Mirrors
+// preprocess_hurdat2.py saffir_simpson(): 0 = TD (<34 kt), -1 = TS (34-63).
+function expectedCategory(windKt) {
+  if (windKt < 34) return 0;
+  if (windKt < 64) return -1;
+  if (windKt < 83) return 1;
+  if (windKt < 96) return 2;
+  if (windKt < 113) return 3;
+  if (windKt < 137) return 4;
+  return 5;
+}
+for (const landfall of landfalls) {
+  if (landfall.wind == null) continue;
+  const expected = expectedCategory(landfall.wind);
+  if (landfall.category !== expected) {
+    fail(`${landfall.storm_id} landfall at ${landfall.t}: category ${landfall.category} inconsistent with wind ${landfall.wind} kt (expected ${expected}).`);
   }
 }
 

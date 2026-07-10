@@ -367,6 +367,28 @@ async function boot() {
   } else if (bareHash === 'compare') {
     setTimeout(() => document.getElementById('toggle-compare')?.click(), 120);
   }
+  // Live permalink navigation: pasting a new hash into this open tab (or
+  // back/forward across hash entries) re-applies the shared view. Our own
+  // hash writes use history.replaceState, which never fires hashchange, so
+  // this only reacts to real navigation.
+  window.addEventListener('hashchange', () => {
+    const nav = applyHashToFilters(filters, location.hash, {
+      yearMinDefault: YEAR_MIN_DEFAULT,
+      yearMaxDefault: YEAR_MAX_DEFAULT,
+      knownStates: getStats()?.by_state || {},
+    });
+    syncFilterUiFromState();
+    applyFilters();
+    highlightYearRange(filters.yearMin, filters.yearMax);
+    if (nav?.storm) {
+      const lf = getLandfalls().find(x => x.storm_id === nav.storm);
+      if (lf) setTimeout(() => onLandfallClick(lf), 60);
+    }
+    if (nav?.s && filters.state === nav.s) {
+      setTimeout(() => openStateLazy(nav.s), 80);
+    }
+  });
+
   // First-run tour is delayed until the map, filters, and timeline are stable.
   setTimeout(() => maybeStartOnboardingLazy(), 700);
 }

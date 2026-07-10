@@ -647,6 +647,18 @@ try {
   await assertNoAxeViolations(page, 'storm panel (WCAG 2.2 AA)', '#storm-panel');
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
+  // Live permalink navigation: assigning a new hash in an open tab must
+  // apply it without a reload (hashchange listener).
+  await page.evaluate(() => { location.hash = '#storm=AL092022'; });
+  await page.waitForFunction(() => {
+    const sticky = document.querySelector('#panel-sticky-header')?.textContent || '';
+    const bodyText = document.querySelector('#panel-body')?.textContent || '';
+    return /Ian/i.test(sticky) || /Ian/i.test(bodyText);
+  }, { timeout: 15000 });
+  await page.evaluate(() => { location.hash = '#storm=AL122005'; });
+  await page.waitForFunction(() => /Katrina/i.test(document.querySelector('#panel-body')?.textContent || ''), { timeout: 15000 });
+  await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
+
   const impactsText = await page.textContent('#storm-panel .impacts-block');
   assert(/Billion-dollar disaster/.test(impactsText) && /\$201\.3B|\$201,297|201\.3/.test(impactsText.replace(/ /g, ' ')), `Katrina NCEI billion-dollar row did not render: ${impactsText}`);
   assert(/1,833 deaths/.test(impactsText), `Katrina NCEI deaths did not render: ${impactsText}`);
