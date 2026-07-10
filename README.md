@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.4.6-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -66,6 +66,14 @@ npm run build
 - **⚠️ 2026 cone standard: coastal + inland watches/warnings** — matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.5.0 - 2026 season readiness (July 2026)
+
+- **2026 NHC cone standard**: active storms now overlay coastal *and inland* watch/warning zones with the official pink/blue dual-alert hatch, plus the NHC Peak Storm Surge forecast layer and a 2026 season outlook card (NOAA + CSU numbers, El Niño context).
+- **Three new data layers**: NCEI billion-dollar disaster costs per storm, on-demand NOAA tide-gauge observed-vs-predicted water levels around landfall, and 10,700+ USGS surveyed high-water marks across 25 modern storms.
+- **Fixed in production**: the 3D globe (CSP had silently killed Cesium), the SST overlay (dead dataset + wrong CRS + hidden behind the basemap — now live CoralTemp), and the active-storm badge blocking header buttons.
+- **Hyper-local**: "Use my location" ranks every historical closest pass by distance and bearing; active storms show live distance to you.
+- **Quality**: axe-core WCAG 2.2 AA gate, full Haitian Creole parity, global error toasts, live permalink navigation, GitHub Pages size guard.
 
 ## What's new in v1.4.6 - Desktop panel fit (July 2026)
 

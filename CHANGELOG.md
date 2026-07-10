@@ -2,6 +2,37 @@
 
 All notable changes to HurricaneMap.
 
+## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
+
+### Fixed (production breakage)
+- **3D globe was dead**: the v1.4.x CSP hardening blocked Cesium three ways (stylesheet host, WASM eval, and its bundled Knockout's top-level string-eval). CSP now grants exactly what Cesium needs; Cesium bumped 1.140→1.143 with SRI pinned on both the script and stylesheet, and the globe smoke is chained into `npm test` so this class of regression fails the suite.
+- **SST overlay was triple-broken**: the pinned dataset dead-ended 2023-12-31 (blank tiles), the WMS request sent a CRS ERDDAP rejects, and the layer stacked *behind* the opaque basemap. Now renders live NOAA Coral Reef Watch CoralTemp (latest-day probe, correct CRS, correct stacking).
+- **Active-storm badge intercepted header clicks** whenever visible — moved below the header row.
+- Rapid panel transitions leaked "Transition was skipped" through `ViewTransition.ready`; all three transition promises are now caught.
+- Smoke suites could not launch (Playwright/browser-cache mismatch) — Playwright bumped to 1.61.1.
+
+### Added (2026 season)
+- **2026 NHC cone parity**: coastal + inland tropical-storm/hurricane watch/warning zones from api.weather.gov render beside the official cone, including the new pink/blue hatch where a Hurricane Watch overlaps a Tropical Storm Warning, with an on-map legend (EN/ES/HT).
+- **NHC Peak Storm Surge forecast layer** for active storms (GeoJSON, height-ramp styling).
+- **2026 season outlook card**: NOAA (55% below-normal, 8-14/3-6/1-3) + CSU July update (9/4/1) with El Niño context in the stats panel.
+
+### Added (data layers)
+- **Billion-dollar disasters**: 65 storms joined to NOAA NCEI's frozen 1980-2024 record — CPI-adjusted cost + official deaths in the storm panel.
+- **Tide-gauge water levels**: on-demand NOAA CO-OPS observed-vs-predicted charts at the gauges nearest the strongest landfall, peak surge residual called out (Katrina: Grand Isle +3.8 ft).
+- **USGS high-water marks**: 10,741 surveyed peak-water elevations across 25 modern storms as a toggleable layer beside the SLOSH surge zones.
+- **SLOSH surge coverage for Hawaii and Puerto Rico/USVI** via NHC's regional tile services.
+- **Geolocated closest approaches**: "Use my location" ranks every historical pass by distance + compass bearing; active-storm tooltips show live distance/bearing to your point.
+
+### Improved
+- Unhandled runtime errors now surface as rate-limited toasts instead of dying silently in the console.
+- Full i18n: dynamic strings (toasts, loading/error states, update prompt) localized; Haitian Creole reaches 100% key parity; locale contract test in the build chain.
+- axe-core WCAG 2.2 AA assertions in smoke (two real violations found and fixed at the root).
+- Live permalink navigation: pasting a hash into an open tab applies it without a reload.
+- Leaflet tooltip sinks escape data-bundle strings (CVE-2025-69993 class) with a build-time tripwire.
+- Build guards: published-size check against GitHub Pages' 1 GB cap; data validation covers wind-null sentinels, decade/state bucket sums, and category-vs-wind consistency.
+- Richer PWA install UI: narrow-form-factor screenshot added to the manifest.
+- `scrape_radar.py --force` works; storm-events/rainfall builders skip malformed rows instead of aborting.
+
 ## v1.4.6 - Desktop panel fit (July 2026)
 
 - Lowered the desktop analytical panel lane and tightened the shelf gutter from 12px to 6px so the right panel uses the available space above the season/timeline shelf.
