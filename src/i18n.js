@@ -237,6 +237,13 @@ export const STRINGS = {
     'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
     'impacts.deaths': 'deaths',
 
+    // Spatial search
+    'spatial.title': 'Storms near a point',
+    'spatial.hint': 'Right-click (long-press on touch) anywhere on the map, or use your device location.',
+    'spatial.useMyLocation': 'Use my location',
+    'spatial.locating': 'Locating…',
+    'spatial.denied': 'Location unavailable — right-click the map instead',
+
     // Tide gauges
     'tides.title': 'Tide gauges (NOAA CO-OPS)',
     'tides.load': 'Load water levels around landfall',
@@ -487,6 +494,13 @@ export const STRINGS = {
     'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
     'impacts.deaths': 'muertes',
 
+    // Spatial search
+    'spatial.title': 'Huracanes cerca de un punto',
+    'spatial.hint': 'Haz clic derecho (mantén pulsado en táctil) en el mapa, o usa la ubicación de tu dispositivo.',
+    'spatial.useMyLocation': 'Usar mi ubicación',
+    'spatial.locating': 'Localizando…',
+    'spatial.denied': 'Ubicación no disponible — haz clic derecho en el mapa',
+
     // Tide gauges
     'tides.title': 'Mareógrafos (NOAA CO-OPS)',
     'tides.load': 'Cargar niveles de agua cerca del tocamiento',
@@ -715,6 +729,13 @@ export const STRINGS = {
     'impacts.ncei': 'Dezas plizyè milya dola',
     'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
     'impacts.deaths': 'moun ki mouri',
+
+    // Spatial search
+    'spatial.title': 'Siklòn tou pre yon pwen',
+    'spatial.hint': 'Klike dwat (peze kenbe sou ekran tactil) sou kat la, oswa itilize pozisyon aparèy ou.',
+    'spatial.useMyLocation': 'Itilize pozisyon mwen',
+    'spatial.locating': 'Ap chache pozisyon…',
+    'spatial.denied': 'Pozisyon pa disponib — klike dwat sou kat la',
 
     // Tide gauges
     'tides.title': 'Estasyon mare (NOAA CO-OPS)',

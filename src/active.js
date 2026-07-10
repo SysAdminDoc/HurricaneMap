@@ -18,6 +18,7 @@ import {
 } from './cone.js';
 import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
 import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
+import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
 
@@ -234,6 +235,24 @@ function ensureBadge(count, {
     `;
 }
 
+/** " · 512 mi NE of you" when the user has geolocated in spatial search
+ *  (shared hm-user-point-v1 key — written only by "Use my location"). */
+function distanceFromUser([stormLat, stormLon]) {
+  try {
+    const point = JSON.parse(localStorage.getItem('hm-user-point-v1') || 'null');
+    if (!Number.isFinite(point?.lat) || !Number.isFinite(point?.lon)) return '';
+    const km = 6371 * 2 * Math.asin(Math.sqrt(
+      Math.sin((stormLat - point.lat) * Math.PI / 360) ** 2 +
+      Math.cos(point.lat * Math.PI / 180) * Math.cos(stormLat * Math.PI / 180) *
+      Math.sin((stormLon - point.lon) * Math.PI / 360) ** 2,
+    ));
+    const dir = compassLabel(bearingDeg(point.lat, point.lon, stormLat, stormLon));
+    return ` · ${Math.round(kmToMi(km))} mi ${dir} of you`;
+  } catch {
+    return '';
+  }
+}
+
 async function renderActive(storms) {
   const map = getMap();
   if (layerGroup) map.removeLayer(layerGroup);
@@ -281,7 +300,7 @@ async function renderActive(storms) {
         radius: 8, color: '#11111b', weight: 2,
         fillColor: '#89b4fa', fillOpacity: 0.95,
       }).bindTooltip(
-        escapeHtml(`${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}`),
+        escapeHtml(`${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}${distanceFromUser(cur)}`),
         { direction: 'top' },
       ).addTo(layerGroup);
     }

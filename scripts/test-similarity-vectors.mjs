@@ -54,4 +54,15 @@ assert.deepEqual(
   'precomputed vectors must preserve runtime similarity ordering',
 );
 
+// Bearing helpers (spatial search + active-storm distance readout).
+const { bearingDeg, compassLabel } = await import('../src/metrics.js');
+assert.ok(Math.abs(bearingDeg(29.95, -90.07, 35.0, -90.07) - 0) < 0.5, 'due north bearing');
+assert.ok(Math.abs(bearingDeg(29.95, -90.07, 29.95, -85.0) - 90) < 1.5, 'due east bearing');
+assert.equal(compassLabel(0), 'N');
+assert.equal(compassLabel(44), 'NE');
+assert.equal(compassLabel(180), 'S');
+assert.equal(compassLabel(292.5), 'NW');
+assert.equal(compassLabel(359), 'N');
+assert.equal(compassLabel(NaN), '');
+
 console.log('similarity vectors ok');

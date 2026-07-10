@@ -1303,7 +1303,9 @@ label > input[type="checkbox"] {
    NHC is tracking storms). */
 .active-badge {
   position: absolute;
-  top: 16px;
+  /* Below the header row — at top:16px the badge overlapped and intercepted
+     clicks on the right-side header buttons whenever it was visible. */
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
@@ -8517,10 +8519,12 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   }
 }
 
-/* Tropical watch/warning overlay (2026 NHC cone standard) */
+/* Tropical watch/warning overlay (2026 NHC cone standard).
+   Stacks below the active-storm badge (top:90px) — both only appear
+   during active storms. */
 .tropical-alert-legend {
   position: absolute;
-  top: 64px;
+  top: 148px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
@@ -8674,4 +8678,14 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 .tide-empty {
   font-size: 11px;
   color: var(--subtext);
+}
+
+/* Spatial-search prompt state + locate button */
+.sp-hint {
+  margin: 8px 0;
+  font-size: 11.5px;
+  color: var(--subtext);
+}
+.sp-locate-btn {
+  white-space: nowrap;
 }

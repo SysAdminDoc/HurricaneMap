@@ -138,6 +138,25 @@ export function kmToMi(km) {
   return km * KM_TO_MI;
 }
 
+/** Initial great-circle bearing from point 1 to point 2, degrees 0-360. */
+export function bearingDeg(lat1, lon1, lat2, lon2) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const phi1 = toRad(lat1);
+  const phi2 = toRad(lat2);
+  const dLon = toRad(lon2 - lon1);
+  const y = Math.sin(dLon) * Math.cos(phi2);
+  const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLon);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+const COMPASS_8 = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+/** Eight-point compass label for a bearing in degrees. */
+export function compassLabel(deg) {
+  if (!Number.isFinite(deg)) return '';
+  return COMPASS_8[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
+}
+
 /** Closest approach of a storm track to a target lat/lon.
  *  Returns the nearest track-point index + distance (km, mi) + the obs at
  *  that point. Returns null if track is empty. */
