@@ -237,6 +237,13 @@ export const STRINGS = {
     'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
     'impacts.deaths': 'deaths',
 
+    // USGS high-water marks
+    'hwm.toggle': 'Show observed high-water marks ({0} USGS surveys)',
+    'hwm.tooltip': 'Surveyed peak-water elevations from the USGS Short-Term Network (coverage from ~2005). Pair with the SLOSH surge overlay to compare modeled vs observed.',
+    'hwm.mark': 'High-water mark',
+    'hwm.coastal': 'coastal',
+    'hwm.riverine': 'riverine',
+
     // Spatial search
     'spatial.title': 'Storms near a point',
     'spatial.hint': 'Right-click (long-press on touch) anywhere on the map, or use your device location.',
@@ -494,6 +501,13 @@ export const STRINGS = {
     'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
     'impacts.deaths': 'muertes',
 
+    // USGS high-water marks
+    'hwm.toggle': 'Mostrar marcas de agua alta observadas ({0} mediciones USGS)',
+    'hwm.tooltip': 'Elevaciones máximas del agua medidas por la red USGS (cobertura desde ~2005). Compara con la capa de marejada SLOSH: modelado vs observado.',
+    'hwm.mark': 'Marca de agua alta',
+    'hwm.coastal': 'costera',
+    'hwm.riverine': 'fluvial',
+
     // Spatial search
     'spatial.title': 'Huracanes cerca de un punto',
     'spatial.hint': 'Haz clic derecho (mantén pulsado en táctil) en el mapa, o usa la ubicación de tu dispositivo.',
@@ -729,6 +743,13 @@ export const STRINGS = {
     'impacts.ncei': 'Dezas plizyè milya dola',
     'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
     'impacts.deaths': 'moun ki mouri',
+
+    // USGS high-water marks
+    'hwm.toggle': 'Montre mak dlo wo obsève ({0} mezi USGS)',
+    'hwm.tooltip': 'Elevasyon dlo maksimòm rezo USGS mezire (kouvèti depi ~2005). Konpare ak kouch vag tanpèt SLOSH la: modèl vs obsève.',
+    'hwm.mark': 'Mak dlo wo',
+    'hwm.coastal': 'kotyè',
+    'hwm.riverine': 'rivyè',
 
     // Spatial search
     'spatial.title': 'Siklòn tou pre yon pwen',

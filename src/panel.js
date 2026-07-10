@@ -10,6 +10,7 @@ import { renderIntensityChart } from './chart.js';
 import { exportChartAsPng, exportChartAsSvg } from './chart-export.js';
 import { togglePin, isPinned } from './compare.js';
 import { radiiCount, showWindField, hideWindField } from './windfield.js';
+import { hwmInfo, showHwm, hideHwm } from './hwm.js';
 import { hidePanel, minimizePanel, restorePanel, showPanel } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
@@ -74,6 +75,7 @@ closeBtn.addEventListener('click', () => {
   if (animator) animator.stop();
   if (radar) radar.close();
   hideWindField();
+  hideHwm();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
@@ -95,6 +97,7 @@ export async function showStorm(landfall) {
   // switching storms — the wind-field swath otherwise outlives its checkbox.
   if (animator) animator.stop();
   hideWindField();
+  hideHwm();
   await ensureStormsLoaded();
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
@@ -300,6 +303,7 @@ function render(storm, landfall, allStorms) {
             </label>
           </div>
         ` : ''}
+        <div id="hwm-row-host"></div>
       </section>
     </div>
   `;
@@ -317,6 +321,7 @@ function render(storm, landfall, allStorms) {
   renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
+  renderHwmRow(document.getElementById('hwm-row-host'), storm);
   import('./tides.js')
     .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
     .catch(() => { /* tide gauges are optional context */ });
@@ -791,6 +796,24 @@ function renderDaysAtIntensity(host, track) {
       <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
     </div>
   `;
+}
+
+/** USGS high-water-mark toggle — only for storms with preprocessed marks. */
+async function renderHwmRow(host, storm) {
+  if (!host) return;
+  const info = await hwmInfo(storm.id);
+  if (!info) return;
+  host.innerHTML = `
+    <div class="wind-field-row">
+      <label class="wf-toggle" title="${t('hwm.tooltip')}">
+        <input type="checkbox" id="hwm-cb">
+        <span>🌊 ${t('hwm.toggle', info.count)}</span>
+      </label>
+    </div>`;
+  host.querySelector('#hwm-cb').addEventListener('change', async event => {
+    if (event.target.checked) await showHwm(storm.id);
+    else hideHwm();
+  });
 }
 
 let rainfallPromise = null;
