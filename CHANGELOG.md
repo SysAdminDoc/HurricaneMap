@@ -11,6 +11,7 @@ All notable changes to HurricaneMap.
 - PWA statistics/comparison shortcuts now survive initial URL canonicalization and work during in-app hash navigation; the climate-trends chart loads storm data on its first opening instead of remaining empty.
 - Storm biographies use basin-aware Pacific genesis wording and report the actual number of landfall events rather than the number of unique states.
 - The Cloudflare edge wrapper marks upstream errors `no-store` and handles HEAD lookups with GET cache keys without attempting invalid bodyless cache writes.
+- Service-worker validation now fails releases whose cache version differs from `package.json` or whose shell manifest omits any application module.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

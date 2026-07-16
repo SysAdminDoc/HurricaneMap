@@ -1,4 +1,4 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +9,13 @@ const source = await readFile(swPath, 'utf8');
 const versionMatch = source.match(/const\s+SW_VERSION\s*=\s*['"]([^'"]+)['"]/);
 if (!versionMatch) {
   console.error('sw.js does not define SW_VERSION.');
+  process.exit(1);
+}
+
+const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+const expectedSwVersion = `hm-v${packageJson.version}`;
+if (versionMatch[1] !== expectedSwVersion) {
+  console.error(`sw.js SW_VERSION ${versionMatch[1]} does not match package.json ${expectedSwVersion}.`);
   process.exit(1);
 }
 
@@ -32,6 +39,16 @@ if (!offlineDataAssets) {
 const assets = [...shellAssets, ...offlineDataAssets];
 const errors = [];
 const seen = new Set();
+
+const srcModules = (await readdir(path.join(root, 'src'), { withFileTypes: true }))
+  .filter(entry => entry.isFile() && entry.name.endsWith('.js'))
+  .map(entry => `./src/${entry.name}`)
+  .sort();
+for (const modulePath of srcModules) {
+  if (!shellAssets.includes(modulePath)) {
+    errors.push(`SHELL_ASSETS is missing application module: ${modulePath}`);
+  }
+}
 
 for (const required of [
   './data/landfalls.json',
