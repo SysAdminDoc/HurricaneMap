@@ -67,7 +67,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
   const windAxis = windTicks.map(k => {
     const y = yWind(k);
     return `<g class="ax-tick">
-      <line x1="${M.left}" y1="${y}" x2="${M.left + PW}" y2="${y}" stroke="rgba(205,214,244,0.06)" stroke-dasharray="2 3"/>
+      <line class="intensity-grid-line" x1="${M.left}" y1="${y}" x2="${M.left + PW}" y2="${y}" stroke-dasharray="2 3"/>
       <text x="${M.left - 4}" y="${y + 3}" text-anchor="end">${k}</text>
     </g>`;
   }).join('');
@@ -96,7 +96,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
 
   // Wind line + colored dots.
   const windLine = windSegments.map(seg =>
-    `<polyline points="${seg.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="rgba(205,214,244,0.85)" stroke-width="1.4"/>`
+    `<polyline class="intensity-wind-line" points="${seg.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke-width="1.4"/>`
   ).join('');
   const dots = track.map((r, i) => {
     if (r.wind == null) return '';
@@ -108,7 +108,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
 
   // Pressure line.
   const presLine = presSegments.map(seg =>
-    `<polyline points="${seg.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="rgba(116,199,236,0.7)" stroke-width="1" stroke-dasharray="3 2"/>`
+    `<polyline class="intensity-pressure-line" points="${seg.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke-width="1" stroke-dasharray="3 2"/>`
   ).join('');
 
   // Rapid-intensification overlay — red-tinted thick segment + label.
@@ -139,9 +139,9 @@ export function renderIntensityChart(container, storm, opts = {}) {
       </div>
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="intensity-svg" role="img" aria-label="Intensity over time chart">
         ${bandRects}
-        <line x1="${M.left}" y1="${M.top + PH}" x2="${M.left + PW}" y2="${M.top + PH}" stroke="rgba(205,214,244,0.18)"/>
-        <line x1="${M.left}" y1="${M.top}" x2="${M.left}" y2="${M.top + PH}" stroke="rgba(205,214,244,0.18)"/>
-        <line x1="${M.left + PW}" y1="${M.top}" x2="${M.left + PW}" y2="${M.top + PH}" stroke="rgba(205,214,244,0.18)"/>
+        <line class="intensity-axis-line" x1="${M.left}" y1="${M.top + PH}" x2="${M.left + PW}" y2="${M.top + PH}"/>
+        <line class="intensity-axis-line" x1="${M.left}" y1="${M.top}" x2="${M.left}" y2="${M.top + PH}"/>
+        <line class="intensity-axis-line" x1="${M.left + PW}" y1="${M.top}" x2="${M.left + PW}" y2="${M.top + PH}"/>
         ${windAxis}
         ${presAxis}
         ${xAxis}

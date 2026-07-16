@@ -506,10 +506,12 @@ function wireSettingsControls() {
       applyThemeToRoot();
       // Marker colors resolve from the theme's --cat-* tokens — repaint so
       // the map matches the re-themed legend.
+      lastTracksKey = '';
       applyFilters();
     }
     if (e.detail.key === 'palette') {
       applyPaletteToBody();
+      lastTracksKey = '';
       applyFilters();
       // If a storm panel is open, re-open it so its colors refresh too.
       if (openStormId) {
@@ -532,6 +534,7 @@ function wireSettingsControls() {
     if (e.detail.key === 'highContrast') {
       document.documentElement.classList.toggle('high-contrast', getSetting('highContrast'));
       invalidatePaletteCache();
+      lastTracksKey = '';
       applyFilters();
     }
   });
@@ -598,6 +601,7 @@ function applyFilters() {
   if (filters.showTracks) {
     redrawTracks(visible);
   } else {
+    lastTracksKey = '';
     clearTracks();
   }
   setHeatmap(filters.showHeatmap, visible);

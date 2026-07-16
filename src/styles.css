@@ -684,7 +684,7 @@ label > input[type="checkbox"] {
   height: 2px;
   border-radius: 1px;
 }
-.cl-swatch.wind { background: rgba(205, 214, 244, 0.85); }
+.cl-swatch.wind { background: var(--intensity-wind-line); }
 .cl-swatch.pres { background: linear-gradient(to right, var(--sapphire) 0%, var(--sapphire) 50%, transparent 50%, transparent 100%); background-size: 6px 2px; height: 2px; }
 .cl-landfall { color: rgba(243,139,168,0.9); }
 
@@ -693,6 +693,10 @@ label > input[type="checkbox"] {
   height: auto;
   display: block;
 }
+.intensity-wind-line { stroke: var(--intensity-wind-line); }
+.intensity-pressure-line { stroke: var(--intensity-pressure-line); }
+.intensity-grid-line { stroke: var(--intensity-grid-line); }
+.intensity-axis-line { stroke: var(--intensity-axis-line); }
 .intensity-svg .ax-tick {
   font-size: 9px;
   fill: var(--subtext);
@@ -4228,8 +4232,8 @@ button:disabled,
 
 .cat-btn:not(.on) {
   opacity: 1;
-  color: var(--text-dim);
-  background: rgba(17, 17, 27, 0.34);
+  color: var(--foreground-muted);
+  background: var(--surface-control);
   border-style: dashed;
 }
 
@@ -5109,6 +5113,10 @@ body.timeline-collapsed {
   --shadow-theme-lg: 0 18px 60px rgba(0, 0, 0, 0.34);
   --focus-ring-color: rgba(180, 190, 254, 0.62);
   --focus-ring-soft: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  --intensity-wind-line: #cdd6f4;
+  --intensity-pressure-line: #74c7ec;
+  --intensity-grid-line: rgba(205, 214, 244, 0.20);
+  --intensity-axis-line: rgba(205, 214, 244, 0.38);
   --on-accent: #11111b;
   --disabled-opacity: 0.58;
   --leaflet-control-bg: rgba(24, 24, 37, 0.92);
@@ -5136,6 +5144,10 @@ html.light-theme {
   --shadow-theme-lg: 0 18px 54px rgba(76, 79, 105, 0.18);
   --focus-ring-color: rgba(124, 58, 237, 0.56);
   --focus-ring-soft: 0 0 0 3px rgba(124, 58, 237, 0.18);
+  --intensity-wind-line: #303446;
+  --intensity-pressure-line: #005f87;
+  --intensity-grid-line: rgba(76, 79, 105, 0.30);
+  --intensity-axis-line: rgba(76, 79, 105, 0.58);
   --on-accent: #ffffff;
   --leaflet-control-bg: rgba(255, 255, 255, 0.94);
 }
@@ -5152,6 +5164,10 @@ html.high-contrast {
   --border-accent: currentColor;
   --focus-ring-color: var(--text);
   --focus-ring-soft: 0 0 0 4px rgba(255, 255, 255, 0.34);
+  --intensity-wind-line: var(--text);
+  --intensity-pressure-line: var(--sapphire);
+  --intensity-grid-line: var(--surface2);
+  --intensity-axis-line: var(--text);
   --disabled-opacity: 0.72;
 }
 
@@ -5198,6 +5214,7 @@ select,
 .similar-storm-row,
 .panel-playback-host .anim-controls,
 .anim-radar-toggle,
+.cat-btn:not(.on),
 .ss-stat,
 .ss-tier {
   background: var(--surface-control) !important;
