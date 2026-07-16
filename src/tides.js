@@ -7,6 +7,7 @@
 // never automatically — to stay polite to the API.
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { categoryStrength } from './data.js';
 
 const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 const MAX_STATIONS = 3;
@@ -144,7 +145,7 @@ export async function renderTidesBlock(host, storm) {
   // Cat-1 four days earlier) — that's the water story people come for.
   const landfall = (storm.us_landfalls || [])
     .filter(lf => lf?.t && Number.isFinite(lf.lat) && Number.isFinite(lf.lon))
-    .reduce((best, lf) => (!best || (lf.category ?? -1) > (best.category ?? -1) ? lf : best), null);
+    .reduce((best, lf) => (!best || categoryStrength(lf.category) > categoryStrength(best.category) ? lf : best), null);
   if (!landfall) return;
 
   host.innerHTML = `

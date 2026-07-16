@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
@@ -35,6 +36,12 @@ function validCategory(value) {
   return Number.isInteger(value) && value >= -1 && value <= 5;
 }
 
+function categoryStrength(category) {
+  if (category === 0) return 0;
+  if (category === -1) return 1;
+  return category + 1;
+}
+
 function validOptionalString(value) {
   return value == null || typeof value === 'string';
 }
@@ -65,6 +72,19 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billi
   readJson('data/storm-events.json'),
   readJson('data/billions.json'),
 ]);
+
+try {
+  const [stormsJsonBytes, stormsGzipBytes] = await Promise.all([
+    readFile(path.join(root, 'data/storms.json')),
+    readFile(path.join(root, 'data/storms.json.gz')),
+  ]);
+  const expanded = gunzipSync(stormsGzipBytes);
+  if (!expanded.equals(stormsJsonBytes)) {
+    fail('data/storms.json.gz does not expand byte-for-byte to data/storms.json.');
+  }
+} catch (error) {
+  fail(`data/storms.json.gz: ${error.message}`);
+}
 
 if (!Array.isArray(landfalls)) fail('data/landfalls.json must contain an array.');
 if (!Array.isArray(storms)) fail('data/storms.json must contain an array.');
@@ -97,6 +117,16 @@ for (const storm of storms) {
   if (!Array.isArray(storm.track) || storm.track.length === 0) fail(`${storm.id}: track must be a non-empty array.`);
   if (Array.isArray(storm.us_landfalls) && storm.us_landfall_count !== storm.us_landfalls.length) {
     fail(`${storm.id}: us_landfall_count does not match us_landfalls length.`);
+  }
+  if (Array.isArray(storm.us_landfalls) && storm.us_landfalls.length > 0) {
+    const strongest = storm.us_landfalls.reduce((best, landfall) => (
+      best == null || categoryStrength(landfall.category) > categoryStrength(best)
+        ? landfall.category
+        : best
+    ), null);
+    if (storm.landfall_max_category !== strongest) {
+      fail(`${storm.id}: landfall_max_category ${storm.landfall_max_category} does not match strongest U.S. landfall ${strongest}.`);
+    }
   }
   if (!Array.isArray(storm.similarity_vector) || storm.similarity_vector.length !== 8) {
     fail(`${storm.id}: similarity_vector must be an 8-number array.`);
@@ -248,6 +278,7 @@ if (!isObject(metadata.outputs)) {
   for (const [key, expectedPath] of Object.entries({
     landfalls: 'data/landfalls.json',
     storms: 'data/storms.json',
+    storms_gzip: 'data/storms.json.gz',
     stats: 'data/stats.json',
   })) {
     const output = metadata.outputs[key];

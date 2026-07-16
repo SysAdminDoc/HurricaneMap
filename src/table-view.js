@@ -1,4 +1,4 @@
-import { categoryLabel } from './data.js';
+import { categoryLabel, categoryStrength } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { formatWind } from './settings.js';
 import { showPanel, hidePanel } from './panels.js';
@@ -85,6 +85,7 @@ function sortRows(rows, col, dir) {
   return rows.sort((a, b) => {
     let va = a[col], vb = b[col];
     if (col === 'name') { va = (va || '').toLowerCase(); vb = (vb || '').toLowerCase(); }
+    if (col === 'category') { va = categoryStrength(va); vb = categoryStrength(vb); }
     // Consistent comparator for null cells (pre-1870s pressure rows): equal
     // nulls compare 0, and null placement follows the sort direction.
     if (va == null && vb == null) return 0;

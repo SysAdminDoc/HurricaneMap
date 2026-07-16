@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { categoryStrength } from '../src/data.js';
 import { createDefaultFilters } from '../src/url-state.js';
 import {
   hasActiveFilters,
@@ -12,6 +13,12 @@ import {
 } from '../src/filter-state.js';
 
 const defaults = { yearMinDefault: 1851, yearMaxDefault: 2025 };
+
+assert.deepEqual(
+  [0, -1, 1, 2, 3, 4, 5].sort((a, b) => categoryStrength(a) - categoryStrength(b)),
+  [0, -1, 1, 2, 3, 4, 5],
+  'category strength must rank TD below TS below hurricanes',
+);
 
 function cats(filters) {
   return [...filters.categories].sort();

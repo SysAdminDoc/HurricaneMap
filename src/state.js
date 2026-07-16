@@ -1,7 +1,7 @@
 // State deep-dive: per-state landfall history, by-category histogram, by-decade
 // trend, and a sortable list of every storm to hit that state.
 
-import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass } from './data.js';
+import { getLandfalls, getStorm, ensureStormsLoaded, categoryLabel, categoryClass, categoryStrength } from './data.js';
 import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { redraw } from './timeline.js';
@@ -88,9 +88,11 @@ export async function openState(stateName) {
   const stormsHere = new Map(); // storm_id -> { name, year, max_cat_here, lf_count_here }
   for (const lf of stateLandfalls) {
     const e = stormsHere.get(lf.storm_id) || {
-      storm_id: lf.storm_id, name: lf.name, year: lf.year, max_cat: -1, count: 0, latest: lf.t,
+      storm_id: lf.storm_id, name: lf.name, year: lf.year, max_cat: null, count: 0, latest: lf.t,
     };
-    e.max_cat = Math.max(e.max_cat, lf.category);
+    if (e.max_cat == null || categoryStrength(lf.category) > categoryStrength(e.max_cat)) {
+      e.max_cat = lf.category;
+    }
     e.count += 1;
     if (lf.t > e.latest) e.latest = lf.t;
     stormsHere.set(lf.storm_id, e);
@@ -139,7 +141,7 @@ export async function openState(stateName) {
 
   // Worst landfalls (top 5 by max category, tiebreak by year)
   const worst = [...stormsHere.values()]
-    .sort((a, b) => b.max_cat - a.max_cat || b.year - a.year)
+    .sort((a, b) => categoryStrength(b.max_cat) - categoryStrength(a.max_cat) || b.year - a.year)
     .slice(0, 5);
 
   const worstHtml = worst.map(s => {
@@ -230,12 +232,12 @@ export async function openState(stateName) {
 function sortStateStorms(storms, mode) {
   const sorted = [...storms];
   if (mode === 'strongest') {
-    return sorted.sort((a, b) => b.max_cat - a.max_cat || b.year - a.year || formatStormName(a.name).localeCompare(formatStormName(b.name)));
+    return sorted.sort((a, b) => categoryStrength(b.max_cat) - categoryStrength(a.max_cat) || b.year - a.year || formatStormName(a.name).localeCompare(formatStormName(b.name)));
   }
   if (mode === 'hits') {
-    return sorted.sort((a, b) => b.count - a.count || b.max_cat - a.max_cat || b.year - a.year);
+    return sorted.sort((a, b) => b.count - a.count || categoryStrength(b.max_cat) - categoryStrength(a.max_cat) || b.year - a.year);
   }
-  return sorted.sort((a, b) => b.year - a.year || b.max_cat - a.max_cat || formatStormName(a.name).localeCompare(formatStormName(b.name)));
+  return sorted.sort((a, b) => b.year - a.year || categoryStrength(b.max_cat) - categoryStrength(a.max_cat) || formatStormName(a.name).localeCompare(formatStormName(b.name)));
 }
 function renderStateStormRows(storms) {
   return storms.map(s => {

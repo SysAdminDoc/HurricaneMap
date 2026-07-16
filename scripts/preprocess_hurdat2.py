@@ -4,6 +4,7 @@ JSON for the web map + a stats roll-up."""
 
 from __future__ import annotations
 
+import gzip
 import json
 import math
 import os
@@ -21,6 +22,7 @@ STATES_GEOJSON = DATA / "us-states.geojson"
 
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
+OUT_STORMS_GZ = DATA / "storms.json.gz"
 OUT_STATS = DATA / "stats.json"
 OUT_METADATA = DATA / "metadata.json"
 
@@ -63,6 +65,15 @@ def saffir_simpson(wind_kt: int) -> int:
     if wind_kt < 137:
         return 4
     return 5
+
+
+def category_strength(category: int) -> int:
+    """Return an intensity rank that preserves the TD=0, TS=-1 encoding."""
+    if category == 0:
+        return 0
+    if category == -1:
+        return 1
+    return category + 1
 
 
 def parse_lat(s: str) -> float:
@@ -663,7 +674,10 @@ def main():
 
             # The storm's "headline" category is the max category at any US landfall
             # (so a storm peaking offshore but landing as a TS shows up as TS).
-            max_landfall_cat = max(lf["category"] for lf in us_landfalls)
+            max_landfall_cat = max(
+                (lf["category"] for lf in us_landfalls),
+                key=category_strength,
+            )
             max_landfall_wind = max((lf["wind"] or 0) for lf in us_landfalls)
 
             storm_record = {
@@ -772,23 +786,33 @@ def main():
         "generated_from": [ATL_FILE.name, EPAC_FILE.name],
     }
 
-    OUT_LANDFALLS.write_text(json.dumps(landfall_events, separators=(",", ":")), encoding="utf-8")
-    OUT_STORMS.write_text(json.dumps(storms_with_us_landfall, separators=(",", ":")), encoding="utf-8")
-    OUT_STATS.write_text(json.dumps(stats, indent=2), encoding="utf-8")
+    OUT_LANDFALLS.write_text(
+        json.dumps(landfall_events, separators=(",", ":")),
+        encoding="utf-8",
+        newline="\n",
+    )
+    storms_json = json.dumps(storms_with_us_landfall, separators=(",", ":")).encode("utf-8")
+    OUT_STORMS.write_bytes(storms_json)
+    with OUT_STORMS_GZ.open("wb") as raw_gzip:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw_gzip, mtime=0) as compressed:
+            compressed.write(storms_json)
+    OUT_STATS.write_text(json.dumps(stats, indent=2), encoding="utf-8", newline="\n")
     metadata = build_metadata(
         source_summaries,
         stats,
         {
             "landfalls": OUT_LANDFALLS,
             "storms": OUT_STORMS,
+            "storms_gzip": OUT_STORMS_GZ,
             "stats": OUT_STATS,
         },
     )
-    OUT_METADATA.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    OUT_METADATA.write_text(json.dumps(metadata, indent=2), encoding="utf-8", newline="\n")
 
     sz = lambda p: f"{p.stat().st_size / 1024:.1f} KB"
     print(f"Wrote {OUT_LANDFALLS.name} ({sz(OUT_LANDFALLS)})", file=sys.stderr)
     print(f"Wrote {OUT_STORMS.name} ({sz(OUT_STORMS)})", file=sys.stderr)
+    print(f"Wrote {OUT_STORMS_GZ.name} ({sz(OUT_STORMS_GZ)})", file=sys.stderr)
     print(f"Wrote {OUT_STATS.name} ({sz(OUT_STATS)})", file=sys.stderr)
     print(f"Wrote {OUT_METADATA.name} ({sz(OUT_METADATA)})", file=sys.stderr)
 

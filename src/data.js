@@ -243,6 +243,14 @@ export function categoryLabel(cat) {
   return `Cat ${cat}`;
 }
 
+/** Numeric intensity rank for the dataset's non-monotonic TD=0, TS=-1 encoding. */
+export function categoryStrength(cat) {
+  if (cat === 0) return 0;
+  if (cat === -1) return 1;
+  if (Number.isInteger(cat) && cat >= 1 && cat <= 5) return cat + 1;
+  return -1;
+}
+
 export function categoryClass(cat) {
   if (cat <= 0) return 'cat-ts';
   return `cat-${cat}`;

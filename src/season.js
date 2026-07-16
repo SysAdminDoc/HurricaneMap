@@ -1,7 +1,7 @@
 // Season summary card. Surfaces when the year filter narrows to a small
 // window (1-3 years). Shows total named storms touching the US, landfall
 // count by Saffir tier, total ACE, strongest landfall, deadliest, costliest.
-import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel, getEnsoForYear } from './data.js';
+import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel, categoryStrength, getEnsoForYear } from './data.js';
 import { computeACE } from './metrics.js';
 import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -74,7 +74,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   const storms = new Map();
   for (const lf of landfalls) {
     if (!storms.has(lf.storm_id)) storms.set(lf.storm_id, { id: lf.storm_id, name: lf.name, year: lf.year, peakCat: lf.category });
-    else if (lf.category > storms.get(lf.storm_id).peakCat) storms.get(lf.storm_id).peakCat = lf.category;
+    else if (categoryStrength(lf.category) > categoryStrength(storms.get(lf.storm_id).peakCat)) storms.get(lf.storm_id).peakCat = lf.category;
   }
   const stormList = Array.from(storms.values());
 
@@ -89,7 +89,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     else if (c === 3) tierCounts.c3++;
     else if (c === 4) tierCounts.c4++;
     else if (c >= 5) tierCounts.c5++;
-    if (!strongest || c > strongest.category) strongest = lf;
+    if (!strongest || categoryStrength(c) > categoryStrength(strongest.category)) strongest = lf;
   }
 
   // Render the synchronous part immediately, then back-fill ACE + impacts.

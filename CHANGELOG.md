@@ -2,6 +2,11 @@
 
 All notable changes to HurricaneMap.
 
+## Unreleased
+
+### Fixed
+- Generated storm data now writes a deterministic `storms.json.gz`, validates compressed/uncompressed parity, ranks tropical storms above tropical depressions across panels/sorts/tide selection, and records genuine preprocessing provenance.
+
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 
 ### Fixed (production breakage)
