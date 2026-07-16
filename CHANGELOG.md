@@ -12,6 +12,7 @@ All notable changes to HurricaneMap.
 - Storm biographies use basin-aware Pacific genesis wording and report the actual number of landfall events rather than the number of unique states.
 - The Cloudflare edge wrapper marks upstream errors `no-store` and handles HEAD lookups with GET cache keys without attempting invalid bodyless cache writes.
 - Service-worker validation now fails releases whose cache version differs from `package.json` or whose shell manifest omits any application module.
+- Translation interpolation now replaces repeated placeholders literally, active-feed and map counters use locale-aware status strings, Spanish landfall terminology uses "toque de tierra," and tropical-depression/storm category labels match the data model.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

@@ -329,7 +329,11 @@ async function boot() {
     const { initSpatialSearch } = await loadSpatialSearch();
     initSpatialSearch((lf) => onLandfallClick(lf, null));
   });
-  els.stormCount.textContent = `${getStats().total_storms.toLocaleString()} storms · ${getStats().total_landfall_events.toLocaleString()} landfalls`;
+  els.stormCount.textContent = t(
+    'status.stormCount',
+    getStats().total_storms.toLocaleString(),
+    getStats().total_landfall_events.toLocaleString(),
+  );
   renderDataProvenance();
   
   // Initialize keyboard shortcuts and navigation
@@ -597,10 +601,10 @@ function applyFilters() {
   renderLandfalls(visible, onLandfallClick);
   const totalLandfalls = getLandfalls().length;
   const countText = visible.length === totalLandfalls
-    ? `${visible.length.toLocaleString()} landfalls`
-    : `${visible.length.toLocaleString()} of ${totalLandfalls.toLocaleString()}`;
+    ? t('status.landfalls', visible.length.toLocaleString())
+    : t('status.landfallsOf', visible.length.toLocaleString(), totalLandfalls.toLocaleString());
   els.visibleCount.textContent = countText;
-  announceToLiveRegion(`Showing ${countText}`);
+  announceToLiveRegion(t('status.showing', countText));
   updateFilterResetState();
   if (filters.showTracks) {
     redrawTracks(visible);

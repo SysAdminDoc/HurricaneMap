@@ -1,7 +1,7 @@
 // Locale contract: every locale carries the full key set (no silent EN
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
-import { STRINGS, t } from '../src/i18n.js';
+import { STRINGS, interpolate, t } from '../src/i18n.js';
 
 function assert(condition, message) {
   if (!condition) {
@@ -32,7 +32,9 @@ for (const locale of locales) {
 }
 
 assert(t('month.1') === 'January', 'default locale should resolve English');
-assert(t('status.visibleCount', 42) === '42 visible', 'placeholder substitution failed');
+assert(t('status.landfalls', 42) === '42 landfalls', 'placeholder substitution failed');
+assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated placeholders should all resolve');
+assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
 assert(t('nonexistent.key') === 'nonexistent.key', 'unknown keys should echo the key');
 
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);

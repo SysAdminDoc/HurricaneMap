@@ -128,17 +128,28 @@ export const STRINGS = {
     // Status messages
     'status.loading': 'Loading…',
     'status.noResults': 'No storms found',
-    'status.stormCount': 'storms · {0} landfalls',
-    'status.visibleCount': '{0} visible',
-    'status.activeStorms': '{0} active storm{1}',
+    'status.stormCount': '{0} storms · {1} landfalls',
+    'status.landfalls': '{0} landfalls',
+    'status.landfallsOf': '{0} of {1} landfalls',
+    'status.showing': 'Showing {0}',
+    'status.activeStorm': '{0} active storm',
+    'status.activeStorms': '{0} active storms',
+    'status.feedRateLimited': 'Active feed rate-limited',
+    'status.feedDelayed': 'Active feed delayed',
+    'status.feedRetry': '{0} - retry {1} UTC',
+    'status.feedUpdated': 'Updated',
+    'status.feedUpdatedAt': 'Updated {0} UTC',
+    'status.feedHourly': '{0} - hourly checks',
+    'status.noActiveStorms': 'No active storms',
+    'status.feedNextCheck': '{0} - next check {1} UTC',
 
     // Toasts
     'toast.copiedLink': 'Copied to clipboard',
     'toast.exportedFile': 'Downloaded {0}',
 
     // Categories
-    'category.-1': 'Extratropical',
-    'category.0': 'Subtropical',
+    'category.-1': 'Tropical Storm',
+    'category.0': 'Tropical Depression',
     'category.ts': 'Tropical Storm',
     'category.1': 'Category 1',
     'category.2': 'Category 2',
@@ -318,14 +329,14 @@ export const STRINGS = {
     'filters.title': 'Filtros',
     'filters.yearRange': 'Rango de años',
     'filters.category': 'Categoría',
-    'filters.categoryTS': 'Tormenta tropical en el momento de tocamiento',
+    'filters.categoryTS': 'Tormenta tropical al tocar tierra',
     'filters.state': 'Estado',
     'filters.searchStorm': 'Buscar huracán',
     'filters.searchPlaceholder': 'p. ej. Katrina, 2005, Helene…',
     'filters.mapLayers': 'Capas del mapa',
-    'filters.tracksForVisibleLandfalls': 'Pistas de tocamientos visibles',
-    'filters.landfall': 'Puntos de tocamiento',
-    'filters.heatmap': 'Mapa de calor de tocamientos',
+    'filters.tracksForVisibleLandfalls': 'Trayectorias de los toques de tierra visibles',
+    'filters.landfall': 'Puntos de toque de tierra',
+    'filters.heatmap': 'Mapa de calor de toques de tierra',
     'filters.population': 'Densidad de población',
     'filters.stormSurge': 'Marea de tormenta (MOMs SLOSH)',
     'filters.sst': 'Temp. superficial del mar (más reciente)',
@@ -341,7 +352,7 @@ export const STRINGS = {
     'panel.formed': 'Formado',
     'panel.dissipated': 'Disipado',
     'panel.track_km': 'Longitud de la trayectoria',
-    'panel.landfalls': 'Tocamientos en EE.UU.',
+    'panel.landfalls': 'Toques de tierra en EE. UU.',
     'panel.ACE': 'Energía ciclónica acumulada',
     'panel.forwardSpeed': 'Velocidad de avance',
     'panel.rapidIntensification': 'Intensificación rápida',
@@ -363,7 +374,7 @@ export const STRINGS = {
     'stats.namedStorms': 'Tormentas con nombre',
     'stats.majors': 'Mayores (Cat 3+)',
     'stats.totalACE': 'ACE total',
-    'stats.landfalls': 'Tocamientos',
+    'stats.landfalls': 'Toques de tierra',
     'stats.strongest': 'Más fuerte',
     'stats.deadliest': 'Más mortífero',
     'stats.costliest': 'Más costoso',
@@ -392,17 +403,28 @@ export const STRINGS = {
     // Status messages
     'status.loading': 'Cargando…',
     'status.noResults': 'No se encontraron huracanes',
-    'status.stormCount': 'huracanes · {0} tocamientos',
-    'status.visibleCount': '{0} visibles',
-    'status.activeStorms': '{0} huracán{1} activo{1}',
+    'status.stormCount': '{0} huracanes · {1} toques de tierra',
+    'status.landfalls': '{0} toques de tierra',
+    'status.landfallsOf': '{0} de {1} toques de tierra',
+    'status.showing': 'Mostrando {0}',
+    'status.activeStorm': '{0} tormenta activa',
+    'status.activeStorms': '{0} tormentas activas',
+    'status.feedRateLimited': 'Fuente activa limitada por frecuencia',
+    'status.feedDelayed': 'Fuente activa retrasada',
+    'status.feedRetry': '{0} - reintento a las {1} UTC',
+    'status.feedUpdated': 'Actualizado',
+    'status.feedUpdatedAt': 'Actualizado a las {0} UTC',
+    'status.feedHourly': '{0} - comprobaciones cada hora',
+    'status.noActiveStorms': 'No hay tormentas activas',
+    'status.feedNextCheck': '{0} - próxima comprobación a las {1} UTC',
 
     // Toasts
     'toast.copiedLink': 'Copiado al portapapeles',
     'toast.exportedFile': 'Descargado {0}',
 
     // Categories
-    'category.-1': 'Extratropical',
-    'category.0': 'Subtropical',
+    'category.-1': 'Tormenta tropical',
+    'category.0': 'Depresión tropical',
     'category.ts': 'Tormenta tropical',
     'category.1': 'Categoría 1',
     'category.2': 'Categoría 2',
@@ -426,13 +448,13 @@ export const STRINGS = {
 
     // On this date
     'onthisdate.title': 'Esta fecha en la historia',
-    'onthisdate.meta': 'Tocamientos registrados dentro de siete días calendario de {0}.',
-    'onthisdate.empty': 'Sin aniversarios de tocamiento cercanos.',
-    'onthisdate.emptyDetail': 'Ningún tocamiento registrado cae dentro de siete días calendario de hoy ({0}).',
+    'onthisdate.meta': 'Toques de tierra registrados dentro de siete días calendario de {0}.',
+    'onthisdate.empty': 'Sin aniversarios cercanos de toque de tierra.',
+    'onthisdate.emptyDetail': 'Ningún toque de tierra registrado cae dentro de siete días calendario de hoy ({0}).',
 
     // State panel
     'state.title': 'Detalles del estado',
-    'state.noLandfalls': 'Sin tocamientos registrados para este estado.',
+    'state.noLandfalls': 'Sin toques de tierra registrados para este estado.',
 
     // Glossary
     'glossary.title': 'Glosario',
@@ -450,7 +472,7 @@ export const STRINGS = {
     'onboarding.aboutBody': 'Notas de código abierto, metodología, brechas de cobertura y detalles del archivo de radar.',
 
     // Storm events
-    'stormevents.title': 'Eventos meteorológicos cerca del tocamiento',
+    'stormevents.title': 'Eventos meteorológicos cerca del toque de tierra',
     'stormevents.unavailable': 'Los registros de eventos comienzan en 1950; datos de tornado y granizo no están disponibles para este huracán.',
 
     // About / info modal
@@ -464,7 +486,7 @@ export const STRINGS = {
     'error.unexpected': 'Algo salió mal — una función puede no estar disponible. Revisa la consola del navegador para más detalles.',
 
     // Storm panel dynamic states
-    'panel.loading': 'Cargando trayectoria, tocamientos y contexto de impactos...',
+    'panel.loading': 'Cargando trayectoria, toques de tierra y contexto de impactos...',
     'panel.errorTitle': 'Registro del huracán no disponible.',
     'panel.errorDetail': 'El punto seleccionado cargó, pero su trayectoria detallada de HURDAT2 no está en este paquete de datos.',
     'panel.unnamedAtlantic': 'Tormenta atlántica sin nombre de {0}',
@@ -517,14 +539,14 @@ export const STRINGS = {
 
     // Tide gauges
     'tides.title': 'Mareógrafos (NOAA CO-OPS)',
-    'tides.load': 'Cargar niveles de agua cerca del tocamiento',
+    'tides.load': 'Cargar niveles de agua cerca del toque de tierra',
     'tides.loading': 'Obteniendo niveles de agua…',
     'tides.empty': 'No hay registros de mareógrafos cercanos para este huracán.',
     'tides.observed': 'Observado',
     'tides.predicted': 'Marea prevista',
-    'tides.landfall': 'Tocamiento',
+    'tides.landfall': 'Toque de tierra',
     'tides.peakResidual': 'Residuo máximo de marejada',
-    'tides.chartLabel': 'Nivel de agua observado vs previsto cerca del tocamiento',
+    'tides.chartLabel': 'Nivel de agua observado vs previsto cerca del toque de tierra',
     'tides.source': 'Fuente: NOAA Tides & Currents',
 
     // Tropical watches/warnings (2026 NHC cone standard)
@@ -677,12 +699,23 @@ export const STRINGS = {
     'btn.exportSVG': 'SVG',
     'btn.showMoreResults': 'Montre plis',
     'btn.recentlyViewed': 'Gade dènyèman',
-    'status.stormCount': 'siklòn · {0} fwa yo touche tè',
-    'status.visibleCount': '{0} vizib',
+    'status.stormCount': '{0} siklòn · {1} fwa yo touche tè',
+    'status.landfalls': '{0} fwa yo touche tè',
+    'status.landfallsOf': '{0} sou {1} fwa yo touche tè',
+    'status.showing': 'Montre {0}',
+    'status.activeStorm': '{0} siklòn aktif',
     'status.activeStorms': '{0} siklòn aktif',
+    'status.feedRateLimited': 'Sous siklòn aktif la limite demann yo',
+    'status.feedDelayed': 'Sous siklòn aktif la anreta',
+    'status.feedRetry': '{0} - reeseye a {1} UTC',
+    'status.feedUpdated': 'Mizajou fèt',
+    'status.feedUpdatedAt': 'Mizajou fèt a {0} UTC',
+    'status.feedHourly': '{0} - verifikasyon chak èdtan',
+    'status.noActiveStorms': 'Pa gen siklòn aktif',
+    'status.feedNextCheck': '{0} - pwochen verifikasyon a {1} UTC',
     'toast.exportedFile': 'Telechaje {0}',
-    'category.-1': 'Ekstratwopikal',
-    'category.0': 'Soutwopikal',
+    'category.-1': 'Tanpèt twopikal',
+    'category.0': 'Depresyon twopikal',
 
     // Months
     'month.1': 'Janvye',
@@ -753,7 +786,7 @@ export const STRINGS = {
 
     // Spatial search
     'spatial.title': 'Siklòn tou pre yon pwen',
-    'spatial.hint': 'Klike dwat (peze kenbe sou ekran tactil) sou kat la, oswa itilize pozisyon aparèy ou.',
+    'spatial.hint': 'Klike dwat (peze kenbe sou ekran taktil) sou kat la, oswa itilize pozisyon aparèy ou.',
     'spatial.useMyLocation': 'Itilize pozisyon mwen',
     'spatial.locating': 'Ap chache pozisyon…',
     'spatial.denied': 'Pozisyon pa disponib — klike dwat sou kat la',
@@ -799,12 +832,17 @@ export function t(key, ...args) {
   // Partial locales (ht) fall back to English before exposing the raw key.
   let str = strings[key] || STRINGS[LOCALE_EN][key] || key;
 
-  // Simple substitution for numbered placeholders: {0}, {1}, etc.
-  for (let i = 0; i < args.length; i++) {
-    str = str.replace(`{${i}}`, args[i]);
-  }
+  return interpolate(str, ...args);
+}
 
-  return str;
+export function interpolate(template, ...args) {
+  let result = String(template);
+  for (let i = 0; i < args.length; i++) {
+    // split/join replaces every occurrence without treating `$&` and friends
+    // in user-supplied values as replacement patterns.
+    result = result.split(`{${i}}`).join(String(args[i]));
+  }
+  return result;
 }
 
 export function initLocale() {

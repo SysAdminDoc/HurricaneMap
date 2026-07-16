@@ -13,7 +13,6 @@ import { windToCategory, categoryLabel } from './data.js';
 // Authored 2026-05-03 for HurricaneMap v0.4.0 to surface ACE, rapid
 // intensification windows, and closest-pass distances to U.S. coastal cities.
 
-const KT_TO_MS_FACTOR = 0.51444; // not used directly; kept for reference
 const EARTH_R_KM = 6371.0088;
 const KM_TO_MI = 0.621371;
 const RI_THRESHOLD_KT = 30;      // standard NHC RI definition
@@ -968,4 +967,3 @@ function formatDamageBrief(usd) {
   }
   return `$${(usd / 1_000_000).toFixed(1)}M`;
 }
-

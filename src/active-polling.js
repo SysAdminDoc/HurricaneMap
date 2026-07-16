@@ -37,16 +37,22 @@ export function activeFeedStatusText({
   status = 0,
 } = {}) {
   if (state === 'rate-limit') {
-    return `NHC feed rate-limited${nextPollAt ? ` - retry ${formatUtcClock(nextPollAt)} UTC` : ''}`;
+    const message = t('status.feedRateLimited');
+    return nextPollAt ? t('status.feedRetry', message, formatUtcClock(nextPollAt)) : message;
   }
   if (state === 'error') {
     const code = status ? ` (${status})` : '';
-    return `NHC feed delayed${code}${nextPollAt ? ` - retry ${formatUtcClock(nextPollAt)} UTC` : ''}`;
+    const message = `${t('status.feedDelayed')}${code}`;
+    return nextPollAt ? t('status.feedRetry', message, formatUtcClock(nextPollAt)) : message;
   }
   if (stormCount > 0) {
-    return `${fetchedAt ? `Updated ${formatUtcClock(fetchedAt)} UTC` : 'Updated'} - hourly checks`;
+    const updated = fetchedAt
+      ? t('status.feedUpdatedAt', formatUtcClock(fetchedAt))
+      : t('status.feedUpdated');
+    return t('status.feedHourly', updated);
   }
-  return `No active storms${nextPollAt ? ` - next check ${formatUtcClock(nextPollAt)} UTC` : ''}`;
+  const message = t('status.noActiveStorms');
+  return nextPollAt ? t('status.feedNextCheck', message, formatUtcClock(nextPollAt)) : message;
 }
 
 export function formatUtcClock(value) {
@@ -112,3 +118,4 @@ function latestPointToken(points) {
     point.time ?? point.date ?? point.validTime ?? '',
   ].map(value => String(value).trim()).join(',');
 }
+import { t } from './i18n.js';

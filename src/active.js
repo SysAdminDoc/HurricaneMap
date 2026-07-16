@@ -21,6 +21,7 @@ import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
 import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
+import { t } from './i18n.js';
 
 const L = window.L;
 
@@ -53,6 +54,9 @@ export async function startActiveStormPolling() {
         renderActive(lastStorms);
       }
     }
+  });
+  document.addEventListener('hm-locale:change', () => {
+    if (lastStorms) renderActive(lastStorms);
   });
 
   await fetchAndRender();
@@ -208,8 +212,8 @@ function ensureBadge(count, {
   }
 
   const mainText = count > 0
-    ? `${count} active storm${count === 1 ? '' : 's'}`
-    : (state === 'rate-limit' ? 'Active feed rate-limited' : 'Active feed delayed');
+    ? t(count === 1 ? 'status.activeStorm' : 'status.activeStorms', count)
+    : t(state === 'rate-limit' ? 'status.feedRateLimited' : 'status.feedDelayed');
   const statusText = activeFeedStatusText({
     state,
     stormCount: count,
@@ -348,4 +352,3 @@ async function renderActive(storms) {
   }
 
 }
-

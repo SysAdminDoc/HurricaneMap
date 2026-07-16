@@ -21,8 +21,6 @@ const PH = H - M.top - M.bottom;
 const WIND_DOMAIN = [0, 175];           // kt — covers Cat 5 with headroom
 const PRES_DOMAIN = [880, 1015];        // mb — Allen '80 / Wilma '05 lower bound
 
-function lerp(a, b, t) { return a + (b - a) * t; }
-
 export function renderIntensityChart(container, storm, opts = {}) {
   if (!container) return;
   const track = storm.track;
