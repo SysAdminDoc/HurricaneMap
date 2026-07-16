@@ -5107,6 +5107,8 @@ body.timeline-collapsed {
   --surface-warning: rgba(249, 226, 175, 0.14);
   --surface-success: rgba(166, 227, 161, 0.14);
   --surface-info: rgba(137, 180, 250, 0.14);
+  --warning-ink: var(--warning);
+  --danger-ink: var(--error);
   --border-subtle: rgba(205, 214, 244, 0.11);
   --border-strong: rgba(205, 214, 244, 0.20);
   --border-accent: rgba(180, 190, 254, 0.42);
@@ -5138,6 +5140,8 @@ html.light-theme {
   --surface-warning: rgba(228, 147, 32, 0.12);
   --surface-success: rgba(64, 160, 43, 0.10);
   --surface-info: rgba(30, 102, 245, 0.10);
+  --warning-ink: #713b00;
+  --danger-ink: #8a0029;
   --border-subtle: rgba(76, 79, 105, 0.14);
   --border-strong: rgba(76, 79, 105, 0.24);
   --border-accent: rgba(124, 58, 237, 0.40);
@@ -5313,7 +5317,7 @@ select:disabled,
 }
 
 .hm-toast--warn {
-  color: var(--warning) !important;
+  color: var(--warning-ink) !important;
   background: var(--surface-warning) !important;
   border-color: rgba(249, 226, 175, 0.32) !important;
 }
@@ -7157,8 +7161,38 @@ body.palette-colorblind {
 }
 /* YlOrRd's light steps read with dark ink; the deep-red end needs white. */
 body.palette-colorblind .cat-pill.cat-5,
-body.palette-colorblind .cat-btn.on.cat-5 {
+body.palette-colorblind .cat-btn.on.cat-5,
+body.palette-colorblind .dai-seg.cat-5 {
   color: #ffffff !important;
+}
+
+/* High contrast may be enabled at the same time as the colorblind palette.
+   The palette override arrives after the HC category tokens, so its four
+   light steps need dark ink while the two red steps retain white ink. */
+html.high-contrast body.palette-colorblind .cat-pill.cat-ts,
+html.high-contrast body.palette-colorblind .cat-pill.cat-1,
+html.high-contrast body.palette-colorblind .cat-pill.cat-2,
+html.high-contrast body.palette-colorblind .cat-pill.cat-3,
+html.high-contrast body.palette-colorblind .cat-pill.cat-4,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-ts,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-1,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-2,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-3,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-4,
+html.high-contrast body.palette-colorblind .dai-seg.cat-ts,
+html.high-contrast body.palette-colorblind .dai-seg.cat-1,
+html.high-contrast body.palette-colorblind .dai-seg.cat-2,
+html.high-contrast body.palette-colorblind .dai-seg.cat-3 {
+  color: #11111b !important;
+}
+
+html.high-contrast body.palette-colorblind {
+  --cat-ts: #ffeda0;
+  --cat-1:  #fed976;
+  --cat-2:  #feb24c;
+  --cat-3:  #fd8d3c;
+  --cat-4:  #f03b20;
+  --cat-5:  #bd0026;
 }
 
 /* Category ink. The hardcoded #11111b on pills defeated the --on-category
@@ -7180,6 +7214,11 @@ html.light-theme .cat-btn.on.cat-5,
 html.light-theme .dai-seg.cat-4,
 html.light-theme .dai-seg.cat-5 {
   color: #ffffff !important;
+}
+body.palette-colorblind .cat-pill.cat-4,
+body.palette-colorblind .cat-btn.on.cat-4,
+body.palette-colorblind .dai-seg.cat-4 {
+  color: #11111b !important;
 }
 
 /* High-contrast dark never overrode --on-accent, leaving #11111b ink on the
@@ -7325,12 +7364,12 @@ html.light-theme .basemap-fallback {
 }
 .storm-flag.ri-flag {
   background: var(--surface-warning);
-  color: var(--warning);
+  color: var(--warning-ink);
   border: 1px solid var(--border-subtle);
 }
 .storm-flag.pf-flag {
   background: var(--surface-danger);
-  color: var(--error);
+  color: var(--danger-ink);
   border: 1px solid var(--border-subtle);
 }
 
