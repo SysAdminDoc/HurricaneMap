@@ -9005,3 +9005,56 @@ body.poster-open { overflow: hidden; }
   .poster-actions { gap: 6px; }
   .poster-canvas-frame canvas { width: 100%; }
 }
+
+/* Baseline-2026 progressive positioning. Fixed coordinates above remain the
+   complete fallback; supporting engines tether the flyout and hint popover to
+   their real triggers. Keep the explicit closed-popover rule defined earlier. */
+#toggle-settings { anchor-name: --settings-trigger; }
+.hm-tooltip-anchor { anchor-name: --hm-tooltip-anchor; }
+#toggle-settings.hm-tooltip-anchor { anchor-name: --settings-trigger, --hm-tooltip-anchor; }
+
+.header-tooltip {
+  position: fixed;
+  z-index: 6000;
+  display: none;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 16px));
+  margin: 0;
+  padding: 7px 9px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--crust) 96%, transparent);
+  border: 1px solid var(--surface1);
+  border-radius: 6px;
+  box-shadow: var(--shadow-theme-md);
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+}
+.header-tooltip:popover-open { display: block; }
+.header-tooltip[data-fallback-open] { display: block; }
+.header-tooltip::backdrop { background: transparent; }
+
+@supports (anchor-name: --hm-anchor) and (top: anchor(bottom)) {
+  .header-tooltip:popover-open {
+    position-anchor: --hm-tooltip-anchor;
+    top: calc(anchor(bottom) + 8px) !important;
+    left: anchor(center) !important;
+    right: auto !important;
+    bottom: auto !important;
+    translate: -50% 0 !important;
+    position-try-fallbacks: flip-block, flip-inline;
+  }
+
+  @media (min-width: 721px) {
+    .settings-menu:popover-open {
+      position-anchor: --settings-trigger;
+      top: calc(anchor(bottom) + 8px) !important;
+      right: anchor(right) !important;
+      bottom: auto !important;
+      left: auto !important;
+      position-try-fallbacks: flip-block, flip-inline;
+    }
+  }
+}

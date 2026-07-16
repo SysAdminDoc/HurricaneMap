@@ -821,6 +821,49 @@ try {
 
   await page.click('#toggle-settings');
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+  await page.hover('#toggle-stats');
+  await page.waitForFunction(() => {
+    const tooltip = document.querySelector('#header-tooltip');
+    return tooltip?.matches(':popover-open') || tooltip?.hasAttribute('data-fallback-open');
+  }, { timeout: 5000 });
+  const anchoredPopovers = await page.evaluate(() => {
+    const rect = element => {
+      const value = element.getBoundingClientRect();
+      return { left: value.left, right: value.right, top: value.top, bottom: value.bottom, width: value.width, height: value.height };
+    };
+    const settings = document.querySelector('#settings-menu');
+    const cog = document.querySelector('#toggle-settings');
+    const tooltip = document.querySelector('#header-tooltip');
+    const stats = document.querySelector('#toggle-stats');
+    return {
+      anchorSupported: tooltip.dataset.anchorPositioning === 'true',
+      hintState: tooltip.getAttribute('popover'),
+      tooltipText: tooltip.textContent || '',
+      settingsOpen: settings.matches(':popover-open'),
+      tooltipOpen: tooltip.matches(':popover-open') || tooltip.hasAttribute('data-fallback-open'),
+      settings: rect(settings),
+      cog: rect(cog),
+      tooltip: rect(tooltip),
+      stats: rect(stats),
+    };
+  });
+  assert(anchoredPopovers.hintState === 'hint' && /Statistics/.test(anchoredPopovers.tooltipText), `hint tooltip state is wrong: ${JSON.stringify(anchoredPopovers)}`);
+  assert(anchoredPopovers.settingsOpen && anchoredPopovers.tooltipOpen, 'opening a hint tooltip closed the settings auto popover');
+  if (anchoredPopovers.anchorSupported) {
+    const tooltipCenter = (anchoredPopovers.tooltip.left + anchoredPopovers.tooltip.right) / 2;
+    const statsCenter = (anchoredPopovers.stats.left + anchoredPopovers.stats.right) / 2;
+    assert(Math.abs(tooltipCenter - statsCenter) < 3 && Math.abs(anchoredPopovers.tooltip.top - anchoredPopovers.stats.bottom - 8) < 3, `tooltip is not anchor-positioned: ${JSON.stringify(anchoredPopovers)}`);
+    assert(Math.abs(anchoredPopovers.settings.top - anchoredPopovers.cog.bottom - 8) < 3 && Math.abs(anchoredPopovers.settings.right - anchoredPopovers.cog.right) < 3, `settings flyout is not anchor-positioned: ${JSON.stringify(anchoredPopovers)}`);
+  }
+  if (process.env.HM_PLATFORM_SCREENSHOT) {
+    await page.screenshot({ path: process.env.HM_PLATFORM_SCREENSHOT });
+  }
+  await page.mouse.move(12, 980);
+  await page.waitForFunction(() => {
+    const tooltip = document.querySelector('#header-tooltip');
+    return !tooltip.matches(':popover-open') && !tooltip.hasAttribute('data-fallback-open');
+  }, { timeout: 5000 });
+  assert(await page.getAttribute('#toggle-stats', 'title') === 'Statistics', 'tooltip fallback did not restore the native title');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   const afterSettingsEscape = await page.evaluate(() => ({

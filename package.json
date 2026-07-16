@@ -29,6 +29,7 @@
     "test:prep": "node scripts/test-prep.mjs",
     "test:evac": "node scripts/test-evac.mjs",
     "test:poster": "node scripts/test-poster.mjs",
+    "test:platform-enhancements": "node scripts/test-platform-enhancements.mjs",
     "test:storm-events": "node scripts/test-storm-events.mjs",
     "test:globe3d-utils": "node scripts/test-globe3d-utils.mjs",
     "test:exposure-utils": "node scripts/test-exposure-utils.mjs",
@@ -42,7 +43,7 @@
     "test:smoke": "node scripts/smoke-playwright.mjs",
     "test:offline-smoke": "node scripts/smoke-offline-service-worker.mjs",
     "test:globe3d-smoke": "node scripts/smoke-globe3d.mjs",
-    "build": "npm run check:syntax && npm run check:sw && npm run check:pages-size && npm run check:popup-sinks && npm run validate:data && npm run test:i18n && npm run test:alerts && npm run test:peak-surge && npm run test:tides && npm run test:url-state && npm run test:filter-state && npm run test:settings && npm run test:search-history && npm run test:impact-scraper && npm run test:impact-utils && npm run test:report-export && npm run test:qgis-export && npm run test:similarity-vectors && npm run test:cone-utils && npm run test:cone-retro && npm run test:art-mode && npm run test:prep && npm run test:evac && npm run test:poster && npm run test:storm-events && npm run test:globe3d-utils && npm run test:exposure-utils && npm run test:hurdat2-refresh && npm run test:goes-realtime && npm run test:active-polling && npm run test:active-products && npm run test:bundle-audit && npm run test:cdn-worker && npm run test:dockerfile",
+    "build": "npm run check:syntax && npm run check:sw && npm run check:pages-size && npm run check:popup-sinks && npm run validate:data && npm run test:i18n && npm run test:alerts && npm run test:peak-surge && npm run test:tides && npm run test:url-state && npm run test:filter-state && npm run test:settings && npm run test:platform-enhancements && npm run test:search-history && npm run test:impact-scraper && npm run test:impact-utils && npm run test:report-export && npm run test:qgis-export && npm run test:similarity-vectors && npm run test:cone-utils && npm run test:cone-retro && npm run test:art-mode && npm run test:prep && npm run test:evac && npm run test:poster && npm run test:storm-events && npm run test:globe3d-utils && npm run test:exposure-utils && npm run test:hurdat2-refresh && npm run test:goes-realtime && npm run test:active-polling && npm run test:active-products && npm run test:bundle-audit && npm run test:cdn-worker && npm run test:dockerfile",
     "test": "npm run build && npm run test:smoke && npm run test:offline-smoke && npm run test:globe3d-smoke"
   },
   "devDependencies": {

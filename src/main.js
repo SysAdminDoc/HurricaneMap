@@ -24,6 +24,7 @@ import {
 } from './filter-state.js';
 import { closeAllPanels } from './panels.js';
 import { initGlobalErrorSurface } from './errors.js';
+import { initHeaderTooltips } from './tooltips.js';
 
 initGlobalErrorSurface();
 
@@ -315,6 +316,7 @@ async function boot() {
   applyFilters();
   wireUI();
   wireSettingsControls();
+  initHeaderTooltips();
   // 174-year timeline ribbon along the bottom edge.
   mountTimeline(getLandfalls(), {
     yearMin: YEAR_MIN_DEFAULT,

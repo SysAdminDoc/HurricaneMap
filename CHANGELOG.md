@@ -11,6 +11,7 @@ All notable changes to HurricaneMap.
 - A fully offline preparedness panel now provides a persistent localized supply checklist and household-scaled three-day go-kit/two-week stay-home water and food calculator, with Ready.gov and Red Cross guidance links.
 - A Florida-first evacuation-zone lookup now checks addresses or selected map points against the state-published ArcGIS layer, links every result to official verification, and degrades to official Florida, Virginia, Maryland, and Massachusetts resources during service failures or for uncovered locations.
 - A filter-aware gallery mode now draws the selected historical tracks as a deterministic 1800×1200 density poster, with lifetime-weighted strokes, intensity color ramps, theme-aware artwork, and NOAA/NHC HURDAT2 attribution baked into the PNG export.
+- Header hints now use non-disruptive `popover="hint"` semantics and CSS anchor positioning where supported, while fixed-coordinate tooltips and the existing settings placement remain complete fallbacks for older browsers.
 
 ### Fixed
 - Generated storm data now writes a deterministic `storms.json.gz`, validates compressed/uncompressed parity, ranks tropical storms above tropical depressions across panels/sorts/tide selection, and records genuine preprocessing provenance.

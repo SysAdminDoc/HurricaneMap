@@ -68,6 +68,7 @@ const SHELL_ASSETS = [
   './src/prep.js',
   './src/evac.js',
   './src/poster.js',
+  './src/tooltips.js',
   './src/population.js',
   './src/qgis.js',
   './src/radar.js',
