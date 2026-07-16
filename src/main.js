@@ -16,7 +16,7 @@ import { initServiceWorkerUpdates } from './sw-updates.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
-  applyHashToFilters, createDefaultFilters, encodeHashState,
+  applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
 } from './url-state.js';
 import {
   hasActiveFilters, isYearFiltered, resetPrimaryFilters, resetYearRange,
@@ -295,6 +295,8 @@ async function boot() {
   await loadInitial();
   syncYearBoundsFromData();
   populateStateFilter();
+  // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.
+  const startupLauncherAction = launcherActionFromHash(location.hash);
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
   const restored = applyHashToFilters(filters, location.hash, {
@@ -361,17 +363,13 @@ async function boot() {
     setTimeout(() => openStateLazy(restored.s), 80);
   }
   // PWA launcher shortcuts use bare hash tokens (manifest.webmanifest).
-  const bareHash = (location.hash || '').replace(/^#/, '');
-  if (bareHash === 'stats') {
-    setTimeout(() => document.getElementById('toggle-stats')?.click(), 120);
-  } else if (bareHash === 'compare') {
-    setTimeout(() => document.getElementById('toggle-compare')?.click(), 120);
-  }
+  openLauncherAction(startupLauncherAction);
   // Live permalink navigation: pasting a new hash into this open tab (or
   // back/forward across hash entries) re-applies the shared view. Our own
   // hash writes use history.replaceState, which never fires hashchange, so
   // this only reacts to real navigation.
   window.addEventListener('hashchange', () => {
+    const launcherAction = launcherActionFromHash(location.hash);
     const nav = applyHashToFilters(filters, location.hash, {
       yearMinDefault: YEAR_MIN_DEFAULT,
       yearMaxDefault: YEAR_MAX_DEFAULT,
@@ -387,10 +385,16 @@ async function boot() {
     if (nav?.s && filters.state === nav.s) {
       setTimeout(() => openStateLazy(nav.s), 80);
     }
+    openLauncherAction(launcherAction, 60);
   });
 
   // First-run tour is delayed until the map, filters, and timeline are stable.
   setTimeout(() => maybeStartOnboardingLazy(), 700);
+}
+
+function openLauncherAction(action, delay = 120) {
+  const buttonId = action === 'stats' ? 'toggle-stats' : action === 'compare' ? 'toggle-compare' : null;
+  if (buttonId) setTimeout(() => document.getElementById(buttonId)?.click(), delay);
 }
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in

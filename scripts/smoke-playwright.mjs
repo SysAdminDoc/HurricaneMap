@@ -531,6 +531,12 @@ try {
   assert(restored.categories.length === 6 && restored.categories.every(category => category.on && category.pressed === 'true'), 'invalid category hash did not restore default categories');
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
 
+  const shortcutPage = await context.newPage();
+  await shortcutPage.goto(`${baseUrl}/#stats`, { waitUntil: 'domcontentloaded' });
+  await waitForAppReady(shortcutPage);
+  await shortcutPage.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+  await shortcutPage.close();
+
   await page.click('#toggle-info');
   await page.waitForFunction(() => {
     const modal = document.querySelector('#info-modal');
@@ -706,6 +712,7 @@ try {
   await page.click('#toggle-stats');
   await page.waitForSelector('#climatology-chart .clim-legend-item', { timeout: 15000 });
   await page.waitForSelector('#decade-trends-chart .dt-row', { timeout: 15000 });
+  await page.waitForSelector('#climate-trends-chart svg', { timeout: 15000 });
   const stats = await page.evaluate(() => {
     const climatologyText = document.querySelector('#climatology-chart')?.textContent || '';
     const decadeAceValues = [...document.querySelectorAll('#decade-trends-chart .dt-ace')]

@@ -3,6 +3,12 @@ export const YEAR_FALLBACK_MAX = 2025;
 export const CATEGORY_DEFAULTS = Object.freeze(['ts', '1', '2', '3', '4', '5']);
 
 const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
+const LAUNCHER_ACTIONS = new Set(['stats', 'compare']);
+
+export function launcherActionFromHash(hash) {
+  const raw = String(hash || '').replace(/^#/, '').trim().toLowerCase();
+  return LAUNCHER_ACTIONS.has(raw) ? raw : null;
+}
 
 export function categoryHashDefault() {
   return [...CATEGORY_DEFAULTS].sort().join(',');

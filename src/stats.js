@@ -1,6 +1,6 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { t } from './i18n.js';
-import { getStats, getLandfalls, getAllStorms } from './data.js';
+import { getStats, getLandfalls, getAllStorms, ensureStormsLoaded } from './data.js';
 import { hidePanel, showPanel } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
@@ -135,14 +135,17 @@ function render() {
 
   const ctHost = document.getElementById('climate-trends-chart');
   if (ctHost) {
-    try {
-      const allStorms = getAllStorms();
-      const trends = computeClimateTrends(allStorms);
+    ctHost.innerHTML = '<p class="panel-muted">Loading climate trends…</p>';
+    ensureStormsLoaded().then(() => {
+      if (!ctHost.isConnected) return;
+      const trends = computeClimateTrends(getAllStorms());
       if (trends) renderClimateTrendsChart(ctHost, trends);
       else ctHost.innerHTML = '<p class="panel-muted">No trend data available.</p>';
-    } catch (e) {
-      ctHost.innerHTML = `<p class="panel-inline-error">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
-    }
+    }).catch(e => {
+      if (ctHost.isConnected) {
+        ctHost.innerHTML = `<p class="panel-inline-error">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+      }
+    });
   }
 
   // Fetch and render the current NOAA seasonal outlook

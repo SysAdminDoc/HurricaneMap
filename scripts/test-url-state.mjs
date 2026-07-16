@@ -5,8 +5,13 @@ import {
   createDefaultFilters,
   decodeHashState,
   encodeHashState,
+  launcherActionFromHash,
   restoreFiltersFromHash,
 } from '../src/url-state.js';
+
+assert.equal(launcherActionFromHash('#stats'), 'stats');
+assert.equal(launcherActionFromHash('compare'), 'compare');
+assert.equal(launcherActionFromHash('#storm=AL122005'), null);
 
 function cats(filters) {
   return [...filters.categories].sort();
