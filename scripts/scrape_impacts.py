@@ -50,6 +50,12 @@ WIKI_API = "https://en.wikipedia.org/w/api.php"
 USER_AGENT = "HurricaneMap-ImpactsScraper/0.1 (https://github.com/SysAdminDoc/HurricaneMap)"
 IMPACT_SCHEMA_VERSION = 1
 SCRAPER_NAME = "scripts/scrape_impacts.py"
+DERIVED_IMPACT_FIELDS = {
+    "deaths_total", "deaths_min", "deaths_max", "deaths_qualifier",
+    "damage_usd_nominal", "damage_millions_usd", "damage_source_units",
+    "damage_qualifier", "damage_usd_min", "damage_usd_max",
+    "impact_schema_version", "impact_provenance",
+}
 
 
 def http_get(url: str, timeout: int = 30) -> str | None:
@@ -154,6 +160,9 @@ def clean_source_text(value: str | None) -> str:
             value = value.encode("cp1252").decode("utf-8")
         except UnicodeError:
             pass
+    # A legacy decode path replaced the en dash in numeric ranges with U+FFFD.
+    # The surrounding digits make this repair unambiguous (`200�250`).
+    value = re.sub(r"(?<=\d)\ufffd(?=\d)", "–", value)
     value = value.replace("\xa0", " ").replace("&nbsp;", " ")
     value = re.sub(r"\[[^\]]+\]", "", value)
     value = re.sub(r"\s+", " ", value).strip()
@@ -230,12 +239,14 @@ def parse_damage(raw: str | None, suffix: str | None = None, prefix: str | None 
     context = clean_source_text(" ".join(part for part in (prefix, raw, suffix) if part)).lower()
     has_explicit_unit = any(token in context for token in ("trillion", "billion", "million", "thousand"))
     has_plus_expression = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*\+\s*\d", text))
-    value = sum(numbers) if has_plus_expression and not has_explicit_unit else numbers[0]
+    has_range = bool(re.search(r"\d[\d,]*(?:\.\d+)?\s*(?:-|–|—|to)\s*\$?\s*\d", text, re.IGNORECASE))
+    range_values = sorted(numbers[:2]) if has_range and len(numbers) >= 2 else None
+    value = range_values[1] if range_values else (sum(numbers) if has_plus_expression and not has_explicit_unit else numbers[0])
 
-    qualifier = "computed_sum" if has_plus_expression and not has_explicit_unit else "exact"
-    if any(token in context for token in ("≥", "at least", "over ")) or ("+" in context and not has_plus_expression):
+    qualifier = "range_high" if range_values else ("computed_sum" if has_plus_expression and not has_explicit_unit else "exact")
+    if not range_values and (any(token in context for token in ("≥", "at least", "over ")) or ("+" in context and not has_plus_expression)):
         qualifier = "minimum"
-    elif any(token in context for token in ("about", "approx", "approximately", "~")):
+    elif not range_values and any(token in context for token in ("about", "approx", "approximately", "~")):
         qualifier = "approximate"
 
     unit = "usd"
@@ -259,12 +270,16 @@ def parse_damage(raw: str | None, suffix: str | None = None, prefix: str | None 
         multiplier = 1_000_000.0
 
     usd = int(round(value * multiplier))
-    return {
+    parsed = {
         "damage_usd_nominal": usd,
         "damage_millions_usd": round(usd / 1_000_000, 6),
         "damage_source_units": unit,
         "damage_qualifier": qualifier,
     }
+    if range_values:
+        parsed["damage_usd_min"] = int(round(range_values[0] * multiplier))
+        parsed["damage_usd_max"] = int(round(range_values[1] * multiplier))
+    return parsed
 
 
 def utc_now() -> str:
@@ -272,19 +287,24 @@ def utc_now() -> str:
 
 
 def normalize_impact_record(record: dict, *, parsed_at_utc: str | None = None) -> dict:
-    out = dict(record)
+    # Rebuild derived fields from the raw strings while preserving the stable
+    # raw -> derived -> provenance ordering used by the checked-in dataset.
+    out = {key: value for key, value in record.items() if key not in DERIVED_IMPACT_FIELDS}
     raw_deaths = out.get("deaths")
     raw_damage = out.get("damages")
     if raw_deaths:
         out["deaths"] = clean_source_text(raw_deaths)
     if raw_damage:
         out["damages"] = clean_source_text(raw_damage)
+    for key in ("damage_prefix", "damage_suffix"):
+        if out.get(key):
+            out[key] = clean_source_text(out[key])
 
     out.update(parse_deaths(out.get("deaths")))
     out.update(parse_damage(
         out.get("damages"),
-        suffix=out.pop("damage_suffix", None),
-        prefix=out.pop("damage_prefix", None),
+        suffix=out.get("damage_suffix"),
+        prefix=out.get("damage_prefix"),
     ))
     out["impact_schema_version"] = IMPACT_SCHEMA_VERSION
     out["impact_provenance"] = {
@@ -302,6 +322,16 @@ def existing_parsed_at(record: dict, fallback: str) -> str:
         if isinstance(parsed_at, str) and parsed_at:
             return parsed_at
     return fallback
+
+
+def normalize_impact_records(records: dict, fallback_stamp: str) -> dict:
+    return {
+        key: normalize_impact_record(
+            records[key],
+            parsed_at_utc=existing_parsed_at(records[key], fallback_stamp),
+        )
+        for key in sorted(records)
+    }
 
 
 def extract_impacts(wikitext: str) -> dict | None:
@@ -360,11 +390,8 @@ def main():
 
     if args.normalize_existing:
         stamp = utc_now()
-        out_sorted = {
-            k: normalize_impact_record(out[k], parsed_at_utc=existing_parsed_at(out[k], stamp))
-            for k in sorted(out)
-        }
-        OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8")
+        out_sorted = normalize_impact_records(out, stamp)
+        OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
         print(f"Normalized {len(out_sorted)} existing impact rows.", file=sys.stderr)
         print(f"Wrote {OUT} ({OUT.stat().st_size / 1024:.1f} KB)", file=sys.stderr)
         return
@@ -387,11 +414,8 @@ def main():
 
     # Sort and write.
     stamp = utc_now()
-    out_sorted = {
-        k: normalize_impact_record(out[k], parsed_at_utc=stamp)
-        for k in sorted(out)
-    }
-    OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8")
+    out_sorted = normalize_impact_records(out, stamp)
+    OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
     print(f"Done. Found impacts for {len(out_sorted)} storms.", file=sys.stderr)
     print(f"Wrote {OUT} ({OUT.stat().st_size / 1024:.1f} KB)", file=sys.stderr)
 

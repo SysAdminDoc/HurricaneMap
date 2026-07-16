@@ -21,6 +21,7 @@ All notable changes to HurricaneMap.
 - Active storms now use only the real CurrentStorms position plus official NHC FeatureServer tracks/cones; unused polling APIs are gone; tide requests time out and retry with an exact ±48-hour residual window and retry UI; optional navigation performance entries fail soft.
 - Offline storage now bounds radar frames and prunes retired data records; the container image avoids a duplicate ownership layer and includes its manifest screenshot; rainfall and Storm Events builders reject incomplete/stale inputs; foreign Tamaulipas landfalls are no longer attributed to Texas; and the shell uses the compact favicon asset.
 - Shell styles now parse cleanly, use theme-safe tide/legend colors and consistent radii, avoid clipped header fades and dead focus rules, and keep filter/table/category rules deterministic; settings radio groups support roving arrow-key navigation, nested panels no longer create unnamed landmarks, and map/radar fallbacks match their live rendering invariants.
+- Impact refreshes preserve each row's real parse timestamp and MediaWiki damage prefix/suffix fields, repair the known numeric-range mojibake, and normalize damage ranges to an explicit low/high interval instead of treating the low bound as exact.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

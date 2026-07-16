@@ -387,6 +387,8 @@ for (const [stormId, impact] of Object.entries(impacts)) {
 
   if (!validOptionalString(impact.deaths)) fail(`${stormId}.deaths must be a string when present.`);
   if (!validOptionalString(impact.damages)) fail(`${stormId}.damages must be a string when present.`);
+  if (!validOptionalString(impact.damage_prefix)) fail(`${stormId}.damage_prefix must be a string when present.`);
+  if (!validOptionalString(impact.damage_suffix)) fail(`${stormId}.damage_suffix must be a string when present.`);
   if (!validOptionalString(impact.wiki_title)) fail(`${stormId}.wiki_title must be a string when present.`);
   if (!validOptionalString(impact.wiki_url)) fail(`${stormId}.wiki_url must be a string when present.`);
   if (impact.wiki_url != null && !/^https:\/\/en\.wikipedia\.org\/wiki\//.test(impact.wiki_url)) {
@@ -433,6 +435,18 @@ for (const [stormId, impact] of Object.entries(impacts)) {
     }
     if (typeof impact.damage_qualifier !== 'string' || !impact.damage_qualifier) {
       fail(`${stormId}.damage_qualifier is required when damage is present.`);
+    }
+    if (impact.damage_usd_min != null || impact.damage_usd_max != null) {
+      if (!validNonNegativeInteger(impact.damage_usd_min)) fail(`${stormId}.damage_usd_min must be a non-negative integer.`);
+      if (!validNonNegativeInteger(impact.damage_usd_max)) fail(`${stormId}.damage_usd_max must be a non-negative integer.`);
+      if (validNonNegativeInteger(impact.damage_usd_min) && validNonNegativeInteger(impact.damage_usd_max)) {
+        if (impact.damage_usd_min > impact.damage_usd_nominal || impact.damage_usd_nominal > impact.damage_usd_max) {
+          fail(`${stormId}.damage_usd_nominal must fall inside its damage range.`);
+        }
+      }
+    }
+    if (impact.damage_qualifier === 'range_high' && (impact.damage_usd_min == null || impact.damage_usd_max == null)) {
+      fail(`${stormId}: range_high damage requires damage_usd_min and damage_usd_max.`);
     }
   }
 }
