@@ -122,7 +122,12 @@ function resetMarkerStyle(marker) {
   // Restore the exact creation style — hardcoded constants here drifted from
   // renderLandfalls (e.g. a major hurricane's 2.2 border became 1.2 after the
   // first hover and never came back).
-  marker.setStyle(marker._baseStyle || { weight: 1.2, color: '#0a0f1a', radius: marker._baseRadius || 4 });
+  const radius = marker._baseRadius || 4;
+  marker.setStyle(marker._baseStyle || {
+    weight: radius >= radiusForCategory(3) ? 2.2 : 1.6,
+    color: '#0a0f1a',
+    radius,
+  });
 }
 
 function ensureLandfallTooltip() {
@@ -240,7 +245,7 @@ export function focusLandfall(lf, panTo = true) {
     marker.setStyle({
       weight: 3,
       color: '#f7fbff',
-      radius: (marker._baseRadius || 6) + 4,
+      radius: (marker._baseRadius || 4) + 4,
     });
     if (panTo) {
       const target = [lf.lat, lf.lon];

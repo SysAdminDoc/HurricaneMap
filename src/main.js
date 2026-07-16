@@ -410,28 +410,26 @@ function wireSettingsControls() {
   const menu = document.getElementById('settings-menu');
   if (!cog || !menu) return;
 
+  function syncRadioGroup(selector, setting, dataKey) {
+    const buttons = [...menu.querySelectorAll(selector)];
+    let selected = null;
+    for (const btn of buttons) {
+      const checked = btn.dataset[dataKey] === getSetting(setting);
+      btn.classList.toggle('on', checked);
+      btn.setAttribute('aria-checked', String(checked));
+      btn.tabIndex = checked ? 0 : -1;
+      if (checked) selected = btn;
+    }
+    if (!selected && buttons[0]) buttons[0].tabIndex = 0;
+  }
+
   // Reflect current settings into the menu controls.
   function syncMenu() {
-    menu.querySelectorAll('[data-set-unit]').forEach(btn => {
-      btn.classList.toggle('on', btn.dataset.setUnit === getSetting('windUnit'));
-      btn.setAttribute('aria-checked', String(btn.dataset.setUnit === getSetting('windUnit')));
-    });
-    menu.querySelectorAll('[data-set-theme]').forEach(btn => {
-      btn.classList.toggle('on', btn.dataset.setTheme === getSetting('theme'));
-      btn.setAttribute('aria-checked', String(btn.dataset.setTheme === getSetting('theme')));
-    });
-    menu.querySelectorAll('[data-set-palette]').forEach(btn => {
-      btn.classList.toggle('on', btn.dataset.setPalette === getSetting('palette'));
-      btn.setAttribute('aria-checked', String(btn.dataset.setPalette === getSetting('palette')));
-    });
-    menu.querySelectorAll('[data-set-locale]').forEach(btn => {
-      btn.classList.toggle('on', btn.dataset.setLocale === getSetting('locale'));
-      btn.setAttribute('aria-checked', String(btn.dataset.setLocale === getSetting('locale')));
-    });
-    menu.querySelectorAll('[data-set-damage]').forEach(btn => {
-      btn.classList.toggle('on', btn.dataset.setDamage === getSetting('damageMode'));
-      btn.setAttribute('aria-checked', String(btn.dataset.setDamage === getSetting('damageMode')));
-    });
+    syncRadioGroup('[data-set-unit]', 'windUnit', 'setUnit');
+    syncRadioGroup('[data-set-theme]', 'theme', 'setTheme');
+    syncRadioGroup('[data-set-palette]', 'palette', 'setPalette');
+    syncRadioGroup('[data-set-locale]', 'locale', 'setLocale');
+    syncRadioGroup('[data-set-damage]', 'damageMode', 'setDamage');
     const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
     if (coneToggle) {
       coneToggle.checked = getSetting('nhcForecastCone');
@@ -468,6 +466,25 @@ function wireSettingsControls() {
     if (l) { setSetting('locale', l.dataset.setLocale); location.reload(); return; }
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
+  });
+
+  menu.addEventListener('keydown', (event) => {
+    const radio = event.target.closest?.('.settings-pill[role="radio"]');
+    if (!radio) return;
+    const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+    const radios = [...radio.closest('[role="radiogroup"]')?.querySelectorAll('[role="radio"]') || []]
+      .filter(candidate => !candidate.disabled);
+    if (!radios.length) return;
+    const current = Math.max(0, radios.indexOf(radio));
+    let next = current;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = radios.length - 1;
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (current + 1) % radios.length;
+    else next = (current - 1 + radios.length) % radios.length;
+    event.preventDefault();
+    radios[next].focus();
+    radios[next].click();
   });
 
   const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');

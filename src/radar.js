@@ -31,7 +31,7 @@
 //   prcomp: 1000 x 1000 px @ 0.01°  -> [[13.1, -71.07], [23.1, -61.07]]
 //
 // The PNGs are indexed-palette with black background for "no echo". We render
-// them through `mix-blend-mode: lighten` so only the colored reflectivity
+// them through `mix-blend-mode: screen` so only the colored reflectivity
 // shows through on the dark basemap.
 
 import { formatTime } from './data.js';

@@ -308,6 +308,10 @@ async function assertSettingsSurface(page, label) {
       position: style?.position || '',
       overflowY: style?.overflowY || '',
       helperCount: document.querySelectorAll('#settings-menu .settings-help, #settings-menu .settings-toggle-copy small').length,
+      radioGroups: [...document.querySelectorAll('#settings-menu [role="radiogroup"]')].map(group => ({
+        checked: group.querySelectorAll('[role="radio"][aria-checked="true"]').length,
+        tabbable: [...group.querySelectorAll('[role="radio"]')].filter(radio => radio.tabIndex === 0).length,
+      })),
       focusables,
     };
   });
@@ -320,8 +324,24 @@ async function assertSettingsSurface(page, label) {
   assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
   assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
   assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
+  assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
+  assert(layout.radioGroups.every(group => group.checked === 1 && group.tabbable === 1), `${label}: settings radios do not use one checked/tabbable item per group`);
   const cramped = layout.focusables.filter(item => item.height < 34);
   assert(!cramped.length, `${label}: settings controls are too small: ${cramped.map(item => `${item.text}:${item.height}`).join(', ')}`);
+  const priorUnit = await page.evaluate(() => {
+    const selected = document.querySelector('[data-set-unit][aria-checked="true"]');
+    selected?.focus();
+    return selected?.dataset.setUnit || '';
+  });
+  await page.keyboard.press('ArrowRight');
+  const nextUnit = await page.evaluate(() => ({
+    value: document.querySelector('[data-set-unit][aria-checked="true"]')?.dataset.setUnit || '',
+    focused: document.activeElement?.dataset?.setUnit || '',
+    tabbable: [...document.querySelectorAll('[data-set-unit]')].filter(radio => radio.tabIndex === 0).length,
+  }));
+  assert(nextUnit.value && nextUnit.value !== priorUnit, `${label}: ArrowRight did not select the next wind-unit radio`);
+  assert(nextUnit.focused === nextUnit.value && nextUnit.tabbable === 1, `${label}: radio focus did not rove with selection`);
+  await page.keyboard.press('ArrowLeft');
   await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
 }
 
@@ -515,6 +535,15 @@ try {
 
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
+
+  const hasPanelKeyframes = await page.evaluate(() => [...document.styleSheets].some(sheet => {
+    try {
+      return [...sheet.cssRules].some(rule => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'slideInPanel');
+    } catch {
+      return false;
+    }
+  }));
+  assert(hasPanelKeyframes, 'slideInPanel keyframes were swallowed by an invalid preceding CSS selector');
 
   const restored = await page.evaluate(() => ({
     hash: location.hash,
