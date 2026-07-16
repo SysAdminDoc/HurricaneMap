@@ -5,6 +5,8 @@
 // module renders a direct link to the official outlook with historical accuracy
 // context that helps users interpret the forecast.
 
+import { escapeHtml, safeExternalUrl } from './html-utils.js';
+
 const CPC_URL = 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
 
 const SKILL_DATA = {
@@ -55,17 +57,24 @@ export async function fetchSeasonalOutlook() {
 }
 
 function renderCurrentSeasonRows(current) {
-  const rows = current.sources.map(source => `
+  const rows = current.sources.map(source => {
+    const agency = escapeHtml(source.agency);
+    const sourceUrl = safeExternalUrl(source.url);
+    const agencyHtml = sourceUrl
+      ? `<a class="sob-agency" href="${sourceUrl}" target="_blank" rel="noopener">${agency}</a>`
+      : `<span class="sob-agency">${agency}</span>`;
+    return `
     <div class="sob-row">
-      <a class="sob-agency" href="${source.url}" target="_blank" rel="noopener">${source.agency}</a>
-      <span class="sob-numbers">${source.named} named · ${source.hurricanes} hurricanes · ${source.majors} major</span>
-      <span class="sob-issued">${source.probability ? `${source.probability} · ` : ''}issued ${source.issued}</span>
-    </div>`).join('');
+      ${agencyHtml}
+      <span class="sob-numbers">${escapeHtml(source.named)} named · ${escapeHtml(source.hurricanes)} hurricanes · ${escapeHtml(source.majors)} major</span>
+      <span class="sob-issued">${source.probability ? `${escapeHtml(source.probability)} · ` : ''}issued ${escapeHtml(source.issued)}</span>
+    </div>`;
+  }).join('');
   return `
     <div class="sob-current">
       <div class="sob-headline">
-        <strong>${current.season} ${current.basin}: ${current.headline}</strong>
-        <span class="sob-enso">${current.enso}</span>
+        <strong>${escapeHtml(current.season)} ${escapeHtml(current.basin)}: ${escapeHtml(current.headline)}</strong>
+        <span class="sob-enso">${escapeHtml(current.enso)}</span>
       </div>
       ${rows}
     </div>`;

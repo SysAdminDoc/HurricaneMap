@@ -52,7 +52,7 @@ export async function showHwm(stormId) {
       fillOpacity: 0.85,
       className: 'hwm-marker',
     }).bindTooltip(
-      `${t('hwm.mark')}: ${elevFt.toFixed(1)} ft · ${env === 'R' ? t('hwm.riverine') : t('hwm.coastal')}`,
+      `${t('hwm.mark')}: ${escapeText(elevFt.toFixed(1))} ft · ${env === 'R' ? t('hwm.riverine') : t('hwm.coastal')}`,
       { direction: 'top' },
     ).addTo(nextLayerGroup);
   }

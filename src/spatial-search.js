@@ -202,8 +202,8 @@ function renderResults(results, lat, lon) {
     <ul class="sp-list">
       ${results.map(r => `
         <li data-sid="${escapeHtml(r.storm_id)}" tabindex="0">
-          <span class="sp-name">${escapeHtml(formatStormName(r.name))} ${r.year}</span>
-          <span class="sp-meta">${escapeHtml(categoryLabel(r.category))} · ${r.distance_mi} mi${r.bearing ? ` ${r.bearing}` : ''}${r.wind_at_closest ? ` · ${r.wind_at_closest} kt` : ''}</span>
+          <span class="sp-name">${escapeHtml(formatStormName(r.name))} ${escapeHtml(r.year)}</span>
+          <span class="sp-meta">${escapeHtml(categoryLabel(r.category))} · ${escapeHtml(r.distance_mi)} mi${r.bearing ? ` ${escapeHtml(r.bearing)}` : ''}${r.wind_at_closest ? ` · ${escapeHtml(r.wind_at_closest)} kt` : ''}</span>
         </li>
       `).join('')}
     </ul>
