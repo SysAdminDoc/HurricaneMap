@@ -9,7 +9,15 @@ import {
   activeFeedStatusText,
   computeActivePollDelay,
   formatUtcClock,
+  isPotentialTropicalCyclone,
+  pronunciationUrlForActiveStorm,
 } from '../src/active-polling.js';
+
+assert.equal(isPotentialTropicalCyclone({ classification: 'Potential Tropical Cyclone' }), true);
+assert.equal(isPotentialTropicalCyclone({ classification: 'PTC' }), true);
+assert.equal(isPotentialTropicalCyclone({ classification: 'Tropical Storm' }), false);
+assert.match(pronunciationUrlForActiveStorm({ id: 'EP052026' }), /epac\.pdf$/);
+assert.match(pronunciationUrlForActiveStorm({ id: 'AL052026' }), /atlc\.pdf$/);
 
 assert.equal(
   computeActivePollDelay({ ok: true, stormCount: 2 }),

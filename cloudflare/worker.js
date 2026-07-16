@@ -25,6 +25,11 @@ const POLICIES = {
 
 const NHC_PROXY_ALLOWLIST = {
   '/nhc/CurrentStorms.json': 'https://www.nhc.noaa.gov/CurrentStorms.json',
+  '/nhc/outlook/atl.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_atl.kmz',
+  '/nhc/outlook/pac.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_pac.kmz',
+  '/nhc/outlook/cpac.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_cpac.kmz',
+  '/nhc/marine/atlantic.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml',
+  '/nhc/marine/pacific.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml',
 };
 
 const NHC_POLICY = {
@@ -41,7 +46,7 @@ export default {
 
     const requestUrl = new URL(request.url);
 
-    const nhcTarget = NHC_PROXY_ALLOWLIST[requestUrl.pathname];
+    const nhcTarget = nhcProxyTargetFor(requestUrl.pathname);
     if (nhcTarget) {
       return handleNhcProxy(nhcTarget, request, ctx);
     }
@@ -86,6 +91,10 @@ async function handleNhcProxy(targetUrl, request, ctx) {
     ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
   }
   return toRequestMethod(addCorsHeaders(tagCacheStatus(finalResponse, 'MISS')), request.method);
+}
+
+export function nhcProxyTargetFor(pathname) {
+  return NHC_PROXY_ALLOWLIST[normalizePath(pathname)] || null;
 }
 
 function addCorsHeaders(response) {

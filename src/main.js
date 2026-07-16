@@ -434,6 +434,14 @@ function wireSettingsControls() {
     if (coneToggle) {
       coneToggle.checked = getSetting('nhcForecastCone');
     }
+    const outlookToggle = menu.querySelector('#toggle-nhc-outlook');
+    if (outlookToggle) {
+      outlookToggle.checked = getSetting('nhcOutlook');
+    }
+    const marineToggle = menu.querySelector('#toggle-marine-warnings');
+    if (marineToggle) {
+      marineToggle.checked = getSetting('marineWarnings');
+    }
     const goesToggle = menu.querySelector('#toggle-goes-realtime');
     if (goesToggle) {
       goesToggle.checked = getSetting('goesRealtime');
@@ -491,6 +499,20 @@ function wireSettingsControls() {
   if (coneToggle) {
     coneToggle.addEventListener('change', () => {
       setSetting('nhcForecastCone', coneToggle.checked);
+    });
+  }
+
+  const outlookToggle = menu.querySelector('#toggle-nhc-outlook');
+  if (outlookToggle) {
+    outlookToggle.addEventListener('change', () => {
+      setSetting('nhcOutlook', outlookToggle.checked);
+    });
+  }
+
+  const marineToggle = menu.querySelector('#toggle-marine-warnings');
+  if (marineToggle) {
+    marineToggle.addEventListener('change', () => {
+      setSetting('marineWarnings', marineToggle.checked);
     });
   }
 

@@ -8,6 +8,8 @@ const settings = normalizeSettings({
   palette: 'colorblind',
   damageMode: 'invalid',
   nhcForecastCone: false,
+  nhcOutlook: false,
+  marineWarnings: true,
   goesRealtime: true,
   highContrast: true,
   reducedMotion: true,
@@ -21,6 +23,8 @@ assert.equal(settings.theme, 'dark');
 assert.equal(settings.palette, 'colorblind');
 assert.equal(settings.damageMode, 'real');
 assert.equal(settings.nhcForecastCone, false);
+assert.equal(settings.nhcOutlook, false);
+assert.equal(settings.marineWarnings, true);
 assert.equal(settings.goesRealtime, true);
 assert.equal(settings.highContrast, true);
 assert.equal(settings.reducedMotion, true);

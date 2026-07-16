@@ -664,6 +664,81 @@ try {
   assert(alertOverlay.paths >= 2, `expected zone polygons in the SVG pane, got ${alertOverlay.paths}`);
   assert(alertOverlay.hatch, 'pink/blue hatch pattern was not installed in the map SVG defs');
   assert(/Hurricane Warning/.test(alertOverlay.legendText) && /Hurricane Watch \+ Tropical Storm Warning/.test(alertOverlay.legendText), `alert legend incomplete: ${alertOverlay.legendText}`);
+
+  // Operational NHC product parity: the near-zero formation style renders as
+  // a gray X and the opt-in marine feed produces warning polygons + legend.
+  const operationalLayers = await page.evaluate(async () => {
+    const outlook = await import('/src/outlook.js');
+    const marine = await import('/src/marine-warnings.js');
+    const { getMap } = await import('/src/map.js');
+    const kml = `<?xml version="1.0"?><kml><Document><Placemark><styleUrl>#zerox</styleUrl><ExtendedData><Data name="Disturbance"><value>1</value></Data><Data name="2day_percentage"><value>Near 0%</value></Data><Data name="2day_category"><value>NearZero</value></Data><Data name="7day_percentage"><value>Near 0%</value></Data><Data name="7day_category"><value>NearZero</value></Data></ExtendedData><Point><coordinates>-70,20,0</coordinates></Point></Placemark></Document></kml>`;
+    const marineKml = `<?xml version="1.0"?><kml><Document><Placemark><name>Hurricane force possible</name><styleUrl>#high</styleUrl><Polygon><outerBoundaryIs><LinearRing><coordinates>-75,25 -74,25 -74,26 -75,25</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>`;
+    const storedZip = (filename, contents) => {
+      const name = new TextEncoder().encode(filename);
+      const data = new TextEncoder().encode(contents);
+      const local = new Uint8Array(30 + name.length + data.length);
+      const localView = new DataView(local.buffer);
+      localView.setUint32(0, 0x04034b50, true);
+      localView.setUint16(4, 20, true);
+      localView.setUint32(18, data.length, true);
+      localView.setUint32(22, data.length, true);
+      localView.setUint16(26, name.length, true);
+      local.set(name, 30);
+      local.set(data, 30 + name.length);
+      const central = new Uint8Array(46 + name.length);
+      const centralView = new DataView(central.buffer);
+      centralView.setUint32(0, 0x02014b50, true);
+      centralView.setUint16(4, 20, true);
+      centralView.setUint16(6, 20, true);
+      centralView.setUint32(20, data.length, true);
+      centralView.setUint32(24, data.length, true);
+      centralView.setUint16(28, name.length, true);
+      central.set(name, 46);
+      const end = new Uint8Array(22);
+      const endView = new DataView(end.buffer);
+      endView.setUint32(0, 0x06054b50, true);
+      endView.setUint16(8, 1, true);
+      endView.setUint16(10, 1, true);
+      endView.setUint32(12, central.length, true);
+      endView.setUint32(16, local.length, true);
+      const zip = new Uint8Array(local.length + central.length + end.length);
+      zip.set(local);
+      zip.set(central, local.length);
+      zip.set(end, local.length + central.length);
+      return zip;
+    };
+    const kmz = storedZip('doc.kml', kml);
+    const realFetch = window.fetch;
+    window.fetch = async url => String(url).includes('/nhc/outlook/')
+      ? new Response(kmz, { status: 200 })
+      : String(url).includes('/nhc/marine/')
+        ? new Response(marineKml, { status: 200 })
+        : realFetch(url);
+    try {
+      const [outlookResult, marineResult] = await Promise.all([
+        outlook.renderTropicalOutlook({ map: getMap(), enabled: true, force: true }),
+        marine.renderMarineWarnings({ map: getMap(), enabled: true, force: true }),
+      ]);
+      const grayX = document.querySelector('.nhc-outlook-x--near-zero');
+      const marineLegend = document.querySelector('#marine-warning-legend');
+      const snapshot = {
+        outlookResult,
+        marineResult,
+        grayX: grayX ? getComputedStyle(grayX).color : '',
+        marinePaths: document.querySelectorAll('path.marine-warning-zone').length,
+        marineLegend: marineLegend && !marineLegend.hidden ? marineLegend.textContent : '',
+      };
+      outlook.clearTropicalOutlook();
+      marine.clearMarineWarnings();
+      return snapshot;
+    } finally {
+      window.fetch = realFetch;
+    }
+  });
+  assert(operationalLayers.outlookResult.status === 'rendered' && operationalLayers.outlookResult.pointCount === 3, `outlook overlay did not render: ${JSON.stringify(operationalLayers)}`);
+  assert(operationalLayers.grayX === 'rgb(147, 153, 178)', `near-zero outlook X was not gray: ${operationalLayers.grayX}`);
+  assert(operationalLayers.marineResult.status === 'rendered' && operationalLayers.marineResult.polygonCount === 2, `marine warning overlay did not render: ${JSON.stringify(operationalLayers)}`);
+  assert(operationalLayers.marinePaths >= 2 && /High/.test(operationalLayers.marineLegend), `marine warning rendering incomplete: ${JSON.stringify(operationalLayers)}`);
   // Synthetic ErrorEvent exercises the listener + toast without registering
   // as a real uncaught error (which would trip the pageerror assertions).
   await page.evaluate(() => {

@@ -4,6 +4,18 @@ export const ACTIVE_FEED_RETRY_MS = 15 * 60 * 1000;
 export const ACTIVE_FEED_RATE_LIMIT_MS = 2 * 60 * 60 * 1000;
 export const MAX_ACTIVE_FEED_BACKOFF_MS = 4 * 60 * 60 * 1000;
 
+export function isPotentialTropicalCyclone(storm) {
+  const classification = String(storm?.classification || '').trim().toLowerCase();
+  return classification === 'ptc' || classification.includes('potential tropical cyclone');
+}
+
+export function pronunciationUrlForActiveStorm(storm) {
+  const basin = `${storm?.id || ''} ${storm?.binNumber || ''}`.toUpperCase();
+  return /(?:^|\s)(?:EP|CP)\d/.test(basin)
+    ? 'https://www.nhc.noaa.gov/pdf/aboutnames_pronounce_epac.pdf'
+    : 'https://www.nhc.noaa.gov/pdf/aboutnames_pronounce_atlc.pdf';
+}
+
 export function computeActivePollDelay({
   ok,
   status = 0,

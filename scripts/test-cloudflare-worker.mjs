@@ -5,6 +5,7 @@ import {
   cachePolicyFor,
   classifyAsset,
   cloudflareFetchOptions,
+  nhcProxyTargetFor,
   originUrlFor,
 } from '../cloudflare/worker.js';
 
@@ -47,6 +48,13 @@ const imageOptions = cloudflareFetchOptions('/branding/logo.png', cachePolicyFor
 assert.equal(imageOptions.image.format, 'auto', 'image requests should opt into automatic image format negotiation');
 const radarOptions = cloudflareFetchOptions('/data/radar/Katrina-2005/t_200508291200.png', cachePolicyFor('/data/radar/Katrina-2005/t_200508291200.png'));
 assert.equal(radarOptions.image, undefined, 'radar frames should not be transformed because coordinates depend on exact rasters');
+
+assert.equal(nhcProxyTargetFor('/nhc/outlook/atl.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_atl.kmz');
+assert.equal(nhcProxyTargetFor('/nhc/outlook/pac.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_pac.kmz');
+assert.equal(nhcProxyTargetFor('/nhc/outlook/cpac.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_cpac.kmz');
+assert.equal(nhcProxyTargetFor('/nhc/marine/atlantic.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml');
+assert.equal(nhcProxyTargetFor('/nhc/marine/pacific.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml');
+assert.equal(nhcProxyTargetFor('/nhc/outlook/../../secrets'), null, 'proxy must reject every path outside the fixed allowlist');
 
 // Verify NHC proxy route is declared
 import workerModule from '../cloudflare/worker.js';

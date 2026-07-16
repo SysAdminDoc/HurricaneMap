@@ -12,6 +12,8 @@ const DEFAULTS = {
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   nhcForecastCone: true,   // Show official NHC forecast cone/track for active storms
+  nhcOutlook: true,        // Show NHC Graphical Tropical Weather Outlook disturbance points
+  marineWarnings: false,  // Opt in to broad 0-24 hour marine wind-warning polygons
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' | 'ht'
   highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
@@ -29,6 +31,8 @@ const VALID_VALUES = {
 
 const BOOLEAN_KEYS = new Set([
   'nhcForecastCone',
+  'nhcOutlook',
+  'marineWarnings',
   'goesRealtime',
   'highContrast',
   'reducedMotion',

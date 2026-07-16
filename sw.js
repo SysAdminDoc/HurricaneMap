@@ -26,6 +26,8 @@ const SHELL_ASSETS = [
   './manifest.webmanifest',
   './src/styles.css',
   './src/main.js',
+  './src/outlook.js',
+  './src/marine-warnings.js',
   './src/data.js',
   './src/errors.js',
   './src/map.js',

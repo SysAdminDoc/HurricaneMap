@@ -5,11 +5,13 @@
 // style.
 
 import { getMap } from './map.js';
-import { escapeHtml } from './html-utils.js';
+import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import {
   activeAdvisoryKey,
   activeFeedStatusText,
   computeActivePollDelay,
+  isPotentialTropicalCyclone,
+  pronunciationUrlForActiveStorm,
 } from './active-polling.js';
 import {
   clearOfficialForecastCache,
@@ -22,6 +24,8 @@ import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
 import { t } from './i18n.js';
+import { clearTropicalOutlook, renderTropicalOutlook } from './outlook.js';
+import { clearMarineWarnings, renderMarineWarnings } from './marine-warnings.js';
 
 const L = window.L;
 
@@ -54,11 +58,16 @@ export async function startActiveStormPolling() {
         renderActive(lastStorms);
       }
     }
+    if (e.detail.key === 'nhcOutlook' || e.detail.key === 'marineWarnings') {
+      renderOperationalLayers();
+    }
   });
   document.addEventListener('hm-locale:change', () => {
     if (lastStorms) renderActive(lastStorms);
+    renderOperationalLayers();
   });
 
+  await renderOperationalLayers();
   await fetchAndRender();
 }
 
@@ -105,6 +114,8 @@ async function fetchAndRender() {
     advisoryChanged,
   });
 
+  await renderOperationalLayers();
+
   if (!storms.length) {
     clearActiveLayers();
     hideGoesRealtimeContext();
@@ -115,7 +126,15 @@ async function fetchAndRender() {
     clearPeakSurgeCache();
     return;
   }
-  renderActive(storms);
+  await renderActive(storms);
+}
+
+async function renderOperationalLayers() {
+  const map = getMap();
+  await Promise.all([
+    renderTropicalOutlook({ map, enabled: getSetting('nhcOutlook') }),
+    renderMarineWarnings({ map, enabled: getSetting('marineWarnings') }),
+  ]);
 }
 
 function resolveProxyUrl() {
@@ -257,6 +276,39 @@ function distanceFromUser([stormLat, stormLon]) {
   }
 }
 
+export function activeStormDisplayName(storm) {
+  const name = String(storm?.name || '').trim();
+  if (name && name.toUpperCase() !== 'UNNAMED') return name;
+  const number = String(storm?.binNumber || storm?.id || '').match(/\d{1,2}/)?.[0] || '';
+  if (isPotentialTropicalCyclone(storm)) {
+    return `${t('active.ptc')}${number ? ` ${Number(number)}` : ''}`;
+  }
+  return number ? `${t('active.storm')} ${Number(number)}` : t('active.storm');
+}
+
+function activeStormCardHtml(storm, currentPoint) {
+  const name = activeStormDisplayName(storm);
+  const classification = isPotentialTropicalCyclone(storm)
+    ? t('active.ptc')
+    : String(storm.classification || '').trim();
+  const intensity = Number(storm.intensity);
+  const links = [
+    [safeExternalUrl(storm.publicAdvisory?.url), t('active.advisory')],
+    [safeExternalUrl(storm.forecastDiscussion?.url), t('active.discussion')],
+    [safeExternalUrl(pronunciationUrlForActiveStorm(storm)), t('active.pronunciation')],
+    ['https://www.nhc.noaa.gov/rip-currents/map.html', t('active.ripCurrents')],
+  ].filter(([url]) => url);
+  return `<article class="active-storm-card">
+    <h3>${escapeHtml(name)}</h3>
+    <p>${escapeHtml([
+      classification,
+      Number.isFinite(intensity) ? `${intensity} kt` : '',
+      currentPoint ? `${currentPoint[0].toFixed(1)}, ${currentPoint[1].toFixed(1)}` : '',
+    ].filter(Boolean).join(' · '))}</p>
+    <nav aria-label="${escapeHtml(t('active.links'))}">${links.map(([url, label]) => `<a href="${url}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`).join('')}</nav>
+  </article>`;
+}
+
 async function renderActive(storms) {
   const map = getMap();
   if (layerGroup) map.removeLayer(layerGroup);
@@ -269,13 +321,16 @@ async function renderActive(storms) {
     const point = latestStormPoint(s);
     const cur = point ? [point.lat, point.lon] : null;
     if (cur) {
+      const ptc = isPotentialTropicalCyclone(s);
+      const displayName = activeStormDisplayName(s);
       L.circleMarker(cur, {
         radius: 8, color: '#11111b', weight: 2,
-        fillColor: '#89b4fa', fillOpacity: 0.95,
+        fillColor: ptc ? '#cba6f7' : '#89b4fa', fillOpacity: 0.95,
+        dashArray: ptc ? '4 3' : null,
       }).bindTooltip(
-        escapeHtml(`${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}${distanceFromUser(cur)}`),
+        escapeHtml(`${displayName}${s.classification ? ' · ' + (ptc ? t('active.ptc') : s.classification) : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}${distanceFromUser(cur)}`),
         { direction: 'top' },
-      ).addTo(layerGroup);
+      ).bindPopup(activeStormCardHtml(s, cur), { className: 'active-storm-popup' }).addTo(layerGroup);
     }
   }
   layerGroup.addTo(map);
@@ -310,4 +365,9 @@ async function renderActive(storms) {
     hideGoesRealtimeContext();
   }
 
+}
+
+export function clearActiveOperationalLayers() {
+  clearTropicalOutlook();
+  clearMarineWarnings();
 }

@@ -7,6 +7,94 @@
   src: url(../fonts/inter-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* Official NHC operational layers. These sit at opposite map edges so both
+   legends remain readable when the opt-in marine layer is enabled. */
+.nhc-outlook-marker {
+  background: transparent;
+  border: 0;
+}
+
+.nhc-outlook-x {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: #f9e2af;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 2px #11111b, 0 0 2px #11111b;
+}
+
+.nhc-outlook-x--near-zero { color: #9399b2; }
+.nhc-outlook-x--medium { color: #fab387; }
+.nhc-outlook-x--high { color: #f38ba8; }
+
+.nhc-outlook-legend,
+.marine-warning-legend {
+  position: absolute;
+  z-index: 998;
+  top: 148px;
+  display: grid;
+  gap: 5px;
+  max-width: 220px;
+  padding: 9px 11px;
+  color: var(--text);
+  font-size: 0.74rem;
+  border-radius: 10px;
+}
+
+.nhc-outlook-legend { left: 12px; }
+.marine-warning-legend { right: 12px; }
+
+.nhc-outlook-legend strong,
+.marine-warning-legend strong { font-size: 0.78rem; }
+
+.nhc-outlook-legend span,
+.marine-warning-legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nhc-outlook-legend .nhc-outlook-x {
+  width: 16px;
+  height: 16px;
+  font-size: 21px;
+}
+
+.marine-risk-swatch {
+  width: 13px;
+  height: 13px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+}
+
+.marine-risk-swatch--low { color: #b45f9d; background: #dda0dd; }
+.marine-risk-swatch--moderate { color: #94005f; background: #d30094; }
+.marine-risk-swatch--high { color: #9f3131; background: #cd5c5c; }
+.marine-risk-swatch--extreme { color: #7a007a; background: #cc00cc; }
+
+.active-storm-card { min-width: 210px; }
+.active-storm-card h3 { margin: 0 0 4px; }
+.active-storm-card p { margin: 0 0 8px; }
+.active-storm-card nav {
+  display: grid;
+  gap: 4px;
+}
+.active-storm-card a { color: var(--blue); }
+
+@media (max-width: 720px) {
+  .nhc-outlook-legend,
+  .marine-warning-legend {
+    top: auto;
+    bottom: 158px;
+    max-width: min(42vw, 180px);
+  }
+  .nhc-outlook-legend { left: 8px; }
+  .marine-warning-legend { right: 8px; }
+}
 @font-face {
   font-family: 'JetBrains Mono';
   font-style: normal;
