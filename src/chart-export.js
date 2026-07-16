@@ -11,7 +11,7 @@ function slug(name) {
 }
 
 /** Serialize an SVGElement into a standalone string with proper xmlns. */
-function serializeSvg(svgEl) {
+export function serializeSvg(svgEl) {
   const clone = svgEl.cloneNode(true);
   if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
@@ -25,6 +25,8 @@ function serializeSvg(svgEl) {
   `;
   // Background so PNGs aren't transparent.
   const vb = (clone.getAttribute('viewBox') || '0 0 360 160').split(/\s+/).map(Number);
+  if (!clone.getAttribute('width')) clone.setAttribute('width', String(vb[2]));
+  if (!clone.getAttribute('height')) clone.setAttribute('height', String(vb[3]));
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   bg.setAttribute('class', 'bg');
   bg.setAttribute('x', vb[0]); bg.setAttribute('y', vb[1]);

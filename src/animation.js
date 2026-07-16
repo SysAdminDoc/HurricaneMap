@@ -185,12 +185,14 @@ export class TrackAnimator {
 
   tick = () => {
     if (!this.marker) return;
+    if (this.paused) {
+      this.rafId = null;
+      return;
+    }
     const now = performance.now();
     const dt = now - this.lastTickAt;
     this.lastTickAt = now;
-    if (!this.paused) {
-      this.elapsed += dt * this.speed;
-    }
+    this.elapsed += dt * this.speed;
     const t = Math.min(1, this.elapsed / this.duration);
     const sample = this.sampleAt(t);
     this.updateGlyph(sample);
@@ -356,6 +358,7 @@ export class TrackAnimator {
       // While scrubbing we want the visual to update immediately, even paused.
       const sample = this.sampleAt(t);
       this.updateGlyph(sample);
+      this.updateRadar(sample.t);
       this.updateControlsHud(sample, t, /*fromScrub*/ true);
     });
   }
@@ -378,6 +381,10 @@ export class TrackAnimator {
       return;
     }
     this.paused = !this.paused;
+    if (this.paused && this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
       btn.textContent = this.paused ? 'Play' : 'Pause';

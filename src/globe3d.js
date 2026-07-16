@@ -50,6 +50,7 @@ const els = typeof document === 'undefined' ? {} : {
 };
 
 let wired = false;
+let openGeneration = 0;
 
 export function initGlobe3D() {
   if (!els.panel) return;
@@ -76,6 +77,7 @@ export function initGlobe3D() {
 
 export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) {
   if (!els.panel || !els.canvas) return;
+  const generation = ++openGeneration;
   previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   els.panel.hidden = false;
   els.panel.dataset.ready = 'false';
@@ -84,6 +86,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
   els.close?.focus();
 
   await ensureStormsLoaded();
+  if (generation !== openGeneration || els.panel.hidden) return;
   const dataset = buildGlobeTrackDataset(getAllStorms(), landfalls, {
     focusStormId,
     maxStorms: focusStormId ? 1 : MAX_GLOBE_STORMS,
@@ -98,6 +101,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
 
   try {
     const Cesium = await loadCesium();
+    if (generation !== openGeneration || els.panel.hidden) return;
     cesiumApi = Cesium;
     ensureViewer(Cesium);
     configureWindConeControl(dataset);
@@ -109,6 +113,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
     setStatus(t('globe.ready'));
     els.panel.dataset.ready = 'true';
   } catch (error) {
+    if (generation !== openGeneration || els.panel.hidden) return;
     console.warn('3D globe failed to initialize:', error);
     setStatus(t('globe.error'));
   }
@@ -116,6 +121,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
 
 export function closeGlobe3D() {
   if (!els.panel) return;
+  openGeneration += 1;
   els.panel.hidden = true;
   els.trigger?.setAttribute('aria-pressed', 'false');
   if (previouslyFocused) previouslyFocused.focus();
@@ -142,15 +148,6 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
       if (ids.length >= maxStorms) break;
     }
   }
-  if (!ids.length) {
-    for (const storm of storms || []) {
-      if (!storm?.id || seen.has(storm.id)) continue;
-      seen.add(storm.id);
-      ids.push(storm.id);
-      if (ids.length >= maxStorms) break;
-    }
-  }
-
   const selectedStorms = ids
     .map(id => stormMap.get(id))
     .filter(storm => storm && Array.isArray(storm.track) && storm.track.length > 1);

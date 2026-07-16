@@ -17,6 +17,7 @@ All notable changes to HurricaneMap.
 - Spanish and Haitian Creole now cover the static application shell, titles and accessible names, filters, legend, 3D globe, About/data notes, loading state, keyboard help, search empty states, and localized globe/runtime summaries without stripping trusted inline links or code.
 - Shared URLs preserve an explicitly empty category selection; timelines, reports, CSV dictionaries, and QGIS names use metadata-defined coverage years; future-year damages remain nominal/current; multi-state tornado links encode once; climatology copy describes the landfall-storm subtotal; comparison dates are locale-safe; and TD exports remain TD.
 - Seasonal-outlook and spatial-result HTML now escape every data field and reject unsafe source URLs; the Leaflet sink guard scans multiline templates and validates each interpolation independently.
+- Paused track playback stops its animation-frame chain, radar follows scrubs after natural completion, chart SVG serialization supplies intrinsic dimensions, track SVG URLs revoke after navigation commits, empty 3D selections remain empty, and stale/closed 3D opens cannot create a viewer.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 
