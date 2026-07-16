@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -73,6 +73,14 @@ npm run build
 - **⚠️ 2026 cone standard: coastal + inland watches/warnings** — matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.6.0 - Safety, education, and resilience (July 2026)
+
+- **Official safety tools:** Florida address/map-point evacuation-zone lookup with local verification and outage-safe state link-outs, plus a fully offline household preparedness checklist and supply calculator.
+- **2026 NHC parity:** tropical outlook gray-X symbology, Potential Tropical Cyclone support, richer official storm links, and an optional marine wind-warning outlook.
+- **Uncertainty education:** historical 2015/2025/2026 cone comparisons, a qualified 2026 ellipse reconstruction, and reduced-motion-aware plausible risk trajectories.
+- **Shareable track art:** current filters render as an attributed 1800×1200 PNG gallery poster, with progressive anchored header hints in supported browsers.
+- **Deep reliability pass:** deterministic generated data, cancellation-safe live layers, bounded offline caches, hardened HTML/network edges, complete shell localization, contrast fixes, and expanded headless regression coverage.
 
 ## What's new in v1.5.0 - 2026 season readiness (July 2026)
 

@@ -4,6 +4,8 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+## v1.6.0 - Safety, education, and resilience (July 2026)
+
 ### Added
 - Active-storm mode now shows the official NHC tropical outlook with the 2026 gray-X near-zero symbology, handles Potential Tropical Cyclones as first-class advisories, links to public advisories, forecast discussions, name pronunciations, and rip-current forecasts, and offers an opt-in 0–24 hour marine wind-warning layer.
 - Historical storm panels now offer an educational forecast-cone retrospective using selectable official 2015, 2025, and 2026 error-radius tables, plus a clearly qualified interactive reconstruction of the 2026 experimental ellipse method.
