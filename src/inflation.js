@@ -53,6 +53,9 @@ const BASE_CPI = CPI[BASE_YEAR];
 // Returns { real, factor } or null when out of range.
 export function inflateUSD(amountUSD, fromYear, toYear = BASE_YEAR) {
   if (amountUSD == null) return null;
+  if (Number(fromYear) > BASE_YEAR) {
+    return { real: amountUSD, factor: 1, baseYear: fromYear, currentDollars: true };
+  }
   const fromCPI = CPI[fromYear];
   const toCPI = CPI[toYear] || BASE_CPI;
   if (!fromCPI) return null;

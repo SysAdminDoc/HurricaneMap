@@ -1,6 +1,6 @@
 // P12.3 — QGIS layer export: Export filtered storms as GeoJSON ready for QGIS import.
 
-import { ensureStormsLoaded, filterLandfalls, getAllStorms, getLandfalls } from './data.js';
+import { ensureStormsLoaded, filterLandfalls, getAllStorms, getCoverageYearRange, getLandfalls } from './data.js';
 
 export async function exportQGISGeoJSON(filters) {
   await ensureStormsLoaded();
@@ -17,6 +17,7 @@ export function buildQGISGeoJSON({
   storms = [],
   filters = {},
   exportedAt = new Date().toISOString(),
+  coverageYearRange = getCoverageYearRange(),
 } = {}) {
   const filteredLandfalls = Array.isArray(landfalls)
     ? landfalls.filter(hasFiniteLatLon)
@@ -99,7 +100,7 @@ export function buildQGISGeoJSON({
 
   return {
     type: 'FeatureCollection',
-    name: buildExportName(filters),
+    name: buildExportName(filters, coverageYearRange),
     features,
     metadata: {
       exported_at: exportedAt,
@@ -167,7 +168,9 @@ function durationDays(points) {
 }
 
 function categoryLabel(category) {
-  if (!Number.isFinite(category) || category <= 0) return 'TS';
+  if (category === 0) return 'TD';
+  if (category === -1) return 'TS';
+  if (!Number.isFinite(category)) return '';
   return String(category);
 }
 
@@ -200,12 +203,12 @@ function roundNumber(value, decimals) {
   return Math.round(value * scale) / scale;
 }
 
-function buildExportName(filters = {}) {
+function buildExportName(filters = {}, [yearMinDefault, yearMaxDefault] = getCoverageYearRange()) {
   const parts = [];
   if (Number.isFinite(filters.yearMin) && Number.isFinite(filters.yearMax)) {
     if (filters.yearMin === filters.yearMax) {
       parts.push(`${filters.yearMin}`);
-    } else if (filters.yearMin !== 1851 || filters.yearMax !== 2025) {
+    } else if (filters.yearMin !== yearMinDefault || filters.yearMax !== yearMaxDefault) {
       parts.push(`${filters.yearMin}-${filters.yearMax}`);
     }
   }

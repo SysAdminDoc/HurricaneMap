@@ -19,7 +19,7 @@ async function buildClimatology() {
   for (let y = yearMin; y <= yearMax; y++) m.set(y, { ace: 0, named: new Set(), landfalls: 0 });
 
   // Named-storm + ACE: walk every storm with a track. NOTE: getStorm() is
-  // populated by ensureStormsLoaded() which fetches `data/storms-min.json`.
+  // populated by ensureStormsLoaded() from the generated storm bundle.
   // For seasons before NHC naming (pre-1950), HURDAT2 still IDs storms.
   // We approximate "named storm" as "storm with peak winds >= 34kt at some
   // point in track" (i.e. tropical-storm or stronger). This matches NOAA's
@@ -124,6 +124,6 @@ export async function renderClimatologyChart(host) {
         <div class="clim-legend-item"><span class="clim-swatch clim-named"></span> Named storms (≥34 kt) — peak ${maxNamed}</div>
         <div class="clim-legend-item"><span class="clim-swatch clim-landfalls"></span> US landfalls — peak ${maxLF}</div>
       </div>
-      <p class="clim-note">Top 3 ACE years annotated at top: ${top3.map(s => `<strong>${s.year}</strong> (${s.ace.toFixed(0)})`).join(', ')}. ACE counts every basin storm regardless of US impact; named-storm threshold is the post-1950 naming convention applied retroactively.</p>
+      <p class="clim-note">Top 3 landfall-storm ACE years annotated at top: ${top3.map(s => `<strong>${s.year}</strong> (${s.ace.toFixed(0)})`).join(', ')}. ACE is subtotaled only for storms in this U.S.-landfall catalog; the named-storm threshold is the post-1950 naming convention applied retroactively.</p>
     </div>`;
 }

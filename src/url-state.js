@@ -51,7 +51,7 @@ export function encodeHashState(filters, {
   };
   const parts = [];
   for (const key of Object.keys(current)) {
-    if (current[key] && current[key] !== defaults[key]) {
+    if (current[key] !== defaults[key] && (current[key] || key === 'c')) {
       parts.push(`${key}=${encodeURIComponent(current[key])}`);
     }
   }
@@ -95,9 +95,9 @@ export function restoreFiltersFromHash(hash, currentFilters, {
     next.yearMin = clamp(Math.min(a, b));
     next.yearMax = clamp(Math.max(a, b));
   }
-  if (decoded.c) {
+  if (decoded.c !== undefined) {
     const categories = decoded.c.split(',').filter(category => VALID_CATEGORIES.has(category));
-    next.categories = new Set(categories.length ? categories : CATEGORY_DEFAULTS);
+    next.categories = new Set(categories);
   }
   if (decoded.s !== undefined) {
     next.state = hasKnownState(knownStates, decoded.s) ? decoded.s : '';

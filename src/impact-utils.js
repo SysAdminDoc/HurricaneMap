@@ -32,6 +32,37 @@ export function formatFatalityCount(value) {
   return value.toLocaleString();
 }
 
+const STORM_EVENT_STATE_FIPS = Object.freeze({
+  Alabama: '01', Alaska: '02', California: '06', Connecticut: '09', Delaware: '10',
+  'District of Columbia': '11', Florida: '12', Georgia: '13', Hawaii: '15', Louisiana: '22',
+  Maine: '23', Maryland: '24', Massachusetts: '25', Mississippi: '28', 'New Hampshire': '33',
+  'New Jersey': '34', 'New York': '36', 'North Carolina': '37', Pennsylvania: '42',
+  'Rhode Island': '44', 'South Carolina': '45', Texas: '48', Virginia: '51', 'Puerto Rico': '72',
+});
+
+export function tornadoSearchUrl(storm) {
+  if (!storm?.year || storm.year < 1950 || !storm.track?.length) return null;
+  const start = new Date(storm.track[0].t);
+  const end = new Date(storm.track[storm.track.length - 1].t);
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) return null;
+  const stateFilters = [...new Set((storm.us_landfalls || [])
+    .map(landfall => landfall?.state)
+    .filter(state => STORM_EVENT_STATE_FIPS[state]))]
+    .map(state => `${STORM_EVENT_STATE_FIPS[state]},${state.toUpperCase()}`);
+  if (!stateFilters.length) return null;
+  const params = new URLSearchParams({
+    eventType: '(C) Tornado',
+    beginDate_mm: String(start.getUTCMonth() + 1).padStart(2, '0'),
+    beginDate_dd: String(start.getUTCDate()).padStart(2, '0'),
+    beginDate_yyyy: String(start.getUTCFullYear()),
+    endDate_mm: String(end.getUTCMonth() + 1).padStart(2, '0'),
+    endDate_dd: String(end.getUTCDate()).padStart(2, '0'),
+    endDate_yyyy: String(end.getUTCFullYear()),
+    statefips: stateFilters.join(','),
+  });
+  return `https://www.ncei.noaa.gov/stormevents/listevents.jsp?${params}`;
+}
+
 function parseLegacyDeaths(value) {
   if (!value) return null;
   const text = String(value).replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();

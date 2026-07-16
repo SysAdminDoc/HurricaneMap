@@ -2,7 +2,7 @@
 // on the map and side-by-side intensity charts in a comparison panel.
 
 import { t } from './i18n.js';
-import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, formatTime, windToCategory } from './data.js';
+import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, windToCategory } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { hidePanel, showPanel } from './panels.js';
@@ -16,6 +16,17 @@ const MAX_PINS = 4;
 
 // Distinct, high-contrast track colors. Each pin gets one in pin order.
 const PIN_COLORS = ['#cba6f7', '#74c7ec', '#fab387', '#a6e3a1'];
+
+function formatDate(value) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return '—';
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+}
 
 const tray = ensureTray();
 const comparePanel = document.getElementById('compare-panel');
@@ -199,8 +210,8 @@ function renderComparePanel() {
     ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
     ['# US landfalls', p => p.storm.us_landfall_count, 'number', 'higher'],
     ['Track points', p => p.storm.track?.length || 0, 'number', 'higher'],
-    ['Genesis', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[0].t).split(',')[0] : '—', 'text'],
-    ['Final', p => p.storm.track && p.storm.track.length > 0 ? formatTime(p.storm.track[p.storm.track.length - 1].t).split(',')[0] : '—', 'text'],
+    ['Genesis', p => p.storm.track && p.storm.track.length > 0 ? formatDate(p.storm.track[0].t) : '—', 'text'],
+    ['Final', p => p.storm.track && p.storm.track.length > 0 ? formatDate(p.storm.track[p.storm.track.length - 1].t) : '—', 'text'],
     ['States hit', p => p.storm.us_landfalls && p.storm.us_landfalls.length > 0 ? [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', ') : '—', 'text'],
   ];
 
@@ -368,4 +379,3 @@ function escapeCSV(s) {
   }
   return str;
 }
-

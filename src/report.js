@@ -1,13 +1,13 @@
 // P12.4 — Statistical summary auto-report: Generate one-page reports from filtered datasets.
 
-import { filterLandfalls, getImpactsFor, getLandfalls } from './data.js';
+import { filterLandfalls, getCoverageYearRange, getImpactsFor, getLandfalls } from './data.js';
 import { getDamageMillions, getFatalityCount, formatFatalityCount } from './impact-utils.js';
 
 export function generateStatisticalReport(filters) {
   const filtered = filterLandfalls(getLandfalls(), filters);
   const sortedByDate = filtered.slice().sort((a, b) => timeKey(a).localeCompare(timeKey(b)));
 
-  const title = buildFilterTitle(filters);
+  const title = buildFilterTitle(filters, getCoverageYearRange());
   const timestamp = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -39,7 +39,7 @@ export function generateStatisticalReport(filters) {
 
   const catCounts = {};
   filtered.forEach(lf => {
-    const cat = lf.category <= 0 ? 'TS' : String(lf.category);
+    const cat = lf.category === 0 ? 'TD' : lf.category === -1 ? 'TS' : String(lf.category);
     catCounts[cat] = (catCounts[cat] || 0) + 1;
   });
 
@@ -120,10 +120,10 @@ Historical hurricane landfall data sourced from **NOAA's National Hurricane Cent
   };
 }
 
-function buildFilterTitle(filters) {
+export function buildFilterTitle(filters, [yearMinDefault, yearMaxDefault] = getCoverageYearRange()) {
   const parts = [];
 
-  if (filters.yearMin !== 1851 || filters.yearMax !== 2025) {
+  if (filters.yearMin !== yearMinDefault || filters.yearMax !== yearMaxDefault) {
     parts.push(`Years ${filters.yearMin}-${filters.yearMax}`);
   }
 
@@ -141,7 +141,7 @@ function buildFilterTitle(filters) {
   }
 
   if (parts.length === 0) {
-    return 'All landfalls (1851-2025, all categories, all states)';
+    return `All landfalls (${yearMinDefault}-${yearMaxDefault}, all categories, all states)`;
   }
 
   return parts.join(' | ');

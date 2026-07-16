@@ -310,6 +310,8 @@ async function boot() {
   wireSettingsControls();
   // 174-year timeline ribbon along the bottom edge.
   mountTimeline(getLandfalls(), {
+    yearMin: YEAR_MIN_DEFAULT,
+    yearMax: YEAR_MAX_DEFAULT,
     onYearRangeChange: ({ yearMin, yearMax }) => {
       filters.yearMin = yearMin;
       filters.yearMax = yearMax;

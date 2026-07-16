@@ -1,6 +1,6 @@
 // 174-year timeline ribbon along the bottom of the viewport.
 //
-// One vertical bar per year (1851-2025). Bar height = number of landfall
+// One vertical bar per dataset year. Bar height = number of landfall
 // events that year, color = darkest category that year. Click sets the
 // year filter to that single year. Drag a range to set yearMin/yearMax.
 // Collapsible — saves real estate when not in use.
@@ -10,8 +10,8 @@ let onChange = null;
 let collapsed = false;
 let lastVisible = []; // memoize so we don't repaint on identical state
 
-const Y0 = 1851;
-const Y1 = 2025;
+let Y0 = 1851;
+let Y1 = 2025;
 let selectedMin = Y0;
 let selectedMax = Y1;
 
@@ -36,6 +36,14 @@ function tierColor(t) {
 }
 
 export function mountTimeline(landfalls, callbacks) {
+  const requestedMin = Number(callbacks?.yearMin);
+  const requestedMax = Number(callbacks?.yearMax);
+  if (Number.isFinite(requestedMin) && Number.isFinite(requestedMax)) {
+    Y0 = Math.min(requestedMin, requestedMax);
+    Y1 = Math.max(requestedMin, requestedMax);
+  }
+  selectedMin = Y0;
+  selectedMax = Y1;
   onChange = callbacks?.onYearRangeChange || (() => {});
   host = document.createElement('section');
   host.className = 'timeline-ribbon glass';
@@ -146,7 +154,7 @@ function attachDragInteraction() {
   });
 
   axis.addEventListener('dblclick', (e) => {
-    // Double-click resets to full range (1851-2025)
+    // Double-click resets to the full metadata-defined range.
     e.stopPropagation();
     onChange({ yearMin: Y0, yearMax: Y1 });
   });
@@ -171,8 +179,9 @@ function attachDragInteraction() {
 
 function drawSelection(a, b) {
   const axis = host.querySelector('#timeline-axis');
-  const lo = Math.min(a, b);
-  const hi = Math.max(a, b);
+  const clamp = value => Math.max(Y0, Math.min(Y1, Number(value)));
+  const lo = clamp(Math.min(a, b));
+  const hi = clamp(Math.max(a, b));
   selectedMin = lo;
   selectedMax = hi;
   let sel = axis.querySelector('.tl-selection');

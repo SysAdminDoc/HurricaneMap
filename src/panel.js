@@ -32,6 +32,7 @@ import {
   getDamageMillions,
   getRawDamageText,
   getRawFatalityText,
+  tornadoSearchUrl,
 } from './impact-utils.js';
 import { renderStormEventsSummary } from './storm-events.js';
 
@@ -652,7 +653,9 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
       if (mode === 'real' && nominalM != null && storm.year) {
         const r = inflateUSD(nominalM, storm.year);
         if (r) {
-          valueHTML = `${formatMillionsUSD(r.real)} <span class="im-adj">(2024 USD · ${formatMillionsUSD(nominalM)} nominal)</span>`;
+          valueHTML = r.currentDollars
+            ? `${formatMillionsUSD(r.real)} <span class="im-adj">(${storm.year} USD)</span>`
+            : `${formatMillionsUSD(r.real)} <span class="im-adj">(2024 USD · ${formatMillionsUSD(nominalM)} nominal)</span>`;
         }
       } else if (mode === 'nominal' && nominalM != null) {
         valueHTML = `${formatMillionsUSD(nominalM)} <span class="im-adj">(${storm.year || ''} USD)</span>`;
@@ -680,41 +683,6 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
       <div class="im-source">${sources.join(' · ')}</div>
     </div>
   `;
-}
-
-/** NOAA Storm Events listing pre-filtered to tornadoes during this storm's
- *  active window in any state it affected. Storm Events DB starts 1950 but
- *  tornado linkage is most useful from 1995 onward. */
-function tornadoSearchUrl(storm) {
-  if (!storm.year || storm.year < 1950) return null;
-  if (!storm.track?.length) return null;
-  const start = new Date(storm.track[0].t);
-  const end = new Date(storm.track[storm.track.length - 1].t);
-  const states = [...new Set((storm.us_landfalls || []).map(l => l.state))];
-  if (!states.length) return null;
-  // Storm Events expects FIPS state codes.
-  const FIPS = {
-    'Alabama': '01', 'Alaska': '02', 'Connecticut': '09', 'Delaware': '10',
-    'District of Columbia': '11', 'Florida': '12', 'Georgia': '13', 'Hawaii': '15',
-    'Louisiana': '22', 'Maine': '23', 'Maryland': '24', 'Massachusetts': '25',
-    'Mississippi': '28', 'New Hampshire': '33', 'New Jersey': '34', 'New York': '36',
-    'North Carolina': '37', 'Pennsylvania': '42', 'Puerto Rico': '72',
-    'Rhode Island': '44', 'South Carolina': '45', 'Texas': '48', 'Virginia': '51',
-    'California': '06',
-  };
-  const fipsList = states.map(s => `${FIPS[s] || ''},${s.toUpperCase()}`).filter(Boolean).join('%2C');
-  if (!fipsList) return null;
-  const params = new URLSearchParams({
-    eventType: '(C) Tornado',
-    beginDate_mm: String(start.getUTCMonth() + 1).padStart(2, '0'),
-    beginDate_dd: String(start.getUTCDate()).padStart(2, '0'),
-    beginDate_yyyy: String(start.getUTCFullYear()),
-    endDate_mm: String(end.getUTCMonth() + 1).padStart(2, '0'),
-    endDate_dd: String(end.getUTCDate()).padStart(2, '0'),
-    endDate_yyyy: String(end.getUTCFullYear()),
-    statefips: fipsList,
-  });
-  return `https://www.ncei.noaa.gov/stormevents/listevents.jsp?${params.toString()}`;
 }
 
 /** Aircraft reconnaissance archive (Tropical Atlantic mirror). Hurricane

@@ -169,6 +169,17 @@ export function getMetadata() {
   return DATA.metadata;
 }
 
+export function getCoverageYearRange(metadata = DATA.metadata, {
+  fallbackMin = 1851,
+  fallbackMax = 2025,
+} = {}) {
+  const range = metadata?.coverage?.year_range;
+  const a = Number(range?.[0]);
+  const b = Number(range?.[1]);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return [fallbackMin, fallbackMax];
+  return [Math.min(a, b), Math.max(a, b)];
+}
+
 export function getEnsoForYear(year) {
   if (!DATA.enso) return null;
   const entry = DATA.enso[String(year)];

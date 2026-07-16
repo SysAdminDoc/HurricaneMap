@@ -51,8 +51,18 @@ function cats(filters) {
     knownStates: { Florida: true },
   });
   assert.deepEqual(decoded, { c: 'bad', s: 'NotAState' });
-  assert.deepEqual(cats(restored), [...CATEGORY_DEFAULTS].sort());
+  assert.deepEqual(cats(restored), []);
   assert.equal(restored.state, '');
+}
+
+// An explicit empty selection must survive sharing and reload.
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  filters.categories.clear();
+  const hash = encodeHashState(filters, { yearMinDefault: 1851, yearMaxDefault: 2025 });
+  assert.equal(hash, '#c=');
+  const { filters: restored } = restoreFiltersFromHash(hash, createDefaultFilters());
+  assert.deepEqual(cats(restored), []);
 }
 
 {

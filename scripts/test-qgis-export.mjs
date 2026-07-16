@@ -59,4 +59,12 @@ assert.equal(point.properties.month, 8);
 assert.equal(point.properties.day, 29);
 assert.equal(point.properties.hour, 11);
 
+const tdGeojson = buildQGISGeoJSON({
+  landfalls: [{ ...landfalls[0], storm_id: 'AL012026', category: 0, wind: 30 }],
+  filters: { yearMin: 1851, yearMax: 2026, categories: new Set(['ts', '1', '2', '3', '4', '5']), state: '' },
+  coverageYearRange: [1851, 2026],
+});
+assert.equal(tdGeojson.features[0].properties.category, 'TD');
+assert.equal(tdGeojson.name, 'HurricaneMap-Export');
+
 console.log('qgis export ok');

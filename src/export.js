@@ -1,6 +1,6 @@
 // P12.1 — Publication-ready export: One-click export of filtered dataset as CSV with documentation
 
-import { getLandfalls, filterLandfalls } from './data.js';
+import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
 
 export function exportPublicationCSV(filters) {
   // Get all landfalls and filter them
@@ -45,7 +45,7 @@ export function exportPublicationCSV(filters) {
       lf.wind || '',
       windMph,
       lf.pres || '',
-      lf.category ? (lf.category <= 0 ? 'TS' : String(lf.category)) : 'TS',
+      publicationCategoryLabel(lf.category),
       lf.state || '',
     ];
     rows.push(row);
@@ -59,6 +59,7 @@ export function exportPublicationCSV(filters) {
   
   // Add data dictionary as comments
   const uniqueStorms = new Set(filtered.map(lf => lf.storm_id)).size;
+  const [coverageMin, coverageMax] = getCoverageYearRange();
   const dataDictionary = `# HurricaneMap Publication-Ready Export
 # Generated: ${new Date().toISOString()}
 # Data source: NOAA NHC HURDAT2 (Public Domain)
@@ -67,7 +68,7 @@ export function exportPublicationCSV(filters) {
 # Data Dictionary:
 # storm_id: 6-character identifier (AALLNNNN: AL=Atlantic, LL=basin, NNNN=sequence, YYYY=year)
 # name: Hurricane or tropical storm name
-# year: Year of occurrence (1851-2025)
+# year: Year of occurrence (${coverageMin}-${coverageMax})
 # month: Month (1-12)
 # day: Day of month
 # hour: Hour (UTC, 0-23)
@@ -76,7 +77,7 @@ export function exportPublicationCSV(filters) {
 # wind_speed_kt: Maximum sustained winds (knots)
 # wind_speed_mph: Maximum sustained winds (miles per hour) converted from knots * 1.15078
 # pressure_mb: Central pressure (millibars)
-# category: Saffir-Simpson category (TS, 1-5)
+# category: Tropical Depression (TD), Tropical Storm (TS), or Saffir-Simpson category 1-5
 # state: U.S. state at landfall
 #
 # Methodology:
@@ -137,4 +138,8 @@ export function csvEscape(value, { preventFormula = false } = {}) {
   return cell;
 }
 
-
+export function publicationCategoryLabel(category) {
+  if (category === 0) return 'TD';
+  if (category === -1) return 'TS';
+  return Number.isFinite(category) ? String(category) : '';
+}
