@@ -772,6 +772,24 @@ try {
   const impactsText = await page.textContent('#storm-panel .impacts-block');
   assert(/Billion-dollar disaster/.test(impactsText) && /\$201\.3B|\$201,297|201\.3/.test(impactsText.replace(/ /g, ' ')), `Katrina NCEI billion-dollar row did not render: ${impactsText}`);
   assert(/1,833 deaths/.test(impactsText), `Katrina NCEI deaths did not render: ${impactsText}`);
+
+  await page.check('#cone-retro-enabled');
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), { timeout: 5000 });
+  const circleConePath = await page.getAttribute('path.cone-retro-shape--circle', 'd');
+  await page.selectOption('#cone-retro-era', '2026');
+  await page.check('#cone-retro-ellipse');
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), { timeout: 5000 });
+  const ellipseCone = await page.evaluate(() => ({
+    path: document.querySelector('path.cone-retro-shape--ellipse')?.getAttribute('d') || '',
+    legend: document.querySelector('#cone-retro-legend')?.textContent || '',
+    explainer: document.querySelector('.cone-retro-control p')?.textContent || '',
+  }));
+  assert(circleConePath && ellipseCone.path && circleConePath !== ellipseCone.path, 'ellipse mode did not redraw the retrospective cone geometry');
+  assert(/illustrative ellipse/.test(ellipseCone.legend), `retrospective cone legend did not identify ellipse mode: ${ellipseCone.legend}`);
+  assert(/not a historical forecast/i.test(ellipseCone.explainer) && /outside any cone/i.test(ellipseCone.explainer), `retrospective cone explainer is incomplete: ${ellipseCone.explainer}`);
+  await page.uncheck('#cone-retro-enabled');
+  await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), { timeout: 5000 });
+
   await page.click('#toggle-settings');
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   await page.keyboard.press('Escape');

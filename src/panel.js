@@ -35,6 +35,7 @@ import {
   tornadoSearchUrl,
 } from './impact-utils.js';
 import { renderStormEventsSummary } from './storm-events.js';
+import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -77,6 +78,7 @@ closeBtn.addEventListener('click', () => {
   if (radar) radar.close();
   hideWindField();
   hideHwm();
+  clearRetrospectiveCone();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
@@ -99,6 +101,7 @@ export async function showStorm(landfall) {
   if (animator) animator.stop();
   hideWindField();
   hideHwm();
+  clearRetrospectiveCone();
   await ensureStormsLoaded();
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
@@ -296,6 +299,30 @@ function render(storm, landfall, allStorms) {
           <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
         </div>
 
+        <section class="cone-retro-control" aria-labelledby="cone-retro-title">
+          <div class="cone-retro-heading">
+            <h3 id="cone-retro-title">${t('coneRetro.title')}</h3>
+            <label class="wf-toggle">
+              <input type="checkbox" id="cone-retro-enabled">
+              <span>${t('coneRetro.show')}</span>
+            </label>
+          </div>
+          <div class="cone-retro-options">
+            <label for="cone-retro-era">${t('coneRetro.era')}</label>
+            <select id="cone-retro-era">
+              <option value="2015"${storm.year < 2020 ? ' selected' : ''}>2015</option>
+              <option value="2025"${storm.year >= 2020 && storm.year < 2026 ? ' selected' : ''}>2025</option>
+              <option value="2026"${storm.year >= 2026 ? ' selected' : ''}>2026</option>
+            </select>
+            <label class="wf-toggle">
+              <input type="checkbox" id="cone-retro-ellipse">
+              <span>${t('coneRetro.ellipseToggle')}</span>
+            </label>
+          </div>
+          <p>${t('coneRetro.explainer')}</p>
+          <p class="cone-retro-status" id="cone-retro-status" role="status" aria-live="polite"></p>
+        </section>
+
         ${radiiCount(storm) > 0 ? `
           <div class="wind-field-row">
             <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
@@ -476,6 +503,35 @@ function render(storm, landfall, allStorms) {
       if (wfCb.checked) showWindField(storm);
       else hideWindField();
     });
+  }
+
+  const coneEnabled = document.getElementById('cone-retro-enabled');
+  const coneEra = document.getElementById('cone-retro-era');
+  const coneEllipse = document.getElementById('cone-retro-ellipse');
+  const coneStatus = document.getElementById('cone-retro-status');
+  if (coneEnabled && coneEra && coneEllipse && coneStatus) {
+    const syncCone = async () => {
+      coneEra.disabled = !coneEnabled.checked;
+      coneEllipse.disabled = !coneEnabled.checked;
+      if (!coneEnabled.checked) {
+        clearRetrospectiveCone();
+        coneStatus.textContent = '';
+        return;
+      }
+      coneStatus.textContent = t('coneRetro.loading');
+      const result = await renderRetrospectiveCone(storm, {
+        map: getMap(),
+        era: coneEra.value,
+        ellipse: coneEllipse.checked,
+      });
+      coneStatus.textContent = result.status === 'rendered'
+        ? t('coneRetro.ready', result.sampleCount)
+        : result.status === 'error' ? t('coneRetro.error') : '';
+    };
+    coneEnabled.addEventListener('change', syncCone);
+    coneEra.addEventListener('change', syncCone);
+    coneEllipse.addEventListener('change', syncCone);
+    syncCone();
   }
 }
 
