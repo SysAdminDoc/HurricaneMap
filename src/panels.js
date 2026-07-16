@@ -3,12 +3,13 @@
 // minimize button that collapses it to a slim edge tab (keeping the map fully
 // visible) and a restore bar to bring it back.
 
-const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel', 'table-view-panel', 'prep-panel', 'spatial-results'];
+const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel', 'table-view-panel', 'prep-panel', 'evac-panel', 'spatial-results'];
 const PANEL_BUTTONS = {
   'stats-panel': 'toggle-stats',
   'compare-panel': 'toggle-compare',
   'on-this-date-panel': 'toggle-on-this-date',
   'prep-panel': 'toggle-prep',
+  'evac-panel': 'toggle-evac',
 };
 
 function getPanel(id) {

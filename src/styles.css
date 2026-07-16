@@ -7336,7 +7336,7 @@ html.light-theme .basemap-fallback {
 :root {
   --map-first-filter-width: clamp(320px, 27vw, 420px);
   --map-first-panel-width: clamp(380px, 28vw, 460px);
-  --map-first-header-width: min(980px, calc(100vw - 24px));
+  --map-first-header-width: min(1040px, calc(100vw - 24px));
 }
 
 .app-header {
@@ -8808,7 +8808,8 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 }
 
 /* Offline hurricane-preparedness panel */
-.prep-panel {
+.prep-panel,
+.evac-panel {
   position: fixed;
   inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) auto;
   z-index: 1800;
@@ -8821,9 +8822,12 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   line-height: 1.5;
   contain: layout paint;
 }
-.prep-panel[hidden] { display: none !important; }
-.prep-panel h2 { margin: 0 34px 12px 0; font-size: 1.25rem; }
-.prep-panel h3 { margin: 0; font-size: 0.9rem; }
+.prep-panel[hidden],
+.evac-panel[hidden] { display: none !important; }
+.prep-panel h2,
+.evac-panel h2 { margin: 0 34px 12px 0; font-size: 1.25rem; }
+.prep-panel h3,
+.evac-panel h3 { margin: 0; font-size: 0.9rem; }
 .prep-header p { margin: 0 0 8px; color: var(--subtext); }
 .prep-sources { display: flex; flex-wrap: wrap; gap: 8px 14px; }
 .prep-sources a { color: var(--blue); }
@@ -8882,8 +8886,57 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 .prep-item input:checked + span { color: var(--subtext); text-decoration: line-through; }
 .prep-reset { justify-self: start; min-height: 40px; }
 .prep-caveat { margin: 14px 2px 0; font-size: 0.72rem; }
+
+/* State-published Florida evacuation-zone lookup */
+.evac-intro,
+.evac-not-flood { color: var(--subtext); }
+.evac-intro { margin: 0 0 14px; }
+.evac-address { display: grid; gap: 6px; }
+.evac-address > label { font-weight: 720; }
+.evac-address > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.evac-address input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--crust);
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+}
+.evac-address small { color: var(--subtext); }
+.evac-map-pick { width: 100%; min-height: 44px; margin-top: 12px; justify-content: center; }
+.evac-result {
+  min-height: 66px;
+  margin-top: 14px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--surface0) 62%, transparent);
+  border: 1px solid var(--surface1);
+  border-radius: 10px;
+}
+.evac-result p { margin: 0 0 8px; }
+.evac-result p:last-child { margin-bottom: 0; }
+.evac-result--warning { border-color: color-mix(in srgb, var(--yellow) 58%, var(--surface1)); }
+.evac-result--found { border-color: color-mix(in srgb, var(--green) 52%, var(--surface1)); }
+.evac-location { color: var(--subtext); font-size: 0.76rem; }
+.evac-zone-badge { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.evac-zone-badge span { color: var(--subtext); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.evac-zone-badge strong { color: var(--peach); font-size: 2rem; line-height: 1; }
+.evac-order { color: var(--yellow); }
+.evac-result a,
+.evac-linkouts a { color: var(--blue); }
+.evac-result-links { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; }
+.evac-not-flood { margin: 14px 2px; font-size: 0.74rem; }
+.evac-linkouts {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface1);
+}
+.evac-linkouts > div { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.evac-map-selecting { cursor: crosshair; }
 @media (max-width: 720px) {
-  .prep-panel {
+  .prep-panel,
+  .evac-panel {
     inset: calc(var(--side-panel-top) - 8px) 8px 124px;
     width: auto;
     max-width: none;
@@ -8891,4 +8944,5 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   }
   .prep-inputs,
   .prep-totals { grid-template-columns: 1fr; }
+  .evac-address > div { grid-template-columns: 1fr; }
 }

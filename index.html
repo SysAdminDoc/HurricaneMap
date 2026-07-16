@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11111b" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cesium.com 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://cesium.com; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io https://cesium.com https://*.cesium.com; font-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cesium.com 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://cesium.com; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io https://cesium.com https://*.cesium.com; font-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
   <meta name="description" content="HurricaneMap — Interactive map of every U.S. hurricane landfall on record (1851-present), built from NOAA's HURDAT2 best-track database." />
   <meta property="og:title" content="HurricaneMap — 174 Years of U.S. Hurricane Landfalls" />
   <meta property="og:description" content="Interactive map of 595 storms and 759 landfall events drawn from NOAA's HURDAT2 database (1851-2025). Track animation, archived NEXRAD radar, storm comparison, and publication-ready exports." />
@@ -72,6 +72,10 @@
         <button class="icon-btn" id="toggle-spatial-search" title="Nearby storms" aria-label="Nearby storms" data-i18n-title="header.btn.spatial" data-i18n-aria-label="header.btn.spatial" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
           <span class="mobile-action-label" data-i18n="header.btn.spatial">Nearby storms</span>
+        </button>
+        <button class="icon-btn" id="toggle-evac" title="Evacuation zones" aria-label="Evacuation zones" data-i18n-title="header.btn.evac" data-i18n-aria-label="header.btn.evac" aria-pressed="false" aria-controls="evac-panel">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 10.5A3.5 3.5 0 1 1 12 5a3.5 3.5 0 0 1 0 7.5zm-1-5h2v3h-2v-3zm0 4h2v2h-2v-2z"/></svg>
+          <span class="mobile-action-label" data-i18n="header.btn.evac">Evacuation zones</span>
         </button>
         <button class="icon-btn" id="toggle-prep" title="Hurricane preparedness" aria-label="Hurricane preparedness" data-i18n-title="header.btn.prep" data-i18n-aria-label="header.btn.prep" aria-pressed="false" aria-controls="prep-panel">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9 3h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2zm0 4h6V5H9v2zm2 3v3H8v2h3v3h2v-3h3v-2h-3v-3h-2z"/></svg>
@@ -327,6 +331,12 @@
     <button class="close-btn" id="close-prep" aria-label="Close hurricane preparedness" data-i18n-aria-label="prep.close">×</button>
     <h2 id="prep-panel-title" data-i18n="prep.title">Hurricane preparedness</h2>
     <div id="prep-body"></div>
+  </section>
+
+  <section class="evac-panel glass" id="evac-panel" hidden role="region" aria-labelledby="evac-panel-title" aria-label="Evacuation zone lookup" data-i18n-aria-label="evac.title">
+    <button class="close-btn" id="close-evac" aria-label="Close evacuation zone lookup" data-i18n-aria-label="evac.close">×</button>
+    <h2 id="evac-panel-title" data-i18n="evac.title">Evacuation zone lookup</h2>
+    <div id="evac-body"></div>
   </section>
 
   <section class="globe3d-panel" id="globe3d-panel" hidden role="dialog" aria-modal="true" aria-labelledby="globe3d-title" aria-describedby="globe3d-subtitle">

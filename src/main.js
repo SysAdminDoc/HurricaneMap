@@ -71,6 +71,7 @@ const loadQgis = once(() => import('./qgis.js'));
 const loadTableView = once(() => import('./table-view.js'));
 const loadSpatialSearch = once(() => import('./spatial-search.js'));
 const loadPrep = once(() => import('./prep.js'));
+const loadEvac = once(() => import('./evac.js'));
 const loadSST = once(() => import('./sst.js'));
 
 async function showStormLazy(landfall) {
@@ -122,6 +123,7 @@ function writeHash() {
 }
 
 const els = {
+  headerActions: document.querySelector('.header-actions'),
   yearMin: document.getElementById('year-min'),
   yearMax: document.getElementById('year-max'),
   clearYearFilter: document.getElementById('clear-year-filter'),
@@ -152,6 +154,7 @@ const els = {
   qgisBtn: document.getElementById('export-qgis'),
   tableViewBtn: document.getElementById('toggle-table-view'),
   prepBtn: document.getElementById('toggle-prep'),
+  evacBtn: document.getElementById('toggle-evac'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
@@ -1083,6 +1086,19 @@ function wireUI() {
   els.prepBtn?.addEventListener('click', async () => {
     const { openPrepPanel } = await loadPrep();
     openPrepPanel();
+  });
+
+  // Desktop presents secondary actions inline in a horizontal rail. Return
+  // the rail to its primary controls after activating one so Filters and the
+  // other core views never remain scrolled underneath the title block.
+  els.headerActions?.addEventListener('click', event => {
+    if (innerWidth <= 720 || !event.target.closest('.mobile-actions-menu > .icon-btn')) return;
+    requestAnimationFrame(() => { els.headerActions.scrollLeft = 0; });
+  });
+
+  els.evacBtn?.addEventListener('click', async () => {
+    const { openEvacPanel } = await loadEvac();
+    await openEvacPanel();
   });
 
   const spatialBtn = document.getElementById('toggle-spatial-search');

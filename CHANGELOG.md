@@ -9,6 +9,7 @@ All notable changes to HurricaneMap.
 - Historical storm panels now offer an educational forecast-cone retrospective using selectable official 2015, 2025, and 2026 error-radius tables, plus a clearly qualified interactive reconstruction of the 2026 experimental ellipse method.
 - An opt-in Animated Risk Trajectories education mode shows 20 deterministic, era-scaled plausible center paths without a containment boundary and falls back to a static ensemble under reduced-motion preferences.
 - A fully offline preparedness panel now provides a persistent localized supply checklist and household-scaled three-day go-kit/two-week stay-home water and food calculator, with Ready.gov and Red Cross guidance links.
+- A Florida-first evacuation-zone lookup now checks addresses or selected map points against the state-published ArcGIS layer, links every result to official verification, and degrades to official Florida, Virginia, Maryland, and Massachusetts resources during service failures or for uncovered locations.
 
 ### Fixed
 - Generated storm data now writes a deterministic `storms.json.gz`, validates compressed/uncompressed parity, ranks tropical storms above tropical depressions across panels/sorts/tide selection, and records genuine preprocessing provenance.
