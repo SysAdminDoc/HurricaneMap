@@ -13,6 +13,8 @@ const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 const MAX_STATIONS = 3;
 const MAX_KM = 150;
 const WINDOW_HOURS = 48;
+const REQUEST_TIMEOUT_MS = 12_000;
+const REQUEST_ATTEMPTS = 2;
 
 let stationsPromise = null;
 
@@ -75,10 +77,12 @@ function parseSeries(payload, key) {
 }
 
 /** Max observed-minus-predicted residual (ft), matching points by hour. */
-export function peakResidual(observed, predicted) {
+export function peakResidual(observed, predicted, { centerTime = null, windowHours = WINDOW_HOURS } = {}) {
   const predictedByTime = new Map(predicted.map(point => [point.time, point.ft]));
+  const windowMs = windowHours * 3600_000;
   let peak = null;
   for (const point of observed) {
+    if (Number.isFinite(centerTime) && Math.abs(point.time - centerTime) > windowMs) continue;
     const base = predictedByTime.get(point.time);
     if (base == null) continue;
     const residual = point.ft - base;
@@ -87,16 +91,44 @@ export function peakResidual(observed, predicted) {
   return peak;
 }
 
+export async function fetchWithRetry(url, {
+  attempts = REQUEST_ATTEMPTS,
+  timeoutMs = REQUEST_TIMEOUT_MS,
+  fetchImpl = fetch,
+} = {}) {
+  let lastResponse = null;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetchImpl(url, { signal: controller.signal, cache: 'no-cache' });
+      lastResponse = response;
+      if (response.ok || (response.status < 500 && response.status !== 429)) return response;
+    } catch {
+      // Retry timeouts and transient network failures.
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  return lastResponse;
+}
+
+function exactWindow(series, centerTime) {
+  const windowMs = WINDOW_HOURS * 3600_000;
+  return series.filter(point => Math.abs(point.time - centerTime) <= windowMs);
+}
+
 async function fetchStationSeries(station, landfallIso) {
+  const centerTime = Date.parse(landfallIso);
   const [obsRes, predRes] = await Promise.all([
-    fetch(buildDataUrl(station.id, 'hourly_height', landfallIso)),
-    fetch(buildDataUrl(station.id, 'predictions', landfallIso)),
+    fetchWithRetry(buildDataUrl(station.id, 'hourly_height', landfallIso)),
+    fetchWithRetry(buildDataUrl(station.id, 'predictions', landfallIso)),
   ]);
-  if (!obsRes.ok || !predRes.ok) return null;
-  const observed = parseSeries(await obsRes.json(), 'data');
-  const predicted = parseSeries(await predRes.json(), 'predictions');
+  if (!obsRes?.ok || !predRes?.ok) return null;
+  const observed = exactWindow(parseSeries(await obsRes.json(), 'data'), centerTime);
+  const predicted = exactWindow(parseSeries(await predRes.json(), 'predictions'), centerTime);
   if (observed.length < 12 || predicted.length < 12) return null;
-  return { station, observed, predicted, peak: peakResidual(observed, predicted) };
+  return { station, observed, predicted, peak: peakResidual(observed, predicted, { centerTime }) };
 }
 
 function chartSvg({ observed, predicted }, landfallMs) {
@@ -153,7 +185,7 @@ export async function renderTidesBlock(host, storm) {
     <div class="tides-block">
       <button class="text-btn tide-load-btn" type="button">${t('tides.load')}</button>
     </div>`;
-  host.querySelector('.tide-load-btn').addEventListener('click', async event => {
+  const wireLoadButton = () => host.querySelector('.tide-load-btn')?.addEventListener('click', async event => {
     const block = host.querySelector('.tides-block');
     event.target.disabled = true;
     event.target.textContent = t('tides.loading');
@@ -162,8 +194,10 @@ export async function renderTidesBlock(host, storm) {
       const nearby = nearestStations(stations, landfall.lat, landfall.lon);
       const results = (await Promise.all(nearby.map(station => fetchStationSeries(station, landfall.t).catch(() => null))))
         .filter(Boolean);
+      if (!host.isConnected) return;
       if (!results.length) {
-        block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div>`;
+        block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
+        wireLoadButton();
         return;
       }
       const landfallMs = Date.parse(landfall.t);
@@ -176,7 +210,10 @@ export async function renderTidesBlock(host, storm) {
         ${results.map(result => stationCard(result, landfallMs)).join('')}
         <div class="im-source"><a href="https://tidesandcurrents.noaa.gov/" target="_blank" rel="noopener">${t('tides.source')}</a></div>`;
     } catch {
-      block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div>`;
+      if (!host.isConnected) return;
+      block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
+      wireLoadButton();
     }
   }, { once: true });
+  wireLoadButton();
 }

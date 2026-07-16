@@ -263,42 +263,11 @@ async function renderActive(storms) {
   layerGroup = L.layerGroup();
 
   for (const s of storms) {
-    // Best-track points so far + forecast advisory points (5d cone).
-    // The exact JSON schema varies; we tolerate missing fields gracefully.
-    const advisoryPts = [];
-    if (Array.isArray(s.forecastTrack)) {
-      for (const p of s.forecastTrack) {
-        if (Number.isFinite(p.lat) && Number.isFinite(p.lon)) advisoryPts.push([p.lat, p.lon]);
-      }
-    }
-    const bestTrackPts = [];
-    if (Array.isArray(s.track)) {
-      for (const p of s.track) {
-        if (Number.isFinite(p.lat) && Number.isFinite(p.lon)) bestTrackPts.push([p.lat, p.lon]);
-      }
-    }
-    // Best-track polyline (solid).
-    if (bestTrackPts.length > 1) {
-      L.polyline(bestTrackPts, {
-        color: '#89b4fa', weight: 3, opacity: 0.9, className: 'active-track',
-      }).addTo(layerGroup);
-    }
-    // Forecast track (dashed).
-    if (advisoryPts.length > 1) {
-      L.polyline(advisoryPts, {
-        color: '#f9e2af', weight: 2.5, opacity: 0.85, dashArray: '6 5',
-        className: 'active-forecast',
-      }).addTo(layerGroup);
-    }
-    // Current position marker. NHC's real CurrentStorms.json carries the
-    // position as latitudeNumeric/longitudeNumeric (or "25.5N" strings) on
-    // the storm object, not as track arrays — fall back to the same
-    // normalizer the GOES overlay uses so an active storm always gets a dot.
-    let cur = bestTrackPts[bestTrackPts.length - 1] || advisoryPts[0];
-    if (!cur) {
-      const point = latestStormPoint(s);
-      if (point) cur = [point.lat, point.lon];
-    }
+    // CurrentStorms.json exposes the current fix, not forecast/best-track
+    // point arrays. Official observed/forecast tracks and cone geometry are
+    // rendered below from the NHC FeatureServer.
+    const point = latestStormPoint(s);
+    const cur = point ? [point.lat, point.lon] : null;
     if (cur) {
       L.circleMarker(cur, {
         radius: 8, color: '#11111b', weight: 2,
@@ -307,16 +276,6 @@ async function renderActive(storms) {
         escapeHtml(`${s.name || s.binNumber || 'Active storm'}${s.classification ? ' · ' + s.classification : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}${distanceFromUser(cur)}`),
         { direction: 'top' },
       ).addTo(layerGroup);
-    }
-    // Cone of uncertainty (if provided as a polygon).
-    if (s.cone && Array.isArray(s.cone.coordinates)) {
-      try {
-        L.polygon(s.cone.coordinates.map(p => [p[1], p[0]]), {
-          color: '#89b4fa', weight: 1, opacity: 0.5,
-          fillColor: '#89b4fa', fillOpacity: 0.10,
-          className: 'active-cone',
-        }).addTo(layerGroup);
-      } catch (_) { /* skip malformed cone */ }
     }
   }
   layerGroup.addTo(map);

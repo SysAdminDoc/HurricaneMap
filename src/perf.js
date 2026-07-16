@@ -74,6 +74,7 @@ export function initPerformanceMonitoring() {
   if ('PerformanceNavigationTiming' in window) {
     window.addEventListener('load', () => {
       const nav = performance.getEntriesByType('navigation')[0];
+      if (!nav) return;
       console.log('[Perf] DNS:', (nav.domainLookupEnd - nav.domainLookupStart), 'ms');
       console.log('[Perf] TCP:', (nav.connectEnd - nav.connectStart), 'ms');
       console.log('[Perf] TTFB:', (nav.responseStart - nav.requestStart), 'ms');
@@ -82,4 +83,3 @@ export function initPerformanceMonitoring() {
     });
   }
 }
-

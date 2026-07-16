@@ -31,7 +31,6 @@ let forecastLayerGroup = null;
 let forecastLayerMap = null;
 let forecastLayerVisible = true;
 let forecastCache = null;
-let conePollingInterval = null;
 let renderGeneration = 0;
 
 export function buildNHCFeatureQueryUrl(layerId, options = {}) {
@@ -152,44 +151,9 @@ export function clearOfficialForecastCache() {
   forecastCache = null;
 }
 
-export function setOfficialForecastVisibility(visible) {
+function setOfficialForecastVisibility(visible) {
   forecastLayerVisible = !!visible;
   setLayerDisplay(forecastLayerGroup, forecastLayerVisible);
-}
-
-export function initConeLayer(map) {
-  ensureForecastLayer(map);
-}
-
-export async function showConeForStorm(stormId, map) {
-  const id = normalizeId(stormId);
-  if (!id) return { status: 'idle', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
-  return renderOfficialForecastContext([{ id }], { map, enabled: true, force: true });
-}
-
-export function clearCone() {
-  stopConePolling();
-  clearOfficialForecastContext();
-}
-
-export function startConePolling(stormId, map) {
-  stopConePolling();
-  const storm = { id: stormId };
-  renderOfficialForecastContext([storm], { map, enabled: true, force: true });
-  conePollingInterval = setInterval(() => {
-    renderOfficialForecastContext([storm], { map, enabled: true, force: true });
-  }, NHC_FORECAST_POLL_MS);
-}
-
-export function stopConePolling() {
-  if (conePollingInterval) {
-    clearInterval(conePollingInterval);
-    conePollingInterval = null;
-  }
-}
-
-export function toggleConeVisibility(visible) {
-  setOfficialForecastVisibility(visible);
 }
 
 async function fetchOfficialForecastLayers(activeStorms, { force = false } = {}) {
