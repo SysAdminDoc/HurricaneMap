@@ -7,11 +7,10 @@ LABEL org.opencontainers.image.source="https://github.com/SysAdminDoc/HurricaneM
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-COPY . /app
-
 RUN addgroup -S hurricanemap \
-  && adduser -S -G hurricanemap hurricanemap \
-  && chown -R hurricanemap:hurricanemap /app
+  && adduser -S -G hurricanemap hurricanemap
+
+COPY --chown=hurricanemap:hurricanemap . /app
 
 USER hurricanemap
 

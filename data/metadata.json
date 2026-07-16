@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-07-16T05:15:52Z",
+  "generated_at_utc": "2026-07-16T06:29:42Z",
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.5.0"
@@ -38,8 +38,8 @@
       1851,
       2025
     ],
-    "storm_count": 596,
-    "landfall_event_count": 760,
+    "storm_count": 595,
+    "landfall_event_count": 759,
     "hurricane_landfall_count": 374,
     "basins": [
       "AL",
@@ -49,23 +49,23 @@
   "outputs": {
     "landfalls": {
       "path": "data/landfalls.json",
-      "size_bytes": 129991,
-      "modified_utc": "2026-07-16T05:15:52Z"
+      "size_bytes": 129824,
+      "modified_utc": "2026-07-16T06:29:42Z"
     },
     "storms": {
       "path": "data/storms.json",
-      "size_bytes": 2300512,
-      "modified_utc": "2026-07-16T05:15:52Z"
+      "size_bytes": 2299081,
+      "modified_utc": "2026-07-16T06:29:42Z"
     },
     "storms_gzip": {
       "path": "data/storms.json.gz",
-      "size_bytes": 234729,
-      "modified_utc": "2026-07-16T05:15:52Z"
+      "size_bytes": 234595,
+      "modified_utc": "2026-07-16T06:29:42Z"
     },
     "stats": {
       "path": "data/stats.json",
-      "size_bytes": 8365,
-      "modified_utc": "2026-07-16T05:15:52Z"
+      "size_bytes": 8364,
+      "modified_utc": "2026-07-16T06:29:42Z"
     }
   },
   "methodology": {

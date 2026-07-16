@@ -8,6 +8,8 @@ assert.match(dockerfile, /^FROM python:3\.12-alpine/m, 'Dockerfile should use th
 assert.match(dockerfile, /WORKDIR \/app/, 'Dockerfile should serve from /app');
 assert.match(dockerfile, /EXPOSE 8080/, 'Dockerfile should expose port 8080');
 assert.match(dockerfile, /USER hurricanemap/, 'Dockerfile should run as a non-root user');
+assert.match(dockerfile, /COPY --chown=hurricanemap:hurricanemap \. \/app/, 'Dockerfile should assign ownership while copying');
+assert.doesNotMatch(dockerfile, /chown -R/, 'Dockerfile should not duplicate the data layer with a recursive chown');
 assert.match(dockerfile, /http\.server", "8080"/, 'Dockerfile should use Python http.server on port 8080');
 assert.match(dockerfile, /HEALTHCHECK/, 'Dockerfile should include a healthcheck');
 assert.match(dockerfile, /data\/metadata\.json/, 'healthcheck should verify a real app data asset');
@@ -18,9 +20,9 @@ for (const required of [
   '.tmp-bundle',
   '.tmp-pw',
   'test-results',
-  'example.png',
 ]) {
   assert.match(dockerignore, new RegExp(`(^|\\n)${required.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\n|$)`), `.dockerignore should exclude ${required}`);
 }
+assert.doesNotMatch(dockerignore, /(^|\n)example\.png(\n|$)/, '.dockerignore must include the manifest screenshot');
 
 console.log('docker packaging ok');

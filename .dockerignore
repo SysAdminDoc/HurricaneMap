@@ -11,6 +11,5 @@ test-results
 server.log
 npm-debug.log*
 .tmp-pid.txt
-example.png
 __pycache__
 *.pyc

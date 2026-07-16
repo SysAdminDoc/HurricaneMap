@@ -66,6 +66,12 @@ for (const required of [
 if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/DecompressionStream/.test(source)) {
   errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
 }
+if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR_CACHE_MAX_ENTRIES\)/.test(source)) {
+  errors.push('sw.js must cap the on-demand radar cache.');
+}
+if (!/pruneOfflineData\(\)/.test(source) || !/idbDeleteExcept/.test(source)) {
+  errors.push('sw.js activate path must prune removed offline-data records.');
+}
 
 const radarBranch = source.indexOf('if (isRadarAsset(url))');
 const shellBranch = source.indexOf('if (isShell(url))');

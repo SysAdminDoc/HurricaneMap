@@ -1,6 +1,6 @@
 {
-  "total_storms": 596,
-  "total_landfall_events": 760,
+  "total_storms": 595,
+  "total_landfall_events": 759,
   "total_hurricane_landfalls": 374,
   "by_state": {
     "Alabama": {
@@ -196,13 +196,13 @@
       ]
     },
     "Texas": {
-      "total": 114,
+      "total": 113,
       "by_cat": [
-        55,
+        54,
         25,
         14,
-        11,
-        9,
+        12,
+        8,
         0,
         0
       ]
@@ -263,8 +263,8 @@
         24,
         12,
         11,
-        3,
-        2,
+        4,
+        1,
         0,
         0
       ]
@@ -330,9 +330,9 @@
       ]
     },
     "1940": {
-      "total": 47,
+      "total": 46,
       "by_cat": [
-        17,
+        16,
         9,
         13,
         3,
@@ -531,7 +531,7 @@
     "1944": 6,
     "1945": 7,
     "1946": 3,
-    "1947": 10,
+    "1947": 9,
     "1948": 5,
     "1949": 4,
     "1950": 6,
@@ -611,11 +611,11 @@
     "2025": 1
   },
   "by_category": {
-    "ts_or_below": 386,
+    "ts_or_below": 385,
     "cat1": 160,
     "cat2": 103,
-    "cat3": 73,
-    "cat4": 33,
+    "cat3": 74,
+    "cat4": 32,
     "cat5": 5
   },
   "cold_spot_coastal_states": [

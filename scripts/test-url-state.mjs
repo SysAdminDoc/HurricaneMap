@@ -51,7 +51,7 @@ function cats(filters) {
     knownStates: { Florida: true },
   });
   assert.deepEqual(decoded, { c: 'bad', s: 'NotAState' });
-  assert.deepEqual(cats(restored), []);
+  assert.deepEqual(cats(restored), [...CATEGORY_DEFAULTS].sort());
   assert.equal(restored.state, '');
 }
 

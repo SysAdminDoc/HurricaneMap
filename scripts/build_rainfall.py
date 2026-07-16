@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import urllib.request
+from pathlib import Path
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SCRIPT_DIR)
@@ -23,13 +24,39 @@ DATA_DIR = os.path.join(ROOT, 'data')
 
 CSV_URL = 'https://www.wpc.ncep.noaa.gov/tropical/rain/CONUS_rainfall_obs_1900-2020.csv'
 CSV_CACHE = os.path.join(ROOT, '.tmp-stormevents', 'tc_rainfall.csv')
+REQUIRED_COLUMNS = {'Storm', 'Year', 'Total', 'Station', 'Lat', 'Lon'}
+
+def valid_cached_csv(path):
+    candidate = Path(path)
+    if not candidate.exists() or candidate.stat().st_size < 1024:
+        return False
+    try:
+        with candidate.open('rb') as raw:
+            raw.seek(-1, os.SEEK_END)
+            if raw.read(1) not in (b'\n', b'\r'):
+                return False
+        with candidate.open(encoding='utf-8', errors='replace', newline='') as handle:
+            reader = csv.DictReader(handle)
+            if not REQUIRED_COLUMNS.issubset(reader.fieldnames or []):
+                return False
+            return sum(1 for _ in reader) >= 1000
+    except (OSError, csv.Error):
+        return False
 
 def download_csv():
     os.makedirs(os.path.dirname(CSV_CACHE), exist_ok=True)
-    if os.path.exists(CSV_CACHE):
+    if valid_cached_csv(CSV_CACHE):
         return CSV_CACHE
     print(f'Downloading {CSV_URL}...')
-    urllib.request.urlretrieve(CSV_URL, CSV_CACHE)
+    temp_path = CSV_CACHE + '.download'
+    try:
+        urllib.request.urlretrieve(CSV_URL, temp_path)
+        if not valid_cached_csv(temp_path):
+            raise RuntimeError('downloaded rainfall CSV failed completeness validation')
+        os.replace(temp_path, CSV_CACHE)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
     return CSV_CACHE
 
 def load_storms():

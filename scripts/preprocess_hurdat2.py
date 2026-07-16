@@ -355,6 +355,15 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
     return (best, best_d) if best else (None, None)
 
 
+def on_known_foreign_coast(lon: float, lat: float) -> bool:
+    """Exclude explicit-L fixes south of the Rio Grande mouth in Tamaulipas.
+
+    Three current HURDAT2 rows (1857, 1880, 1947) fall within the generic
+    0.5-degree coastline tolerance but are geographically south of Texas.
+    """
+    return lon <= -96.8 and lat < 25.84
+
+
 # US territory bounding boxes for the coarse first-pass filter (lat,lat,lon,lon).
 US_BBOXES = [
     # CONUS east + Gulf coast
@@ -577,6 +586,8 @@ def main():
                 if rec["rec"] != "L":
                     continue
                 if not in_us_bbox(rec["lon"], rec["lat"]):
+                    continue
+                if on_known_foreign_coast(rec["lon"], rec["lat"]):
                     continue
                 state, d = nearest_state(rec["lon"], rec["lat"], states)
                 if not state:

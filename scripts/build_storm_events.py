@@ -53,12 +53,19 @@ def state_key(value):
 def discover_detail_files():
     with urlopen(BULK_URL, timeout=60) as response:
         html = response.read().decode("utf-8", errors="replace")
+    return discover_detail_files_from_html(html)
+
+
+def discover_detail_files_from_html(html):
     files = {}
-    for name in re.findall(r'StormEvents_details-ftp_v1\.0_d(\d{4})_c\d+\.csv\.gz', html):
-        year = int(name)
-        match = re.search(rf'(StormEvents_details-ftp_v1\.0_d{name}_c\d+\.csv\.gz)', html)
-        if match:
-            files[year] = match.group(1)
+    revisions = {}
+    pattern = r'(StormEvents_details-ftp_v1\.0_d(\d{4})_c(\d+)\.csv\.gz)'
+    for filename, year_text, revision_text in re.findall(pattern, html):
+        year = int(year_text)
+        revision = int(revision_text)
+        if revision > revisions.get(year, -1):
+            revisions[year] = revision
+            files[year] = filename
     return files
 
 

@@ -96,8 +96,14 @@ export function restoreFiltersFromHash(hash, currentFilters, {
     next.yearMax = clamp(Math.max(a, b));
   }
   if (decoded.c !== undefined) {
-    const categories = decoded.c.split(',').filter(category => VALID_CATEGORIES.has(category));
-    next.categories = new Set(categories);
+    const categories = decoded.c
+      ? decoded.c.split(',').filter(category => VALID_CATEGORIES.has(category))
+      : [];
+    // Preserve an intentionally empty selection (`#c=`), but canonicalize a
+    // non-empty value containing only unknown categories back to the default.
+    next.categories = new Set(
+      decoded.c && categories.length === 0 ? CATEGORY_DEFAULTS : categories,
+    );
   }
   if (decoded.s !== undefined) {
     next.state = hasKnownState(knownStates, decoded.s) ? decoded.s : '';

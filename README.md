@@ -42,7 +42,7 @@ npm run build
 
 ## Highlights
 
-- **596 storms · 760 landfall events · 374 hurricane-strength landfalls** spanning 1851–2025.
+- **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851–2025.
 - Both **Atlantic** and **Eastern North Pacific** HURDAT2 basins ingested (so storms like Iniki '92 on Kauai are included).
 - **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times — fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).

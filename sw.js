@@ -83,7 +83,7 @@ const SHELL_ASSETS = [
   './src/url-state.js',
   './src/windfield.js',
   './branding/favicon.png',
-  './branding/logo.png',
+  './branding/logo-192.png',
   './vendor/leaflet.css',
   './vendor/leaflet.js',
   './vendor/leaflet-heat.js',
@@ -140,6 +140,7 @@ self.addEventListener('activate', (event) => {
     if (self.registration.navigationPreload) {
       await self.registration.navigationPreload.enable();
     }
+    await pruneOfflineData();
     self.clients.claim();
   })());
 });
@@ -175,7 +176,7 @@ self.addEventListener('fetch', (event) => {
   if (!url.protocol.startsWith('http')) return;
 
   if (isRadarAsset(url)) {
-    event.respondWith(cacheFirst(req, RADAR_CACHE));
+    event.respondWith(cacheFirst(req, RADAR_CACHE, event));
   } else if (isShell(url)) {
     event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, event));
   } else if (isData(url)) {
@@ -188,6 +189,7 @@ self.addEventListener('fetch', (event) => {
 // Keep the tile cache bounded — without a cap it grows with every pan/zoom
 // for the life of the origin. Eviction is insertion-order (oldest first).
 const TILE_CACHE_MAX_ENTRIES = 600;
+const RADAR_CACHE_MAX_ENTRIES = 240;
 
 async function trimCache(cacheName, maxEntries) {
   try {
@@ -198,13 +200,18 @@ async function trimCache(cacheName, maxEntries) {
   } catch { /* best-effort */ }
 }
 
-async function cacheFirst(req, cacheName) {
+async function cacheFirst(req, cacheName, event) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(req);
   if (hit) return hit;
   try {
     const res = await fetch(req);
-    if (res && res.status === 200) cache.put(req, res.clone()).catch(() => {});
+    if (res && res.status === 200) {
+      const write = cache.put(req, res.clone())
+        .then(() => cacheName === RADAR_CACHE ? trimCache(RADAR_CACHE, RADAR_CACHE_MAX_ENTRIES) : undefined)
+        .catch(() => {});
+      if (event && typeof event.waitUntil === 'function') event.waitUntil(write);
+    }
     return res;
   } catch (e) {
     return hit || Response.error();
@@ -263,6 +270,23 @@ async function precacheOfflineData() {
       /* Keep install resilient when a data sidecar is temporarily unavailable. */
     }
   }));
+}
+
+async function pruneOfflineData() {
+  const allowed = new Set(OFFLINE_DATA_ASSETS.map(asset => {
+    const url = new URL(asset, self.location.href);
+    return url.pathname.replace(/^\//, '');
+  }));
+  try {
+    const cache = await caches.open(DATA_CACHE);
+    const keys = await cache.keys();
+    await Promise.all(keys.map(request => (
+      allowed.has(cacheKeyFor(request)) ? undefined : cache.delete(request)
+    )));
+  } catch { /* best-effort */ }
+  try {
+    await idbDeleteExcept(allowed);
+  } catch { /* IndexedDB may be unavailable */ }
 }
 
 async function readOfflineResponse(req) {
@@ -362,6 +386,29 @@ async function idbPut(record) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DATA_STORE, 'readwrite');
     tx.objectStore(DATA_STORE).put(record);
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
+}
+
+async function idbDeleteExcept(allowedKeys) {
+  const db = await openDataDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DATA_STORE, 'readwrite');
+    const request = tx.objectStore(DATA_STORE).openCursor();
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (!cursor) return;
+      if (!allowedKeys.has(cursor.key)) cursor.delete();
+      cursor.continue();
+    };
+    request.onerror = () => reject(request.error);
     tx.oncomplete = () => {
       db.close();
       resolve();
