@@ -36,6 +36,7 @@ import {
 } from './impact-utils.js';
 import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
+import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -79,6 +80,7 @@ closeBtn.addEventListener('click', () => {
   hideWindField();
   hideHwm();
   clearRetrospectiveCone();
+  clearRiskTrajectories();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
@@ -102,6 +104,7 @@ export async function showStorm(landfall) {
   hideWindField();
   hideHwm();
   clearRetrospectiveCone();
+  clearRiskTrajectories();
   await ensureStormsLoaded();
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
@@ -323,6 +326,26 @@ function render(storm, landfall, allStorms) {
           <p class="cone-retro-status" id="cone-retro-status" role="status" aria-live="polite"></p>
         </section>
 
+        <section class="art-mode-control" aria-labelledby="art-mode-title">
+          <div class="cone-retro-heading">
+            <h3 id="art-mode-title">${t('art.title')}</h3>
+            <label class="wf-toggle">
+              <input type="checkbox" id="art-mode-enabled">
+              <span>${t('art.show')}</span>
+            </label>
+          </div>
+          <div class="cone-retro-options">
+            <label for="art-mode-era">${t('coneRetro.era')}</label>
+            <select id="art-mode-era" disabled>
+              <option value="2015"${storm.year < 2020 ? ' selected' : ''}>2015</option>
+              <option value="2025"${storm.year >= 2020 && storm.year < 2026 ? ' selected' : ''}>2025</option>
+              <option value="2026"${storm.year >= 2026 ? ' selected' : ''}>2026</option>
+            </select>
+          </div>
+          <p>${t('art.explainer')}</p>
+          <p class="cone-retro-status" id="art-mode-status" role="status" aria-live="polite"></p>
+        </section>
+
         ${radiiCount(storm) > 0 ? `
           <div class="wind-field-row">
             <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
@@ -532,6 +555,27 @@ function render(storm, landfall, allStorms) {
     coneEra.addEventListener('change', syncCone);
     coneEllipse.addEventListener('change', syncCone);
     syncCone();
+  }
+
+  const artEnabled = document.getElementById('art-mode-enabled');
+  const artEra = document.getElementById('art-mode-era');
+  const artStatus = document.getElementById('art-mode-status');
+  if (artEnabled && artEra && artStatus) {
+    const syncArt = async () => {
+      artEra.disabled = !artEnabled.checked;
+      if (!artEnabled.checked) {
+        clearRiskTrajectories();
+        artStatus.textContent = '';
+        return;
+      }
+      artStatus.textContent = t('art.loading');
+      const result = await renderRiskTrajectories(storm, { map: getMap(), era: artEra.value });
+      artStatus.textContent = result.status === 'rendered'
+        ? t(result.reduced ? 'art.readyStatic' : 'art.ready', result.pathCount)
+        : result.status === 'error' ? t('art.error') : '';
+    };
+    artEnabled.addEventListener('change', syncArt);
+    artEra.addEventListener('change', syncArt);
   }
 }
 

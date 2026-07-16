@@ -790,6 +790,35 @@ try {
   await page.uncheck('#cone-retro-enabled');
   await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), { timeout: 5000 });
 
+  await page.check('#art-mode-enabled');
+  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--animated').length === 20 && /20 plausible paths/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
+  const animatedRisk = await page.evaluate(() => ({
+    pathCount: document.querySelectorAll('path.art-risk-path').length,
+    animationName: getComputedStyle(document.querySelector('path.art-risk-path')).animationName,
+    legend: document.querySelector('#art-mode-legend')?.textContent || '',
+    explainer: document.querySelector('.art-mode-control p')?.textContent || '',
+  }));
+  assert(animatedRisk.pathCount === 20 && animatedRisk.animationName === 'art-risk-flow', `risk trajectories did not animate: ${JSON.stringify(animatedRisk)}`);
+  assert(/educational possibilities/i.test(animatedRisk.explainer) && /not forecasts/i.test(animatedRisk.explainer), `risk trajectory explainer is incomplete: ${animatedRisk.explainer}`);
+
+  await page.uncheck('#art-mode-enabled');
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('reducedMotion', true);
+  });
+  await page.check('#art-mode-enabled');
+  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--static').length === 20 && /without animation/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
+  const reducedRisk = await page.evaluate(() => ({
+    animationName: getComputedStyle(document.querySelector('path.art-risk-path--static')).animationName,
+    legend: document.querySelector('#art-mode-legend')?.textContent || '',
+  }));
+  assert(reducedRisk.animationName === 'none' && /Animation paused/.test(reducedRisk.legend), `risk trajectories ignored reduced motion: ${JSON.stringify(reducedRisk)}`);
+  await page.uncheck('#art-mode-enabled');
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('reducedMotion', false);
+  });
+
   await page.click('#toggle-settings');
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   await page.keyboard.press('Escape');
