@@ -39,6 +39,10 @@ assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff', 'worker 
 assert.match(response.headers.get('Vary'), /Accept-Encoding/, 'worker should vary on compression support');
 assert.match(response.headers.get('Cloudflare-CDN-Cache-Control'), /stale-while-revalidate/, 'worker should set Cloudflare CDN cache policy');
 
+const errorResponse = applyResponseHeaders(new Response('missing', { status: 404 }), cachePolicyFor('/data/radar/missing.png'));
+assert.equal(errorResponse.headers.get('Cache-Control'), 'no-store', 'error responses must not be pinned in browser caches');
+assert.equal(errorResponse.headers.get('Cloudflare-CDN-Cache-Control'), 'no-store', 'error responses must not be pinned at the edge');
+
 const imageOptions = cloudflareFetchOptions('/branding/logo.png', cachePolicyFor('/branding/logo.png'));
 assert.equal(imageOptions.image.format, 'auto', 'image requests should opt into automatic image format negotiation');
 const radarOptions = cloudflareFetchOptions('/data/radar/Katrina-2005/t_200508291200.png', cachePolicyFor('/data/radar/Katrina-2005/t_200508291200.png'));
@@ -47,5 +51,31 @@ assert.equal(radarOptions.image, undefined, 'radar frames should not be transfor
 // Verify NHC proxy route is declared
 import workerModule from '../cloudflare/worker.js';
 assert.equal(typeof workerModule.fetch, 'function', 'worker should export a fetch handler');
+
+const originalCaches = globalThis.caches;
+const originalFetch = globalThis.fetch;
+let cachePutCalls = 0;
+globalThis.caches = {
+  default: {
+    match: async () => null,
+    put: async () => { cachePutCalls += 1; },
+  },
+};
+globalThis.fetch = async () => new Response(null, { status: 200, headers: { 'Content-Type': 'text/plain' } });
+try {
+  const waitUntilCalls = [];
+  const headResponse = await workerModule.fetch(
+    new Request('https://map.example.com/src/main.js', { method: 'HEAD' }),
+    { ORIGIN_BASE_URL: 'https://sysadmindoc.github.io/HurricaneMap' },
+    { waitUntil: promise => waitUntilCalls.push(promise) },
+  );
+  assert.equal(headResponse.status, 200, 'HEAD request should return the origin status');
+  assert.equal(headResponse.body, null, 'HEAD response must not expose a body');
+  assert.equal(cachePutCalls, 0, 'HEAD requests must not call cache.put');
+  assert.equal(waitUntilCalls.length, 0, 'HEAD requests must not enqueue cache writes');
+} finally {
+  globalThis.caches = originalCaches;
+  globalThis.fetch = originalFetch;
+}
 
 console.log('cloudflare worker policy ok');

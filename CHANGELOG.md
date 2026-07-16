@@ -10,6 +10,7 @@ All notable changes to HurricaneMap.
 - Delayed geolocation, SST probes, high-water-mark fetches, tropical alerts, peak-surge forecasts, and official cone requests can no longer resurrect layers after users turn them off; SST fallback probes also retry instead of freezing for the session.
 - PWA statistics/comparison shortcuts now survive initial URL canonicalization and work during in-app hash navigation; the climate-trends chart loads storm data on its first opening instead of remaining empty.
 - Storm biographies use basin-aware Pacific genesis wording and report the actual number of landfall events rather than the number of unique states.
+- The Cloudflare edge wrapper marks upstream errors `no-store` and handles HEAD lookups with GET cache keys without attempting invalid bodyless cache writes.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

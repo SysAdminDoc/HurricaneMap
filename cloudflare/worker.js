@@ -48,11 +48,12 @@ export default {
 
     const originUrl = originUrlFor(requestUrl, env);
     const policy = cachePolicyFor(requestUrl.pathname);
-    const cacheKey = new Request(originUrl.href, request);
+    const isHead = request.method === 'HEAD';
+    const cacheKey = getCacheKey(originUrl.href, request);
     const cache = caches.default;
 
     const cached = await cache.match(cacheKey);
-    if (cached) return tagCacheStatus(cached, 'HIT');
+    if (cached) return toRequestMethod(tagCacheStatus(cached, 'HIT'), request.method);
 
     const originRequest = new Request(originUrl.href, request);
     const response = await fetch(originRequest, {
@@ -60,19 +61,20 @@ export default {
     });
 
     const finalResponse = applyResponseHeaders(response, policy);
-    if (finalResponse.ok && policy.edgeTtl > 0) {
+    if (!isHead && finalResponse.ok && policy.edgeTtl > 0) {
       ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
     }
-    return tagCacheStatus(finalResponse, 'MISS');
+    return toRequestMethod(tagCacheStatus(finalResponse, 'MISS'), request.method);
   },
 };
 
 async function handleNhcProxy(targetUrl, request, ctx) {
   const cache = caches.default;
-  const cacheKey = new Request(targetUrl, request);
+  const isHead = request.method === 'HEAD';
+  const cacheKey = getCacheKey(targetUrl, request);
 
   const cached = await cache.match(cacheKey);
-  if (cached) return addCorsHeaders(tagCacheStatus(cached, 'HIT'));
+  if (cached) return toRequestMethod(addCorsHeaders(tagCacheStatus(cached, 'HIT')), request.method);
 
   const response = await fetch(targetUrl, {
     headers: { 'User-Agent': 'HurricaneMap/1.0 (https://github.com/SysAdminDoc/HurricaneMap)' },
@@ -80,10 +82,10 @@ async function handleNhcProxy(targetUrl, request, ctx) {
   });
 
   const finalResponse = applyResponseHeaders(response, NHC_POLICY);
-  if (finalResponse.ok) {
+  if (!isHead && finalResponse.ok) {
     ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
   }
-  return addCorsHeaders(tagCacheStatus(finalResponse, 'MISS'));
+  return toRequestMethod(addCorsHeaders(tagCacheStatus(finalResponse, 'MISS')), request.method);
 }
 
 function addCorsHeaders(response) {
@@ -128,9 +130,11 @@ export function originUrlFor(requestUrl, env = {}) {
 
 export function applyResponseHeaders(response, policy) {
   const headers = new Headers(response.headers);
-  headers.set('Cache-Control', policy.browser);
-  headers.set('CDN-Cache-Control', policy.edge);
-  headers.set('Cloudflare-CDN-Cache-Control', policy.edge);
+  const browserPolicy = response.ok ? policy.browser : 'no-store';
+  const edgePolicy = response.ok ? policy.edge : 'no-store';
+  headers.set('Cache-Control', browserPolicy);
+  headers.set('CDN-Cache-Control', edgePolicy);
+  headers.set('Cloudflare-CDN-Cache-Control', edgePolicy);
   headers.set('Vary', appendVary(headers.get('Vary'), 'Accept-Encoding'));
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -139,6 +143,21 @@ export function applyResponseHeaders(response, policy) {
     status: response.status,
     statusText: response.statusText,
     headers,
+  });
+}
+
+function getCacheKey(url, request) {
+  // Cache API keys must be GET requests. HEAD reuses a matching GET entry but
+  // never writes its bodyless origin response into the cache.
+  return new Request(url, { method: 'GET', headers: request.headers });
+}
+
+function toRequestMethod(response, method) {
+  if (method !== 'HEAD') return response;
+  return new Response(null, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
   });
 }
 
