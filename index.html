@@ -73,6 +73,10 @@
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
           <span class="mobile-action-label" data-i18n="header.btn.spatial">Nearby storms</span>
         </button>
+        <button class="icon-btn" id="toggle-prep" title="Hurricane preparedness" aria-label="Hurricane preparedness" data-i18n-title="header.btn.prep" data-i18n-aria-label="header.btn.prep" aria-pressed="false" aria-controls="prep-panel">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9 3h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2zm0 4h6V5H9v2zm2 3v3H8v2h3v3h2v-3h3v-2h-3v-3h-2z"/></svg>
+          <span class="mobile-action-label" data-i18n="header.btn.prep">Preparedness</span>
+        </button>
         <button class="icon-btn" id="toggle-info" title="About" aria-label="About" data-i18n-title="header.btn.info" data-i18n-aria-label="header.btn.info">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11 17h2v-6h-2v6zm1-15A10 10 0 1 0 22 12 10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-11h2V7h-2v2z"/></svg>
           <span class="mobile-action-label" data-i18n="header.btn.info">About</span>
@@ -317,6 +321,12 @@
       <button class="close-btn" id="close-table-view" aria-label="Close table view" data-i18n-aria-label="panel.closeTable">×</button>
     </div>
     <div id="table-view-body"></div>
+  </section>
+
+  <section class="prep-panel glass" id="prep-panel" hidden role="region" aria-labelledby="prep-panel-title" aria-label="Hurricane preparedness" data-i18n-aria-label="prep.title">
+    <button class="close-btn" id="close-prep" aria-label="Close hurricane preparedness" data-i18n-aria-label="prep.close">×</button>
+    <h2 id="prep-panel-title" data-i18n="prep.title">Hurricane preparedness</h2>
+    <div id="prep-body"></div>
   </section>
 
   <section class="globe3d-panel" id="globe3d-panel" hidden role="dialog" aria-modal="true" aria-labelledby="globe3d-title" aria-describedby="globe3d-subtitle">

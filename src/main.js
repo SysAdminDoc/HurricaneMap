@@ -70,6 +70,7 @@ const loadReport = once(() => import('./report.js'));
 const loadQgis = once(() => import('./qgis.js'));
 const loadTableView = once(() => import('./table-view.js'));
 const loadSpatialSearch = once(() => import('./spatial-search.js'));
+const loadPrep = once(() => import('./prep.js'));
 const loadSST = once(() => import('./sst.js'));
 
 async function showStormLazy(landfall) {
@@ -150,6 +151,7 @@ const els = {
   reportBtn: document.getElementById('generate-report'),
   qgisBtn: document.getElementById('export-qgis'),
   tableViewBtn: document.getElementById('toggle-table-view'),
+  prepBtn: document.getElementById('toggle-prep'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
@@ -1077,6 +1079,11 @@ function wireUI() {
       tv.show(currentVisibleLandfalls, (lf) => onLandfallClick(lf, null));
     });
   }
+
+  els.prepBtn?.addEventListener('click', async () => {
+    const { openPrepPanel } = await loadPrep();
+    openPrepPanel();
+  });
 
   const spatialBtn = document.getElementById('toggle-spatial-search');
   if (spatialBtn) {

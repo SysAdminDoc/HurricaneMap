@@ -155,6 +155,17 @@ try {
   assert(/Katrina/i.test(offlineResult.panelText), 'offline storm panel did not render Katrina');
   assert(/Est\. exposure/.test(offlineResult.panelText), 'offline exposure metric did not render from cached state density data');
 
+  const offlinePrep = await page.evaluate(async () => {
+    const prep = await import('/src/prep.js');
+    prep.openPrepPanel();
+    document.querySelector('#prep-household').value = '5';
+    document.querySelector('#prep-household').dispatchEvent(new Event('change', { bubbles: true }));
+    document.querySelector('#prep-mode').value = 'home';
+    document.querySelector('#prep-mode').dispatchEvent(new Event('change', { bubbles: true }));
+    return document.querySelector('#prep-body')?.textContent || '';
+  });
+  assert(/70\s*gallons of water/.test(offlinePrep), `offline preparedness calculator did not render: ${offlinePrep}`);
+
   await context.close();
   await browser.close();
 

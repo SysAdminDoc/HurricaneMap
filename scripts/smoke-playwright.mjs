@@ -830,6 +830,41 @@ try {
   }));
   assert(afterSettingsEscape.stormPanelHidden === false, 'Escape while settings was open also closed the storm panel.');
 
+  await page.click('#toggle-prep');
+  await page.waitForSelector('#prep-panel:not([hidden]) #prep-household');
+  await page.fill('#prep-household', '4');
+  await page.dispatchEvent('#prep-household', 'change');
+  await page.selectOption('#prep-mode', 'home');
+  await page.check('[data-prep-item="water"]');
+  await page.check('[data-prep-item="food"]');
+  const prepState = await page.evaluate(() => ({
+    text: document.querySelector('#prep-body')?.textContent || '',
+    completed: document.querySelector('.prep-progress')?.getAttribute('aria-valuenow'),
+    stored: JSON.parse(localStorage.getItem('hm-prep-v1') || 'null'),
+  }));
+  assert(/56\s*gallons of water/.test(prepState.text) && /56\s*person-days of food/.test(prepState.text), `preparedness calculator totals are wrong: ${prepState.text}`);
+  assert(prepState.completed === '2' && prepState.stored?.household === 4 && prepState.stored?.mode === 'home', `preparedness progress did not persist: ${JSON.stringify(prepState)}`);
+  await page.click('#close-prep');
+  await page.click('#toggle-prep');
+  await page.waitForFunction(() => document.querySelector('#prep-household')?.value === '4' && document.querySelector('[data-prep-item="water"]')?.checked, { timeout: 5000 });
+  const prepLocales = await page.evaluate(async () => {
+    const i18n = await import('/src/i18n.js');
+    const prep = await import('/src/prep.js');
+    i18n.setLocale('es');
+    prep.renderPrepPanel();
+    const es = document.querySelector('#prep-body')?.textContent || '';
+    i18n.setLocale('ht');
+    prep.renderPrepPanel();
+    const ht = document.querySelector('#prep-body')?.textContent || '';
+    i18n.setLocale('en');
+    prep.renderPrepPanel();
+    return { es, ht };
+  });
+  assert(/Calculadora de suministros/.test(prepLocales.es) && /Lista de suministros/.test(prepLocales.es), 'Spanish preparedness surface did not render');
+  assert(/Kalkilatris pwovizyon/.test(prepLocales.ht) && /Lis pwovizyon/.test(prepLocales.ht), 'Haitian Creole preparedness surface did not render');
+  await assertNoAxeViolations(page, 'preparedness panel (WCAG 2.2 AA)', '#prep-panel');
+  await page.click('#close-prep');
+
   await page.evaluate(async () => {
     const data = await import('/src/data.js');
     const panel = await import('/src/panel.js');

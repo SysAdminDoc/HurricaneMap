@@ -8806,3 +8806,89 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 @media (prefers-reduced-motion: reduce) {
   .art-risk-path--animated { animation: none; stroke-dasharray: none; }
 }
+
+/* Offline hurricane-preparedness panel */
+.prep-panel {
+  position: fixed;
+  inset: var(--side-panel-top) var(--side-panel-gap) var(--side-panel-bottom) auto;
+  z-index: 1800;
+  width: min(var(--side-panel-width), calc(100vw - 368px));
+  max-width: calc(100vw - 32px);
+  padding: 18px 22px 22px;
+  overflow: hidden auto;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  contain: layout paint;
+}
+.prep-panel[hidden] { display: none !important; }
+.prep-panel h2 { margin: 0 34px 12px 0; font-size: 1.25rem; }
+.prep-panel h3 { margin: 0; font-size: 0.9rem; }
+.prep-header p { margin: 0 0 8px; color: var(--subtext); }
+.prep-sources { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.prep-sources a { color: var(--blue); }
+.prep-calculator,
+.prep-checklist {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--surface0) 58%, transparent);
+  border: 1px solid var(--surface1);
+  border-radius: 10px;
+}
+.prep-inputs { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; }
+.prep-inputs label { display: grid; gap: 4px; color: var(--subtext); font-size: 0.72rem; }
+.prep-inputs input,
+.prep-inputs select {
+  min-height: 44px;
+  width: 100%;
+  padding: 7px 9px;
+  color: var(--text);
+  background: var(--crust);
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+}
+.prep-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.prep-totals > div {
+  display: grid;
+  padding: 10px;
+  background: var(--crust);
+  border-radius: 8px;
+}
+.prep-totals strong { color: var(--blue); font-size: 1.35rem; }
+.prep-totals span { font-weight: 650; }
+.prep-totals small,
+.prep-note,
+.prep-caveat { color: var(--subtext); }
+.prep-note { margin: 0; font-size: 0.72rem; }
+.prep-checklist-heading { display: flex; align-items: center; justify-content: space-between; }
+.prep-checklist-heading strong { color: var(--green); }
+.prep-progress { height: 7px; overflow: hidden; background: var(--surface1); border-radius: 4px; }
+.prep-progress span { display: block; height: 100%; background: var(--green); transition: width 160ms ease; }
+.prep-group { display: grid; gap: 2px; margin: 0; padding: 0; border: 0; }
+.prep-group legend { margin-bottom: 4px; color: var(--lavender); font-size: 0.72rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; }
+.prep-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.prep-item:hover { background: color-mix(in srgb, var(--surface1) 45%, transparent); }
+.prep-item input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--green); }
+.prep-item input:checked + span { color: var(--subtext); text-decoration: line-through; }
+.prep-reset { justify-self: start; min-height: 40px; }
+.prep-caveat { margin: 14px 2px 0; font-size: 0.72rem; }
+@media (max-width: 720px) {
+  .prep-panel {
+    inset: calc(var(--side-panel-top) - 8px) 8px 124px;
+    width: auto;
+    max-width: none;
+    padding: 16px;
+  }
+  .prep-inputs,
+  .prep-totals { grid-template-columns: 1fr; }
+}
