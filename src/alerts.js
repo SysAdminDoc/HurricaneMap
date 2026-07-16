@@ -56,6 +56,7 @@ let layerGroup = null;
 let layerMap = null;
 let legendEl = null;
 let alertsCache = null;
+let renderGeneration = 0;
 const zoneGeometryCache = new Map();
 
 export function buildAlertsUrl() {
@@ -132,9 +133,9 @@ async function fetchWithTimeout(url) {
   }
 }
 
-async function fetchActiveAlerts() {
+async function fetchActiveAlerts(force = false) {
   const now = Date.now();
-  if (alertsCache && now - alertsCache.fetchedAt < ALERTS_CACHE_MS) return alertsCache.features;
+  if (!force && alertsCache && now - alertsCache.fetchedAt < ALERTS_CACHE_MS) return alertsCache.features;
   const data = await fetchWithTimeout(buildAlertsUrl());
   const features = Array.isArray(data?.features) ? data.features : [];
   alertsCache = { fetchedAt: now, features };
@@ -255,16 +256,19 @@ function updateLegend(present) {
   legendEl.hidden = false;
 }
 
-export async function renderTropicalAlerts(activeStorms, { map, enabled = true } = {}) {
+export async function renderTropicalAlerts(activeStorms, { map, enabled = true, force = false } = {}) {
   if (!map || !enabled || !Array.isArray(activeStorms) || activeStorms.length === 0) {
     clearTropicalAlerts();
     return { status: 'idle', zoneCount: 0 };
   }
+  const generation = ++renderGeneration;
   ensureLayer(map);
   try {
-    const features = await fetchActiveAlerts();
+    const features = await fetchActiveAlerts(force);
+    if (generation !== renderGeneration) return { status: 'stale', zoneCount: 0 };
     const { zoneFlags, directGeometries } = classifyAlerts(features);
     const resolvedZoneIds = await resolveZoneGeometries([...zoneFlags.keys()]);
+    if (generation !== renderGeneration) return { status: 'stale', zoneCount: 0 };
 
     const entries = [];
     for (const zoneId of resolvedZoneIds) {
@@ -282,6 +286,7 @@ export async function renderTropicalAlerts(activeStorms, { map, enabled = true }
     updateLegend(present);
     return { status: entries.length ? 'rendered' : 'empty', zoneCount: entries.length };
   } catch (error) {
+    if (generation !== renderGeneration) return { status: 'stale', zoneCount: 0 };
     console.warn('Tropical watch/warning overlay unavailable:', error);
     clearTropicalAlerts();
     return { status: 'error', zoneCount: 0 };
@@ -289,6 +294,7 @@ export async function renderTropicalAlerts(activeStorms, { map, enabled = true }
 }
 
 export function clearTropicalAlerts() {
+  renderGeneration++;
   if (layerGroup) layerGroup.clearLayers();
   if (legendEl) legendEl.hidden = true;
 }

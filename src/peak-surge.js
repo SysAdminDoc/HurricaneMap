@@ -14,6 +14,7 @@ const CACHE_MS = 30 * 60 * 1000;
 let layerGroup = null;
 let layerMap = null;
 let cache = null;
+let renderGeneration = 0;
 
 export function buildPeakSurgeQueryUrl(layerId = POLYGON_LAYER_ID) {
   const params = new URLSearchParams({
@@ -67,14 +68,17 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
     clearPeakSurge();
     return { status: 'idle', featureCount: 0 };
   }
+  const generation = ++renderGeneration;
   ensureLayer(map);
   try {
     const now = Date.now();
     let features = cache && now - cache.fetchedAt < CACHE_MS ? cache.features : null;
     if (!features) {
       const response = await fetch(buildPeakSurgeQueryUrl(), { cache: 'no-cache' });
+      if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
       if (!response.ok) throw new Error(`peak surge query returned ${response.status}`);
       const data = await response.json();
+      if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
       features = Array.isArray(data?.features) ? data.features : [];
       cache = { fetchedAt: now, features };
     }
@@ -95,6 +99,7 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
     }
     return { status: features.length ? 'rendered' : 'empty', featureCount: features.length };
   } catch (error) {
+    if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
     console.warn('Peak storm surge layer unavailable:', error);
     clearPeakSurge();
     return { status: 'error', featureCount: 0 };
@@ -102,6 +107,7 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
 }
 
 export function clearPeakSurge() {
+  renderGeneration++;
   if (layerGroup) layerGroup.clearLayers();
 }
 

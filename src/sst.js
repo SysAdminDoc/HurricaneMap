@@ -14,10 +14,14 @@ const LATEST_TIME_PROBE = `${ERDDAP_HOST}/griddap/dhw_5km.json?time%5Blast%5D`;
 // Dataset lags realtime by ~1-2 days (testOutOfDate: now-2days). If the
 // probe fails, a few days back still renders a plausible field.
 const FALLBACK_DAYS_BACK = 3;
+const LATEST_TIME_REFRESH_MS = 6 * 60 * 60 * 1000;
 
 let sstLayer = null;
 let latestTimePromise = null;
 let resolvedTime = null;
+let resolvedTimeAt = 0;
+let resolvedTimeFromProbe = false;
+let desiredVisible = false;
 
 function fallbackTime() {
   const date = new Date(Date.now() - FALLBACK_DAYS_BACK * 86_400_000);
@@ -32,11 +36,17 @@ function resolveLatestTime() {
         if (response.ok) {
           const data = await response.json();
           const iso = data?.table?.rows?.[0]?.[0];
-          if (typeof iso === 'string' && !Number.isNaN(Date.parse(iso))) return iso;
+          if (typeof iso === 'string' && !Number.isNaN(Date.parse(iso))) {
+            return { time: iso, fromProbe: true };
+          }
         }
       } catch { /* probe unreachable — fall back below */ }
-      return fallbackTime();
-    })();
+      return { time: fallbackTime(), fromProbe: false };
+    })().finally(() => {
+      // Coalesce only concurrent probes. A fallback is retried next enable,
+      // and successful probes refresh periodically in long-lived tabs.
+      latestTimePromise = null;
+    });
   }
   return latestTimePromise;
 }
@@ -46,13 +56,21 @@ export function getSSTTime() {
 }
 
 export async function setSSTVisible(visible) {
+  desiredVisible = !!visible;
   const map = getMap();
   if (!visible) {
     if (sstLayer) map.removeLayer(sstLayer);
     return;
   }
+  const shouldRefresh = !resolvedTime || !resolvedTimeFromProbe || Date.now() - resolvedTimeAt >= LATEST_TIME_REFRESH_MS;
+  if (shouldRefresh) {
+    const resolved = await resolveLatestTime();
+    if (!desiredVisible) return;
+    resolvedTime = resolved.time;
+    resolvedTimeFromProbe = resolved.fromProbe;
+    resolvedTimeAt = Date.now();
+  }
   if (!sstLayer) {
-    resolvedTime = await resolveLatestTime();
     const day = resolvedTime.slice(0, 10);
     sstLayer = L.tileLayer.wms(ERDDAP_WMS, {
       layers: 'dhw_5km:CRW_SST',
@@ -70,8 +88,11 @@ export async function setSSTVisible(visible) {
       colorBarMaximum: 32,
       attribution: `SST: NOAA Coral Reef Watch CoralTemp via PacIOOS ERDDAP (${day})`,
     });
+  } else {
+    sstLayer.setParams({ time: resolvedTime });
+    sstLayer.options.attribution = `SST: NOAA Coral Reef Watch CoralTemp via PacIOOS ERDDAP (${resolvedTime.slice(0, 10)})`;
   }
-  sstLayer.addTo(map);
+  if (desiredVisible) sstLayer.addTo(map);
 }
 
 export function setSSTTime(isoTime) {

@@ -1,4 +1,4 @@
-import { ensureStormsLoaded, getStorm, getLandfalls, categoryLabel } from './data.js';
+import { ensureStormsLoaded, getStorm, getLandfalls, categoryLabel, categoryStrength } from './data.js';
 import { bearingDeg, closestApproach, compassLabel, kmToMi } from './metrics.js';
 import { getMap } from './map.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
@@ -37,6 +37,7 @@ const RADIUS_OPTIONS = [
 let circle = null;
 let panelEl = null;
 let active = false;
+let searchGeneration = 0;
 let currentRadius = RADIUS_OPTIONS[1];
 let onSelectStorm = null;
 
@@ -65,11 +66,13 @@ export function toggleSpatialMode() {
 export function isSpatialActive() { return active; }
 
 export function clearSearch() {
+  searchGeneration++;
   if (circle) { getMap().removeLayer(circle); circle = null; }
   if (panelEl && !panelEl.hidden) hidePanel('spatial-results');
 }
 
 async function performSearch(lat, lon) {
+  const generation = ++searchGeneration;
   const map = getMap();
   if (circle) map.removeLayer(circle);
   circle = L.circle([lat, lon], {
@@ -83,10 +86,11 @@ async function performSearch(lat, lon) {
   }).addTo(map);
 
   await ensureStormsLoaded();
+  if (!active || generation !== searchGeneration) return;
   const peakCatByStorm = new Map();
   for (const lf of getLandfalls()) {
     const prev = peakCatByStorm.get(lf.storm_id);
-    if (prev == null || lf.category > prev) peakCatByStorm.set(lf.storm_id, lf.category);
+    if (prev == null || categoryStrength(lf.category) > categoryStrength(prev)) peakCatByStorm.set(lf.storm_id, lf.category);
   }
   const seenStorms = new Set();
   const results = [];
@@ -143,12 +147,14 @@ function wireLocateButton(spBody) {
     event.target.textContent = t('spatial.locating');
     navigator.geolocation.getCurrentPosition(
       position => {
+        if (!active) return;
         const { latitude, longitude } = position.coords;
         saveUserPoint(latitude, longitude);
         getMap().setView([latitude, longitude], Math.max(getMap().getZoom(), 6));
         performSearch(latitude, longitude);
       },
       () => {
+        if (!active) return;
         event.target.disabled = false;
         event.target.textContent = t('spatial.denied');
       },
@@ -171,7 +177,7 @@ function renderPrompt() {
   `;
   spBody.querySelector('.close-btn').addEventListener('click', () => {
     clearSearch();
-    toggleSpatialMode();
+    if (active) toggleSpatialMode();
   });
   wireLocateButton(spBody);
 }
@@ -205,7 +211,7 @@ function renderResults(results, lat, lon) {
 
   spBody.querySelector('.close-btn').addEventListener('click', () => {
     clearSearch();
-    toggleSpatialMode();
+    if (active) toggleSpatialMode();
   });
 
   spBody.querySelectorAll('.sp-radius-btn').forEach(btn => {

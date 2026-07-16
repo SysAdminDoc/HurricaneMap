@@ -8,6 +8,7 @@ import { t } from './i18n.js';
 let indexPromise = null;
 let layerGroup = null;
 let shownStormId = null;
+let renderGeneration = 0;
 
 function loadIndex() {
   if (!indexPromise) {
@@ -32,13 +33,16 @@ function elevationColor(ft) {
 }
 
 export async function showHwm(stormId) {
-  hideHwm();
+  const generation = ++renderGeneration;
+  removeLayerGroup();
   const response = await fetch(`data/surge-obs/${stormId}.json`).catch(() => null);
+  if (generation !== renderGeneration) return 0;
   if (!response?.ok) return 0;
   const points = await response.json();
+  if (generation !== renderGeneration) return 0;
   if (!Array.isArray(points) || !points.length) return 0;
   const L = window.L;
-  layerGroup = L.layerGroup();
+  const nextLayerGroup = L.layerGroup();
   for (const [lat, lon, elevFt, env] of points) {
     L.circleMarker([lat, lon], {
       radius: 4,
@@ -50,19 +54,26 @@ export async function showHwm(stormId) {
     }).bindTooltip(
       `${t('hwm.mark')}: ${elevFt.toFixed(1)} ft · ${env === 'R' ? t('hwm.riverine') : t('hwm.coastal')}`,
       { direction: 'top' },
-    ).addTo(layerGroup);
+    ).addTo(nextLayerGroup);
   }
+  if (generation !== renderGeneration) return 0;
+  layerGroup = nextLayerGroup;
   layerGroup.addTo(getMap());
   shownStormId = stormId;
   return points.length;
 }
 
 export function hideHwm() {
+  renderGeneration++;
+  removeLayerGroup();
+  shownStormId = null;
+}
+
+function removeLayerGroup() {
   if (layerGroup) {
     getMap().removeLayer(layerGroup);
     layerGroup = null;
   }
-  shownStormId = null;
 }
 
 export function hwmShownFor() {

@@ -7,6 +7,7 @@ All notable changes to HurricaneMap.
 ### Fixed
 - Generated storm data now writes a deterministic `storms.json.gz`, validates compressed/uncompressed parity, ranks tropical storms above tropical depressions across panels/sorts/tide selection, and records genuine preprocessing provenance.
 - Track overlays reliably return after toggling and repaint with theme/palette changes; intensity-chart strokes and inactive category controls remain readable in light and high-contrast themes.
+- Delayed geolocation, SST probes, high-water-mark fetches, tropical alerts, peak-surge forecasts, and official cone requests can no longer resurrect layers after users turn them off; SST fallback probes also retry instead of freezing for the session.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

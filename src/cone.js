@@ -32,6 +32,7 @@ let forecastLayerMap = null;
 let forecastLayerVisible = true;
 let forecastCache = null;
 let conePollingInterval = null;
+let renderGeneration = 0;
 
 export function buildNHCFeatureQueryUrl(layerId, options = {}) {
   const params = new URLSearchParams({
@@ -109,10 +110,14 @@ export async function renderOfficialForecastContext(activeStorms, options = {}) 
     return { status: 'idle', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
   }
 
+  const generation = ++renderGeneration;
   ensureForecastLayer(map);
 
   try {
     const layers = await fetchOfficialForecastLayers(activeStorms, { force: options.force });
+    if (generation !== renderGeneration) {
+      return { status: 'stale', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+    }
     const coneFeatures = filterFeaturesForActiveStorms(layers.cones, activeStorms);
     const forecastTrackFeatures = filterFeaturesForActiveStorms(layers.forecastTracks, activeStorms);
     const observedTrackFeatures = filterFeaturesForActiveStorms(layers.observedTracks, activeStorms);
@@ -130,12 +135,16 @@ export async function renderOfficialForecastContext(activeStorms, options = {}) 
       observedTrackCount: observedTrackFeatures.length,
     };
   } catch (error) {
+    if (generation !== renderGeneration) {
+      return { status: 'stale', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+    }
     console.warn('Failed to fetch official NHC forecast geometry:', error);
     return { status: 'error', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
   }
 }
 
 export function clearOfficialForecastContext() {
+  renderGeneration++;
   if (forecastLayerGroup) forecastLayerGroup.clearLayers();
 }
 

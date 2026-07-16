@@ -611,7 +611,7 @@ try {
       return realFetch(url, init);
     };
     try {
-      const result = await alerts.renderTropicalAlerts([{ id: 'AL012026', name: 'TEST' }], { map: getMap(), enabled: true });
+      const result = await alerts.renderTropicalAlerts([{ id: 'AL012026', name: 'TEST' }], { map: getMap(), enabled: true, force: true });
       const legend = document.querySelector('#tropical-alert-legend');
       const snapshot = {
         ...result,
