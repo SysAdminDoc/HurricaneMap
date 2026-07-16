@@ -14,6 +14,7 @@ All notable changes to HurricaneMap.
 - Service-worker validation now fails releases whose cache version differs from `package.json` or whose shell manifest omits any application module.
 - Translation interpolation now replaces repeated placeholders literally, active-feed and map counters use locale-aware status strings, Spanish landfall terminology uses "toque de tierra," and tropical-depression/storm category labels match the data model.
 - Combined high-contrast/colorblind controls choose readable category ink for every YlOrRd step, while light-theme warning toasts and rapid-intensification/pressure-fall flags use high-contrast semantic ink.
+- Spanish and Haitian Creole now cover the static application shell, titles and accessible names, filters, legend, 3D globe, About/data notes, loading state, keyboard help, search empty states, and localized globe/runtime summaries without stripping trusted inline links or code.
 
 ## v1.5.0 - 2026 season readiness, new NOAA data layers, reliability (July 2026)
 

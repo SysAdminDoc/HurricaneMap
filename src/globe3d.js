@@ -1,5 +1,6 @@
 import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { t } from './i18n.js';
 
 const CESIUM_VERSION = '1.143';
 const CESIUM_BASE_URL = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/`;
@@ -79,7 +80,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
   els.panel.hidden = false;
   els.panel.dataset.ready = 'false';
   els.trigger?.setAttribute('aria-pressed', 'true');
-  setStatus('Loading 3D engine...');
+  setStatus(t('globe.loading'));
   els.close?.focus();
 
   await ensureStormsLoaded();
@@ -90,7 +91,7 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
   currentDataset = dataset;
 
   if (!dataset.segments.length) {
-    setStatus('No storm tracks available for the current selection.');
+    setStatus(t('globe.empty'));
     updateSubtitle(dataset);
     return;
   }
@@ -105,11 +106,11 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
     updateTimeline(dataset.timeline.length - 1);
     flyToDataset(dataset);
     updateSubtitle(dataset);
-    setStatus('3D globe ready');
+    setStatus(t('globe.ready'));
     els.panel.dataset.ready = 'true';
   } catch (error) {
     console.warn('3D globe failed to initialize:', error);
-    setStatus('3D globe could not load. Check your connection and try again.');
+    setStatus(t('globe.error'));
   }
 }
 
@@ -472,7 +473,7 @@ function updateTimeline(index) {
   }
   if (els.timeLabel) {
     const value = currentDataset.timeline[clamped];
-    const label = value ? formatTimelineDate(value) : 'No timeline';
+    const label = value ? formatTimelineDate(value) : t('globe.noTimeline');
     els.timeLabel.textContent = label;
     els.scrubber?.setAttribute('aria-valuetext', label);
   }
@@ -499,12 +500,14 @@ function flyToFocus(dataset) {
 function updateSubtitle(dataset) {
   if (!els.subtitle || !dataset) return;
   const stormCount = dataset.storms.length;
-  const mode = dataset.focusStormId ? 'focused storm' : 'visible selection';
+  const mode = t(dataset.focusStormId ? 'globe.modeFocused' : 'globe.modeSelection');
   const cones = dataset.windCones?.length
-    ? ` · ${dataset.windCones.length.toLocaleString()} wind-cone layers`
+    ? t('globe.windConeLayers', dataset.windCones.length.toLocaleString())
     : '';
-  const cap = dataset.capped ? ' · capped for performance' : '';
-  els.subtitle.textContent = `${stormCount.toLocaleString()} ${stormCount === 1 ? 'storm' : 'storms'} · ${dataset.segments.length.toLocaleString()} elevated segments${cones} · ${mode}${cap}`;
+  const cap = dataset.capped ? t('globe.capped') : '';
+  els.subtitle.textContent = stormCount === 1
+    ? t('globe.summaryOne', dataset.segments.length.toLocaleString(), cones, mode, cap)
+    : t('globe.summary', stormCount.toLocaleString(), dataset.segments.length.toLocaleString(), cones, mode, cap);
 }
 
 function setStatus(message) {

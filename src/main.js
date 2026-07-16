@@ -769,7 +769,7 @@ function wireUI() {
     const history = getHistory();
     if (!history.length) return;
     els.searchResults.classList.remove('search-results--empty');
-    els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">Recently viewed</li>` +
+    els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">${t('search.recent')}</li>` +
       history.map(h => {
         const name = escapeHtml(formatStormName(h.name));
         const cat = escapeHtml(categoryLabel(h.category));
@@ -801,8 +801,8 @@ function wireUI() {
     els.searchResults.classList.add('search-results--empty');
     els.searchResults.innerHTML = `
       <li class="search-empty" role="status">
-        <strong>No storm matches "${safeQuery}"</strong>
-        <span>Search by storm name, state, or year, such as Andrew, Florida, or 2005.</span>
+        <strong>${t('search.noMatch', safeQuery)}</strong>
+        <span>${t('search.help')}</span>
       </li>
     `;
     setSearchOpen(true);
@@ -880,7 +880,7 @@ function wireUI() {
     };
     let html = results.map(renderRow).join('');
     if (fuzzy.length) {
-      html += `<li class="search-section-label" aria-hidden="true">Did you mean…</li>`;
+      html += `<li class="search-section-label" aria-hidden="true">${t('search.suggest')}</li>`;
       html += fuzzy.map(renderRow).join('');
     }
     els.searchResults.innerHTML = html;
@@ -1115,8 +1115,8 @@ function wireFilterPanel() {
     els.filtersPanel.classList.toggle('collapsed', collapsed);
     document.body.classList.toggle('filters-open', !collapsed);
     els.toggleFiltersBtn.setAttribute('aria-expanded', String(!collapsed));
-    els.toggleFiltersBtn.setAttribute('aria-label', collapsed ? 'Show filters' : 'Hide filters');
-    els.toggleFiltersBtn.title = collapsed ? 'Show filters' : 'Hide filters';
+    els.toggleFiltersBtn.setAttribute('aria-label', t(collapsed ? 'filters.show' : 'filters.hide'));
+    els.toggleFiltersBtn.title = t(collapsed ? 'filters.show' : 'filters.hide');
   };
 
   setCollapsed(true);

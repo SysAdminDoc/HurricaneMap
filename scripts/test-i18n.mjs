@@ -2,6 +2,7 @@
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
 import { STRINGS, interpolate, t } from '../src/i18n.js';
+import { readFileSync } from 'node:fs';
 
 function assert(condition, message) {
   if (!condition) {
@@ -36,5 +37,12 @@ assert(t('status.landfalls', 42) === '42 landfalls', 'placeholder substitution f
 assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated placeholders should all resolve');
 assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
 assert(t('nonexistent.key') === 'nonexistent.key', 'unknown keys should echo the key');
+
+const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const staticKeys = [...html.matchAll(/data-i18n(?:-html|-title|-placeholder|-aria-label)?="([^"]+)"/g)]
+  .map(match => match[1]);
+for (const key of staticKeys) {
+  assert(Object.hasOwn(STRINGS.en, key), `index.html references unknown key: ${key}`);
+}
 
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);
