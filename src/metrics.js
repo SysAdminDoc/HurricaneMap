@@ -918,18 +918,22 @@ export function generateStormBiography(storm, impacts) {
 
   const firstLat = storm.track[0]?.lat || 0;
   const firstLon = storm.track[0]?.lon || 0;
+  const stormBasin = String(storm.id || '').slice(0, 2).toUpperCase() || String(storm.basin || '').toUpperCase();
   let region = 'the Atlantic basin';
-  if (firstLon < -100) region = 'the Gulf of Mexico';
+  if (stormBasin === 'CP') region = 'the central Pacific';
+  else if (stormBasin === 'EP') region = 'the eastern Pacific';
+  else if (firstLon < -80 && firstLat < 31) region = 'the Gulf of Mexico';
   else if (firstLon < -70 && firstLat < 25) region = 'the Caribbean';
   else if (firstLon < -70) region = 'the western Atlantic';
   else if (firstLon < -30) region = 'the central Atlantic';
   else region = 'off the African coast';
   
   // Landfall info
-  const landfallStates = storm.us_landfalls ? [...new Set(storm.us_landfalls.map(lf => lf.state))] : [];
-  const landfallStr = landfallStates.length === 0 ? 'did not make landfall' :
-    landfallStates.length === 1 ? `made landfall in ${landfallStates[0]}` :
-    `made ${landfallStates.length} landfalls in ${landfallStates.join(', ')}`;
+  const landfalls = Array.isArray(storm.us_landfalls) ? storm.us_landfalls : [];
+  const landfallStates = [...new Set(landfalls.map(lf => lf.state).filter(Boolean))];
+  const landfallStr = landfalls.length === 0 ? 'did not make landfall' :
+    landfalls.length === 1 ? `made landfall in ${landfallStates[0] || 'the United States'}` :
+    `made ${landfalls.length} landfalls in ${landfallStates.join(', ') || 'the United States'}`;
   
   // Impact info
   const fatalities = getFatalityCount(impacts);
@@ -964,5 +968,4 @@ function formatDamageBrief(usd) {
   }
   return `$${(usd / 1_000_000).toFixed(1)}M`;
 }
-
 

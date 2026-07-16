@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   findSimilarStorms,
+  generateStormBiography,
   getSimilarityVector,
   getStormVector,
   STORM_SIMILARITY_VECTOR_LENGTH,
@@ -39,6 +40,12 @@ for (const storm of storms) {
 
 const reference = storms.find(storm => storm.id === 'AL122005');
 assert.ok(reference, 'Katrina 2005 fixture is expected in storms.json');
+assert.match(generateStormBiography(reference, null), /made 3 landfalls in Florida, Louisiana/);
+
+const iniki = storms.find(storm => storm.id === 'EP181992');
+assert.ok(iniki, 'Iniki 1992 fixture is expected in storms.json');
+assert.match(generateStormBiography(iniki, null), /in the eastern Pacific/);
+assert.doesNotMatch(generateStormBiography(iniki, null), /Gulf of Mexico/);
 
 const cloneWithoutVectors = storms.map(storm => {
   const { similarity_vector, ...rest } = storm;
