@@ -917,6 +917,46 @@ try {
   await page.click('#close-evac');
   assert(await page.locator('.evac-location-marker').count() === 0, 'closing the zone panel left its selection marker on the map');
 
+  await page.click('#toggle-poster');
+  await page.waitForFunction(() => Number(document.querySelector('#poster-canvas')?.dataset.segmentCount) > 1000, { timeout: 15000 });
+  const poster = await page.evaluate(() => {
+    const canvas = document.querySelector('#poster-canvas');
+    const context = canvas.getContext('2d');
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    const colors = new Set();
+    for (let y = 0; y < canvas.height; y += 60) {
+      for (let x = 0; x < canvas.width; x += 60) {
+        const offset = (y * canvas.width + x) * 4;
+        colors.add(`${pixels[offset]},${pixels[offset + 1]},${pixels[offset + 2]},${pixels[offset + 3]}`);
+      }
+    }
+    return {
+      width: canvas.width,
+      height: canvas.height,
+      stormCount: Number(canvas.dataset.stormCount),
+      segmentCount: Number(canvas.dataset.segmentCount),
+      attribution: canvas.dataset.attribution || '',
+      colorCount: colors.size,
+      label: canvas.getAttribute('aria-label') || '',
+    };
+  });
+  assert(poster.width === 1800 && poster.height === 1200, `poster export resolution changed: ${JSON.stringify(poster)}`);
+  assert(poster.stormCount === 591 && poster.segmentCount > 10000, `poster did not honor the 591 drawable tracks in the unfiltered storm set: ${JSON.stringify(poster)}`);
+  assert(poster.colorCount > 30, `poster canvas lacks rendered visual variation: ${JSON.stringify(poster)}`);
+  assert(/NOAA\/NHC HURDAT2/.test(poster.attribution) && /591 storms/.test(poster.label), `poster metadata is incomplete: ${JSON.stringify(poster)}`);
+  if (process.env.HM_POSTER_SCREENSHOT) {
+    await page.locator('#poster-view').screenshot({ path: process.env.HM_POSTER_SCREENSHOT });
+  }
+  await assertNoAxeViolations(page, 'track gallery poster (WCAG 2.2 AA)', '#poster-view');
+  const [posterDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.click('#poster-export'),
+  ]);
+  assert(/^HurricaneMap-tracks-1851-2025\.png$/.test(posterDownload.suggestedFilename()), `poster download filename is unstable: ${posterDownload.suggestedFilename()}`);
+  assert(await posterDownload.failure() === null, 'poster PNG download failed');
+  await page.click('#close-poster');
+  await page.waitForFunction(() => document.querySelector('#poster-view')?.hidden && !document.body.classList.contains('poster-open'));
+
   await page.evaluate(async () => {
     const data = await import('/src/data.js');
     const panel = await import('/src/panel.js');

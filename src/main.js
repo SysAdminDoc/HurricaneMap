@@ -72,6 +72,7 @@ const loadTableView = once(() => import('./table-view.js'));
 const loadSpatialSearch = once(() => import('./spatial-search.js'));
 const loadPrep = once(() => import('./prep.js'));
 const loadEvac = once(() => import('./evac.js'));
+const loadPoster = once(() => import('./poster.js'));
 const loadSST = once(() => import('./sst.js'));
 
 async function showStormLazy(landfall) {
@@ -155,6 +156,7 @@ const els = {
   tableViewBtn: document.getElementById('toggle-table-view'),
   prepBtn: document.getElementById('toggle-prep'),
   evacBtn: document.getElementById('toggle-evac'),
+  posterBtn: document.getElementById('toggle-poster'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
@@ -1099,6 +1101,14 @@ function wireUI() {
   els.evacBtn?.addEventListener('click', async () => {
     const { openEvacPanel } = await loadEvac();
     await openEvacPanel();
+  });
+
+  els.posterBtn?.addEventListener('click', async () => {
+    const { openPoster } = await loadPoster();
+    await openPoster({
+      landfalls: currentVisibleLandfalls,
+      filters: { ...filters, categories: new Set(filters.categories) },
+    });
   });
 
   const spatialBtn = document.getElementById('toggle-spatial-search');

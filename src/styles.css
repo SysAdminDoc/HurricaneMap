@@ -7336,7 +7336,7 @@ html.light-theme .basemap-fallback {
 :root {
   --map-first-filter-width: clamp(320px, 27vw, 420px);
   --map-first-panel-width: clamp(380px, 28vw, 460px);
-  --map-first-header-width: min(1040px, calc(100vw - 24px));
+  --map-first-header-width: min(1100px, calc(100vw - 24px));
 }
 
 .app-header {
@@ -8934,6 +8934,58 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 }
 .evac-linkouts > div { display: flex; flex-wrap: wrap; gap: 8px 14px; }
 .evac-map-selecting { cursor: crosshair; }
+
+/* Filter-aware all-tracks gallery poster */
+.poster-view {
+  position: fixed;
+  inset: 0;
+  z-index: 5200;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(7, 8, 14, 0.86);
+  backdrop-filter: blur(12px);
+}
+.poster-view[hidden] { display: none !important; }
+.poster-shell {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  width: min(1500px, calc(100vw - 44px));
+  height: min(1000px, calc(100vh - 44px));
+  padding: 18px;
+  color: var(--text);
+  overflow: hidden;
+}
+.poster-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.poster-toolbar h2 { margin: 0; font-size: 1.2rem; }
+.poster-toolbar p { margin: 4px 0 0; color: var(--subtext); font-size: 0.78rem; }
+.poster-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.poster-actions .close-btn { position: static; flex: 0 0 auto; }
+.poster-actions #poster-status { color: var(--subtext); font-size: 0.74rem; }
+.poster-canvas-frame {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  background: #0c0d16;
+  border: 1px solid var(--surface1);
+  border-radius: 10px;
+}
+.poster-canvas-frame canvas {
+  display: block;
+  width: min(100%, calc((100vh - 160px) * 1.5));
+  height: auto;
+  aspect-ratio: 3 / 2;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+}
+body.poster-open { overflow: hidden; }
 @media (max-width: 720px) {
   .prep-panel,
   .evac-panel {
@@ -8945,4 +8997,11 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   .prep-inputs,
   .prep-totals { grid-template-columns: 1fr; }
   .evac-address > div { grid-template-columns: 1fr; }
+  .poster-view { padding: 8px; }
+  .poster-shell { width: calc(100vw - 16px); height: calc(100vh - 16px); padding: 12px; }
+  .poster-toolbar { align-items: flex-start; }
+  .poster-toolbar p,
+  .poster-actions #poster-status { display: none; }
+  .poster-actions { gap: 6px; }
+  .poster-canvas-frame canvas { width: 100%; }
 }

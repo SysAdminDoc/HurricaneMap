@@ -61,6 +61,10 @@
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           <span class="mobile-action-label" data-i18n="header.btn.report">Summary report</span>
         </button>
+        <button class="icon-btn" id="toggle-poster" title="Track gallery poster" aria-label="Track gallery poster" data-i18n-title="header.btn.poster" data-i18n-aria-label="header.btn.poster" aria-controls="poster-view">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 3h18v18H3V3zm2 2v11.2l3.8-4.6 2.7 3.2 2.2-2.6L19 18.4V5H5zm10.5 2A2.5 2.5 0 1 0 18 9.5 2.5 2.5 0 0 0 15.5 7z"/></svg>
+          <span class="mobile-action-label" data-i18n="header.btn.poster">Track gallery poster</span>
+        </button>
         <button class="icon-btn" id="export-qgis" title="QGIS GeoJSON" aria-label="QGIS GeoJSON" data-i18n-title="header.btn.qgis" data-i18n-aria-label="header.btn.qgis">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.3-1.54-4 5h12L13.96 12.29z"/></svg>
           <span class="mobile-action-label" data-i18n="header.btn.qgis">QGIS GeoJSON</span>
@@ -361,6 +365,23 @@
         <span id="globe3d-time-label" data-i18n="globe.noTimeline">No timeline</span>
       </div>
       <div class="globe3d-status" id="globe3d-status" role="status" aria-live="polite" data-i18n="globe.inactive">3D globe inactive</div>
+    </div>
+  </section>
+
+  <section class="poster-view" id="poster-view" hidden role="dialog" aria-modal="true" aria-labelledby="poster-title" aria-describedby="poster-intro">
+    <div class="poster-shell glass">
+      <header class="poster-toolbar">
+        <div>
+          <h2 id="poster-title" data-i18n="poster.title">Track gallery poster</h2>
+          <p id="poster-intro" data-i18n="poster.intro">A high-resolution density portrait of the storms in your current filters.</p>
+        </div>
+        <div class="poster-actions">
+          <span id="poster-status" role="status" aria-live="polite"></span>
+          <button class="text-btn" id="poster-export" type="button" data-i18n="poster.export">Export PNG</button>
+          <button class="close-btn" id="close-poster" type="button" aria-label="Close track gallery poster" data-i18n-aria-label="poster.close">×</button>
+        </div>
+      </header>
+      <div class="poster-canvas-frame"><canvas id="poster-canvas" width="1800" height="1200"></canvas></div>
     </div>
   </section>
 
