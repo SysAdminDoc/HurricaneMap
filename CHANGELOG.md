@@ -7,6 +7,9 @@ All notable changes to HurricaneMap.
 ### Added
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
 
+### Changed
+- Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.
+
 ### Fixed
 - Corrected the published Saffir-Simpson and major-hurricane thresholds and added a semantic contract test that keeps application logic, glossary copy, and the README category table aligned.
 - Storm biographies now compose fatality and damage details through one grammar-safe presenter, including correct singular fatality wording.
