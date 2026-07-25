@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -78,6 +78,14 @@ npm run build
 - **⚠️ 2026 cone standard: coastal + inland watches/warnings** — matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
+
+## What's new in v1.7.0 - Trust, resilience, and official forecast context (2026-07-25)
+
+- **Official decision context:** selected points show fresh NHC 34/50/64 kt cumulative wind probabilities and nearby 34 kt arrival contours, with issue time, source links, and stale/offline safeguards.
+- **Measured forecast skill:** storm panels use NHC's archived 2021–2025 OFCL errors to compare official track and intensity forecasts with post-season best track, separately from illustrative cone reconstructions.
+- **Data trust:** expanded impact coverage includes raw source values, parse provenance, normalized ranges, confidence levels, and explicit missing-data treatment.
+- **Resilient local workflows:** schema migrations, bounded saved views, storage/quota diagnostics, optional-feed health, and cache recovery now have tested compatibility contracts.
+- **Maintainability and access:** shared metric presenters and split shell controllers reduce drift; keyboard, focus, contrast, localization, release-truth, and dependency gates are stricter.
 
 ## What's new in v1.6.0 - Safety, education, and resilience (July 2026)
 
