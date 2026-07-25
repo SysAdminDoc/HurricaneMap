@@ -1,5 +1,6 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { activateDialogFocus } from './dialog-focus.js';
 
 // Glossary management — meteorological and hurricane terminology.
 //
@@ -9,6 +10,7 @@ import { t } from './i18n.js';
 
 let glossaryData = null;
 let glossaryCache = {};
+let releaseGlossaryFocus = null;
 
 /** Fetch and cache the glossary. */
 export async function loadGlossary() {
@@ -99,26 +101,26 @@ export async function initGlossary() {
     renderList(results);
   });
   
-  closeBtn.addEventListener('click', () => {
+  const closeGlossary = () => {
     modal.hidden = true;
     searchInput.value = '';
     renderList();
-  });
+    releaseGlossaryFocus?.();
+    releaseGlossaryFocus = null;
+  };
+
+  closeBtn.addEventListener('click', closeGlossary);
   
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.hidden = true;
-      searchInput.value = '';
-      renderList();
+      closeGlossary();
     }
   });
   
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.hidden) {
       e.preventDefault();
-      modal.hidden = true;
-      searchInput.value = '';
-      renderList();
+      closeGlossary();
     }
   });
 }
@@ -126,7 +128,7 @@ export async function initGlossary() {
 /** Show the glossary modal. */
 export function showGlossary() {
   const modal = document.getElementById('glossary-modal');
-  if (modal) modal.hidden = false;
-  const searchInput = document.getElementById('glossary-search');
-  if (searchInput) searchInput.focus();
+  if (!modal) return;
+  modal.hidden = false;
+  releaseGlossaryFocus = activateDialogFocus(modal, { initialFocus: '#glossary-search' });
 }

@@ -131,7 +131,7 @@ npm run build
 - **Map-first overlays.** Filters now start collapsed, open as a bounded scroll drawer, and collapse the active side panel instead of stacking over it.
 - **Cleaner panel lanes.** Storm, stats, table, compare, and state panels stay in a right-side lane with map controls and the timeline pushed out of their way.
 - **Mobile vertical space.** The phone layout keeps the header tighter, shortens the filter drawer, hides map controls while filters are open, and leaves more map visible.
-- **Smoke coverage.** Browser smoke tests now verify the panel layout matrix through an installed Chrome fallback when Playwright's managed browser is unavailable.
+- **Smoke coverage.** Browser tests verify desktop and 390px mobile visual snapshots across themes and major surfaces, modal focus trap/return, skip-link and keyboard map alternatives, 44px mobile targets, reduced motion, the panel layout matrix, and a rendered 3D globe.
 
 ## What's new in v1.4.0 — Deep audit pass (July 2026)
 

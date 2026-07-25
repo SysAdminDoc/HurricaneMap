@@ -4,6 +4,7 @@
 
 import { ensureStormsLoaded, getAllStorms } from './data.js';
 import { t } from './i18n.js';
+import { activateDialogFocus } from './dialog-focus.js';
 
 export const POSTER_WIDTH = 1800;
 export const POSTER_HEIGHT = 1200;
@@ -189,11 +190,14 @@ export function renderPosterCanvas(canvas, storms, { filters = {}, light = false
 }
 
 let latest = { storms: [], filters: {} };
+let releasePosterFocus = null;
 
 function closePoster() {
   const view = document.getElementById('poster-view');
   if (view) view.hidden = true;
   document.body.classList.remove('poster-open');
+  releasePosterFocus?.();
+  releasePosterFocus = null;
 }
 
 export async function downloadPosterPng() {
@@ -234,6 +238,7 @@ export async function openPoster({ landfalls = [], filters = {} } = {}) {
   ensureWired();
   view.hidden = false;
   document.body.classList.add('poster-open');
+  releasePosterFocus = activateDialogFocus(view, { initialFocus: '#close-poster' });
   status.textContent = t('poster.rendering');
   await ensureStormsLoaded();
   const storms = selectPosterStorms(getAllStorms(), landfalls);
@@ -245,6 +250,5 @@ export async function openPoster({ landfalls = [], filters = {} } = {}) {
   });
   status.textContent = storms.length ? t('poster.ready', storms.length) : t('poster.empty');
   document.getElementById('poster-export').disabled = !storms.length;
-  document.getElementById('close-poster')?.focus({ preventScroll: true });
   return result;
 }

@@ -29,6 +29,7 @@ const SHELL_ASSETS = [
   './src/outlook.js',
   './src/marine-warnings.js',
   './src/data.js',
+  './src/dialog-focus.js',
   './src/errors.js',
   './src/map.js',
   './src/panel.js',

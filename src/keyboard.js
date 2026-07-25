@@ -9,9 +9,11 @@
 // browser and never reach page content — do not bind them.
 
 import { closeAllPanels } from './panels.js';
+import { activateDialogFocus } from './dialog-focus.js';
 
 const palette = document.getElementById('keyboard-palette');
 const paletteClose = palette?.querySelector('.palette-close');
+let releasePaletteFocus = null;
 
 export function init() {
   setupGlobalShortcuts();
@@ -74,33 +76,7 @@ function setupPaletteHandlers() {
 }
 
 function setupFocusHighlight() {
-  // Add visible focus indicators via :focus-visible
-  // This is handled by CSS, but we can enhance with manual highlights if needed
-  
-  // Trap focus inside modals
-  document.addEventListener('keydown', (e) => {
-    if (palette && !palette.hidden && e.key === 'Tab') {
-      const focusableElements = palette.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusableElements.length === 0) return;
-      
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus();
-        }
-      }
-    }
-  });
+  // Visible focus indicators are handled by the shared :focus-visible tokens.
 }
 
 function openPalette() {
@@ -112,10 +88,7 @@ function openPalette() {
     palette.setAttribute('open', '');
   }
   palette.setAttribute('aria-hidden', 'false');
-  
-  // Focus the close button or first focusable element
-  const closeBtn = palette.querySelector('.palette-close');
-  if (closeBtn) closeBtn.focus();
+  releasePaletteFocus = activateDialogFocus(palette, { initialFocus: '.palette-close' });
 }
 
 function closePalette() {
@@ -127,6 +100,8 @@ function closePalette() {
   }
   palette.hidden = true;
   palette.setAttribute('aria-hidden', 'true');
+  releasePaletteFocus?.();
+  releasePaletteFocus = null;
 }
 
 function filterMajorOnly() {

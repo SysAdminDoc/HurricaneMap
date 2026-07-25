@@ -1,6 +1,7 @@
 import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { activateDialogFocus } from './dialog-focus.js';
 
 const CESIUM_VERSION = '1.143';
 const CESIUM_BASE_URL = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/`;
@@ -33,7 +34,7 @@ let viewer = null;
 let cesiumApi = null;
 let renderedEntities = [];
 let currentDataset = null;
-let previouslyFocused = null;
+let releaseGlobeFocus = null;
 
 const els = typeof document === 'undefined' ? {} : {
   panel: document.getElementById('globe3d-panel'),
@@ -78,12 +79,11 @@ export function initGlobe3D() {
 export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) {
   if (!els.panel || !els.canvas) return;
   const generation = ++openGeneration;
-  previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   els.panel.hidden = false;
   els.panel.dataset.ready = 'false';
   els.trigger?.setAttribute('aria-pressed', 'true');
   setStatus(t('globe.loading'));
-  els.close?.focus();
+  releaseGlobeFocus = activateDialogFocus(els.panel, { initialFocus: '#close-globe3d' });
 
   await ensureStormsLoaded();
   if (generation !== openGeneration || els.panel.hidden) return;
@@ -124,7 +124,8 @@ export function closeGlobe3D() {
   openGeneration += 1;
   els.panel.hidden = true;
   els.trigger?.setAttribute('aria-pressed', 'false');
-  if (previouslyFocused) previouslyFocused.focus();
+  releaseGlobeFocus?.();
+  releaseGlobeFocus = null;
 }
 
 export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = {}) {

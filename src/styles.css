@@ -5840,6 +5840,38 @@ html.high-contrast {
     --overlay-bottom-reserve: 124px;
   }
 
+  .active-badge {
+    top: calc(var(--side-panel-top) + 8px);
+    left: 8px;
+    right: auto;
+    transform: none;
+    max-width: calc(100vw - 72px);
+  }
+
+  body.filters-open .active-badge,
+  body.side-panel-open .active-badge,
+  body.track-playback-active .active-badge {
+    display: none;
+  }
+
+  .settings-pill,
+  .settings-action,
+  .settings-menu .toggle-row,
+  .filters button,
+  .filters input,
+  .filters select {
+    min-height: 44px !important;
+  }
+
+  .side-panel:not([hidden]) button,
+  body.track-playback-active .anim-controls button,
+  body.track-playback-active .anim-controls input,
+  body.track-playback-active .anim-controls select,
+  body.track-playback-active .anim-radar-toggle {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
   .app-header {
     display: grid !important;
     grid-template-columns: 48px minmax(0, 1fr) !important;
@@ -8083,10 +8115,10 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
   body.track-playback-active .anim-controls:not(.anim-controls-inline) {
     width: calc(100vw - 16px);
+    overflow: visible !important;
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
       "toggle scrub close"
-      "hud hud hud"
       "restart speed radar";
     gap: 6px;
     padding: 7px;
@@ -8111,8 +8143,17 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
   body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-hud {
     display: grid;
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 6px);
+    max-width: min(72vw, 280px);
+    padding: 5px 8px;
     gap: 1px;
     min-width: 0;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--hm-radius-sm);
+    background: var(--surface-panel);
+    box-shadow: var(--shadow-theme-sm);
   }
 }
 

@@ -27,6 +27,7 @@ import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
 import { initStorageManager } from './storage-manager.js';
+import { activateDialogFocus } from './dialog-focus.js';
 
 initGlobalErrorSurface();
 
@@ -599,6 +600,9 @@ function wireSettingsControls() {
       lastTracksKey = '';
       applyFilters();
     }
+    if (e.detail.key === 'reducedMotion') {
+      document.documentElement.classList.toggle('reduce-motion', getSetting('reducedMotion'));
+    }
   });
 }
 
@@ -1042,15 +1046,24 @@ function wireUI() {
   wireMobileActionsMenu();
 
   // Info modal
-  els.toggleInfoBtn.addEventListener('click', () => { els.infoModal.hidden = false; });
-  els.closeInfo.addEventListener('click', () => { els.infoModal.hidden = true; });
+  let releaseInfoFocus = null;
+  const closeInfoModal = () => {
+    els.infoModal.hidden = true;
+    releaseInfoFocus?.();
+    releaseInfoFocus = null;
+  };
+  els.toggleInfoBtn.addEventListener('click', () => {
+    els.infoModal.hidden = false;
+    releaseInfoFocus = activateDialogFocus(els.infoModal, { initialFocus: '#close-info' });
+  });
+  els.closeInfo.addEventListener('click', closeInfoModal);
   els.infoModal.addEventListener('click', (e) => {
-    if (e.target === els.infoModal) els.infoModal.hidden = true;
+    if (e.target === els.infoModal) closeInfoModal();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !els.infoModal.hidden) {
       e.preventDefault();
-      els.infoModal.hidden = true;
+      closeInfoModal();
     }
   });
 

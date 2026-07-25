@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { readFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -93,6 +93,7 @@ const server = createServer(async (request, response) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address();
 const baseUrl = `http://127.0.0.1:${port}`;
+const visualSnapshotDir = path.join(root, 'test-results', 'visual');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -118,6 +119,144 @@ async function openKatrinaPanel(page) {
     await panel.showStorm(landfall);
   });
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+}
+
+async function captureVisualSnapshot(page, name) {
+  await mkdir(visualSnapshotDir, { recursive: true });
+  const buffer = await page.screenshot({
+    path: path.join(visualSnapshotDir, `${name}.png`),
+    animations: 'disabled',
+  });
+  assert(buffer.subarray(0, 8).toString('hex') === '89504e470d0a1a0a', `${name}: visual snapshot is not a PNG`);
+  const width = buffer.readUInt32BE(16);
+  const height = buffer.readUInt32BE(20);
+  const viewport = page.viewportSize();
+  assert(width === viewport.width && height === viewport.height, `${name}: snapshot dimensions ${width}x${height} do not match ${viewport.width}x${viewport.height}`);
+  assert(buffer.length > 20_000, `${name}: snapshot is unexpectedly small (${buffer.length} bytes)`);
+}
+
+async function assertDialogAndKeyboardContracts(page) {
+  await page.evaluate(() => {
+    document.querySelector('#toggle-info')?.focus();
+    scrollTo(0, 0);
+  });
+  await page.keyboard.press('Shift+/');
+  await page.waitForFunction(() => document.querySelector('#keyboard-palette')?.open, { timeout: 5000 });
+  assert(await page.evaluate(() => document.activeElement?.classList.contains('palette-close')), 'shortcut dialog did not focus its close button');
+  await page.keyboard.press('Tab');
+  assert(await page.evaluate(() => document.activeElement?.classList.contains('palette-close')), 'single-control shortcut dialog did not trap Tab');
+  await page.keyboard.press('Escape');
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-info'), 'shortcut dialog did not return focus to its opener');
+
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => !document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
+  assert(await page.evaluate(() => document.activeElement?.id === 'close-info'), 'About dialog did not focus its close button');
+  await page.keyboard.press('Shift+Tab');
+  assert(await page.evaluate(() => document.activeElement?.closest('#info-modal') !== null), 'About dialog let reverse focus escape');
+  await page.evaluate(() => {
+    const dialog = document.querySelector('#info-modal');
+    const focusable = [...dialog.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      .filter(element => {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+    focusable.at(-1)?.focus();
+  });
+  await page.keyboard.press('Tab');
+  assert(await page.evaluate(() => document.activeElement?.id === 'close-info'), 'About dialog did not wrap forward focus');
+  await page.keyboard.press('Escape');
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-info'), 'About dialog did not return focus to its opener');
+
+  await page.focus('#toggle-glossary');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('#glossary-modal:not([hidden]) #glossary-search', { timeout: 5000 });
+  assert(await page.evaluate(() => document.activeElement?.id === 'glossary-search'), 'Glossary dialog did not focus search');
+  await page.keyboard.press('Tab');
+  assert(await page.evaluate(() => document.activeElement?.id === 'close-glossary'), 'Glossary dialog did not wrap forward focus');
+  await page.keyboard.press('Shift+Tab');
+  assert(await page.evaluate(() => document.activeElement?.id === 'glossary-search'), 'Glossary dialog did not wrap reverse focus');
+  await page.keyboard.press('Escape');
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-glossary'), 'Glossary dialog did not return focus to its opener');
+
+  await page.evaluate(() => {
+    document.body.tabIndex = -1;
+    document.body.focus({ preventScroll: true });
+    scrollTo(0, 0);
+  });
+  await page.keyboard.press('Tab');
+  assert(await page.evaluate(() => document.activeElement?.classList.contains('skip-to-content')), 'skip link is not the first keyboard stop');
+  await page.keyboard.press('Enter');
+  assert(await page.evaluate(() => location.hash === '#map' && document.activeElement?.id === 'map'), 'skip link did not focus the labeled map target');
+
+  const mapAlternative = await page.evaluate(() => ({
+    mapLabel: document.querySelector('#map')?.getAttribute('aria-label') || '',
+    mapTabIndex: document.querySelector('#map')?.getAttribute('tabindex') || '',
+    tableLabel: document.querySelector('#toggle-table-view')?.getAttribute('aria-label') || '',
+  }));
+  assert(mapAlternative.mapLabel && /^-?1$|^0$/.test(mapAlternative.mapTabIndex), `map target is not programmatically focusable: ${JSON.stringify(mapAlternative)}`);
+  assert(/table/i.test(mapAlternative.tableLabel), `keyboard map alternative is not labeled: ${JSON.stringify(mapAlternative)}`);
+}
+
+async function assertReducedMotionContract(page, label) {
+  const state = await page.evaluate(() => {
+    const parseTimes = value => String(value || '').split(',').map(part => {
+      const token = part.trim();
+      if (token.endsWith('ms')) return Number.parseFloat(token);
+      if (token.endsWith('s')) return Number.parseFloat(token) * 1000;
+      return 0;
+    });
+    const offenders = [];
+    for (const element of document.querySelectorAll('body *')) {
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) continue;
+      const style = getComputedStyle(element);
+      const animationTimes = parseTimes(style.animationDuration);
+      const transitionTimes = parseTimes(style.transitionDuration);
+      if (
+        (style.animationName !== 'none' && animationTimes.some(time => time > 0.02)) ||
+        transitionTimes.some(time => time > 0.02)
+      ) {
+        offenders.push({
+          tag: element.tagName.toLowerCase(),
+          id: element.id,
+          className: String(element.className || '').slice(0, 80),
+          animation: `${style.animationName}/${style.animationDuration}`,
+          transition: style.transitionDuration,
+        });
+        if (offenders.length >= 12) break;
+      }
+    }
+    return {
+      classApplied: document.documentElement.classList.contains('reduce-motion'),
+      offenders,
+    };
+  });
+  assert(state.classApplied, `${label}: reduced-motion class was not applied`);
+  assert(!state.offenders.length, `${label}: visible motion remains: ${JSON.stringify(state.offenders)}`);
+}
+
+async function assertMobileTargetSizes(page, label) {
+  const undersized = await page.evaluate(() => [...document.querySelectorAll(
+    '.app-header button, #filters button, #filters input, #filters select, .side-panel:not([hidden]) button, .anim-controls button, .anim-controls input'
+  )].filter(element => {
+    const rect = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return rect.width > 0 &&
+      rect.height > 0 &&
+      style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      style.pointerEvents !== 'none' &&
+      Number(style.opacity) !== 0 &&
+      (rect.width < 44 || rect.height < 44);
+  }).slice(0, 20).map(element => {
+    const rect = element.getBoundingClientRect();
+    return {
+      selector: element.id ? `#${element.id}` : `${element.tagName.toLowerCase()}.${String(element.className || '').split(/\s+/)[0]}`,
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+    };
+  }));
+  assert(!undersized.length, `${label}: interactive targets below 44x44px: ${JSON.stringify(undersized)}`);
 }
 
 function rectsIntersect(a, b) {
@@ -191,7 +330,7 @@ async function assertSidePanelLayout(page, label) {
   }
 }
 
-async function assertPlaybackMapMode(page, label) {
+async function assertPlaybackMapMode(page, label, snapshotName = null) {
   await page.click('#play-anim-btn');
   await page.waitForFunction(() => {
     const panel = document.querySelector('#storm-panel');
@@ -272,8 +411,10 @@ async function assertPlaybackMapMode(page, label) {
     assert(layout.header && layout.header.height <= 70, `${label}: mobile playback header is too tall (${layout.header?.height}px)`);
     assert(!layout.headerActions, `${label}: mobile playback still shows secondary header actions`);
     assert(layout.controls.height <= 140, `${label}: mobile playback dock is too tall (${layout.controls.height}px)`);
+    await assertMobileTargetSizes(page, `${label} controls`);
   }
 
+  if (snapshotName) await captureVisualSnapshot(page, snapshotName);
   await page.click('.anim-close');
   await page.waitForFunction(() => (
     !document.body.classList.contains('track-playback-active') &&
@@ -521,6 +662,107 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   }
 }
 
+async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }) {
+  const context = await browser.newContext({
+    viewport: { width, height },
+    serviceWorkers: 'block',
+    reducedMotion: 'no-preference',
+  });
+  await context.addInitScript(() => {
+    localStorage.setItem('hm-settings-v1', JSON.stringify({
+      onboarded: true,
+      theme: 'dark',
+      highContrast: false,
+      reducedMotion: false,
+      locale: 'en',
+    }));
+  });
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await captureVisualSnapshot(page, `${name}-dark`);
+
+    await page.click('#toggle-filters');
+    await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), { timeout: 5000 });
+    if (width <= 720) await assertMobileTargetSizes(page, `${name} filters`);
+    await captureVisualSnapshot(page, `${name}-filters`);
+    await page.click('#toggle-filters');
+
+    await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
+    await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+    if (width <= 720) await assertMobileTargetSizes(page, `${name} settings`);
+    await captureVisualSnapshot(page, `${name}-settings`);
+    await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
+
+    await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('theme', 'light');
+    });
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+    await captureVisualSnapshot(page, `${name}-light`);
+
+    await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('theme', 'dark');
+      settings.setSetting('highContrast', true);
+    });
+    await page.waitForFunction(() => document.documentElement.classList.contains('high-contrast'));
+    await captureVisualSnapshot(page, `${name}-high-contrast`);
+
+    await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('highContrast', false);
+      settings.setSetting('reducedMotion', true);
+    });
+    await page.waitForFunction(() => document.documentElement.classList.contains('reduce-motion'));
+    await assertReducedMotionContract(page, `${name} reduced motion`);
+    await captureVisualSnapshot(page, `${name}-reduced-motion`);
+    await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('reducedMotion', false);
+    });
+
+    await openKatrinaPanel(page);
+    await assertSidePanelLayout(page, `${name} storm detail`);
+    if (width <= 720) await assertMobileTargetSizes(page, `${name} storm detail`);
+    await captureVisualSnapshot(page, `${name}-storm-detail`);
+
+    await page.evaluate(async () => {
+      const panels = await import('/src/panels.js');
+      panels.closeAllPanels();
+      const stats = await import('/src/stats.js');
+      stats.toggleStats();
+    });
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    if (width <= 720) await assertMobileTargetSizes(page, `${name} statistics`);
+    await captureVisualSnapshot(page, `${name}-statistics`);
+
+    await page.evaluate(async () => {
+      const data = await import('/src/data.js');
+      const compare = await import('/src/compare.js');
+      await data.ensureStormsLoaded();
+      for (const id of ['AL122005', 'AL041992']) {
+        const storm = data.getAllStorms().find(item => item.id === id);
+        if (!storm) throw new Error(`Visual comparison storm ${id} not found`);
+        if (!compare.isPinned(id)) await compare.togglePin(storm);
+      }
+      compare.openComparePanel();
+    });
+    await page.waitForSelector('#compare-panel:not([hidden]) .cp-card', { timeout: 10000 });
+    if (width <= 720) await assertMobileTargetSizes(page, `${name} comparison`);
+    await captureVisualSnapshot(page, `${name}-comparison`);
+
+    await openKatrinaPanel(page);
+    await assertPlaybackMapMode(page, `${name} playback`, `${name}-playback`);
+    if (pageErrors.length) throw new Error(`${name}: page errors: ${pageErrors.join(' | ')}`);
+  } finally {
+    await context.close();
+  }
+}
+
 try {
   const launchOptions = { headless: true };
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
@@ -564,6 +806,8 @@ try {
   assert(restored.state === '', `invalid state filter was not cleared: ${restored.state}`);
   assert(restored.categories.length === 6 && restored.categories.every(category => category.on && category.pressed === 'true'), 'invalid category hash did not restore default categories');
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
+
+  await assertDialogAndKeyboardContracts(page);
 
   const shortcutPage = await context.newPage();
   await shortcutPage.goto(`${baseUrl}/#stats`, { waitUntil: 'domcontentloaded' });
@@ -965,7 +1209,8 @@ try {
   await page.click('#close-evac');
   assert(await page.locator('.evac-location-marker').count() === 0, 'closing the zone panel left its selection marker on the map');
 
-  await page.click('#toggle-poster');
+  await page.focus('#toggle-poster');
+  await page.keyboard.press('Enter');
   await page.waitForFunction(() => Number(document.querySelector('#poster-canvas')?.dataset.segmentCount) > 1000, { timeout: 15000 });
   const poster = await page.evaluate(() => {
     const canvas = document.querySelector('#poster-canvas');
@@ -1004,6 +1249,7 @@ try {
   assert(await posterDownload.failure() === null, 'poster PNG download failed');
   await page.click('#close-poster');
   await page.waitForFunction(() => document.querySelector('#poster-view')?.hidden && !document.body.classList.contains('poster-open'));
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-poster'), 'poster dialog did not return focus to its opener');
 
   await page.evaluate(async () => {
     const data = await import('/src/data.js');
@@ -1158,9 +1404,12 @@ try {
     }
   }
 
+  await runVisualSnapshotMatrix(browser, baseUrl, { width: 1440, height: 960, name: 'desktop' });
+  await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
+
   await browser.close();
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, mobile pass ok, panel layout/playback matrix ok)`);
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, keyboard/focus contracts ok, 20 visual snapshots, panel layout/playback matrix ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

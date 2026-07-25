@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { inflateSync } from 'node:zlib';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const visualSnapshotDir = path.join(root, 'test-results', 'visual');
 
 let chromium;
 try {
@@ -170,6 +171,7 @@ function paeth(left, up, upLeft) {
 
 try {
   await mkdir(new URL('../.tmp-pw/', import.meta.url), { recursive: true });
+  await mkdir(visualSnapshotDir, { recursive: true });
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
@@ -192,6 +194,7 @@ try {
 
   await page.click('#toggle-globe3d');
   await page.waitForSelector('#globe3d-panel:not([hidden])', { timeout: 5000 });
+  assert(await page.evaluate(() => document.activeElement?.id === 'close-globe3d'), '3D globe dialog did not focus its close button');
   await page.waitForSelector('#globe3d-canvas canvas', { timeout: 90000 });
   await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.dataset.ready === 'true', { timeout: 90000 });
 
@@ -212,8 +215,8 @@ try {
     };
   });
 
-  await page.locator('#globe3d-panel').screenshot({ path: path.join(root, '.tmp-pw', 'globe3d-desktop.png') });
-  const desktopCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(root, '.tmp-pw', 'globe3d-canvas-desktop.png') });
+  await page.locator('#globe3d-panel').screenshot({ path: path.join(visualSnapshotDir, 'desktop-globe.png'), animations: 'disabled' });
+  const desktopCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(visualSnapshotDir, 'desktop-globe-canvas.png'), animations: 'disabled' });
   const desktopPixels = summarizePng(desktopCanvasPng);
 
   assert(desktop.ready === 'true', '3D globe did not mark itself ready');
@@ -242,8 +245,8 @@ try {
       viewportHeight: innerHeight,
     };
   });
-  await page.locator('#globe3d-panel').screenshot({ path: path.join(root, '.tmp-pw', 'globe3d-mobile.png') });
-  const mobileCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(root, '.tmp-pw', 'globe3d-canvas-mobile.png') });
+  await page.locator('#globe3d-panel').screenshot({ path: path.join(visualSnapshotDir, 'mobile-globe.png'), animations: 'disabled' });
+  const mobileCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(visualSnapshotDir, 'mobile-globe-canvas.png'), animations: 'disabled' });
   const mobilePixels = summarizePng(mobileCanvasPng);
   assert(mobile.canvasWidth >= 360 && mobile.canvasHeight >= 800, `mobile canvas is too small: ${mobile.canvasWidth}x${mobile.canvasHeight}`);
   assert(mobile.topbarWidth <= 374 && mobile.topbarHeight < 260, `mobile topbar overflows or covers too much canvas: ${mobile.topbarWidth}x${mobile.topbarHeight}`);
@@ -252,6 +255,22 @@ try {
     mobilePixels.nonDarkPixels > 10_000 && mobilePixels.variedPixels > 10_000,
     `mobile canvas appears blank or unrendered: ${JSON.stringify({ mobile, mobilePixels })}`,
   );
+  await page.evaluate(() => {
+    const dialog = document.querySelector('#globe3d-panel');
+    const focusable = [...dialog.querySelectorAll('button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')]
+      .filter(element => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+      });
+    window.__expectedGlobeFirstFocus = focusable[0] || null;
+    focusable.at(-1)?.focus();
+  });
+  await page.keyboard.press('Tab');
+  assert(await page.evaluate(() => document.activeElement === window.__expectedGlobeFirstFocus), '3D globe dialog did not wrap focus');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.hidden, { timeout: 5000 });
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-globe3d'), '3D globe dialog did not return focus to its opener');
 
   await context.close();
   await browser.close();

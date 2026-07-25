@@ -6,6 +6,7 @@ All notable changes to HurricaneMap.
 
 ### Added
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
+- Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.
@@ -15,6 +16,7 @@ All notable changes to HurricaneMap.
 - Storm biographies now compose fatality and damage details through one grammar-safe presenter, including correct singular fatality wording.
 - Optional live and on-demand feeds now share a localized diagnostics contract for loading, empty, stale, offline, rate-limited, and error states; failed layer refreshes retain last-good map data, and settings shows source, freshness, retry, and cache-origin details.
 - Release validation now keeps package/service-worker/data versions, impact coverage counts, and the documented skip-link conformance claim aligned.
+- Mobile active-storm status no longer blocks header actions, settings and detail controls meet 44px target sizing, and the compact playback dock preserves status context without consuming a third control row.
 
 ## v1.6.0 - Safety, education, and resilience (July 2026)
 
