@@ -8916,6 +8916,70 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 }
 
 /* Historical forecast-cone education controls + map legend */
+.forecast-skill-control {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--green) 45%, var(--surface1));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--green) 5%, var(--surface0));
+}
+.forecast-skill-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.forecast-skill-heading h3 { margin: 0; font-size: 0.88rem; color: var(--text); }
+.forecast-skill-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.forecast-skill-control p,
+.forecast-skill-loading,
+.forecast-skill-error {
+  margin: 0;
+  color: var(--subtext);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+.forecast-skill-scope { color: var(--text) !important; font-weight: 650; }
+.forecast-skill-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--surface1);
+  border-radius: 7px;
+}
+.forecast-skill-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+.forecast-skill-table th,
+.forecast-skill-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--surface0);
+  text-align: right;
+  white-space: nowrap;
+}
+.forecast-skill-table th:first-child { text-align: left; }
+.forecast-skill-table thead th {
+  color: var(--subtext);
+  background: color-mix(in srgb, var(--surface1) 45%, transparent);
+  font-weight: 650;
+}
+.forecast-skill-table tbody tr:last-child > * { border-bottom: 0; }
+.forecast-skill-definition { color: var(--text) !important; }
+.forecast-skill-sources a { color: var(--blue); }
+
 .cone-retro-control,
 .art-mode-control {
   display: grid;

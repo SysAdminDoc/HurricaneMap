@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Added
+- Historical storm panels now separate measured NHC forecast skill from illustrative cones: official 2021–2025 OFCL track/intensity mean errors, lead-time sample sizes, best-track comparison definitions, basin scope, and source files ship in a reproducible offline dataset.
 - Spatial point searches now add current NHC 34/50/64 kt cumulative wind probabilities and nearby 34 kt arrival contours with issue time, official sources, explicit contour-distance/caveat copy, cancellation safety, and stale/offline link-only fallback.
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
 - Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.

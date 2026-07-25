@@ -69,7 +69,7 @@ npm run build
 - **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears with the official cone/track, Potential Tropical Cyclone support, advisory/discussion/name-pronunciation/rip-current links, an optional GOES backdrop, hourly feed checks, and retry/backoff status.
 - **📍 Point-specific NHC wind guidance** — right-click/long-press the map or use device location to see current official 34/50/64 kt cumulative probability bands and the nearest 34 kt earliest-reasonable/most-likely arrival contours. Issue time, contour distance, source links, and an explicit impact-forecast caveat are always shown; stale or offline products fall back to links without displaying old values.
 - **❎ NHC tropical outlook + marine warnings** — official formation disturbances render with the NHC's 2026 gray-X treatment for near-0% systems; an opt-in layer adds the 0–24 hour offshore wind-warning zones.
-- **📐 Forecast-cone retrospective** — every historical storm can be overlaid with selectable 2015, 2025, or 2026 NHC error-radius tables, plus a clearly labeled illustrative reconstruction of the 2026 experimental ellipse methodology.
+- **📐 Measured forecast-skill retrospective** — each historical storm shows its basin's official NHC 2021–2025 OFCL track and intensity errors by lead time, sample sizes, definitions, and source files. A separate control retains the clearly labeled illustrative 2015/2025/2026 cone-radius reconstruction.
 - **〰️ Animated risk trajectories** — an opt-in education mode replaces the cone boundary with 20 deterministic plausible center paths, scaled to the selected error era and automatically rendered without motion when reduced motion is preferred.
 - **🎒 Offline preparedness planner** — a device-local EN/ES/Kreyòl checklist and household calculator sizes water and food for a three-day evacuation kit or two-week stay-at-home kit, with progress available after a fully offline reload.
 - **📍 Official evacuation-zone lookup** — enter a Florida address or choose a map point to query the state-published evacuation-zone layer, with local-official caveats and direct state lookups preserved when the service is unavailable or the location is outside Florida.
@@ -396,6 +396,7 @@ Every preprocessing run writes `data/metadata.json` alongside the generated land
 | ---- | ----- |
 | Atlantic best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
+| Official forecast skill (2021–2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml) — regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
 | Format spec | [Landsea, C. W. — *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
 | Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/) — fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |

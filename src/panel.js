@@ -38,6 +38,7 @@ import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
 import { presentPressure } from './metric-presenters.js';
+import { renderForecastSkill } from './forecast-skill.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -303,6 +304,8 @@ function render(storm, landfall, allStorms) {
           <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
         </div>
 
+        <div id="forecast-skill-host"></div>
+
         <section class="cone-retro-control" aria-labelledby="cone-retro-title">
           <div class="cone-retro-heading">
             <h3 id="cone-retro-title">${t('coneRetro.title')}</h3>
@@ -374,6 +377,7 @@ function render(storm, landfall, allStorms) {
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
   renderHwmRow(document.getElementById('hwm-row-host'), storm);
+  renderForecastSkill(document.getElementById('forecast-skill-host'), storm);
   import('./tides.js')
     .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
     .catch(() => { /* tide gauges are optional context */ });

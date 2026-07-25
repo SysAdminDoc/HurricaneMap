@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "period": {
+    "startYear": 2021,
+    "endYear": 2025,
+    "label": "2021-2025"
+  },
+  "sourceUpdated": "2026-07-08",
+  "bestTrackAsOf": "2026-05-18",
+  "model": "OFCL",
+  "definitions": {
+    "trackError": "Great-circle distance between the official forecast position and post-season best-track position at the verification time.",
+    "intensityError": "Absolute difference between official forecast and post-season best-track maximum sustained wind at the verification time.",
+    "aggregation": "Mean error across all qualifying official forecasts; tropical or subtropical at both initial and verifying time."
+  },
+  "sources": {
+    "methodology": "https://www.nhc.noaa.gov/verification/verify2.shtml",
+    "summary": "https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf",
+    "format": "https://www.nhc.noaa.gov/verification/pdfs/Error_Tabulation_File_Format.pdf"
+  },
+  "basins": {
+    "AL": {
+      "label": "Atlantic",
+      "url": "https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_ATL_TI_errors.txt",
+      "sourceSubsetSha256": "e55163e0ac9e3a8eb02fa5c0aee15528d0763e1a46a78c9332cde13c5bd17d78",
+      "rows": [
+        {
+          "leadHours": 0,
+          "trackErrorNmi": 6.9,
+          "trackSampleSize": 1676,
+          "intensityErrorKt": 1.3,
+          "intensitySampleSize": 1676
+        },
+        {
+          "leadHours": 12,
+          "trackErrorNmi": 22.3,
+          "trackSampleSize": 1504,
+          "intensityErrorKt": 5,
+          "intensitySampleSize": 1504
+        },
+        {
+          "leadHours": 24,
+          "trackErrorNmi": 33.6,
+          "trackSampleSize": 1336,
+          "intensityErrorKt": 7.1,
+          "intensitySampleSize": 1336
+        },
+        {
+          "leadHours": 36,
+          "trackErrorNmi": 44,
+          "trackSampleSize": 1182,
+          "intensityErrorKt": 8.5,
+          "intensitySampleSize": 1182
+        },
+        {
+          "leadHours": 48,
+          "trackErrorNmi": 55.9,
+          "trackSampleSize": 1049,
+          "intensityErrorKt": 9.9,
+          "intensitySampleSize": 1049
+        },
+        {
+          "leadHours": 60,
+          "trackErrorNmi": 70.5,
+          "trackSampleSize": 923,
+          "intensityErrorKt": 10.8,
+          "intensitySampleSize": 923
+        },
+        {
+          "leadHours": 72,
+          "trackErrorNmi": 86.4,
+          "trackSampleSize": 805,
+          "intensityErrorKt": 11.6,
+          "intensitySampleSize": 805
+        },
+        {
+          "leadHours": 96,
+          "trackErrorNmi": 124.9,
+          "trackSampleSize": 613,
+          "intensityErrorKt": 13.3,
+          "intensitySampleSize": 613
+        },
+        {
+          "leadHours": 120,
+          "trackErrorNmi": 181,
+          "trackSampleSize": 464,
+          "intensityErrorKt": 14.7,
+          "intensitySampleSize": 464
+        }
+      ]
+    },
+    "EP": {
+      "label": "Eastern North Pacific",
+      "url": "https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_EPAC_TI_errors.txt",
+      "sourceSubsetSha256": "68dfc26d75a567406bf5ada6a7da2f43aa6b01a48e225d701a21e894449a9ee6",
+      "rows": [
+        {
+          "leadHours": 0,
+          "trackErrorNmi": 8,
+          "trackSampleSize": 1452,
+          "intensityErrorKt": 1.4,
+          "intensitySampleSize": 1452
+        },
+        {
+          "leadHours": 12,
+          "trackErrorNmi": 21.4,
+          "trackSampleSize": 1281,
+          "intensityErrorKt": 5.7,
+          "intensitySampleSize": 1281
+        },
+        {
+          "leadHours": 24,
+          "trackErrorNmi": 32.1,
+          "trackSampleSize": 1112,
+          "intensityErrorKt": 9,
+          "intensitySampleSize": 1112
+        },
+        {
+          "leadHours": 36,
+          "trackErrorNmi": 41.6,
+          "trackSampleSize": 953,
+          "intensityErrorKt": 10.9,
+          "intensitySampleSize": 953
+        },
+        {
+          "leadHours": 48,
+          "trackErrorNmi": 50.3,
+          "trackSampleSize": 807,
+          "intensityErrorKt": 12.6,
+          "intensitySampleSize": 807
+        },
+        {
+          "leadHours": 60,
+          "trackErrorNmi": 61.1,
+          "trackSampleSize": 679,
+          "intensityErrorKt": 13.7,
+          "intensitySampleSize": 679
+        },
+        {
+          "leadHours": 72,
+          "trackErrorNmi": 74,
+          "trackSampleSize": 574,
+          "intensityErrorKt": 14.2,
+          "intensitySampleSize": 573
+        },
+        {
+          "leadHours": 96,
+          "trackErrorNmi": 101.4,
+          "trackSampleSize": 400,
+          "intensityErrorKt": 16,
+          "intensitySampleSize": 400
+        },
+        {
+          "leadHours": 120,
+          "trackErrorNmi": 125,
+          "trackSampleSize": 273,
+          "intensityErrorKt": 17.8,
+          "intensitySampleSize": 273
+        }
+      ]
+    }
+  }
+}

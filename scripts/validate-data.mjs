@@ -63,7 +63,7 @@ function assertImpactNumber(value, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
@@ -72,6 +72,7 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billi
   readJson('data/metadata.json'),
   readJson('data/storm-events.json'),
   readJson('data/billions.json'),
+  readJson('data/forecast-skill.json'),
 ]);
 
 try {
@@ -95,9 +96,46 @@ if (!Array.isArray(glossary)) fail('data/glossary.json must contain an array.');
 if (!isObject(metadata)) fail('data/metadata.json must contain an object.');
 if (!isObject(stormEvents)) fail('data/storm-events.json must contain an object.');
 if (!isObject(billions)) fail('data/billions.json must contain an object.');
+if (!isObject(forecastSkill)) fail('data/forecast-skill.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
+}
+
+if (forecastSkill.schema !== 1) fail('forecast-skill.schema must be 1.');
+if (forecastSkill.model !== 'OFCL') fail('forecast-skill.model must identify official OFCL forecasts.');
+if (forecastSkill.period?.startYear !== 2021 || forecastSkill.period?.endYear !== 2025) {
+  fail('forecast-skill period must be the published 2021-2025 sample.');
+}
+if (!validIsoDate(forecastSkill.bestTrackAsOf)) fail('forecast-skill.bestTrackAsOf must be an absolute ISO date.');
+for (const sourceKey of ['methodology', 'summary', 'format']) {
+  if (!/^https:\/\/www\.nhc\.noaa\.gov\//.test(forecastSkill.sources?.[sourceKey] || '')) {
+    fail(`forecast-skill.sources.${sourceKey} must be an official NHC URL.`);
+  }
+}
+const skillLeads = [0, 12, 24, 36, 48, 60, 72, 96, 120];
+for (const basinId of ['AL', 'EP']) {
+  const basin = forecastSkill.basins?.[basinId];
+  if (!isObject(basin)) {
+    fail(`forecast-skill.basins.${basinId} is required.`);
+    continue;
+  }
+  if (!/^https:\/\/www\.nhc\.noaa\.gov\/verification\/errors\//.test(basin.url || '')) {
+    fail(`forecast-skill ${basinId} must link its official individual error file.`);
+  }
+  if (!/^[a-f0-9]{64}$/.test(basin.sourceSubsetSha256 || '')) {
+    fail(`forecast-skill ${basinId} must record a SHA-256 for its source subset.`);
+  }
+  if (!Array.isArray(basin.rows) || JSON.stringify(basin.rows.map(row => row.leadHours)) !== JSON.stringify(skillLeads)) {
+    fail(`forecast-skill ${basinId} must contain the complete official lead-time sequence.`);
+    continue;
+  }
+  for (const row of basin.rows) {
+    if (!isFiniteNumber(row.trackErrorNmi) || row.trackErrorNmi < 0) fail(`forecast-skill ${basinId} ${row.leadHours} h track error is invalid.`);
+    if (!isFiniteNumber(row.intensityErrorKt) || row.intensityErrorKt < 0) fail(`forecast-skill ${basinId} ${row.leadHours} h intensity error is invalid.`);
+    if (!Number.isInteger(row.trackSampleSize) || row.trackSampleSize < 1) fail(`forecast-skill ${basinId} ${row.leadHours} h track sample is invalid.`);
+    if (!Number.isInteger(row.intensitySampleSize) || row.intensitySampleSize < 1) fail(`forecast-skill ${basinId} ${row.leadHours} h intensity sample is invalid.`);
+  }
 }
 
 const stormsById = new Map();
