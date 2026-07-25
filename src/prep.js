@@ -4,6 +4,11 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { hidePanel, showPanel } from './panels.js';
+import {
+  PREP_SCHEMA_VERSION,
+  createVersionedRecord,
+  migrateVersionedRecord,
+} from './schema-contract.js';
 
 const STORAGE_KEY = 'hm-prep-v1';
 const MAX_HOUSEHOLD = 20;
@@ -40,13 +45,31 @@ export function calculatePrepSupplies(household, mode = 'go') {
 }
 
 function loadState() {
-  try { return normalizePrepState(JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')); }
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return normalizePrepState(null);
+    const migration = migratePrepRecord(JSON.parse(raw));
+    if (migration.shouldPersist) saveState(migration.value);
+    return migration.value;
+  }
   catch { return normalizePrepState(null); }
 }
 
 function saveState(state) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizePrepState(state))); }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(
+      createVersionedRecord(PREP_SCHEMA_VERSION, 'state', normalizePrepState(state)),
+    ));
+  }
   catch { /* private mode / storage quota — checklist still works for this view */ }
+}
+
+export function migratePrepRecord(record) {
+  return migrateVersionedRecord(record, {
+    schemaVersion: PREP_SCHEMA_VERSION,
+    payloadKey: 'state',
+    normalize: normalizePrepState,
+  });
 }
 
 let state = null;

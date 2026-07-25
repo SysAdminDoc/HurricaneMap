@@ -19,6 +19,8 @@ const TILE_CACHE = 'hm-tiles-v1';
 const RADAR_CACHE = 'hm-radar-v1';
 const DATA_DB = 'hm-offline-data-v2';
 const DATA_STORE = 'responses';
+const DATA_DB_VERSION = 1;
+const LEGACY_DATA_DBS = ['hm-offline-data-v1'];
 
 const SHELL_ASSETS = [
   './',
@@ -75,6 +77,7 @@ const SHELL_ASSETS = [
   './src/radar.js',
   './src/report.js',
   './src/search-history.js',
+  './src/schema-contract.js',
   './src/spatial-search.js',
   './src/settings.js',
   './src/storage-manager.js',
@@ -153,6 +156,7 @@ self.addEventListener('activate', (event) => {
       await self.registration.navigationPreload.enable();
     }
     await pruneOfflineData();
+    await deleteLegacyDataDbs();
     self.clients.claim();
   })());
 });
@@ -369,13 +373,21 @@ function openDataDb() {
       reject(new Error('IndexedDB unavailable'));
       return;
     }
-    const request = indexedDB.open(DATA_DB, 1);
+    const request = indexedDB.open(DATA_DB, DATA_DB_VERSION);
     request.onupgradeneeded = () => {
       request.result.createObjectStore(DATA_STORE, { keyPath: 'key' });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+async function deleteLegacyDataDbs() {
+  if (!('indexedDB' in self)) return;
+  await Promise.all(LEGACY_DATA_DBS.map(name => new Promise(resolve => {
+    const request = indexedDB.deleteDatabase(name);
+    request.onsuccess = request.onerror = request.onblocked = () => resolve();
+  })));
 }
 
 async function idbGet(key) {

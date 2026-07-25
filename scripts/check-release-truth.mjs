@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CACHE_CONTRACT, DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = relative => readFile(path.join(root, relative), 'utf8');
@@ -22,6 +23,7 @@ const [
   vpat,
   license,
   claude,
+  preprocessor,
 ] = await Promise.all([
   read('package.json'),
   read('data/metadata.json'),
@@ -32,6 +34,7 @@ const [
   read('docs/VPAT.html'),
   readOptional('LICENSE.md'),
   readOptional('CLAUDE.md'),
+  read('scripts/preprocess_hurdat2.py'),
 ]);
 
 const packageJson = JSON.parse(packageText);
@@ -43,6 +46,25 @@ const errors = [];
 
 if (metadata.generator?.app_version !== version) {
   errors.push(`metadata generator version ${metadata.generator?.app_version} does not match package ${version}`);
+}
+if (metadata.schema_version !== DATA_SCHEMA_VERSION) {
+  errors.push(`metadata schema ${metadata.schema_version} does not match supported schema ${DATA_SCHEMA_VERSION}`);
+}
+for (const cacheName of [CACHE_CONTRACT.data, CACHE_CONTRACT.tiles, CACHE_CONTRACT.radar, CACHE_CONTRACT.offlineDb]) {
+  if (!serviceWorker.includes(`'${cacheName}'`)) {
+    errors.push(`service worker does not implement compatibility cache ${cacheName}`);
+  }
+}
+if (!preprocessor.includes(`METADATA_SCHEMA_VERSION = ${DATA_SCHEMA_VERSION}`)) {
+  errors.push(`HURDAT2 preprocessor does not emit metadata schema ${DATA_SCHEMA_VERSION}`);
+}
+if (!serviceWorker.includes(`const DATA_DB_VERSION = ${CACHE_CONTRACT.offlineDbVersion}`)) {
+  errors.push(`service worker IndexedDB version does not match ${CACHE_CONTRACT.offlineDbVersion}`);
+}
+for (const legacyDb of CACHE_CONTRACT.legacyOfflineDbs) {
+  if (!serviceWorker.includes(`'${legacyDb}'`)) {
+    errors.push(`service worker does not retire legacy IndexedDB ${legacyDb}`);
+  }
 }
 if (metadata.coverage?.impact_row_count !== impactCount) {
   errors.push(`metadata impact_row_count ${metadata.coverage?.impact_row_count} does not match ${impactCount} impact rows`);

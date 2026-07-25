@@ -8,6 +8,7 @@ All notable changes to HurricaneMap.
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
 - Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.
 - English-only glossary definitions and generated storm narratives now carry machine-readable language metadata and a localized source-language disclosure in every interface locale and comparison export.
+- Persisted settings, search history, preparedness state, shared URLs, generated metadata, and offline storage now share an explicit compatibility contract with legacy migration and future-version rejection tests.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.
@@ -18,6 +19,7 @@ All notable changes to HurricaneMap.
 - Optional live and on-demand feeds now share a localized diagnostics contract for loading, empty, stale, offline, rate-limited, and error states; failed layer refreshes retain last-good map data, and settings shows source, freshness, retry, and cache-origin details.
 - Release validation now keeps package/service-worker/data versions, impact coverage counts, and the documented skip-link conformance claim aligned.
 - Mobile active-storm status no longer blocks header actions, settings and detail controls meet 44px target sizing, and the compact playback dock preserves status context without consuming a third control row.
+- Service-worker activation now removes superseded IndexedDB generations and regression coverage proves old caches and stale records are pruned without losing the current offline catalogue.
 
 ## v1.6.0 - Safety, education, and resilience (July 2026)
 

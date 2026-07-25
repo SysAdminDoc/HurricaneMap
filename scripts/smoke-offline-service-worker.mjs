@@ -81,6 +81,45 @@ try {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
+  // Seed the previous cache/database generation before the service worker is
+  // installed. Activation must remove it without disturbing the current store.
+  await page.goto(`${baseUrl}/data/metadata.json`, { waitUntil: 'load' });
+  await page.evaluate(async () => {
+    for (const cacheName of [
+      'hm-shell-hm-v0.9.0',
+      'hm-data-v1',
+      'hm-tiles-v0',
+      'hm-radar-v0',
+    ]) {
+      const cache = await caches.open(cacheName);
+      await cache.put('/legacy', new Response('legacy'));
+    }
+
+    const createDb = (name, seed) => new Promise((resolve, reject) => {
+      const request = indexedDB.open(name, 1);
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore('responses', { keyPath: 'key' });
+      };
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('responses', 'readwrite');
+        tx.objectStore('responses').put(seed);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      };
+    });
+
+    await createDb('hm-offline-data-v1', { key: 'legacy/data.json' });
+    await createDb('hm-offline-data-v2', { key: 'data/obsolete.json' });
+  });
+
   await page.goto(baseUrl, { waitUntil: 'load' });
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
@@ -98,23 +137,41 @@ try {
     await page.reload({ waitUntil: 'load' });
   }
 
-  const offlineKeys = await page.evaluate(async () => {
+  const migrationState = await page.evaluate(async () => {
     const db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('hm-offline-data-v2');
+      const request = indexedDB.open('hm-offline-data-v2', 1);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
     try {
-      return await new Promise((resolve, reject) => {
+      const offlineKeys = await new Promise((resolve, reject) => {
         const tx = db.transaction('responses', 'readonly');
         const request = tx.objectStore('responses').getAllKeys();
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
       });
+      return {
+        offlineKeys,
+        cacheKeys: await caches.keys(),
+        databaseNames: typeof indexedDB.databases === 'function'
+          ? (await indexedDB.databases()).map(database => database.name)
+          : [],
+      };
     } finally {
       db.close();
     }
   });
+  const offlineKeys = migrationState.offlineKeys;
+  for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-tiles-v0', 'hm-radar-v0']) {
+    assert(!migrationState.cacheKeys.includes(legacyCache), `legacy cache survived activation: ${legacyCache}`);
+  }
+  assert(!offlineKeys.includes('data/obsolete.json'), 'obsolete current-database record survived activation pruning');
+  if (migrationState.databaseNames.length) {
+    assert(
+      !migrationState.databaseNames.includes('hm-offline-data-v1'),
+      'legacy IndexedDB survived activation',
+    );
+  }
   for (const required of [
     'data/landfalls.json',
     'data/stats.json',
@@ -177,7 +234,7 @@ try {
   await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
-  console.log(`offline service worker ok (${offlineKeys.length} data records, ${offlineResult.storms} storms, optional caches absent)`);
+  console.log(`offline service worker ok (${offlineKeys.length} data records, ${offlineResult.storms} storms, legacy storage removed, optional caches absent)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

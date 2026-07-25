@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { PREP_ITEMS, calculatePrepSupplies, normalizePrepState } from '../src/prep.js';
+import { PREP_ITEMS, calculatePrepSupplies, migratePrepRecord, normalizePrepState } from '../src/prep.js';
 
 assert.deepEqual(calculatePrepSupplies(4, 'go'), {
   people: 4,
@@ -27,5 +27,15 @@ assert.equal(normalized.mode, 'go');
 assert.deepEqual(normalized.checked, ['water', 'food']);
 assert(PREP_ITEMS.length >= 16, 'preparedness checklist should cover essential and household-specific needs');
 assert.equal(new Set(PREP_ITEMS.map(([id]) => id)).size, PREP_ITEMS.length, 'checklist IDs must be unique for persistence');
+
+const legacy = migratePrepRecord({ household: 4, mode: 'home', checked: ['water', 'bad'] });
+assert.equal(legacy.status, 'legacy');
+assert.equal(legacy.shouldPersist, true);
+assert.deepEqual(legacy.value, { household: 4, mode: 'home', checked: ['water'] });
+
+const future = migratePrepRecord({ schema_version: 999, state: { household: 9, mode: 'home' } });
+assert.equal(future.status, 'unsupported');
+assert.equal(future.shouldPersist, false);
+assert.deepEqual(future.value, { household: 1, mode: 'go', checked: [] });
 
 console.log('preparedness calculator ok');

@@ -72,6 +72,11 @@ if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR
 if (!/pruneOfflineData\(\)/.test(source) || !/idbDeleteExcept/.test(source)) {
   errors.push('sw.js activate path must prune removed offline-data records.');
 }
+if (!/const\s+DATA_DB_VERSION\s*=\s*1/.test(source) ||
+    !/LEGACY_DATA_DBS\s*=\s*\[['"]hm-offline-data-v1['"]\]/.test(source) ||
+    !/deleteLegacyDataDbs\(\)/.test(source)) {
+  errors.push('sw.js must version IndexedDB and remove the superseded v1 database during activation.');
+}
 
 const radarBranch = source.indexOf('if (isRadarAsset(url))');
 const shellBranch = source.indexOf('if (isShell(url))');

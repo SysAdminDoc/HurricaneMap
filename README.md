@@ -27,6 +27,8 @@ The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.
 
 The app uses an offline-first service worker. Historical lookup data is preinstalled into compressed IndexedDB with CacheStorage fallback, while large local radar PNGs are cached on demand. Settings reports browser usage/quota and protects the core shell/data scopes while allowing tile or radar cleanup; an opened radar timeline can save an explicit, bounded per-storm offline pack. When shell or offline-data assets change, bump `SW_VERSION` in `sw.js`; installed users will then see an in-app reload prompt instead of silently staying on stale UI.
 
+Persisted browser state has an explicit compatibility contract: settings, search history, and preparedness data use schema-versioned envelopes; legacy unversioned records migrate in place, while unknown future versions remain untouched and load safe defaults. Shared URL hashes emit `v=1`, continue to accept legacy unversioned links, and ignore unsupported future versions. Generated data must match the schema in `src/schema-contract.js`, and service-worker activation removes superseded caches and IndexedDB generations only after the replacement shell and offline data install.
+
 Local verification:
 
 ```bash

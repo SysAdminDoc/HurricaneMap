@@ -29,6 +29,7 @@ export function isRetired(name, year) {
 // storms.json    — full track + metadata, keyed by storm id.
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
 // metadata.json  — generated data provenance, coverage, and source details.
+import { assertSupportedDataSchema } from './schema-contract.js';
 
 const DATA = {
   landfalls: [],
@@ -70,6 +71,7 @@ export async function loadInitial() {
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
   if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
+  if (md) assertSupportedDataSchema(md);
   DATA.landfalls = lf || [];
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;

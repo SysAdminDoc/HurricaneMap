@@ -33,7 +33,7 @@ function cats(filters) {
       yearMinDefault: 1851,
       yearMaxDefault: 2025,
     }),
-    '#c=3%2C4%2C5&s=Florida&t=1&storm=AL122005',
+    '#v=1&c=3%2C4%2C5&s=Florida&t=1&storm=AL122005',
   );
 }
 
@@ -60,7 +60,7 @@ function cats(filters) {
   const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
   filters.categories.clear();
   const hash = encodeHashState(filters, { yearMinDefault: 1851, yearMaxDefault: 2025 });
-  assert.equal(hash, '#c=');
+  assert.equal(hash, '#v=1&c=');
   const { filters: restored } = restoreFiltersFromHash(hash, createDefaultFilters());
   assert.deepEqual(cats(restored), []);
 }
@@ -116,10 +116,23 @@ function cats(filters) {
   const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
   filters.retiredOnly = true;
   const hash = encodeHashState(filters, { yearMinDefault: 1851, yearMaxDefault: 2025 });
-  assert.equal(hash, '#r=1');
+  assert.equal(hash, '#v=1&r=1');
   const fresh = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
   applyHashToFilters(fresh, hash, { yearMinDefault: 1851, yearMaxDefault: 2025 });
   assert.equal(fresh.retiredOnly, true);
+}
+
+// Unversioned hashes remain valid; future incompatible versions safely retain
+// the caller's current state instead of partially applying unknown fields.
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  filters.state = 'Texas';
+  const { decoded, filters: restored } = restoreFiltersFromHash('#v=999&s=Florida&c=5', filters, {
+    knownStates: ['Florida', 'Texas'],
+  });
+  assert.equal(decoded.v, '999');
+  assert.equal(restored.state, 'Texas');
+  assert.deepEqual(cats(restored), [...CATEGORY_DEFAULTS].sort());
 }
 
 console.log('url state ok');

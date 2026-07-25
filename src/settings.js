@@ -4,6 +4,12 @@
 // Other modules read via getSetting() and react to the
 // "hm-settings:change" custom event when a value flips.
 
+import {
+  SETTINGS_SCHEMA_VERSION,
+  createVersionedRecord,
+  migrateVersionedRecord,
+} from './schema-contract.js';
+
 const STORAGE_KEY = 'hm-settings-v1';
 
 const DEFAULTS = {
@@ -47,7 +53,13 @@ function load() {
   if (_state) return _state;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    _state = raw ? normalizeSettings(JSON.parse(raw)) : { ...DEFAULTS };
+    if (!raw) {
+      _state = { ...DEFAULTS };
+      return _state;
+    }
+    const migration = migrateSettingsRecord(JSON.parse(raw));
+    _state = migration.value;
+    if (migration.shouldPersist) save();
   } catch {
     _state = { ...DEFAULTS };
   }
@@ -55,7 +67,11 @@ function load() {
 }
 
 function save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(_state)); }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(
+      createVersionedRecord(SETTINGS_SCHEMA_VERSION, 'settings', _state),
+    ));
+  }
   catch { /* private mode / quota — non-fatal */ }
 }
 
@@ -71,7 +87,12 @@ export function hasStoredSetting(key) {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' && Object.prototype.hasOwnProperty.call(parsed, key);
+    const source = parsed?.schema_version === SETTINGS_SCHEMA_VERSION
+      ? parsed.settings
+      : !Object.prototype.hasOwnProperty.call(parsed || {}, 'schema_version')
+        ? parsed
+        : null;
+    return source && typeof source === 'object' && Object.prototype.hasOwnProperty.call(source, key);
   } catch {
     return false;
   }
@@ -234,4 +255,12 @@ export function normalizeSettings(raw) {
     if (typeof source[key] === 'boolean') next[key] = source[key];
   }
   return next;
+}
+
+export function migrateSettingsRecord(record) {
+  return migrateVersionedRecord(record, {
+    schemaVersion: SETTINGS_SCHEMA_VERSION,
+    payloadKey: 'settings',
+    normalize: normalizeSettings,
+  });
 }

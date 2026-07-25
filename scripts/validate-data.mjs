@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
+import { DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
@@ -219,7 +220,9 @@ if (!Array.isArray(stats.year_range) || stats.year_range.length !== 2) {
   }
 }
 
-if (metadata.schema_version !== 1) fail('metadata.schema_version must be 1.');
+if (metadata.schema_version !== DATA_SCHEMA_VERSION) {
+  fail(`metadata.schema_version must be ${DATA_SCHEMA_VERSION}.`);
+}
 if (!validIsoDate(metadata.generated_at_utc)) fail('metadata.generated_at_utc must be an ISO timestamp.');
 if (!isObject(metadata.generator)) {
   fail('metadata.generator must contain generator details.');

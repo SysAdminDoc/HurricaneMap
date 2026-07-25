@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { normalizeSettings } from '../src/settings.js';
+import { migrateSettingsRecord, normalizeSettings } from '../src/settings.js';
 
 const settings = normalizeSettings({
   windUnit: 'mph',
@@ -33,5 +33,17 @@ assert.equal(settings.onboarded, true);
 assert.equal(Object.hasOwn(settings, 'unknownKey'), false);
 
 assert.deepEqual(normalizeSettings(null), normalizeSettings({}));
+
+const legacy = migrateSettingsRecord({ windUnit: 'mph', locale: 'es', unknownKey: 'ignored' });
+assert.equal(legacy.status, 'legacy');
+assert.equal(legacy.shouldPersist, true);
+assert.equal(legacy.value.windUnit, 'mph');
+assert.equal(legacy.value.locale, 'es');
+assert.equal(Object.hasOwn(legacy.value, 'unknownKey'), false);
+
+const future = migrateSettingsRecord({ schema_version: 999, settings: { windUnit: 'mph' } });
+assert.equal(future.status, 'unsupported');
+assert.equal(future.shouldPersist, false);
+assert.equal(future.value.windUnit, 'kt');
 
 console.log('settings ok');

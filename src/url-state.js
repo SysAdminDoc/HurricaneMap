@@ -1,3 +1,5 @@
+import { URL_STATE_VERSION } from './schema-contract.js';
+
 export const YEAR_FALLBACK_MIN = 1851;
 export const YEAR_FALLBACK_MAX = 2025;
 export const CATEGORY_DEFAULTS = Object.freeze(['ts', '1', '2', '3', '4', '5']);
@@ -55,7 +57,7 @@ export function encodeHashState(filters, {
       parts.push(`${key}=${encodeURIComponent(current[key])}`);
     }
   }
-  return parts.length ? `#${parts.join('&')}` : '';
+  return parts.length ? `#v=${URL_STATE_VERSION}&${parts.join('&')}` : '';
 }
 
 export function decodeHashState(hash) {
@@ -86,6 +88,9 @@ export function restoreFiltersFromHash(hash, currentFilters, {
   if (!decoded) return { decoded: null, filters: cloneFilters(currentFilters) };
 
   const next = cloneFilters(currentFilters);
+  if (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION) {
+    return { decoded, filters: next };
+  }
   if (decoded.y && /^\d{4}-\d{4}$/.test(decoded.y)) {
     const [a, b] = decoded.y.split('-').map(Number);
     // Clamp each endpoint into bounds AFTER ordering — clamping lo with max()

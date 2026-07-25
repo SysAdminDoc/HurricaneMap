@@ -827,6 +827,15 @@ try {
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
 
+  const migratedSettings = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('hm-settings-v1') || 'null'),
+  );
+  assert(
+    migratedSettings?.schema_version === 1 &&
+      migratedSettings?.settings?.onboarded === true,
+    `legacy settings were not migrated to a versioned envelope: ${JSON.stringify(migratedSettings)}`,
+  );
+
   const hasPanelKeyframes = await page.evaluate(() => [...document.styleSheets].some(sheet => {
     try {
       return [...sheet.cssRules].some(rule => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'slideInPanel');
@@ -1179,7 +1188,13 @@ try {
     stored: JSON.parse(localStorage.getItem('hm-prep-v1') || 'null'),
   }));
   assert(/56\s*gallons of water/.test(prepState.text) && /56\s*person-days of food/.test(prepState.text), `preparedness calculator totals are wrong: ${prepState.text}`);
-  assert(prepState.completed === '2' && prepState.stored?.household === 4 && prepState.stored?.mode === 'home', `preparedness progress did not persist: ${JSON.stringify(prepState)}`);
+  assert(
+    prepState.completed === '2' &&
+      prepState.stored?.schema_version === 1 &&
+      prepState.stored?.state?.household === 4 &&
+      prepState.stored?.state?.mode === 'home',
+    `preparedness progress did not persist: ${JSON.stringify(prepState)}`,
+  );
   await page.click('#close-prep');
   await page.click('#toggle-prep');
   await page.waitForFunction(() => document.querySelector('#prep-household')?.value === '4' && document.querySelector('[data-prep-item="water"]')?.checked, { timeout: 5000 });

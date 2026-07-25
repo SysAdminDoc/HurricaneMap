@@ -1,5 +1,10 @@
 // Last-N viewed storms, persisted to localStorage. Surfaces as a dropdown
 // when the search input gains focus with an empty value.
+import {
+  SEARCH_HISTORY_SCHEMA_VERSION,
+  createVersionedRecord,
+} from './schema-contract.js';
+
 const KEY = 'hm-search-history-v1';
 const MAX_ENTRIES = 8;
 const VALID_CATEGORY_MIN = -1;
@@ -9,14 +14,17 @@ function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr)
-      ? arr.map(normalizeHistoryEntry).filter(Boolean).slice(0, MAX_ENTRIES)
-      : [];
+    const migration = migrateHistoryRecord(JSON.parse(raw));
+    if (migration.shouldPersist) save(migration.value);
+    return migration.value;
   } catch (e) { return []; }
 }
 function save(arr) {
-  try { localStorage.setItem(KEY, JSON.stringify(arr.slice(0, MAX_ENTRIES))); } catch (e) { /* quota */ }
+  try {
+    localStorage.setItem(KEY, JSON.stringify(
+      createVersionedRecord(SEARCH_HISTORY_SCHEMA_VERSION, 'entries', normalizeHistoryEntries(arr)),
+    ));
+  } catch (e) { /* quota */ }
 }
 
 export function recordView(landfall) {
@@ -65,6 +73,25 @@ export function normalizeHistoryEntry(entry) {
     lat,
     lon,
   };
+}
+
+export function migrateHistoryRecord(record) {
+  if (Array.isArray(record)) {
+    return { value: normalizeHistoryEntries(record), status: 'legacy', shouldPersist: true };
+  }
+  if (!record || typeof record !== 'object') {
+    return { value: [], status: 'invalid', shouldPersist: false };
+  }
+  if (record.schema_version !== SEARCH_HISTORY_SCHEMA_VERSION) {
+    return { value: [], status: 'unsupported', shouldPersist: false };
+  }
+  return { value: normalizeHistoryEntries(record.entries), status: 'current', shouldPersist: false };
+}
+
+function normalizeHistoryEntries(entries) {
+  return Array.isArray(entries)
+    ? entries.map(normalizeHistoryEntry).filter(Boolean).slice(0, MAX_ENTRIES)
+    : [];
 }
 
 function normalizeText(value, maxLength) {
