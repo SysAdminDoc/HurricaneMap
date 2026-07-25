@@ -935,16 +935,8 @@ export function generateStormBiography(storm, impacts) {
     `made ${landfalls.length} landfalls in ${landfallStates.join(', ') || 'the United States'}`;
   
   // Impact info
-  const fatalities = getFatalityCount(impacts);
-  const damageUsd = getNominalDamageUsd(impacts);
-  const impactParts = [];
-  if (Number.isFinite(fatalities) && fatalities > 0) {
-    impactParts.push(`caused ${fatalities.toLocaleString('en-US')} fatalities`);
-  }
-  if (Number.isFinite(damageUsd) && damageUsd > 0) {
-    impactParts.push(`caused ${formatDamageBrief(damageUsd)} in damages`);
-  }
-  const impactStr = impactParts.length > 0 ? ` and ${impactParts.join(' and ')}` : '';
+  const impactSummary = formatBiographyImpacts(impacts);
+  const impactStr = impactSummary ? ` and ${impactSummary}` : '';
   
   // Distinctive features
   const ri = findRapidIntensification(storm.track);
@@ -958,6 +950,21 @@ export function generateStormBiography(storm, impacts) {
   
   // Assemble biography
   return `${nameStr.toUpperCase()} (${yearStr}) was a ${catDescriptor} that formed in ${genesisMonth} in ${region} and ${landfallStr}, with peak intensity of ${storm.peak_wind_kt} kt${impactStr}.${featureStr}`;
+}
+
+/** Format the optional impact clause shared by biography display and exports. */
+export function formatBiographyImpacts(impacts) {
+  const fatalities = getFatalityCount(impacts);
+  const damageUsd = getNominalDamageUsd(impacts);
+  const details = [];
+  if (Number.isFinite(fatalities) && fatalities > 0) {
+    const noun = fatalities === 1 ? 'fatality' : 'fatalities';
+    details.push(`${fatalities.toLocaleString('en-US')} ${noun}`);
+  }
+  if (Number.isFinite(damageUsd) && damageUsd > 0) {
+    details.push(`${formatDamageBrief(damageUsd)} in damage`);
+  }
+  return details.length > 0 ? `caused ${details.join(' and ')}` : '';
 }
 
 function formatDamageBrief(usd) {

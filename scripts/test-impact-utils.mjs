@@ -6,6 +6,7 @@ import {
   getFatalityCount,
   getNominalDamageUsd,
 } from '../src/impact-utils.js';
+import { formatBiographyImpacts } from '../src/metrics.js';
 import { renderOutlookBanner } from '../src/seasonal-outlook.js';
 
 assert.equal(getFatalityCount({ deaths: '506 direct, 7 indirect' }), 513);
@@ -23,6 +24,21 @@ assert.equal(getNominalDamageUsd({ damage_millions_usd: 150 }), 150000000);
 
 assert.equal(formatFatalityCount(1192), '1,192');
 assert.equal(formatFatalityCount(12000), '12k');
+
+assert.equal(formatBiographyImpacts(null), '');
+assert.equal(formatBiographyImpacts({ deaths_total: 1 }), 'caused 1 fatality');
+assert.equal(
+  formatBiographyImpacts({ damage_millions_usd: 150 }),
+  'caused $150.0M in damage',
+);
+assert.equal(
+  formatBiographyImpacts({ deaths_total: 1833, damage_millions_usd: 125000 }),
+  'caused 1,833 fatalities and $125B in damage',
+);
+assert.doesNotMatch(
+  formatBiographyImpacts({ deaths_total: 1833, damage_millions_usd: 125000 }),
+  /caused.+caused/i,
+);
 
 const hostileOutlook = renderOutlookBanner({
   current: {

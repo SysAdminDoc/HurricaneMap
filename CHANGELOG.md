@@ -6,6 +6,7 @@ All notable changes to HurricaneMap.
 
 ### Fixed
 - Corrected the published Saffir-Simpson and major-hurricane thresholds and added a semantic contract test that keeps application logic, glossary copy, and the README category table aligned.
+- Storm biographies now compose fatality and damage details through one grammar-safe presenter, including correct singular fatality wording.
 
 ## v1.6.0 - Safety, education, and resilience (July 2026)
 
