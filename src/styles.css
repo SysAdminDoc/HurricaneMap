@@ -5807,6 +5807,24 @@ html.high-contrast {
   text-transform: uppercase;
 }
 
+.saved-view-create { display: grid; grid-template-columns: minmax(110px, 1fr) auto auto; gap: 6px; }
+.saved-view-create input {
+  min-width: 0; border: 1px solid var(--surface1); border-radius: 7px;
+  background: var(--mantle); color: var(--text); padding: 7px 9px;
+}
+.saved-view-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.saved-view-list li { display: flex; align-items: center; gap: 4px; }
+.saved-view-restore {
+  flex: 1; min-width: 0; text-align: left; border: 0; background: transparent;
+  color: var(--text); padding: 7px; border-radius: 6px; cursor: pointer;
+}
+.saved-view-restore:hover { background: var(--surface0); }
+.saved-view-delete {
+  border: 0; background: transparent; color: var(--red); min-width: 32px;
+  min-height: 32px; border-radius: 6px; cursor: pointer;
+}
+.saved-view-status { min-height: 1.2em; color: var(--yellow); font-size: 11px; margin-top: 4px; }
+
 .settings-row {
   grid-template-columns: minmax(112px, 0.82fr) minmax(0, 1.65fr) !important;
   align-items: center !important;

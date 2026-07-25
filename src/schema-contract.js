@@ -7,6 +7,7 @@ export const SETTINGS_SCHEMA_VERSION = 1;
 export const SEARCH_HISTORY_SCHEMA_VERSION = 1;
 export const PREP_SCHEMA_VERSION = 1;
 export const URL_STATE_VERSION = '1';
+export const SAVED_VIEWS_SCHEMA_VERSION = 1;
 
 export const CACHE_CONTRACT = Object.freeze({
   data: 'hm-data-v2',

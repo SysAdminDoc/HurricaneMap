@@ -66,6 +66,17 @@ export function isPinned(stormId) {
 
 export function getPins() { return pinned.slice(); }
 
+export async function setPinsByIds(ids) {
+  await ensureStormsLoaded();
+  while (pinned.length) removePin(pinned[0].id);
+  for (const id of [...new Set(ids || [])].slice(0, MAX_PINS)) {
+    const storm = getStorm(id);
+    if (storm) await togglePin(storm);
+  }
+  notifyPinsChanged();
+  return pinned.map(pin => pin.id);
+}
+
 export async function togglePin(storm) {
   await ensureStormsLoaded();
   const fullStorm = getStorm(storm.id) || storm;
@@ -91,6 +102,7 @@ export async function togglePin(storm) {
   });
   refreshTray();
   refreshComparePanelIfOpen();
+  notifyPinsChanged();
   return true;
 }
 
@@ -102,6 +114,13 @@ export function removePin(stormId) {
   pinned.splice(idx, 1);
   refreshTray();
   refreshComparePanelIfOpen();
+  notifyPinsChanged();
+}
+
+function notifyPinsChanged() {
+  document.dispatchEvent(new CustomEvent('comparison-pins:change', {
+    detail: { ids: pinned.map(pin => pin.id) },
+  }));
 }
 
 export function clearAll() {

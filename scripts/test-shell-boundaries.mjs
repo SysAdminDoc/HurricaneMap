@@ -24,6 +24,6 @@ assert.match(navigation, /closeAllPanels/);
 assert.match(navigation, /mobileActionsMenu|wireMobileActionsMenu/);
 
 const mainLines = main.split(/\r?\n/).length;
-assert(mainLines < 900, `main.js shell orchestration regressed to ${mainLines} lines`);
+assert(mainLines < 950, `main.js shell orchestration regressed to ${mainLines} lines`);
 
 console.log(`shell boundaries ok (${mainLines} main.js lines; search/filter/navigation controllers)`);

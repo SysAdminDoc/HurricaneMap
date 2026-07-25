@@ -29,6 +29,8 @@ The app uses an offline-first service worker. Historical lookup data is preinsta
 
 Persisted browser state has an explicit compatibility contract: settings, search history, and preparedness data use schema-versioned envelopes; legacy unversioned records migrate in place, while unknown future versions remain untouched and load safe defaults. Shared URL hashes emit `v=1`, continue to accept legacy unversioned links, and ignore unsupported future versions. Generated data must match the schema in `src/schema-contract.js`, and service-worker activation removes superseded caches and IndexedDB generations only after the replacement shell and offline data install.
 
+The settings menu can save up to 20 named views on the current device. A view restores filters, map-layer choices, display units, and up to four comparison storms; it can be deleted or exported as versioned JSON. Saved views never include evacuation addresses, selected points, or other location coordinates.
+
 Local verification:
 
 ```bash

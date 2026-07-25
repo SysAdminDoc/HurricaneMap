@@ -81,6 +81,8 @@ const SHELL_ASSETS = [
   './src/search-history.js',
   './src/schema-contract.js',
   './src/search-controller.js',
+  './src/saved-views.js',
+  './src/saved-views-ui.js',
   './src/spatial-search.js',
   './src/settings.js',
   './src/shell-navigation.js',

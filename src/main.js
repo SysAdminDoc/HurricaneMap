@@ -14,6 +14,7 @@ import { escapeHtml } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
   applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
+  viewOptionsFromDecoded,
 } from './url-state.js';
 import {
   setCategoryMacro,
@@ -26,6 +27,7 @@ import { activateDialogFocus } from './dialog-focus.js';
 import { initSearchController } from './search-controller.js';
 import { createFilterController } from './filter-controller.js';
 import { wireShellNavigation } from './shell-navigation.js';
+import { initSavedViewsUI } from './saved-views-ui.js';
 
 initGlobalErrorSurface();
 
@@ -36,6 +38,7 @@ const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_
 
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
+let comparisonIds = [];
 let currentVisibleLandfalls = [];
 
 function deferNonCritical(task) {
@@ -115,6 +118,9 @@ async function lazyStartActiveStormPolling() {
 function writeHash() {
   const newHash = encodeHashState(filters, {
     openStormId,
+    comparisonIds,
+    windUnit: getSetting('windUnit'),
+    damageMode: getSetting('damageMode'),
     yearMinDefault: YEAR_MIN_DEFAULT,
     yearMaxDefault: YEAR_MAX_DEFAULT,
   });
@@ -324,12 +330,25 @@ async function boot() {
     yearMaxDefault: YEAR_MAX_DEFAULT,
     knownStates: getStats()?.by_state || {},
   });
+  restoreExtendedView(restored);
   syncFilterUiFromState();
   applyFilters();
   wireUI();
   wireSettingsControls();
   initOptionalFeedDiagnostics();
   initStorageManager();
+  initSavedViewsUI({
+    host: document.getElementById('saved-views-manager'),
+    getCurrentHash: () => encodeHashState(filters, {
+      openStormId,
+      comparisonIds,
+      windUnit: getSetting('windUnit'),
+      damageMode: getSetting('damageMode'),
+      yearMinDefault: YEAR_MIN_DEFAULT,
+      yearMaxDefault: YEAR_MAX_DEFAULT,
+    }) || '#v=1',
+    restoreHash: hash => { location.hash = hash; },
+  });
   initHeaderTooltips();
   // 174-year timeline ribbon along the bottom edge.
   mountTimeline(getLandfalls(), {
@@ -404,6 +423,7 @@ async function boot() {
       yearMaxDefault: YEAR_MAX_DEFAULT,
       knownStates: getStats()?.by_state || {},
     });
+    restoreExtendedView(nav);
     syncFilterUiFromState();
     applyFilters();
     highlightYearRange(filters.yearMin, filters.yearMax);
@@ -420,6 +440,25 @@ async function boot() {
   // First-run tour is delayed until the map, filters, and timeline are stable.
   setTimeout(() => maybeStartOnboardingLazy(), 700);
 }
+
+function restoreExtendedView(decoded) {
+  const options = viewOptionsFromDecoded(decoded);
+  if (options.windUnit) setSetting('windUnit', options.windUnit);
+  if (options.damageMode) setSetting('damageMode', options.damageMode);
+  comparisonIds = options.comparisonIds;
+  if (comparisonIds.length) {
+    loadCompare()
+      .then(({ setPinsByIds }) => setPinsByIds(comparisonIds))
+      .catch(error => console.error('Failed to restore comparison set:', error));
+  } else if (decoded?.p !== undefined) {
+    loadCompare().then(({ setPinsByIds }) => setPinsByIds([])).catch(() => {});
+  }
+}
+
+document.addEventListener('comparison-pins:change', event => {
+  comparisonIds = Array.isArray(event.detail?.ids) ? event.detail.ids.slice(0, 4) : [];
+  writeHash();
+});
 
 function openLauncherAction(action, delay = 120) {
   const buttonId = action === 'stats' ? 'toggle-stats' : action === 'compare' ? 'toggle-compare' : null;

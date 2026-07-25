@@ -6,6 +6,10 @@ export const CATEGORY_DEFAULTS = Object.freeze(['ts', '1', '2', '3', '4', '5']);
 
 const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
 const LAUNCHER_ACTIONS = new Set(['stats', 'compare']);
+const VALID_UNITS = new Set(['kt', 'mph', 'kmh']);
+const VALID_DAMAGE_MODES = new Set(['nominal', 'real']);
+const STORM_ID_PATTERN = /^(?:AL|EP)\d{6}$/;
+const MAX_HASH_LENGTH = 2048;
 
 export function launcherActionFromHash(hash) {
   const raw = String(hash || '').replace(/^#/, '').trim().toLowerCase();
@@ -30,6 +34,9 @@ export function createDefaultFilters({ yearMin = YEAR_FALLBACK_MIN, yearMax = YE
 
 export function encodeHashState(filters, {
   openStormId = '',
+  comparisonIds = [],
+  windUnit = 'kt',
+  damageMode = 'real',
   yearMinDefault = YEAR_FALLBACK_MIN,
   yearMaxDefault = YEAR_FALLBACK_MAX,
 } = {}) {
@@ -41,6 +48,9 @@ export function encodeHashState(filters, {
     h: '0',
     r: '0',
     storm: '',
+    p: '',
+    u: 'kt',
+    d: 'real',
   };
   const current = {
     y: `${filters.yearMin}-${filters.yearMax}`,
@@ -50,6 +60,9 @@ export function encodeHashState(filters, {
     h: filters.showHeatmap ? '1' : '0',
     r: filters.retiredOnly ? '1' : '0',
     storm: openStormId || '',
+    p: normalizeComparisonIds(comparisonIds).join(','),
+    u: VALID_UNITS.has(windUnit) ? windUnit : 'kt',
+    d: VALID_DAMAGE_MODES.has(damageMode) ? damageMode : 'real',
   };
   const parts = [];
   for (const key of Object.keys(current)) {
@@ -62,7 +75,7 @@ export function encodeHashState(filters, {
 
 export function decodeHashState(hash) {
   const raw = String(hash || '').replace(/^#/, '');
-  if (!raw) return null;
+  if (!raw || raw.length > MAX_HASH_LENGTH) return null;
   const decoded = {};
   for (const pair of raw.split('&')) {
     const eq = pair.indexOf('=');
@@ -79,6 +92,24 @@ export function decodeHashState(hash) {
   return decoded;
 }
 
+export function viewOptionsFromDecoded(decoded) {
+  if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) {
+    return { comparisonIds: [], windUnit: null, damageMode: null };
+  }
+  const versioned = decoded.v === URL_STATE_VERSION;
+  return {
+    comparisonIds: normalizeComparisonIds(String(decoded.p || '').split(',')),
+    windUnit: VALID_UNITS.has(decoded.u) ? decoded.u : versioned ? 'kt' : null,
+    damageMode: VALID_DAMAGE_MODES.has(decoded.d) ? decoded.d : versioned ? 'real' : null,
+  };
+}
+
+function normalizeComparisonIds(ids) {
+  return [...new Set((Array.isArray(ids) ? ids : [])
+    .map(id => String(id || '').toUpperCase())
+    .filter(id => STORM_ID_PATTERN.test(id)))].slice(0, 4);
+}
+
 export function restoreFiltersFromHash(hash, currentFilters, {
   yearMinDefault = YEAR_FALLBACK_MIN,
   yearMaxDefault = YEAR_FALLBACK_MAX,
@@ -87,10 +118,14 @@ export function restoreFiltersFromHash(hash, currentFilters, {
   const decoded = decodeHashState(hash);
   if (!decoded) return { decoded: null, filters: cloneFilters(currentFilters) };
 
-  const next = cloneFilters(currentFilters);
   if (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION) {
-    return { decoded, filters: next };
+    return { decoded, filters: cloneFilters(currentFilters) };
   }
+  // A versioned hash is a complete saved/shareable view: omitted fields mean
+  // contract defaults, not whatever happened to be active in this tab.
+  const next = decoded.v === URL_STATE_VERSION
+    ? createDefaultFilters({ yearMin: yearMinDefault, yearMax: yearMaxDefault })
+    : cloneFilters(currentFilters);
   if (decoded.y && /^\d{4}-\d{4}$/.test(decoded.y)) {
     const [a, b] = decoded.y.split('-').map(Number);
     // Clamp each endpoint into bounds AFTER ordering — clamping lo with max()

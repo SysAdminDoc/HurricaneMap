@@ -7,6 +7,7 @@ import {
   encodeHashState,
   launcherActionFromHash,
   restoreFiltersFromHash,
+  viewOptionsFromDecoded,
 } from '../src/url-state.js';
 
 assert.equal(launcherActionFromHash('#stats'), 'stats');
@@ -136,3 +137,35 @@ function cats(filters) {
 }
 
 console.log('url state ok');
+
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const hash = encodeHashState(filters, {
+    comparisonIds: ['al122005', 'EP012024', 'BAD', 'AL122005'],
+    windUnit: 'mph',
+    damageMode: 'nominal',
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+  });
+  assert.equal(hash, '#v=1&p=AL122005%2CEP012024&u=mph&d=nominal');
+  assert.deepEqual(viewOptionsFromDecoded(decodeHashState(hash)), {
+    comparisonIds: ['AL122005', 'EP012024'],
+    windUnit: 'mph',
+    damageMode: 'nominal',
+  });
+  assert.deepEqual(viewOptionsFromDecoded(decodeHashState('#v=1')), {
+    comparisonIds: [],
+    windUnit: 'kt',
+    damageMode: 'real',
+  });
+  assert.equal(decodeHashState(`#v=1&x=${'a'.repeat(2050)}`), null);
+
+  filters.categories = new Set(['3', '4', '5']);
+  filters.showTracks = true;
+  const { filters: defaultsRestored } = restoreFiltersFromHash('#v=1', filters, {
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+  });
+  assert.deepEqual(cats(defaultsRestored), [...CATEGORY_DEFAULTS].sort());
+  assert.equal(defaultsRestored.showTracks, false);
+}

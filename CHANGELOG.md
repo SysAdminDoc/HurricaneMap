@@ -9,6 +9,7 @@ All notable changes to HurricaneMap.
 - Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.
 - English-only glossary definitions and generated storm narratives now carry machine-readable language metadata and a localized source-language disclosure in every interface locale and comparison export.
 - Persisted settings, search history, preparedness state, shared URLs, generated metadata, and offline storage now share an explicit compatibility contract with legacy migration and future-version rejection tests.
+- Named device-local views can now restore and share versioned filters, layer choices, display units, and comparison sets, with bounded JSON export and explicit exclusion of addresses and selected locations.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.

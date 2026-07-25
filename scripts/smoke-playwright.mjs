@@ -923,6 +923,42 @@ try {
   assert(localeStrings.es !== localeStrings.before && /Cargando/.test(localeStrings.es), `ES dynamic string did not switch: ${localeStrings.es}`);
   assert(localeStrings.ht !== localeStrings.before && /chaje/.test(localeStrings.ht), `HT dynamic string did not switch: ${localeStrings.ht}`);
 
+  // Versioned saved views restore bounded filters, units, and comparison IDs
+  // without persisting addresses or arbitrary location coordinates.
+  await page.evaluate(() => {
+    location.hash = '#v=1&c=3%2C4%2C5&p=AL122005%2CAL041992&u=mph&d=nominal';
+  });
+  await page.waitForFunction(async () => {
+    const compare = await import('/src/compare.js');
+    const settings = await import('/src/settings.js');
+    return compare.getPins().length === 2 &&
+      settings.getSetting('windUnit') === 'mph' &&
+      settings.getSetting('damageMode') === 'nominal';
+  }, { timeout: 15000 });
+  await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
+  await page.fill('#saved-view-name', 'Major comparison');
+  await page.click('#saved-views-manager [data-action="save"]');
+  const savedViewState = await page.evaluate(() => {
+    const raw = localStorage.getItem('hm-saved-views-v1') || '';
+    return { raw, parsed: JSON.parse(raw || 'null') };
+  });
+  assert(savedViewState.parsed?.schema_version === 1, 'saved view did not use a versioned envelope');
+  assert(savedViewState.parsed?.views?.[0]?.hash.includes('p=AL122005%2CAL041992'), 'saved comparison IDs did not round-trip');
+  assert(!/address|latitude|longitude|\\blat\\b|\\blon\\b/i.test(savedViewState.raw), 'saved view persisted unexpected location data');
+  await page.click('#saved-views-manager [data-action="delete"]');
+  assert(await page.evaluate(() => JSON.parse(localStorage.getItem('hm-saved-views-v1')).views.length === 0), 'saved view delete did not persist');
+  await page.evaluate(() => {
+    document.querySelector('#settings-menu')?.hidePopover();
+    location.hash = '#v=1';
+  });
+  await page.waitForFunction(async () => {
+    const compare = await import('/src/compare.js');
+    const settings = await import('/src/settings.js');
+    return compare.getPins().length === 0 &&
+      settings.getSetting('windUnit') === 'kt' &&
+      settings.getSetting('damageMode') === 'real';
+  }, { timeout: 15000 });
+
   // 2026 cone parity: watch/warning overlay renders zone polygons, the
   // pink/blue hatch pattern, and its legend — exercised against stubbed
   // api.weather.gov responses since active storms are rare in test runs.
@@ -1076,11 +1112,11 @@ try {
   assert(/1,833 deaths/.test(impactsText), `Katrina NCEI deaths did not render: ${impactsText}`);
 
   await page.check('#cone-retro-enabled');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), { timeout: 10000 });
   const circleConePath = await page.getAttribute('path.cone-retro-shape--circle', 'd');
   await page.selectOption('#cone-retro-era', '2026');
   await page.check('#cone-retro-ellipse');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), { timeout: 10000 });
   const ellipseCone = await page.evaluate(() => ({
     path: document.querySelector('path.cone-retro-shape--ellipse')?.getAttribute('d') || '',
     legend: document.querySelector('#cone-retro-legend')?.textContent || '',

@@ -3,6 +3,7 @@ import {
   CACHE_CONTRACT,
   DATA_SCHEMA_VERSION,
   PREP_SCHEMA_VERSION,
+  SAVED_VIEWS_SCHEMA_VERSION,
   SEARCH_HISTORY_SCHEMA_VERSION,
   SETTINGS_SCHEMA_VERSION,
   URL_STATE_VERSION,
@@ -14,6 +15,7 @@ assert.equal(DATA_SCHEMA_VERSION, 1);
 assert.equal(SETTINGS_SCHEMA_VERSION, 1);
 assert.equal(SEARCH_HISTORY_SCHEMA_VERSION, 1);
 assert.equal(PREP_SCHEMA_VERSION, 1);
+assert.equal(SAVED_VIEWS_SCHEMA_VERSION, 1);
 assert.equal(URL_STATE_VERSION, '1');
 assert.deepEqual(createVersionedRecord(1, 'state', { safe: true }), {
   schema_version: 1,
