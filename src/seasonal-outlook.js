@@ -6,6 +6,11 @@
 // context that helps users interpret the forecast.
 
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+} from './optional-feeds.js';
 
 const CPC_URL = 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
 
@@ -44,15 +49,24 @@ export async function fetchSeasonalOutlook() {
   // Static editorial snapshot of the current season's published outlooks
   // (data/outlook.json). Refresh it when NOAA/CSU issue updates; a stale or
   // missing file degrades to the link-only banner.
+  beginOptionalFeed('seasonal', { cacheOrigin: 'bundled' });
   try {
     const response = await fetch('data/outlook.json');
     if (response.ok) {
       const data = await response.json();
       if (data && Number.isInteger(data.season) && Array.isArray(data.sources)) {
         base.current = data;
+        completeOptionalFeed('seasonal', {
+          itemCount: data.sources.length,
+          cacheOrigin: 'bundled',
+        });
+        return base;
       }
     }
-  } catch { /* offline or missing — link-only banner */ }
+    failOptionalFeed('seasonal', { responseStatus: response.status, cacheOrigin: 'bundled' });
+  } catch (error) {
+    failOptionalFeed('seasonal', { error, cacheOrigin: 'bundled' });
+  }
   return base;
 }
 

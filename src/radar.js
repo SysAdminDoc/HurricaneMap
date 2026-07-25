@@ -36,6 +36,11 @@
 
 import { formatTime } from './data.js';
 import { escapeHtml } from './html-utils.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+} from './optional-feeds.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -182,6 +187,7 @@ export class RadarOverlay {
     // stops the stale continuation from resurrecting the overlay.
     const session = ++this.session;
     this.stopAnimation();
+    beginOptionalFeed('radar', { cacheOrigin: 'bundled' });
     await loadManifest();
     if (session !== this.session) return;
     this.storm = storm;
@@ -223,6 +229,7 @@ export class RadarOverlay {
       frame = await findRemoteNearest(this.region, target);
       if (session !== this.session) return;
       if (!frame) {
+        completeOptionalFeed('radar', { empty: true, itemCount: 0, cacheOrigin: 'network' });
         this.setStatus('No archived radar found within ±1 hour of landfall.');
         return;
       }
@@ -230,6 +237,10 @@ export class RadarOverlay {
 
     this.currentDate = frame.date;
     this.draw(frame.url);
+    completeOptionalFeed('radar', {
+      itemCount: this.localFrames.length || 1,
+      cacheOrigin: frame.source === 'remote' ? 'network' : 'bundled',
+    });
     this.setStatus(this.timestampLabel(frame.source));
 
     this.map.setView([lf.lat, lf.lon], Math.max(this.map.getZoom(), 7), { animate: true });
@@ -317,20 +328,24 @@ export class RadarOverlay {
     const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
     const url = buildIemUrl(this.region, next);
     this.setStatus('Loading…');
+    beginOptionalFeed('radar');
     try {
       const r = await fetch(url, { method: 'HEAD' });
       if (session !== this.session) return;
       if (!r.ok) {
+        failOptionalFeed('radar', { responseStatus: r.status });
         this.setStatus(`No frame at ${formatTime(next.toISOString())}`);
         return;
       }
-    } catch (_) {
+    } catch (error) {
       if (session !== this.session) return;
+      failOptionalFeed('radar', { error });
       this.setStatus(`Failed to load ${formatTime(next.toISOString())}`);
       return;
     }
     this.currentDate = next;
     this.draw(url);
+    completeOptionalFeed('radar', { itemCount: 1 });
     this.setStatus(this.timestampLabel('remote'));
   }
 

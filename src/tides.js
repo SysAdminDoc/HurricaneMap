@@ -8,6 +8,11 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { categoryStrength } from './data.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+} from './optional-feeds.js';
 
 const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 const MAX_STATIONS = 3;
@@ -189,6 +194,7 @@ export async function renderTidesBlock(host, storm) {
     const block = host.querySelector('.tides-block');
     event.target.disabled = true;
     event.target.textContent = t('tides.loading');
+    beginOptionalFeed('tides');
     try {
       const stations = await loadStations();
       const nearby = nearestStations(stations, landfall.lat, landfall.lon);
@@ -196,11 +202,13 @@ export async function renderTidesBlock(host, storm) {
         .filter(Boolean);
       if (!host.isConnected) return;
       if (!results.length) {
+        completeOptionalFeed('tides', { empty: true, itemCount: 0 });
         block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
         wireLoadButton();
         return;
       }
       const landfallMs = Date.parse(landfall.t);
+      completeOptionalFeed('tides', { itemCount: results.length });
       block.innerHTML = `
         <div class="tide-legend">
           <span class="tide-key tide-key--observed">${t('tides.observed')}</span>
@@ -209,8 +217,9 @@ export async function renderTidesBlock(host, storm) {
         </div>
         ${results.map(result => stationCard(result, landfallMs)).join('')}
         <div class="im-source"><a href="https://tidesandcurrents.noaa.gov/" target="_blank" rel="noopener">${t('tides.source')}</a></div>`;
-    } catch {
+    } catch (error) {
       if (!host.isConnected) return;
+      failOptionalFeed('tides', { error });
       block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
       wireLoadButton();
     }

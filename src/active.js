@@ -26,6 +26,13 @@ import { getSetting } from './settings.js';
 import { t } from './i18n.js';
 import { clearTropicalOutlook, renderTropicalOutlook } from './outlook.js';
 import { clearMarineWarnings, renderMarineWarnings } from './marine-warnings.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  idleOptionalFeed,
+  reportOptionalFeedResult,
+} from './optional-feeds.js';
 
 const L = window.L;
 
@@ -72,6 +79,7 @@ export async function startActiveStormPolling() {
 }
 
 async function fetchAndRender() {
+  beginOptionalFeed('active', { nextRetryAt: nextPollAt });
   const result = await fetchCurrentStorms();
   const storms = result.storms || [];
   const countForStatus = result.ok ? storms.length : (lastStorms?.length || 0);
@@ -86,6 +94,11 @@ async function fetchAndRender() {
       failureCount: consecutiveFailures,
     });
     scheduleNextPoll(delay);
+    failOptionalFeed('active', {
+      responseStatus: result.status,
+      error: result.error,
+      nextRetryAt: nextPollAt,
+    });
     ensureBadge(countForStatus, {
       state,
       fetchedAt: lastSuccessfulFetchAt,
@@ -107,6 +120,12 @@ async function fetchAndRender() {
     stormCount: storms.length,
   });
   scheduleNextPoll(delay);
+  completeOptionalFeed('active', {
+    empty: storms.length === 0,
+    itemCount: storms.length,
+    completedAt: lastSuccessfulFetchAt,
+    nextRetryAt: nextPollAt,
+  });
   ensureBadge(storms.length, {
     state,
     fetchedAt: lastSuccessfulFetchAt,
@@ -119,6 +138,10 @@ async function fetchAndRender() {
   if (!storms.length) {
     clearActiveLayers();
     hideGoesRealtimeContext();
+    idleOptionalFeed('forecast');
+    idleOptionalFeed('alerts');
+    idleOptionalFeed('surge');
+    idleOptionalFeed('goes');
     clearOfficialForecastContext();
     clearOfficialForecastCache();
     clearTropicalAlerts();
@@ -131,10 +154,18 @@ async function fetchAndRender() {
 
 async function renderOperationalLayers() {
   const map = getMap();
-  await Promise.all([
-    renderTropicalOutlook({ map, enabled: getSetting('nhcOutlook') }),
-    renderMarineWarnings({ map, enabled: getSetting('marineWarnings') }),
+  const outlookEnabled = getSetting('nhcOutlook');
+  const marineEnabled = getSetting('marineWarnings');
+  if (outlookEnabled) beginOptionalFeed('outlook');
+  else idleOptionalFeed('outlook');
+  if (marineEnabled) beginOptionalFeed('marine');
+  else idleOptionalFeed('marine');
+  const [outlookResult, marineResult] = await Promise.all([
+    renderTropicalOutlook({ map, enabled: outlookEnabled }),
+    renderMarineWarnings({ map, enabled: marineEnabled }),
   ]);
+  reportOptionalFeedResult('outlook', outlookResult);
+  reportOptionalFeedResult('marine', marineResult);
 }
 
 function resolveProxyUrl() {
@@ -336,33 +367,48 @@ async function renderActive(storms) {
   layerGroup.addTo(map);
 
   const officialConeEnabled = getSetting('nhcForecastCone');
-  await renderOfficialForecastContext(storms, {
+  if (officialConeEnabled) {
+    beginOptionalFeed('forecast');
+    beginOptionalFeed('alerts');
+    beginOptionalFeed('surge');
+  } else {
+    idleOptionalFeed('forecast');
+    idleOptionalFeed('alerts');
+    idleOptionalFeed('surge');
+  }
+  const forecastResult = await renderOfficialForecastContext(storms, {
     map,
     enabled: officialConeEnabled,
   });
+  reportOptionalFeedResult('forecast', forecastResult);
 
   // 2026 cone standard: coastal + inland tropical watches/warnings travel
   // with the official cone toggle.
-  await renderTropicalAlerts(storms, {
+  const alertsResult = await renderTropicalAlerts(storms, {
     map,
     enabled: officialConeEnabled,
   });
+  reportOptionalFeedResult('alerts', alertsResult);
 
   // Peak Storm Surge forecast (published during surge watches/warnings;
   // empty otherwise) — same toggle as the official cone context.
-  await renderPeakSurge(storms, {
+  const surgeResult = await renderPeakSurge(storms, {
     map,
     enabled: officialConeEnabled,
   });
+  reportOptionalFeedResult('surge', surgeResult);
 
   const goesEnabled = getSetting('goesRealtime');
   if (goesEnabled) {
-    await renderGoesRealtimeContext(storms, {
+    beginOptionalFeed('goes');
+    const goesResult = await renderGoesRealtimeContext(storms, {
       map,
       enabled: true,
     });
+    if (goesResult.status !== 'rendered') reportOptionalFeedResult('goes', goesResult);
   } else {
     hideGoesRealtimeContext();
+    idleOptionalFeed('goes');
   }
 
 }

@@ -113,7 +113,11 @@ async function fetchBasin(basin, force) {
   const cached = cache.get(basin);
   if (!force && cached && Date.now() - cached.fetchedAt < CACHE_MS) return cached.points;
   const response = await fetch(`/nhc/outlook/${basin}.kmz`, { cache: 'no-cache' });
-  if (!response.ok) throw new Error(`NHC ${basin} outlook returned ${response.status}`);
+  if (!response.ok) {
+    const error = new Error(`NHC ${basin} outlook returned ${response.status}`);
+    error.responseStatus = response.status;
+    throw error;
+  }
   const kml = await extractKmlFromKmz(await response.arrayBuffer());
   const points = parseOutlookKml(kml, basin);
   cache.set(basin, { fetchedAt: Date.now(), points });
@@ -151,9 +155,23 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
   }
   const generation = ++renderGeneration;
   ensureLayer(map);
+  const cacheOrigin = BASINS.every(basin => {
+    const cached = cache.get(basin);
+    return !force && cached && Date.now() - cached.fetchedAt < CACHE_MS;
+  }) ? 'memory' : 'network';
   const results = await Promise.allSettled(BASINS.map(basin => fetchBasin(basin, force)));
   if (generation !== renderGeneration) return { status: 'stale', pointCount: 0 };
   const points = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
+  const failures = results.filter(result => result.status === 'rejected');
+  if (!points.length && failures.length === results.length) {
+    const error = failures[0]?.reason;
+    return {
+      status: 'error',
+      pointCount: 0,
+      error,
+      responseStatus: error?.responseStatus || 0,
+    };
+  }
   layerGroup.clearLayers();
   for (const point of points) {
     const marker = window.L.marker([point.lat, point.lon], {
@@ -171,8 +189,11 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     layerGroup.addLayer(marker);
   }
   updateLegend(points);
-  const failures = results.filter(result => result.status === 'rejected').length;
-  return { status: points.length ? 'rendered' : failures === results.length ? 'error' : 'empty', pointCount: points.length };
+  return {
+    status: points.length ? 'rendered' : 'empty',
+    pointCount: points.length,
+    cacheOrigin,
+  };
 }
 
 export function clearTropicalOutlook() {

@@ -73,10 +73,15 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
   try {
     const now = Date.now();
     let features = cache && now - cache.fetchedAt < CACHE_MS ? cache.features : null;
+    const cacheOrigin = features ? 'memory' : 'network';
     if (!features) {
       const response = await fetch(buildPeakSurgeQueryUrl(), { cache: 'no-cache' });
       if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
-      if (!response.ok) throw new Error(`peak surge query returned ${response.status}`);
+      if (!response.ok) {
+        const error = new Error(`peak surge query returned ${response.status}`);
+        error.responseStatus = response.status;
+        throw error;
+      }
       const data = await response.json();
       if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
       features = Array.isArray(data?.features) ? data.features : [];
@@ -97,12 +102,16 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
       layerGroup.addLayer(geoJsonLayer);
       geoJsonLayer.bringToBack();
     }
-    return { status: features.length ? 'rendered' : 'empty', featureCount: features.length };
+    return { status: features.length ? 'rendered' : 'empty', featureCount: features.length, cacheOrigin };
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
     console.warn('Peak storm surge layer unavailable:', error);
-    clearPeakSurge();
-    return { status: 'error', featureCount: 0 };
+    return {
+      status: 'error',
+      featureCount: 0,
+      error,
+      responseStatus: error.responseStatus || 0,
+    };
   }
 }
 

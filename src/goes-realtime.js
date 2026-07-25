@@ -5,6 +5,8 @@
 // from cloud object storage require server-side reprojection/raster processing
 // before they can be overlaid cleanly in Leaflet.
 
+import { completeOptionalFeed, failOptionalFeed } from './optional-feeds.js';
+
 const GOES_PANE_NAME = 'hm-goes-realtime';
 const GOES_DEFAULT_SIZE = '900x540';
 export const GOES_REFRESH_MS = 10 * 60 * 1000;
@@ -45,6 +47,7 @@ export const GOES_SECTORS = Object.freeze({
 let goesLayerGroup = null;
 let goesLayerMap = null;
 let statusEl = null;
+let activeOverlays = [];
 // Bumped whenever layers are cleared so late image load/error events from a
 // removed overlay can't resurrect the status badge.
 let goesRenderGeneration = 0;
@@ -65,11 +68,31 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
   }
 
   ensureGoesLayer(map);
-  clearGoesLayers();
+  const generation = ++goesRenderGeneration;
+  const previousOverlays = activeOverlays.slice();
+  const loadedOverlays = [];
+  let settledCount = 0;
   updateGoesStatus('loading', sectorIds, options.now);
 
   const L = window.L;
   const now = options.now || Date.now();
+  const settle = () => {
+    settledCount += 1;
+    if (generation !== goesRenderGeneration || settledCount < sectorIds.length) return;
+    if (loadedOverlays.length) {
+      for (const oldOverlay of previousOverlays) goesLayerGroup.removeLayer(oldOverlay);
+      activeOverlays = loadedOverlays;
+      updateGoesStatus('ready', sectorIds, now);
+      completeOptionalFeed('goes', {
+        itemCount: loadedOverlays.length,
+        completedAt: now,
+        nextRetryAt: now + GOES_REFRESH_MS,
+      });
+      return;
+    }
+    updateGoesStatus('error', sectorIds, now);
+    failOptionalFeed('goes', { nextRetryAt: now + GOES_REFRESH_MS });
+  };
   for (const sectorId of sectorIds) {
     const sector = GOES_SECTORS[sectorId];
     const overlay = L.imageOverlay(
@@ -84,12 +107,17 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
         attribution: 'NOAA/NESDIS/STAR GOES',
       },
     );
-    const generation = goesRenderGeneration;
     overlay.once('load', () => {
-      if (generation === goesRenderGeneration) updateGoesStatus('ready', sectorIds, now);
+      if (generation === goesRenderGeneration) {
+        loadedOverlays.push(overlay);
+        settle();
+      }
     });
     overlay.once('error', () => {
-      if (generation === goesRenderGeneration) updateGoesStatus('error', sectorIds, now);
+      if (generation === goesRenderGeneration) {
+        goesLayerGroup.removeLayer(overlay);
+        settle();
+      }
     });
     overlay.addTo(goesLayerGroup);
   }
@@ -105,6 +133,7 @@ export function hideGoesRealtimeContext() {
 export function clearGoesLayers() {
   goesRenderGeneration++;
   if (goesLayerGroup) goesLayerGroup.clearLayers();
+  activeOverlays = [];
 }
 
 export function selectGoesSectors(activeStorms) {

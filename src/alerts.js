@@ -126,7 +126,11 @@ async function fetchWithTimeout(url) {
       signal: controller.signal,
       headers: { Accept: 'application/geo+json' },
     });
-    if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+    if (!response.ok) {
+      const error = new Error(`${url} returned ${response.status}`);
+      error.responseStatus = response.status;
+      throw error;
+    }
     return await response.json();
   } finally {
     clearTimeout(timeout);
@@ -264,6 +268,9 @@ export async function renderTropicalAlerts(activeStorms, { map, enabled = true, 
   const generation = ++renderGeneration;
   ensureLayer(map);
   try {
+    const cacheOrigin = !force && alertsCache && Date.now() - alertsCache.fetchedAt < ALERTS_CACHE_MS
+      ? 'memory'
+      : 'network';
     const features = await fetchActiveAlerts(force);
     if (generation !== renderGeneration) return { status: 'stale', zoneCount: 0 };
     const { zoneFlags, directGeometries } = classifyAlerts(features);
@@ -284,12 +291,11 @@ export async function renderTropicalAlerts(activeStorms, { map, enabled = true, 
     const present = addHazardPolygons(entries);
     ensureHatchPattern(map);
     updateLegend(present);
-    return { status: entries.length ? 'rendered' : 'empty', zoneCount: entries.length };
+    return { status: entries.length ? 'rendered' : 'empty', zoneCount: entries.length, cacheOrigin };
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale', zoneCount: 0 };
     console.warn('Tropical watch/warning overlay unavailable:', error);
-    clearTropicalAlerts();
-    return { status: 'error', zoneCount: 0 };
+    return { status: 'error', zoneCount: 0, error, responseStatus: error.responseStatus || 0 };
   }
 }
 

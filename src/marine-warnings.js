@@ -46,7 +46,11 @@ async function fetchWarnings(force) {
   if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) return cache.features;
   const results = await Promise.allSettled(URLS.map(async url => {
     const response = await fetch(url, { cache: 'no-cache' });
-    if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+    if (!response.ok) {
+      const error = new Error(`${url} returned ${response.status}`);
+      error.responseStatus = response.status;
+      throw error;
+    }
     return parseMarineWarningKml(await response.text());
   }));
   const features = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
@@ -87,6 +91,9 @@ export async function renderMarineWarnings({ map, enabled = false, force = false
   const generation = ++renderGeneration;
   ensureLayer(map);
   try {
+    const cacheOrigin = !force && cache && Date.now() - cache.fetchedAt < CACHE_MS
+      ? 'memory'
+      : 'network';
     const features = await fetchWarnings(force);
     if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0 };
     layerGroup.clearLayers();
@@ -97,11 +104,15 @@ export async function renderMarineWarnings({ map, enabled = false, force = false
     });
     layerGroup.addLayer(layer);
     updateLegend(risks);
-    return { status: features.length ? 'rendered' : 'empty', polygonCount: features.length };
+    return { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, cacheOrigin };
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0 };
-    clearMarineWarnings();
-    return { status: 'error', polygonCount: 0, error };
+    return {
+      status: 'error',
+      polygonCount: 0,
+      error,
+      responseStatus: error.responseStatus || 0,
+    };
   }
 }
 

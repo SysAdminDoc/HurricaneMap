@@ -113,6 +113,13 @@ export async function renderOfficialForecastContext(activeStorms, options = {}) 
   ensureForecastLayer(map);
 
   try {
+    const now = Date.now();
+    const cacheOrigin = forecastCache &&
+      !options.force &&
+      forecastCache.stormKey === activeStormCacheKey(activeStorms) &&
+      now - forecastCache.fetchedAt < NHC_FORECAST_POLL_MS
+      ? 'memory'
+      : 'network';
     const layers = await fetchOfficialForecastLayers(activeStorms, { force: options.force });
     if (generation !== renderGeneration) {
       return { status: 'stale', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
@@ -132,13 +139,21 @@ export async function renderOfficialForecastContext(activeStorms, options = {}) 
       coneCount: coneFeatures.length,
       forecastTrackCount: forecastTrackFeatures.length,
       observedTrackCount: observedTrackFeatures.length,
+      cacheOrigin,
     };
   } catch (error) {
     if (generation !== renderGeneration) {
       return { status: 'stale', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
     }
     console.warn('Failed to fetch official NHC forecast geometry:', error);
-    return { status: 'error', coneCount: 0, forecastTrackCount: 0, observedTrackCount: 0 };
+    return {
+      status: 'error',
+      coneCount: 0,
+      forecastTrackCount: 0,
+      observedTrackCount: 0,
+      error,
+      responseStatus: error.responseStatus || 0,
+    };
   }
 }
 
@@ -184,7 +199,11 @@ async function fetchOfficialForecastLayers(activeStorms, { force = false } = {})
 
 async function fetchFeatureLayer(layerId) {
   const response = await fetch(buildNHCFeatureQueryUrl(layerId), { cache: 'no-cache' });
-  if (!response.ok) throw new Error(`NHC layer ${layerId} returned ${response.status}`);
+  if (!response.ok) {
+    const error = new Error(`NHC layer ${layerId} returned ${response.status}`);
+    error.responseStatus = response.status;
+    throw error;
+  }
   const data = await response.json();
   return Array.isArray(data?.features) ? data.features : [];
 }

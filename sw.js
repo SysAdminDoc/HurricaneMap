@@ -77,6 +77,7 @@ const SHELL_ASSETS = [
   './src/spatial-search.js',
   './src/settings.js',
   './src/onboarding.js',
+  './src/optional-feeds.js',
   './src/timeline.js',
   './src/sparkline.js',
   './src/season.js',

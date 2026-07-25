@@ -3556,6 +3556,50 @@ select:focus {
   font-size: 12px;
 }
 
+.feed-diagnostics {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.feed-diagnostic {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--surface2) 72%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface0) 82%, transparent);
+}
+
+.feed-diagnostic-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.feed-state {
+  color: var(--subtext1);
+  text-align: right;
+}
+
+.feed-diagnostic[data-state="error"] .feed-state,
+.feed-diagnostic[data-state="offline"] .feed-state,
+.feed-diagnostic[data-state="rate-limited"] .feed-state {
+  color: var(--red);
+}
+
+.feed-diagnostic[data-state="stale"] .feed-state {
+  color: var(--yellow);
+}
+
+.feed-diagnostic-meta {
+  display: grid;
+  gap: 0.12rem;
+  margin-top: 0.3rem;
+  color: var(--subtext0);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
 .search-results {
   padding: 5px;
   border-radius: 12px;
