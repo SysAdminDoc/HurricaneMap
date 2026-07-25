@@ -9,7 +9,7 @@
   },
   {
     "term": "Saffir-Simpson Scale",
-    "definition": "A classification system for tropical cyclones based on sustained wind speed. Categories range from Tropical Storm (34-63 kt) through Category 5 (≥157 kt). The scale estimates potential property damage and flooding, though wind speed alone does not determine hurricane danger."
+    "definition": "A classification system based on a tropical cyclone's maximum sustained wind speed. Tropical storms are 34-63 kt; hurricanes are Category 1 (64-82 kt), Category 2 (83-95 kt), Category 3 (96-112 kt), Category 4 (113-136 kt), and Category 5 (137+ kt). The scale describes wind hazard only; storm surge, rainfall, tornadoes, and forward speed are separate risks."
   },
   {
     "term": "Landfall",
@@ -77,6 +77,6 @@
   },
   {
     "term": "Major Hurricane",
-    "definition": "A hurricane of Category 3 or higher on the Saffir-Simpson Scale (winds ≥111 kt). Major hurricanes are responsible for the vast majority of hurricane-related deaths and damage."
+    "definition": "A hurricane of Category 3 or higher on the Saffir-Simpson Scale, with maximum sustained winds of at least 96 kt (111 mph). This wind classification alone does not determine the storm's total impacts."
   }
 ]

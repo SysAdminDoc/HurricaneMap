@@ -4,6 +4,9 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Fixed
+- Corrected the published Saffir-Simpson and major-hurricane thresholds and added a semantic contract test that keeps application logic, glossary copy, and the README category table aligned.
+
 ## v1.6.0 - Safety, education, and resilience (July 2026)
 
 ### Added
