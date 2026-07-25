@@ -247,7 +247,9 @@ async function assertMobileTargetSizes(page, label) {
       style.visibility !== 'hidden' &&
       style.pointerEvents !== 'none' &&
       Number(style.opacity) !== 0 &&
-      (rect.width < 44 || rect.height < 44);
+      // Chromium can report a 44px CSS target as 43.999... after viewport
+      // scaling. Half-pixel tolerance distinguishes that from a real 43px target.
+      (rect.width < 43.5 || rect.height < 43.5);
   }).slice(0, 20).map(element => {
     const rect = element.getBoundingClientRect();
     return {
@@ -1360,7 +1362,28 @@ try {
   const impactText = await page.textContent('#storm-panel .impacts-block');
   assert(/Fatalities\s*439/.test(impactText), `normalized fatalities did not render in impact panel: ${impactText}`);
   assert(/Damage/.test(impactText), `damage row did not render in impact panel: ${impactText}`);
+  assert(/Confidence:\s*(high|medium|low)/i.test(impactText), `impact confidence did not render: ${impactText}`);
   assert(!/undefined|NaN/.test(impactText), `impact panel contains invalid text: ${impactText}`);
+
+  const missingImpactState = await page.evaluate(async () => {
+    const data = await import('/src/data.js');
+    const panel = await import('/src/panel.js');
+    const missing = data.getAllStorms().find(storm =>
+      storm.year >= 2000 && !data.getImpactsFor(storm.id) && storm.us_landfalls?.length
+    );
+    if (!missing) throw new Error('No missing-impact fixture found');
+    const landfall = data.getLandfalls().find(item => item.storm_id === missing.id);
+    if (!landfall) throw new Error(`No landfall fixture found for ${missing.id}`);
+    await panel.showStorm(landfall);
+    return {
+      stormId: missing.id,
+      text: document.querySelector('#storm-panel .impacts-block')?.textContent || '',
+    };
+  });
+  assert(
+    /missing means unavailable, not zero/i.test(missingImpactState.text),
+    `missing impact state did not distinguish unavailable from zero: ${JSON.stringify(missingImpactState)}`,
+  );
 
   await page.click('#toggle-filters');
   await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), { timeout: 5000 });
@@ -1380,6 +1403,11 @@ try {
   await page.waitForSelector('#climatology-chart .clim-legend-item', { timeout: 15000 });
   await page.waitForSelector('#decade-trends-chart .dt-row', { timeout: 15000 });
   await page.waitForSelector('#climate-trends-chart svg', { timeout: 15000 });
+  await page.waitForFunction(() => {
+    const host = document.querySelector('#impact-coverage-summary');
+    return /244 of 595/.test(host?.textContent || '') &&
+      host?.querySelectorAll('.impact-coverage-table tbody tr').length > 100;
+  }, { timeout: 15000 });
   const stats = await page.evaluate(() => {
     const climatologyText = document.querySelector('#climatology-chart')?.textContent || '';
     const decadeAceValues = [...document.querySelectorAll('#decade-trends-chart .dt-ace')]

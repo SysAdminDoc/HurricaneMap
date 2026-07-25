@@ -1,6 +1,6 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { t } from './i18n.js';
-import { getStats, getLandfalls, getAllStorms, ensureStormsLoaded } from './data.js';
+import { getStats, getLandfalls, getAllStorms, getImpactsFor, ensureStormsLoaded } from './data.js';
 import { hidePanel, showPanel } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';
@@ -8,6 +8,7 @@ import { computeClimateTrends } from './metrics.js';
 import { fetchSeasonalOutlook, renderOutlookBanner } from './seasonal-outlook.js';
 import { escapeHtml } from './html-utils.js';
 import { presentCategory } from './metric-presenters.js';
+import { summarizeImpactCoverage } from './impact-coverage.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -94,6 +95,10 @@ function render() {
             HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.
           </p>
         </section>
+        <section class="stats-section stats-section--impact-coverage">
+          <h3>${t('impacts.coverageTitle')}</h3>
+          <div id="impact-coverage-summary" class="impact-coverage-summary"><span class="panel-muted">${t('panel.loading')}</span></div>
+        </section>
       </div>
 
       <div class="stats-panel-column stats-panel-column--decades">
@@ -149,6 +154,18 @@ function render() {
     });
   }
 
+  const impactHost = document.getElementById('impact-coverage-summary');
+  if (impactHost) {
+    ensureStormsLoaded().then(() => {
+      if (!impactHost.isConnected) return;
+      impactHost.innerHTML = renderImpactCoverage(
+        summarizeImpactCoverage(getAllStorms(), stormId => Boolean(getImpactsFor(stormId))),
+      );
+    }).catch(() => {
+      if (impactHost.isConnected) impactHost.textContent = t('impacts.coverageUnavailable');
+    });
+  }
+
   // Fetch and render the current NOAA seasonal outlook
   const outlookHost = document.getElementById('seasonal-outlook-host');
   if (outlookHost) {
@@ -161,6 +178,22 @@ function render() {
         outlookHost.innerHTML = '';
       });
   }
+}
+
+function renderImpactCoverage(coverage) {
+  const percent = coverage.total ? Math.round(coverage.covered / coverage.total * 100) : 0;
+  return `
+    <p>${t('impacts.coverageSummary', coverage.covered, coverage.total, percent)}</p>
+    <p class="stats-note">${t('impacts.missingMeaning')}</p>
+    <details>
+      <summary>${t('impacts.showByYear')}</summary>
+      <div class="impact-coverage-table-wrap">
+        <table class="impact-coverage-table">
+          <thead><tr><th>${t('impacts.year')}</th><th>${t('impacts.covered')}</th><th>${t('impacts.missing')}</th></tr></thead>
+          <tbody>${coverage.years.map(row => `<tr><th>${row.year}</th><td>${row.covered}</td><td>${row.missing}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </details>`;
 }
 
 function bar(label, count, max, suffix = '') {

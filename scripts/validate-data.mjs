@@ -399,10 +399,19 @@ for (const [stormId, impact] of Object.entries(impacts)) {
   }
 
   if (impact.impact_schema_version !== 1) fail(`${stormId}.impact_schema_version must be 1.`);
+  if (!['high', 'medium', 'low'].includes(impact.impact_confidence)) {
+    fail(`${stormId}.impact_confidence must be high, medium, or low.`);
+  }
+  if (typeof impact.impact_confidence_reason !== 'string' || !impact.impact_confidence_reason) {
+    fail(`${stormId}.impact_confidence_reason is required.`);
+  }
+  if (!impact.deaths && !impact.damages) fail(`${stormId} must retain deaths or damages raw source text.`);
   if (!isObject(impact.impact_provenance)) {
     fail(`${stormId}.impact_provenance is required.`);
   } else {
     if (impact.impact_provenance.source !== 'Wikipedia infobox') fail(`${stormId}.impact_provenance.source must be Wikipedia infobox.`);
+    if (impact.impact_provenance.source_title !== impact.wiki_title) fail(`${stormId}.impact_provenance.source_title must match wiki_title.`);
+    if (impact.impact_provenance.source_url !== impact.wiki_url) fail(`${stormId}.impact_provenance.source_url must match wiki_url.`);
     if (impact.impact_provenance.scraper !== 'scripts/scrape_impacts.py') fail(`${stormId}.impact_provenance.scraper must name scripts/scrape_impacts.py.`);
     if (!validIsoDate(impact.impact_provenance.parsed_at_utc)) fail(`${stormId}.impact_provenance.parsed_at_utc must be an ISO timestamp.`);
   }
@@ -423,7 +432,11 @@ for (const [stormId, impact] of Object.entries(impacts)) {
     }
   }
 
-  if (impact.damages && impact.damage_millions_usd == null) fail(`${stormId}: damages text is present but damage_millions_usd is missing.`);
+  if (impact.damages && impact.damage_millions_usd == null) {
+    if (impact.damage_qualifier !== 'unparsed' || impact.damage_source_units !== 'unknown') {
+      fail(`${stormId}: non-numeric damages text must be marked unparsed with unknown units.`);
+    }
+  }
   if (impact.damage_millions_usd != null || impact.damage_usd_nominal != null) {
     assertImpactNumber(impact.damage_millions_usd, `${stormId}.damage_millions_usd`);
     if (!validNonNegativeInteger(impact.damage_usd_nominal)) fail(`${stormId}.damage_usd_nominal must be a non-negative integer.`);

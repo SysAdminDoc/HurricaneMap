@@ -765,7 +765,15 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
     }
     if (rows.length) {
       const safeSourceUrl = safeExternalUrl(im.wiki_url);
-      sources.push(safeSourceUrl ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">${t('impacts.wikiSource')}</a>` : t('impacts.wikiSource'));
+      const confidence = ['high', 'medium', 'low'].includes(im.impact_confidence)
+        ? im.impact_confidence
+        : 'unknown';
+      const confidenceText = escapeHtml(t('impacts.confidence', t(`impacts.confidence.${confidence}`)));
+      const confidenceTitle = escapeHtml(im.impact_confidence_reason || '');
+      const source = safeSourceUrl
+        ? `<a href="${safeSourceUrl}" target="_blank" rel="noopener">${t('impacts.wikiSource')}</a>`
+        : t('impacts.wikiSource');
+      sources.push(`${source} · <span title="${confidenceTitle}">${confidenceText}</span>`);
     }
   }
   const billions = getBillionsFor(storm.id);
@@ -775,6 +783,9 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
       : '';
     rows.push(`<div class="im-row"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${formatMillionsUSD(billions.cost_cpi_musd)} <span class="im-adj">(2024 USD${deaths})</span></span></div>`);
     sources.push(`<a href="https://www.ncei.noaa.gov/access/billions/" target="_blank" rel="noopener">${t('impacts.nceiSource')}</a>`);
+  }
+  if (!im) {
+    rows.push(`<div class="im-row im-row--missing"><span class="im-value">${t('impacts.missingRecord')}</span></div>`);
   }
   if (!rows.length) return '';
   return `

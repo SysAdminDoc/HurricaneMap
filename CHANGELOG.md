@@ -10,10 +10,12 @@ All notable changes to HurricaneMap.
 - English-only glossary definitions and generated storm narratives now carry machine-readable language metadata and a localized source-language disclosure in every interface locale and comparison export.
 - Persisted settings, search history, preparedness state, shared URLs, generated metadata, and offline storage now share an explicit compatibility contract with legacy migration and future-version rejection tests.
 - Named device-local views can now restore and share versioned filters, layer choices, display units, and comparison sets, with bounded JSON export and explicit exclusion of addresses and selected locations.
+- Impact records now carry source title/URL, retained raw fields, parse timestamp, units, qualifiers, and explicit confidence reasoning; statistics reports all 244 covered and 351 missing catalog storms by year without treating missing as zero.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.
 - Split search, filter-control, and responsive shell navigation out of the entry point, and unified metric/category/unit/missing-value presentation across panels, statistics, comparisons, reports, CSV, and QGIS exports.
+- Refreshed the existing MediaWiki impact pipeline from 208 to 244 validated storm records and made repeated normalization byte-for-byte deterministic.
 
 ### Fixed
 - Corrected the published Saffir-Simpson and major-hurricane thresholds and added a semantic contract test that keeps application logic, glossary copy, and the README category table aligned.

@@ -5825,6 +5825,14 @@ html.high-contrast {
 }
 .saved-view-status { min-height: 1.2em; color: var(--yellow); font-size: 11px; margin-top: 4px; }
 
+.impact-coverage-table-wrap { max-height: 220px; overflow: auto; margin-top: 6px; }
+.impact-coverage-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.impact-coverage-table th, .impact-coverage-table td {
+  padding: 3px 6px; border-bottom: 1px solid var(--surface0); text-align: right;
+}
+.impact-coverage-table th:first-child { text-align: left; }
+.im-row--missing .im-value { color: var(--subtext); font-style: italic; }
+
 .settings-row {
   grid-template-columns: minmax(112px, 0.82fr) minmax(0, 1.65fr) !important;
   align-items: center !important;

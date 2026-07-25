@@ -13,8 +13,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Alice (1953)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alice_%281953%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -33,8 +37,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Brenda (1955)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281955%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -53,8 +61,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Arlene (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -73,8 +85,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Alma (1966)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Alma_%281966%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -93,8 +109,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Abby (1968)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Abby_%281968%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -113,8 +133,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Alberto (1994)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alberto_%281994%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -133,8 +157,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Allison (1995)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Allison_%281995%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -153,8 +181,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Arthur (1996)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arthur_%281996%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -173,8 +205,12 @@
     "damage_source_units": "usd_billions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Allison (2001)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Allison_%282001%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -193,8 +229,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Arlene (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -213,8 +253,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Alberto (2006)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alberto_%282006%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -233,8 +277,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Andrea (2013)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Andrea_%282013%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -253,8 +301,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Arthur (2014)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Arthur_%282014%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -273,8 +325,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Ana (2015)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Ana_%282015%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -293,8 +349,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Alberto (2018)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Alberto_%282018%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -313,8 +373,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Baker (1950)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Baker_%281950%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -333,8 +397,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Able (1952)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Able_%281952%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -353,8 +421,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Connie (1955)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Connie_%281955%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -373,8 +445,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Audrey (1957)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Audrey_%281957%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -393,8 +469,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Becky (1970)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Becky_%281970%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -413,8 +493,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Agnes",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Agnes",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -433,8 +517,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bob (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -453,8 +541,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bonnie (1986)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bonnie_%281986%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -473,8 +565,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Beryl (1988)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%281988%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -493,8 +589,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Allison (1989)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Allison_%281989%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -513,8 +613,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Arlene (1993)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Arlene_%281993%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -533,8 +637,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bertha (1996)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bertha_%281996%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -553,8 +661,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bonnie (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bonnie_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -573,8 +685,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bertha (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -593,8 +709,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bonnie (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bonnie_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -613,8 +733,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Barry (2007)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barry_%282007%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -633,8 +757,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Beryl (2012)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%282012%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -653,8 +781,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bill (2015)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bill_%282015%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -673,8 +805,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bonnie (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bonnie_%282016%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -693,10 +829,63 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Barry (2019)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Barry_%282019%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL022020": {
+    "deaths": "1 total",
+    "damages": "130000",
+    "wiki_title": "Tropical Storm Bertha (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%282020%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 130000,
+    "damage_millions_usd": 0.13,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bertha (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:35Z"
+    }
+  },
+  "AL022024": {
+    "deaths": "73 total",
+    "damages": "9050000000",
+    "damage_prefix": ">",
+    "wiki_title": "Hurricane Beryl (2024)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Beryl_%282024%29",
+    "deaths_total": 73,
+    "deaths_min": 73,
+    "deaths_max": 73,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 9050000000,
+    "damage_millions_usd": 9050.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Beryl (2024)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Beryl_%282024%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
     }
   },
   "AL031953": {
@@ -713,8 +902,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Barbara (1953)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Barbara_%281953%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -733,8 +926,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: minimum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Diane",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Diane",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -753,8 +950,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Betsy (1956)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281956%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -773,8 +974,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bertha (1957)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bertha_%281957%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -793,8 +998,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: minimum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Brenda (1960)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Brenda_%281960%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -813,8 +1022,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Carla (1961)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Carla_%281961%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -833,8 +1046,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Abby (1964)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Abby_%281964%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -853,8 +1070,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "computed_sum",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: computed_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Betsy (1965)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Betsy_%281965%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -873,8 +1094,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Candy (1968)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Candy_%281968%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -893,8 +1118,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Alicia (1983)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Alicia_%281983%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -913,8 +1142,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Chris (1988)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chris_%281988%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -933,8 +1166,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bob (1991)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281991%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -953,8 +1190,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Beryl (1994)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%281994%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -973,8 +1214,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Charley (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Charley_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -993,8 +1238,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bret (1999)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bret_%281999%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1013,8 +1262,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Barry (2001)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barry_%282001%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1033,8 +1286,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bill (2003)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bill_%282003%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1053,8 +1310,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Charley (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Charley_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1073,8 +1334,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Cindy (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1093,8 +1358,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Beryl (2006)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beryl_%282006%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1113,8 +1382,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Bonnie (2010)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Bonnie_%282010%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1133,8 +1406,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Colin (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Colin_%282016%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1153,10 +1430,113 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Cindy (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Cindy_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL032020": {
+    "deaths": "46 total",
+    "damages": "865000000",
+    "damage_prefix": "≥",
+    "wiki_title": "Tropical Storm Cristobal (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Cristobal_%282020%29",
+    "deaths_total": 46,
+    "deaths_min": 46,
+    "deaths_max": 46,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 865000000,
+    "damage_millions_usd": 865.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "minimum",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: minimum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Cristobal (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Cristobal_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL032021": {
+    "deaths": "14 total",
+    "damages": "375000000",
+    "wiki_title": "Tropical Storm Claudette (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%282021%29",
+    "deaths_total": 14,
+    "deaths_min": 14,
+    "deaths_max": 14,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 375000000,
+    "damage_millions_usd": 375.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Claudette (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
+    }
+  },
+  "AL032022": {
+    "deaths": "305 total",
+    "damages": "118000",
+    "wiki_title": "Tropical Storm Colin (2022)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Colin_%282022%29",
+    "deaths_total": 305,
+    "deaths_min": 305,
+    "deaths_max": 305,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 118000,
+    "damage_millions_usd": 0.118,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Colin (2022)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Colin_%282022%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
+    }
+  },
+  "AL032025": {
+    "deaths": "6 total",
+    "damages": "500000000",
+    "damage_prefix": "| damage-suffix =",
+    "damage_suffix": "| economic-losses-country =",
+    "wiki_title": "Tropical Storm Chantal (2025)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chantal_%282025%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 500000000,
+    "damage_millions_usd": 500.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Chantal (2025)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chantal_%282025%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
     }
   },
   "AL041959": {
@@ -1173,8 +1553,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Cindy (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1193,8 +1577,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Cindy (1963)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Cindy_%281963%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1213,8 +1601,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Celia (1970)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Celia_%281970%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1233,8 +1625,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Amelia (1978)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Amelia_%281978%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1253,8 +1649,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Bob (1979)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Bob_%281979%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1273,19 +1673,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
-      "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-21T00:15:44Z"
-    }
-  },
-  "AL041983": {
-    "damages": null,
-    "wiki_title": "Hurricane Barry (1983)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Barry_%281983%29",
-    "impact_schema_version": 1,
-    "impact_provenance": {
-      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Allen (1980)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Allen_%281980%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1304,8 +1697,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Danny (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Danny_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1324,8 +1721,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Chantal (1989)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Chantal_%281989%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1344,8 +1745,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Andrew (1992)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Andrew_%281992%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1364,8 +1769,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Dean (1995)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dean_%281995%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1384,8 +1793,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Claudette (2003)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Claudette_%282003%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1404,8 +1817,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dennis (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dennis_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1424,8 +1841,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dolly (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dolly_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1444,8 +1865,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Claudette (2009)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%282009%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1464,8 +1889,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Don (2011)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Don_%282011%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1484,10 +1913,58 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Debby (2012)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debby_%282012%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL042021": {
+    "damages": "5000",
+    "wiki_title": "Tropical Storm Danny (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danny_%282021%29",
+    "damage_usd_nominal": 5000000000,
+    "damage_millions_usd": 5000.0,
+    "damage_source_units": "legacy_assumed_usd_millions",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Danny (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danny_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
+    }
+  },
+  "AL042024": {
+    "deaths": "18 total",
+    "damages": "4500000000",
+    "damage_suffix": "(Costliest tropical cyclone in Canadian history)",
+    "wiki_title": "Hurricane Debby (2024)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Debby_%282024%29",
+    "deaths_total": 18,
+    "deaths_min": 18,
+    "deaths_max": 18,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 4500000000,
+    "damage_millions_usd": 4500.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Debby (2024)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Debby_%282024%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
     }
   },
   "AL051950": {
@@ -1504,8 +1981,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Easy (1950)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Easy_%281950%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1524,8 +2005,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Barbara (1954)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Barbara_%281954%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1544,8 +2029,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Debbie (1957)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281957%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1564,8 +2053,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ella (1958)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ella_%281958%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1579,8 +2072,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Debra (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Debra_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1599,8 +2096,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Donna (1960)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Donna_%281960%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1619,8 +2120,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Esther (1961)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Esther_%281961%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1639,8 +2144,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Cleo (1964)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Cleo_%281964%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1659,8 +2168,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Debbie (1965)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Debbie_%281965%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1674,8 +2187,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Chris (1982)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Chris_%281982%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1694,8 +2211,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Elena",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Elena",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1714,8 +2235,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Charley (1986)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Charley_%281986%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1734,8 +2259,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Erin (1995)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Erin_%281995%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1754,8 +2283,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Danny (1997)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Danny_%281997%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1774,8 +2307,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Earl (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Earl_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1794,8 +2331,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dennis (1999)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dennis_%281999%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1814,8 +2355,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Edouard (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Edouard_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1834,8 +2379,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Erin (2007)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Erin_%282007%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1854,8 +2403,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Edouard (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Edouard_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1874,10 +2427,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dorian (2019)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dorian_%282019%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL052021": {
+    "deaths": "13",
+    "damages": "1200000000",
+    "wiki_title": "Hurricane Elsa (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Elsa_%282021%29",
+    "deaths_total": 13,
+    "deaths_min": 13,
+    "deaths_max": 13,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1200000000,
+    "damage_millions_usd": 1200.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Elsa (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Elsa_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
     }
   },
   "AL061954": {
@@ -1894,8 +2475,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Carol (1954)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Carol_%281954%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1914,8 +2499,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Esther (1957)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Esther_%281957%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1934,8 +2523,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ethel (1960)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ethel_%281960%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1954,8 +2547,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dora (1964)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dora_%281964%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1969,8 +2566,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Babe (1977)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Babe_%281977%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -1989,19 +2590,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
-      "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-21T00:15:44Z"
-    }
-  },
-  "AL061983": {
-    "damages": null,
-    "wiki_title": "Tropical Storm Dean (1983)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dean_%281983%29",
-    "impact_schema_version": 1,
-    "impact_provenance": {
-      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Claudette (1979)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Claudette_%281979%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2020,8 +2614,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Fran (1996)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Fran_%281996%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2040,8 +2638,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Frances (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Frances_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2055,8 +2657,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Fay (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fay_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2075,8 +2681,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Frances (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Frances_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2095,8 +2705,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ernesto (2006)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ernesto_%282006%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2115,8 +2729,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Fay (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fay_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2135,8 +2753,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Emily (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Emily_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2155,10 +2777,81 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Florence (2018)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%282018%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL062020": {
+    "deaths": "6 total",
+    "damages": "220000000",
+    "wiki_title": "Tropical Storm Fay (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fay_%282020%29",
+    "deaths_total": 6,
+    "deaths_min": 6,
+    "deaths_max": 6,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 220000000,
+    "damage_millions_usd": 220.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Fay (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fay_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL062021": {
+    "deaths": "7 total",
+    "damages": "1300000000",
+    "wiki_title": "Tropical Storm Fred (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fred_%282021%29",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1300000000,
+    "damage_millions_usd": 1300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Fred (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Fred_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
+    }
+  },
+  "AL062024": {
+    "damages": "1300000000",
+    "wiki_title": "Hurricane Francine (2024)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Francine_%282024%29",
+    "damage_usd_nominal": 1300000000,
+    "damage_millions_usd": 1300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Francine (2024)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Francine_%282024%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
     }
   },
   "AL071956": {
@@ -2175,8 +2868,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Flossy (1956)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Flossy_%281956%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2195,8 +2892,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Belle (1976)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Belle_%281976%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2215,15 +2916,18 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Florence (1988)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%281988%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL071992": {
     "deaths": "2 direct",
-    "damages": null,
     "wiki_title": "Tropical Storm Danielle (1992)",
     "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danielle_%281992%29",
     "deaths_total": 2,
@@ -2231,8 +2935,12 @@
     "deaths_max": 2,
     "deaths_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Danielle (1992)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danielle_%281992%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2251,8 +2959,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Georges (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Georges_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2271,8 +2983,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gaston (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gaston_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2286,8 +3002,12 @@
     "deaths_max": 1,
     "deaths_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Gabrielle (2007)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Gabrielle_%282007%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2306,8 +3026,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gustav (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gustav_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2328,10 +3052,40 @@
     "damage_usd_min": 200000000,
     "damage_usd_max": 250000000,
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum, range_high.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Gordon (2018)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Gordon_%282018%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL072022": {
+    "deaths": "29 (7 direct, 22 indirect)",
+    "damages": "3090000000",
+    "damage_prefix": "≥",
+    "damage_suffix": "(Second costliest tropical cyclone in Canadian history)",
+    "wiki_title": "Hurricane Fiona (2022)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Fiona_%282022%29",
+    "deaths_total": 36,
+    "deaths_min": 36,
+    "deaths_max": 36,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 3090000000,
+    "damage_millions_usd": 3090.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "minimum",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum, minimum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Fiona (2022)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Fiona_%282022%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
     }
   },
   "AL081954": {
@@ -2348,8 +3102,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Edna",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Edna",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2368,8 +3126,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ione",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ione",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2388,15 +3150,18 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gracie (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gracie_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
   "AL081976": {
     "deaths": "4",
-    "damages": null,
     "wiki_title": "Tropical Storm Dottie (1976)",
     "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dottie_%281976%29",
     "deaths_total": 4,
@@ -2404,8 +3169,12 @@
     "deaths_max": 4,
     "deaths_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Dottie (1976)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Dottie_%281976%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2424,8 +3193,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hortense (1996)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hortense_%281996%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2444,8 +3217,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Hermine (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2464,8 +3241,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Floyd (1999)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Floyd_%281999%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2484,8 +3265,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gabrielle (2001)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gabrielle_%282001%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2504,8 +3289,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Hermine (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2524,10 +3313,62 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hanna (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hanna_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL082020": {
+    "deaths": "9",
+    "damages": "1200000000",
+    "wiki_title": "Hurricane Hanna (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Hanna_%282020%29",
+    "deaths_total": 9,
+    "deaths_min": 9,
+    "deaths_max": 9,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1200000000,
+    "damage_millions_usd": 1200.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hanna (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hanna_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:35Z"
+    }
+  },
+  "AL082021": {
+    "deaths": "2 direct",
+    "damages": "700000000",
+    "wiki_title": "Hurricane Henri (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Henri_%282021%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 700000000,
+    "damage_millions_usd": 700.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Henri (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Henri_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
     }
   },
   "AL091951": {
@@ -2544,8 +3385,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane How (1951)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_How_%281951%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2559,8 +3404,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Florence (1953)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Florence_%281953%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2579,8 +3428,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Inez (1966)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Inez_%281966%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2599,8 +3452,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Camille (1969)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Camille_%281969%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2619,8 +3476,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Doria (1971)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Doria_%281971%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2639,8 +3500,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane David (1979)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_David_%281979%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2659,8 +3524,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gloria",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gloria",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2679,8 +3548,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Hanna (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hanna_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2699,8 +3572,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ivan (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ivan_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2719,8 +3596,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Humberto (2007)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Humberto_%282007%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2739,8 +3620,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ike (2008)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ike_%282008%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2759,8 +3644,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Irene (2011)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Irene_%282011%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2779,8 +3668,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Isaac (2012)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Isaac_%282012%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2799,8 +3692,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hermine (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hermine_%282016%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2819,10 +3716,137 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Harvey (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Harvey_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL092020": {
+    "deaths": "17 total",
+    "damages": "5025000000",
+    "wiki_title": "Hurricane Isaias (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Isaias_%282020%29",
+    "deaths_total": 17,
+    "deaths_min": 17,
+    "deaths_max": 17,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 5025000000,
+    "damage_millions_usd": 5025.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Isaias (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Isaias_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL092021": {
+    "deaths": "112 total (60 direct, 52 indirect)",
+    "damages": "75250000000",
+    "damage_suffix": "(Seventh-costliest tropical cyclone on record; Fifth-costliest in U.S history)",
+    "wiki_title": "Hurricane Ida (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ida_%282021%29",
+    "deaths_total": 172,
+    "deaths_min": 172,
+    "deaths_max": 172,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 75250000000,
+    "damage_millions_usd": 75250.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ida (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ida_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
+    }
+  },
+  "AL092022": {
+    "deaths": "161 total",
+    "damages": "111800000000",
+    "damage_suffix": "(Third-costliest tropical cyclone on record; costliest in Florida history)",
+    "wiki_title": "Hurricane Ian (2022)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Ian_%282022%29",
+    "deaths_total": 161,
+    "deaths_min": 161,
+    "deaths_max": 161,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 111800000000,
+    "damage_millions_usd": 111800.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ian (2022)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ian_%282022%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
+    }
+  },
+  "AL092023": {
+    "deaths": "1 direct",
+    "damages": "505000",
+    "wiki_title": "Tropical Storm Harold (2023)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Harold_%282023%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 505000,
+    "damage_millions_usd": 0.505,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Harold (2023)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Harold_%282023%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
+    }
+  },
+  "AL092024": {
+    "deaths": "252 total",
+    "damages": "78700000000",
+    "damage_suffix": "(Fifth-costliest tropical cyclone on record; costliest in North Carolina history)",
+    "wiki_title": "Hurricane Helene (2024)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Helene_%282024%29",
+    "deaths_total": 252,
+    "deaths_min": 252,
+    "deaths_max": 252,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 78700000000,
+    "damage_millions_usd": 78700.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Helene (2024)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Helene_%282024%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
     }
   },
   "AL101959": {
@@ -2839,8 +3863,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Irene (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Irene_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2859,8 +3887,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hilda (1964)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hilda_%281964%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2879,8 +3911,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Delia (1973)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Delia_%281973%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2899,8 +3935,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Carmen (1974)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Carmen_%281974%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2919,8 +3959,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dennis (1981)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dennis_%281981%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2939,8 +3983,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Diana (1984)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Diana_%281984%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2959,8 +4007,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Henri (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Henri_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2979,8 +4031,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Josephine (1996)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Josephine_%281996%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -2999,8 +4055,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Harvey (1999)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Harvey_%281999%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3019,8 +4079,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Isidore (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Isidore_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3039,10 +4103,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Hermine (2010)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%282010%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL102023": {
+    "deaths": "12 (8 direct, 4 indirect)",
+    "damages": "3500000000",
+    "wiki_title": "Hurricane Idalia (2023)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Idalia_%282023%29",
+    "deaths_total": 20,
+    "deaths_min": 20,
+    "deaths_max": 20,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 3500000000,
+    "damage_millions_usd": 3500.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Idalia (2023)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Idalia_%282023%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
     }
   },
   "AL111950": {
@@ -3059,8 +4151,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane King (1950)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_King_%281950%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3079,8 +4175,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Judith (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Judith_%281959%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3099,8 +4199,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Isbell (1964)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Isbell_%281964%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3119,8 +4223,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Fern (1971)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Fern_%281971%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3139,8 +4247,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Frederic",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Frederic",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3159,8 +4271,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Danielle (1980)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Danielle_%281980%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3179,8 +4295,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Isabel (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Isabel_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3199,8 +4319,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hugo (1989)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hugo_%281989%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3219,8 +4343,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Jerry (1995)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Jerry_%281995%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3239,8 +4367,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gordon (2000)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gordon_%282000%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3259,8 +4391,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Grace (2003)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Grace_%282003%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3279,8 +4415,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Jeanne (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Jeanne_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3294,8 +4434,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Julia (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Julia_%282016%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3314,10 +4458,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Irma (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Irma_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL112019": {
+    "deaths": "7",
+    "damages": "5000000000",
+    "wiki_title": "Tropical Storm Imelda (2019)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Imelda_%282019%29",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 5000000000,
+    "damage_millions_usd": 5000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Imelda (2019)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Imelda_%282019%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:35Z"
     }
   },
   "AL121953": {
@@ -3334,8 +4506,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hazel (1953)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel_%281953%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3354,8 +4530,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Juan (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Juan_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3374,8 +4554,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Keith (1988)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Keith_%281988%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3394,8 +4578,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gordon (1994)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gordon_%281994%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3414,8 +4602,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Helene (2000)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Helene_%282000%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3434,8 +4626,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Kyle (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Kyle_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3454,8 +4650,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Henri (2003)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Henri_%282003%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3474,10 +4674,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Katrina (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL122019": {
+    "deaths": "None reported",
+    "damages": "3540000",
+    "wiki_title": "Tropical Storm Karen (2019)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Karen_%282019%29",
+    "deaths_total": 0,
+    "deaths_min": 0,
+    "deaths_max": 0,
+    "deaths_qualifier": "zero",
+    "damage_usd_nominal": 3540000,
+    "damage_millions_usd": 3.54,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Karen (2019)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Karen_%282019%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:35Z"
     }
   },
   "AL131950": {
@@ -3494,8 +4722,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Love (1950)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Love_%281950%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3514,8 +4746,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Beulah (1967)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Beulah_%281967%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3534,8 +4770,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Edith (1971)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Edith_%281971%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3554,8 +4794,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Eloise (1975)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Eloise_%281975%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3574,8 +4818,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Kate (1985)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Kate_%281985%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3594,8 +4842,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Floyd (1987)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Floyd_%281987%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3614,8 +4866,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Mitch (1998)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Mitch_%281998%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3634,8 +4890,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Irene (1999)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Irene_%281999%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3654,8 +4914,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Lili (2002)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Lili_%282002%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3674,8 +4938,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Isabel (2003)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Isabel_%282003%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3694,10 +4962,63 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Lee (2011)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Lee_%282011%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL132020": {
+    "deaths": "81 (47 direct, 34 indirect)",
+    "damages": "23300000000",
+    "damage_prefix": "≥",
+    "wiki_title": "Hurricane Laura (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Laura_%282020%29",
+    "deaths_total": 128,
+    "deaths_min": 128,
+    "deaths_max": 128,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 23300000000,
+    "damage_millions_usd": 23300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "minimum",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum, minimum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Laura (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Laura_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL132021": {
+    "deaths": "23 total",
+    "damages": "75169000",
+    "wiki_title": "Tropical Storm Mindy (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Mindy_%282021%29",
+    "deaths_total": 23,
+    "deaths_min": 23,
+    "deaths_max": 23,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 75169000,
+    "damage_millions_usd": 75.169,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Mindy (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Mindy_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
     }
   },
   "AL141954": {
@@ -3714,8 +5035,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: range_high.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Hazel",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Hazel",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3734,8 +5059,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Doria (1967)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Doria_%281967%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3754,8 +5083,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gladys (1968)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gladys_%281968%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3774,8 +5107,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Ginger (1971)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Ginger_%281971%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3794,8 +5131,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Jerry (1989)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Jerry_%281989%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3814,8 +5155,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Matthew (2004)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Matthew_%282004%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3834,8 +5179,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Matthew (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Matthew_%282016%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3854,10 +5203,64 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Michael (2018)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Michael_%282018%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL142021": {
+    "deaths": "2 direct, 2 indirect",
+    "damages": "1100000000",
+    "wiki_title": "Hurricane Nicholas (2021)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Nicholas_%282021%29",
+    "deaths_total": 4,
+    "deaths_min": 4,
+    "deaths_max": 4,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 1100000000,
+    "damage_millions_usd": 1100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Nicholas (2021)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Nicholas_%282021%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:37Z"
+    }
+  },
+  "AL142024": {
+    "deaths": "45 total",
+    "damages": "34361200000",
+    "damage_prefix": "| damage = 34361200000",
+    "damage_suffix": "| areas = {{Flatlist| * Eastern Mexico * Northern Yucatán Peninsula * Western Cuba * Southeastern United States (particularly Florida; Georgia, coastal South Carolina) * Northern Bahamas",
+    "wiki_title": "Hurricane Milton (2024)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Milton_%282024%29",
+    "deaths_total": 45,
+    "deaths_min": 45,
+    "deaths_max": 45,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 34361200000,
+    "damage_millions_usd": 34361.2,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Milton (2024)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Milton_%282024%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
     }
   },
   "AL151981": {
@@ -3874,8 +5277,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gert (1981)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gert_%281981%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3894,8 +5301,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Isidore (1984)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Isidore_%281984%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3914,8 +5325,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Maria (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Maria_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3929,8 +5344,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Gerda (1969)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Gerda_%281969%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3949,10 +5368,33 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Nate (2017)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Nate_%282017%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL162023": {
+    "damages": "450000000",
+    "wiki_title": "Tropical Storm Ophelia (2023)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Ophelia_%282023%29",
+    "damage_usd_nominal": 450000000,
+    "damage_millions_usd": 450.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Ophelia (2023)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Ophelia_%282023%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
     }
   },
   "AL171995": {
@@ -3969,8 +5411,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Opal (1995)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Opal_%281995%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -3989,10 +5435,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Olga (2007)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Olga_%282007%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL172022": {
+    "deaths": "11 indirect",
+    "damages": "1000000000",
+    "wiki_title": "Hurricane Nicole (2022)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Nicole_%282022%29",
+    "deaths_total": 11,
+    "deaths_min": 11,
+    "deaths_max": 11,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 1000000000,
+    "damage_millions_usd": 1000.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Nicole (2022)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Nicole_%282022%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:38Z"
     }
   },
   "AL182005": {
@@ -4009,8 +5483,12 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Rita (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Rita_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -4029,10 +5507,38 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Sandy (2012)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Sandy_%282012%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL192020": {
+    "deaths": "9 (4 direct, 5 indirect)",
+    "damages": "7300000000",
+    "wiki_title": "Hurricane Sally (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Sally_%282020%29",
+    "deaths_total": 13,
+    "deaths_min": 13,
+    "deaths_max": 13,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 7300000000,
+    "damage_millions_usd": 7300.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Sally (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Sally_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
     }
   },
   "AL222005": {
@@ -4049,10 +5555,39 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Tammy (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Tammy_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL222020": {
+    "deaths": "1 total",
+    "damages": "225000000",
+    "damage_prefix": "≥",
+    "wiki_title": "Tropical Storm Beta (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beta_%282020%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 225000000,
+    "damage_millions_usd": 225.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "minimum",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: minimum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Beta (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Beta_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
     }
   },
   "AL241969": {
@@ -4069,8 +5604,12 @@
     "damage_source_units": "legacy_assumed_usd_millions",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "Damage units were absent from the retained raw field and inferred as millions of USD.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Tropical Storm Jenny (1969)",
+      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Jenny_%281969%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
@@ -4089,10 +5628,176 @@
     "damage_source_units": "usd",
     "damage_qualifier": "exact",
     "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
     "impact_provenance": {
       "source": "Wikipedia infobox",
+      "source_title": "Hurricane Wilma (2005)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Wilma_%282005%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
+    }
+  },
+  "AL262020": {
+    "deaths": "6 (2 direct, 4 indirect)",
+    "damages": "3086000000",
+    "wiki_title": "Hurricane Delta (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Delta_%282020%29",
+    "deaths_total": 8,
+    "deaths_min": 8,
+    "deaths_max": 8,
+    "deaths_qualifier": "direct_indirect_sum",
+    "damage_usd_nominal": 3086000000,
+    "damage_millions_usd": 3086.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Delta (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Delta_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL282020": {
+    "deaths": "9 total",
+    "damages": "4400000000",
+    "wiki_title": "Hurricane Zeta (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Zeta_%282020%29",
+    "deaths_total": 9,
+    "deaths_min": 9,
+    "deaths_max": 9,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 4400000000,
+    "damage_millions_usd": 4400.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Zeta (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Zeta_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "AL292020": {
+    "deaths": "189+",
+    "damages": "7240000000",
+    "wiki_title": "Hurricane Eta (2020)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Eta_%282020%29",
+    "deaths_total": 189,
+    "deaths_min": 189,
+    "deaths_max": null,
+    "deaths_qualifier": "minimum",
+    "damage_usd_nominal": 7240000000,
+    "damage_millions_usd": 7240.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "medium",
+    "impact_confidence_reason": "Normalized from a qualified source value: minimum.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Eta (2020)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Eta_%282020%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:36Z"
+    }
+  },
+  "CP011959": {
+    "deaths": "2 indirect",
+    "damages": "6000000",
+    "wiki_title": "Hurricane Dot (1959)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Dot_%281959%29",
+    "deaths_total": 2,
+    "deaths_min": 2,
+    "deaths_max": 2,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 6000000,
+    "damage_millions_usd": 6.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Dot (1959)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Dot_%281959%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
+    }
+  },
+  "EP052016": {
+    "damages": "Minimal",
+    "wiki_title": "Hurricane Darby (2016)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Darby_%282016%29",
+    "damage_source_units": "unknown",
+    "damage_qualifier": "unparsed",
+    "impact_schema_version": 1,
+    "impact_confidence": "low",
+    "impact_confidence_reason": "The retained damage field is qualitative and was not converted to a numeric value.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Darby (2016)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Darby_%282016%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:40Z"
+    }
+  },
+  "EP092014": {
+    "deaths": "1 direct",
+    "damages": "148000000",
+    "wiki_title": "Hurricane Iselle (2014)",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Iselle_%282014%29",
+    "deaths_total": 1,
+    "deaths_min": 1,
+    "deaths_max": 1,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 148000000,
+    "damage_millions_usd": 148.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Iselle (2014)",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Iselle_%282014%29",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:39Z"
+    }
+  },
+  "EP181992": {
+    "deaths": "7 total",
+    "damages": "3100000000",
+    "damage_suffix": "(Third-costliest Pacific hurricane on record; costliest in Hawaiian history)",
+    "wiki_title": "Hurricane Iniki",
+    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Iniki",
+    "deaths_total": 7,
+    "deaths_min": 7,
+    "deaths_max": 7,
+    "deaths_qualifier": "exact",
+    "damage_usd_nominal": 3100000000,
+    "damage_millions_usd": 3100.0,
+    "damage_source_units": "usd",
+    "damage_qualifier": "exact",
+    "impact_schema_version": 1,
+    "impact_confidence": "high",
+    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
+    "impact_provenance": {
+      "source": "Wikipedia infobox",
+      "source_title": "Hurricane Iniki",
+      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Iniki",
+      "scraper": "scripts/scrape_impacts.py",
+      "parsed_at_utc": "2026-07-25T22:05:40Z"
     }
   }
 }

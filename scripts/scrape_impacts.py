@@ -54,7 +54,8 @@ DERIVED_IMPACT_FIELDS = {
     "deaths_total", "deaths_min", "deaths_max", "deaths_qualifier",
     "damage_usd_nominal", "damage_millions_usd", "damage_source_units",
     "damage_qualifier", "damage_usd_min", "damage_usd_max",
-    "impact_schema_version", "impact_provenance",
+    "impact_schema_version", "impact_confidence", "impact_confidence_reason",
+    "impact_provenance",
 }
 
 
@@ -296,23 +297,49 @@ def normalize_impact_record(record: dict, *, parsed_at_utc: str | None = None) -
         out["deaths"] = clean_source_text(raw_deaths)
     if raw_damage:
         out["damages"] = clean_source_text(raw_damage)
+    for key in ("deaths", "damages"):
+        if not out.get(key):
+            out.pop(key, None)
     for key in ("damage_prefix", "damage_suffix"):
         if out.get(key):
             out[key] = clean_source_text(out[key])
 
     out.update(parse_deaths(out.get("deaths")))
-    out.update(parse_damage(
+    parsed_damage = parse_damage(
         out.get("damages"),
         suffix=out.get("damage_suffix"),
         prefix=out.get("damage_prefix"),
-    ))
+    )
+    out.update(parsed_damage)
+    if out.get("damages") and not parsed_damage:
+        out["damage_source_units"] = "unknown"
+        out["damage_qualifier"] = "unparsed"
     out["impact_schema_version"] = IMPACT_SCHEMA_VERSION
+    confidence, confidence_reason = impact_confidence(out)
+    out["impact_confidence"] = confidence
+    out["impact_confidence_reason"] = confidence_reason
     out["impact_provenance"] = {
         "source": "Wikipedia infobox",
+        "source_title": out.get("wiki_title"),
+        "source_url": out.get("wiki_url"),
         "scraper": SCRAPER_NAME,
         "parsed_at_utc": parsed_at_utc or utc_now(),
     }
     return out
+
+
+def impact_confidence(record: dict) -> tuple[str, str]:
+    if record.get("damage_qualifier") == "unparsed":
+        return "low", "The retained damage field is qualitative and was not converted to a numeric value."
+    if record.get("damage_source_units") == "legacy_assumed_usd_millions":
+        return "low", "Damage units were absent from the retained raw field and inferred as millions of USD."
+    qualifiers = {
+        record.get("deaths_qualifier"),
+        record.get("damage_qualifier"),
+    } - {None, "exact", "zero"}
+    if qualifiers:
+        return "medium", f"Normalized from a qualified source value: {', '.join(sorted(qualifiers))}."
+    return "high", "Retained raw fields contained directly parseable values and explicit damage units when applicable."
 
 
 def existing_parsed_at(record: dict, fallback: str) -> str:
@@ -325,12 +352,16 @@ def existing_parsed_at(record: dict, fallback: str) -> str:
 
 
 def normalize_impact_records(records: dict, fallback_stamp: str) -> dict:
-    return {
+    normalized = {
         key: normalize_impact_record(
             records[key],
             parsed_at_utc=existing_parsed_at(records[key], fallback_stamp),
         )
         for key in sorted(records)
+    }
+    return {
+        key: record for key, record in normalized.items()
+        if record.get("deaths") or record.get("damages")
     }
 
 
