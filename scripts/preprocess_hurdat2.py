@@ -25,6 +25,7 @@ OUT_STORMS = DATA / "storms.json"
 OUT_STORMS_GZ = DATA / "storms.json.gz"
 OUT_STATS = DATA / "stats.json"
 OUT_METADATA = DATA / "metadata.json"
+IMPACTS_FILE = DATA / "impacts.json"
 
 GENERATOR_NAME = "scripts/preprocess_hurdat2.py"
 METADATA_SCHEMA_VERSION = 1
@@ -222,6 +223,12 @@ def build_metadata(source_summaries, stats, outputs):
             "modified_utc": file_mtime_utc(path),
         }
 
+    try:
+        impacts = json.loads(IMPACTS_FILE.read_text(encoding="utf-8"))
+        impact_row_count = len([key for key in impacts if key != "_meta"]) if isinstance(impacts, dict) else 0
+    except (OSError, json.JSONDecodeError):
+        impact_row_count = 0
+
     return {
         "schema_version": METADATA_SCHEMA_VERSION,
         "generated_at_utc": utc_iso(datetime.now(timezone.utc)),
@@ -235,6 +242,7 @@ def build_metadata(source_summaries, stats, outputs):
             "storm_count": stats.get("total_storms"),
             "landfall_event_count": stats.get("total_landfall_events"),
             "hurricane_landfall_count": stats.get("total_hurricane_landfalls"),
+            "impact_row_count": impact_row_count,
             "basins": sorted({source["basin"] for source in source_summaries if source.get("basin")}),
         },
         "outputs": output_files,

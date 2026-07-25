@@ -451,6 +451,11 @@ for (const [stormId, impact] of Object.entries(impacts)) {
   }
 }
 
+const impactRowCount = Object.keys(impacts).filter(key => key !== '_meta').length;
+if (metadata.coverage?.impact_row_count !== impactRowCount) {
+  fail(`metadata.coverage.impact_row_count must match impacts.json (${impactRowCount}).`);
+}
+
 for (const [index, entry] of glossary.entries()) {
   if (!isObject(entry)) {
     fail(`glossary[${index}]: row must be an object.`);

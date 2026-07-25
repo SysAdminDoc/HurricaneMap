@@ -68,7 +68,7 @@
 <tr><td>2.2.1 Timing Adjustable</td><td>A</td><td class="na">Not Applicable</td><td>No time limits on content.</td></tr>
 <tr><td>2.2.2 Pause, Stop, Hide</td><td>A</td><td class="supports">Supports</td><td>Track animation has pause/stop controls. Active storm badge pulse respects prefers-reduced-motion.</td></tr>
 <tr><td>2.3.1 Three Flashes</td><td>A</td><td class="supports">Supports</td><td>No content flashes more than three times per second.</td></tr>
-<tr><td>2.4.1 Bypass Blocks</td><td>A</td><td class="partial">Partially Supports</td><td>ARIA landmarks present (header, main map, filter region, panel region). Skip-to-content link not implemented.</td></tr>
+<tr><td>2.4.1 Bypass Blocks</td><td>A</td><td class="supports">Supports</td><td>A keyboard-visible skip link moves focus directly to the map, supplemented by header, map, filter, and panel landmarks.</td></tr>
 <tr><td>2.4.2 Page Titled</td><td>A</td><td class="supports">Supports</td><td>"HurricaneMap — 174 Years of U.S. Hurricane Landfalls"</td></tr>
 <tr><td>2.4.3 Focus Order</td><td>A</td><td class="supports">Supports</td><td>Focus order follows visual layout: header → filters → map → panels.</td></tr>
 <tr><td>2.4.4 Link Purpose</td><td>A</td><td class="supports">Supports</td><td>All links have descriptive text or aria-labels.</td></tr>
@@ -122,12 +122,11 @@
 <h2>Known limitations</h2>
 <ul>
 <li>Leaflet map markers (SVG circles) are not individually keyboard-focusable. The data table provides an equivalent keyboard-navigable alternative.</li>
-<li>Skip-to-content link is not yet implemented (WCAG 2.4.1).</li>
 <li>3D globe visualization (Cesium) has limited accessibility — it is an opt-in feature and the 2D map is the default.</li>
 <li>Print stylesheet hides interactive elements; printed output is a snapshot of the last-rendered map state.</li>
 </ul>
 
-<p><em>This VPAT is based on the ITI VPAT 2.5 template. Last updated June 2026.</em></p>
+<p><em>This VPAT is based on the ITI VPAT 2.5 template. Last updated 2026-07-25.</em></p>
 
 </body>
 </html>
