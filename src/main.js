@@ -870,6 +870,7 @@ function wireUI() {
     await openPoster({
       landfalls: currentVisibleLandfalls,
       filters: { ...filters, categories: new Set(filters.categories) },
+      returnFocus: els.toggleMobileActionsBtn,
     });
   });
 

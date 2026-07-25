@@ -10,9 +10,9 @@
 >
 > **Live demo:** https://sysadmindoc.github.io/HurricaneMap/
 
-<img width="2068" height="916" alt="HurricaneMap map-first dark layout" src="example.png" />
+<img width="1440" height="960" alt="HurricaneMap operational atlas with labeled navigation, dataset context, and historical timeline" src="example.png" />
 <br>
-<img width="2402" height="1118" alt="HurricaneMap storm panel with map-preserving lane" src="examplemap.png" />
+<img width="1440" height="960" alt="HurricaneMap storm detail workspace with structured metrics and a map-preserving lane" src="examplemap.png" />
 
 
 ## What this is

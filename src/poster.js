@@ -230,7 +230,7 @@ function ensureWired() {
   });
 }
 
-export async function openPoster({ landfalls = [], filters = {} } = {}) {
+export async function openPoster({ landfalls = [], filters = {}, returnFocus = null } = {}) {
   const view = document.getElementById('poster-view');
   const status = document.getElementById('poster-status');
   const canvas = document.getElementById('poster-canvas');
@@ -238,7 +238,7 @@ export async function openPoster({ landfalls = [], filters = {} } = {}) {
   ensureWired();
   view.hidden = false;
   document.body.classList.add('poster-open');
-  releasePosterFocus = activateDialogFocus(view, { initialFocus: '#close-poster' });
+  releasePosterFocus = activateDialogFocus(view, { initialFocus: '#close-poster', returnFocus });
   status.textContent = t('poster.rendering');
   await ensureStormsLoaded();
   const storms = selectPosterStorms(getAllStorms(), landfalls);

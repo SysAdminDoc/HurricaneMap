@@ -99,6 +99,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+async function clickHeaderAction(page, selector) {
+  const action = page.locator(selector);
+  if (!await action.isVisible()) {
+    await page.click('#toggle-mobile-actions');
+    await page.waitForFunction(() => document.querySelector('#mobile-actions-menu')?.dataset.open === 'true');
+  }
+  await action.click();
+}
+
 async function waitForAppReady(page) {
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
@@ -1213,7 +1222,7 @@ try {
   }));
   assert(afterSettingsEscape.stormPanelHidden === false, 'Escape while settings was open also closed the storm panel.');
 
-  await page.click('#toggle-prep');
+  await clickHeaderAction(page, '#toggle-prep');
   await page.waitForSelector('#prep-panel:not([hidden]) #prep-household');
   await page.fill('#prep-household', '4');
   await page.dispatchEvent('#prep-household', 'change');
@@ -1234,7 +1243,7 @@ try {
     `preparedness progress did not persist: ${JSON.stringify(prepState)}`,
   );
   await page.click('#close-prep');
-  await page.click('#toggle-prep');
+  await clickHeaderAction(page, '#toggle-prep');
   await page.waitForFunction(() => document.querySelector('#prep-household')?.value === '4' && document.querySelector('[data-prep-item="water"]')?.checked, { timeout: 5000 });
   const prepLocales = await page.evaluate(async () => {
     const i18n = await import('/src/i18n.js');
@@ -1275,7 +1284,7 @@ try {
       } }] }),
     });
   });
-  await page.click('#toggle-evac');
+  await clickHeaderAction(page, '#toggle-evac');
   await page.waitForSelector('#evac-panel:not([hidden]) #evac-address-input');
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
@@ -1306,8 +1315,7 @@ try {
   await page.click('#close-evac');
   assert(await page.locator('.evac-location-marker').count() === 0, 'closing the zone panel left its selection marker on the map');
 
-  await page.focus('#toggle-poster');
-  await page.keyboard.press('Enter');
+  await clickHeaderAction(page, '#toggle-poster');
   await page.waitForFunction(() => Number(document.querySelector('#poster-canvas')?.dataset.segmentCount) > 1000, { timeout: 15000 });
   const poster = await page.evaluate(() => {
     const canvas = document.querySelector('#poster-canvas');
@@ -1346,7 +1354,7 @@ try {
   assert(await posterDownload.failure() === null, 'poster PNG download failed');
   await page.click('#close-poster');
   await page.waitForFunction(() => document.querySelector('#poster-view')?.hidden && !document.body.classList.contains('poster-open'));
-  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-poster'), 'poster dialog did not return focus to its opener');
+  assert(await page.evaluate(() => document.activeElement?.id === 'toggle-mobile-actions'), 'poster dialog did not return focus to the actions trigger');
 
   await page.evaluate(async () => {
     const data = await import('/src/data.js');

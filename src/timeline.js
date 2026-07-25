@@ -5,6 +5,8 @@
 // year filter to that single year. Drag a range to set yearMin/yearMax.
 // Collapsible — saves real estate when not in use.
 
+import { t } from './i18n.js';
+
 let host = null;
 let onChange = null;
 let collapsed = false;
@@ -49,13 +51,24 @@ export function mountTimeline(landfalls, callbacks) {
   host.className = 'timeline-ribbon glass';
   host.id = 'timeline';
   host.innerHTML = `
-    <button class="timeline-toggle icon-btn" id="timeline-toggle" title="Collapse timeline" aria-label="Collapse timeline" aria-expanded="true">
+    <button class="timeline-toggle icon-btn" id="timeline-toggle" title="${t('timeline.collapse')}" aria-label="${t('timeline.collapse')}" aria-expanded="true">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
     </button>
     <div class="timeline-inner">
+      <div class="timeline-head">
+        <strong data-i18n="timeline.title">${t('timeline.title')}</strong>
+        <span class="timeline-selection-label" id="timeline-selection-label">${Y0}–${Y1}</span>
+        <span class="timeline-source" data-i18n="timeline.source">${t('timeline.source')}</span>
+      </div>
       <div class="timeline-axis" id="timeline-axis" role="slider" aria-label="Year range" aria-valuemin="${Y0}" aria-valuemax="${Y1}" aria-valuenow="${Y0}" aria-valuetext="${Y0} to ${Y1}" tabindex="0"></div>
-      <div class="timeline-labels">
-        <span>${Y0}</span><span>1900</span><span>1950</span><span>2000</span><span>${Y1}</span>
+      <div class="timeline-footer">
+        <div class="timeline-labels">
+          <span>${Y0}</span><span>1900</span><span>1950</span><span>2000</span><span>${Y1}</span>
+        </div>
+        <div class="timeline-legend" aria-label="${t('timeline.legend')}" data-i18n-aria-label="timeline.legend">
+          <span class="timeline-legend-item"><i style="--legend-color:var(--cat-ts)"></i><span data-i18n="timeline.ts">${t('timeline.ts')}</span></span>
+          ${[1, 2, 3, 4, 5].map(cat => `<span class="timeline-legend-item"><i style="--legend-color:var(--cat-${cat})"></i><span>${t('timeline.cat', cat)}</span></span>`).join('')}
+        </div>
       </div>
     </div>
   `;
@@ -68,7 +81,9 @@ export function mountTimeline(landfalls, callbacks) {
     host.classList.toggle('collapsed', collapsed);
     document.body.classList.toggle('timeline-collapsed', collapsed);
     toggle.setAttribute('aria-expanded', String(!collapsed));
-    toggle.title = collapsed ? 'Expand timeline' : 'Collapse timeline';
+    const label = t(collapsed ? 'timeline.expand' : 'timeline.collapse');
+    toggle.title = label;
+    toggle.setAttribute('aria-label', label);
   });
 
   redraw(landfalls);
@@ -197,6 +212,8 @@ function drawSelection(a, b) {
   // Keep ARIA slider state honest for AT.
   axis.setAttribute('aria-valuenow', String(lo));
   axis.setAttribute('aria-valuetext', `${lo} to ${hi}`);
+  const selectionLabel = host.querySelector('#timeline-selection-label');
+  if (selectionLabel) selectionLabel.textContent = lo === hi ? String(lo) : `${lo}–${hi}`;
 }
 
 export function redraw(landfalls) {
