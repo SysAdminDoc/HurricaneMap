@@ -232,8 +232,9 @@ function render(storm, landfall, allStorms) {
   body.innerHTML = `
     <div class="storm-panel-layout">
       <section class="storm-summary-cluster" aria-label="Storm summary">
-        <div class="biography-text">
-          ${escapeHtml(biography)}
+        <div class="biography-text" lang="en">
+          <span class="content-language-note" data-content-language="en" title="${escapeHtml(t('content.englishSourceDetail'))}">${escapeHtml(t('content.englishSource'))}</span>
+          <span>${escapeHtml(biography)}</span>
         </div>
 
         ${riBadge || pfBadge ? `<div class="storm-flags">${riBadge}${pfBadge}</div>` : ''}

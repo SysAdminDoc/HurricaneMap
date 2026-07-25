@@ -88,7 +88,7 @@ npm run build
 - **Three new data layers**: NCEI billion-dollar disaster costs per storm, on-demand NOAA tide-gauge observed-vs-predicted water levels around landfall, and 10,700+ USGS surveyed high-water marks across 25 modern storms.
 - **Fixed in production**: the 3D globe (CSP had silently killed Cesium), the SST overlay (dead dataset + wrong CRS + hidden behind the basemap — now live CoralTemp), and the active-storm badge blocking header buttons.
 - **Hyper-local**: "Use my location" ranks every historical closest pass by distance and bearing; active storms show live distance to you.
-- **Quality**: axe-core WCAG 2.2 AA gate, full Haitian Creole parity, global error toasts, live permalink navigation, GitHub Pages size guard.
+- **Quality**: axe-core WCAG 2.2 AA gate, complete Haitian Creole interface-key parity with English-only educational text disclosed in every locale, global error toasts, live permalink navigation, GitHub Pages size guard.
 
 ## What's new in v1.4.6 - Desktop panel fit (July 2026)
 
@@ -190,7 +190,7 @@ The interface has undergone a premium-polish pass focused on clarity, trust, acc
 - **Non-color encoding** — Category markers use distinct dash patterns (solid/dashed/dotted/mixed) in addition to color, satisfying WCAG 1.4.1.
 - **Data table alternative** — "Table view" button renders filtered landfalls as a sortable, keyboard-navigable HTML table (Section 508 compliance).
 - **VPAT published** — See [`docs/VPAT.html`](docs/VPAT.html) for the full WCAG 2.2 AA Voluntary Product Accessibility Template.
-- **Internationalization** — English, Spanish (ES-LA), and Haitian Creole (Kreyòl) locales with browser auto-detection.
+- **Internationalization** — English, Spanish (ES-LA), and Haitian Creole (Kreyòl) interface locales with browser auto-detection. Glossary definitions and generated storm narratives remain English source content and are visibly labeled as such in each locale.
 
 ## Phase 8: Mobile Optimization & Advanced Features
 

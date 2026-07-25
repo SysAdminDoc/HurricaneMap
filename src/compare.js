@@ -339,7 +339,7 @@ function exportComparisonCSV(storms) {
   });
 
   // Generate narratives
-  const narrativeSection = ['', '', 'COMPARISON NARRATIVES', ...storms.map(p => {
+  const narrativeSection = ['', '', 'COMPARISON NARRATIVES', 'Narrative language,English', ...storms.map(p => {
     const bio = generateStormBiography(p.storm, {});
     return escapeCSV(`${formatStormName(p.name)} (${p.year}): ${bio}`);
   })];

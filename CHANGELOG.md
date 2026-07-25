@@ -7,6 +7,7 @@ All notable changes to HurricaneMap.
 ### Added
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
 - Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.
+- English-only glossary definitions and generated storm narratives now carry machine-readable language metadata and a localized source-language disclosure in every interface locale and comparison export.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.

@@ -462,6 +462,7 @@ for (const [index, entry] of glossary.entries()) {
     continue;
   }
   if (typeof entry.term !== 'string' || !entry.term.trim()) fail(`glossary[${index}]: term is required.`);
+  if (entry.language !== 'en') fail(`glossary[${index}]: language must declare the English source as "en".`);
   if (typeof entry.definition !== 'string' || !entry.definition.trim()) fail(`glossary[${index}]: definition is required.`);
 }
 

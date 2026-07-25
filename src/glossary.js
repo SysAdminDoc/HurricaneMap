@@ -66,6 +66,7 @@ export async function initGlossary() {
         <button class="close-btn" id="close-glossary" title="Close glossary" aria-label="Close glossary">×</button>
       </div>
       <input type="search" id="glossary-search" class="glossary-search" placeholder="${t('glossary.searchPlaceholder')}" aria-label="${t('glossary.title')}" />
+      <p class="content-language-note" data-content-language="en">${t('content.englishSource')}</p>
       <div id="glossary-list" class="glossary-list"></div>
     </div>
   `;
@@ -86,7 +87,7 @@ export async function initGlossary() {
       return;
     }
     glossaryList.innerHTML = items.map(item => `
-      <div class="glossary-item">
+      <div class="glossary-item" lang="${escapeHtml(item.language)}">
         <h3 class="glossary-term">${escapeHtml(item.term)}</h3>
         <p class="glossary-definition">${escapeHtml(item.definition)}</p>
       </div>

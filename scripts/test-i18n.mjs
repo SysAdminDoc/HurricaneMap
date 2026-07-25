@@ -45,4 +45,16 @@ for (const key of staticKeys) {
   assert(Object.hasOwn(STRINGS.en, key), `index.html references unknown key: ${key}`);
 }
 
+const glossary = JSON.parse(readFileSync(new URL('../data/glossary.json', import.meta.url), 'utf8'));
+assert(glossary.length > 0 && glossary.every(entry => entry.language === 'en'), 'glossary rows must declare their English source language');
+const disclosureSurfaces = [
+  readFileSync(new URL('../src/glossary.js', import.meta.url), 'utf8'),
+  readFileSync(new URL('../src/panel.js', import.meta.url), 'utf8'),
+];
+assert(disclosureSurfaces.every(source => source.includes("t('content.englishSource')")), 'English-only educational surfaces must render the localized source-language disclosure');
+for (const locale of locales) {
+  const disclosure = STRINGS[locale]['content.englishSource'];
+  assert(typeof disclosure === 'string' && /English|inglés|anglè/i.test(disclosure), `${locale} source-language disclosure must identify English`);
+}
+
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);

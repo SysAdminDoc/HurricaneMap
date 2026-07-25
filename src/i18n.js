@@ -355,6 +355,8 @@ export const STRINGS = {
     'glossary.title': 'Glossary',
     'glossary.searchPlaceholder': 'Search terms…',
     'glossary.noResults': 'No matching terms.',
+    'content.englishSource': 'Educational text · English source',
+    'content.englishSourceDetail': 'This narrative is currently available in English.',
 
     // Onboarding
     'onboarding.welcome': 'Welcome to HurricaneMap',
@@ -911,6 +913,8 @@ export const STRINGS = {
     'glossary.title': 'Glosario',
     'glossary.searchPlaceholder': 'Buscar términos…',
     'glossary.noResults': 'Sin resultados.',
+    'content.englishSource': 'Texto educativo · fuente en inglés',
+    'content.englishSourceDetail': 'Esta narración está disponible actualmente en inglés.',
 
     // Onboarding
     'onboarding.welcome': 'Bienvenido a HurricaneMap',
@@ -1382,6 +1386,8 @@ export const STRINGS = {
     'state.noLandfalls': 'Pa gen siklòn anrejistre pou eta sa a.',
     'glossary.title': 'Glosè',
     'glossary.noResults': 'Pa jwenn rezilta.',
+    'content.englishSource': 'Tèks edikatif · sous anglè',
+    'content.englishSourceDetail': 'Narasyon sa a disponib an anglè pou kounye a.',
     'onboarding.welcome': 'Byenveni nan HurricaneMap',
     'onboarding.welcomeBody': 'Eksplore 174 ane siklòn ki frape Etazini. Chak pwen se yon evènman HURDAT2 NOAA.',
     'onboarding.filters': 'Filtre katalòg la',

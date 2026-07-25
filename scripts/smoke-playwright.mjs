@@ -103,7 +103,7 @@ async function waitForAppReady(page) {
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
-    return loading && loading.style.display === 'none' && /landfalls/.test(visible);
+    return loading && loading.style.display === 'none' && /\d/.test(visible);
   }, { timeout: 20000 });
 }
 
@@ -763,6 +763,50 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
   }
 }
 
+async function assertSourceLanguageDisclosures(browser, baseUrl) {
+  const expected = {
+    es: /fuente en inglés/i,
+    ht: /sous anglè/i,
+  };
+  for (const [locale, pattern] of Object.entries(expected)) {
+    const context = await browser.newContext({
+      viewport: { width: 1200, height: 900 },
+      serviceWorkers: 'block',
+    });
+    await context.addInitScript(language => {
+      localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true, locale: language }));
+    }, locale);
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await openKatrinaPanel(page);
+      const biography = await page.evaluate(() => {
+        const disclosure = document.querySelector('#storm-panel .content-language-note');
+        return {
+          text: disclosure?.textContent || '',
+          language: disclosure?.closest('.biography-text')?.getAttribute('lang') || '',
+        };
+      });
+      assert(pattern.test(biography.text) && biography.language === 'en', `${locale}: biography source language is not disclosed: ${JSON.stringify(biography)}`);
+
+      await page.evaluate(async () => {
+        const glossary = await import('/src/glossary.js');
+        await glossary.initGlossary();
+        glossary.showGlossary();
+      });
+      const glossary = await page.evaluate(() => ({
+        text: document.querySelector('#glossary-modal .content-language-note')?.textContent || '',
+        languages: [...document.querySelectorAll('#glossary-modal .glossary-item')].map(item => item.lang),
+      }));
+      assert(pattern.test(glossary.text), `${locale}: glossary source language is not disclosed: ${JSON.stringify(glossary)}`);
+      assert(glossary.languages.length === 20 && glossary.languages.every(language => language === 'en'), `${locale}: glossary rows lack English language metadata`);
+    } finally {
+      await context.close();
+    }
+  }
+}
+
 try {
   const launchOptions = { headless: true };
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
@@ -1406,6 +1450,7 @@ try {
 
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 1440, height: 960, name: 'desktop' });
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
+  await assertSourceLanguageDisclosures(browser, baseUrl);
 
   await browser.close();
 

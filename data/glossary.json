@@ -1,82 +1,102 @@
 [
   {
     "term": "ACE",
+    "language": "en",
     "definition": "Accumulated Cyclone Energy — a measure of the total wind-energy output of a tropical cyclone. Calculated as the sum of (wind speed²/10⁴) over all 6-hourly observations where wind ≥ 34 kt. Typical Atlantic season produces ~100 ACE units; a single major hurricane alone generates ~10-30 units."
   },
   {
     "term": "Rapid Intensification (RI)",
+    "language": "en",
     "definition": "A sudden and dramatic increase in a hurricane's strength. The National Hurricane Center defines RI as a wind speed increase of at least 30 kt in a 24-hour period. RI events are notoriously difficult to forecast and often lead to the most severe impacts."
   },
   {
     "term": "Saffir-Simpson Scale",
+    "language": "en",
     "definition": "A classification system based on a tropical cyclone's maximum sustained wind speed. Tropical storms are 34-63 kt; hurricanes are Category 1 (64-82 kt), Category 2 (83-95 kt), Category 3 (96-112 kt), Category 4 (113-136 kt), and Category 5 (137+ kt). The scale describes wind hazard only; storm surge, rainfall, tornadoes, and forward speed are separate risks."
   },
   {
     "term": "Landfall",
+    "language": "en",
     "definition": "The point at which the center of a tropical cyclone crosses the coast. Officially defined as the center's passage over the coastline; does not require the eye to reach land."
   },
   {
     "term": "Forward Speed",
+    "language": "en",
     "definition": "The speed at which a hurricane moves across the surface. Slower-moving storms can produce excessive rainfall and flooding; faster-moving storms minimize exposure duration but can still be extremely destructive."
   },
   {
     "term": "Pressure Fall",
+    "language": "en",
     "definition": "Explosive Deepening — when central pressure drops rapidly, typically ≥20 mb in 24 hours. Indicates very rapid intensification and often precedes the strongest winds."
   },
   {
     "term": "HURDAT2",
+    "language": "en",
     "definition": "The Hurricane Databases maintained by NOAA's National Hurricane Center. HURDAT2 contains 6-hourly position, wind, and pressure estimates for all known tropical cyclones in the Atlantic basin dating back to 1851."
   },
   {
     "term": "Category",
+    "language": "en",
     "definition": "A numerical rating (1-5) for hurricanes based on sustained wind speed according to the Saffir-Simpson Scale. Higher categories indicate stronger winds, but other factors like storm surge, rainfall, and forward speed also determine overall impact."
   },
   {
     "term": "Wind Radii",
+    "language": "en",
     "definition": "The geographic extent of different wind-speed thresholds around a hurricane's center. Describes where 34 kt, 50 kt, and 64 kt winds are expected, helping forecast who will experience dangerous conditions."
   },
   {
     "term": "Track",
+    "language": "en",
     "definition": "The path of the center of a hurricane across the Earth's surface. HurricaneMap displays historical tracks as lines on the map; track position is measured every 6 hours in HURDAT2."
   },
   {
     "term": "Landfall State",
+    "language": "en",
     "definition": "The U.S. state(s) where a hurricane made landfall. A single hurricane can make multiple landfalls in different states during its lifetime."
   },
   {
     "term": "Peak Wind",
+    "language": "en",
     "definition": "The maximum sustained wind speed recorded during a hurricane's entire lifetime. Occurs at different times for different storms and may happen over water or at landfall."
   },
   {
     "term": "Minimum Pressure",
+    "language": "en",
     "definition": "The lowest central pressure recorded during a hurricane's lifetime. Lower pressure generally corresponds to stronger winds and more intense storms. Related to wind speed but not perfectly correlated."
   },
   {
     "term": "Storm Surge",
+    "language": "en",
     "definition": "An abnormal rise in sea level accompanying a hurricane, primarily due to the hurricane's winds pushing water toward the coast. Can reach 20+ feet and is often the most destructive aspect of a hurricane."
   },
   {
     "term": "Casualty",
+    "language": "en",
     "definition": "A fatality (death) caused by a hurricane or its impacts. Includes direct deaths (e.g., from storm surge) and indirect deaths (e.g., from evacuation accidents or post-disaster complications)."
   },
   {
     "term": "Damage",
+    "language": "en",
     "definition": "Economic loss caused by a hurricane, typically measured in US dollars. Includes property damage, infrastructure destruction, agricultural losses, and business interruption."
   },
   {
     "term": "Inflation-Adjusted Damage",
+    "language": "en",
     "definition": "Historical damage figures converted to a fixed year's dollars (e.g., 2024 USD) to account for changes in property values and construction costs. Allows fair comparison of storms across different eras."
   },
   {
     "term": "Tropical Depression",
+    "language": "en",
     "definition": "A tropical cyclone with maximum sustained winds below 34 kt. The first stage of tropical cyclone development; can strengthen into a tropical storm or hurricane."
   },
   {
     "term": "Tropical Storm",
+    "language": "en",
     "definition": "A tropical cyclone with maximum sustained winds between 34 and 63 kt. Named systems that have become organized enough to receive an official name from the National Hurricane Center."
   },
   {
     "term": "Major Hurricane",
+    "language": "en",
     "definition": "A hurricane of Category 3 or higher on the Saffir-Simpson Scale, with maximum sustained winds of at least 96 kt (111 mph). This wind classification alone does not determine the storm's total impacts."
   }
 ]
