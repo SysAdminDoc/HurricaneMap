@@ -4,6 +4,7 @@ import { getMap } from './map.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { showPanel, hidePanel } from './panels.js';
 import { t } from './i18n.js';
+import { renderWindContextForPoint } from './wind-context.js';
 
 // Geolocated "my location" points persist so active-storm tooltips can show
 // live distance/bearing; right-click search points stay session-only.
@@ -38,6 +39,7 @@ let circle = null;
 let panelEl = null;
 let active = false;
 let searchGeneration = 0;
+let windContextController = null;
 let currentRadius = RADIUS_OPTIONS[1];
 let onSelectStorm = null;
 
@@ -67,12 +69,16 @@ export function isSpatialActive() { return active; }
 
 export function clearSearch() {
   searchGeneration++;
+  windContextController?.abort();
+  windContextController = null;
   if (circle) { getMap().removeLayer(circle); circle = null; }
   if (panelEl && !panelEl.hidden) hidePanel('spatial-results');
 }
 
 async function performSearch(lat, lon) {
   const generation = ++searchGeneration;
+  windContextController?.abort();
+  windContextController = new AbortController();
   const map = getMap();
   if (circle) map.removeLayer(circle);
   circle = L.circle([lat, lon], {
@@ -115,7 +121,10 @@ async function performSearch(lat, lon) {
     });
   }
   results.sort((a, b) => a.distance_mi - b.distance_mi);
-  renderResults(results, lat, lon);
+  const windHost = renderResults(results, lat, lon);
+  renderWindContextForPoint(windHost, lat, lon, { signal: windContextController.signal }).then(() => {
+    if (!active || generation !== searchGeneration) windHost.replaceChildren();
+  });
 }
 
 function ensurePanel() {
@@ -207,6 +216,7 @@ function renderResults(results, lat, lon) {
         </li>
       `).join('')}
     </ul>
+    <div class="wind-context-host"></div>
   `;
 
   spBody.querySelector('.close-btn').addEventListener('click', () => {
@@ -232,4 +242,5 @@ function renderResults(results, lat, lon) {
       li.addEventListener('keydown', (e) => { if (e.key === 'Enter') handler(); });
     });
   }
+  return spBody.querySelector('.wind-context-host');
 }

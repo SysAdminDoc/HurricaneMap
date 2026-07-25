@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Added
+- Spatial point searches now add current NHC 34/50/64 kt cumulative wind probabilities and nearby 34 kt arrival contours with issue time, official sources, explicit contour-distance/caveat copy, cancellation safety, and stale/offline link-only fallback.
 - Settings now reports browser storage usage, persistence, and cache scopes; only optional tile/radar data is clearable, and radar timelines can save bounded per-storm offline packs with quota-safe rollback.
 - Browser QA now produces desktop/mobile visual snapshots for every primary surface and asserts modal focus cycling/return, skip-link behavior, keyboard map alternatives, reduced motion, and mobile target sizes.
 - English-only glossary definitions and generated storm narratives now carry machine-readable language metadata and a localized source-language disclosure in every interface locale and comparison export.

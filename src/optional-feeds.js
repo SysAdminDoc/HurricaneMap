@@ -11,6 +11,7 @@ export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   goes: { labelKey: 'feeds.goes', source: 'NOAA/NESDIS/STAR GOES' },
   tides: { labelKey: 'feeds.tides', source: 'NOAA CO-OPS' },
   radar: { labelKey: 'feeds.radar', source: 'Iowa State IEM NEXRAD archive' },
+  'wind-context': { labelKey: 'feeds.windContext', source: 'NOAA NHC tropical weather summary GIS' },
   seasonal: { labelKey: 'feeds.seasonal', source: 'NOAA CPC bundled outlook snapshot' },
 });
 

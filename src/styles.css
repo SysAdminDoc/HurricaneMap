@@ -7187,6 +7187,34 @@ html.high-contrast .globe3d-topbar {
 .sp-list li:focus { outline: 2px solid var(--lavender); outline-offset: -2px; }
 .sp-name { color: var(--text); font-weight: 500; }
 .sp-meta { color: var(--subtext); font-size: 11px; }
+.wind-context {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--surface1);
+}
+.wind-context h4,
+.wind-context h5 {
+  margin: 0 0 6px;
+  color: var(--text);
+}
+.wind-context h4 { font-size: 14px; }
+.wind-context h5 { margin-top: 10px; font-size: 11px; color: var(--subtext); text-transform: uppercase; letter-spacing: .04em; }
+.wind-context ul { list-style: none; margin: 0; padding: 0; }
+.wind-context li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; font-size: 12px; color: var(--text); }
+.wind-context li span { text-align: right; }
+.wind-context .wind-context-empty { color: var(--subtext); display: block; }
+.wind-context-issued,
+.wind-context-status,
+.wind-context-contour-note,
+.wind-context-links,
+.wind-context-disclaimer { margin: 6px 0 0; font-size: 11px; color: var(--subtext); line-height: 1.4; }
+.wind-context-links a { color: var(--blue); }
+.wind-context-disclaimer {
+  border-left: 3px solid var(--yellow);
+  padding: 6px 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--yellow) 8%, transparent);
+}
 
 /* Panel chrome — shared minimize/restore affordance (panels.js).
    Minimizing collapses the active side panel to a slim tab at the map edge so

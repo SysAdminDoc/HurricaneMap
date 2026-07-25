@@ -103,6 +103,7 @@ const SHELL_ASSETS = [
   './src/tides.js',
   './src/url-state.js',
   './src/windfield.js',
+  './src/wind-context.js',
   './branding/favicon.png',
   './branding/logo-192.png',
   './vendor/leaflet.css',
