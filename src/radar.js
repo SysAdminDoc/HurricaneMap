@@ -41,6 +41,7 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
 } from './optional-feeds.js';
+import { cacheRadarPack, isQuotaExceededError } from './storage-manager.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -286,6 +287,7 @@ export class RadarOverlay {
         <span class="radar-time" id="radar-time">…</span>
         <button class="radar-btn" data-act="next" title="Next frame">▶</button>
         <button class="radar-btn" data-act="loop" title="${loopHint}">▶▶</button>
+        ${totalFrames ? '<button class="radar-btn radar-save" data-act="save" title="Save a bounded offline radar pack for this storm">Save offline</button>' : ''}
         <button class="radar-btn radar-close" data-act="close" title="Close radar">×</button>
       </div>
       <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>
@@ -294,7 +296,26 @@ export class RadarOverlay {
     el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-1));
     el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(+1));
     el.querySelector('[data-act="loop"]').addEventListener('click', () => this.toggleLoop());
+    el.querySelector('[data-act="save"]')?.addEventListener('click', event => this.saveOfflinePack(event.currentTarget));
     el.querySelector('[data-act="close"]').addEventListener('click', () => this.close());
+  }
+
+  async saveOfflinePack(button) {
+    if (!this.stormId || !this.localFrames?.length || !button) return;
+    button.disabled = true;
+    this.setStatus('Saving radar pack…');
+    try {
+      const result = await cacheRadarPack(this.stormId, this.localFrames, {
+        onProgress: ({ saved, total }) => this.setStatus(`Saving radar pack ${saved}/${total}…`),
+      });
+      this.setStatus(`Saved ${result.saved} radar frames for offline use.`);
+      button.textContent = 'Saved';
+    } catch (error) {
+      this.setStatus(isQuotaExceededError(error)
+        ? 'Not enough storage. Clear optional radar or tile data in Settings.'
+        : 'Radar pack could not be saved.');
+      button.disabled = false;
+    }
   }
 
   setStatus(text) {

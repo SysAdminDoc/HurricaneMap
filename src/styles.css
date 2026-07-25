@@ -3600,6 +3600,58 @@ select:focus {
   line-height: 1.35;
 }
 
+.storage-manager,
+.storage-scopes {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.storage-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.storage-summary span {
+  color: var(--subtext0);
+  text-align: right;
+}
+
+.storage-scope {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--surface2) 72%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.storage-scope > span {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.75rem;
+}
+
+.storage-scope small {
+  color: var(--subtext0);
+}
+
+.storage-clear {
+  width: auto;
+  min-height: 34px;
+  padding: 0.3rem 0.65rem;
+  white-space: nowrap;
+}
+
+.radar-save {
+  width: auto;
+  padding-inline: 0.55rem;
+  font-size: 0.7rem;
+}
+
 .search-results {
   padding: 5px;
   border-radius: 12px;

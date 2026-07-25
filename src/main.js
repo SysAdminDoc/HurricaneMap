@@ -26,6 +26,7 @@ import { closeAllPanels } from './panels.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
+import { initStorageManager } from './storage-manager.js';
 
 initGlobalErrorSurface();
 
@@ -318,6 +319,7 @@ async function boot() {
   wireUI();
   wireSettingsControls();
   initOptionalFeedDiagnostics();
+  initStorageManager();
   initHeaderTooltips();
   // 174-year timeline ribbon along the bottom edge.
   mountTimeline(getLandfalls(), {

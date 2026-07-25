@@ -76,6 +76,7 @@ const SHELL_ASSETS = [
   './src/search-history.js',
   './src/spatial-search.js',
   './src/settings.js',
+  './src/storage-manager.js',
   './src/onboarding.js',
   './src/optional-feeds.js',
   './src/timeline.js',

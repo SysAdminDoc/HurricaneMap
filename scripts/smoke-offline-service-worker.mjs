@@ -128,6 +128,13 @@ try {
     'offline IndexedDB store missing storms bundle',
   );
 
+  // Optional cache pressure/clears must never remove the required historical
+  // data store used by the offline app shell.
+  await page.evaluate(async () => {
+    await caches.delete('hm-radar-v1');
+    await caches.delete('hm-tiles-v1');
+  });
+
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
@@ -170,7 +177,7 @@ try {
   await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
-  console.log(`offline service worker ok (${offlineKeys.length} data records, ${offlineResult.storms} storms)`);
+  console.log(`offline service worker ok (${offlineKeys.length} data records, ${offlineResult.storms} storms, optional caches absent)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

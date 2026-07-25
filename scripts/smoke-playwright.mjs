@@ -287,6 +287,7 @@ async function assertSettingsSurface(page, label) {
     if (menu && !menu.matches(':popover-open')) menu.showPopover();
   });
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 4, { timeout: 5000 });
   const layout = await page.evaluate(() => {
     const menu = document.querySelector('#settings-menu');
     const rect = menu?.getBoundingClientRect();
@@ -308,6 +309,8 @@ async function assertSettingsSurface(page, label) {
       position: style?.position || '',
       overflowY: style?.overflowY || '',
       helperCount: document.querySelectorAll('#settings-menu .settings-help, #settings-menu .settings-toggle-copy small').length,
+      storageScopes: document.querySelectorAll('#storage-manager .storage-scope').length,
+      storageClearActions: document.querySelectorAll('#storage-manager [data-clear-storage]').length,
       radioGroups: [...document.querySelectorAll('#settings-menu [role="radiogroup"]')].map(group => ({
         checked: group.querySelectorAll('[role="radio"][aria-checked="true"]').length,
         tabbable: [...group.querySelectorAll('[role="radio"]')].filter(radio => radio.tabIndex === 0).length,
@@ -324,6 +327,8 @@ async function assertSettingsSurface(page, label) {
   assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
   assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
   assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
+  assert(layout.storageScopes === 4, `${label}: expected four storage scopes`);
+  assert(layout.storageClearActions === 2, `${label}: only tile and radar scopes should be clearable`);
   assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
   assert(layout.radioGroups.every(group => group.checked === 1 && group.tabbable === 1), `${label}: settings radios do not use one checked/tabbable item per group`);
   const cramped = layout.focusables.filter(item => item.height < 34);
