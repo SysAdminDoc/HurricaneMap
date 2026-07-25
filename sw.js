@@ -34,6 +34,7 @@ const SHELL_ASSETS = [
   './src/dialog-focus.js',
   './src/errors.js',
   './src/map.js',
+  './src/metric-presenters.js',
   './src/panel.js',
   './src/panels.js',
   './src/stats.js',

@@ -1,7 +1,7 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  ktToMph, formatTime, getImpactsFor, getBillionsFor, getAllStorms, windToCategory,
+  formatTime, getImpactsFor, getBillionsFor, getAllStorms, windToCategory,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -37,6 +37,7 @@ import {
 import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
+import { presentPressure } from './metric-presenters.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -168,8 +169,7 @@ function render(storm, landfall, allStorms) {
     }).join('')
     : '<li><em style="color:var(--text-dim);">No US landfalls on record</em></li>';
 
-  const minPres = storm.min_pres_mb ? `${storm.min_pres_mb} mb` : '—';
-  const peakWindMph = ktToMph(storm.peak_wind_kt);
+  const minPres = presentPressure(storm.min_pres_mb);
 
   const ace = computeACE(storm.track);
   const aceStr = ace.value > 0 ? formatNumber(ace.value, 1) : '—';

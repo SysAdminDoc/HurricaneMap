@@ -7,6 +7,7 @@ import { renderDecadeTrends } from './decade-trends.js';
 import { computeClimateTrends } from './metrics.js';
 import { fetchSeasonalOutlook, renderOutlookBanner } from './seasonal-outlook.js';
 import { escapeHtml } from './html-utils.js';
+import { presentCategory } from './metric-presenters.js';
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -50,12 +51,12 @@ function render() {
 
   const cat = stats.by_category;
   const catRows = [
-    { label: 'TS / sub-hurricane', count: cat.ts_or_below, color: '--cat-ts' },
-    { label: 'Category 1', count: cat.cat1, color: '--cat-1' },
-    { label: 'Category 2', count: cat.cat2, color: '--cat-2' },
-    { label: 'Category 3', count: cat.cat3, color: '--cat-3' },
-    { label: 'Category 4', count: cat.cat4, color: '--cat-4' },
-    { label: 'Category 5', count: cat.cat5, color: '--cat-5' },
+    { label: `${presentCategory(-1, { style: 'short' })} / sub-hurricane`, count: cat.ts_or_below, color: '--cat-ts' },
+    { label: presentCategory(1, { style: 'long' }), count: cat.cat1, color: '--cat-1' },
+    { label: presentCategory(2, { style: 'long' }), count: cat.cat2, color: '--cat-2' },
+    { label: presentCategory(3, { style: 'long' }), count: cat.cat3, color: '--cat-3' },
+    { label: presentCategory(4, { style: 'long' }), count: cat.cat4, color: '--cat-4' },
+    { label: presentCategory(5, { style: 'long' }), count: cat.cat5, color: '--cat-5' },
   ];
   const maxCat = Math.max(...catRows.map(r => r.count));
   const catBars = catRows.map(r => coloredBar(r.label, r.count, maxCat, r.color)).join('');

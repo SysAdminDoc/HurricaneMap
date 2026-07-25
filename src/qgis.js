@@ -1,6 +1,7 @@
 // P12.3 — QGIS layer export: Export filtered storms as GeoJSON ready for QGIS import.
 
 import { ensureStormsLoaded, filterLandfalls, getAllStorms, getCoverageYearRange, getLandfalls } from './data.js';
+import { presentCategory, roundMetric } from './metric-presenters.js';
 
 export async function exportQGISGeoJSON(filters) {
   await ensureStormsLoaded();
@@ -55,7 +56,7 @@ export function buildQGISGeoJSON({
         name: storm?.name || points[0]?.name || 'UNNAMED',
         year: firstFiniteNumber(storm?.year, points[0]?.year),
         category_max: categoryMax,
-        category_label: categoryLabel(categoryMax),
+        category_label: presentCategory(categoryMax, { style: 'short', missing: '' }),
         start_date: dateOnly(firstPoint?.t) || dateFromParts(firstPoint),
         end_date: dateOnly(lastPoint?.t) || dateFromParts(lastPoint),
         duration_days: durationDays(linePoints),
@@ -91,7 +92,7 @@ export function buildQGISGeoJSON({
         wind_speed_kt: Number.isFinite(lf.wind) ? lf.wind : null,
         wind_speed_mph: Number.isFinite(lf.wind) ? Math.round(lf.wind * 1.15078) : null,
         pressure_mb: Number.isFinite(lf.pres) ? lf.pres : null,
-        category: categoryLabel(lf.category),
+        category: presentCategory(lf.category, { style: 'short', missing: '' }),
         state: lf.state || null,
         feature_type: 'landfall',
       },
@@ -167,13 +168,6 @@ function durationDays(points) {
   return roundNumber((end - start) / 86_400_000, 2);
 }
 
-function categoryLabel(category) {
-  if (category === 0) return 'TD';
-  if (category === -1) return 'TS';
-  if (!Number.isFinite(category)) return '';
-  return String(category);
-}
-
 function dateOnly(value) {
   return typeof value === 'string' && value.includes('T') ? value.split('T')[0] : null;
 }
@@ -198,9 +192,7 @@ function minFinite(values) {
 }
 
 function roundNumber(value, decimals) {
-  if (!Number.isFinite(value)) return null;
-  const scale = 10 ** decimals;
-  return Math.round(value * scale) / scale;
+  return roundMetric(value, decimals);
 }
 
 function buildExportName(filters = {}, [yearMinDefault, yearMaxDefault] = getCoverageYearRange()) {

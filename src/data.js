@@ -30,6 +30,7 @@ export function isRetired(name, year) {
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
 // metadata.json  — generated data provenance, coverage, and source details.
 import { assertSupportedDataSchema } from './schema-contract.js';
+import { presentCategory, roundMetric } from './metric-presenters.js';
 
 const DATA = {
   landfalls: [],
@@ -251,9 +252,7 @@ export function searchStorms(query, landfalls) {
 
 // Saffir-Simpson display helpers
 export function categoryLabel(cat) {
-  if (cat === -1) return 'TS';
-  if (cat === 0) return 'TD';
-  return `Cat ${cat}`;
+  return presentCategory(cat);
 }
 
 /** Numeric intensity rank for the dataset's non-monotonic TD=0, TS=-1 encoding. */
@@ -287,7 +286,7 @@ export function windToCategory(kt) {
 }
 
 export function ktToMph(kt) {
-  return kt == null ? null : Math.round(kt * 1.15078);
+  return roundMetric(Number.isFinite(kt) ? kt * 1.15078 : null);
 }
 
 export function formatTime(iso) {

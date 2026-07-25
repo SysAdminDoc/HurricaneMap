@@ -1,6 +1,7 @@
 // P12.1 — Publication-ready export: One-click export of filtered dataset as CSV with documentation
 
 import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
+import { presentCategory, roundMetric } from './metric-presenters.js';
 
 export function exportPublicationCSV(filters) {
   // Get all landfalls and filter them
@@ -28,7 +29,7 @@ export function exportPublicationCSV(filters) {
   
   for (const lf of filtered) {
     // Ensure defaults for undefined values
-    const windMph = lf.wind ? Math.round(lf.wind * 1.15078) : '';
+    const windMph = Number.isFinite(lf.wind) ? roundMetric(lf.wind * 1.15078) : '';
     // Landfall records carry only the ISO timestamp `t` — derive the
     // documented month/day/hour columns from it.
     const when = lf.t ? new Date(lf.t) : null;
@@ -139,7 +140,5 @@ export function csvEscape(value, { preventFormula = false } = {}) {
 }
 
 export function publicationCategoryLabel(category) {
-  if (category === 0) return 'TD';
-  if (category === -1) return 'TS';
-  return Number.isFinite(category) ? String(category) : '';
+  return presentCategory(category, { style: 'short', missing: '' });
 }

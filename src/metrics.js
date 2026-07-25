@@ -3,6 +3,7 @@ import {
   getNominalDamageUsd,
 } from './impact-utils.js';
 import { windToCategory, categoryLabel } from './data.js';
+import { presentNumber } from './metric-presenters.js';
 
 // Derived intensity metrics + spatial queries.
 //
@@ -232,11 +233,7 @@ export function computeCityReturnPeriods(city, allStorms) {
 
 /** Format a number with thousand-separators + N fixed decimals. */
 export function formatNumber(n, decimals = 0) {
-  if (n == null || !Number.isFinite(n)) return '—';
-  return n.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  return presentNumber(n, decimals);
 }
 
 /** Build an export payload for a storm. Returns three string variants. */

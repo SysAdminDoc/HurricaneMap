@@ -9,6 +9,7 @@ import {
   createVersionedRecord,
   migrateVersionedRecord,
 } from './schema-contract.js';
+import { presentWind } from './metric-presenters.js';
 
 const STORAGE_KEY = 'hm-settings-v1';
 
@@ -144,15 +145,11 @@ function attachSystemThemeListener() {
 const WIND_UNIT_LABEL = { kt: 'kt', mph: 'mph', kmh: 'km/h' };
 
 export function formatWind(kt, opts = {}) {
-  if (kt == null) return '—';
-  const u = getSetting('windUnit');
-  let v = kt;
-  if (u === 'mph') v = kt * 1.15078;
-  else if (u === 'kmh') v = kt * 1.852;
-  const rounded = opts.decimals != null
-    ? v.toFixed(opts.decimals)
-    : String(Math.round(v));
-  return opts.suffix === false ? rounded : `${rounded} ${WIND_UNIT_LABEL[u]}`;
+  return presentWind(kt, {
+    unit: getSetting('windUnit'),
+    decimals: opts.decimals ?? 0,
+    suffix: opts.suffix !== false,
+  });
 }
 
 export function windUnitLabel() {

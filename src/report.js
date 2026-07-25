@@ -1,7 +1,12 @@
 // P12.4 — Statistical summary auto-report: Generate one-page reports from filtered datasets.
 
 import { filterLandfalls, getCoverageYearRange, getImpactsFor, getLandfalls } from './data.js';
-import { getDamageMillions, getFatalityCount, formatFatalityCount } from './impact-utils.js';
+import { getDamageMillions, getFatalityCount } from './impact-utils.js';
+import {
+  presentCategory,
+  presentDamageMillions,
+  presentFatalities,
+} from './metric-presenters.js';
 
 export function generateStatisticalReport(filters) {
   const filtered = filterLandfalls(getLandfalls(), filters);
@@ -39,7 +44,7 @@ export function generateStatisticalReport(filters) {
 
   const catCounts = {};
   filtered.forEach(lf => {
-    const cat = lf.category === 0 ? 'TD' : lf.category === -1 ? 'TS' : String(lf.category);
+    const cat = presentCategory(lf.category, { style: 'short', missing: 'Unknown' });
     catCounts[cat] = (catCounts[cat] || 0) + 1;
   });
 
@@ -242,19 +247,11 @@ function formatImpactLeader(leader, formatter) {
 }
 
 function formatFatalities(value) {
-  return `${formatFatalityCount(value)} ${value === 1 ? 'fatality' : 'fatalities'}`;
+  return presentFatalities(value);
 }
 
 function formatDamageMillions(value) {
-  if (!Number.isFinite(value)) return 'N/A';
-  if (value >= 1000) {
-    const billions = value / 1000;
-    return `$${billions.toLocaleString('en-US', { maximumFractionDigits: billions >= 10 ? 0 : 1 })}B`;
-  }
-  if (value >= 1) {
-    return `$${value.toLocaleString('en-US', { maximumFractionDigits: value >= 10 ? 0 : 1 })}M`;
-  }
-  return `$${Math.round(value * 1000).toLocaleString('en-US')}K`;
+  return presentDamageMillions(value);
 }
 
 function timeKey(lf) {

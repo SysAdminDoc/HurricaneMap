@@ -8,6 +8,7 @@ import { renderIntensityChart } from './chart.js';
 import { hidePanel, showPanel } from './panels.js';
 import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { presentNumber, presentPressure } from './metric-presenters.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -182,7 +183,7 @@ function renderComparePanel() {
     const peakLabel = categoryLabel(windToCategory(s.peak_wind_kt));
     const lfLabel = categoryLabel(s.landfall_max_category);
     const lfClass = categoryClass(s.landfall_max_category);
-    const minPres = s.min_pres_mb ? `${s.min_pres_mb} mb` : '—';
+    const minPres = presentPressure(s.min_pres_mb);
     const states = [...new Set((s.us_landfalls || []).map(lf => lf.state))].join(' · ');
     return `
       <div class="cp-card" style="--pin-color:${p.color}">
@@ -309,11 +310,11 @@ function exportComparisonCSV(storms) {
     ['Track points', p => p.storm.track?.length ?? 0],
     ['ACE (10⁴ kt²)', p => {
       const ace = computeACE(p.storm.track || []);
-      return formatFixed(ace.value, 2);
+      return presentNumber(ace.value, 2);
     }],
     ['Forward speed (km/h)', p => {
       const trans = computeTranslationStats(p.storm.track || []);
-      return trans ? formatFixed(trans.mean_kmh, 1) : '—';
+      return presentNumber(trans?.mean_kmh, 1);
     }],
     ['RI detected', p => {
       const ri = findRapidIntensification(p.storm.track || []);
@@ -365,10 +366,6 @@ function exportComparisonCSV(storms) {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-}
-
-function formatFixed(value, decimals) {
-  return Number.isFinite(value) ? value.toFixed(decimals) : '—';
 }
 
 /** Escape a value for CSV (wrap in quotes if contains comma/quote/newline). */
