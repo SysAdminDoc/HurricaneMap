@@ -1,33 +1,31 @@
 // HurricaneMap entry point.
 import {
   loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
-  searchStorms, categoryLabel, ensureStormsLoaded, getStorm,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
 import { initLocale, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
-import { buildSparkline } from './sparkline.js';
 import { refreshSeasonSummary } from './season.js';
-import { fuzzyAugment } from './fuzzy.js';
-import { recordView, getHistory } from './search-history.js';
+import { recordView } from './search-history.js';
 import { initPerformanceMonitoring } from './perf.js';
 import { initServiceWorkerUpdates } from './sw-updates.js';
-import { escapeHtml, formatStormName } from './html-utils.js';
+import { escapeHtml } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
   applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
 } from './url-state.js';
 import {
-  hasActiveFilters, isYearFiltered, resetPrimaryFilters, resetYearRange,
-  setCategoryMacro, setYearRange, toggleCategory,
+  setCategoryMacro,
 } from './filter-state.js';
-import { closeAllPanels } from './panels.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
 import { initStorageManager } from './storage-manager.js';
 import { activateDialogFocus } from './dialog-focus.js';
+import { initSearchController } from './search-controller.js';
+import { createFilterController } from './filter-controller.js';
+import { wireShellNavigation } from './shell-navigation.js';
 
 initGlobalErrorSurface();
 
@@ -38,7 +36,6 @@ const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_
 
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
-let activeSearchIndex = -1;
 let currentVisibleLandfalls = [];
 
 function deferNonCritical(task) {
@@ -166,6 +163,18 @@ const els = {
   dataProvenanceBody: document.getElementById('data-provenance-body'),
   loading: document.getElementById('loading'),
 };
+
+const filterController = createFilterController({
+  filters,
+  elements: els,
+  yearDefaults,
+  applyFilters,
+  openState: openStateLazy,
+  setSurgeCategory: setSurgeCategoryLazy,
+  setPopulation: setPopulationLazy,
+  loadSST,
+  resetTrackCache: () => { lastTracksKey = ''; },
+});
 
 function syncYearBoundsFromData() {
   const range = getMetadata()?.coverage?.year_range || getStats()?.year_range;
@@ -609,23 +618,7 @@ function wireSettingsControls() {
 // Reflect the in-memory `filters` state back into the DOM controls. Used
 // after restoring a permalink so the toggles match what was applied.
 function syncFilterUiFromState() {
-  if (els.yearMin) els.yearMin.value = String(filters.yearMin);
-  if (els.yearMax) els.yearMax.value = String(filters.yearMax);
-  // Highlight year filter row when a non-default year range is selected
-  const yearFilterRow = document.querySelector('.filter-row--year');
-  const yearActive = isYearFiltered(filters, yearDefaults());
-  if (yearFilterRow) yearFilterRow.classList.toggle('active-filter', yearActive);
-  els.catBtns.forEach((btn) => {
-    const cat = btn.dataset.cat;
-    const on = filters.categories.has(cat);
-    btn.classList.toggle('active', on);
-    btn.classList.toggle('on', on);
-    btn.setAttribute('aria-pressed', String(on));
-  });
-  if (els.stateFilter) els.stateFilter.value = filters.state;
-  if (els.showTracks) els.showTracks.checked = filters.showTracks;
-  if (els.showHeatmap) els.showHeatmap.checked = filters.showHeatmap;
-  if (els.showRetiredOnly) els.showRetiredOnly.checked = filters.retiredOnly;
+  filterController.sync();
 }
 
 function populateStateFilter() {
@@ -663,7 +656,7 @@ function applyFilters() {
     : t('status.landfallsOf', visible.length.toLocaleString(), totalLandfalls.toLocaleString());
   els.visibleCount.textContent = countText;
   announceToLiveRegion(t('status.showing', countText));
-  updateFilterResetState();
+  filterController.updateResetState();
   if (filters.showTracks) {
     redrawTracks(visible);
   } else {
@@ -675,17 +668,6 @@ function applyFilters() {
   highlightYearRange(filters.yearMin, filters.yearMax);
   refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
   writeHash();
-}
-
-function updateFilterResetState() {
-  if (!els.resetFilters) return;
-  const active = hasActiveFilters(filters, yearDefaults(), {
-    surgeCategory: els.surgeCategory?.value,
-    showPopulation: els.showPopulation?.checked,
-    showSST: els.showSST?.checked,
-  });
-  els.resetFilters.disabled = !active;
-  els.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
 }
 
 function yearDefaults() {
@@ -727,294 +709,18 @@ document.addEventListener('storm-panel:close', () => {
 });
 
 function wireUI() {
-  wireFilterPanel();
-
-  // Year inputs
-  const onYearChange = () => {
-    if (setYearRange(filters, els.yearMin.value, els.yearMax.value, yearDefaults())) {
-      applyFilters();
-    }
-  };
-  els.yearMin.addEventListener('change', onYearChange);
-  els.yearMax.addEventListener('change', onYearChange);
-  
-  // Escape key resets year filter to full range
-  els.yearMin.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      resetYearRange(filters, yearDefaults());
-      syncFilterUiFromState();
-      applyFilters();
-    }
+  wireShellNavigation({
+    filtersButton: els.toggleFiltersBtn,
+    filtersPanel: els.filtersPanel,
+    mobileActionsButton: els.toggleMobileActionsBtn,
+    mobileActionsMenu: els.mobileActionsMenu,
   });
-  els.yearMax.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      resetYearRange(filters, yearDefaults());
-      syncFilterUiFromState();
-      applyFilters();
-    }
-  });
+  filterController.wire();
 
-  // Clear year filter button
-  if (els.clearYearFilter) {
-    els.clearYearFilter.addEventListener('click', () => {
-      resetYearRange(filters, yearDefaults());
-      syncFilterUiFromState();
-      applyFilters();
-    });
-  }
-
-  // Category toggles
-  for (const btn of els.catBtns) {
-    btn.setAttribute('aria-pressed', String(btn.classList.contains('on')));
-    btn.addEventListener('click', () => {
-      const cat = btn.dataset.cat;
-      const on = toggleCategory(filters, cat);
-      btn.classList.toggle('on', on);
-      btn.setAttribute('aria-pressed', String(on));
-      applyFilters();
-    });
-  }
-
-  // State filter — additionally opens the state deep-dive panel when set.
-  els.stateFilter.addEventListener('change', () => {
-    filters.state = els.stateFilter.value;
-    applyFilters();
-    if (filters.state) openStateLazy(filters.state);
-  });
-
-  // Search
-  // Warm the storms cache as soon as the user focuses the search input so that
-  // sparklines can render without a perceptible lag on the first keystroke.
-  els.searchInput.addEventListener('focus', () => { ensureStormsLoaded(); }, { once: true });
-  // History dropdown when input is focused with empty value.
-  els.searchInput.addEventListener('focus', () => {
-    if (els.searchInput.value.trim()) return;
-    showHistoryDropdown();
-  });
-
-  function setSearchOpen(open) {
-    els.searchResults.hidden = !open;
-    els.searchInput.setAttribute('aria-expanded', String(open));
-    if (!open) {
-      activeSearchIndex = -1;
-      els.searchResults.classList.remove('search-results--empty');
-      els.searchInput.removeAttribute('aria-activedescendant');
-      els.searchResults.querySelectorAll('[aria-selected="true"]').forEach(el => el.setAttribute('aria-selected', 'false'));
-    }
-  }
-
-  function getSearchOptions() {
-    return [...els.searchResults.querySelectorAll('li[data-storm-id]')];
-  }
-
-  function updateActiveSearchOption(nextIndex) {
-    const options = getSearchOptions();
-    if (!options.length) return;
-    activeSearchIndex = (nextIndex + options.length) % options.length;
-    options.forEach((option, index) => {
-      const active = index === activeSearchIndex;
-      option.classList.toggle('is-active', active);
-      option.setAttribute('aria-selected', String(active));
-      if (!option.id) option.id = `search-option-${option.dataset.stormId}-${index}`;
-      if (active) {
-        els.searchInput.setAttribute('aria-activedescendant', option.id);
-        option.scrollIntoView({ block: 'nearest' });
-      }
-    });
-  }
-
-  function showHistoryDropdown() {
-    const history = getHistory();
-    if (!history.length) return;
-    els.searchResults.classList.remove('search-results--empty');
-    els.searchResults.innerHTML = `<li class="search-section-label" aria-hidden="true">${t('search.recent')}</li>` +
-      history.map(h => {
-        const name = escapeHtml(formatStormName(h.name));
-        const cat = escapeHtml(categoryLabel(h.category));
-        const state = escapeHtml(h.state || '');
-        const stormId = escapeHtml(h.storm_id);
-        return `<li data-storm-id="${stormId}" data-t="${escapeHtml(h.t)}" data-lat="${escapeHtml(h.lat)}" data-lon="${escapeHtml(h.lon)}" role="option" tabindex="-1">
-          <span class="search-result-spark-host" data-storm-id="${stormId}" aria-hidden="true"></span>
-          <span class="search-result-text"><strong>${escapeHtml(h.year)}</strong> ${name} <span class="search-result-meta">· ${cat} ${state}</span></span>
-        </li>`;
-      }).join('');
-    setSearchOpen(true);
-    backfillSparklines();
-    wireResultClicks();
-  }
-
-  function backfillSparklines() {
-    ensureStormsLoaded().then(() => {
-      for (const host of els.searchResults.querySelectorAll('.search-result-spark-host')) {
-        const storm = getStorm(host.dataset.stormId);
-        if (storm && storm.track) {
-          host.innerHTML = buildSparkline(storm.track, { title: `${storm.name || 'Storm'} ${storm.year || ''} wind profile` });
-        }
-      }
-    });
-  }
-
-  function showNoSearchResults(query) {
-    const safeQuery = escapeHtml(query.trim());
-    els.searchResults.classList.add('search-results--empty');
-    els.searchResults.innerHTML = `
-      <li class="search-empty" role="status">
-        <strong>${t('search.noMatch', safeQuery)}</strong>
-        <span>${t('search.help')}</span>
-      </li>
-    `;
-    setSearchOpen(true);
-  }
-
-  function wireResultClicks() {
-    for (const li of els.searchResults.querySelectorAll('li[data-storm-id]')) {
-      li.addEventListener('click', () => {
-        // Resolve via getLandfalls so we always click a real, current landfall record.
-        const lf = getLandfalls().find(x =>
-          x.storm_id === li.dataset.stormId &&
-          x.t === li.dataset.t &&
-          String(x.lat) === li.dataset.lat
-        ) || getLandfalls().find(x => x.storm_id === li.dataset.stormId);
-        if (lf) onLandfallClick(lf);
-        setSearchOpen(false);
-        els.searchInput.value = '';
-      });
-    }
-  }
-
-  els.searchInput.addEventListener('keydown', (e) => {
-    if (els.searchResults.hidden) return;
-    const options = getSearchOptions();
-    if (!options.length) {
-      if (e.key === 'Escape') setSearchOpen(false);
-      return;
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      updateActiveSearchOption(activeSearchIndex + 1);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      updateActiveSearchOption(activeSearchIndex - 1);
-    } else if (e.key === 'Enter' && activeSearchIndex >= 0) {
-      e.preventDefault();
-      options[activeSearchIndex].click();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setSearchOpen(false);
-    }
-  });
-
-  els.searchInput.addEventListener('input', () => {
-    const q = els.searchInput.value;
-    if (!q.trim()) {
-      // Empty query → show history dropdown if any.
-      const history = getHistory();
-      if (history.length) { showHistoryDropdown(); return; }
-      setSearchOpen(false);
-      els.searchResults.innerHTML = '';
-      return;
-    }
-    let results = searchStorms(q, getLandfalls());
-    let fuzzy = [];
-    if (results.length < 5) {
-      fuzzy = fuzzyAugment(q, getLandfalls(), results, { limit: 5 });
-    }
-    if (!results.length && !fuzzy.length) {
-      showNoSearchResults(q);
-      return;
-    }
-    els.searchResults.classList.remove('search-results--empty');
-    setSearchOpen(true);
-    const renderRow = (lf) => {
-      const name = formatStormName(lf.name);
-      const cat = categoryLabel(lf.category);
-      const safeName = escapeHtml(name);
-      const safeState = escapeHtml(lf.state || '');
-      const safeStormId = escapeHtml(lf.storm_id);
-      return `<li data-storm-id="${safeStormId}" data-t="${escapeHtml(lf.t)}" data-lat="${escapeHtml(lf.lat)}" data-lon="${escapeHtml(lf.lon)}" role="option" tabindex="-1">
-        <span class="search-result-spark-host" data-storm-id="${safeStormId}" aria-hidden="true"></span>
-        <span class="search-result-text"><strong>${escapeHtml(lf.year)}</strong> ${safeName} <span class="search-result-meta">· ${escapeHtml(cat)} ${safeState}</span></span>
-      </li>`;
-    };
-    let html = results.map(renderRow).join('');
-    if (fuzzy.length) {
-      html += `<li class="search-section-label" aria-hidden="true">${t('search.suggest')}</li>`;
-      html += fuzzy.map(renderRow).join('');
-    }
-    els.searchResults.innerHTML = html;
-    updateActiveSearchOption(0);
-    backfillSparklines();
-    wireResultClicks();
-  });
-  els.searchInput.addEventListener('blur', () => {
-    setTimeout(() => { setSearchOpen(false); }, 180);
-  });
-
-  // Tracks toggle
-  els.showTracks.addEventListener('change', () => {
-    filters.showTracks = els.showTracks.checked;
-    applyFilters();
-  });
-
-  // Heatmap toggle
-  els.showHeatmap.addEventListener('change', () => {
-    filters.showHeatmap = els.showHeatmap.checked;
-    applyFilters();
-  });
-
-  if (els.showRetiredOnly) {
-    els.showRetiredOnly.addEventListener('change', () => {
-      filters.retiredOnly = els.showRetiredOnly.checked;
-      applyFilters();
-    });
-  }
-
-  // Storm-surge SLOSH MOM tile layer (per category).
-  els.surgeCategory.addEventListener('change', () => {
-    const v = parseInt(els.surgeCategory.value, 10);
-    setSurgeCategoryLazy(Number.isFinite(v) && v > 0 ? v : null);
-  });
-
-  // Population density overlay.
-  els.showPopulation.addEventListener('change', () => {
-    setPopulationLazy(els.showPopulation.checked);
-  });
-
-  // Sea surface temperature overlay.
-  if (els.showSST) {
-    els.showSST.addEventListener('change', async () => {
-      const { setSSTVisible } = await loadSST();
-      setSSTVisible(els.showSST.checked);
-      updateFilterResetState();
-    });
-  }
-
-  // Reset
-  els.resetFilters.addEventListener('click', async () => {
-    resetPrimaryFilters(filters, yearDefaults());
-    syncFilterUiFromState();
-    els.surgeCategory.value = '';
-    els.showPopulation.checked = false;
-    setSurgeCategoryLazy(null);
-    setPopulationLazy(false);
-    if (els.showSST?.checked) {
-      els.showSST.checked = false;
-      const { setSSTVisible } = await loadSST();
-      setSSTVisible(false);
-    }
-    lastTracksKey = '';
-    applyFilters();
-  });
-
-  // Escape resets the year filter only when focus is inside the year controls.
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    if (e.defaultPrevented) return;
-    if (document.activeElement !== els.yearMin && document.activeElement !== els.yearMax) return;
-    if (filters.yearMin === YEAR_MIN_DEFAULT && filters.yearMax === YEAR_MAX_DEFAULT) return;
-    resetYearRange(filters, yearDefaults());
-    syncFilterUiFromState();
-    applyFilters();
+  initSearchController({
+    input: els.searchInput,
+    results: els.searchResults,
+    onSelect: onLandfallClick,
   });
 
   // Stats panel toggle
@@ -1042,8 +748,6 @@ function wireUI() {
     globe.initGlobe3D();
     globe.openGlobe3D({ landfalls: currentVisibleLandfalls, focusStormId: openStormId });
   });
-
-  wireMobileActionsMenu();
 
   // Info modal
   let releaseInfoFocus = null;
@@ -1154,83 +858,6 @@ function wireUI() {
   const glossaryBtn = document.getElementById('toggle-glossary');
   if (glossaryBtn) {
     glossaryBtn.addEventListener('click', openGlossaryLazy);
-  }
-}
-
-function wireMobileActionsMenu() {
-  const trigger = els.toggleMobileActionsBtn;
-  const menu = els.mobileActionsMenu;
-  if (!trigger || !menu) return;
-
-  const closeMenu = ({ restoreFocus = false } = {}) => {
-    menu.dataset.open = 'false';
-    trigger.setAttribute('aria-expanded', 'false');
-    if (restoreFocus) trigger.focus({ preventScroll: true });
-  };
-
-  const openMenu = () => {
-    menu.dataset.open = 'true';
-    trigger.setAttribute('aria-expanded', 'true');
-  };
-
-  trigger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (menu.dataset.open === 'true') closeMenu();
-    else openMenu();
-  });
-
-  menu.addEventListener('click', (event) => {
-    if (event.target.closest('.icon-btn')) {
-      closeMenu();
-    }
-  }, true);
-
-  document.addEventListener('click', (event) => {
-    if (menu.dataset.open !== 'true') return;
-    if (menu.contains(event.target) || event.target === trigger) return;
-    closeMenu();
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    if (menu.dataset.open !== 'true') return;
-    event.preventDefault();
-    closeMenu({ restoreFocus: true });
-  });
-}
-
-function wireFilterPanel() {
-  if (!els.toggleFiltersBtn || !els.filtersPanel) return;
-  const mobileQuery = window.matchMedia('(max-width: 720px)');
-  let userChanged = false;
-
-  const setCollapsed = (collapsed) => {
-    els.filtersPanel.classList.toggle('collapsed', collapsed);
-    document.body.classList.toggle('filters-open', !collapsed);
-    els.toggleFiltersBtn.setAttribute('aria-expanded', String(!collapsed));
-    els.toggleFiltersBtn.setAttribute('aria-label', t(collapsed ? 'filters.show' : 'filters.hide'));
-    els.toggleFiltersBtn.title = t(collapsed ? 'filters.show' : 'filters.hide');
-  };
-
-  setCollapsed(true);
-  els.toggleFiltersBtn.addEventListener('click', () => {
-    userChanged = true;
-    const nextCollapsed = !els.filtersPanel.classList.contains('collapsed');
-    if (!nextCollapsed) closeAllPanels();
-    setCollapsed(nextCollapsed);
-  });
-
-  document.addEventListener('hm-panel:shown', () => {
-    setCollapsed(true);
-  });
-
-  const onViewportChange = () => {
-    if (!userChanged) setCollapsed(true);
-  };
-  if (mobileQuery.addEventListener) {
-    mobileQuery.addEventListener('change', onViewportChange);
-  } else if (mobileQuery.addListener) {
-    mobileQuery.addListener(onViewportChange);
   }
 }
 

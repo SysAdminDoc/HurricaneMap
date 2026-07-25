@@ -12,6 +12,7 @@ All notable changes to HurricaneMap.
 
 ### Changed
 - Refreshed esbuild and Playwright to tested current releases and documented the audit, license, runtime-pin, and compatibility policy for all direct build and mapping dependencies.
+- Split search, filter-control, and responsive shell navigation out of the entry point, and unified metric/category/unit/missing-value presentation across panels, statistics, comparisons, reports, CSV, and QGIS exports.
 
 ### Fixed
 - Corrected the published Saffir-Simpson and major-hurricane thresholds and added a semantic contract test that keeps application logic, glossary copy, and the README category table aligned.
