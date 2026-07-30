@@ -57,4 +57,32 @@ for (const locale of locales) {
   assert(typeof disclosure === 'string' && /English|inglés|anglè/i.test(disclosure), `${locale} source-language disclosure must identify English`);
 }
 
+// Dynamic workflow markup must interpolate catalog strings instead of adding
+// new English text or accessibility labels directly inside HTML templates.
+const localizedWorkflowFiles = [
+  '../src/onboarding.js',
+  '../src/saved-views-ui.js',
+  '../src/table-view.js',
+  '../src/spatial-search.js',
+  '../src/seasonal-outlook.js',
+];
+for (const relativePath of localizedWorkflowFiles) {
+  const source = readFileSync(new URL(relativePath, import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/[^\n]*/g, '');
+  const literalText = [...source.matchAll(/>[ \t]*(\p{L}[^\r\n<>{}$]*)[ \t]*</gu)]
+    .map(match => match[1].trim())
+    .filter(Boolean);
+  const literalAttributes = [...source.matchAll(/\b(?:aria-label|placeholder|title)="(\p{L}[^"$]*)"/gu)]
+    .map(match => match[1].trim())
+    .filter(Boolean);
+  const literalAssignments = [...source.matchAll(/\.(?:textContent|innerText|title)\s*=\s*['"](\p{L}[^'"]*)['"]/gu)]
+    .map(match => match[1].trim())
+    .filter(Boolean);
+  const literals = [...literalText, ...literalAttributes, ...literalAssignments]
+    .filter(value => !/^(?:NOAA CPC|Ready\.gov|American Red Cross)$/i.test(value));
+  assert(!literals.length, `${relativePath} contains untranslated visible literals: ${literals.slice(0, 8).join(' | ')}`);
+  assert(source.includes("from './i18n.js'"), `${relativePath} must source visible workflow copy from i18n.js`);
+}
+
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);

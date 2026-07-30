@@ -118,7 +118,7 @@ function ensurePanel() {
     panelEl.className = 'spatial-results glass';
     panelEl.hidden = true;
     panelEl.setAttribute('role', 'region');
-    panelEl.setAttribute('aria-label', 'Nearby storm search results');
+    panelEl.setAttribute('aria-label', t('spatial.title'));
     // Results render into a child body so the panel manager's injected chrome
     // (minimize button / restore tab) on the root survives re-renders.
     const bodyEl = document.createElement('div');
@@ -199,7 +199,7 @@ function renderPrompt() {
   spBody.innerHTML = `
     <div class="sp-header">
       <h3>${t('spatial.title')}</h3>
-      <button class="close-btn" aria-label="Close spatial search">×</button>
+      <button class="close-btn" aria-label="${escapeHtml(t('spatial.close'))}">×</button>
     </div>
     <p class="sp-hint">${t('spatial.hint')}</p>
     <button class="text-btn sp-locate-btn" type="button">📍 ${t('spatial.useMyLocation')}</button>
@@ -214,6 +214,9 @@ function renderPrompt() {
 
 function renderResults(results, lat, lon) {
   const spBody = ensurePanel();
+  const countLabel = results.length === 1
+    ? t('spatial.countOne', currentRadius.label)
+    : t('spatial.countMany', results.length, currentRadius.label);
 
   const radiusBtns = RADIUS_OPTIONS.map(r =>
     `<button class="sp-radius-btn${r === currentRadius ? ' active' : ''}" data-km="${r.km}">${r.label}</button>`
@@ -224,12 +227,12 @@ function renderResults(results, lat, lon) {
   showPanel('spatial-results');
   spBody.innerHTML = `
     <div class="sp-header">
-      <h3>Storms near ${lat.toFixed(2)}, ${lon.toFixed(2)}</h3>
-      <button class="close-btn" aria-label="Close spatial search">×</button>
+      <h3>${escapeHtml(t('spatial.near', lat.toFixed(2), lon.toFixed(2)))}</h3>
+      <button class="close-btn" aria-label="${escapeHtml(t('spatial.close'))}">×</button>
     </div>
     <div class="sp-controls">${radiusBtns}<button class="text-btn sp-locate-btn" type="button">📍 ${t('spatial.useMyLocation')}</button></div>
     ${locationPrivacyControls()}
-    <div class="sp-count">${results.length} storm${results.length === 1 ? '' : 's'} within ${currentRadius.label}</div>
+    <div class="sp-count">${escapeHtml(countLabel)}</div>
     <ul class="sp-list">
       ${results.map(r => `
         <li data-sid="${escapeHtml(r.storm_id)}" tabindex="0">

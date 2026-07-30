@@ -5,6 +5,7 @@ import {
   saveCurrentView,
 } from './saved-views.js';
 import { escapeHtml } from './html-utils.js';
+import { t } from './i18n.js';
 
 export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
   if (!host) return;
@@ -13,17 +14,17 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
     const views = loadSavedViews();
     host.innerHTML = `
       <div class="saved-view-create">
-        <label class="sr-only" for="saved-view-name">Saved view name</label>
-        <input id="saved-view-name" maxlength="60" placeholder="View name" />
-        <button class="settings-action" data-action="save" type="button">Save current</button>
-        <button class="settings-action" data-action="export" type="button"${views.length ? '' : ' disabled'}>Export JSON</button>
+        <label class="sr-only" for="saved-view-name">${escapeHtml(t('savedViews.nameLabel'))}</label>
+        <input id="saved-view-name" maxlength="60" placeholder="${escapeHtml(t('savedViews.namePlaceholder'))}" />
+        <button class="settings-action" data-action="save" type="button">${escapeHtml(t('savedViews.saveCurrent'))}</button>
+        <button class="settings-action" data-action="export" type="button"${views.length ? '' : ' disabled'}>${escapeHtml(t('savedViews.exportJson'))}</button>
       </div>
       <div class="saved-view-status" role="status" aria-live="polite"></div>
       <ul class="saved-view-list">
         ${views.map(view => `<li>
           <button class="saved-view-restore" data-action="restore" data-id="${view.id}" type="button">${escapeHtml(view.name)}</button>
-          <button class="saved-view-delete" data-action="delete" data-id="${view.id}" type="button" aria-label="Delete ${escapeHtml(view.name)}">×</button>
-        </li>`).join('') || '<li class="settings-help">No saved views on this device.</li>'}
+          <button class="saved-view-delete" data-action="delete" data-id="${view.id}" type="button" aria-label="${escapeHtml(t('savedViews.delete', view.name))}">×</button>
+        </li>`).join('') || `<li class="settings-help">${escapeHtml(t('savedViews.empty'))}</li>`}
       </ul>`;
   };
 
@@ -35,7 +36,7 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
       const input = host.querySelector('#saved-view-name');
       const view = saveCurrentView(input.value, getCurrentHash() || '#v=1');
       if (!view) {
-        status.textContent = 'Enter a name to save this view.';
+        status.textContent = t('savedViews.enterName');
         input.focus();
         return;
       }

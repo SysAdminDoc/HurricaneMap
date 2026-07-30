@@ -62,10 +62,10 @@ function start() {
       <h3 class="onb-title" id="onb-title-id"></h3>
       <p class="onb-body" id="onb-body-id"></p>
       <div class="onb-actions">
-        <button class="onb-skip text-btn" type="button">Skip tour</button>
+        <button class="onb-skip text-btn" type="button">${t('onboarding.skip')}</button>
         <div class="onb-nav">
-          <button class="onb-prev text-btn" type="button">Back</button>
-          <button class="onb-next action-btn primary" type="button">Next</button>
+          <button class="onb-prev text-btn" type="button">${t('onboarding.back')}</button>
+          <button class="onb-next action-btn primary" type="button">${t('onboarding.next')}</button>
         </div>
       </div>
     </div>
@@ -128,9 +128,9 @@ function start() {
     }
     titleEl.textContent = step.title;
     bodyEl.textContent = step.body;
-    stepEl.textContent = `${idx + 1} of ${STEPS.length}`;
+    stepEl.textContent = t('onboarding.step', idx + 1, STEPS.length);
     prevBtn.disabled = idx === 0;
-    nextBtn.textContent = idx === STEPS.length - 1 ? 'Got it' : 'Next';
+    nextBtn.textContent = t(idx === STEPS.length - 1 ? 'onboarding.done' : 'onboarding.next');
   }
 
   function finish() {

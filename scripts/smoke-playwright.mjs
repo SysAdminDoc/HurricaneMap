@@ -1000,6 +1000,82 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
   }
 }
 
+async function assertLocalizedWorkflowChrome(browser, baseUrl) {
+  for (const locale of ['es', 'ht']) {
+    const context = await browser.newContext({
+      viewport: { width: 1200, height: 900 },
+      serviceWorkers: 'block',
+      reducedMotion: 'reduce',
+    });
+    await context.addInitScript(language => {
+      localStorage.setItem('hm-settings-v1', JSON.stringify({
+        onboarded: true,
+        locale: language,
+        reducedMotion: true,
+      }));
+    }, locale);
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      const expected = await page.evaluate(async () => {
+        const { getLocale, t } = await import('/src/i18n.js');
+        return {
+          locale: getLocale(),
+          onboardingSkip: t('onboarding.skip'),
+          savedTitle: t('savedViews.title'),
+          savedEmpty: t('savedViews.empty'),
+          tableLabel: t('table.filteredLabel'),
+          tableYear: t('table.column.year'),
+          tableCount: t('table.countMany', (759).toLocaleString(getLocale())),
+          spatialTitle: t('spatial.title'),
+          spatialClose: t('spatial.close'),
+          seasonalLabel: t('seasonal.label'),
+          seasonalHistory: t('seasonal.history'),
+        };
+      });
+      assert(expected.locale === locale, `${locale}: application locale did not initialize`);
+
+      await page.evaluate(async () => {
+        const onboarding = await import('/src/onboarding.js');
+        onboarding.maybeStartOnboarding({ force: true });
+      });
+      await page.waitForSelector('.onb-overlay .onb-skip', { timeout: 5_000 });
+      assert(await page.locator('.onb-skip').textContent() === expected.onboardingSkip, `${locale}: onboarding controls are not localized`);
+      await page.locator('.onb-skip').click();
+      await page.waitForSelector('.onb-overlay', { state: 'detached', timeout: 5_000 });
+
+      await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
+      await page.waitForSelector('#settings-menu:popover-open #saved-views-manager', { timeout: 5_000 });
+      assert((await page.locator('#settings-saved-views-title').textContent()) === expected.savedTitle, `${locale}: saved-view heading is not localized`);
+      assert((await page.locator('#saved-views-manager .settings-help').textContent()) === expected.savedEmpty, `${locale}: saved-view empty state is not localized`);
+      await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
+
+      await clickHeaderAction(page, '#toggle-table-view');
+      await page.waitForSelector('#table-view-panel:not([hidden]) tbody tr', { timeout: 10_000 });
+      assert(await page.locator('.table-view-table').getAttribute('aria-label') === expected.tableLabel, `${locale}: table label is not localized`);
+      assert((await page.locator('th[data-col="year"]').textContent()).startsWith(expected.tableYear), `${locale}: table columns are not localized`);
+      assert((await page.locator('.table-view-count').textContent()) === expected.tableCount, `${locale}: table count is not locale-aware`);
+      await page.locator('#close-table-view').focus();
+      await page.keyboard.press('Enter');
+
+      await clickHeaderAction(page, '#toggle-spatial-search');
+      await page.waitForSelector('#spatial-results:not([hidden]) h3', { timeout: 5_000 });
+      assert((await page.locator('#spatial-results h3').textContent()) === expected.spatialTitle, `${locale}: spatial prompt is not localized`);
+      assert(await page.locator('#spatial-results .close-btn').getAttribute('aria-label') === expected.spatialClose, `${locale}: spatial close label is not localized`);
+      await page.locator('#spatial-results .close-btn').focus();
+      await page.keyboard.press('Enter');
+
+      await clickHeaderAction(page, '#toggle-stats');
+      await page.waitForSelector('#stats-panel:not([hidden]) .seasonal-outlook-banner', { timeout: 10_000 });
+      assert((await page.locator('.sob-label').textContent()) === expected.seasonalLabel, `${locale}: seasonal heading is not localized`);
+      assert((await page.locator('.sob-details summary').textContent()) === expected.seasonalHistory, `${locale}: seasonal disclosure is not localized`);
+    } finally {
+      await context.close();
+    }
+  }
+}
+
 async function assertSourceLanguageDisclosures(browser, baseUrl) {
   const expected = {
     es: /fuente en inglés/i,
@@ -1880,6 +1956,7 @@ try {
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 1440, height: 960, name: 'desktop' });
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
   await assertManagedPanelFocusContracts(browser, baseUrl);
+  await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
 
   await browser.close();

@@ -2,6 +2,7 @@
 // never stack or fight for viewport space. Each panel gets shared chrome: a
 // minimize button that collapses it to a slim edge tab (keeping the map fully
 // visible) and a restore bar to bring it back.
+import { t } from './i18n.js';
 
 const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel', 'table-view-panel', 'prep-panel', 'evac-panel', 'spatial-results'];
 const PANEL_BUTTONS = {
@@ -72,16 +73,16 @@ function ensurePanelChrome(el) {
   const minBtn = document.createElement('button');
   minBtn.type = 'button';
   minBtn.className = 'panel-min-btn';
-  minBtn.title = 'Minimize panel — keep it as a tab at the edge of the map';
-  minBtn.setAttribute('aria-label', `Minimize ${panelTitle(el).toLowerCase()}`);
+  minBtn.title = t('panel.minimize');
+  minBtn.setAttribute('aria-label', t('panel.minimizeNamed', panelTitle(el).toLowerCase()));
   minBtn.innerHTML = '<span aria-hidden="true">–</span>';
   minBtn.addEventListener('click', () => minimizePanel(el.id));
 
   const restoreBar = document.createElement('button');
   restoreBar.type = 'button';
   restoreBar.className = 'panel-restore-bar';
-  restoreBar.title = 'Restore panel';
-  restoreBar.setAttribute('aria-label', `Restore ${panelTitle(el).toLowerCase()}`);
+  restoreBar.title = t('panel.restore');
+  restoreBar.setAttribute('aria-label', t('panel.restoreNamed', panelTitle(el).toLowerCase()));
   restoreBar.innerHTML = `<span class="panel-restore-icon" aria-hidden="true">❐</span><span class="panel-restore-label"></span>`;
   restoreBar.querySelector('.panel-restore-label').textContent = panelTitle(el);
   restoreBar.addEventListener('click', () => restorePanel(el.id));

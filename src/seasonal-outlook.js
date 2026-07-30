@@ -6,6 +6,7 @@
 // context that helps users interpret the forecast.
 
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
+import { t } from './i18n.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -71,8 +72,18 @@ export async function fetchSeasonalOutlook() {
 }
 
 function renderCurrentSeasonRows(current) {
+  const editorial = value => {
+    const keys = {
+      Atlantic: 'seasonal.basinAtlantic',
+      'El Niño (strong)': 'seasonal.ensoStrong',
+      'Below-normal season expected': 'seasonal.headlineBelowNormal',
+      'CSU (July update)': 'seasonal.csuJuly',
+      '55% chance below-normal': 'seasonal.probabilityBelow',
+    };
+    return keys[value] ? t(keys[value]) : value;
+  };
   const rows = current.sources.map(source => {
-    const agency = escapeHtml(source.agency);
+    const agency = escapeHtml(editorial(source.agency));
     const sourceUrl = safeExternalUrl(source.url);
     const agencyHtml = sourceUrl
       ? `<a class="sob-agency" href="${sourceUrl}" target="_blank" rel="noopener">${agency}</a>`
@@ -80,15 +91,15 @@ function renderCurrentSeasonRows(current) {
     return `
     <div class="sob-row">
       ${agencyHtml}
-      <span class="sob-numbers">${escapeHtml(source.named)} named · ${escapeHtml(source.hurricanes)} hurricanes · ${escapeHtml(source.majors)} major</span>
-      <span class="sob-issued">${source.probability ? `${escapeHtml(source.probability)} · ` : ''}issued ${escapeHtml(source.issued)}</span>
+      <span class="sob-numbers">${escapeHtml(t('seasonal.counts', source.named, source.hurricanes, source.majors))}</span>
+      <span class="sob-issued">${source.probability ? `${escapeHtml(editorial(source.probability))} · ` : ''}${escapeHtml(t('seasonal.issued', source.issued))}</span>
     </div>`;
   }).join('');
   return `
     <div class="sob-current">
       <div class="sob-headline">
-        <strong>${escapeHtml(current.season)} ${escapeHtml(current.basin)}: ${escapeHtml(current.headline)}</strong>
-        <span class="sob-enso">${escapeHtml(current.enso)}</span>
+        <strong>${escapeHtml(current.season)} ${escapeHtml(editorial(current.basin))}: ${escapeHtml(editorial(current.headline))}</strong>
+        <span class="sob-enso">${escapeHtml(editorial(current.enso))}</span>
       </div>
       ${rows}
     </div>`;
@@ -106,19 +117,19 @@ export function renderOutlookBanner(outlook) {
     <div class="seasonal-outlook-banner">
       <div class="sob-header">
         <span class="sob-icon">📊</span>
-        <span class="sob-label">SEASONAL OUTLOOK</span>
+        <span class="sob-label">${escapeHtml(t('seasonal.label'))}</span>
         <span class="sob-source">NOAA CPC</span>
       </div>
       ${outlook.current ? renderCurrentSeasonRows(outlook.current) : ''}
       <div class="sob-meta">
-        <a href="${CPC_URL}" target="_blank" rel="noopener">View current NOAA CPC seasonal hurricane outlook →</a>
+        <a href="${CPC_URL}" target="_blank" rel="noopener">${escapeHtml(t('seasonal.currentLink'))}</a>
       </div>
       <details class="sob-details">
-        <summary>Historical forecast accuracy</summary>
-        <p>NOAA CPC outlooks have averaged ~${avgAccuracy}% accuracy over 2015-2024.</p>
-        <p class="sob-definition"><strong>Above normal:</strong> ${skill['above-normal'].definition} (${skill['above-normal'].accuracy}% accurate)</p>
-        <p class="sob-definition"><strong>Near normal:</strong> ${skill['near-normal'].definition} (${skill['near-normal'].accuracy}% accurate)</p>
-        <p class="sob-definition"><strong>Below normal:</strong> ${skill['below-normal'].definition} (${skill['below-normal'].accuracy}% accurate)</p>
+        <summary>${escapeHtml(t('seasonal.history'))}</summary>
+        <p>${escapeHtml(t('seasonal.accuracySummary', avgAccuracy))}</p>
+        <p class="sob-definition"><strong>${escapeHtml(t('seasonal.aboveNormal'))}:</strong> ${escapeHtml(t('seasonal.definition.above'))} (${escapeHtml(t('seasonal.accurate', skill['above-normal'].accuracy))})</p>
+        <p class="sob-definition"><strong>${escapeHtml(t('seasonal.nearNormal'))}:</strong> ${escapeHtml(t('seasonal.definition.near'))} (${escapeHtml(t('seasonal.accurate', skill['near-normal'].accuracy))})</p>
+        <p class="sob-definition"><strong>${escapeHtml(t('seasonal.belowNormal'))}:</strong> ${escapeHtml(t('seasonal.definition.below'))} (${escapeHtml(t('seasonal.accurate', skill['below-normal'].accuracy))})</p>
       </details>
     </div>
   `;

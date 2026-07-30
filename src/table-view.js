@@ -1,7 +1,8 @@
-import { categoryLabel, categoryStrength } from './data.js';
+import { categoryStrength } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { formatWind } from './settings.js';
 import { showPanel, hidePanel } from './panels.js';
+import { getLocale, t } from './i18n.js';
 
 const panel = document.getElementById('table-view-panel');
 const body = document.getElementById('table-view-body');
@@ -34,19 +35,27 @@ function render(landfalls) {
   if (!body) return;
   const sorted = sortRows([...landfalls], lastSort.col, lastSort.dir);
   const arrow = (col) => lastSort.col === col ? (lastSort.dir === 'asc' ? ' ↑' : ' ↓') : '';
-  const th = (col, label) => `<th role="columnheader" aria-sort="${lastSort.col === col ? (lastSort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}" data-col="${col}" tabindex="0">${label}${arrow(col)}</th>`;
+  const th = (col, labelKey = col) => `<th role="columnheader" aria-sort="${lastSort.col === col ? (lastSort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}" data-col="${col}" tabindex="0">${escapeHtml(t(`table.column.${labelKey}`))}${arrow(col)}</th>`;
+  const category = value => value === 0
+    ? t('table.category.td')
+    : value === -1
+      ? t('table.category.ts')
+      : t('table.category.hurricane', value);
+  const count = landfalls.length === 1
+    ? t('table.countOne')
+    : t('table.countMany', landfalls.length.toLocaleString(getLocale()));
 
   body.innerHTML = `
     <div class="table-view-scroll">
-      <table class="table-view-table" role="table" aria-label="Filtered hurricane landfalls">
+      <table class="table-view-table" role="table" aria-label="${escapeHtml(t('table.filteredLabel'))}">
         <thead>
-          <tr>${th('year', 'Year')}${th('name', 'Name')}${th('category', 'Category')}${th('state', 'State')}${th('wind', 'Wind')}${th('pres', 'Pressure')}</tr>
+          <tr>${th('year')}${th('name')}${th('category')}${th('state')}${th('wind')}${th('pres', 'pressure')}</tr>
         </thead>
         <tbody>
           ${sorted.map(lf => `<tr data-sid="${escapeHtml(lf.storm_id)}" data-t="${escapeHtml(lf.t)}" tabindex="0">
             <td>${lf.year}</td>
             <td>${escapeHtml(formatStormName(lf.name))}</td>
-            <td><span class="cat-pill cat-${lf.category <= 0 ? 'ts' : lf.category}">${escapeHtml(categoryLabel(lf.category))}</span></td>
+            <td><span class="cat-pill cat-${lf.category <= 0 ? 'ts' : lf.category}">${escapeHtml(category(lf.category))}</span></td>
             <td>${escapeHtml(lf.state || '')}</td>
             <td>${lf.wind ? formatWind(lf.wind) : '—'}</td>
             <td>${lf.pres ? `${lf.pres} mb` : '—'}</td>
@@ -54,7 +63,7 @@ function render(landfalls) {
         </tbody>
       </table>
     </div>
-    <p class="table-view-count">${landfalls.length.toLocaleString()} landfall${landfalls.length === 1 ? '' : 's'}</p>
+    <p class="table-view-count">${escapeHtml(count)}</p>
   `;
 
   body.querySelectorAll('th[data-col]').forEach(th => {
