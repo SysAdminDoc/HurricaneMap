@@ -1,0 +1,176 @@
+/* Light theme — Catppuccin Latte */
+html.light-theme {
+  --base:   #eff1f5;
+  --mantle: #e6e9f0;
+  --crust:  #dce0e8;
+  --surface0: #ccd0dd;
+  --surface1: #bcc0cc;
+  --text:    #4c4f69;
+  --subtext: #6c6f85;
+  --overlay: #7c8296;
+  --blue:    #1e66f5;
+  --lavender:#7c3aed;
+  --sapphire:#04a5e5;
+  --brand-title-start: #5b21b6;
+  --brand-title-end: #075985;
+  --sky:     #04a5e5;
+  --peach:   #fe640b;
+  --yellow:  #df8e1d;
+  --red:     #d20f39;
+  --green:   #40a02b;
+
+  --cat-ts:  #04a5e5;  /* sapphire */
+  --cat-1:   #40a02b;  /* green */
+  --cat-2:   #e49320;  /* yellow */
+  --cat-3:   #fe640b;  /* peach */
+  --cat-4:   #d20f39;  /* pink */
+  --cat-5:   #8839ef;  /* mauve */
+
+  --success: #40a02b;  /* green */
+  --warning: #e49320;  /* yellow */
+  --error:   #d20f39;  /* pink/red */
+  --info:    #1e66f5;  /* blue */
+  --tide-observed: #1e66f5;
+  --tide-predicted: #5c5f77;
+  --tide-landfall: #d20f39;
+  --legend-swatch-border: rgba(76, 79, 105, 0.42);
+
+  --glass-bg:   rgba(239, 241, 245, 0.85);
+  --glass-edge: rgba(76, 79, 105, 0.12);
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-xl:  0 12px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* Phase 4: Dark Mode Only Features */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+
+}
+
+/* Phase 4: Light Mode Only Features */
+@media (prefers-color-scheme: light) {
+  .glass {
+    backdrop-filter: blur(12px) saturate(130%);
+  }
+
+  .icon-btn {
+    background: rgba(255, 255, 255, 0.4);
+  }
+}
+
+html.light-theme {
+  --control-bg: rgba(255, 255, 255, 0.72);
+  --control-bg-hover: rgba(30, 102, 245, 0.08);
+  --focus-color: rgba(124, 58, 237, 0.52);
+  --focus-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+  --surface-sunken: rgba(255, 255, 255, 0.64);
+  --surface-raised: rgba(255, 255, 255, 0.78);
+}
+
+html.light-theme .info-modal,
+html.light-theme .glossary-modal,
+html.light-theme .onb-overlay {
+  background: rgba(76, 79, 105, 0.38);
+}
+
+html.light-theme input[type="number"],
+html.light-theme input[type="search"],
+html.light-theme select {
+  border-color: rgba(76, 79, 105, 0.16);
+}
+
+html.light-theme .panel-sticky-header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 241, 245, 0.88));
+}
+
+html.light-theme {
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --panel-border: rgba(76, 79, 105, 0.14);
+  --category-ink: #11111b;
+}
+
+html.light-theme .search-results {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+html.light-theme {
+  color-scheme: light;
+  --background: var(--base);
+  --foreground: var(--text);
+  --foreground-muted: var(--subtext);
+  --foreground-subtle: var(--overlay);
+  --surface-app: rgba(239, 241, 245, 0.96);
+  --surface-panel: rgba(255, 255, 255, 0.94);
+  --surface-elevated: rgba(246, 248, 252, 0.96);
+  --surface-control: rgba(255, 255, 255, 0.86);
+  --surface-control-hover: rgba(30, 102, 245, 0.09);
+  --surface-control-active: rgba(124, 58, 237, 0.12);
+  --surface-danger: rgba(210, 15, 57, 0.10);
+  --surface-warning: rgba(228, 147, 32, 0.12);
+  --surface-success: rgba(64, 160, 43, 0.10);
+  --surface-info: rgba(30, 102, 245, 0.10);
+  --warning-ink: #713b00;
+  --danger-ink: #8a0029;
+  --border-subtle: rgba(76, 79, 105, 0.14);
+  --border-strong: rgba(76, 79, 105, 0.24);
+  --border-accent: rgba(124, 58, 237, 0.40);
+  --shadow-theme-lg: 0 18px 54px rgba(76, 79, 105, 0.18);
+  --focus-ring-color: rgba(124, 58, 237, 0.56);
+  --focus-ring-soft: 0 0 0 3px rgba(124, 58, 237, 0.18);
+  --intensity-wind-line: #303446;
+  --intensity-pressure-line: #005f87;
+  --intensity-grid-line: rgba(76, 79, 105, 0.30);
+  --intensity-axis-line: rgba(76, 79, 105, 0.58);
+  --on-accent: #ffffff;
+  --leaflet-control-bg: rgba(255, 255, 255, 0.94);
+}
+
+/* YlOrRd's light steps read with dark ink; the deep-red end needs white. */
+body.palette-colorblind .cat-pill.cat-5,
+body.palette-colorblind .cat-btn.on.cat-5,
+body.palette-colorblind .dai-seg.cat-5 {
+  color: #ffffff !important;
+}
+
+html.light-theme .cat-pill.cat-4,
+html.light-theme .cat-pill.cat-5,
+html.light-theme .cat-btn.on.cat-4,
+html.light-theme .cat-btn.on.cat-5,
+html.light-theme .dai-seg.cat-4,
+html.light-theme .dai-seg.cat-5 {
+  color: #ffffff !important;
+}
+
+body.palette-colorblind .cat-pill.cat-4,
+body.palette-colorblind .cat-btn.on.cat-4,
+body.palette-colorblind .dai-seg.cat-4 {
+  color: #11111b !important;
+}
+
+html.light-theme {
+  --accent-grad: linear-gradient(135deg, #7c3aed, #0969da);
+}
+
+html.light-theme .basemap-fallback {
+  filter: none;
+}
+
+html.light-theme #map .leaflet-tile-pane {
+  filter: none;
+}
+
+html.light-theme .app-header,
+html.light-theme .atlas-context-rail,
+html.light-theme .mobile-actions-menu {
+  --atlas-panel-strong: rgba(248, 250, 255, 0.98);
+  --atlas-edge: rgba(53, 95, 126, 0.2);
+  --atlas-cyan: #087d91;
+  --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
+  background: color-mix(in srgb, var(--surface-panel) 97%, transparent) !important;
+}

@@ -1,0 +1,220 @@
+/* Vendored fonts — Inter (latin, variable weight 400-800) + JetBrains Mono (latin, 400-500) */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(../fonts/inter-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url(../fonts/jetbrains-mono-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* HurricaneMap — Catppuccin Mocha + glassmorphism */
+:root {
+  --base:   #11111b;
+  --mantle: #181825;
+  --crust:  #1e1e2e;
+  --surface0: #313244;
+  --surface1: #45475a;
+  --text:    #cdd6f4;
+  --subtext: #a6adc8;
+  --overlay: #6c7086;
+  --blue:    #89b4fa;
+  --lavender:#b4befe;
+  --sapphire:#74c7ec;
+  --brand-title-start: #b4befe;
+  --brand-title-end: #74c7ec;
+  --sky:     #89dcfe;
+  --peach:   #fab387;
+  --yellow:  #f9e2af;
+  --red:     #f38ba8;
+  --green:   #a6e3a1;
+
+  --cat-ts:  #74c7ec;  /* sapphire */
+  --cat-1:   #a6e3a1;  /* green */
+  --cat-2:   #f9e2af;  /* yellow */
+  --cat-3:   #fab387;  /* peach */
+  --cat-4:   #f38ba8;  /* pink */
+  --cat-5:   #cba6f7;  /* mauve */
+
+  /* Semantic status colors */
+  --success: #a6e3a1;  /* green */
+  --warning: #f9e2af;  /* yellow */
+  --error:   #f38ba8;  /* pink/red */
+  --info:    #89b4fa;  /* blue */
+  --tide-observed: #74c7ec;
+  --tide-predicted: #9399b2;
+  --tide-landfall: #f38ba8;
+  --legend-swatch-border: rgba(205, 214, 244, 0.32);
+
+  --glass-bg:   rgba(30, 30, 46, 0.72);
+  --glass-edge: rgba(205, 214, 244, 0.10);
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* Elevation shadows (semantic depth) */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-xl:  0 12px 48px rgba(0, 0, 0, 0.45);
+
+  /* Spacing scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+
+  /* Component sizing */
+  --button-height: 40px;
+  --button-height-lg: 44px;
+  --input-height: 40px;
+  --touch-target-min: 44px;
+
+}
+
+/* ==========================================================================
+   Premium refinement layer
+   --------------------------------------------------------------------------
+   Consolidates missing secondary-surface styling and corrects late appended
+   overrides without changing the app architecture.
+   ========================================================================== */
+
+:root {
+  --text-secondary: var(--subtext);
+  --text-dim: var(--overlay);
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --control-bg: rgba(17, 17, 27, 0.72);
+  --control-bg-hover: rgba(180, 190, 254, 0.10);
+  --focus-color: rgba(180, 190, 254, 0.62);
+  --focus-shadow: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  --surface-sunken: rgba(17, 17, 27, 0.54);
+  --surface-raised: rgba(49, 50, 68, 0.72);
+}
+
+/* ==========================================================================
+   Premium polish pass v1.3.1
+   System-level refinement for hierarchy, states, panels, and secondary flows.
+   ========================================================================== */
+
+:root {
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --panel-bg: rgba(24, 24, 37, 0.88);
+  --panel-border: rgba(205, 214, 244, 0.12);
+  --panel-width: 440px;
+  --category-ink: #11111b;
+}
+
+/* Layout stabilization pass v1.3.2
+   One deterministic lane for analytical panels, with the timeline and summary
+   surfaces constrained below it. */
+:root {
+  --side-panel-gap: 16px;
+  --side-panel-top: 96px;
+  --side-panel-bottom: 142px;
+  --side-panel-width: 440px;
+}
+
+/* Overlay shelf stabilization pass v1.3.4
+   Compare and radar controls share a reserved map shelf above the timeline
+   instead of floating through the chart or the side-panel lane. */
+:root {
+  --map-left-reserve: 344px;
+  --overlay-right-reserve: 16px;
+  --overlay-bottom-reserve: 156px;
+}
+
+/* Theme system hardening v1.3.6
+   Centralized semantic tokens and late overrides for surfaces that had drifted
+   toward dark-only rgba values in appended polish layers. */
+:root {
+  color-scheme: dark;
+  --background: var(--base);
+  --foreground: var(--text);
+  --foreground-muted: var(--subtext);
+  --foreground-subtle: var(--overlay);
+  --surface-app: rgba(17, 17, 27, 0.94);
+  --surface-panel: rgba(24, 24, 37, 0.92);
+  --surface-elevated: rgba(30, 30, 46, 0.92);
+  --surface-control: rgba(17, 17, 27, 0.72);
+  --surface-control-hover: rgba(180, 190, 254, 0.12);
+  --surface-control-active: rgba(180, 190, 254, 0.18);
+  --surface-danger: rgba(243, 139, 168, 0.16);
+  --surface-warning: rgba(249, 226, 175, 0.14);
+  --surface-success: rgba(166, 227, 161, 0.14);
+  --surface-info: rgba(137, 180, 250, 0.14);
+  --warning-ink: var(--warning);
+  --danger-ink: var(--error);
+  --border-subtle: rgba(205, 214, 244, 0.11);
+  --border-strong: rgba(205, 214, 244, 0.20);
+  --border-accent: rgba(180, 190, 254, 0.42);
+  --shadow-theme-lg: 0 18px 60px rgba(0, 0, 0, 0.34);
+  --focus-ring-color: rgba(180, 190, 254, 0.62);
+  --focus-ring-soft: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  --intensity-wind-line: #cdd6f4;
+  --intensity-pressure-line: #74c7ec;
+  --intensity-grid-line: rgba(205, 214, 244, 0.20);
+  --intensity-axis-line: rgba(205, 214, 244, 0.38);
+  --on-accent: #11111b;
+  --disabled-opacity: 0.58;
+  --leaflet-control-bg: rgba(24, 24, 37, 0.92);
+}
+
+/* Premium polish pass v1.3.8
+   Tightens remaining command, first-run, accessibility, and mobile states. */
+:root {
+  --on-category: #11111b;
+}
+
+/* Accent gradient endpoints as a token: light theme's #04a5e5 sapphire only
+   reaches 2.8:1 under white text, so light mode uses a deeper azure. */
+:root {
+  --accent-grad: linear-gradient(135deg, var(--lavender), var(--sapphire));
+}
+
+/* Map-first overlay polish v1.4.1
+   Filters, panels, and the timeline should never compete as full windows.
+   The map remains the primary canvas; controls open as bounded drawers. */
+:root {
+  --map-first-filter-width: clamp(320px, 27vw, 420px);
+  --map-first-panel-width: clamp(380px, 28vw, 460px);
+  --map-first-header-width: min(1100px, calc(100vw - 24px));
+}
+
+/* Premium cohesion pass v1.4.3
+   Final layout layer for map-first playback, compact mobile chrome, settings
+   readability, and non-pill component geometry. */
+:root {
+  --hm-radius-xs: 4px;
+  --hm-radius-sm: 6px;
+  --hm-radius-md: 8px;
+  --hm-radius-lg: 10px;
+  --hm-radius-xl: 12px;
+}
+
+/* ==========================================================================
+   Operational atlas redesign
+   Imagegen-guided visual direction: a quieter midnight map canvas, explicit
+   primary navigation, a single secondary-actions drawer, and compact
+   information rails that read as one mapping workspace.
+   ========================================================================== */
+:root {
+  --atlas-navy: #071426;
+  --atlas-panel: rgba(8, 23, 42, 0.94);
+  --atlas-panel-strong: rgba(7, 18, 34, 0.985);
+  --atlas-edge: rgba(129, 188, 220, 0.22);
+  --atlas-cyan: #54d7e8;
+  --atlas-cyan-soft: rgba(84, 215, 232, 0.14);
+  --atlas-shadow: 0 18px 48px rgba(1, 8, 18, 0.46);
+}

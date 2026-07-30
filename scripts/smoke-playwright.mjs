@@ -1320,13 +1320,26 @@ try {
     `legacy settings were not migrated to a versioned envelope: ${JSON.stringify(migratedSettings)}`,
   );
 
-  const hasPanelKeyframes = await page.evaluate(() => [...document.styleSheets].some(sheet => {
-    try {
-      return [...sheet.cssRules].some(rule => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'slideInPanel');
-    } catch {
-      return false;
-    }
-  }));
+  const hasPanelKeyframes = await page.evaluate(() => {
+    const containsKeyframes = rules => [...rules].some(rule => {
+      if (rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'slideInPanel') return true;
+      if (rule.styleSheet) {
+        try {
+          if (containsKeyframes(rule.styleSheet.cssRules)) return true;
+        } catch {
+          // Ignore cross-origin stylesheets; application styles are same-origin.
+        }
+      }
+      return rule.cssRules ? containsKeyframes(rule.cssRules) : false;
+    });
+    return [...document.styleSheets].some(sheet => {
+      try {
+        return containsKeyframes(sheet.cssRules);
+      } catch {
+        return false;
+      }
+    });
+  });
   assert(hasPanelKeyframes, 'slideInPanel keyframes were swallowed by an invalid preceding CSS selector');
 
   const restored = await page.evaluate(() => ({

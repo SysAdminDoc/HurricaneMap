@@ -1,0 +1,86 @@
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--crust, #11111b);
+  color: var(--text, #cdd6f4);
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* `hidden` should always win over our display rules */
+[hidden] { display: none !important; }
+
+.panel-playback-host[hidden] {
+  display: none !important;
+}
+
+/* Phase 3: Print Styles for Better Rendering */
+@media print {
+  .glass {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+  }
+
+  .icon-btn,
+  .text-btn,
+  .cat-btn {
+    border: 1px solid #999;
+  }
+
+  button:disabled {
+    opacity: 1;
+    background: #f0f0f0;
+  }
+}
+
+.storm-panel[hidden],
+.stats-panel[hidden],
+.compare-panel[hidden],
+.state-panel[hidden],
+.on-this-date-panel[hidden],
+.table-view-panel[hidden],
+.spatial-results[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media print {
+  .globe3d-panel {
+    display: none !important;
+  }
+}
+
+.tropical-alert-legend[hidden] { display: none !important; }
+
+.prep-panel[hidden],
+.evac-panel[hidden] { display: none !important; }
+
+.poster-view[hidden] { display: none !important; }

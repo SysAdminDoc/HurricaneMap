@@ -1,0 +1,49 @@
+/* Header — user-tuned offset to clear the left-edge map controls */
+.app-header,
+header.app-header.glass {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.app-header.glass,
+.settings-menu.glass {
+  overflow: visible;
+}
+
+.app-header {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  max-width: min(960px, calc(100vw - 24px));
+}
+
+.app-header {
+  min-height: 72px;
+  padding: 10px 12px 10px 10px;
+  border-radius: 18px;
+}
+
+.app-header {
+  isolation: isolate;
+}
+
+.app-header {
+  width: auto !important;
+  max-width: var(--map-first-header-width) !important;
+  min-height: 0 !important;
+  border-radius: 12px !important;
+}
+
+.app-header {
+  z-index: 3000 !important;
+  background: linear-gradient(135deg, rgba(8, 25, 45, 0.97), rgba(7, 18, 34, 0.95)) !important;
+  border: 1px solid var(--atlas-edge) !important;
+  box-shadow: var(--atlas-shadow) !important;
+  backdrop-filter: blur(18px) saturate(135%) !important;
+}

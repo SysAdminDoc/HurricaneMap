@@ -1,0 +1,7 @@
+* { box-sizing: border-box; }
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface1) transparent;
+}

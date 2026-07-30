@@ -3,10 +3,13 @@ import { readFile } from 'node:fs/promises';
 
 import { computeTooltipFallback } from '../src/tooltips.js';
 
-const [html, css] = await Promise.all([
+const layerNames = ['tokens', 'reset', 'base', 'shell', 'components', 'utilities', 'themes', 'accessibility'];
+const [html, ...styleFiles] = await Promise.all([
   readFile(new URL('../index.html', import.meta.url), 'utf8'),
   readFile(new URL('../src/styles.css', import.meta.url), 'utf8'),
+  ...layerNames.map(layer => readFile(new URL(`../src/styles-${layer}.css`, import.meta.url), 'utf8')),
 ]);
+const css = styleFiles.join('\n');
 
 assert(/id="header-tooltip"[^>]+popover="hint"/.test(html), 'header tooltip must use the non-disruptive hint popover state');
 assert(css.includes('.settings-menu:not(:popover-open) { display: none; }'), 'closed settings popovers must never override the UA hidden state');

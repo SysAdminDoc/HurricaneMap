@@ -1,0 +1,465 @@
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* High-contrast mode — WCAG AAA 7:1 minimum contrast ratios */
+html.high-contrast {
+  --base:   #000000;
+  --mantle: #0a0a0a;
+  --crust:  #1a1a1a;
+  --surface0: #2d2d2d;
+  --surface1: #404040;
+  --text:    #ffffff;  /* 21:1 contrast on black */
+  --subtext: #e0e0e0;  /* 19:1 contrast */
+  --overlay: #404040;
+  --blue:    #0047b2;  /* darkened for 7:1+ on white text */
+  --lavender:#4a0080;
+  --sapphire:#00539b;
+  --brand-title-start: #ffffff;
+  --brand-title-end: #7dd3fc;
+
+  --cat-ts:  #00539b;  /* darker sapphire */
+  --cat-1:   #004d00;  /* darker green */
+  --cat-2:   #994c00;  /* darker yellow */
+  --cat-3:   #993300;  /* darker peach */
+  --cat-4:   #800020;  /* darker pink */
+  --cat-5:   #330099;  /* darker mauve */
+
+  --success: #00b300;  /* bright green */
+  --warning: #ccaa00;  /* bright yellow */
+  --error:   #ff0000;  /* bright red */
+  --info:    #0047b2;  /* bright blue */
+  --tide-observed: #00bfff;
+  --tide-predicted: #ffffff;
+  --tide-landfall: #ff5c8a;
+  --legend-swatch-border: #ffffff;
+
+  --glass-bg:   rgba(0, 0, 0, 0.95);
+  --glass-edge: rgba(255, 255, 255, 0.20);
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.8);
+
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl:  0 12px 48px rgba(0, 0, 0, 0.8);
+
+  font-size: 18px; /* +2px larger base font */
+  font-weight: 500; /* bolder text overall */
+}
+
+/* High-contrast light mode — WCAG AAA on light backgrounds */
+html.light-theme.high-contrast {
+  --base:   #ffffff;
+  --mantle: #f5f5f5;
+  --crust:  #e8e8e8;
+  --surface0: #d0d0d0;
+  --surface1: #b8b8b8;
+  --text:    #000000;  /* 21:1 contrast on white */
+  --subtext: #1a1a1a;  /* 19:1 contrast */
+  --overlay: #666666;
+  --blue:    #0047b2;  /* same darker blue */
+  --lavender:#4a0080;
+  --sapphire:#00539b;
+  --brand-title-start: #000000;
+  --brand-title-end: #0047b2;
+
+  --cat-ts:  #00539b;
+  --cat-1:   #004d00;
+  --cat-2:   #994c00;
+  --cat-3:   #993300;
+  --cat-4:   #800020;
+  --cat-5:   #330099;
+
+  --success: #004d00;
+  --warning: #994c00;
+  --error:   #800020;
+  --info:    #0047b2;
+  --tide-observed: #0047b2;
+  --tide-predicted: #1a1a1a;
+  --tide-landfall: #800020;
+  --legend-swatch-border: #000000;
+
+  --glass-bg:   rgba(255, 255, 255, 0.98);
+  --glass-edge: rgba(0, 0, 0, 0.20);
+  --shadow:     0 8px 32px rgba(0, 0, 0, 0.15);
+
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-xl:  0 12px 48px rgba(0, 0, 0, 0.2);
+}
+
+.side-panel :is(h1, h2, h3)[tabindex="-1"]:focus-visible {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.icon-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px var(--focus-ring-color);
+  border-color: rgba(180, 190, 254, 0.5);
+}
+
+input[type="number"]:focus,
+input[type="search"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--lavender);
+  background: var(--crust);
+  box-shadow: inset 0 0 0 2px rgba(180, 190, 254, 0.3), 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.cat-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px var(--focus-ring-color), var(--shadow-sm);
+}
+
+.text-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px var(--focus-ring-color), var(--shadow-sm);
+  border-color: var(--lavender);
+}
+
+.close-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.action-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.pin-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.ct-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.anim-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.anim-scrubber:focus {
+  box-shadow: 0 0 12px rgba(180, 190, 254, 0.4);
+}
+
+.anim-speed:focus {
+  border-color: var(--lavender);
+  background: rgba(180, 190, 254, 0.08);
+  outline: none;
+}
+
+.play-anim-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.2);
+}
+
+.anim-radar-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.radar-quick-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+.radar-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
+}
+
+/* Phase 2: Input Focus Enhancement */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 
+    inset 0 0 0 2px rgba(170, 183, 255, 0.5),
+    var(--focus-ring-soft);
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: 2px;
+}
+
+.filter-row:focus-within {
+  background: rgba(170, 183, 255, 0.05);
+}
+
+a:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.timeline-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  border-radius: 8px;
+}
+
+.icon-btn:focus-visible,
+.text-btn:focus-visible,
+.action-btn:focus-visible,
+.export-btn:focus-visible,
+.settings-pill:focus-visible,
+.settings-action:focus-visible,
+.cat-btn:focus-visible,
+.close-btn:focus-visible,
+.radar-btn:focus-visible,
+.anim-btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+  box-shadow: var(--focus-shadow);
+}
+
+input[type="number"]:focus,
+input[type="search"]:focus,
+select:focus {
+  background: var(--surface-raised);
+  border-color: var(--focus-color);
+}
+
+html.high-contrast {
+  --panel-bg: var(--glass-bg);
+  --panel-border: var(--glass-edge);
+  --category-ink: #ffffff;
+}
+
+.filter-row:focus-within,
+.filter-group:focus-within {
+  background: rgba(180, 190, 254, 0.055);
+}
+
+.toggle-row:hover,
+.toggle-row:focus-within {
+  background: var(--control-bg-hover);
+  border-color: rgba(180, 190, 254, 0.26);
+}
+
+html.high-contrast {
+  --surface-app: var(--base);
+  --surface-panel: var(--mantle);
+  --surface-elevated: var(--crust);
+  --surface-control: var(--crust);
+  --surface-control-hover: var(--surface0);
+  --surface-control-active: var(--surface1);
+  --border-subtle: var(--glass-edge);
+  --border-strong: rgba(255, 255, 255, 0.38);
+  --border-accent: currentColor;
+  --focus-ring-color: var(--text);
+  --focus-ring-soft: 0 0 0 4px rgba(255, 255, 255, 0.34);
+  --intensity-wind-line: var(--text);
+  --intensity-pressure-line: var(--sapphire);
+  --intensity-grid-line: var(--surface2);
+  --intensity-axis-line: var(--text);
+  --disabled-opacity: 0.72;
+}
+
+.icon-btn:hover,
+.text-btn:hover,
+.settings-pill:hover,
+.settings-action:hover,
+.action-btn:hover,
+.export-btn:hover,
+.ct-btn:hover,
+.radar-btn:hover,
+.anim-btn:hover,
+.toggle-row:hover,
+.toggle-row:focus-within,
+.state-storm-row:hover,
+.search-results li:hover,
+.cat-btn:not(.on):hover {
+  background: var(--surface-control-hover) !important;
+  border-color: var(--border-accent) !important;
+  color: var(--foreground) !important;
+}
+
+input[type="number"]:focus,
+input[type="search"]:focus,
+select:focus,
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: none !important;
+  border-color: var(--focus-ring-color) !important;
+  box-shadow: var(--focus-ring-soft) !important;
+}
+
+html.high-contrast {
+  --on-category: #ffffff;
+}
+
+.globe3d-toggle:focus-within {
+  outline: 2px solid rgba(180, 190, 254, 0.78);
+  outline-offset: 2px;
+}
+
+.globe3d-actions .text-btn:hover,
+.globe3d-actions .text-btn:focus-visible {
+  background: rgba(116, 199, 236, 0.17);
+  border-color: rgba(116, 199, 236, 0.42);
+}
+
+.globe3d-timeline input[type="range"]:focus-visible {
+  outline: 2px solid rgba(180, 190, 254, 0.78);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+html.high-contrast .globe3d-topbar {
+  background: rgba(0, 0, 0, 0.94);
+  border: 2px solid #ffffff;
+}
+
+.table-view-table th:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
+
+.table-view-table tr[data-sid]:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hurricane-glyph, .ab-pulse, .loading .spinner,
+  .storm-loading-dot, .hurricane-icon, .onb-spotlight,
+  .onb-overlay, .hm-toast { animation: none !important; }
+  .glass::before, .stat-grid .stat::before,
+  .storm-panel h2::after, .cat-btn::before,
+  .search-results li::before { display: none; }
+  body.side-panel-open .leaflet-control-container .leaflet-right,
+  body.side-panel-open .filters,
+  body.side-panel-open .timeline-ribbon,
+  body.side-panel-open .season-summary { transform: none !important; }
+}
+
+.sp-list li:focus { outline: 2px solid var(--lavender); outline-offset: -2px; }
+
+.panel-min-btn:focus-visible {
+  border-color: var(--focus-ring-color);
+  box-shadow: var(--focus-ring-soft);
+}
+
+.side-panel.minimized .panel-restore-bar:focus-visible {
+  border-color: var(--focus-ring-color);
+  box-shadow: var(--focus-ring-soft);
+}
+
+/* ==========================================================================
+   Theme correctness pass — colorblind palette wiring, climatology chart,
+   high-contrast/light contrast repairs, focus visibility, basemap fallback.
+   ========================================================================== */
+
+/* Colorblind palette (ColorBrewer YlOrRd). Previously only the JS marker
+   palette switched; the CSS --cat-* tokens driving the legend dots, category
+   buttons, pills, DAI segments, and timeline bars never changed, so enabling
+   the accessibility palette made the legend contradict the map. */
+body.palette-colorblind {
+  --cat-ts: #ffeda0;
+  --cat-1:  #fed976;
+  --cat-2:  #feb24c;
+  --cat-3:  #fd8d3c;
+  --cat-4:  #f03b20;
+  --cat-5:  #bd0026;
+}
+
+/* High contrast may be enabled at the same time as the colorblind palette.
+   The palette override arrives after the HC category tokens, so its four
+   light steps need dark ink while the two red steps retain white ink. */
+html.high-contrast body.palette-colorblind .cat-pill.cat-ts,
+html.high-contrast body.palette-colorblind .cat-pill.cat-1,
+html.high-contrast body.palette-colorblind .cat-pill.cat-2,
+html.high-contrast body.palette-colorblind .cat-pill.cat-3,
+html.high-contrast body.palette-colorblind .cat-pill.cat-4,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-ts,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-1,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-2,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-3,
+html.high-contrast body.palette-colorblind .cat-btn.on.cat-4,
+html.high-contrast body.palette-colorblind .dai-seg.cat-ts,
+html.high-contrast body.palette-colorblind .dai-seg.cat-1,
+html.high-contrast body.palette-colorblind .dai-seg.cat-2,
+html.high-contrast body.palette-colorblind .dai-seg.cat-3 {
+  color: #11111b !important;
+}
+
+html.high-contrast body.palette-colorblind {
+  --cat-ts: #ffeda0;
+  --cat-1:  #fed976;
+  --cat-2:  #feb24c;
+  --cat-3:  #fd8d3c;
+  --cat-4:  #f03b20;
+  --cat-5:  #bd0026;
+}
+
+/* Category ink. The hardcoded #11111b on pills defeated the --on-category
+   token: high-contrast darkens the category hues (cat-5 #330099 → 1.4:1 with
+   dark ink), and light theme's cat-4/#d20f39 and cat-5/#8839ef sit below
+   4.5:1 with dark ink as well. */
+.cat-pill.cat-ts,
+.cat-pill.cat-1,
+.cat-pill.cat-2,
+.cat-pill.cat-3,
+.cat-pill.cat-4,
+.cat-pill.cat-5 {
+  color: var(--on-category);
+}
+
+/* High-contrast dark never overrode --on-accent, leaving #11111b ink on the
+   darkened accent gradient (1.4-2.4:1) for pressed toggles, active settings
+   pills, and the Play button. */
+html.high-contrast {
+  --on-accent: #ffffff;
+}
+
+/* Focus visibility: the light-theme glow blended to ~1.3:1 on white, and
+   high-contrast light inherited a *white* glow on a white page. Opaque-enough
+   rings restore the WCAG 3:1 non-text minimum. */
+html.light-theme {
+  --focus-ring-color: #6d28d9;
+  --focus-ring-soft: 0 0 0 3px rgba(109, 40, 217, 0.75);
+}
+
+html.light-theme.high-contrast {
+  --focus-ring-color: #000000;
+  --focus-ring-soft: 0 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+/* High-contrast dark used --overlay (#404040) as dim TEXT (~1.9:1 on black) —
+   unchecked category buttons, section headings, search section labels. */
+html.high-contrast:not(.light-theme) {
+  --text-dim: #a6a6a6;
+  --foreground-subtle: #a6a6a6;
+}
+
+.settings-menu .toggle-row:has(input:focus-visible),
+.settings-pill:focus-visible,
+.settings-action:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-risk-path--animated { animation: none; stroke-dasharray: none; }
+}
+
+html.high-contrast #map .leaflet-tile-pane {
+  filter: none;
+}

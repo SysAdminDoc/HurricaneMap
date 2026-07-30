@@ -18,6 +18,7 @@ All notable changes to HurricaneMap.
 - Prep, evacuation, table, and nearby-storm regions now focus their heading on entry, return to a visible invoker on close, preserve focus through minimize/restore, and explicitly focus the map from the skip link.
 
 ### Changed
+- Application styles now use an explicit tokens, reset, base, shell, components, utilities, themes, and accessibility cascade with duplicate-rule validation and offline caching for every layer.
 - Toolchain reproducibility now declares Node.js 20+, pins the complete notebook/Pillow environment, audits lockfile and vendored-font licenses/hashes, and keeps the 759-landfall count synchronized across generated metadata and notebook documentation.
 - Deterministic Playwright screenshot comparisons now guard the atlas shell and Statistics panel with checked-in Windows baselines, masked live/map content, and an explicit baseline-refresh command.
 - Onboarding, saved views, the landfall table, nearby-storm counts, and Seasonal Outlook chrome now use complete English, Spanish, and Haitian Creole catalogs with locale-aware counts and browser journey coverage.
