@@ -145,6 +145,8 @@
   --blue:    #89b4fa;
   --lavender:#b4befe;
   --sapphire:#74c7ec;
+  --brand-title-start: #b4befe;
+  --brand-title-end: #74c7ec;
   --sky:     #89dcfe;
   --peach:   #fab387;
   --yellow:  #f9e2af;
@@ -207,6 +209,8 @@ html.light-theme {
   --blue:    #1e66f5;
   --lavender:#7c3aed;
   --sapphire:#04a5e5;
+  --brand-title-start: #5b21b6;
+  --brand-title-end: #075985;
   --sky:     #04a5e5;
   --peach:   #fe640b;
   --yellow:  #df8e1d;
@@ -252,6 +256,8 @@ html.high-contrast {
   --blue:    #0047b2;  /* darkened for 7:1+ on white text */
   --lavender:#4a0080;
   --sapphire:#00539b;
+  --brand-title-start: #ffffff;
+  --brand-title-end: #7dd3fc;
 
   --cat-ts:  #00539b;  /* darker sapphire */
   --cat-1:   #004d00;  /* darker green */
@@ -295,6 +301,8 @@ html.light-theme.high-contrast {
   --blue:    #0047b2;  /* same darker blue */
   --lavender:#4a0080;
   --sapphire:#00539b;
+  --brand-title-start: #000000;
+  --brand-title-end: #0047b2;
 
   --cat-ts:  #00539b;
   --cat-1:   #004d00;
@@ -371,7 +379,7 @@ header.app-header.glass {
   font-size: 20px;
   margin: 0;
   font-weight: 700;
-  background: linear-gradient(95deg, var(--lavender), var(--sapphire));
+  background: linear-gradient(95deg, var(--brand-title-start), var(--brand-title-end));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

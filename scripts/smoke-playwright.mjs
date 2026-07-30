@@ -40,6 +40,109 @@ async function assertNoAxeViolations(page, label, include = null) {
   assert(!violations.length, `${label}: axe violations: ${violations.map(v => `${v.id} (${v.impact}, ${v.nodes.length} nodes, first: ${v.nodes[0]?.target?.[0]})`).join(' | ')}`);
 }
 
+async function assertThemeContrastMatrix(page) {
+  const combinations = [];
+  for (const theme of ['dark', 'light']) {
+    for (const palette of ['default', 'colorblind']) {
+      for (const highContrast of [false, true]) combinations.push({ theme, palette, highContrast });
+    }
+  }
+
+  for (const combination of combinations) {
+    await page.evaluate(async ({ theme, palette, highContrast }) => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('theme', theme);
+      settings.setSetting('palette', palette);
+      settings.setSetting('highContrast', highContrast);
+    }, combination);
+    await page.waitForFunction(
+      ({ theme, palette, highContrast }) =>
+        document.documentElement.dataset.theme === theme &&
+        document.body.classList.contains('palette-colorblind') === (palette === 'colorblind') &&
+        document.documentElement.classList.contains('high-contrast') === highContrast,
+      combination,
+    );
+    await page.waitForTimeout(200);
+
+    const audit = await page.evaluate(() => {
+      const parseColor = value => {
+        const hex = String(value).trim().match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+        if (hex) {
+          const expanded = hex[1].length === 3
+            ? [...hex[1]].map(character => character.repeat(2)).join('')
+            : hex[1];
+          return [
+            Number.parseInt(expanded.slice(0, 2), 16),
+            Number.parseInt(expanded.slice(2, 4), 16),
+            Number.parseInt(expanded.slice(4, 6), 16),
+            1,
+          ];
+        }
+        const srgb = String(value).match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i);
+        if (srgb) {
+          return [
+            Number(srgb[1]) * 255,
+            Number(srgb[2]) * 255,
+            Number(srgb[3]) * 255,
+            srgb[4] === undefined ? 1 : Number(srgb[4]),
+          ];
+        }
+        const match = String(value).match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i);
+        if (!match) throw new Error(`Unsupported computed color: ${value}`);
+        return [Number(match[1]), Number(match[2]), Number(match[3]), match[4] === undefined ? 1 : Number(match[4])];
+      };
+      const composite = (foreground, background) => {
+        const alpha = foreground[3] + background[3] * (1 - foreground[3]);
+        return [
+          ...[0, 1, 2].map(index =>
+            (foreground[index] * foreground[3] + background[index] * background[3] * (1 - foreground[3])) / alpha),
+          alpha,
+        ];
+      };
+      const channel = value => {
+        const normalized = value / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      };
+      const luminance = color => 0.2126 * channel(color[0]) + 0.7152 * channel(color[1]) + 0.0722 * channel(color[2]);
+      const ratio = (foreground, background) => {
+        const light = Math.max(luminance(foreground), luminance(background));
+        const dark = Math.min(luminance(foreground), luminance(background));
+        return (light + 0.05) / (dark + 0.05);
+      };
+      const rootStyle = getComputedStyle(document.documentElement);
+      const base = parseColor(rootStyle.getPropertyValue('--base'));
+      const header = document.querySelector('.app-header');
+      const headerBackground = composite(parseColor(getComputedStyle(header).backgroundColor), base);
+      const titleStart = parseColor(rootStyle.getPropertyValue('--brand-title-start'));
+      const titleEnd = parseColor(rootStyle.getPropertyValue('--brand-title-end'));
+      const controls = [...header.querySelectorAll('button')].filter(element => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+      }).map(element => ({
+        id: element.id || element.className,
+        color: getComputedStyle(element).color,
+        ratio: ratio(composite(parseColor(getComputedStyle(element).color), headerBackground), headerBackground),
+      }));
+      return {
+        title: [ratio(titleStart, headerBackground), ratio(titleEnd, headerBackground)],
+        controls,
+      };
+    });
+    const label = `${combination.theme}/${combination.palette}/${combination.highContrast ? 'high-contrast' : 'standard'}`;
+    assert(Math.min(...audit.title) >= 4.5, `${label}: title contrast ${audit.title.map(value => value.toFixed(2)).join(', ')} is below 4.5:1`);
+    const failedControls = audit.controls.filter(control => control.ratio < 4.5);
+    assert(!failedControls.length, `${label}: header control contrast below 4.5:1: ${failedControls.map(control => `${control.id} ${control.ratio.toFixed(2)} (${control.color})`).join(', ')}`);
+  }
+
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('theme', 'dark');
+    settings.setSetting('palette', 'default');
+    settings.setSetting('highContrast', false);
+  });
+}
+
 const mime = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
@@ -732,6 +835,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
+    await assertThemeContrastMatrix(page);
     await captureVisualSnapshot(page, `${name}-dark`);
 
     await page.click('#toggle-filters');
