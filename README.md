@@ -263,7 +263,7 @@ Live satellite backdrop: [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md) docume
 
 Runtime mapping code is deliberately pinned: Leaflet 1.9.4 is vendored locally for offline use, while Cesium 1.143 is loaded only for the optional globe with exact script and stylesheet integrity hashes. Updating either requires checking its upstream license/release, changing the complete pinned asset pair, and passing the desktop/mobile map and globe smokes.
 
-Build and test dependencies use maintained npm release lines: esbuild 0.28.1 (MIT), Playwright and Playwright Test 1.62.0 (Apache-2.0), and axe-core Playwright 4.12.1 (MPL-2.0). Before merging an update, run `npm outdated`, `npm audit --audit-level=high`, and `npm test`; the latter includes the bundle budget, browser accessibility/layout checks, checked-in shell and Statistics screenshot comparisons, offline service-worker check, and Cesium globe smoke. Playwright 1.62+ requires Node.js 20 or newer. Review visual changes before explicitly refreshing the Windows baselines with `npm run test:visual:update`; ordinary `npm run test:visual` runs comparison-only.
+Build and test dependencies use maintained npm release lines: esbuild 0.28.1 (MIT), Playwright and Playwright Test 1.62.0 (Apache-2.0), and axe-core Playwright 4.12.1 (MPL-2.0). Before merging an update, run `npm outdated`, `npm audit --audit-level=high`, and `npm test`; the latter includes a lockfile/vendor license audit, bundle budget, browser accessibility/layout checks, checked-in shell and Statistics screenshot comparisons, offline service-worker check, and Cesium globe smoke. Playwright 1.62+ requires Node.js 20 or newer, enforced by `package.json`. Review visual changes before explicitly refreshing the Windows baselines with `npm run test:visual:update`; ordinary `npm run test:visual` runs comparison-only. Vendored library and font notices, versions, sources, and font hashes are recorded in [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt).
 
 ## Data Export & Research
 
@@ -283,6 +283,16 @@ Perfect for:
 - Spreadsheet analysis (Excel, Google Sheets)
 
 See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
+
+### Notebook analysis
+
+The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, Pillow, and Jupyter Notebook environment. From the repository root, install everything with one command:
+
+```bash
+python -m pip install -r requirements-notebooks.txt
+```
+
+Then run `python -m notebook notebooks/analysis-starter.ipynb`. Pillow is included because the repository's radar-transparency, placeholder-branding, and radar preprocessing tools import `PIL`; keeping it in the same pinned environment avoids a separate undocumented setup path.
 
 ## Project layout
 
@@ -476,8 +486,9 @@ The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stat
 
 ## License & Attribution
 
-**Software:** MIT — see [LICENSE](LICENSE)  
-**Data Sources:** See [LICENSE.md](LICENSE.md) for detailed attribution
+- **Software:** MIT — see [LICENSE](LICENSE)
+- **Data Sources:** See [LICENSE.md](LICENSE.md) for detailed attribution
+- **Vendored code and fonts:** See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt)
 
 This project aggregates data from multiple sources:
 - **HURDAT2 Best-Track Database** — NOAA National Hurricane Center (public domain)

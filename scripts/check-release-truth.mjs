@@ -24,6 +24,8 @@ const [
   license,
   claude,
   preprocessor,
+  landfallsText,
+  notebooksReadme,
 ] = await Promise.all([
   read('package.json'),
   read('data/metadata.json'),
@@ -35,13 +37,17 @@ const [
   readOptional('LICENSE.md'),
   readOptional('CLAUDE.md'),
   read('scripts/preprocess_hurdat2.py'),
+  read('data/landfalls.json'),
+  read('notebooks/README.md'),
 ]);
 
 const packageJson = JSON.parse(packageText);
 const metadata = JSON.parse(metadataText);
 const impacts = JSON.parse(impactsText);
+const landfalls = JSON.parse(landfallsText);
 const version = packageJson.version;
 const impactCount = Object.keys(impacts).filter(key => key !== '_meta').length;
+const landfallCount = landfalls.length;
 const errors = [];
 
 if (metadata.generator?.app_version !== version) {
@@ -69,6 +75,9 @@ for (const legacyDb of CACHE_CONTRACT.legacyOfflineDbs) {
 if (metadata.coverage?.impact_row_count !== impactCount) {
   errors.push(`metadata impact_row_count ${metadata.coverage?.impact_row_count} does not match ${impactCount} impact rows`);
 }
+if (metadata.coverage?.landfall_event_count !== landfallCount) {
+  errors.push(`metadata landfall_event_count ${metadata.coverage?.landfall_event_count} does not match ${landfallCount} records`);
+}
 if (!serviceWorker.includes(`const SW_VERSION = 'hm-v${version}'`)) {
   errors.push(`service worker does not declare hm-v${version}`);
 }
@@ -80,6 +89,12 @@ if (!readme.includes(`What's new in v${version}`)) {
 }
 if (!readme.includes(`(${impactCount} storms covered so far;`)) {
   errors.push(`README impact coverage does not declare ${impactCount} storms`);
+}
+if (!readme.includes(`${landfallCount} landfall events`)) {
+  errors.push(`README landfall coverage does not declare ${landfallCount} events`);
+}
+if (!notebooksReadme.includes(`${landfallCount} landfall events`)) {
+  errors.push(`notebooks/README.md landfall coverage does not declare ${landfallCount} events`);
 }
 if (!/<a\s+href="#map"\s+class="skip-to-content"/i.test(indexHtml)) {
   errors.push('index.html does not expose the skip-to-map link');
@@ -102,4 +117,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`release truth ok (v${version}, ${impactCount} impact rows, skip link documented)`);
+console.log(`release truth ok (v${version}, ${landfallCount} landfalls, ${impactCount} impact rows, skip link documented)`);

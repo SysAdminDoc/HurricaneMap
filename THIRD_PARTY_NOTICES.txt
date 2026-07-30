@@ -1,0 +1,43 @@
+HurricaneMap third-party notices
+================================
+
+Vendored browser libraries
+--------------------------
+
+Leaflet 1.9.4
+Copyright (c) 2010-2023, Vladimir Agafonkin
+License: BSD-2-Clause
+Source: https://github.com/Leaflet/Leaflet/tree/v1.9.4
+
+Leaflet.heat 0.2.0
+Copyright (c) 2014, Vladimir Agafonkin
+License: MIT
+Source: https://github.com/Leaflet/Leaflet.heat
+
+Vendored fonts
+--------------
+
+Inter 4.001 (fonts/inter-latin.woff2)
+Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
+License: SIL Open Font License 1.1
+Source: https://github.com/rsms/inter
+SHA-256: 3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62
+
+JetBrains Mono 2.211 (fonts/jetbrains-mono-latin.woff2)
+Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+License: SIL Open Font License 1.1
+Source: https://github.com/JetBrains/JetBrainsMono
+SHA-256: 83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be
+
+Build and test tooling
+----------------------
+
+The complete npm dependency graph and resolved versions are recorded in
+package-lock.json. Direct tooling licenses are:
+
+- @axe-core/playwright 4.12.1: MPL-2.0
+- @playwright/test 1.62.0: Apache-2.0
+- playwright 1.62.0: Apache-2.0
+- esbuild 0.28.1: MIT
+
+These tools are not shipped in the static application bundle.

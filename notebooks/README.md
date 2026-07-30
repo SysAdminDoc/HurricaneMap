@@ -22,8 +22,8 @@ A comprehensive introduction to analyzing U.S. hurricane landfalls with Python +
 **Run locally:**
 ```bash
 cd HurricaneMap
-pip install pandas numpy matplotlib jupyter
-jupyter notebook notebooks/analysis-starter.ipynb
+python -m pip install -r requirements-notebooks.txt
+python -m notebook notebooks/analysis-starter.ipynb
 ```
 
 **What you'll learn:**
@@ -35,7 +35,7 @@ jupyter notebook notebooks/analysis-starter.ipynb
 ## Data Files
 
 The notebooks expect HurricaneMap's data files in the `data/` directory:
-- `data/landfalls.json` — 760 landfall events (flat list)
+- `data/landfalls.json` — 759 landfall events (flat list)
 - `data/storms.json` — Full track + metadata for every storm
 - `data/impacts.json` — Deaths and damage figures (partial coverage)
 
