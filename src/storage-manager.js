@@ -46,6 +46,26 @@ async function readStorageEstimate(storageApi) {
   }
 }
 
+async function inspectCache(cachesApi, cacheName) {
+  if (!cachesApi || !cacheName) return { entries: 0, sizeBytes: 0 };
+  try {
+    const cache = await cachesApi.open(cacheName);
+    const requests = await cache.keys();
+    let sizeBytes = 0;
+    for (const request of requests) {
+      const response = await cache.match(request);
+      if (!response) continue;
+      const declared = Number(response.headers?.get?.('content-length'));
+      sizeBytes += Number.isFinite(declared) && declared >= 0
+        ? declared
+        : await response.clone().blob().then(blob => blob.size).catch(() => 0);
+    }
+    return { entries: requests.length, sizeBytes };
+  } catch {
+    return { entries: 0, sizeBytes: null };
+  }
+}
+
 export function selectBoundedRadarFrames(frames, limit = MAX_RADAR_PACK_FRAMES) {
   const unique = [...new Map(
     (Array.isArray(frames) ? frames : [])
@@ -98,13 +118,11 @@ export async function inspectStorage({
     const cacheName = definition.prefix
       ? cacheNames.find(name => name.startsWith(definition.prefix)) || null
       : definition.cacheName;
-    let entries = 0;
+    let cacheSnapshot = { entries: 0, sizeBytes: 0 };
     if (cacheName && cacheNames.includes(cacheName)) {
-      try {
-        entries = (await (await cachesApi.open(cacheName)).keys()).length;
-      } catch { /* CacheStorage can be unavailable in private modes. */ }
+      cacheSnapshot = await inspectCache(cachesApi, cacheName);
     }
-    scopes.push({ ...definition, cacheName, entries });
+    scopes.push({ ...definition, cacheName, ...cacheSnapshot });
   }
   return {
     ...estimate,
@@ -213,7 +231,7 @@ export async function renderStorageManager(host) {
     <div class="storage-scopes" role="list">
       ${snapshot.scopes.map(scope => `
         <div class="storage-scope" role="listitem">
-          <span><strong>${escapeHtml(scopeLabel(scope))}</strong><small>${escapeHtml(t(scope.required ? 'storage.required' : 'storage.optional'))} · ${scope.entries} ${escapeHtml(t('storage.entries'))}</small></span>
+          <span><strong>${escapeHtml(scopeLabel(scope))}</strong><small>${escapeHtml(t(scope.required ? 'storage.required' : 'storage.optional'))} · ${scope.entries} ${escapeHtml(t('storage.entries'))} · ${escapeHtml(formatStorageBytes(scope.sizeBytes))}</small></span>
           ${scope.required ? '' : `<button class="settings-action storage-clear" type="button" data-clear-storage="${escapeHtml(scope.id)}">${escapeHtml(t('storage.clear'))}</button>`}
         </div>`).join('')}
     </div>

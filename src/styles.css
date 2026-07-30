@@ -3660,6 +3660,58 @@ select:focus {
   white-space: nowrap;
 }
 
+.offline-diagnostics {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.diagnostics-summary,
+.diagnostics-caches {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.diagnostics-summary span,
+.diagnostics-caches span {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.diagnostics-summary strong,
+.diagnostics-caches strong,
+.diagnostics-feeds strong {
+  color: var(--text);
+}
+
+.diagnostics-caches small,
+.diagnostics-feeds span {
+  color: var(--subtext);
+  font-size: 0.68rem;
+}
+
+.diagnostics-feeds {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.diagnostics-error {
+  margin: 0;
+  color: var(--danger-ink);
+  font-size: 0.72rem;
+}
+
+.diagnostics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.diagnostics-actions .settings-action {
+  width: auto;
+}
+
 .radar-save {
   width: auto;
   padding-inline: 0.55rem;

@@ -23,6 +23,7 @@ import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
 import { initStorageManager } from './storage-manager.js';
+import { initOfflineDiagnostics } from './diagnostics.js';
 import { activateDialogFocus } from './dialog-focus.js';
 import { initSearchController } from './search-controller.js';
 import { createFilterController } from './filter-controller.js';
@@ -344,6 +345,7 @@ async function boot() {
   wireSettingsControls();
   initOptionalFeedDiagnostics();
   initStorageManager();
+  initOfflineDiagnostics();
   initSavedViewsUI({
     host: document.getElementById('saved-views-manager'),
     getCurrentHash: () => encodeHashState(filters, {

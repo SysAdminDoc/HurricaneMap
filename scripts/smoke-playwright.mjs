@@ -554,6 +554,7 @@ async function assertSettingsSurface(page, label) {
   });
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
   await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 4, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', { timeout: 10000 });
   const layout = await page.evaluate(() => {
     const menu = document.querySelector('#settings-menu');
     const rect = menu?.getBoundingClientRect();
@@ -577,6 +578,8 @@ async function assertSettingsSurface(page, label) {
       helperCount: document.querySelectorAll('#settings-menu .settings-help, #settings-menu .settings-toggle-copy small').length,
       storageScopes: document.querySelectorAll('#storage-manager .storage-scope').length,
       storageClearActions: document.querySelectorAll('#storage-manager [data-clear-storage]').length,
+      diagnosticScopes: document.querySelectorAll('#offline-diagnostics .diagnostics-caches [role="listitem"]').length,
+      diagnosticActions: document.querySelectorAll('#offline-diagnostics [data-diagnostics-retry], #offline-diagnostics [data-diagnostics-refresh], #offline-diagnostics [data-diagnostics-export]').length,
       radioGroups: [...document.querySelectorAll('#settings-menu [role="radiogroup"]')].map(group => ({
         checked: group.querySelectorAll('[role="radio"][aria-checked="true"]').length,
         tabbable: [...group.querySelectorAll('[role="radio"]')].filter(radio => radio.tabIndex === 0).length,
@@ -593,6 +596,7 @@ async function assertSettingsSurface(page, label) {
   assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
   assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
   assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
+  assert(layout.diagnosticScopes === 4 && layout.diagnosticActions === 3, `${label}: offline diagnostics are incomplete`);
   assert(layout.storageScopes === 4, `${label}: expected four storage scopes`);
   assert(layout.storageClearActions === 2, `${label}: only tile and radar scopes should be clearable`);
   assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
@@ -754,6 +758,35 @@ async function assertDesktopPanelSystem(page, label) {
       outlookLayout.rows.every(row => row.width >= 240 && row.scrollWidth <= row.width + 2),
     `${label}: Seasonal Outlook rows overlap or clip (${JSON.stringify(outlookLayout.rows)})`,
   );
+}
+
+async function assertSupportBundleExport(page) {
+  await page.evaluate(() => {
+    localStorage.setItem('hm-saved-views-v1', JSON.stringify({ views: [{ name: 'PRIVATE VIEW' }] }));
+    localStorage.setItem('hm-search-history-v1', JSON.stringify({ values: ['PRIVATE SEARCH'] }));
+    localStorage.setItem('hm-prep-v1', JSON.stringify({ answers: ['PRIVATE ANSWER'] }));
+    localStorage.setItem('hm-user-point-v2', JSON.stringify({ lat: 25.7617, lon: -80.1918 }));
+    document.querySelector('#settings-menu')?.showPopover();
+  });
+  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', { timeout: 10000 });
+  const downloadPromise = page.waitForEvent('download');
+  await page.click('[data-diagnostics-export]');
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  const body = Buffer.concat(chunks).toString('utf8');
+  const bundle = JSON.parse(body);
+  assert(bundle.schema_version === 1 && bundle.app?.version === expectedGeneratorVersion, 'support bundle is missing app/schema versions');
+  assert(bundle.storage?.scopes?.length === 4, 'support bundle is missing cache scope versions and sizes');
+  assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');
+  assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');
+  await page.evaluate(() => {
+    for (const key of ['hm-saved-views-v1', 'hm-search-history-v1', 'hm-prep-v1', 'hm-user-point-v2']) {
+      localStorage.removeItem(key);
+    }
+    document.querySelector('#settings-menu')?.hidePopover();
+  });
 }
 
 async function assertPremiumChrome(page, label) {
@@ -1333,6 +1366,7 @@ try {
   const reloadClicked = await page.evaluate(() => window.__swUpdateReload);
   assert(reloadClicked === true, 'service-worker update prompt reload action did not fire.');
   await page.evaluate(() => window.__swUpdatePrompt.hide());
+  await assertSupportBundleExport(page);
 
   const errorSurfaceInstalled = await page.evaluate(() => window.__hmErrorSurface === true);
   assert(errorSurfaceInstalled, 'global error surface was not installed at boot.');

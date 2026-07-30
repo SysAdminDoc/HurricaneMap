@@ -5,6 +5,7 @@ import {
   cacheRadarPack,
   clearOptionalStorageScope,
   formatStorageBytes,
+  inspectStorage,
   isQuotaExceededError,
   selectBoundedRadarFrames,
   summarizeStorageEstimate,
@@ -15,6 +16,23 @@ assert.equal(formatStorageBytes(1536), '1.5 KB');
 assert.equal(formatStorageBytes(25 * 1024 * 1024), '25 MB');
 assert.deepEqual(summarizeStorageEstimate({ usage: 25, quota: 100 }), { usage: 25, quota: 100, percent: 25 });
 assert.equal(isQuotaExceededError({ name: 'QuotaExceededError' }), true);
+
+const inspected = await inspectStorage({
+  storageApi: {
+    estimate: async () => ({ usage: 10, quota: 100 }),
+    persisted: async () => true,
+  },
+  cachesApi: {
+    keys: async () => ['hm-shell-hm-v1.7.0'],
+    open: async () => ({
+      keys: async () => [new Request('https://example.test/index.html')],
+      match: async () => new Response('12345', { headers: { 'content-length': '5' } }),
+    }),
+  },
+  packStorage: null,
+});
+assert.equal(inspected.persisted, true);
+assert.equal(inspected.scopes.find(scope => scope.id === 'shell').sizeBytes, 5);
 
 const manyFrames = Array.from({ length: 300 }, (_, index) => ({
   url: `data/radar/Test/frame-${String(index).padStart(3, '0')}.png`,

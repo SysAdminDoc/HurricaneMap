@@ -4,6 +4,9 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Added
+- Settings now exposes actionable offline diagnostics for service-worker control, cache versions and sizes, persistence/quota, and optional-feed freshness, with scoped retry/refresh controls and a privacy-allowlisted JSON support bundle.
+
 ### Fixed
 - The desktop Seasonal Outlook card now gives its current-season summary a full-width row, with browser geometry coverage preventing crushed, clipped, or overlapping forecast content.
 - Active-storm Leaflet popups now use DOM nodes, HTTPS/NHC host allowlists, poisoned-data browser coverage, and a CI guard that rejects string or unverified-variable popup content.

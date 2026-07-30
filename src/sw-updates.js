@@ -2,6 +2,70 @@ import { t } from './i18n.js';
 
 const UPDATE_PROMPT_ID = 'hm-update-prompt';
 const TOAST_HOST_ID = 'hm-toast-host';
+let lastRegistrationOptions = null;
+let serviceWorkerDiagnostics = Object.freeze({
+  supported: false,
+  registration: 'not-checked',
+  controller: 'uncontrolled',
+  scope: null,
+  scriptUrl: null,
+  lastError: null,
+});
+
+function publishDiagnostics(patch, documentRef = globalThis.document) {
+  serviceWorkerDiagnostics = Object.freeze({ ...serviceWorkerDiagnostics, ...patch });
+  const CustomEventCtor = documentRef?.defaultView?.CustomEvent ?? globalThis.CustomEvent;
+  if (documentRef?.dispatchEvent && typeof CustomEventCtor === 'function') {
+    documentRef.dispatchEvent(new CustomEventCtor('hm-service-worker:change', {
+      detail: serviceWorkerDiagnostics,
+    }));
+  }
+  return serviceWorkerDiagnostics;
+}
+
+export function getServiceWorkerDiagnostics() {
+  return { ...serviceWorkerDiagnostics };
+}
+
+export async function retryServiceWorkerRegistration(options = lastRegistrationOptions || {}) {
+  const {
+    navigatorRef = globalThis.navigator,
+    documentRef = globalThis.document,
+    locationRef = globalThis.location,
+    swPath = './sw.js',
+  } = options;
+  const supported = canRegisterServiceWorker({ navigatorRef, locationRef });
+  publishDiagnostics({
+    supported,
+    registration: supported ? 'registering' : 'unsupported',
+    controller: navigatorRef?.serviceWorker?.controller ? 'controlled' : 'uncontrolled',
+    lastError: null,
+  }, documentRef);
+  if (!supported) return null;
+  try {
+    const registration = await navigatorRef.serviceWorker.register(swPath);
+    publishDiagnostics({
+      supported: true,
+      registration: 'registered',
+      controller: navigatorRef.serviceWorker.controller ? 'controlled' : 'uncontrolled',
+      scope: registration.scope || null,
+      scriptUrl: registration.active?.scriptURL || registration.waiting?.scriptURL || null,
+      lastError: null,
+    }, documentRef);
+    return registration;
+  } catch (error) {
+    publishDiagnostics({
+      supported: true,
+      registration: 'error',
+      controller: navigatorRef?.serviceWorker?.controller ? 'controlled' : 'uncontrolled',
+      lastError: {
+        name: String(error?.name || 'Error').slice(0, 80),
+        message: String(error?.message || 'Service worker registration failed').slice(0, 240),
+      },
+    }, documentRef);
+    return null;
+  }
+}
 
 export function canRegisterServiceWorker({
   navigatorRef = globalThis.navigator,
@@ -75,7 +139,13 @@ export function initServiceWorkerUpdates({
   locationRef = globalThis.location,
   swPath = './sw.js',
 } = {}) {
+  lastRegistrationOptions = { windowRef, navigatorRef, documentRef, locationRef, swPath };
   if (!canRegisterServiceWorker({ navigatorRef, locationRef }) || !windowRef || !documentRef) {
+    publishDiagnostics({
+      supported: false,
+      registration: 'unsupported',
+      controller: 'uncontrolled',
+    }, documentRef);
     return;
   }
 
@@ -96,14 +166,16 @@ export function initServiceWorkerUpdates({
   });
 
   serviceWorker.addEventListener?.('controllerchange', () => {
+    publishDiagnostics({ controller: serviceWorker.controller ? 'controlled' : 'uncontrolled' }, documentRef);
     if (reloadRequested && typeof locationRef.reload === 'function') {
       locationRef.reload();
     }
   });
 
   windowRef.addEventListener('load', () => {
-    serviceWorker.register(swPath)
+    retryServiceWorkerRegistration({ navigatorRef, documentRef, locationRef, swPath })
       .then((registration) => {
+        if (!registration) return;
         if (registration.waiting && serviceWorker.controller) {
           waitingWorker = registration.waiting;
           prompt?.show();
@@ -118,8 +190,7 @@ export function initServiceWorkerUpdates({
             prompt?.show();
           });
         });
-      })
-      .catch(() => { /* service-worker registration is non-fatal */ });
+      });
   });
 }
 
