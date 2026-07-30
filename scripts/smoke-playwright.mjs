@@ -892,6 +892,82 @@ async function assertActivePopupDomSafety(page) {
   );
 }
 
+async function assertLocationPrivacyFlow(page) {
+  await page.evaluate(async () => {
+    const spatial = await import('/src/spatial-search.js');
+    if (!spatial.isSpatialActive()) spatial.toggleSpatialMode();
+  });
+  await page.waitForSelector('#spatial-results:not([hidden]) .sp-location-privacy');
+  const initial = await page.evaluate(() => ({
+    disclosure: document.querySelector('.sp-location-privacy p')?.textContent || '',
+    rememberChecked: document.querySelector('.sp-remember-location')?.checked,
+    legacy: localStorage.getItem('hm-user-point-v1'),
+    persisted: localStorage.getItem('hm-user-point-v2'),
+    session: sessionStorage.getItem('hm-user-point-session-v2'),
+  }));
+  assert(/tab session/i.test(initial.disclosure), `location retention disclosure is missing: ${JSON.stringify(initial)}`);
+  assert(initial.rememberChecked === false, 'location persistence was opted in by default');
+  assert(initial.legacy === null && initial.persisted === null && initial.session === null, `location storage was not initially empty: ${JSON.stringify(initial)}`);
+  await captureVisualSnapshot(page, 'desktop-location-privacy');
+
+  await page.click('.sp-locate-btn');
+  await page.waitForFunction(() => sessionStorage.getItem('hm-user-point-session-v2') && document.querySelector('.sp-count'));
+  const sessionState = await page.evaluate(() => ({
+    session: JSON.parse(sessionStorage.getItem('hm-user-point-session-v2')),
+    persisted: localStorage.getItem('hm-user-point-v2'),
+    status: document.querySelector('.sp-location-status')?.textContent || '',
+  }));
+  assert(sessionState.session?.schema_version === 2 && sessionState.persisted === null, `default location did not remain session-only: ${JSON.stringify(sessionState)}`);
+  assert(/tab session/i.test(sessionState.status), `session retention status is missing: ${JSON.stringify(sessionState)}`);
+
+  await page.check('.sp-remember-location');
+  await page.click('.sp-locate-btn');
+  await page.waitForFunction(() => localStorage.getItem('hm-user-point-v2') && !sessionStorage.getItem('hm-user-point-session-v2'));
+  const remembered = await page.evaluate(() => JSON.parse(localStorage.getItem('hm-user-point-v2')));
+  assert(
+    remembered?.schema_version === 2 && remembered.expires_at > Date.now() && remembered.expires_at <= Date.now() + 24 * 60 * 60 * 1000 + 5000,
+    `remembered location lacks a bounded expiry: ${JSON.stringify(remembered)}`,
+  );
+
+  await page.click('.sp-clear-location');
+  const cleared = await page.evaluate(() => ({
+    persisted: localStorage.getItem('hm-user-point-v2'),
+    session: sessionStorage.getItem('hm-user-point-session-v2'),
+    status: document.querySelector('.sp-location-status')?.textContent || '',
+  }));
+  assert(cleared.persisted === null && cleared.session === null && /cleared/i.test(cleared.status), `location clear control failed: ${JSON.stringify(cleared)}`);
+
+  const errors = [
+    [1, /permission was denied/i],
+    [3, /timed out/i],
+    [2, /could not provide a location/i],
+  ];
+  for (const [code, pattern] of errors) {
+    await page.evaluate((errorCode) => {
+      Object.defineProperty(navigator.geolocation, 'getCurrentPosition', {
+        configurable: true,
+        value: (_success, error) => error({ code: errorCode }),
+      });
+    }, code);
+    await page.click('.sp-locate-btn');
+    await page.waitForFunction(expectedCode => {
+      const text = document.querySelector('.sp-location-status')?.textContent || '';
+      return expectedCode === 1
+        ? /permission was denied/i.test(text)
+        : expectedCode === 3
+          ? /timed out/i.test(text)
+          : /could not provide a location/i.test(text);
+    }, code);
+    const text = await page.textContent('.sp-location-status');
+    assert(pattern.test(text || ''), `geolocation error ${code} was not distinct: ${text}`);
+  }
+
+  await page.evaluate(async () => {
+    const spatial = await import('/src/spatial-search.js');
+    if (spatial.isSpatialActive()) spatial.toggleSpatialMode();
+  });
+}
+
 try {
   const launchOptions = { headless: true };
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
@@ -901,6 +977,8 @@ try {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
     serviceWorkers: 'block',
+    permissions: ['geolocation'],
+    geolocation: { latitude: 25.7617, longitude: -80.1918 },
   });
   await context.addInitScript(() => {
     localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
@@ -912,6 +990,7 @@ try {
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
   await assertActivePopupDomSafety(page);
+  await assertLocationPrivacyFlow(page);
 
   const migratedSettings = await page.evaluate(
     () => JSON.parse(localStorage.getItem('hm-settings-v1') || 'null'),
@@ -1616,7 +1695,7 @@ try {
 
   await browser.close();
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, keyboard/focus contracts ok, 20 visual snapshots, panel layout/playback matrix ok)`);
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, keyboard/focus contracts ok, 21 visual snapshots, panel layout/playback matrix ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

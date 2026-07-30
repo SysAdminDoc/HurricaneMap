@@ -21,6 +21,7 @@ import {
 import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
 import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
 import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
+import { loadUserPoint } from './user-point.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
 import { t } from './i18n.js';
@@ -289,11 +290,10 @@ function ensureBadge(count, {
     `;
 }
 
-/** " · 512 mi NE of you" when the user has geolocated in spatial search
- *  (shared hm-user-point-v1 key — written only by "Use my location"). */
+/** " · 512 mi NE of you" for a disclosed session or expiring remembered point. */
 function distanceFromUser([stormLat, stormLon]) {
   try {
-    const point = JSON.parse(localStorage.getItem('hm-user-point-v1') || 'null');
+    const point = loadUserPoint();
     if (!Number.isFinite(point?.lat) || !Number.isFinite(point?.lon)) return '';
     const km = 6371 * 2 * Math.asin(Math.sqrt(
       Math.sin((stormLat - point.lat) * Math.PI / 360) ** 2 +

@@ -5,26 +5,10 @@ import { escapeHtml, formatStormName } from './html-utils.js';
 import { showPanel, hidePanel } from './panels.js';
 import { t } from './i18n.js';
 import { renderWindContextForPoint } from './wind-context.js';
-
-// Geolocated "my location" points persist so active-storm tooltips can show
-// live distance/bearing; right-click search points stay session-only.
-const USER_POINT_KEY = 'hm-user-point-v1';
+import { clearUserPoint, loadUserPoint, saveUserPoint } from './user-point.js';
 
 export function getSavedUserPoint() {
-  try {
-    const raw = localStorage.getItem(USER_POINT_KEY);
-    if (!raw) return null;
-    const point = JSON.parse(raw);
-    return Number.isFinite(point?.lat) && Number.isFinite(point?.lon) ? point : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveUserPoint(lat, lon) {
-  try {
-    localStorage.setItem(USER_POINT_KEY, JSON.stringify({ lat, lon }));
-  } catch { /* private mode — session-only */ }
+  return loadUserPoint();
 }
 
 const L = window.L;
@@ -147,29 +131,65 @@ function ensurePanel() {
 
 function wireLocateButton(spBody) {
   spBody.querySelector('.sp-locate-btn')?.addEventListener('click', event => {
+    const status = spBody.querySelector('.sp-location-status');
     if (!navigator.geolocation) {
-      event.target.textContent = t('spatial.denied');
+      status.textContent = t('spatial.errorUnavailable');
       event.target.disabled = true;
       return;
     }
     event.target.disabled = true;
     event.target.textContent = t('spatial.locating');
+    status.textContent = '';
     navigator.geolocation.getCurrentPosition(
       position => {
         if (!active) return;
         const { latitude, longitude } = position.coords;
-        saveUserPoint(latitude, longitude);
+        const remember = !!spBody.querySelector('.sp-remember-location')?.checked;
+        saveUserPoint(latitude, longitude, { remember });
         getMap().setView([latitude, longitude], Math.max(getMap().getZoom(), 6));
         performSearch(latitude, longitude);
       },
-      () => {
+      error => {
         if (!active) return;
         event.target.disabled = false;
-        event.target.textContent = t('spatial.denied');
+        event.target.textContent = `📍 ${t('spatial.useMyLocation')}`;
+        const key = error?.code === 1
+          ? 'spatial.errorPermission'
+          : error?.code === 3
+            ? 'spatial.errorTimeout'
+            : 'spatial.errorUnavailable';
+        status.textContent = t(key);
       },
       { maximumAge: 300_000, timeout: 15_000 },
     );
   });
+  spBody.querySelector('.sp-clear-location')?.addEventListener('click', event => {
+    clearUserPoint();
+    const remember = spBody.querySelector('.sp-remember-location');
+    if (remember) remember.checked = false;
+    event.currentTarget.disabled = true;
+    spBody.querySelector('.sp-location-status').textContent = t('spatial.locationCleared');
+  });
+}
+
+function locationPrivacyControls() {
+  const point = getSavedUserPoint();
+  const remembered = point?.retention === 'device';
+  const status = point
+    ? t(remembered ? 'spatial.locationDevice' : 'spatial.locationSession')
+    : '';
+  return `
+    <div class="sp-location-privacy">
+      <p>${escapeHtml(t('spatial.locationPrivacy'))}</p>
+      <label>
+        <input class="sp-remember-location" type="checkbox"${remembered ? ' checked' : ''}>
+        <span><strong>${escapeHtml(t('spatial.rememberLocation'))}</strong><small>${escapeHtml(t('spatial.rememberHelp'))}</small></span>
+      </label>
+      <div class="sp-location-actions">
+        <button class="text-btn sp-clear-location" type="button"${point ? '' : ' disabled'}>${escapeHtml(t('spatial.clearLocation'))}</button>
+        <span class="sp-location-status" role="status" aria-live="polite">${escapeHtml(status)}</span>
+      </div>
+    </div>`;
 }
 
 /** Empty-state prompt shown when spatial mode is armed but nothing searched. */
@@ -183,6 +203,7 @@ function renderPrompt() {
     </div>
     <p class="sp-hint">${t('spatial.hint')}</p>
     <button class="text-btn sp-locate-btn" type="button">📍 ${t('spatial.useMyLocation')}</button>
+    ${locationPrivacyControls()}
   `;
   spBody.querySelector('.close-btn').addEventListener('click', () => {
     clearSearch();
@@ -207,6 +228,7 @@ function renderResults(results, lat, lon) {
       <button class="close-btn" aria-label="Close spatial search">×</button>
     </div>
     <div class="sp-controls">${radiusBtns}<button class="text-btn sp-locate-btn" type="button">📍 ${t('spatial.useMyLocation')}</button></div>
+    ${locationPrivacyControls()}
     <div class="sp-count">${results.length} storm${results.length === 1 ? '' : 's'} within ${currentRadius.label}</div>
     <ul class="sp-list">
       ${results.map(r => `

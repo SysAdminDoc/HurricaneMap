@@ -28,8 +28,10 @@ import { initSearchController } from './search-controller.js';
 import { createFilterController } from './filter-controller.js';
 import { wireShellNavigation } from './shell-navigation.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
+import { purgeLegacyUserPoint } from './user-point.js';
 
 initGlobalErrorSurface();
+purgeLegacyUserPoint();
 
 let YEAR_MIN_DEFAULT = YEAR_FALLBACK_MIN;
 let YEAR_MAX_DEFAULT = YEAR_FALLBACK_MAX;

@@ -7185,6 +7185,33 @@ html.high-contrast .globe3d-topbar {
 }
 .sp-radius-btn.active { background: var(--lavender); color: #11111b; border-color: var(--lavender); }
 .sp-count { font-size: 12px; color: var(--subtext); margin-bottom: 8px; }
+.sp-location-privacy {
+  display: grid;
+  gap: 7px;
+  margin: 8px 0 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--surface-control);
+}
+.sp-location-privacy p,
+.sp-location-privacy small {
+  margin: 0;
+  color: var(--subtext);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.sp-location-privacy label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text);
+  font-size: 12px;
+}
+.sp-location-privacy label span { display: grid; gap: 2px; }
+.sp-location-privacy input { margin-top: 2px; }
+.sp-location-actions { display: flex; align-items: center; gap: 8px; }
+.sp-location-status { color: var(--subtext); font-size: 11px; }
 .sp-list { list-style: none; padding: 0; margin: 0; }
 .sp-list li {
   display: flex;
