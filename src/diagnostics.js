@@ -136,11 +136,16 @@ export async function renderOfflineDiagnostics(host) {
   if (!host) return;
   const generation = Number(host.dataset.renderGeneration || 0) + 1;
   host.dataset.renderGeneration = String(generation);
-  delete host.dataset.ready;
-  host.innerHTML = `<p class="settings-help">${escapeHtml(t('diagnostics.loading'))}</p>`;
+  if (host.dataset.ready === 'true') {
+    host.dataset.refreshing = 'true';
+  } else {
+    delete host.dataset.ready;
+    host.innerHTML = `<p class="settings-help">${escapeHtml(t('diagnostics.loading'))}</p>`;
+  }
   const bundle = await collectOfflineDiagnostics();
   if (host.dataset.renderGeneration !== String(generation)) return;
   host.dataset.ready = 'true';
+  delete host.dataset.refreshing;
   host.innerHTML = `
     <div class="diagnostics-summary">
       <span><strong>${escapeHtml(t('diagnostics.registration'))}</strong>${escapeHtml(t(`diagnostics.registration.${bundle.service_worker.registration}`))}</span>

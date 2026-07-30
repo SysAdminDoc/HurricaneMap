@@ -248,7 +248,7 @@ async function captureVisualSnapshot(page, name) {
 }
 
 async function assertDialogAndKeyboardContracts(page) {
-  await page.evaluate(() => {
+  await page.evaluate(async () => {
     document.querySelector('#toggle-info')?.focus();
     scrollTo(0, 0);
   });
@@ -781,10 +781,32 @@ async function assertSupportBundleExport(page) {
   assert(bundle.storage?.scopes?.length === 4, 'support bundle is missing cache scope versions and sizes');
   assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');
   assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');
-  await page.evaluate(() => {
+  await page.evaluate(async () => {
+    await (await caches.open('hm-tiles-v1')).put('/recoverable-tile', new Response('tile'));
+    await (await caches.open('hm-data-v2')).put('/protected-history', new Response('history'));
+  });
+  await page.click('[data-clear-storage="tiles"]');
+  await page.waitForSelector('#confirm-local-action[open]');
+  assert(/Map tiles/.test(await page.locator('#confirm-local-action').textContent()), 'storage confirmation did not name its scope');
+  await page.click('#confirm-local-action .confirm-action-cancel');
+  await page.waitForFunction(() => document.activeElement?.matches('[data-clear-storage="tiles"]'));
+  assert(await page.evaluate(async () => (
+    Boolean(await (await caches.open('hm-tiles-v1')).match('/recoverable-tile')) &&
+    document.activeElement?.matches('[data-clear-storage="tiles"]')
+  )), 'cancelling cache clearing removed data or lost invoker focus');
+  await page.click('[data-clear-storage="tiles"]');
+  await page.click('#confirm-local-action .confirm-action-submit');
+  await page.waitForFunction(async () => (
+    !(await caches.keys()).includes('hm-tiles-v1') &&
+    (await caches.keys()).includes('hm-data-v2') &&
+    document.activeElement?.matches('[data-clear-storage="tiles"]') &&
+    /Map tiles.*cleared/i.test(document.querySelector('#map-announce')?.textContent || '')
+  ), { timeout: 10000 });
+  await page.evaluate(async () => {
     for (const key of ['hm-saved-views-v1', 'hm-search-history-v1', 'hm-prep-v1', 'hm-user-point-v2']) {
       localStorage.removeItem(key);
     }
+    await caches.delete('hm-data-v2');
     document.querySelector('#settings-menu')?.hidePopover();
   });
 }
@@ -1409,7 +1431,29 @@ try {
   assert(savedViewState.parsed?.views?.[0]?.hash.includes('p=AL122005%2CAL041992'), 'saved comparison IDs did not round-trip');
   assert(!/address|latitude|longitude|\\blat\\b|\\blon\\b/i.test(savedViewState.raw), 'saved view persisted unexpected location data');
   await page.click('#saved-views-manager [data-action="delete"]');
-  assert(await page.evaluate(() => JSON.parse(localStorage.getItem('hm-saved-views-v1')).views.length === 0), 'saved view delete did not persist');
+  await page.waitForSelector('#confirm-local-action[open]');
+  await assertNoAxeViolations(page, 'saved-view deletion confirmation (WCAG 2.2 AA)', '#confirm-local-action');
+  assert(await page.evaluate(() => document.activeElement?.classList.contains('confirm-action-cancel')), 'saved-view confirmation did not focus the safe action');
+  await page.click('#confirm-local-action .confirm-action-cancel');
+  await page.waitForSelector('#confirm-local-action', { state: 'hidden' });
+  await page.waitForFunction(() => document.activeElement?.matches('#saved-views-manager [data-action="delete"]'));
+  const cancelledSavedViewDelete = await page.evaluate(() => ({
+    count: JSON.parse(localStorage.getItem('hm-saved-views-v1')).views.length,
+    active: document.activeElement?.outerHTML || '',
+    isDelete: document.activeElement?.matches('#saved-views-manager [data-action="delete"]'),
+    settingsOpen: document.querySelector('#settings-menu')?.matches(':popover-open'),
+  }));
+  assert(
+    cancelledSavedViewDelete.count === 1 && cancelledSavedViewDelete.isDelete,
+    `cancelling saved-view deletion changed data or lost invoker focus: ${JSON.stringify(cancelledSavedViewDelete)}`,
+  );
+  await page.click('#saved-views-manager [data-action="delete"]');
+  await page.click('#confirm-local-action .confirm-action-submit');
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem('hm-saved-views-v1')).views.length === 0);
+  assert(await page.evaluate(() => (
+    document.activeElement?.id === 'saved-view-name' &&
+    /Major comparison.*deleted/i.test(document.querySelector('#map-announce')?.textContent || '')
+  )), 'saved-view deletion did not announce completion or move focus predictably');
   await page.evaluate(() => {
     document.querySelector('#settings-menu')?.hidePopover();
     location.hash = '#v=1';
@@ -1713,6 +1757,32 @@ try {
   assert(/Calculadora de suministros/.test(prepLocales.es) && /Lista de suministros/.test(prepLocales.es), 'Spanish preparedness surface did not render');
   assert(/Kalkilatris pwovizyon/.test(prepLocales.ht) && /Lis pwovizyon/.test(prepLocales.ht), 'Haitian Creole preparedness surface did not render');
   await assertNoAxeViolations(page, 'preparedness panel (WCAG 2.2 AA)', '#prep-panel');
+  await page.click('#prep-reset');
+  await page.click('#confirm-local-action .confirm-action-cancel');
+  await page.waitForFunction(() => document.activeElement?.id === 'prep-reset');
+  assert(await page.evaluate(() => (
+    JSON.parse(localStorage.getItem('hm-prep-v1')).state.checked.length === 2 &&
+    document.activeElement?.id === 'prep-reset'
+  )), 'cancelling preparedness reset changed data or lost focus');
+  await page.click('#prep-reset');
+  await page.click('#confirm-local-action .confirm-action-submit');
+  await page.waitForFunction(() => (
+    JSON.parse(localStorage.getItem('hm-prep-v1')).state.checked.length === 0 &&
+    document.activeElement?.id === 'prep-reset'
+  ));
+  const prepReset = await page.evaluate(() => ({
+    state: JSON.parse(localStorage.getItem('hm-prep-v1')).state,
+    focused: document.activeElement?.id,
+    announcement: document.querySelector('#map-announce')?.textContent || '',
+  }));
+  assert(
+    prepReset.state.checked.length === 0 &&
+      prepReset.state.household === 4 &&
+      prepReset.state.mode === 'home' &&
+      prepReset.focused === 'prep-reset' &&
+      /items cleared/i.test(prepReset.announcement),
+    `preparedness reset was not scoped and recoverable: ${JSON.stringify(prepReset)}`,
+  );
   await page.click('#close-prep');
 
   let evacServiceDown = false;

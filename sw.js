@@ -33,6 +33,7 @@ const SHELL_ASSETS = [
   './src/data.js',
   './src/dialog-focus.js',
   './src/diagnostics.js',
+  './src/confirm-action.js',
   './src/errors.js',
   './src/map.js',
   './src/metric-presenters.js',

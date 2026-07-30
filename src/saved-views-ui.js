@@ -6,6 +6,7 @@ import {
 } from './saved-views.js';
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 
 export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
   if (!host) return;
@@ -28,7 +29,7 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
       </ul>`;
   };
 
-  host.addEventListener('click', event => {
+  host.addEventListener('click', async event => {
     const button = event.target.closest('button[data-action]');
     if (!button) return;
     const status = host.querySelector('.saved-view-status');
@@ -42,8 +43,21 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
       }
       render();
     } else if (button.dataset.action === 'delete') {
+      const view = loadSavedViews().find(item => item.id === button.dataset.id);
+      if (!view) return;
+      const confirmed = await confirmLocalAction({
+        title: t('savedViews.confirmDeleteTitle'),
+        message: t('savedViews.confirmDeleteBody', view.name),
+        confirmLabel: t('savedViews.confirmDeleteAction'),
+        invoker: button,
+      });
+      if (!confirmed) return;
       deleteSavedView(button.dataset.id);
       render();
+      const message = t('savedViews.deleted', view.name);
+      host.querySelector('.saved-view-status').textContent = message;
+      announceLocalAction(message);
+      host.querySelector('#saved-view-name')?.focus({ preventScroll: true });
     } else if (button.dataset.action === 'restore') {
       const view = loadSavedViews().find(item => item.id === button.dataset.id);
       if (view) restoreHash(view.hash);

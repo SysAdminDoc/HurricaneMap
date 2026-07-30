@@ -3,6 +3,7 @@
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 import { hidePanel, showPanel } from './panels.js';
 import {
   PREP_SCHEMA_VERSION,
@@ -147,11 +148,22 @@ function ensureWired() {
     saveState(state);
     renderPrepPanel();
   });
-  panel.addEventListener('click', event => {
-    if (event.target.closest('#prep-reset')) {
+  panel.addEventListener('click', async event => {
+    const resetButton = event.target.closest('#prep-reset');
+    if (resetButton) {
+      const confirmed = await confirmLocalAction({
+        title: t('prep.confirmResetTitle'),
+        message: t('prep.confirmResetBody', state?.checked?.length || 0),
+        confirmLabel: t('prep.confirmResetAction'),
+        invoker: resetButton,
+      });
+      if (!confirmed) return;
       state = { ...normalizePrepState(state), checked: [] };
       saveState(state);
       renderPrepPanel();
+      const message = t('prep.resetComplete');
+      announceLocalAction(message);
+      document.getElementById('prep-reset')?.focus({ preventScroll: true });
     }
   });
   document.addEventListener('hm-locale:change', () => {

@@ -1,5 +1,6 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
@@ -135,6 +136,7 @@ export async function inspectStorage({
 export async function clearOptionalStorageScope(scopeId, {
   cachesApi = globalThis.caches,
   packStorage = globalThis.localStorage,
+  notify = true,
 } = {}) {
   const scope = STORAGE_SCOPES.find(candidate => candidate.id === scopeId);
   if (!scope) throw new Error(`Unknown storage scope: ${scopeId}`);
@@ -142,7 +144,7 @@ export async function clearOptionalStorageScope(scopeId, {
   if (!cachesApi) return false;
   const removed = await cachesApi.delete(scope.cacheName);
   if (scopeId === 'radar') writePackIndex({}, packStorage);
-  emitStorageChange();
+  if (notify) emitStorageChange();
   return removed;
 }
 
@@ -235,6 +237,7 @@ export async function renderStorageManager(host) {
           ${scope.required ? '' : `<button class="settings-action storage-clear" type="button" data-clear-storage="${escapeHtml(scope.id)}">${escapeHtml(t('storage.clear'))}</button>`}
         </div>`).join('')}
     </div>
+    <p class="storage-action-status" role="status" aria-live="polite"></p>
     <p class="settings-help">${escapeHtml(t('storage.packs', packCount))}</p>`;
 }
 
@@ -244,9 +247,24 @@ export function initStorageManager(host = document.getElementById('storage-manag
   host.addEventListener('click', async event => {
     const button = event.target.closest?.('[data-clear-storage]');
     if (!button) return;
+    const scopeId = button.dataset.clearStorage;
+    const scope = STORAGE_SCOPES.find(candidate => candidate.id === scopeId);
+    const label = scope ? scopeLabel(scope) : scopeId;
+    const confirmed = await confirmLocalAction({
+      title: t('storage.confirmTitle', label),
+      message: t('storage.confirmBody', label),
+      confirmLabel: t('storage.confirmAction', label),
+      invoker: button,
+    });
+    if (!confirmed) return;
     button.disabled = true;
-    await clearOptionalStorageScope(button.dataset.clearStorage).catch(() => false);
+    const removed = await clearOptionalStorageScope(scopeId, { notify: false }).then(() => true).catch(() => false);
     await refresh();
+    const message = t(removed ? 'storage.clearComplete' : 'storage.clearFailed', label);
+    const status = host.querySelector('.storage-action-status');
+    if (status) status.textContent = message;
+    announceLocalAction(message);
+    host.querySelector(`[data-clear-storage="${scopeId}"]`)?.focus({ preventScroll: true });
   });
   document.addEventListener('hm-storage:change', refresh);
   refresh();
