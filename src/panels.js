@@ -53,10 +53,13 @@ function focusPanelEntry(el) {
 function restorePanelInvoker(el) {
   const invoker = panelInvokers.get(el.id);
   panelInvokers.delete(el.id);
-  if (!el.contains(document.activeElement)) return;
-  const target = isVisibleFocusTarget(invoker)
+  if (!el.contains(document.activeElement)) return null;
+  return isVisibleFocusTarget(invoker)
     ? invoker
     : document.getElementById('map');
+}
+
+function focusPanelInvoker(target) {
   if (target instanceof HTMLElement) {
     requestAnimationFrame(() => target.focus({ preventScroll: true }));
   }
@@ -120,31 +123,34 @@ export function restorePanel(id) {
 
 /** Close every managed side panel except the named one. Pass null to close all. */
 export function closePanelsExcept(keepId = null) {
+  let focusTarget = null;
   for (const id of PANEL_IDS) {
     if (id === keepId) continue;
     const el = getPanel(id);
     if (el && !el.hidden) {
-      restorePanelInvoker(el);
+      focusTarget = restorePanelInvoker(el) || focusTarget;
       el.hidden = true;
       el.classList.remove('minimized');
       document.dispatchEvent(new CustomEvent('hm-panel:hidden', { detail: { id } }));
     }
   }
   setPanelState();
+  return focusTarget;
 }
 
-function withTransition(fn) {
+function withTransition(fn, after = null) {
   if (document.startViewTransition) {
     // Rapid open/close skips the previous transition; ALL THREE of its
     // promises (finished, ready, updateCallbackDone) then reject with
     // "Transition was skipped" — each must be caught or it surfaces as an
     // unhandled rejection (ready was the one still escaping).
     const transition = document.startViewTransition(fn);
-    transition.finished.catch(() => {});
+    transition.finished.catch(() => {}).then(() => after?.());
     transition.ready.catch(() => {});
     transition.updateCallbackDone.catch(() => {});
   } else {
     fn();
+    after?.();
   }
 }
 
@@ -168,20 +174,21 @@ export function showPanel(id) {
 
 /** Hide one side panel without reopening any previous surface. */
 export function hidePanel(id) {
+  let focusTarget = null;
   withTransition(() => {
     const el = getPanel(id);
     if (el && !el.hidden) {
-      restorePanelInvoker(el);
+      focusTarget = restorePanelInvoker(el);
       el.hidden = true;
       el.classList.remove('minimized');
       document.dispatchEvent(new CustomEvent('hm-panel:hidden', { detail: { id } }));
     }
     setPanelState();
-  });
+  }, () => focusPanelInvoker(focusTarget));
 }
 
 export function closeAllPanels() {
-  closePanelsExcept(null);
+  focusPanelInvoker(closePanelsExcept(null));
 }
 
 export function syncPanelControls() {

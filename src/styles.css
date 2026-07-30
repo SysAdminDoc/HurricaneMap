@@ -5925,11 +5925,13 @@ html.high-contrast {
   text-transform: uppercase;
 }
 
-.saved-view-create { display: grid; grid-template-columns: minmax(110px, 1fr) auto auto; gap: 6px; }
+.saved-view-create { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .saved-view-create input {
+  grid-column: 1 / -1;
   min-width: 0; border: 1px solid var(--surface1); border-radius: 7px;
   background: var(--mantle); color: var(--text); padding: 7px 9px;
 }
+.saved-view-create .settings-action { width: 100%; }
 .saved-view-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
 .saved-view-list li { display: flex; align-items: center; gap: 4px; }
 .saved-view-restore {
@@ -5942,6 +5944,31 @@ html.high-contrast {
   min-height: 32px; border-radius: 6px; cursor: pointer;
 }
 .saved-view-status { min-height: 1.2em; color: var(--yellow); font-size: 11px; margin-top: 4px; }
+.saved-view-import-preview {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.45rem;
+  padding: 0.7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+}
+.saved-view-import-preview h4,
+.saved-view-import-preview p,
+.saved-view-import-preview ul,
+.saved-view-import-preview fieldset { margin: 0; }
+.saved-view-import-summary,
+.saved-view-import-list,
+.saved-view-import-errors { font-size: 0.72rem; line-height: 1.45; }
+.saved-view-import-list,
+.saved-view-import-errors { padding-left: 1.2rem; }
+.saved-view-import-errors { color: var(--danger-ink); }
+.saved-view-import-errors code { color: inherit; }
+.saved-view-import-mode { display: flex; flex-wrap: wrap; gap: 0.45rem 0.8rem; padding: 0; border: 0; }
+.saved-view-import-mode legend { margin-bottom: 0.25rem; color: var(--foreground-muted); font-size: 0.68rem; font-weight: 700; }
+.saved-view-import-mode label { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 44px; font-size: 0.72rem; }
+.saved-view-import-actions { display: flex; justify-content: flex-end; gap: 0.45rem; }
+.saved-view-import-actions .settings-action { width: auto; }
 
 .impact-coverage-table-wrap { max-height: 220px; overflow: auto; margin-top: 6px; }
 .impact-coverage-table { width: 100%; border-collapse: collapse; font-size: 11px; }

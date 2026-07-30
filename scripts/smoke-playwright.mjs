@@ -1454,6 +1454,52 @@ try {
     document.activeElement?.id === 'saved-view-name' &&
     /Major comparison.*deleted/i.test(document.querySelector('#map-announce')?.textContent || '')
   )), 'saved-view deletion did not announce completion or move focus predictably');
+
+  await page.fill('#saved-view-name', 'Existing view');
+  await page.click('#saved-views-manager [data-action="save"]');
+  await page.setInputFiles('[data-saved-view-file]', {
+    name: 'malformed.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from('{not json'),
+  });
+  await page.waitForSelector('.saved-view-import-preview');
+  assert(
+    await page.locator('.saved-view-import-errors code').textContent() === '$' &&
+      await page.locator('[data-action="commit-import"]').isDisabled(),
+    'malformed saved-view import did not show a field-level error and disable commit',
+  );
+  await page.click('[data-action="cancel-import"]');
+
+  const transferBody = JSON.stringify({
+    schema_version: 1,
+    views: [
+      { id: 'transfer-existing', name: 'Existing view', hash: '#v=1&y=2004-2005' },
+      { id: 'transfer-florida', name: 'Florida majors', hash: '#v=1&s=Florida&c=3%2C4%2C5' },
+    ],
+  });
+  await page.setInputFiles('[data-saved-view-file]', {
+    name: 'saved-views.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(transferBody),
+  });
+  await page.waitForFunction(() => (
+    [...document.querySelectorAll('.saved-view-import-list li')].some(item => item.textContent === 'Existing view (2)')
+  ));
+  await assertNoAxeViolations(page, 'saved-view import preview (WCAG 2.2 AA)', '.saved-view-import-preview');
+  await page.check('[name="saved-view-import-mode"][value="replace"]');
+  await page.waitForFunction(() => {
+    const names = [...document.querySelectorAll('.saved-view-import-list li')].map(item => item.textContent);
+    return names.includes('Existing view') && !names.includes('Existing view (2)');
+  });
+  await page.click('[data-action="commit-import"]');
+  await page.waitForFunction(() => {
+    const record = JSON.parse(localStorage.getItem('hm-saved-views-v1'));
+    return record.views.length === 2 &&
+      record.views[0].name === 'Existing view' &&
+      record.views[1].name === 'Florida majors' &&
+      document.activeElement?.id === 'saved-view-name';
+  });
+  await page.waitForFunction(() => /2 saved views imported/i.test(document.querySelector('#map-announce')?.textContent || ''));
   await page.evaluate(() => {
     document.querySelector('#settings-menu')?.hidePopover();
     location.hash = '#v=1';
