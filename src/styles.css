@@ -6494,6 +6494,9 @@ html.high-contrast {
   .stats-panel .seasonal-outlook-banner {
     display: grid;
     grid-template-columns: minmax(0, max-content) minmax(0, 1fr) minmax(0, max-content);
+    grid-template-areas:
+      "header meta details"
+      "current current current";
     align-items: center;
     gap: 6px 10px;
     padding: 7px 9px;
@@ -6508,13 +6511,21 @@ html.high-contrast {
   }
 
   .stats-panel .sob-header {
+    grid-area: header;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
   }
 
+  .stats-panel .sob-current {
+    grid-area: current;
+    width: 100%;
+    margin: 0;
+  }
+
   .stats-panel .sob-meta {
+    grid-area: meta;
     font-size: 9.5px;
     color: var(--subtext);
     white-space: nowrap;
@@ -6523,6 +6534,7 @@ html.high-contrast {
   }
 
   .stats-panel .sob-details {
+    grid-area: details;
     justify-self: end;
     font-size: 9.5px;
   }

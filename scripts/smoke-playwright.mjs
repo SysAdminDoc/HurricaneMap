@@ -602,6 +602,44 @@ async function assertDesktopPanelSystem(page, label) {
   await page.click('#toggle-stats');
   await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
   await assertPanelFit('#stats-panel', 'statistics panel');
+  const outlookLayout = await page.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const bounds = element.getBoundingClientRect();
+      return {
+        left: bounds.left,
+        right: bounds.right,
+        top: bounds.top,
+        bottom: bounds.bottom,
+        width: bounds.width,
+        height: bounds.height,
+      };
+    };
+    return {
+      banner: rect('#stats-panel .seasonal-outlook-banner'),
+      current: rect('#stats-panel .sob-current'),
+      rows: [...document.querySelectorAll('#stats-panel .sob-row')].map((row) => {
+        const bounds = row.getBoundingClientRect();
+        return { width: bounds.width, height: bounds.height, scrollWidth: row.scrollWidth };
+      }),
+    };
+  });
+  assert(outlookLayout.banner && outlookLayout.current, `${label}: Seasonal Outlook did not render`);
+  assert(
+    outlookLayout.current.width >= outlookLayout.banner.width - 20,
+    `${label}: Seasonal Outlook current block is crushed (${outlookLayout.current.width}px vs ${outlookLayout.banner.width}px)`,
+  );
+  assert(
+    outlookLayout.current.left >= outlookLayout.banner.left - 1 &&
+      outlookLayout.current.right <= outlookLayout.banner.right + 1,
+    `${label}: Seasonal Outlook current block escapes its card`,
+  );
+  assert(
+    outlookLayout.rows.length > 0 &&
+      outlookLayout.rows.every(row => row.width >= 240 && row.scrollWidth <= row.width + 2),
+    `${label}: Seasonal Outlook rows overlap or clip (${JSON.stringify(outlookLayout.rows)})`,
+  );
 }
 
 async function assertPremiumChrome(page, label) {

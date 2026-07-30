@@ -4,6 +4,9 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Fixed
+- The desktop Seasonal Outlook card now gives its current-season summary a full-width row, with browser geometry coverage preventing crushed, clipped, or overlapping forecast content.
+
 ## v1.7.0 - Trust, resilience, and official forecast context (2026-07-25)
 
 ### Added
