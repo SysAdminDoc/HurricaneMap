@@ -290,6 +290,14 @@ Perfect for:
 
 See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 
+Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
+
+```bash
+node scripts/generate-release-manifest.mjs --generated-at 2026-07-29T00:00:00Z
+```
+
+QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude order, geometry structure, coordinate bounds, and prohibition on alternate `crs` declarations.
+
 ### Notebook analysis
 
 The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, Pillow, and Jupyter Notebook environment. From the repository root, install everything with one command:
@@ -332,6 +340,7 @@ HurricaneMap/
 │       │   ├── t_200508250000.png
 │       │   └── ...
 │       └── ...
+├── schemas/                # published JSON Schema 2020-12 data contracts
 ├── scripts/
 │   ├── refresh-hurdat2.mjs   # NOAA HURDAT2 detector/downloader for local refreshes
 │   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up

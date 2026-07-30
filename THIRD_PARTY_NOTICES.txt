@@ -39,5 +39,7 @@ package-lock.json. Direct tooling licenses are:
 - @playwright/test 1.62.0: Apache-2.0
 - playwright 1.62.0: Apache-2.0
 - esbuild 0.28.1: MIT
+- ajv 8.20.0: MIT
 
+Ajv's validation dependency graph also includes fast-uri under BSD-3-Clause.
 These tools are not shipped in the static application bundle.

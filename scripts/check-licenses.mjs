@@ -21,8 +21,9 @@ const expectedDirectLicenses = {
   '@playwright/test': 'Apache-2.0',
   playwright: 'Apache-2.0',
   esbuild: 'MIT',
+  ajv: 'MIT',
 };
-const redistributableLicenses = new Set(['MIT', 'Apache-2.0', 'MPL-2.0']);
+const redistributableLicenses = new Set(['MIT', 'BSD-3-Clause', 'Apache-2.0', 'MPL-2.0']);
 for (const [dependency, expectedLicense] of Object.entries(expectedDirectLicenses)) {
   const locked = lockfile.packages?.[`node_modules/${dependency}`];
   if (!locked) errors.push(`${dependency} is missing from package-lock.json`);

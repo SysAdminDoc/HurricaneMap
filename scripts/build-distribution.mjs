@@ -12,7 +12,7 @@ const STATIC_ROOT_FILES = new Set([
   'manifest.webmanifest',
   'sw.js',
 ]);
-const STATIC_PREFIXES = ['branding/', 'data/', 'fonts/', 'src/', 'vendor/'];
+const STATIC_PREFIXES = ['branding/', 'data/', 'fonts/', 'schemas/', 'src/', 'vendor/'];
 
 function git(args) {
   return execFileSync('git', args, {

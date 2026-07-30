@@ -138,6 +138,7 @@ const OFFLINE_DATA_ASSETS = [
   './data/stats.json',
   './data/metadata.json',
   './data/distribution.json',
+  './data/release-manifest.json',
   './data/impacts.json',
   './data/billions.json',
   './data/glossary.json',
@@ -147,6 +148,12 @@ const OFFLINE_DATA_ASSETS = [
   './data/hurdat2-atlantic.txt',
   './data/hurdat2-nepac.txt',
   './data/radar/manifest.json',
+  './schemas/metadata-v1.schema.json',
+  './schemas/landfalls-v1.schema.json',
+  './schemas/storms-v1.schema.json',
+  './schemas/impacts-v1.schema.json',
+  './schemas/saved-views-v1.schema.json',
+  './schemas/release-manifest-v1.schema.json',
 ];
 
 self.addEventListener('install', (event) => {
