@@ -1,5 +1,6 @@
 // Tide-gauge helpers: station picking, datagetter URL contract, residual math.
-import { buildDataUrl, fetchWithRetry, haversineKm, nearestStations, peakResidual } from '../src/tides.js';
+import { buildDataUrl, fetchWithRetry, nearestStations, peakResidual } from '../src/tides.js';
+import { haversineKm } from '../src/geodesy.js';
 
 function assert(condition, message) {
   if (!condition) {

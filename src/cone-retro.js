@@ -5,9 +5,13 @@
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import {
+  destinationPointNmi,
+  initialBearingDeg,
+  toDegrees,
+} from './geodesy.js';
 
 const RADII_URL = new URL('../data/cone-radii.json', import.meta.url);
-const EARTH_RADIUS_NMI = 3440.065;
 let radiiPromise = null;
 let layerGroup = null;
 let layerMap = null;
@@ -27,33 +31,12 @@ export async function loadConeRadii() {
   return radiiPromise;
 }
 
-function toRadians(value) { return value * Math.PI / 180; }
-function toDegrees(value) { return value * 180 / Math.PI; }
-
 export function destinationPoint(lat, lon, bearing, distanceNmi) {
-  const angular = Number(distanceNmi) / EARTH_RADIUS_NMI;
-  const phi1 = toRadians(lat);
-  const lambda1 = toRadians(lon);
-  const theta = toRadians(bearing);
-  const phi2 = Math.asin(
-    Math.sin(phi1) * Math.cos(angular) +
-    Math.cos(phi1) * Math.sin(angular) * Math.cos(theta),
-  );
-  const lambda2 = lambda1 + Math.atan2(
-    Math.sin(theta) * Math.sin(angular) * Math.cos(phi1),
-    Math.cos(angular) - Math.sin(phi1) * Math.sin(phi2),
-  );
-  return [toDegrees(phi2), ((toDegrees(lambda2) + 540) % 360) - 180];
+  return destinationPointNmi(lat, lon, bearing, distanceNmi);
 }
 
 function bearingBetween(a, b) {
-  const phi1 = toRadians(a.lat);
-  const phi2 = toRadians(b.lat);
-  const delta = toRadians(b.lon - a.lon);
-  return (toDegrees(Math.atan2(
-    Math.sin(delta) * Math.cos(phi2),
-    Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(delta),
-  )) + 360) % 360;
+  return initialBearingDeg(a.lat, a.lon, b.lat, b.lon);
 }
 
 export function interpolateTrackPoint(track, timestampMs) {

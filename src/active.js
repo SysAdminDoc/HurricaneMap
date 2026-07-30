@@ -21,6 +21,7 @@ import {
 import { hideGoesRealtimeContext, latestStormPoint, renderGoesRealtimeContext } from './goes-realtime.js';
 import { clearTropicalAlerts, renderTropicalAlerts } from './alerts.js';
 import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
+import { haversineKm } from './geodesy.js';
 import { loadUserPoint } from './user-point.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
@@ -295,11 +296,7 @@ function distanceFromUser([stormLat, stormLon]) {
   try {
     const point = loadUserPoint();
     if (!Number.isFinite(point?.lat) || !Number.isFinite(point?.lon)) return '';
-    const km = 6371 * 2 * Math.asin(Math.sqrt(
-      Math.sin((stormLat - point.lat) * Math.PI / 360) ** 2 +
-      Math.cos(point.lat * Math.PI / 180) * Math.cos(stormLat * Math.PI / 180) *
-      Math.sin((stormLon - point.lon) * Math.PI / 360) ** 2,
-    ));
+    const km = haversineKm(point.lat, point.lon, stormLat, stormLon);
     const dir = compassLabel(bearingDeg(point.lat, point.lon, stormLat, stormLon));
     return ` · ${Math.round(kmToMi(km))} mi ${dir} of you`;
   } catch {

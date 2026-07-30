@@ -319,29 +319,48 @@ def point_in_polygon(lon: float, lat: float, poly) -> bool:
     return True
 
 
-def dist_point_to_segment(px, py, ax, ay, bx, by) -> float:
-    """Approximate planar distance, scaled by cos(lat) so degrees~uniform."""
-    # Convert to roughly equirectangular metric.
-    cos_lat = math.cos(math.radians((ay + by) * 0.5))
-    ax_m = ax * cos_lat
-    bx_m = bx * cos_lat
-    px_m = px * cos_lat
-    dx = bx_m - ax_m
-    dy = by - ay
-    if dx == 0 and dy == 0:
-        return math.hypot(px_m - ax_m, py - ay)
-    t = max(0.0, min(1.0, ((px_m - ax_m) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-    cx = ax_m + t * dx
-    cy = ay + t * dy
-    return math.hypot(px_m - cx, py - cy)
+def initial_bearing_radians(lat1, lon1, lat2, lon2) -> float:
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_lon = math.radians(((lon2 - lon1 + 540) % 360) - 180)
+    return math.atan2(
+        math.sin(delta_lon) * math.cos(phi2),
+        math.cos(phi1) * math.sin(phi2)
+        - math.sin(phi1) * math.cos(phi2) * math.cos(delta_lon),
+    )
+
+
+def point_segment_distance_km(lat, lon, start, end) -> float:
+    """Shortest spherical distance from a point to a finite GeoJSON segment."""
+    a_lon, a_lat = start
+    b_lon, b_lat = end
+    segment_angle = haversine_km(a_lat, a_lon, b_lat, b_lon) / EARTH_R_KM
+    if segment_angle == 0:
+        return haversine_km(lat, lon, a_lat, a_lon)
+    point_angle = haversine_km(a_lat, a_lon, lat, lon) / EARTH_R_KM
+    bearing_delta = (
+        initial_bearing_radians(a_lat, a_lon, lat, lon)
+        - initial_bearing_radians(a_lat, a_lon, b_lat, b_lon)
+    )
+    cross_track = math.asin(max(-1.0, min(1.0, math.sin(point_angle) * math.sin(bearing_delta))))
+    along_track = math.atan2(
+        math.sin(point_angle) * math.cos(bearing_delta),
+        math.cos(point_angle),
+    )
+    if along_track < 0 or along_track > segment_angle:
+        return min(
+            haversine_km(lat, lon, a_lat, a_lon),
+            haversine_km(lat, lon, b_lat, b_lon),
+        )
+    return abs(cross_track) * EARTH_R_KM
 
 
 def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
-    """Return (state_name, distance_deg) for the closest US state polygon edge.
-    If no state is within max_deg, return (None, None).
+    """Return (state_name, distance_km) for the closest US state polygon edge.
+    If no state is within the equivalent max_deg radius, return (None, None).
     Tries PIP first (returns 0 distance), else samples polygon edges."""
     best = None
-    best_d = max_deg
+    best_d = max_deg * 111.1950802335329
     for st in states:
         mlon, mlat, Mlon, Mlat = st["bbox"]
         if lon < mlon - max_deg or lon > Mlon + max_deg:
@@ -356,7 +375,7 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
                 for i in range(n - 1):
                     ax, ay = ring[i]
                     bx, by = ring[i + 1]
-                    d = dist_point_to_segment(lon, lat, ax, ay, bx, by)
+                    d = point_segment_distance_km(lat, lon, [ax, ay], [bx, by])
                     if d < best_d:
                         best_d = d
                         best = st["name"]

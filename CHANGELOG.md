@@ -14,6 +14,7 @@ All notable changes to HurricaneMap.
 ### Changed
 - Deterministic Playwright screenshot comparisons now guard the atlas shell and Statistics panel with checked-in Windows baselines, masked live/map content, and an explicit baseline-refresh command.
 - Onboarding, saved views, the landfall table, nearby-storm counts, and Seasonal Outlook chrome now use complete English, Spanish, and Haitian Creole catalogs with locale-aware counts and browser journey coverage.
+- Map, tide, active-storm, cone, and wind-contour calculations now share one antimeridian-safe spherical geodesy module; preprocessing validates the same distance and segment reference vectors.
 
 ## v1.7.0 - Trust, resilience, and official forecast context (2026-07-25)
 

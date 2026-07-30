@@ -1,5 +1,6 @@
 import { escapeHtml } from './html-utils.js';
 import { getLocale, t } from './i18n.js';
+import { pointToSegmentDistanceKm } from './geodesy.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -87,25 +88,6 @@ export function parseWindProbability(payload, definition, now = Date.now()) {
   return { ...definition, ...candidates[0] };
 }
 
-function pointSegmentDistanceKm(lat, lon, a, b) {
-  const meanLat = ((lat + a[1] + b[1]) / 3) * Math.PI / 180;
-  const scaleX = 111.32 * Math.cos(meanLat);
-  const scaleY = 110.57;
-  const px = lon * scaleX;
-  const py = lat * scaleY;
-  const ax = a[0] * scaleX;
-  const ay = a[1] * scaleY;
-  const bx = b[0] * scaleX;
-  const by = b[1] * scaleY;
-  const dx = bx - ax;
-  const dy = by - ay;
-  const lengthSquared = dx * dx + dy * dy;
-  const fraction = lengthSquared
-    ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSquared))
-    : 0;
-  return Math.hypot(px - (ax + fraction * dx), py - (ay + fraction * dy));
-}
-
 function geometryLines(geometry) {
   if (geometry?.type === 'LineString') return [geometry.coordinates];
   if (geometry?.type === 'MultiLineString') return geometry.coordinates;
@@ -122,7 +104,7 @@ export function parseNearestArrival(payload, definition, lat, lon, now = Date.no
     let distanceKm = Infinity;
     for (const line of geometryLines(feature.geometry)) {
       for (let index = 1; index < line.length; index++) {
-        distanceKm = Math.min(distanceKm, pointSegmentDistanceKm(lat, lon, line[index - 1], line[index]));
+        distanceKm = Math.min(distanceKm, pointToSegmentDistanceKm(lat, lon, line[index - 1], line[index]));
       }
     }
     if (Number.isFinite(distanceKm) && distanceKm <= MAX_ARRIVAL_DISTANCE_KM) {

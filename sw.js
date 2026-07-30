@@ -62,6 +62,7 @@ const SHELL_ASSETS = [
   './src/export.js',
   './src/exposure.js',
   './src/filter-state.js',
+  './src/geodesy.js',
   './src/filter-controller.js',
   './src/forecast-skill.js',
   './src/fuzzy.js',

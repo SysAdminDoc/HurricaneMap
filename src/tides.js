@@ -8,6 +8,7 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { categoryStrength } from './data.js';
+import { haversineKm } from './geodesy.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -30,15 +31,6 @@ function loadStations() {
       .catch(() => null);
   }
   return stationsPromise;
-}
-
-export function haversineKm(lat1, lon1, lat2, lon2) {
-  const rad = Math.PI / 180;
-  const dLat = (lat2 - lat1) * rad;
-  const dLon = (lon2 - lon1) * rad;
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(a));
 }
 
 export function nearestStations(stations, lat, lon, { max = MAX_STATIONS, maxKm = MAX_KM } = {}) {

@@ -4,6 +4,10 @@ import {
 } from './impact-utils.js';
 import { windToCategory, categoryLabel } from './data.js';
 import { presentNumber } from './metric-presenters.js';
+import {
+  haversineKm as geodesicDistanceKm,
+  initialBearingDeg,
+} from './geodesy.js';
 
 // Derived intensity metrics + spatial queries.
 //
@@ -14,7 +18,6 @@ import { presentNumber } from './metric-presenters.js';
 // Authored 2026-05-03 for HurricaneMap v0.4.0 to surface ACE, rapid
 // intensification windows, and closest-pass distances to U.S. coastal cities.
 
-const EARTH_R_KM = 6371.0088;
 const KM_TO_MI = 0.621371;
 const RI_THRESHOLD_KT = 30;      // standard NHC RI definition
 const RI_WINDOW_HOURS = 24;
@@ -126,12 +129,7 @@ export const COASTAL_CITIES = [
 
 /** Great-circle distance in km between two lat/lon points (haversine). */
 export function haversineKm(lat1, lon1, lat2, lon2) {
-  const toRad = (d) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * EARTH_R_KM * Math.asin(Math.min(1, Math.sqrt(a)));
+  return geodesicDistanceKm(lat1, lon1, lat2, lon2);
 }
 
 export function kmToMi(km) {
@@ -140,13 +138,7 @@ export function kmToMi(km) {
 
 /** Initial great-circle bearing from point 1 to point 2, degrees 0-360. */
 export function bearingDeg(lat1, lon1, lat2, lon2) {
-  const toRad = (d) => (d * Math.PI) / 180;
-  const phi1 = toRad(lat1);
-  const phi2 = toRad(lat2);
-  const dLon = toRad(lon2 - lon1);
-  const y = Math.sin(dLon) * Math.cos(phi2);
-  const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLon);
-  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  return initialBearingDeg(lat1, lon1, lat2, lon2);
 }
 
 const COMPASS_8 = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
