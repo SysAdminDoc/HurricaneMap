@@ -299,7 +299,7 @@ async function assertDialogAndKeyboardContracts(page) {
   assert(await page.evaluate(() => document.activeElement?.classList.contains('skip-to-content')), 'skip link is not the first keyboard stop');
   await page.keyboard.press('Enter');
   await page.waitForFunction(
-    () => location.hash === '#map' && document.activeElement?.id === 'map',
+    () => document.activeElement?.id === 'map',
     null,
     { timeout: 2000 },
   ).catch(async () => {
@@ -924,6 +924,79 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     if (pageErrors.length) throw new Error(`${name}: page errors: ${pageErrors.join(' | ')}`);
   } finally {
     await context.close();
+  }
+}
+
+async function assertManagedPanelFocusContracts(browser, baseUrl) {
+  for (const viewport of [{ width: 1200, height: 900 }, { width: 390, height: 844 }]) {
+    const context = await browser.newContext({
+      viewport,
+      serviceWorkers: 'block',
+      reducedMotion: 'reduce',
+    });
+    await context.addInitScript(() => {
+      localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true, locale: 'en' }));
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      const scenarios = [
+        { trigger: '#toggle-prep', panel: '#prep-panel', close: '#close-prep', entry: '#prep-panel-title' },
+        { trigger: '#toggle-evac', panel: '#evac-panel', close: '#close-evac', entry: '#evac-panel-title' },
+        { trigger: '#toggle-table-view', panel: '#table-view-panel', close: '#close-table-view', entry: '#table-view-title' },
+        { trigger: '#toggle-spatial-search', panel: '#spatial-results', close: '#spatial-results .close-btn', entry: '#spatial-results h3' },
+      ];
+      for (const scenario of scenarios) {
+        const directTriggerVisible = await page.locator(scenario.trigger).isVisible();
+        await clickHeaderAction(page, scenario.trigger);
+        await page.waitForSelector(`${scenario.panel}:not([hidden])`, { timeout: 10_000 });
+        await page.waitForFunction(
+          selector => document.activeElement === document.querySelector(selector),
+          scenario.entry,
+          { timeout: 5_000 },
+        );
+        const semantics = await page.locator(scenario.panel).evaluate(element => ({
+          role: element.getAttribute('role'),
+          modal: element.getAttribute('aria-modal'),
+        }));
+        assert(semantics.role === 'region' && semantics.modal !== 'true', `${scenario.panel}: non-modal panel semantics changed: ${JSON.stringify(semantics)}`);
+        await page.locator(scenario.close).focus();
+        await page.keyboard.press('Enter');
+        await page.waitForFunction(
+          ({ panel, expected }) => {
+            const target = document.activeElement;
+            const rect = target?.getBoundingClientRect?.();
+            return document.querySelector(panel)?.hidden === true
+              && target?.id === expected
+              && rect?.width > 0
+              && rect?.height > 0
+              && getComputedStyle(target).visibility !== 'hidden';
+          },
+          {
+            panel: scenario.panel,
+            expected: directTriggerVisible ? scenario.trigger.slice(1) : 'toggle-mobile-actions',
+          },
+          { timeout: 5_000 },
+        ).catch(async () => {
+          const state = await page.evaluate(panel => {
+            const target = document.activeElement;
+            const rect = target?.getBoundingClientRect?.();
+            return {
+              panel,
+              hidden: document.querySelector(panel)?.hidden,
+              activeId: target?.id || '',
+              activeClass: String(target?.className || ''),
+              width: rect?.width || 0,
+              height: rect?.height || 0,
+            };
+          }, scenario.panel);
+          throw new Error(`${viewport.width}px ${scenario.panel}: focus was not returned to a visible invoker: ${JSON.stringify(state)}`);
+        });
+      }
+    } finally {
+      await context.close();
+    }
   }
 }
 
@@ -1806,6 +1879,7 @@ try {
 
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 1440, height: 960, name: 'desktop' });
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
+  await assertManagedPanelFocusContracts(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
 
   await browser.close();

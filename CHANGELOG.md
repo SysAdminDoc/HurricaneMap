@@ -9,6 +9,7 @@ All notable changes to HurricaneMap.
 - Active-storm Leaflet popups now use DOM nodes, HTTPS/NHC host allowlists, poisoned-data browser coverage, and a CI guard that rejects string or unverified-variable popup content.
 - Device geolocation is now session-only by default, with pre-use privacy copy, explicit 24-hour persistence, legacy-coordinate purge, a clear control, and localized permission/timeout/unavailable recovery.
 - Brand-title ink is now independent from dark accent-fill tokens, and computed browser checks enforce readable header text and controls across the complete theme, palette, and high-contrast matrix.
+- Prep, evacuation, table, and nearby-storm regions now focus their heading on entry, return to a visible invoker on close, preserve focus through minimize/restore, and explicitly focus the map from the skip link.
 
 ### Changed
 - Deterministic Playwright screenshot comparisons now guard the atlas shell and Statistics panel with checked-in Windows baselines, masked live/map content, and an explicit baseline-refresh command.

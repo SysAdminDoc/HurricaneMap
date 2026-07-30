@@ -11,6 +11,7 @@ const PANEL_BUTTONS = {
   'prep-panel': 'toggle-prep',
   'evac-panel': 'toggle-evac',
 };
+const panelInvokers = new Map();
 
 function getPanel(id) {
   return document.getElementById(id);
@@ -18,6 +19,46 @@ function getPanel(id) {
 
 function panelTitle(el) {
   return el.getAttribute('aria-label') || 'Panel';
+}
+
+function normalizedInvoker(candidate) {
+  if (!(candidate instanceof HTMLElement)) return null;
+  if (candidate.closest('.mobile-actions-menu')) {
+    return document.getElementById('toggle-mobile-actions') || candidate;
+  }
+  return candidate;
+}
+
+function isVisibleFocusTarget(element) {
+  if (!(element instanceof HTMLElement) || !element.isConnected || element.closest('[hidden], [inert]')) return false;
+  const style = getComputedStyle(element);
+  const rect = element.getBoundingClientRect();
+  return !element.matches(':disabled') && style.display !== 'none' && style.visibility !== 'hidden'
+    && rect.width > 0 && rect.height > 0;
+}
+
+function focusPanelEntry(el) {
+  requestAnimationFrame(() => {
+    if (!el || el.hidden || el.classList.contains('minimized')) return;
+    const labelledBy = el.getAttribute('aria-labelledby');
+    const heading = labelledBy ? document.getElementById(labelledBy) : el.querySelector('h1, h2, h3');
+    const target = heading || el.querySelector('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])');
+    if (!(target instanceof HTMLElement)) return;
+    if (heading === target && !target.hasAttribute('tabindex')) target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+  });
+}
+
+function restorePanelInvoker(el) {
+  const invoker = panelInvokers.get(el.id);
+  panelInvokers.delete(el.id);
+  if (!el.contains(document.activeElement)) return;
+  const target = isVisibleFocusTarget(invoker)
+    ? invoker
+    : document.getElementById('map');
+  if (target instanceof HTMLElement) {
+    requestAnimationFrame(() => target.focus({ preventScroll: true }));
+  }
 }
 
 /** Inject shared chrome (minimize button + restore tab) once per panel.
@@ -65,6 +106,7 @@ export function minimizePanel(id) {
   if (!el || el.hidden) return;
   el.classList.add('minimized');
   setPanelState();
+  requestAnimationFrame(() => el.querySelector('.panel-restore-bar')?.focus({ preventScroll: true }));
 }
 
 export function restorePanel(id) {
@@ -72,6 +114,7 @@ export function restorePanel(id) {
   if (!el) return;
   el.classList.remove('minimized');
   setPanelState();
+  focusPanelEntry(el);
 }
 
 /** Close every managed side panel except the named one. Pass null to close all. */
@@ -80,6 +123,7 @@ export function closePanelsExcept(keepId = null) {
     if (id === keepId) continue;
     const el = getPanel(id);
     if (el && !el.hidden) {
+      restorePanelInvoker(el);
       el.hidden = true;
       el.classList.remove('minimized');
       document.dispatchEvent(new CustomEvent('hm-panel:hidden', { detail: { id } }));
@@ -105,14 +149,17 @@ function withTransition(fn) {
 
 /** Show one side panel and hide all others. */
 export function showPanel(id) {
+  const invoker = normalizedInvoker(document.activeElement);
   withTransition(() => {
     closePanelsExcept(id);
     const el = getPanel(id);
     if (el) {
+      panelInvokers.set(id, invoker);
       ensurePanelChrome(el);
       el.classList.remove('minimized');
       el.hidden = false;
       document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id } }));
+      focusPanelEntry(el);
     }
     setPanelState();
   });
@@ -123,6 +170,7 @@ export function hidePanel(id) {
   withTransition(() => {
     const el = getPanel(id);
     if (el && !el.hidden) {
+      restorePanelInvoker(el);
       el.hidden = true;
       el.classList.remove('minimized');
       document.dispatchEvent(new CustomEvent('hm-panel:hidden', { detail: { id } }));

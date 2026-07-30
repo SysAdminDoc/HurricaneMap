@@ -363,6 +363,12 @@ html, body {
   box-shadow: var(--shadow);
 }
 
+.side-panel :is(h1, h2, h3)[tabindex="-1"]:focus-visible {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
 /* Header — user-tuned offset to clear the left-edge map controls */
 .app-header,
 header.app-header.glass {
