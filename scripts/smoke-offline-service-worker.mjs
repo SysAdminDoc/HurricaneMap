@@ -4,7 +4,9 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = process.env.HURRICANEMAP_ROOT
+  ? path.resolve(process.env.HURRICANEMAP_ROOT)
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 let chromium;
 try {
@@ -219,6 +221,20 @@ try {
   assert(/Katrina/i.test(offlineResult.panelText), 'offline storm panel did not render Katrina');
   assert(/Est\. exposure/.test(offlineResult.panelText), 'offline exposure metric did not render from cached state density data');
 
+  const distribution = await page.evaluate(async () => {
+    const response = await fetch('/data/distribution.json');
+    return response.json();
+  });
+  if (process.env.HURRICANEMAP_EXPECT_PROFILE) {
+    assert(
+      distribution.profile === process.env.HURRICANEMAP_EXPECT_PROFILE,
+      `expected ${process.env.HURRICANEMAP_EXPECT_PROFILE} profile, got ${distribution.profile}`,
+    );
+  }
+  if (distribution.profile === 'core') {
+    assert(distribution.capabilities?.bundled_radar === false, 'core profile claims bundled radar');
+  }
+
   const offlinePrep = await page.evaluate(async () => {
     const prep = await import('/src/prep.js');
     prep.openPrepPanel();
@@ -234,7 +250,7 @@ try {
   await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
-  console.log(`offline service worker ok (${offlineKeys.length} data records, ${offlineResult.storms} storms, legacy storage removed, optional caches absent)`);
+  console.log(`offline service worker ok (${distribution.profile} profile, ${offlineKeys.length} data records, ${offlineResult.storms} storms, legacy storage removed, optional caches absent)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

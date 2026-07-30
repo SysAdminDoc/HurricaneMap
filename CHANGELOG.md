@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Added
+- Reproducible core and full static distribution profiles now share one source commit and publish machine-readable capability metadata; core retains the complete offline historical app at about 19 MB, while full includes the 1,700+ archived radar frames.
 - Saved views can now be imported from versioned JSON with field-level preview errors, merge/replace choice, deterministic duplicate renaming, future-schema rejection, and atomic rollback after storage failures.
 - Settings now exposes actionable offline diagnostics for service-worker control, cache versions and sizes, persistence/quota, and optional-feed freshness, with scoped retry/refresh controls and a privacy-allowlisted JSON support bundle.
 

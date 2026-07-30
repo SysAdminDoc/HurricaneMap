@@ -137,6 +137,7 @@ const OFFLINE_DATA_ASSETS = [
   './data/surge-obs/index.json',
   './data/stats.json',
   './data/metadata.json',
+  './data/distribution.json',
   './data/impacts.json',
   './data/billions.json',
   './data/glossary.json',

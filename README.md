@@ -253,6 +253,12 @@ python -m http.server 8765
 
 Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directory locally. When source files change, rerun with `--apply`, rebuild derived JSON with `python scripts/preprocess_hurdat2.py`, then validate with `npm test`.
 
+### Distribution profiles
+
+Run `npm run dist:core` for an approximately 19 MB static deployment containing the complete historical catalogue and offline application without bundled radar PNGs. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write `data/distribution.json` with the source commit and capability flags. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
+
+Either staged directory can be served directly or used as the Docker build context with the included `Dockerfile`, for example `docker build -t hurricanemap-core dist/core`.
+
 Optional edge deployment: [`docs/CLOUDFLARE_CDN.md`](docs/CLOUDFLARE_CDN.md) documents the Cloudflare Worker CDN wrapper, cache policy, image optimization hints, and curl checks for before/after latency validation.
 
 Self-hosting: [`docs/SELF_HOSTING.md`](docs/SELF_HOSTING.md) documents the Docker image, port mapping, healthcheck, and offline/intranet deployment notes.
@@ -308,7 +314,8 @@ HurricaneMap/
 │   ├── animation.js        # spinning hurricane glyph + wind-field disk along the track
 │   ├── radar.js            # NEXRAD overlay — local manifest first, IEM fallback
 │   ├── stats.js            # state hotspot / decade / category breakdowns
-│   └── styles.css          # Catppuccin Mocha + glassmorphism
+│   ├── styles.css          # explicit cascade-layer entry point
+│   └── styles-*.css        # tokens, base, shell, components, themes, accessibility
 ├── data/
 │   ├── hurdat2-atlantic.txt    # raw NOAA Atlantic best-track (1851–2025)
 │   ├── hurdat2-nepac.txt       # raw NOAA Eastern Pacific best-track (1949–2025)
@@ -317,6 +324,7 @@ HurricaneMap/
 │   ├── storms.json             # full track + metadata for every US-landfalling storm
 │   ├── stats.json              # pre-computed stats: by state, decade, category, cold spots
 │   ├── metadata.json           # generated source provenance, coverage, and output metadata
+│   ├── distribution.json       # core/full build profile and capability contract
 │   └── radar/                  # archived NEXRAD composites (~512 MB, 1700+ frames)
 │       ├── manifest.json           # storm_id → {landfalls, frames}
 │       ├── Katrina-2005/           # one folder per storm

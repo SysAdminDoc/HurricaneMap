@@ -3,6 +3,7 @@ FROM python:3.12-alpine
 LABEL org.opencontainers.image.title="HurricaneMap"
 LABEL org.opencontainers.image.description="Static NOAA HURDAT2 hurricane landfall map served by Python http.server"
 LABEL org.opencontainers.image.source="https://github.com/SysAdminDoc/HurricaneMap"
+LABEL org.opencontainers.image.vendor="HurricaneMap full/core distribution compatible"
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
