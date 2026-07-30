@@ -263,7 +263,7 @@ Live satellite backdrop: [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md) docume
 
 Runtime mapping code is deliberately pinned: Leaflet 1.9.4 is vendored locally for offline use, while Cesium 1.143 is loaded only for the optional globe with exact script and stylesheet integrity hashes. Updating either requires checking its upstream license/release, changing the complete pinned asset pair, and passing the desktop/mobile map and globe smokes.
 
-Build and test dependencies use maintained npm release lines: esbuild 0.28.1 (MIT), Playwright 1.62.0 (Apache-2.0), and axe-core Playwright 4.12.1 (MPL-2.0). Before merging an update, run `npm outdated`, `npm audit --audit-level=high`, and `npm test`; the latter includes the bundle budget, browser accessibility/layout checks, offline service-worker check, and Cesium globe smoke. Playwright 1.62+ requires Node.js 20 or newer.
+Build and test dependencies use maintained npm release lines: esbuild 0.28.1 (MIT), Playwright and Playwright Test 1.62.0 (Apache-2.0), and axe-core Playwright 4.12.1 (MPL-2.0). Before merging an update, run `npm outdated`, `npm audit --audit-level=high`, and `npm test`; the latter includes the bundle budget, browser accessibility/layout checks, checked-in shell and Statistics screenshot comparisons, offline service-worker check, and Cesium globe smoke. Playwright 1.62+ requires Node.js 20 or newer. Review visual changes before explicitly refreshing the Windows baselines with `npm run test:visual:update`; ordinary `npm run test:visual` runs comparison-only.
 
 ## Data Export & Research
 

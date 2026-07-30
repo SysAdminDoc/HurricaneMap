@@ -320,6 +320,11 @@ async function boot() {
     document.documentElement.classList.add('reduce-motion');
   }
   const map = initMap();
+  const skipLink = document.querySelector('.skip-to-content');
+  const mapTarget = document.getElementById('map');
+  skipLink?.addEventListener('click', () => {
+    requestAnimationFrame(() => mapTarget?.focus({ preventScroll: true }));
+  });
   await loadInitial();
   syncYearBoundsFromData();
   populateStateFilter();

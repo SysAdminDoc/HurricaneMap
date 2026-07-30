@@ -10,6 +10,9 @@ All notable changes to HurricaneMap.
 - Device geolocation is now session-only by default, with pre-use privacy copy, explicit 24-hour persistence, legacy-coordinate purge, a clear control, and localized permission/timeout/unavailable recovery.
 - Brand-title ink is now independent from dark accent-fill tokens, and computed browser checks enforce readable header text and controls across the complete theme, palette, and high-contrast matrix.
 
+### Changed
+- Deterministic Playwright screenshot comparisons now guard the atlas shell and Statistics panel with checked-in Windows baselines, masked live/map content, and an explicit baseline-refresh command.
+
 ## v1.7.0 - Trust, resilience, and official forecast context (2026-07-25)
 
 ### Added

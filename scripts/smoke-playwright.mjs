@@ -298,7 +298,18 @@ async function assertDialogAndKeyboardContracts(page) {
   await page.keyboard.press('Tab');
   assert(await page.evaluate(() => document.activeElement?.classList.contains('skip-to-content')), 'skip link is not the first keyboard stop');
   await page.keyboard.press('Enter');
-  assert(await page.evaluate(() => location.hash === '#map' && document.activeElement?.id === 'map'), 'skip link did not focus the labeled map target');
+  await page.waitForFunction(
+    () => location.hash === '#map' && document.activeElement?.id === 'map',
+    null,
+    { timeout: 2000 },
+  ).catch(async () => {
+    const state = await page.evaluate(() => ({
+      hash: location.hash,
+      activeId: document.activeElement?.id || '',
+      activeClass: document.activeElement?.className || '',
+    }));
+    throw new Error(`skip link did not focus the labeled map target: ${JSON.stringify(state)}`);
+  });
 
   const mapAlternative = await page.evaluate(() => ({
     mapLabel: document.querySelector('#map')?.getAttribute('aria-label') || '',
