@@ -856,6 +856,42 @@ async function assertSourceLanguageDisclosures(browser, baseUrl) {
   }
 }
 
+async function assertActivePopupDomSafety(page) {
+  const result = await page.evaluate(async () => {
+    const { activeStormCardElement } = await import('/src/active.js');
+    const poison = '<img src=x onerror="window.__hmPopupPoisoned=true"><svg onload="window.__hmPopupPoisoned=true">';
+    window.__hmPopupPoisoned = false;
+    const card = activeStormCardElement({
+      id: 'AL012026',
+      name: poison,
+      classification: poison,
+      intensity: 70,
+      publicAdvisory: { url: 'https://www.nhc.noaa.gov/text/MIATCPAT1.shtml?note=%22%3E%3Cscript%3E' },
+      forecastDiscussion: { url: 'javascript:window.__hmPopupPoisoned=true' },
+    }, [25, -70]);
+    document.body.appendChild(card);
+    const snapshot = {
+      text: card.textContent || '',
+      dangerousElements: card.querySelectorAll('img,svg,script,iframe,object').length,
+      eventAttributes: [...card.querySelectorAll('*')].flatMap(element =>
+        [...element.attributes].filter(attribute => /^on/i.test(attribute.name)).map(attribute => attribute.name)
+      ),
+      hrefs: [...card.querySelectorAll('a')].map(anchor => anchor.href),
+      poisoned: window.__hmPopupPoisoned,
+    };
+    card.remove();
+    return snapshot;
+  });
+  assert(result.text.includes('<img src=x onerror='), `active popup did not preserve poisoned text as text: ${JSON.stringify(result)}`);
+  assert(result.dangerousElements === 0, `active popup created executable elements: ${JSON.stringify(result)}`);
+  assert(result.eventAttributes.length === 0 && !result.poisoned, `active popup created executable attributes: ${JSON.stringify(result)}`);
+  assert(result.hrefs.length === 3, `active popup URL allowlist kept the wrong links: ${JSON.stringify(result.hrefs)}`);
+  assert(
+    result.hrefs.every(href => new URL(href).protocol === 'https:' && ['www.nhc.noaa.gov', 'nhc.noaa.gov'].includes(new URL(href).hostname)),
+    `active popup URL allowlist admitted an unexpected origin: ${JSON.stringify(result.hrefs)}`,
+  );
+}
+
 try {
   const launchOptions = { headless: true };
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
@@ -875,6 +911,7 @@ try {
 
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
+  await assertActivePopupDomSafety(page);
 
   const migratedSettings = await page.evaluate(
     () => JSON.parse(localStorage.getItem('hm-settings-v1') || 'null'),

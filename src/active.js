@@ -5,7 +5,7 @@
 // style.
 
 import { getMap } from './map.js';
-import { escapeHtml, safeExternalUrl } from './html-utils.js';
+import { escapeHtml, safeExternalHref } from './html-utils.js';
 import {
   activeAdvisoryKey,
   activeFeedStatusText,
@@ -317,27 +317,51 @@ export function activeStormDisplayName(storm) {
   return number ? `${t('active.storm')} ${Number(number)}` : t('active.storm');
 }
 
-function activeStormCardHtml(storm, currentPoint) {
+const NHC_LINK_HOSTS = ['www.nhc.noaa.gov', 'nhc.noaa.gov'];
+
+export function activeStormCardElement(storm, currentPoint, doc = globalThis.document) {
+  if (!doc?.createElement) throw new Error('A DOM document is required to build an active-storm popup.');
   const name = activeStormDisplayName(storm);
   const classification = isPotentialTropicalCyclone(storm)
     ? t('active.ptc')
     : String(storm.classification || '').trim();
   const intensity = Number(storm.intensity);
   const links = [
-    [safeExternalUrl(storm.publicAdvisory?.url), t('active.advisory')],
-    [safeExternalUrl(storm.forecastDiscussion?.url), t('active.discussion')],
-    [safeExternalUrl(pronunciationUrlForActiveStorm(storm)), t('active.pronunciation')],
-    ['https://www.nhc.noaa.gov/rip-currents/map.html', t('active.ripCurrents')],
+    [safeExternalHref(storm.publicAdvisory?.url, { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.advisory')],
+    [safeExternalHref(storm.forecastDiscussion?.url, { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.discussion')],
+    [safeExternalHref(pronunciationUrlForActiveStorm(storm), { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.pronunciation')],
+    [safeExternalHref('https://www.nhc.noaa.gov/rip-currents/map.html', { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.ripCurrents')],
   ].filter(([url]) => url);
-  return `<article class="active-storm-card">
-    <h3>${escapeHtml(name)}</h3>
-    <p>${escapeHtml([
-      classification,
-      Number.isFinite(intensity) ? `${intensity} kt` : '',
-      currentPoint ? `${currentPoint[0].toFixed(1)}, ${currentPoint[1].toFixed(1)}` : '',
-    ].filter(Boolean).join(' · '))}</p>
-    <nav aria-label="${escapeHtml(t('active.links'))}">${links.map(([url, label]) => `<a href="${url}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`).join('')}</nav>
-  </article>`;
+
+  const article = doc.createElement('article');
+  article.className = 'active-storm-card';
+
+  const heading = doc.createElement('h3');
+  heading.textContent = name;
+  article.appendChild(heading);
+
+  const summary = doc.createElement('p');
+  summary.textContent = [
+    classification,
+    Number.isFinite(intensity) ? `${intensity} kt` : '',
+    Array.isArray(currentPoint) && currentPoint.every(Number.isFinite)
+      ? `${currentPoint[0].toFixed(1)}, ${currentPoint[1].toFixed(1)}`
+      : '',
+  ].filter(Boolean).join(' · ');
+  article.appendChild(summary);
+
+  const nav = doc.createElement('nav');
+  nav.setAttribute('aria-label', t('active.links'));
+  for (const [url, label] of links) {
+    const anchor = doc.createElement('a');
+    anchor.href = url;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener';
+    anchor.textContent = label;
+    nav.appendChild(anchor);
+  }
+  article.appendChild(nav);
+  return article;
 }
 
 async function renderActive(storms) {
@@ -361,7 +385,7 @@ async function renderActive(storms) {
       }).bindTooltip(
         escapeHtml(`${displayName}${s.classification ? ' · ' + (ptc ? t('active.ptc') : s.classification) : ''}${s.intensity ? ' · ' + s.intensity + ' kt' : ''}${distanceFromUser(cur)}`),
         { direction: 'top' },
-      ).bindPopup(activeStormCardHtml(s, cur), { className: 'active-storm-popup' }).addTo(layerGroup);
+      ).bindPopup(activeStormCardElement(s, cur), { className: 'active-storm-popup' }).addTo(layerGroup);
     }
   }
   layerGroup.addTo(map);

@@ -18,20 +18,29 @@ export function escapeHtml(s) {
 }
 
 /**
- * Validate an externally supplied URL before inserting it into href/src.
- * Returns an escaped absolute URL, or an empty string when the protocol is unsafe.
+ * Validate an externally supplied URL before assigning it to a DOM href/src.
+ * Returns an absolute URL, or an empty string when its protocol or host is not allowed.
  */
-export function safeExternalUrl(value, { protocols = ['https:', 'http:'] } = {}) {
+export function safeExternalHref(value, { protocols = ['https:', 'http:'], hosts = null } = {}) {
   if (!value) return '';
   try {
     const base = typeof window !== 'undefined' && window.location?.href
       ? window.location.href
       : 'https://example.invalid/';
     const url = new URL(String(value), base);
-    return protocols.includes(url.protocol) ? escapeHtml(url.href) : '';
+    if (!protocols.includes(url.protocol)) return '';
+    if (hosts && !hosts.map(host => host.toLowerCase()).includes(url.hostname.toLowerCase())) return '';
+    return url.href;
   } catch {
     return '';
   }
+}
+
+/**
+ * Validate and escape an external URL for insertion into a trusted HTML template.
+ */
+export function safeExternalUrl(value, options) {
+  return escapeHtml(safeExternalHref(value, options));
 }
 
 /**
