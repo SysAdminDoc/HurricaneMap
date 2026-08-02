@@ -115,12 +115,43 @@ async function runShellContract(browser, baseUrl, label) {
     const page = await preparePage(context, baseUrl);
     await waitForAppReady(page, label);
 
-    const manifestCheck = await page.evaluate(async () => {
-      const response = await fetch('/manifest.webmanifest', { cache: 'no-store' });
-      return { ok: response.ok, status: response.status, body: response.ok ? await response.text() : '' };
+    const manifestChecks = await page.evaluate(async () => {
+      const manifests = [
+        ['manifest.webmanifest', 'en-US', 'Statistics'],
+        ['manifest.es.webmanifest', 'es', 'Estadísticas'],
+        ['manifest.ht.webmanifest', 'ht', 'Estatistik'],
+      ];
+      return Promise.all(manifests.map(async ([name, locale, shortcutName]) => {
+        const manifestUrl = new URL(`./${name}`, location.href);
+        const response = await fetch(manifestUrl, { cache: 'no-store' });
+        const manifest = response.ok ? await response.json() : null;
+        const references = manifest
+          ? [...(manifest.icons || []).map(icon => icon.src), ...(manifest.screenshots || []).map(image => image.src), ...(manifest.shortcuts || []).map(shortcut => shortcut.url)]
+          : [];
+        const assets = await Promise.all(references.map(async reference => {
+          const assetResponse = await fetch(new URL(reference, manifestUrl), { cache: 'no-store' });
+          return assetResponse.ok;
+        }));
+        return {
+          name,
+          locale,
+          shortcutName,
+          ok: response.ok,
+          status: response.status,
+          manifest,
+          assets,
+        };
+      }));
     });
-    assert(manifestCheck.ok, `${label}: web app manifest did not load (${manifestCheck.status})`);
-    const manifest = JSON.parse(manifestCheck.body);
+    for (const manifestCheck of manifestChecks) {
+      assert(manifestCheck.ok, `${label}: ${manifestCheck.name} did not load (${manifestCheck.status})`);
+      const manifest = manifestCheck.manifest;
+      assert(manifest.id === './' && manifest.scope === './' && manifest.start_url === './', `${label}: ${manifestCheck.name} has unstable identity/scope`);
+      assert(manifest.lang === manifestCheck.locale, `${label}: ${manifestCheck.name} locale is incorrect`);
+      assert(manifest.shortcuts?.[0]?.name === manifestCheck.shortcutName, `${label}: ${manifestCheck.name} shortcut label is not localized`);
+      assert(manifestCheck.assets.length > 0 && manifestCheck.assets.every(Boolean), `${label}: ${manifestCheck.name} has an unresolved icon/screenshot/shortcut URL`);
+    }
+    const manifest = manifestChecks[0].manifest;
     assert(manifest.short_name === 'HurricaneMap', `${label}: web app manifest short name is incorrect`);
     assert(Array.isArray(manifest.icons) && manifest.icons.length >= 2, `${label}: manifest icons are incomplete`);
 

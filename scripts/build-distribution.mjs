@@ -9,9 +9,12 @@ const STATIC_ROOT_FILES = new Set([
   '.dockerignore',
   'Dockerfile',
   'THIRD_PARTY_NOTICES.txt',
+  'example.png',
   'globe.html',
   'index.html',
   'manifest.webmanifest',
+  'manifest.es.webmanifest',
+  'manifest.ht.webmanifest',
   'sw.js',
 ]);
 const STATIC_PREFIXES = ['branding/', 'data/', 'fonts/', 'schemas/', 'src/', 'vendor/'];

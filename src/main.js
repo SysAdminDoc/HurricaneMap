@@ -4,7 +4,7 @@ import {
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
-import { initLocale, setLocale, t, translateStaticElements } from './i18n.js';
+import { getLocale, initLocale, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { refreshSeasonSummary } from './season.js';
 import { recordView } from './search-history.js';
@@ -31,6 +31,7 @@ import { createFilterController } from './filter-controller.js';
 import { wireShellNavigation } from './shell-navigation.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
 import { purgeLegacyUserPoint } from './user-point.js';
+import { initManifestLocale } from './manifest-locale.js';
 
 initGlobalErrorSurface();
 purgeLegacyUserPoint();
@@ -308,6 +309,7 @@ async function boot() {
   // first-time Spanish/Creole visitors to English unconditionally.
   initLocale();
   if (hasStoredSetting('locale')) setLocale(getSetting('locale'));
+  initManifestLocale(getLocale());
   translateStaticElements();
 
   // Start performance monitoring early

@@ -263,6 +263,8 @@ Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directo
 
 Run `npm run dist:core` for an approximately 19 MB static deployment containing the complete historical catalogue and offline application without bundled radar PNGs. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write `data/distribution.json` with the source commit and capability flags. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
 
+The PWA manifests use the stable relative identity and scope `./`, so installs remain tied to the deployed app root on GitHub Pages, a subpath, or self-hosting. `manifest.webmanifest`, `manifest.es.webmanifest`, and `manifest.ht.webmanifest` localize installed names, screenshots, and shortcuts for the three supported interface locales; the app switches the manifest link when the locale changes. `npm run check:manifests` and the distribution/browser checks verify that every icon, screenshot, and shortcut target resolves in both profiles.
+
 Either staged directory can be served directly or used as the Docker build context with the included `Dockerfile`, for example `docker build -t hurricanemap-core dist/core`.
 
 Optional edge deployment: [`docs/CLOUDFLARE_CDN.md`](docs/CLOUDFLARE_CDN.md) documents the Cloudflare Worker CDN wrapper, cache policy, image optimization hints, and curl checks for before/after latency validation.
@@ -323,7 +325,9 @@ Then run `python -m notebook notebooks/analysis-starter.ipynb`. Pillow is includ
 ```
 HurricaneMap/
 ├── index.html              # entry — map shell
-├── manifest.webmanifest    # PWA manifest
+├── manifest.webmanifest    # English PWA manifest (stable id/scope)
+├── manifest.es.webmanifest # Spanish PWA labels/shortcuts
+├── manifest.ht.webmanifest # Haitian Creole PWA labels/shortcuts
 ├── src/
 │   ├── main.js             # app boot, filters, search, UI wiring
 │   ├── data.js             # JSON loaders + index helpers
