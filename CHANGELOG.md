@@ -13,6 +13,7 @@ All notable changes to HurricaneMap.
 - Settings now exposes actionable offline diagnostics for service-worker control, cache versions and sizes, persistence/quota, and optional-feed freshness, with scoped retry/refresh controls and a privacy-allowlisted JSON support bundle.
 - Offline releases now stage shell, data, database, and release-manifest identities as one hash-verified version tuple; profile packaging rewrites the manifest for the exact staged payload, diagnostics reports coherence, and users can repair required offline data without clearing optional tile/radar caches.
 - Visual regression now compares a deterministic desktop/mobile matrix covering shell, storm, statistics, comparison, settings, advisory replay, track playback, and theme states, with external requests aborted, map rendering stubbed, live chrome masked, and an explicit baseline-refresh command.
+- A local Chromium/Firefox/WebKit contract matrix now verifies boot, manifest, search, storm panels, versioned offline caches, and service-worker fallback through a simulated network outage; unavailable engine capabilities are reported explicitly.
 
 ### Fixed
 - Managed side panels now return keyboard focus only after View Transitions settle, preventing intermittent focus loss to the document body.
