@@ -14,6 +14,7 @@ import { escapeHtml } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
   applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
+  normalizeAdvisoryReplayState,
   viewOptionsFromDecoded,
 } from './url-state.js';
 import {
@@ -42,6 +43,7 @@ const filters = createDefaultFilters({ yearMin: YEAR_MIN_DEFAULT, yearMax: YEAR_
 // Track currently-opened storm so URL hash can encode it.
 let openStormId = null;
 let comparisonIds = [];
+let advisoryReplayState = null;
 let currentVisibleLandfalls = [];
 
 function deferNonCritical(task) {
@@ -82,9 +84,9 @@ const loadEvac = once(() => import('./evac.js'));
 const loadPoster = once(() => import('./poster.js'));
 const loadSST = once(() => import('./sst.js'));
 
-async function showStormLazy(landfall) {
+async function showStormLazy(landfall, options = {}) {
   const { showStorm } = await loadPanel();
-  return showStorm(landfall);
+  return showStorm(landfall, options);
 }
 
 async function openStateLazy(stateName) {
@@ -122,6 +124,7 @@ function writeHash() {
   const newHash = encodeHashState(filters, {
     openStormId,
     comparisonIds,
+    advisoryReplay: advisoryReplayState,
     windUnit: getSetting('windUnit'),
     damageMode: getSetting('damageMode'),
     yearMinDefault: YEAR_MIN_DEFAULT,
@@ -351,6 +354,7 @@ async function boot() {
     getCurrentHash: () => encodeHashState(filters, {
       openStormId,
       comparisonIds,
+      advisoryReplay: advisoryReplayState,
       windUnit: getSetting('windUnit'),
       damageMode: getSetting('damageMode'),
       yearMinDefault: YEAR_MIN_DEFAULT,
@@ -410,7 +414,7 @@ async function boot() {
     const lf = getLandfalls().find(x => x.storm_id === restored.storm);
     if (lf) {
       // Defer slightly so map zoom/markers settle first.
-      setTimeout(() => onLandfallClick(lf), 60);
+      setTimeout(() => onLandfallClick(lf, null, { advisoryReplay: advisoryReplayState }), 60);
     }
   }
   // Only open the state panel for a state the hash validator actually
@@ -438,7 +442,7 @@ async function boot() {
     highlightYearRange(filters.yearMin, filters.yearMax);
     if (nav?.storm) {
       const lf = getLandfalls().find(x => x.storm_id === nav.storm);
-      if (lf) setTimeout(() => onLandfallClick(lf), 60);
+      if (lf) setTimeout(() => onLandfallClick(lf, null, { advisoryReplay: advisoryReplayState }), 60);
     }
     if (nav?.s && filters.state === nav.s) {
       setTimeout(() => openStateLazy(nav.s), 80);
@@ -454,6 +458,7 @@ function restoreExtendedView(decoded) {
   const options = viewOptionsFromDecoded(decoded);
   if (options.windUnit) setSetting('windUnit', options.windUnit);
   if (options.damageMode) setSetting('damageMode', options.damageMode);
+  advisoryReplayState = options.advisoryReplay;
   comparisonIds = options.comparisonIds;
   if (comparisonIds.length) {
     loadCompare()
@@ -466,6 +471,14 @@ function restoreExtendedView(decoded) {
 
 document.addEventListener('comparison-pins:change', event => {
   comparisonIds = Array.isArray(event.detail?.ids) ? event.detail.ids.slice(0, 4) : [];
+  writeHash();
+});
+
+document.addEventListener('advisory-replay:change', event => {
+  const detail = event.detail;
+  advisoryReplayState = detail?.active && detail.stormId === openStormId
+    ? normalizeAdvisoryReplayState(detail)
+    : null;
   writeHash();
 });
 
@@ -741,18 +754,25 @@ async function redrawTracks(visible) {
   }
 }
 
-function onLandfallClick(landfall, marker) {
+function onLandfallClick(landfall, marker, { advisoryReplay = undefined } = {}) {
   focusLandfall(landfall);
   openStormId = landfall.storm_id;
+  const requestedReplay = advisoryReplay === undefined
+    ? advisoryReplayState
+    : advisoryReplay;
+  advisoryReplayState = requestedReplay?.stormId === openStormId
+    ? normalizeAdvisoryReplayState(requestedReplay)
+    : null;
   recordView(landfall);
   writeHash();
-  showStormLazy(landfall).catch((error) => {
+  showStormLazy(landfall, { advisoryReplay: advisoryReplayState }).catch((error) => {
     console.error('Failed to open storm panel:', error);
   });
 }
 
 document.addEventListener('storm-panel:close', () => {
   openStormId = null;
+  advisoryReplayState = null;
   writeHash();
 });
 

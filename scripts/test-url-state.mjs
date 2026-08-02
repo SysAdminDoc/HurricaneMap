@@ -3,9 +3,12 @@ import {
   CATEGORY_DEFAULTS,
   applyHashToFilters,
   createDefaultFilters,
+  decodeAdvisoryReplayState,
   decodeHashState,
+  encodeAdvisoryReplayState,
   encodeHashState,
   launcherActionFromHash,
+  normalizeAdvisoryReplayState,
   restoreFiltersFromHash,
   viewOptionsFromDecoded,
 } from '../src/url-state.js';
@@ -152,11 +155,13 @@ console.log('url state ok');
     comparisonIds: ['AL122005', 'EP012024'],
     windUnit: 'mph',
     damageMode: 'nominal',
+    advisoryReplay: null,
   });
   assert.deepEqual(viewOptionsFromDecoded(decodeHashState('#v=1')), {
     comparisonIds: [],
     windUnit: 'kt',
     damageMode: 'real',
+    advisoryReplay: null,
   });
   assert.equal(decodeHashState(`#v=1&x=${'a'.repeat(2050)}`), null);
 
@@ -168,4 +173,38 @@ console.log('url state ok');
   });
   assert.deepEqual(cats(defaultsRestored), [...CATEGORY_DEFAULTS].sort());
   assert.equal(defaultsRestored.showTracks, false);
+}
+
+{
+  const replay = { stormId: 'al092022', index: 3, coneEra: '2025' };
+  assert.equal(encodeAdvisoryReplayState(replay), '1.AL092022.3.2025');
+  assert.deepEqual(decodeAdvisoryReplayState('1.AL092022.3.2025', { stormId: 'AL092022' }), {
+    stormId: 'AL092022',
+    index: 3,
+    coneEra: '2025',
+  });
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.3.2025', { stormId: 'AL142024' }), null);
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.bad.2025'), null);
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.1000.2025'), null);
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.3.2014'), null);
+  assert.equal(normalizeAdvisoryReplayState({ storm_id: 'AL092022', index: 0, cone_era: '2025' }).stormId, 'AL092022');
+
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const hash = encodeHashState(filters, {
+    openStormId: 'AL092022',
+    advisoryReplay: replay,
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+  });
+  assert.equal(hash, '#v=1&storm=AL092022&replay=1.AL092022.3.2025');
+  assert.deepEqual(viewOptionsFromDecoded(decodeHashState(hash)).advisoryReplay, {
+    stormId: 'AL092022',
+    index: 3,
+    coneEra: '2025',
+  });
+  assert.equal(
+    encodeHashState(filters, { openStormId: 'AL142024', advisoryReplay: replay }),
+    '#v=1&storm=AL142024',
+    'replay state for another storm must not leak into a shared view',
+  );
 }

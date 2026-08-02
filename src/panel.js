@@ -107,7 +107,7 @@ document.addEventListener('hm-panel:hidden', event => {
 
 let showStormSeq = 0;
 
-export async function showStorm(landfall) {
+export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   // Sequence guard: rapid marker clicks interleave across the awaits below
   // (storms.json / exposure-index loads); only the latest click may render.
   const seq = ++showStormSeq;
@@ -151,10 +151,10 @@ export async function showStorm(landfall) {
     if (seq !== showStormSeq) return;
   }
   const allStorms = getAllStorms();
-  render(storm, landfall, allStorms);
+  render(storm, landfall, allStorms, advisoryReplay);
 }
 
-function render(storm, landfall, allStorms) {
+function render(storm, landfall, allStorms, advisoryReplay = null) {
   const niceName = formatStormName(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
   const heading = isUnnamed
@@ -579,7 +579,7 @@ function render(storm, landfall, allStorms) {
     });
   }
 
-  wireAdvisoryReplay(storm);
+  wireAdvisoryReplay(storm, advisoryReplay);
 
   const coneEnabled = document.getElementById('cone-retro-enabled');
   const coneEra = document.getElementById('cone-retro-era');
@@ -636,7 +636,7 @@ let advisoryReplaySeq = 0;
 
 // The archive covers a bounded era, so most storms have no replay at all. That
 // is stated outright rather than left as a dead control.
-function wireAdvisoryReplay(storm) {
+function wireAdvisoryReplay(storm, initialReplay = null) {
   const enabled = document.getElementById('advisory-replay-enabled');
   const steps = document.getElementById('advisory-replay-steps');
   const scrubber = document.getElementById('advisory-replay-scrubber');
@@ -652,6 +652,10 @@ function wireAdvisoryReplay(storm) {
   let record = null;
   let coneEra = '2025';
   let hasFramedReplay = false;
+
+  const notifyReplayState = detail => {
+    document.dispatchEvent(new CustomEvent('advisory-replay:change', { detail }));
+  };
 
   const show = async index => {
     const result = await renderAdvisory(storm, { map: getMap(), record, coneEra, index });
@@ -696,6 +700,14 @@ function wireAdvisoryReplay(storm) {
     discussion.innerHTML = advisory.discussion
       ? `<a href="${escapeHtml(safeExternalUrl(advisory.discussion))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('advisoryReplay.discussion'))}</a>`
       : escapeHtml(t('advisoryReplay.noDiscussion'));
+    notifyReplayState({
+      active: true,
+      stormId: storm.id,
+      index: replayPosition.index,
+      coneEra,
+      advisoryNumber: advisory.n,
+      issueTime: advisory.t,
+    });
   };
 
   const sync = async () => {
@@ -705,6 +717,7 @@ function wireAdvisoryReplay(storm) {
       steps.hidden = true;
       provenance.textContent = '';
       status.textContent = '';
+      notifyReplayState({ active: false, stormId: storm.id });
       return;
     }
     status.textContent = t('advisoryReplay.loading');
@@ -724,18 +737,25 @@ function wireAdvisoryReplay(storm) {
       provenance.textContent = '';
       status.textContent = t('advisoryReplay.unavailable', archive?.era?.label || '');
       enabled.checked = false;
+      notifyReplayState({ active: false, stormId: storm.id });
       return;
     }
     steps.hidden = false;
     scrubber.max = String(record.advisories.length - 1);
-    scrubber.value = '0';
-    await show(0);
+    const recordConeEra = record.coneEra || archive?.era?.coneEra || '2025';
+    coneEra = initialReplay?.coneEra === recordConeEra ? initialReplay.coneEra : recordConeEra;
+    scrubber.value = String(initialReplay?.index ?? 0);
+    await show(Number(scrubber.value));
   };
 
   enabled.addEventListener('change', sync);
   scrubber.addEventListener('input', () => { if (record) show(Number(scrubber.value || 0)); });
   prev.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) - 1); });
   next.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) + 1); });
+  if (initialReplay?.stormId === storm.id) {
+    enabled.checked = true;
+    sync();
+  }
 }
 
 // Map a U.S. state name to a representative city in COASTAL_CITIES so the

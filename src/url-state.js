@@ -9,7 +9,12 @@ const LAUNCHER_ACTIONS = new Set(['stats', 'compare']);
 const VALID_UNITS = new Set(['kt', 'mph', 'kmh']);
 const VALID_DAMAGE_MODES = new Set(['nominal', 'real']);
 const STORM_ID_PATTERN = /^(?:AL|EP)\d{6}$/;
+const ADVISORY_REPLAY_STATE_VERSION = '1';
+const ADVISORY_CONE_ERAS = new Set(Array.from({ length: 11 }, (_, index) => String(2015 + index)));
+const MAX_ADVISORY_REPLAY_INDEX = 999;
 const MAX_HASH_LENGTH = 2048;
+
+export { ADVISORY_REPLAY_STATE_VERSION };
 
 export function launcherActionFromHash(hash) {
   const raw = String(hash || '').replace(/^#/, '').trim().toLowerCase();
@@ -35,6 +40,7 @@ export function createDefaultFilters({ yearMin = YEAR_FALLBACK_MIN, yearMax = YE
 export function encodeHashState(filters, {
   openStormId = '',
   comparisonIds = [],
+  advisoryReplay = null,
   windUnit = 'kt',
   damageMode = 'real',
   yearMinDefault = YEAR_FALLBACK_MIN,
@@ -63,6 +69,7 @@ export function encodeHashState(filters, {
     p: normalizeComparisonIds(comparisonIds).join(','),
     u: VALID_UNITS.has(windUnit) ? windUnit : 'kt',
     d: VALID_DAMAGE_MODES.has(damageMode) ? damageMode : 'real',
+    replay: encodeAdvisoryReplayState(advisoryReplay, { stormId: openStormId }),
   };
   const parts = [];
   for (const key of Object.keys(current)) {
@@ -71,6 +78,43 @@ export function encodeHashState(filters, {
     }
   }
   return parts.length ? `#v=${URL_STATE_VERSION}&${parts.join('&')}` : '';
+}
+
+// The replay payload is versioned independently from the broader v=1 view so
+// saved-view imports remain compatible while this state gains its own contract.
+// The ordinal is zero-based, matching the advisory replay scrubber.
+export function encodeAdvisoryReplayState(state, { stormId = '' } = {}) {
+  const normalized = normalizeAdvisoryReplayState(state);
+  if (!normalized || (stormId && normalized.stormId !== normalizeStormId(stormId))) return '';
+  return [
+    ADVISORY_REPLAY_STATE_VERSION,
+    normalized.stormId,
+    normalized.index,
+    normalized.coneEra,
+  ].join('.');
+}
+
+export function decodeAdvisoryReplayState(value, { stormId = '' } = {}) {
+  const parts = String(value || '').split('.');
+  if (parts.length !== 4 || parts[0] !== ADVISORY_REPLAY_STATE_VERSION) return null;
+  if (!/^\d{1,3}$/.test(parts[2])) return null;
+  const normalized = normalizeAdvisoryReplayState({
+    stormId: parts[1],
+    index: parts[2],
+    coneEra: parts[3],
+  });
+  if (!normalized || (stormId && normalized.stormId !== normalizeStormId(stormId))) return null;
+  return normalized;
+}
+
+export function normalizeAdvisoryReplayState(state) {
+  if (!state || typeof state !== 'object') return null;
+  const stormId = normalizeStormId(state.stormId ?? state.storm_id);
+  const index = Number(state.index);
+  const coneEra = String(state.coneEra ?? state.cone_era ?? '');
+  if (!stormId || !Number.isSafeInteger(index) || index < 0 || index > MAX_ADVISORY_REPLAY_INDEX) return null;
+  if (!ADVISORY_CONE_ERAS.has(coneEra)) return null;
+  return { stormId, index, coneEra };
 }
 
 export function decodeHashState(hash) {
@@ -94,13 +138,16 @@ export function decodeHashState(hash) {
 
 export function viewOptionsFromDecoded(decoded) {
   if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) {
-    return { comparisonIds: [], windUnit: null, damageMode: null };
+    return { comparisonIds: [], windUnit: null, damageMode: null, advisoryReplay: null };
   }
   const versioned = decoded.v === URL_STATE_VERSION;
   return {
     comparisonIds: normalizeComparisonIds(String(decoded.p || '').split(',')),
     windUnit: VALID_UNITS.has(decoded.u) ? decoded.u : versioned ? 'kt' : null,
     damageMode: VALID_DAMAGE_MODES.has(decoded.d) ? decoded.d : versioned ? 'real' : null,
+    advisoryReplay: versioned
+      ? decodeAdvisoryReplayState(decoded.replay, { stormId: decoded.storm })
+      : null,
   };
 }
 
@@ -187,4 +234,9 @@ function hasKnownState(knownStates, state) {
     return Object.prototype.hasOwnProperty.call(knownStates, state);
   }
   return false;
+}
+
+function normalizeStormId(value) {
+  const normalized = String(value || '').trim().toUpperCase();
+  return STORM_ID_PATTERN.test(normalized) ? normalized : '';
 }

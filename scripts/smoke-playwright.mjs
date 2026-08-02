@@ -1867,6 +1867,14 @@ try {
   // Ian is inside the era: the issued forecast, its cone, and the best track it
   // is compared against must all render, and stepping must change the geometry.
   await openStormPanel(page, 'AL092022');
+  // The helper above renders the lazy panel directly; synchronize the shell's
+  // permalink owner before exercising replay URL updates.
+  await page.evaluate(() => { location.hash = '#v=1&storm=AL092022'; });
+  await page.waitForFunction(
+    () => /Ian \(2022\)/i.test(document.querySelector('#panel-sticky-header')?.textContent || '') &&
+      document.querySelector('#advisory-replay-enabled'),
+    { timeout: 15000 },
+  );
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-cone-shape'),
@@ -1909,6 +1917,49 @@ try {
   assert(
     firstAdvisory.actualPath && secondAdvisory.actualPath,
     'advisory replay never drew the best track it compares against',
+  );
+  await page.waitForFunction(
+    () => /(?:^|&)replay=1\.AL092022\.1\.2025(?:&|$)/.test(location.hash),
+    { timeout: 5000 },
+  );
+  const replayShareHash = await page.evaluate(() => location.hash);
+  assert(
+    replayShareHash.includes('storm=AL092022') && replayShareHash.includes('replay=1.AL092022.1.2025'),
+    `advisory replay share state was not canonical: ${replayShareHash}`,
+  );
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => document.querySelector('#storm-panel')?.hidden === false &&
+      document.querySelector('#advisory-replay-enabled')?.checked === true &&
+      /Advisory 2 of/.test(document.querySelector('#advisory-replay-meta')?.textContent || ''),
+    { timeout: 20000 },
+  );
+  const restoredReplay = await page.evaluate(() => ({
+    hash: location.hash,
+    checked: document.querySelector('#advisory-replay-enabled')?.checked,
+    meta: document.querySelector('#advisory-replay-meta')?.textContent || '',
+    forecast: document.querySelectorAll('path.advisory-forecast-line').length,
+    actual: document.querySelectorAll('path.advisory-actual-line').length,
+  }));
+  assert(restoredReplay.checked && /Advisory 2 of/.test(restoredReplay.meta), `shared replay did not restore: ${JSON.stringify(restoredReplay)}`);
+  assert(restoredReplay.forecast > 0 && restoredReplay.actual > 0, 'shared replay lost forecast/actual geometry after reload');
+  await page.evaluate(() => {
+    location.hash = '#v=1&storm=AL092022&replay=1.AL092022.1000.2025';
+  });
+  await page.waitForFunction(
+    () => document.querySelector('#advisory-replay-enabled')?.checked === false &&
+      document.querySelectorAll('path.advisory-forecast-line').length === 0,
+    { timeout: 15000 },
+  );
+  assert(
+    await page.evaluate(() => !location.hash.includes('replay=1.AL092022.1000.2025')),
+    'malformed replay state remained active after navigation',
+  );
+  await page.evaluate(hash => { location.hash = hash; }, replayShareHash);
+  await page.waitForFunction(
+    () => document.querySelector('#advisory-replay-enabled')?.checked === true &&
+      /Advisory 2 of/.test(document.querySelector('#advisory-replay-meta')?.textContent || ''),
+    { timeout: 15000 },
   );
   await page.locator('#advisory-replay-scrubber').evaluate(element => {
     element.value = element.max;

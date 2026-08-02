@@ -15,6 +15,7 @@ All notable changes to HurricaneMap.
 - Visual regression now compares a deterministic desktop/mobile matrix covering shell, storm, statistics, comparison, settings, advisory replay, track playback, and theme states, with external requests aborted, map rendering stubbed, live chrome masked, and an explicit baseline-refresh command.
 - A local Chromium/Firefox/WebKit contract matrix now verifies boot, manifest, search, storm panels, versioned offline caches, and service-worker fallback through a simulated network outage; unavailable engine capabilities are reported explicitly.
 - Research exports now carry a schema-versioned release-provenance block binding the app version, export time, release-manifest hash/source commit, relevant artifact hashes and source dates, and methodology across CSV, Markdown, QGIS GeoJSON, and SVG track output.
+- Advisory replay links now preserve a versioned storm, zero-based replay ordinal, and cone-era state; reloads restore the same issued forecast and final-best-track comparison, while malformed or mismatched state falls back to the ordinary storm panel.
 
 ### Fixed
 - Managed side panels now return keyboard focus only after View Transitions settle, preventing intermittent focus loss to the document body.
