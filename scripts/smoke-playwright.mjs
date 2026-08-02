@@ -1700,6 +1700,76 @@ try {
   await page.uncheck('#cone-retro-enabled');
   await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), { timeout: 5000 });
 
+  // Katrina predates the archived-advisory era, so the replay must say so and
+  // release its own control rather than sitting enabled over an empty map.
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(
+    () => /No archived advisories/.test(document.querySelector('#advisory-replay-status')?.textContent || ''),
+    { timeout: 10000 },
+  );
+  const outsideEra = await page.evaluate(() => ({
+    checked: document.querySelector('#advisory-replay-enabled')?.checked,
+    stepsHidden: document.querySelector('#advisory-replay-steps')?.hidden,
+    status: document.querySelector('#advisory-replay-status')?.textContent || '',
+    shapes: document.querySelectorAll('path.advisory-forecast-line, path.advisory-cone-shape').length,
+  }));
+  assert(outsideEra.checked === false, 'advisory replay stayed enabled for a storm it cannot replay');
+  assert(outsideEra.stepsHidden === true, 'advisory replay left its stepper visible with no advisories');
+  assert(outsideEra.shapes === 0, 'advisory replay drew geometry for a storm outside the archived era');
+  assert(/2020-2024/.test(outsideEra.status), `advisory replay did not name its covered era: ${outsideEra.status}`);
+
+  // Ian is inside the era: the issued forecast, its cone, and the best track it
+  // is compared against must all render, and stepping must change the geometry.
+  await page.evaluate(() => { location.hash = '#storm=AL092022'; });
+  await page.waitForFunction(() => /Ian/i.test(document.querySelector('#panel-body')?.textContent || ''), { timeout: 15000 });
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(
+    () => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-cone-shape'),
+    { timeout: 15000 },
+  );
+  const firstAdvisory = await page.evaluate(() => ({
+    meta: document.querySelector('#advisory-replay-meta')?.textContent || '',
+    status: document.querySelector('#advisory-replay-status')?.textContent || '',
+    discussion: document.querySelector('#advisory-replay-discussion a')?.href || '',
+    forecastPath: document.querySelector('path.advisory-forecast-line')?.getAttribute('d') || '',
+    actualPath: document.querySelector('path.advisory-actual-line')?.getAttribute('d') || '',
+    prevDisabled: document.querySelector('#advisory-replay-prev')?.disabled,
+    points: document.querySelectorAll('path.advisory-forecast-point').length,
+  }));
+  assert(/Advisory 1 of \d+/.test(firstAdvisory.meta), `advisory replay did not report its position: ${firstAdvisory.meta}`);
+  assert(firstAdvisory.prevDisabled === true, 'advisory replay allowed stepping before the first advisory');
+  assert(firstAdvisory.points > 0, 'advisory replay drew no forecast positions');
+  assert(
+    /^https:\/\/www\.nhc\.noaa\.gov\/archive\/2022\/al09\/al092022\.discus\.\d{3}\.shtml$/.test(firstAdvisory.discussion),
+    `advisory replay discussion link is not an archived NHC product: ${firstAdvisory.discussion}`,
+  );
+  await page.click('#advisory-replay-next');
+  await page.waitForFunction(
+    previous => document.querySelector('path.advisory-forecast-line')?.getAttribute('d') !== previous,
+    firstAdvisory.forecastPath,
+    { timeout: 10000 },
+  );
+  const secondAdvisory = await page.evaluate(() => ({
+    meta: document.querySelector('#advisory-replay-meta')?.textContent || '',
+    status: document.querySelector('#advisory-replay-status')?.textContent || '',
+    scrubber: document.querySelector('#advisory-replay-scrubber')?.value || '',
+    actualPath: document.querySelector('path.advisory-actual-line')?.getAttribute('d') || '',
+  }));
+  assert(/Advisory 2 of \d+/.test(secondAdvisory.meta), `stepping did not advance the advisory: ${secondAdvisory.meta}`);
+  assert(secondAdvisory.scrubber === '1', `stepping did not move the scrubber: ${secondAdvisory.scrubber}`);
+  assert(
+    /Verified at \d+ leads/.test(secondAdvisory.status) || /No best-track point/.test(secondAdvisory.status),
+    `advisory replay reported no verification outcome: ${secondAdvisory.status}`,
+  );
+  assert(
+    firstAdvisory.actualPath && secondAdvisory.actualPath,
+    'advisory replay never drew the best track it compares against',
+  );
+  await page.uncheck('#advisory-replay-enabled');
+  await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), { timeout: 5000 });
+  await page.evaluate(() => { location.hash = '#storm=AL122005'; });
+  await page.waitForFunction(() => /Katrina/i.test(document.querySelector('#panel-body')?.textContent || ''), { timeout: 15000 });
+
   await page.check('#art-mode-enabled');
   await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--animated').length === 20 && /20 plausible paths/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
   const animatedRisk = await page.evaluate(() => ({

@@ -64,6 +64,7 @@ function sourceUrl(relative) {
   if (relative === 'data/enso.json') return 'https://psl.noaa.gov/gcos_wgsp/Timeseries/Nino34/';
   if (relative === 'data/outlook.json') return 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
   if (relative === 'data/distribution.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
+  if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';
   return 'https://www.nhc.noaa.gov/data/hurdat/';
 }
 

@@ -36,6 +36,12 @@ import {
 } from './impact-utils.js';
 import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
+import {
+  clearAdvisoryReplay,
+  getStormAdvisories,
+  loadAdvisories,
+  renderAdvisory,
+} from './advisory-replay.js';
 import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
 import { presentPressure } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
@@ -83,6 +89,7 @@ closeBtn.addEventListener('click', () => {
   hideHwm();
   clearRetrospectiveCone();
   clearRiskTrajectories();
+  clearAdvisoryReplay();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
@@ -107,6 +114,7 @@ export async function showStorm(landfall) {
   hideHwm();
   clearRetrospectiveCone();
   clearRiskTrajectories();
+  clearAdvisoryReplay();
   await ensureStormsLoaded();
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
@@ -305,6 +313,31 @@ function render(storm, landfall, allStorms) {
         </div>
 
         <div id="forecast-skill-host"></div>
+
+        <section class="advisory-replay-control" aria-labelledby="advisory-replay-title">
+          <div class="cone-retro-heading">
+            <h3 id="advisory-replay-title">${t('advisoryReplay.title')}</h3>
+            <label class="wf-toggle">
+              <input type="checkbox" id="advisory-replay-enabled">
+              <span>${t('advisoryReplay.show')}</span>
+            </label>
+          </div>
+          <p>${t('advisoryReplay.explainer')}</p>
+          <div class="advisory-replay-steps" id="advisory-replay-steps" hidden>
+            <div class="advisory-replay-nav">
+              <button type="button" class="advisory-replay-step" id="advisory-replay-prev" aria-label="${t('advisoryReplay.previous')}">◀</button>
+              <input type="range" id="advisory-replay-scrubber" min="0" max="0" value="0" step="1" aria-label="${t('advisoryReplay.scrubber')}">
+              <button type="button" class="advisory-replay-step" id="advisory-replay-next" aria-label="${t('advisoryReplay.next')}">▶</button>
+            </div>
+            <p class="advisory-replay-meta" id="advisory-replay-meta"></p>
+            <ul class="advisory-replay-legend">
+              <li><span class="advisory-swatch advisory-swatch--forecast"></span>${t('advisoryReplay.legendForecast')}</li>
+              <li><span class="advisory-swatch advisory-swatch--actual"></span>${t('advisoryReplay.legendActual')}</li>
+            </ul>
+            <p class="advisory-replay-discussion" id="advisory-replay-discussion"></p>
+          </div>
+          <p class="cone-retro-status" id="advisory-replay-status" role="status" aria-live="polite"></p>
+        </section>
 
         <section class="cone-retro-control" aria-labelledby="cone-retro-title">
           <div class="cone-retro-heading">
@@ -533,6 +566,8 @@ function render(storm, landfall, allStorms) {
     });
   }
 
+  wireAdvisoryReplay(storm);
+
   const coneEnabled = document.getElementById('cone-retro-enabled');
   const coneEra = document.getElementById('cone-retro-era');
   const coneEllipse = document.getElementById('cone-retro-ellipse');
@@ -582,6 +617,90 @@ function render(storm, landfall, allStorms) {
     artEnabled.addEventListener('change', syncArt);
     artEra.addEventListener('change', syncArt);
   }
+}
+
+let advisoryReplaySeq = 0;
+
+// The archive covers a bounded era, so most storms have no replay at all. That
+// is stated outright rather than left as a dead control.
+function wireAdvisoryReplay(storm) {
+  const enabled = document.getElementById('advisory-replay-enabled');
+  const steps = document.getElementById('advisory-replay-steps');
+  const scrubber = document.getElementById('advisory-replay-scrubber');
+  const prev = document.getElementById('advisory-replay-prev');
+  const next = document.getElementById('advisory-replay-next');
+  const meta = document.getElementById('advisory-replay-meta');
+  const discussion = document.getElementById('advisory-replay-discussion');
+  const status = document.getElementById('advisory-replay-status');
+  if (!enabled || !steps || !scrubber || !prev || !next || !meta || !discussion || !status) return;
+
+  const seq = ++advisoryReplaySeq;
+  let record = null;
+  let coneEra = '2025';
+
+  const show = async index => {
+    const result = await renderAdvisory(storm, { map: getMap(), record, coneEra, index });
+    if (seq !== advisoryReplaySeq) return;
+    if (result.status !== 'rendered') {
+      status.textContent = result.status === 'error' ? t('advisoryReplay.error') : '';
+      return;
+    }
+    const { advisory, summary } = result;
+    scrubber.value = String(result.index);
+    scrubber.setAttribute('aria-valuenow', String(advisory.n));
+    scrubber.setAttribute('aria-valuetext', t('advisoryReplay.position', String(advisory.n), String(record.advisoryCount)));
+    prev.disabled = result.index <= 0;
+    next.disabled = result.index >= record.advisories.length - 1;
+    meta.textContent = [
+      t('advisoryReplay.position', String(advisory.n), String(record.advisoryCount)),
+      t('advisoryReplay.issued', formatTime(advisory.t)),
+    ].join(' · ');
+    status.textContent = summary.verifiedLeads
+      ? [
+        t('advisoryReplay.verified', String(summary.verifiedLeads), String(summary.meanTrackErrorNmi)),
+        t('advisoryReplay.longest', String(summary.longestLeadHours), String(summary.longestLeadTrackErrorNmi)),
+      ].join(' ')
+      : t('advisoryReplay.unverified');
+    discussion.innerHTML = advisory.discussion
+      ? `<a href="${escapeHtml(safeExternalUrl(advisory.discussion))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('advisoryReplay.discussion'))}</a>`
+      : escapeHtml(t('advisoryReplay.noDiscussion'));
+  };
+
+  const sync = async () => {
+    if (!enabled.checked) {
+      clearAdvisoryReplay();
+      steps.hidden = true;
+      status.textContent = '';
+      return;
+    }
+    status.textContent = t('advisoryReplay.loading');
+    let archive;
+    try {
+      archive = await loadAdvisories();
+    } catch {
+      if (seq !== advisoryReplaySeq) return;
+      status.textContent = t('advisoryReplay.error');
+      return;
+    }
+    if (seq !== advisoryReplaySeq) return;
+    record = getStormAdvisories(archive, storm.id);
+    coneEra = archive?.era?.coneEra || '2025';
+    if (!record?.advisories?.length) {
+      steps.hidden = true;
+      status.textContent = t('advisoryReplay.unavailable', archive?.era?.label || '');
+      enabled.checked = false;
+      return;
+    }
+    steps.hidden = false;
+    scrubber.max = String(record.advisories.length - 1);
+    scrubber.value = '0';
+    await show(0);
+  };
+
+  enabled.addEventListener('change', sync);
+  scrubber.addEventListener('input', () => { if (record) show(Number(scrubber.value || 0)); });
+  prev.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) - 1); });
+  next.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) + 1); });
 }
 
 // Map a U.S. state name to a representative city in COASTAL_CITIES so the

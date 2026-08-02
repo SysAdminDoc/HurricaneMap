@@ -79,6 +79,11 @@ npm run build
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
+## What's new in v1.8.0 - Advisory replay and globe isolation (2026-08-02)
+
+- **Advisory replay:** for U.S.-landfalling Atlantic storms of 2020-2024, storm panels step through every advisory NHC issued — the forecast track and cone as published, beside the final best track, with the verified track and intensity error at each lead and a link to that advisory's own forecast discussion. Positions, intensities, and issue times come verbatim from the archived ATCF a-decks; nothing is reconstructed. The era is bounded deliberately: the cone radii the app draws with are computed from exactly those years, so each advisory is drawn with its own error statistics.
+- **Globe isolation:** the optional 3D globe moved into a least-privilege sandboxed frame, so the application document no longer grants `unsafe-eval` or any third-party script host.
+
 ## What's new in v1.7.0 - Trust, resilience, and official forecast context (2026-07-25)
 
 - **Official decision context:** selected points show fresh NHC 34/50/64 kt cumulative wind probabilities and nearby 34 kt arrival contours, with issue time, source links, and stale/offline safeguards.
@@ -434,6 +439,7 @@ Every preprocessing run writes `data/metadata.json` alongside the generated land
 | Atlantic best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Official forecast skill (2021–2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml) — regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
+| Archived NHC advisories (2020–2024 U.S.-landfalling Atlantic storms) | [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/) — regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
 | Format spec | [Landsea, C. W. — *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
 | Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/) — fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |

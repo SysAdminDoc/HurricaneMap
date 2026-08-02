@@ -8649,6 +8649,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .forecast-skill-sources a { color: var(--blue); }
 
+.advisory-replay-control,
 .cone-retro-control,
 .art-mode-control {
   display: grid;
@@ -8691,6 +8692,74 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 }
 
 .cone-retro-control .cone-retro-status { color: var(--blue); min-height: 1em; }
+
+.advisory-replay-control p {
+  margin: 0;
+  color: var(--subtext);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.advisory-replay-control .cone-retro-status { color: var(--blue); min-height: 1em; }
+
+.advisory-replay-steps {
+  display: grid;
+  gap: 8px;
+}
+
+.advisory-replay-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.advisory-replay-nav input[type="range"] { flex: 1 1 auto; min-width: 0; }
+
+.advisory-replay-step {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--text);
+  background: var(--crust);
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.advisory-replay-step:hover:not(:disabled) { border-color: var(--blue); }
+
+.advisory-replay-step:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.advisory-replay-meta { color: var(--text) !important; font-weight: 600; }
+
+.advisory-replay-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--subtext);
+  font-size: 0.72rem;
+}
+
+.advisory-replay-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.advisory-swatch {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.advisory-swatch--forecast { background: var(--yellow); }
+
+.advisory-swatch--actual { background: var(--green); }
+
+.advisory-replay-discussion a { color: var(--blue); }
 
 .art-mode-control p {
   margin: 0;

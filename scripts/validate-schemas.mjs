@@ -14,6 +14,7 @@ const schemaFiles = [
   'impacts-v1.schema.json',
   'saved-views-v1.schema.json',
   'release-manifest-v1.schema.json',
+  'advisories-v1.schema.json',
 ];
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 const schemas = new Map();
@@ -38,6 +39,7 @@ const fixtures = [
     }],
   }],
   ['release-manifest-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/release-manifest.json'), 'utf8'))],
+  ['advisories-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/advisories.json'), 'utf8'))],
 ];
 
 for (const [schemaName, data] of fixtures) {
