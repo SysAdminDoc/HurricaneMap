@@ -247,16 +247,17 @@ npm install
 # Use --apply before preprocessing when a new revision is detected.
 node scripts/refresh-hurdat2.mjs --dry-run
 
-# Rebuild derived JSON after raw HURDAT2 data changes.
+# Rebuild derived JSON after raw HURDAT2 data changes. --apply also updates
+# data/hurdat2-sources.json with the exact upstream filenames and SHA-256 values.
 # (Already pre-built JSON lives in data/ so you can skip this step entirely.)
-python scripts/preprocess_hurdat2.py
+python scripts/preprocess_hurdat2.py --generated-at 2026-08-02T00:00:00Z
 
 # Serve locally — `fetch()` won't work over file:// in modern browsers.
 python -m http.server 8765
 # open http://127.0.0.1:8765/
 ```
 
-Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directory locally. When source files change, rerun with `--apply`, rebuild derived JSON with `python scripts/preprocess_hurdat2.py`, then validate with `npm test`.
+Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directory locally. When source files change, rerun with `--apply`, rebuild derived JSON with an explicit timestamp such as `python scripts/preprocess_hurdat2.py --generated-at 2026-08-02T00:00:00Z`, then validate with `npm test`.
 
 ### Distribution profiles
 
@@ -300,7 +301,7 @@ See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
 
 ```bash
-node scripts/generate-release-manifest.mjs --generated-at 2026-07-29T00:00:00Z
+node scripts/generate-release-manifest.mjs --generated-at 2026-08-02T00:00:00Z --source-commit "$(git rev-parse HEAD)"
 ```
 
 QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude order, geometry structure, coordinate bounds, and prohibition on alternate `crs` declarations.
@@ -393,7 +394,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 
 ### Data build provenance
 
-Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the source HURDAT2 filenames, local source modification dates, source storm-year ranges, output file metadata, generator name, app version, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing.
+Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and is also included in offline releases.
 
 ### Open Data License Clarity
 
@@ -504,7 +505,7 @@ curl -sSL -o data/hurdat2-atlantic.txt \
 curl -sSL -o data/hurdat2-nepac.txt \
   "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2026-02272026.txt"
 
-python scripts/preprocess_hurdat2.py
+python scripts/preprocess_hurdat2.py --generated-at 2026-08-02T00:00:00Z
 ```
 
 The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. Impact rows can be refreshed with `python scripts/scrape_impacts.py`; use `python scripts/scrape_impacts.py --normalize-existing` after source-format fixes that should be applied to the existing `data/impacts.json` without a network scrape. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +34,18 @@ function validIsoDate(value) {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
 }
 
+function validSha256(value) {
+  return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+}
+
+async function sha256File(relativePath) {
+  const bytes = await readFile(path.join(root, relativePath));
+  return {
+    bytes: bytes.length,
+    sha256: createHash('sha256').update(bytes).digest('hex'),
+  };
+}
+
 function validCategory(value) {
   return Number.isInteger(value) && value >= -1 && value <= 5;
 }
@@ -63,7 +76,7 @@ function assertImpactNumber(value, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill, sourceLock] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
@@ -73,6 +86,7 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billi
   readJson('data/storm-events.json'),
   readJson('data/billions.json'),
   readJson('data/forecast-skill.json'),
+  readJson('data/hurdat2-sources.json'),
 ]);
 
 try {
@@ -97,6 +111,7 @@ if (!isObject(metadata)) fail('data/metadata.json must contain an object.');
 if (!isObject(stormEvents)) fail('data/storm-events.json must contain an object.');
 if (!isObject(billions)) fail('data/billions.json must contain an object.');
 if (!isObject(forecastSkill)) fail('data/forecast-skill.json must contain an object.');
+if (!isObject(sourceLock)) fail('data/hurdat2-sources.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
@@ -267,6 +282,9 @@ if (!isObject(metadata.generator)) {
 } else {
   if (typeof metadata.generator.name !== 'string' || !metadata.generator.name) fail('metadata.generator.name is required.');
   if (typeof metadata.generator.app_version !== 'string' || !metadata.generator.app_version) fail('metadata.generator.app_version is required.');
+  if (!/^[a-f0-9]{40}$/.test(metadata.generator.source_commit || '')) fail('metadata.generator.source_commit must be a 40-character git revision.');
+  if (metadata.generator.source_manifest !== 'data/hurdat2-sources.json') fail('metadata.generator.source_manifest must identify data/hurdat2-sources.json.');
+  if (typeof metadata.generator.runtime !== 'string' || !metadata.generator.runtime) fail('metadata.generator.runtime is required.');
 }
 if (!isObject(metadata.coverage)) {
   fail('metadata.coverage must contain coverage details.');
@@ -291,6 +309,8 @@ if (!Array.isArray(metadata.sources) || metadata.sources.length < 2) {
   fail('metadata.sources must contain Atlantic and Eastern Pacific source entries.');
 } else {
   const seenSources = new Set();
+  const lockedSources = new Map(Array.isArray(sourceLock.sources) ? sourceLock.sources.map(source => [source.local_path, source]) : []);
+  if (sourceLock.schema_version !== 1 || lockedSources.size !== 2) fail('data/hurdat2-sources.json must contain exactly two version 1 source entries.');
   for (const [index, source] of metadata.sources.entries()) {
     const label = `metadata.sources[${index}]`;
     if (!isObject(source)) {
@@ -305,11 +325,33 @@ if (!Array.isArray(metadata.sources) || metadata.sources.length < 2) {
     if (typeof source.path !== 'string' || !source.path.startsWith('data/')) fail(`${label}.path must be a data/ path.`);
     if (!Number.isInteger(source.size_bytes) || source.size_bytes <= 0) fail(`${label}.size_bytes must be positive.`);
     if (!validIsoDate(source.modified_utc)) fail(`${label}.modified_utc must be an ISO timestamp.`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(source.source_date || '')) fail(`${label}.source_date must be an absolute date.`);
+    if (typeof source.source_file !== 'string' || !source.source_file.endsWith('.txt')) fail(`${label}.source_file is required.`);
+    if (!/^https:\/\/www\.nhc\.noaa\.gov\/data\/hurdat\/hurdat2-.+\.txt$/.test(source.source_url || '')) fail(`${label}.source_url must be an official HTTPS HURDAT2 URL.`);
+    if (!validSha256(source.sha256)) fail(`${label}.sha256 must be a SHA-256 digest.`);
+    if (source.modified_utc !== `${source.source_date}T00:00:00Z`) fail(`${label}.modified_utc must be derived from source_date, not filesystem mtime.`);
     if (!Number.isInteger(source.storm_count) || source.storm_count <= 0) fail(`${label}.storm_count must be positive.`);
     if (!Array.isArray(source.storm_year_range) || source.storm_year_range.length !== 2) {
       fail(`${label}.storm_year_range must be [minYear, maxYear].`);
     } else if (!source.storm_year_range.every(Number.isInteger)) {
       fail(`${label}.storm_year_range values must be integers.`);
+    }
+    const locked = lockedSources.get(source.path);
+    if (!locked) {
+      fail(`${label}.path is missing from data/hurdat2-sources.json.`);
+    } else {
+      for (const field of ['basin', 'source_file', 'source_url', 'source_date', 'bytes', 'sha256']) {
+        const metadataField = field === 'bytes' ? source.size_bytes : source[field];
+        if (metadataField !== locked[field]) fail(`${label}.${field} does not match data/hurdat2-sources.json.`);
+      }
+      try {
+        const digest = await sha256File(source.path);
+        if (digest.bytes !== source.size_bytes || digest.sha256 !== source.sha256) {
+          fail(`${label} does not match the bytes recorded in its source lock.`);
+        }
+      } catch (error) {
+        fail(`${label}.path could not be read: ${error.message}`);
+      }
     }
   }
 }
@@ -330,6 +372,16 @@ if (!isObject(metadata.outputs)) {
     if (output.path !== expectedPath) fail(`metadata.outputs.${key}.path must be ${expectedPath}.`);
     if (!Number.isInteger(output.size_bytes) || output.size_bytes <= 0) fail(`metadata.outputs.${key}.size_bytes must be positive.`);
     if (!validIsoDate(output.modified_utc)) fail(`metadata.outputs.${key}.modified_utc must be an ISO timestamp.`);
+    if (output.modified_utc !== metadata.generated_at_utc) fail(`metadata.outputs.${key}.modified_utc must match metadata.generated_at_utc.`);
+    if (!validSha256(output.sha256)) fail(`metadata.outputs.${key}.sha256 must be a SHA-256 digest.`);
+    try {
+      const digest = await sha256File(output.path);
+      if (digest.bytes !== output.size_bytes || digest.sha256 !== output.sha256) {
+        fail(`metadata.outputs.${key} does not match its generated file bytes.`);
+      }
+    } catch (error) {
+      fail(`metadata.outputs.${key}.path could not be read: ${error.message}`);
+    }
   }
 }
 

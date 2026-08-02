@@ -56,6 +56,7 @@ for (const required of [
   './data/stats.json',
   './data/metadata.json',
   './data/us-states.geojson',
+  './data/hurdat2-sources.json',
   './data/radar/manifest.json',
 ]) {
   if (!offlineDataAssets.includes(required)) {

@@ -16,6 +16,7 @@ const readOptional = async relative => {
 const [
   packageText,
   metadataText,
+  sourceLockText,
   impactsText,
   readme,
   serviceWorker,
@@ -29,6 +30,7 @@ const [
 ] = await Promise.all([
   read('package.json'),
   read('data/metadata.json'),
+  read('data/hurdat2-sources.json'),
   read('data/impacts.json'),
   read('README.md'),
   read('sw.js'),
@@ -43,6 +45,7 @@ const [
 
 const packageJson = JSON.parse(packageText);
 const metadata = JSON.parse(metadataText);
+const sourceLock = JSON.parse(sourceLockText);
 const impacts = JSON.parse(impactsText);
 const landfalls = JSON.parse(landfallsText);
 const version = packageJson.version;
@@ -56,6 +59,15 @@ if (metadata.generator?.app_version !== version) {
 if (metadata.schema_version !== DATA_SCHEMA_VERSION) {
   errors.push(`metadata schema ${metadata.schema_version} does not match supported schema ${DATA_SCHEMA_VERSION}`);
 }
+if (!/^[a-f0-9]{40}$/.test(metadata.generator?.source_commit || '')) {
+  errors.push('metadata generator must record a 40-character git source revision');
+}
+if (metadata.generator?.source_manifest !== 'data/hurdat2-sources.json' || sourceLock.schema_version !== 1) {
+  errors.push('metadata and source lock must identify the version 1 HURDAT2 source manifest');
+}
+if (!Array.isArray(sourceLock.sources) || sourceLock.sources.length !== 2) {
+  errors.push('HURDAT2 source lock must contain both basin revisions');
+}
 for (const cacheName of [CACHE_CONTRACT.data, CACHE_CONTRACT.tiles, CACHE_CONTRACT.radar, CACHE_CONTRACT.offlineDb]) {
   if (!serviceWorker.includes(`'${cacheName}'`)) {
     errors.push(`service worker does not implement compatibility cache ${cacheName}`);
@@ -63,6 +75,9 @@ for (const cacheName of [CACHE_CONTRACT.data, CACHE_CONTRACT.tiles, CACHE_CONTRA
 }
 if (!preprocessor.includes(`METADATA_SCHEMA_VERSION = ${DATA_SCHEMA_VERSION}`)) {
   errors.push(`HURDAT2 preprocessor does not emit metadata schema ${DATA_SCHEMA_VERSION}`);
+}
+if (!preprocessor.includes('normalize_generated_at') || preprocessor.includes('datetime.now(')) {
+  errors.push('HURDAT2 preprocessor must use an explicit generation timestamp instead of the wall clock');
 }
 if (!serviceWorker.includes(`const DATA_DB_VERSION = ${CACHE_CONTRACT.offlineDbVersion}`)) {
   errors.push(`service worker IndexedDB version does not match ${CACHE_CONTRACT.offlineDbVersion}`);

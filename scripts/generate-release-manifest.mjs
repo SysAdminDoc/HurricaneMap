@@ -11,8 +11,16 @@ const generatedAt = generatedAtFlag >= 0 ? process.argv[generatedAtFlag + 1] : n
 if (!generatedAt || !/^\d{4}-\d{2}-\d{2}T/.test(generatedAt) || Number.isNaN(Date.parse(generatedAt))) {
   throw new Error('Pass a deterministic ISO timestamp with --generated-at');
 }
+const sourceCommitFlag = process.argv.indexOf('--source-commit');
+const sourceCommit = sourceCommitFlag >= 0
+  ? process.argv[sourceCommitFlag + 1]
+  : execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+if (!/^[a-f0-9]{40}$/.test(sourceCommit)) {
+  throw new Error('Pass a 40-character git revision with --source-commit or run inside a git checkout');
+}
 
 const metadata = JSON.parse(await readFile(path.join(dataRoot, 'metadata.json'), 'utf8'));
+const sourceLock = JSON.parse(await readFile(path.join(dataRoot, 'hurdat2-sources.json'), 'utf8'));
 const files = (await walk(dataRoot))
   .map(file => path.relative(root, file).replaceAll('\\', '/'))
   .filter(file => file !== 'data/release-manifest.json')
@@ -34,6 +42,7 @@ for (const relative of files) {
 const manifest = {
   schema_version: 1,
   generated_at_utc: generatedAt,
+  source_commit: sourceCommit,
   algorithm: 'SHA-256',
   artifacts,
 };
@@ -54,6 +63,9 @@ async function walk(directory) {
 }
 
 function sourceUrl(relative) {
+  const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
+  if (lockedSource) return lockedSource.source_url;
+  if (relative === 'data/hurdat2-sources.json') return 'https://www.nhc.noaa.gov/data/hurdat/';
   if (relative.startsWith('data/radar/')) return 'https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/';
   if (relative === 'data/us-states.geojson') return 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
   if (relative === 'data/impacts.json') return 'https://en.wikipedia.org/';
@@ -71,8 +83,11 @@ function sourceUrl(relative) {
 function sourceDate(relative, buildMetadata) {
   const radarStamp = relative.match(/t_(\d{4})(\d{2})(\d{2})\d{4}\.png$/);
   if (radarStamp) return `${radarStamp[1]}-${radarStamp[2]}-${radarStamp[3]}`;
-  if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').modified_utc.slice(0, 10);
-  if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').modified_utc.slice(0, 10);
+  const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
+  if (lockedSource) return lockedSource.source_date;
+  if (relative === 'data/hurdat2-sources.json') return sourceLock.sources.map(source => source.source_date).sort().at(-1);
+  if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
+  if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').source_date;
   if (['data/landfalls.json', 'data/storms.json', 'data/storms.json.gz', 'data/stats.json', 'data/metadata.json'].includes(relative)) {
     return buildMetadata.generated_at_utc.slice(0, 10);
   }

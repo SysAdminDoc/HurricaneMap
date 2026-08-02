@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_SOURCE_URL = 'https://www.nhc.noaa.gov/data/hurdat/';
+const SOURCE_LOCK_PATH = path.join(root, 'data/hurdat2-sources.json');
 
 const TARGETS = {
   atlantic: {
@@ -82,6 +83,30 @@ export function normalizeHurdatText(text) {
   return String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 }
 
+export function revisionDateFromKey(revisionKey) {
+  const normalized = String(revisionKey || '').slice(0, 8);
+  if (!/^\d{8}$/.test(normalized)) {
+    throw new Error(`Invalid HURDAT2 revision key: ${revisionKey}`);
+  }
+  return `${normalized.slice(0, 4)}-${normalized.slice(4, 6)}-${normalized.slice(6, 8)}`;
+}
+
+export function buildSourceManifest(results) {
+  return {
+    schema_version: 1,
+    sources: results.map(result => ({
+      id: result.key,
+      basin: result.key === 'atlantic' ? 'AL' : 'EP',
+      local_path: result.localPath,
+      source_file: result.file,
+      source_url: result.url,
+      source_date: result.sourceDate,
+      bytes: result.bytes,
+      sha256: result.newSha256,
+    })),
+  };
+}
+
 export async function refreshHurdat2Files(options = {}) {
   const sourceUrl = options.sourceUrl || process.env.HURDAT2_SOURCE_URL || DEFAULT_SOURCE_URL;
   const apply = options.apply === true;
@@ -90,6 +115,7 @@ export async function refreshHurdat2Files(options = {}) {
   const directoryHtml = await fetchText(sourceUrl);
   const latest = selectLatestHurdatFiles(directoryHtml);
   const results = [];
+  const pendingWrites = [];
 
   for (const key of ['atlantic', 'nepac']) {
     const target = TARGETS[key];
@@ -101,9 +127,7 @@ export async function refreshHurdat2Files(options = {}) {
     const localPath = path.join(root, target.localPath);
     const current = normalizeHurdatText(await readFile(localPath, 'utf8'));
     const changed = current !== downloaded;
-    if (apply && changed) {
-      await writeFile(localPath, downloaded, 'utf8');
-    }
+    pendingWrites.push({ localPath, downloaded, changed });
     results.push({
       key,
       label: target.label,
@@ -115,7 +139,20 @@ export async function refreshHurdat2Files(options = {}) {
       newSha256: sha256(downloaded),
       bytes: Buffer.byteLength(downloaded, 'utf8'),
       endYear: candidate.endYear,
+      sourceDate: revisionDateFromKey(candidate.revisionKey),
     });
+  }
+
+  if (apply) {
+    for (const pending of pendingWrites) {
+      if (!pending.changed) continue;
+      await writeFileAtomically(path.join(root, pending.localPath), pending.downloaded, 'utf8');
+    }
+    await writeFileAtomically(
+      SOURCE_LOCK_PATH,
+      `${JSON.stringify(buildSourceManifest(results), null, 2)}\n`,
+      'utf8',
+    );
   }
 
   return {
@@ -124,6 +161,16 @@ export async function refreshHurdat2Files(options = {}) {
     changed: results.some(result => result.changed),
     results,
   };
+}
+
+async function writeFileAtomically(filePath, contents, encoding) {
+  const temporaryPath = `${filePath}.${process.pid}.tmp`;
+  try {
+    await writeFile(temporaryPath, contents, encoding);
+    await rename(temporaryPath, filePath);
+  } finally {
+    await rm(temporaryPath, { force: true });
+  }
 }
 
 function compareHurdatCandidates(a, b) {

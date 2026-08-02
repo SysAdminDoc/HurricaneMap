@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "atlantic",
+      "basin": "AL",
+      "local_path": "data/hurdat2-atlantic.txt",
+      "source_file": "hurdat2-1851-2025-02272026.txt",
+      "source_url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-02272026.txt",
+      "source_date": "2026-02-27",
+      "bytes": 7082381,
+      "sha256": "1b9b0c7beed5b4505838658b1d30e159fc84330c60891a58cfcf43ae55c37202"
+    },
+    {
+      "id": "nepac",
+      "basin": "EP",
+      "local_path": "data/hurdat2-nepac.txt",
+      "source_file": "hurdat2-nepac-1949-2025-02272026.txt",
+      "source_url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-02272026.txt",
+      "source_date": "2026-02-27",
+      "bytes": 4083231,
+      "sha256": "db65f8bc538d5c05e15f738c96111861d6ce3572c007879de58e44d4d05a9cd6"
+    }
+  ]
+}

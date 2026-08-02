@@ -6,6 +6,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dataRoot = path.join(root, 'data');
 const manifest = JSON.parse(await readFile(path.join(dataRoot, 'release-manifest.json'), 'utf8'));
+if (!/^[a-f0-9]{40}$/.test(manifest.source_commit || '')) {
+  throw new Error('release manifest must record a 40-character git source_commit');
+}
 const files = (await walk(dataRoot))
   .map(file => path.relative(root, file).replaceAll('\\', '/'))
   .filter(file => file !== 'data/release-manifest.json')

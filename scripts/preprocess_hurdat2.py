@@ -4,10 +4,14 @@ JSON for the web map + a stats roll-up."""
 
 from __future__ import annotations
 
+import argparse
 import gzip
+import hashlib
 import json
 import math
 import os
+import platform
+import subprocess
 import sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -19,6 +23,7 @@ DATA = ROOT / "data"
 ATL_FILE = DATA / "hurdat2-atlantic.txt"
 EPAC_FILE = DATA / "hurdat2-nepac.txt"
 STATES_GEOJSON = DATA / "us-states.geojson"
+SOURCE_LOCK_FILE = DATA / "hurdat2-sources.json"
 
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
@@ -171,10 +176,95 @@ def utc_iso(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def file_mtime_utc(path: Path):
-    if not path.exists():
-        return None
-    return utc_iso(datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc))
+def normalize_generated_at(value: str) -> str:
+    """Normalize an explicit absolute timestamp without consulting the clock."""
+    candidate = str(value or "").strip()
+    if not candidate:
+        raise ValueError("--generated-at is required; pass an explicit ISO-8601 timestamp")
+    try:
+        parsed = datetime.fromisoformat(candidate.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"--generated-at is not a valid ISO-8601 timestamp: {candidate}") from exc
+    if parsed.tzinfo is None:
+        raise ValueError("--generated-at must include a timezone, for example 2026-08-02T00:00:00Z")
+    return utc_iso(parsed)
+
+
+def resolve_source_commit(explicit: str | None = None) -> str:
+    candidate = str(explicit or os.environ.get("HURRICANEMAP_SOURCE_COMMIT") or "").strip()
+    if not candidate:
+        try:
+            candidate = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise RuntimeError("Unable to resolve a git source revision; pass --source-commit explicitly") from exc
+    if len(candidate) != 40 or any(char not in "0123456789abcdefABCDEF" for char in candidate):
+        raise ValueError(f"--source-commit must be a 40-character git revision: {candidate}")
+    return candidate.lower()
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def load_source_manifest() -> dict[str, dict]:
+    """Load and verify the exact raw HURDAT2 bytes before parsing them."""
+    try:
+        manifest = json.loads(SOURCE_LOCK_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(
+            f"Unable to read {SOURCE_LOCK_FILE.relative_to(ROOT)}; run refresh-hurdat2.mjs --apply first"
+        ) from exc
+    if manifest.get("schema_version") != 1 or not isinstance(manifest.get("sources"), list):
+        raise RuntimeError(f"{SOURCE_LOCK_FILE.relative_to(ROOT)} is not a version 1 source lock")
+
+    expected = {
+        ATL_FILE.relative_to(ROOT).as_posix(): "AL",
+        EPAC_FILE.relative_to(ROOT).as_posix(): "EP",
+    }
+    entries = {}
+    for entry in manifest["sources"]:
+        if not isinstance(entry, dict):
+            raise RuntimeError("HURDAT2 source lock entries must be objects")
+        local_path = entry.get("local_path")
+        if local_path not in expected or entry.get("basin") != expected[local_path]:
+            raise RuntimeError(f"Unexpected HURDAT2 source lock path or basin: {local_path}")
+        if local_path in entries:
+            raise RuntimeError(f"Duplicate HURDAT2 source lock path: {local_path}")
+        if not isinstance(entry.get("source_url"), str) or not entry["source_url"].startswith("https://"):
+            raise RuntimeError(f"HURDAT2 source lock URL is not HTTPS: {local_path}")
+        try:
+            datetime.strptime(entry["source_date"], "%Y-%m-%d")
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RuntimeError(f"HURDAT2 source lock date is invalid: {local_path}") from exc
+        if not isinstance(entry.get("source_file"), str) or not entry["source_file"].endswith(".txt"):
+            raise RuntimeError(f"HURDAT2 source lock filename is invalid: {local_path}")
+        if not isinstance(entry.get("sha256"), str) or len(entry["sha256"]) != 64:
+            raise RuntimeError(f"HURDAT2 source lock SHA-256 is invalid: {local_path}")
+        source_path = ROOT / local_path
+        if not source_path.is_file():
+            raise RuntimeError(f"HURDAT2 source file is missing: {local_path}")
+        actual_bytes = source_path.stat().st_size
+        actual_sha256 = sha256_file(source_path)
+        if actual_bytes != entry.get("bytes") or actual_sha256 != entry.get("sha256"):
+            raise RuntimeError(
+                f"HURDAT2 source lock does not match {local_path}; "
+                "run refresh-hurdat2.mjs --apply after verifying the upstream revision"
+            )
+        entries[local_path] = entry
+    if set(entries) != set(expected):
+        missing = sorted(set(expected) - set(entries))
+        raise RuntimeError(f"HURDAT2 source lock is missing: {', '.join(missing)}")
+    return entries
 
 
 def load_package_version() -> str:
@@ -187,7 +277,7 @@ def load_package_version() -> str:
         return "unknown"
 
 
-def create_source_summary(path: Path, basin: str, label: str) -> dict:
+def create_source_summary(path: Path, basin: str, label: str, source_lock: dict) -> dict:
     stat = path.stat() if path.exists() else None
     return {
         "id": label,
@@ -195,7 +285,11 @@ def create_source_summary(path: Path, basin: str, label: str) -> dict:
         "filename": path.name,
         "path": str(path.relative_to(ROOT)).replace(os.sep, "/"),
         "size_bytes": stat.st_size if stat else None,
-        "modified_utc": file_mtime_utc(path),
+        "modified_utc": f"{source_lock['source_date']}T00:00:00Z",
+        "source_date": source_lock["source_date"],
+        "source_file": source_lock["source_file"],
+        "source_url": source_lock["source_url"],
+        "sha256": source_lock["sha256"],
         "storm_count": 0,
         "storm_year_range": [None, None],
     }
@@ -213,14 +307,15 @@ def update_source_summary(summary: dict, storm: dict) -> None:
     ]
 
 
-def build_metadata(source_summaries, stats, outputs):
+def build_metadata(source_summaries, stats, outputs, generated_at, source_commit):
     output_files = {}
     for key, path in outputs.items():
         stat = path.stat() if path.exists() else None
         output_files[key] = {
             "path": str(path.relative_to(ROOT)).replace(os.sep, "/"),
             "size_bytes": stat.st_size if stat else None,
-            "modified_utc": file_mtime_utc(path),
+            "modified_utc": generated_at,
+            "sha256": sha256_file(path) if stat else None,
         }
 
     try:
@@ -231,10 +326,13 @@ def build_metadata(source_summaries, stats, outputs):
 
     return {
         "schema_version": METADATA_SCHEMA_VERSION,
-        "generated_at_utc": utc_iso(datetime.now(timezone.utc)),
+        "generated_at_utc": generated_at,
         "generator": {
             "name": GENERATOR_NAME,
             "app_version": load_package_version(),
+            "source_commit": source_commit,
+            "source_manifest": str(SOURCE_LOCK_FILE.relative_to(ROOT)).replace(os.sep, "/"),
+            "runtime": f"Python {platform.python_version()}",
         },
         "sources": source_summaries,
         "coverage": {
@@ -587,7 +685,30 @@ def state_at_point(lon, lat, states):
     return None
 
 
+def parse_args() -> tuple[str, str]:
+    parser = argparse.ArgumentParser(description="Build deterministic HurricaneMap HURDAT2 data artifacts.")
+    parser.add_argument(
+        "--generated-at",
+        default=os.environ.get("HURRICANEMAP_GENERATED_AT"),
+        help="explicit UTC generation timestamp, for example 2026-08-02T00:00:00Z",
+    )
+    parser.add_argument(
+        "--source-commit",
+        default=os.environ.get("HURRICANEMAP_SOURCE_COMMIT"),
+        help="40-character git revision; defaults to the current HEAD",
+    )
+    args = parser.parse_args()
+    try:
+        generated_at = normalize_generated_at(args.generated_at)
+        source_commit = resolve_source_commit(args.source_commit)
+    except (RuntimeError, ValueError) as exc:
+        parser.error(str(exc))
+    return generated_at, source_commit
+
+
 def main():
+    generated_at, source_commit = parse_args()
+    source_manifest = load_source_manifest()
     print("Loading state polygons...", file=sys.stderr)
     states = load_states()
     print(f"Loaded {len(states)} state/territory polygons.", file=sys.stderr)
@@ -600,7 +721,12 @@ def main():
         (ATL_FILE, "AL", "hurdat2_atlantic"),
         (EPAC_FILE, "EP", "hurdat2_eastern_pacific"),
     ):
-        source_summary = create_source_summary(src_path, basin, source_id)
+        source_summary = create_source_summary(
+            src_path,
+            basin,
+            source_id,
+            source_manifest[src_path.relative_to(ROOT).as_posix()],
+        )
         source_summaries.append(source_summary)
         if not src_path.exists():
             print(f"WARN: missing {src_path}", file=sys.stderr)
@@ -844,8 +970,10 @@ def main():
             "storms_gzip": OUT_STORMS_GZ,
             "stats": OUT_STATS,
         },
+        generated_at,
+        source_commit,
     )
-    OUT_METADATA.write_text(json.dumps(metadata, indent=2), encoding="utf-8", newline="\n")
+    OUT_METADATA.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     sz = lambda p: f"{p.stat().st_size / 1024:.1f} KB"
     print(f"Wrote {OUT_LANDFALLS.name} ({sz(OUT_LANDFALLS)})", file=sys.stderr)

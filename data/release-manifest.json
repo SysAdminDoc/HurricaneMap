@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-02T00:00:00Z",
+  "source_commit": "ba45fadd636f0cf7abd352ca35f70402f615f541",
   "algorithm": "SHA-256",
   "artifacts": [
     {
@@ -70,8 +71,8 @@
       "path": "data/hurdat2-atlantic.txt",
       "bytes": 7082381,
       "sha256": "1b9b0c7beed5b4505838658b1d30e159fc84330c60891a58cfcf43ae55c37202",
-      "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-05-03",
+      "source_url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-02272026.txt",
+      "source_date": "2026-02-27",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": "HURDAT2-current"
     },
@@ -79,10 +80,19 @@
       "path": "data/hurdat2-nepac.txt",
       "bytes": 4083231,
       "sha256": "db65f8bc538d5c05e15f738c96111861d6ce3572c007879de58e44d4d05a9cd6",
-      "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-05-03",
+      "source_url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-02272026.txt",
+      "source_date": "2026-02-27",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": "HURDAT2-current"
+    },
+    {
+      "path": "data/hurdat2-sources.json",
+      "bytes": 841,
+      "sha256": "dfeb522b8f39cac235daa8b893df022d563882c05e8d0c21f932f4a587d49f23",
+      "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+      "source_date": "2026-02-27",
+      "generated_at_utc": "2026-08-02T00:00:00Z",
+      "schema_version": 1
     },
     {
       "path": "data/impacts.json",
@@ -98,16 +108,16 @@
       "bytes": 129824,
       "sha256": "45accf325a95d241f768cb8c93a1d67064d4ba2b16da458209048369ab1f452f",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-16",
+      "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": 1
     },
     {
       "path": "data/metadata.json",
-      "bytes": 1985,
-      "sha256": "7a9ed900dc0952e942eedaf200ea4455cee0de1742986f57550d2dcc0fe6b8be",
+      "bytes": 3013,
+      "sha256": "2386b629b5935f3d202173f34a7463d1c9ea39df2eaf1de84962b1016b4c0259",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-16",
+      "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": 1
     },
@@ -15488,7 +15498,7 @@
       "bytes": 8364,
       "sha256": "721d16f10f1590d02a4c496dcbaf2a2908cff13afa5567a8f14b31284c301f70",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-16",
+      "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": 1
     },
@@ -15506,7 +15516,7 @@
       "bytes": 2299081,
       "sha256": "8c462a5c9fa8e49bf79a5ff26b97cc68c1fd4b1dfa77f822373f16920c74ed4b",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-16",
+      "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": 1
     },
@@ -15515,7 +15525,7 @@
       "bytes": 234595,
       "sha256": "13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-16",
+      "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
       "schema_version": 1
     },

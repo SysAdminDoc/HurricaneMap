@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sysadmindoc.github.io/HurricaneMap/schemas/hurdat2-sources-v1.schema.json",
+  "title": "HurricaneMap HURDAT2 source lock v1",
+  "type": "object",
+  "required": ["schema_version", "sources"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "basin", "local_path", "source_file", "source_url", "source_date", "bytes", "sha256"],
+        "properties": {
+          "id": { "type": "string", "enum": ["atlantic", "nepac"] },
+          "basin": { "type": "string", "enum": ["AL", "EP"] },
+          "local_path": { "type": "string", "pattern": "^data/hurdat2-(atlantic|nepac)\\.txt$" },
+          "source_file": { "type": "string", "pattern": "^hurdat2-.+\\.txt$" },
+          "source_url": { "type": "string", "pattern": "^https://www\\.nhc\\.noaa\\.gov/data/hurdat/hurdat2-.+\\.txt$" },
+          "source_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "bytes": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
