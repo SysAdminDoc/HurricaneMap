@@ -148,6 +148,10 @@ async function openVisualStorm(page, stormId = 'AL122005') {
     await panel.showStorm(landfall);
   }, stormId);
   await page.waitForSelector('#storm-panel:not([hidden]) .storm-panel-layout', { timeout: 15_000 });
+  await page.evaluate(() => {
+    const panel = document.querySelector('#storm-panel');
+    if (panel) panel.scrollTop = 0;
+  });
 }
 
 async function openVisualStats(page) {
@@ -183,6 +187,14 @@ async function openVisualReplay(page) {
   await page.check('#advisory-replay-enabled');
   await page.waitForSelector('#advisory-replay-meta', { state: 'visible', timeout: 15_000 });
   await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15_000 });
+  await page.evaluate(() => {
+    const panel = document.querySelector('#storm-panel');
+    const header = document.querySelector('#panel-sticky-header');
+    const target = document.querySelector('.advisory-replay-control');
+    if (!panel || !header || !target) return;
+    const targetTop = header.getBoundingClientRect().bottom + 8;
+    panel.scrollTop += target.getBoundingClientRect().top - targetTop;
+  });
 }
 
 async function openVisualPlayback(page) {
