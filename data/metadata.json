@@ -4,7 +4,7 @@
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.9.0",
-    "source_commit": "ba45fadd636f0cf7abd352ca35f70402f615f541",
+    "source_commit": "3acb8db075ee106e12beddb075a064b0d421cf0c",
     "source_manifest": "data/hurdat2-sources.json",
     "runtime": "Python 3.12.10"
   },

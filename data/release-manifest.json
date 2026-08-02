@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-02T00:00:00Z",
-  "source_commit": "ba45fadd636f0cf7abd352ca35f70402f615f541",
+  "source_commit": "3acb8db075ee106e12beddb075a064b0d421cf0c",
   "algorithm": "SHA-256",
   "artifacts": [
     {
@@ -115,7 +115,7 @@
     {
       "path": "data/metadata.json",
       "bytes": 3013,
-      "sha256": "2386b629b5935f3d202173f34a7463d1c9ea39df2eaf1de84962b1016b4c0259",
+      "sha256": "f37d73a4a5c806374b172ebf6cbc875389671909101d27177c138521b9b3bd18",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
