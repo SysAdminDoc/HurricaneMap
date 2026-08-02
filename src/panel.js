@@ -38,6 +38,7 @@ import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 import {
   clearAdvisoryReplay,
+  buildAdvisoryBounds,
   getAdvisoryReplayPosition,
   getStormAdvisories,
   loadAdvisories,
@@ -648,6 +649,7 @@ function wireAdvisoryReplay(storm) {
   const seq = ++advisoryReplaySeq;
   let record = null;
   let coneEra = '2025';
+  let hasFramedReplay = false;
 
   const show = async index => {
     const result = await renderAdvisory(storm, { map: getMap(), record, coneEra, index });
@@ -657,6 +659,14 @@ function wireAdvisoryReplay(storm) {
       return;
     }
     const { advisory, summary } = result;
+    const map = getMap();
+    if (result.bounds && map) {
+      const mapBounds = map.getBounds();
+      if (!hasFramedReplay || !mapBounds.intersects(result.bounds)) {
+        map.fitBounds(result.bounds, { padding: [40, 40] });
+      }
+      hasFramedReplay = true;
+    }
     const replayPosition = getAdvisoryReplayPosition(result.index, record.advisories.length);
     const positionText = t('advisoryReplay.position', String(replayPosition.number), String(replayPosition.count));
     const nhcNumberText = t('advisoryReplay.nhcNumber', String(advisory.n));
@@ -684,6 +694,7 @@ function wireAdvisoryReplay(storm) {
   const sync = async () => {
     if (!enabled.checked) {
       clearAdvisoryReplay();
+      hasFramedReplay = false;
       steps.hidden = true;
       status.textContent = '';
       return;

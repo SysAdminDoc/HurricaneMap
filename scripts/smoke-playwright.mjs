@@ -255,6 +255,48 @@ async function openKatrinaPanel(page) {
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
 }
 
+async function openStormPanel(page, stormId) {
+  await page.evaluate(async id => {
+    const data = await import('/src/data.js');
+    const panel = await import('/src/panel.js');
+    await data.ensureStormsLoaded();
+    const landfall = data.getLandfalls().find(item => item.storm_id === id);
+    if (!landfall) throw new Error(`${id} landfall not found`);
+    await panel.showStorm(landfall);
+  }, stormId);
+  await page.waitForFunction(() => (
+    document.querySelector('#storm-panel')?.hidden === false &&
+    document.querySelector('#advisory-replay-enabled')
+  ), { timeout: 15000 });
+}
+
+async function assertAdvisoryForecastInViewport(page, stormId) {
+  await openStormPanel(page, stormId);
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15000 });
+  await page.waitForFunction(() => {
+    const path = document.querySelector('path.advisory-forecast-line');
+    const map = document.querySelector('#map');
+    if (!path || !map) return false;
+    const pathRect = path.getBoundingClientRect();
+    const mapRect = map.getBoundingClientRect();
+    return pathRect.width > 0 && pathRect.height > 0 &&
+      pathRect.right > mapRect.left && pathRect.left < mapRect.right &&
+      pathRect.bottom > mapRect.top && pathRect.top < mapRect.bottom;
+  }, { timeout: 15000 });
+  const geometry = await page.evaluate(() => {
+    const path = document.querySelector('path.advisory-forecast-line');
+    const map = document.querySelector('#map');
+    const pathRect = path?.getBoundingClientRect();
+    const mapRect = map?.getBoundingClientRect();
+    return {
+      path: pathRect ? { left: pathRect.left, right: pathRect.right, top: pathRect.top, bottom: pathRect.bottom } : null,
+      map: mapRect ? { left: mapRect.left, right: mapRect.right, top: mapRect.top, bottom: mapRect.bottom } : null,
+    };
+  });
+  assert(geometry.path && geometry.map, `${stormId}: advisory forecast viewport geometry is missing`);
+}
+
 async function captureVisualSnapshot(page, name) {
   await mkdir(visualSnapshotDir, { recursive: true });
   const buffer = await page.screenshot({
@@ -1718,10 +1760,13 @@ try {
   assert(outsideEra.shapes === 0, 'advisory replay drew geometry for a storm outside the archived era');
   assert(/2020-2024/.test(outsideEra.status), `advisory replay did not name its covered era: ${outsideEra.status}`);
 
+  for (const stormId of ['AL022024', 'AL132020', 'AL142024', 'AL092022']) {
+    await assertAdvisoryForecastInViewport(page, stormId);
+  }
+
   // Ian is inside the era: the issued forecast, its cone, and the best track it
   // is compared against must all render, and stepping must change the geometry.
-  await page.evaluate(() => { location.hash = '#storm=AL092022'; });
-  await page.waitForFunction(() => /Ian/i.test(document.querySelector('#panel-body')?.textContent || ''), { timeout: 15000 });
+  await openStormPanel(page, 'AL092022');
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-cone-shape'),

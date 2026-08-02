@@ -21,6 +21,7 @@ All notable changes to HurricaneMap.
 - Prep, evacuation, table, and nearby-storm regions now focus their heading on entry, return to a visible invoker on close, preserve focus through minimize/restore, and explicitly focus the map from the skip link.
 - Advisory replay positions now use the replay record ordinal while retaining the NHC advisory number separately, keeping gapped advisory series readable and the range scrubber's ARIA value valid.
 - Storm-owned retrospective cone, risk-trajectory, and advisory overlays now clear when another managed panel opens, including their floating legends.
+- Advisory replay now frames its issued forecast, cone, and comparison track in view, re-fitting only when a later step leaves the current map bounds.
 
 ### Changed
 - The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.

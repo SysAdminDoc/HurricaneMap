@@ -15,6 +15,7 @@ import {
   verifyAgainstBestTrack,
 } from './build-advisories.mjs';
 import {
+  buildAdvisoryBounds,
   buildAdvisoryConeSamples,
   clipBestTrack,
   getAdvisoryReplayPosition,
@@ -107,6 +108,17 @@ assert.equal(summary.longestLeadHours, 48, 'the longest verified lead drives the
 assert.equal(summary.longestLeadTrackErrorNmi, 90);
 assert.equal(summary.meanIntensityErrorKt, 10, 'null intensity errors must not count toward the mean');
 assert.equal(summarizeAdvisoryErrors({ e: [] }).meanTrackErrorNmi, null);
+
+assert.deepEqual(
+  buildAdvisoryBounds(
+    { f: [[0, 20, -95], [12, 22, -91]] },
+    [[21, -94], [23, -90]],
+    [[19, -96], [22, -92]],
+  ),
+  [[19, -96], [23, -90]],
+  'advisory bounds must include forecast, cone, and clipped best-track geometry',
+);
+assert.equal(buildAdvisoryBounds({ f: [] }), null, 'empty advisory geometry has no bounds');
 
 const gappedReplay = {
   advisories: [{ n: 1 }, { n: 3 }, { n: 4 }],

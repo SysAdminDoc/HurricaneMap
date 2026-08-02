@@ -102,6 +102,21 @@ export function clipBestTrack(storm, advisory) {
     .map(point => [point.lat, point.lon]);
 }
 
+export function buildAdvisoryBounds(advisory, envelope = [], actual = []) {
+  const points = [
+    ...(advisory?.f || []).map(([, lat, lon]) => [lat, lon]),
+    ...envelope,
+    ...actual,
+  ].filter(([lat, lon]) => Number.isFinite(lat) && Number.isFinite(lon));
+  if (!points.length) return null;
+  const latitudes = points.map(([lat]) => lat);
+  const longitudes = points.map(([, lon]) => lon);
+  return [
+    [Math.min(...latitudes), Math.min(...longitudes)],
+    [Math.max(...latitudes), Math.max(...longitudes)],
+  ];
+}
+
 function ensureLayer(map) {
   if (layerGroup && layerMap === map) return;
   if (layerGroup && layerMap) layerMap.removeLayer(layerGroup);
@@ -178,12 +193,15 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
       }).bindTooltip(escapeHtml(detail), { direction: 'top' }).addTo(layerGroup);
     }
 
+    const bounds = buildAdvisoryBounds(advisory, envelope, actual);
+
     return {
       status: 'rendered',
       index: clamped,
       advisory,
       conePoints: envelope.length,
       summary: summarizeAdvisoryErrors(advisory),
+      bounds,
     };
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale' };
