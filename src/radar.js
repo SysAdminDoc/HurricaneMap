@@ -42,6 +42,7 @@ import {
   failOptionalFeed,
 } from './optional-feeds.js';
 import { cacheRadarPack, isQuotaExceededError } from './storage-manager.js';
+import { buildRadarProbeTimes } from './radar-utils.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -134,26 +135,15 @@ function resolveFrameUrl(stormId, region, date) {
   return { url: buildIemUrl(region, date), source: 'remote', date };
 }
 
-/** For ONLINE mode only: probe IEM for the nearest available frame, walking
- *  back in 5-min steps then hourly. Returns null if nothing within ±60 min. */
+/** For ONLINE mode only: probe IEM for the nearest available five-minute frame
+ *  on either side of the target. Returns null if nothing is within ±60 min. */
 async function findRemoteNearest(region, target, maxMinutes = 60) {
-  let probe = roundToMinutes(target, 5);
-  for (let stepMin = 0; stepMin <= maxMinutes; stepMin += 5) {
+  for (const probe of buildRadarProbeTimes(target, maxMinutes, 5)) {
     const url = buildIemUrl(region, probe);
     try {
       const r = await fetch(url, { method: 'HEAD' });
       if (r.ok) return { url, date: probe, source: 'remote' };
     } catch (_) { /* keep probing */ }
-    probe = new Date(probe.getTime() - 5 * 60 * 1000);
-  }
-  probe = roundToMinutes(target, 60);
-  for (let i = 0; i <= 3; i++) {
-    const url = buildIemUrl(region, probe);
-    try {
-      const r = await fetch(url, { method: 'HEAD' });
-      if (r.ok) return { url, date: probe, source: 'remote' };
-    } catch (_) { /* keep probing */ }
-    probe = new Date(probe.getTime() - 60 * 60 * 1000);
   }
   return null;
 }

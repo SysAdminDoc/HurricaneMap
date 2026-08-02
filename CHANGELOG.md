@@ -29,6 +29,7 @@ All notable changes to HurricaneMap.
 - Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
 - Advisory replay now identifies archived post-tropical forecasts that fall outside the numbered NHC advisory series, with localized provenance copy and browser coverage for both non-zero and complete archives.
 - Pure fixture-backed contracts now cover fuzzy storm-name matching, annual climatology aggregation, and decade trend bucketing, including edit-distance pruning, ACE totals, major-storm shares, and impact rankings.
+- Online radar fallback now probes the nearest available five-minute frame symmetrically within the documented ±60-minute window, with pure contract coverage for the probe ordering and bounds.
 
 ### Changed
 - The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.
