@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL062006-200608310600",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -126,
+          24
+        ],
+        [
+          -126,
+          50
+        ],
+        [
+          -66,
+          50
+        ],
+        [
+          -66,
+          24
+        ],
+        [
+          -126,
+          24
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -126,
+    24,
+    -66,
+    50
+  ],
+  "properties": {
+    "datetime": "2006-08-31T06:00:00.000Z",
+    "hurricanemap:storm_id": "AL062006",
+    "hurricanemap:storm_name": "ERNESTO",
+    "hurricanemap:year": 2006,
+    "hurricanemap:region": "uscomp",
+    "hurricanemap:product": "n0r",
+    "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2006-08-31",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL062006-200608310600.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Ernesto-2006/t_200608310600.png",
+      "title": "ERNESTO 2006-08-31T06:00:00.000Z n0r radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 267658,
+      "file:checksum": "sha256:d4722a3bce0e5479fdc37eac0cf5554d3bd7b29ff9efa94d794599bde4be2405",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2006-08-31",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

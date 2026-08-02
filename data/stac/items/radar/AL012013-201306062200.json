@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL012013-201306062200",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -126,
+          24
+        ],
+        [
+          -126,
+          50
+        ],
+        [
+          -66,
+          50
+        ],
+        [
+          -66,
+          24
+        ],
+        [
+          -126,
+          24
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -126,
+    24,
+    -66,
+    50
+  ],
+  "properties": {
+    "datetime": "2013-06-06T22:00:00.000Z",
+    "hurricanemap:storm_id": "AL012013",
+    "hurricanemap:storm_name": "ANDREA",
+    "hurricanemap:year": 2013,
+    "hurricanemap:region": "uscomp",
+    "hurricanemap:product": "n0r",
+    "hurricanemap:is_landfall_frame": true,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2013-06-06",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL012013-201306062200.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Andrea-2013/t_201306062200.png",
+      "title": "ANDREA 2013-06-06T22:00:00.000Z n0r radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 345603,
+      "file:checksum": "sha256:3bbb5849ee76fcd7d5b275d03453e9d2da9f0a2d0c60ae0bfc3008b6b0d343da",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2013-06-06",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

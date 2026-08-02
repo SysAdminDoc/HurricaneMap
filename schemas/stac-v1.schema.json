@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hurricanemap.example/schemas/stac-v1.schema.json",
+  "title": "HurricaneMap STAC 1.0.0 document",
+  "oneOf": [
+    { "$ref": "#/$defs/catalog" },
+    { "$ref": "#/$defs/collection" },
+    { "$ref": "#/$defs/item" }
+  ],
+  "$defs": {
+    "link": {
+      "type": "object",
+      "required": ["rel", "href"],
+      "properties": {
+        "rel": { "type": "string", "minLength": 1 },
+        "href": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "title": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "asset": {
+      "type": "object",
+      "required": ["href", "type", "roles", "file:size", "file:checksum"],
+      "properties": {
+        "href": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "roles": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "file:size": { "type": "integer", "minimum": 0 },
+        "file:checksum": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      },
+      "additionalProperties": true
+    },
+    "bbox": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 6,
+      "items": { "type": "number" }
+    },
+    "base": {
+      "type": "object",
+      "required": ["stac_version", "type", "id", "links"],
+      "properties": {
+        "stac_version": { "const": "1.0.0" },
+        "type": { "type": "string" },
+        "id": { "type": "string", "minLength": 1 },
+        "stac_extensions": { "type": "array", "items": { "type": "string" } },
+        "links": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/link" } }
+      },
+      "additionalProperties": true
+    },
+    "catalog": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "const": "Catalog" }
+          }
+        }
+      ]
+    },
+    "collection": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["license", "extent"],
+          "properties": {
+            "type": { "const": "Collection" },
+            "license": { "type": "string", "minLength": 1 },
+            "extent": {
+              "type": "object",
+              "required": ["spatial", "temporal"],
+              "properties": {
+                "spatial": {
+                  "type": "object",
+                  "required": ["bbox"],
+                  "properties": { "bbox": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bbox" } } }
+                },
+                "temporal": {
+                  "type": "object",
+                  "required": ["interval"],
+                  "properties": { "interval": { "type": "array", "minItems": 1 } }
+                }
+              }
+            },
+            "assets": { "type": "object", "additionalProperties": { "$ref": "#/$defs/asset" } }
+          }
+        }
+      ]
+    },
+    "item": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "required": ["collection", "geometry", "properties", "assets"],
+          "properties": {
+            "type": { "const": "Feature" },
+            "collection": { "type": "string", "minLength": 1 },
+            "geometry": {},
+            "bbox": { "$ref": "#/$defs/bbox" },
+            "properties": { "type": "object" },
+            "assets": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/asset" } }
+          }
+        }
+      ]
+    }
+  }
+}

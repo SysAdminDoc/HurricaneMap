@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL051999-199908270000",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -126,
+          24
+        ],
+        [
+          -126,
+          50
+        ],
+        [
+          -66,
+          50
+        ],
+        [
+          -66,
+          24
+        ],
+        [
+          -126,
+          24
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -126,
+    24,
+    -66,
+    50
+  ],
+  "properties": {
+    "datetime": "1999-08-27T00:00:00.000Z",
+    "hurricanemap:storm_id": "AL051999",
+    "hurricanemap:storm_name": "DENNIS",
+    "hurricanemap:year": 1999,
+    "hurricanemap:region": "uscomp",
+    "hurricanemap:product": "n0r",
+    "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "1999-08-27",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL051999-199908270000.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Dennis-1999/t_199908270000.png",
+      "title": "DENNIS 1999-08-27T00:00:00.000Z n0r radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 493444,
+      "file:checksum": "sha256:b954f5be7e14cf0ba39dcb9f2aaa863e6fcb337aa1dc14017302d5a85e613aa3",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "1999-08-27",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

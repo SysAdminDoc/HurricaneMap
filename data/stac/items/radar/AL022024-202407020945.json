@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL022024-202407020945",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -126,
+          24
+        ],
+        [
+          -126,
+          50
+        ],
+        [
+          -66,
+          50
+        ],
+        [
+          -66,
+          24
+        ],
+        [
+          -126,
+          24
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -126,
+    24,
+    -66,
+    50
+  ],
+  "properties": {
+    "datetime": "2024-07-02T09:45:00.000Z",
+    "hurricanemap:storm_id": "AL022024",
+    "hurricanemap:storm_name": "BERYL",
+    "hurricanemap:year": 2024,
+    "hurricanemap:region": "uscomp",
+    "hurricanemap:product": "n0r",
+    "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2024-07-02",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL022024-202407020945.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Beryl-2024/t_202407020945.png",
+      "title": "BERYL 2024-07-02T09:45:00.000Z n0r radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 80833,
+      "file:checksum": "sha256:ad7791f8bc1660d7db1c73d6d3dd2686a912a7be4532944329c56a65bfb2fd8c",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2024-07-02",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

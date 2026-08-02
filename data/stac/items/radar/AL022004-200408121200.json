@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL022004-200408121200",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -126,
+          24
+        ],
+        [
+          -126,
+          50
+        ],
+        [
+          -66,
+          50
+        ],
+        [
+          -66,
+          24
+        ],
+        [
+          -126,
+          24
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -126,
+    24,
+    -66,
+    50
+  ],
+  "properties": {
+    "datetime": "2004-08-12T12:00:00.000Z",
+    "hurricanemap:storm_id": "AL022004",
+    "hurricanemap:storm_name": "BONNIE",
+    "hurricanemap:year": 2004,
+    "hurricanemap:region": "uscomp",
+    "hurricanemap:product": "n0r",
+    "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2004-08-12",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL022004-200408121200.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Bonnie-2004/t_200408121200.png",
+      "title": "BONNIE 2004-08-12T12:00:00.000Z n0r radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 236153,
+      "file:checksum": "sha256:fa40d7502d7d7fbe7b433c71d4d61951fe2ce8b95205f21752b2fcb8422cc634",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2004-08-12",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

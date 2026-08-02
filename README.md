@@ -300,13 +300,15 @@ Perfect for:
 
 See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 
-Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
+Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, STAC documents, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
 
 ```bash
 node scripts/generate-release-manifest.mjs --generated-at 2026-08-02T00:00:00Z --source-commit "$(git rev-parse HEAD)"
 ```
 
 QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude order, geometry structure, coordinate bounds, and prohibition on alternate `crs` declarations.
+
+The static [`data/stac/catalog.json`](data/stac/catalog.json) exposes HURDAT2 tracks/landfalls and archived NEXRAD frames as a standards-based [STAC 1.0.0](https://github.com/radiantearth/stac-spec) catalog. Collection and item links are relative, so the catalog works from a checked-out repository, a core release, or a full release without a server. Each asset records its source URL/date, public-domain license, release availability, byte count, and SHA-256; radar PNG assets are marked `full` while their spatially indexed metadata remains in `core`. Run `npm run check:stac` to validate navigation, geometry, manifest coverage, and asset checksums; regenerate the deterministic files with `npm run generate:stac` before regenerating the release manifest.
 
 Every research export (publication CSV, statistical Markdown report, QGIS GeoJSON, and SVG track) carries a schema-versioned provenance block. It records the app version, export time, data-release timestamp, release-manifest SHA-256, source commit, the relevant artifact byte counts/hashes/source URLs/dates, and the export methodology. It contains no saved views, preparedness state, addresses, or local filesystem paths. Run `npm run check:export-provenance` to verify the embedded release identity against the checked-in manifest, and `npm run test:export-provenance` to exercise all four export formats.
 
@@ -355,6 +357,7 @@ HurricaneMap/
 │   ├── stats.json              # pre-computed stats: by state, decade, category, cold spots
 │   ├── metadata.json           # generated source provenance, coverage, and output metadata
 │   ├── distribution.json       # core/full build profile and capability contract
+│   ├── stac/                    # static STAC catalog, collections, and per-frame items
 │   └── radar/                  # archived NEXRAD composites (~512 MB, 1700+ frames)
 │       ├── manifest.json           # storm_id → {landfalls, frames}
 │       ├── Katrina-2005/           # one folder per storm

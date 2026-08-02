@@ -19,6 +19,7 @@ All notable changes to HurricaneMap.
 - PWA manifests now declare a stable relative identity/scope and localized `en`/`es`/`ht` names, screenshots, and shortcuts; core/full packaging and browser contracts verify every referenced asset.
 - The starter analysis notebook now has an offline release gate that validates the 595-storm, 759-landfall, and 374 hurricane-strength data/provenance contract, executes twice in disposable directories, and detects non-deterministic CSV output.
 - Shell and storm-panel orchestration now have explicit `shell-ui.js` and `panel-controls.js` owners; filter/hash state remains in `main.js`, storm composition remains in `panel.js`, and panel export wiring is isolated behind the rendered-panel boundary.
+- A deterministic STAC 1.0.0 catalog now indexes the HURDAT2 collection and all 1,703 archived radar frames with spatial/temporal extents, source and license provenance, release availability, byte/hash metadata, and core/full distribution validation.
 
 ### Fixed
 - Managed side panels now return keyboard focus only after View Transitions settle, preventing intermittent focus loss to the document body.

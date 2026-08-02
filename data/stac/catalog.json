@@ -1,0 +1,38 @@
+{
+  "stac_version": "1.0.0",
+  "type": "Catalog",
+  "id": "hurricanemap",
+  "title": "HurricaneMap static data catalog",
+  "description": "A serverless STAC catalog for the HURDAT2 and archived radar assets distributed with HurricaneMap.",
+  "license": "various",
+  "hurricanemap:project_license": "MIT",
+  "hurricanemap:source_commit": "3acb8db075ee106e12beddb075a064b0d421cf0c",
+  "hurricanemap:generated_at_utc": "2026-08-02T00:00:00Z",
+  "hurricanemap:distribution": [
+    "core",
+    "full"
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "child",
+      "href": "collections/hurdat2.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "child",
+      "href": "collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "describedby",
+      "href": "../release-manifest.json",
+      "type": "application/json",
+      "title": "Release checksum manifest"
+    }
+  ]
+}

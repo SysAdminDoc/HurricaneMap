@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describeDistribution, stageDistribution } from './build-distribution.mjs';
+import { validateStac } from './check-stac.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist', '.test-core');
@@ -33,6 +34,10 @@ for (const required of [
   'data/landfalls.json',
   'data/storms.json.gz',
   'data/radar/manifest.json',
+  'data/stac/catalog.json',
+  'data/stac/collections/hurdat2.json',
+  'data/stac/collections/radar.json',
+  'data/stac/items/hurdat2.json',
 ]) {
   assert(core.files.includes(required), `core distribution is missing ${required}`);
   assert(full.files.includes(required), `full distribution is missing ${required}`);
@@ -54,6 +59,9 @@ try {
   assert.equal(descriptor.capabilities.bundled_radar, false);
   assert.equal(descriptor.capabilities.remote_radar, true);
   assert.deepEqual(radarManifest, {}, 'core radar manifest must not claim bundled frames');
+  const stac = await validateStac({ root: output, profile: 'core' });
+  assert.equal(stac.collections, 2);
+  assert.equal(stac.radarAssets, full.radar_file_count);
 } finally {
   await rm(output, { recursive: true, force: true });
 }

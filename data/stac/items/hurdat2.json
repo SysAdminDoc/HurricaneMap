@@ -1,0 +1,121 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "hurdat2-data",
+  "collection": "hurdat2",
+  "geometry": null,
+  "bbox": [
+    -165.8,
+    8.5,
+    63,
+    81
+  ],
+  "properties": {
+    "datetime": null,
+    "start_datetime": "1851-06-25T00:00:00Z",
+    "end_datetime": "2025-07-07T18:00:00Z",
+    "hurricanemap:storm_count": 595,
+    "hurricanemap:landfall_event_count": 759,
+    "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+    "hurricanemap:source_date": "2026-02-27",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "hurdat2.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collections/hurdat2.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collections/hurdat2.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "storms": {
+      "href": "../../storms.json.gz",
+      "title": "HURDAT2 storm tracks",
+      "type": "application/gzip",
+      "roles": [
+        "data"
+      ],
+      "file:size": 234595,
+      "file:checksum": "sha256:13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a",
+      "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+      "hurricanemap:source_date": "2026-08-02",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "core",
+        "full"
+      ]
+    },
+    "landfalls": {
+      "href": "../../landfalls.json",
+      "title": "US landfall event index",
+      "type": "application/json",
+      "roles": [
+        "data"
+      ],
+      "file:size": 129824,
+      "file:checksum": "sha256:45accf325a95d241f768cb8c93a1d67064d4ba2b16da458209048369ab1f452f",
+      "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+      "hurricanemap:source_date": "2026-08-02",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "core",
+        "full"
+      ]
+    },
+    "boundaries": {
+      "href": "../../us-states.geojson",
+      "title": "US state boundaries",
+      "type": "application/geo+json",
+      "roles": [
+        "data"
+      ],
+      "file:size": 89263,
+      "file:checksum": "sha256:6f23ed91fce2c25d57c01d83225342ba40258e9571c486c3999bd827c80d193b",
+      "hurricanemap:source_url": "https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html",
+      "hurricanemap:source_date": "2026-05-03",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "core",
+        "full"
+      ]
+    },
+    "sources": {
+      "href": "../../hurdat2-sources.json",
+      "title": "HURDAT2 source lock",
+      "type": "application/json",
+      "roles": [
+        "data"
+      ],
+      "file:size": 841,
+      "file:checksum": "sha256:dfeb522b8f39cac235daa8b893df022d563882c05e8d0c21f932f4a587d49f23",
+      "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+      "hurricanemap:source_date": "2026-02-27",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "core",
+        "full"
+      ]
+    }
+  }
+}

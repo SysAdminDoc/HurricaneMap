@@ -1,0 +1,68 @@
+{
+  "stac_version": "1.0.0",
+  "type": "Collection",
+  "id": "hurdat2",
+  "title": "HURDAT2 storm tracks and US landfalls",
+  "description": "Static HURDAT2-derived storm tracks, landfall events, and attribution boundaries used by HurricaneMap.",
+  "license": "public-domain",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -165.8,
+          8.5,
+          63,
+          81
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1851-06-25T00:00:00Z",
+          "2025-07-07T18:00:00Z"
+        ]
+      ]
+    }
+  },
+  "summaries": {
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ],
+    "hurricanemap:storm_count": [
+      595
+    ],
+    "hurricanemap:landfall_event_count": [
+      759
+    ]
+  },
+  "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
+  "hurricanemap:source_date": "2026-02-27",
+  "hurricanemap:distribution": [
+    "core",
+    "full"
+  ],
+  "links": [
+    {
+      "rel": "self",
+      "href": "hurdat2.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "../items/hurdat2.json",
+      "type": "application/geo+json"
+    }
+  ]
+}

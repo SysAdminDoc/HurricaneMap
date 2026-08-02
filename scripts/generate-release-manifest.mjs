@@ -66,6 +66,7 @@ function sourceUrl(relative) {
   const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
   if (lockedSource) return lockedSource.source_url;
   if (relative === 'data/hurdat2-sources.json') return 'https://www.nhc.noaa.gov/data/hurdat/';
+  if (relative.startsWith('data/stac/')) return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative.startsWith('data/radar/')) return 'https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/';
   if (relative === 'data/us-states.geojson') return 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
   if (relative === 'data/impacts.json') return 'https://en.wikipedia.org/';
@@ -86,6 +87,7 @@ function sourceDate(relative, buildMetadata) {
   const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
   if (lockedSource) return lockedSource.source_date;
   if (relative === 'data/hurdat2-sources.json') return sourceLock.sources.map(source => source.source_date).sort().at(-1);
+  if (relative.startsWith('data/stac/')) return generatedAt.slice(0, 10);
   if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
   if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').source_date;
   if (['data/landfalls.json', 'data/storms.json', 'data/storms.json.gz', 'data/stats.json', 'data/metadata.json'].includes(relative)) {
@@ -102,6 +104,7 @@ function sourceDate(relative, buildMetadata) {
 }
 
 function schemaVersion(relative, bytes) {
+  if (relative.startsWith('data/stac/')) return 'STAC-1.0.0';
   if (relative === 'data/metadata.json') return 1;
   if (relative === 'data/landfalls.json') return 1;
   if (relative === 'data/storms.json' || relative === 'data/storms.json.gz') return 1;

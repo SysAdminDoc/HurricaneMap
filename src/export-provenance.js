@@ -8,7 +8,7 @@ export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-02T00:00:00Z',
   source_commit: '3acb8db075ee106e12beddb075a064b0d421cf0c',
-  manifest_sha256: 'e9f089057daa803ab845ef796c52bd1b1b20d46d51798cb4b476642594d0ba0f',
+  manifest_sha256: 'd4cdc3accabd4404b8826db3df32c614ca6824bfa31d6c7aadddca14a3152d6f',
   algorithm: 'SHA-256',
 });
 

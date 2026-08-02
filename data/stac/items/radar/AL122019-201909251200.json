@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-AL122019-201909251200",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -71.07,
+          13.1
+        ],
+        [
+          -71.07,
+          23.1
+        ],
+        [
+          -61.07,
+          23.1
+        ],
+        [
+          -61.07,
+          13.1
+        ],
+        [
+          -71.07,
+          13.1
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -71.07,
+    13.1,
+    -61.07,
+    23.1
+  ],
+  "properties": {
+    "datetime": "2019-09-25T12:00:00.000Z",
+    "hurricanemap:storm_id": "AL122019",
+    "hurricanemap:storm_name": "KAREN",
+    "hurricanemap:year": 2019,
+    "hurricanemap:region": "prcomp",
+    "hurricanemap:product": "n0q",
+    "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2019-09-25",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "AL122019-201909251200.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Karen-2019/t_201909251200.png",
+      "title": "KAREN 2019-09-25T12:00:00.000Z n0q radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 68233,
+      "file:checksum": "sha256:8b15d82089e470eaed47e32d9aeb76af5d61776c6593bc18a40c81a6457a47dc",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2019-09-25",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}

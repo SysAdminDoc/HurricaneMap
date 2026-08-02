@@ -1,0 +1,98 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "radar-EP092014-201408081230",
+  "collection": "radar",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -162.4,
+          15.44
+        ],
+        [
+          -162.4,
+          24.44
+        ],
+        [
+          -152.4,
+          24.44
+        ],
+        [
+          -152.4,
+          15.44
+        ],
+        [
+          -162.4,
+          15.44
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -162.4,
+    15.44,
+    -152.4,
+    24.44
+  ],
+  "properties": {
+    "datetime": "2014-08-08T12:30:00.000Z",
+    "hurricanemap:storm_id": "EP092014",
+    "hurricanemap:storm_name": "ISELLE",
+    "hurricanemap:year": 2014,
+    "hurricanemap:region": "hicomp",
+    "hurricanemap:product": "n0q",
+    "hurricanemap:is_landfall_frame": true,
+    "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+    "hurricanemap:source_date": "2014-08-08",
+    "hurricanemap:distribution": [
+      "core",
+      "full"
+    ]
+  },
+  "links": [
+    {
+      "rel": "self",
+      "href": "EP092014-201408081230.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../../collections/radar.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "image": {
+      "href": "../../../radar/Iselle-2014/t_201408081230.png",
+      "title": "ISELLE 2014-08-08T12:30:00.000Z n0q radar composite",
+      "type": "image/png",
+      "roles": [
+        "data",
+        "thumbnail"
+      ],
+      "file:size": 82630,
+      "file:checksum": "sha256:59f9ebb781e351dfb0121da5ab4eac3ebe838898396a121b2aa696352d9883f1",
+      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+      "hurricanemap:source_date": "2014-08-08",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "full"
+      ]
+    }
+  }
+}
