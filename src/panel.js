@@ -94,6 +94,16 @@ closeBtn.addEventListener('click', () => {
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 
+// Other managed panels hide the storm panel through panels.js. Keep map-owned
+// storm overlays tied to that panel rather than leaving orphaned geometry and
+// legends over the newly opened surface.
+document.addEventListener('hm-panel:hidden', event => {
+  if (event.detail?.id !== 'storm-panel') return;
+  clearRetrospectiveCone();
+  clearRiskTrajectories();
+  clearAdvisoryReplay();
+});
+
 let showStormSeq = 0;
 
 export async function showStorm(landfall) {

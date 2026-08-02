@@ -1795,8 +1795,30 @@ try {
   );
   await page.uncheck('#advisory-replay-enabled');
   await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), { timeout: 5000 });
-  await page.evaluate(() => { location.hash = '#storm=AL122005'; });
-  await page.waitForFunction(() => /Katrina/i.test(document.querySelector('#panel-body')?.textContent || ''), { timeout: 15000 });
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 10000 });
+  await page.check('#cone-retro-enabled');
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape'), { timeout: 10000 });
+  await page.check('#art-mode-enabled');
+  await page.waitForFunction(() => document.querySelector('path.art-risk-path'), { timeout: 10000 });
+  await page.click('#toggle-stats');
+  await page.waitForFunction(() => (
+    document.querySelector('#storm-panel')?.hidden === true &&
+    document.querySelector('#stats-panel')?.hidden === false
+  ), { timeout: 10000 });
+  const orphanedOverlays = await page.evaluate(() => ({
+    stormHidden: document.querySelector('#storm-panel')?.hidden,
+    conePaths: document.querySelectorAll('path.cone-retro-shape').length,
+    artPaths: document.querySelectorAll('path.art-risk-path').length,
+    advisoryPaths: document.querySelectorAll('path.advisory-forecast-line').length,
+    coneLegendVisible: Boolean(document.querySelector('#cone-retro-legend') && !document.querySelector('#cone-retro-legend').hidden),
+    artLegendVisible: Boolean(document.querySelector('#art-mode-legend') && !document.querySelector('#art-mode-legend').hidden),
+  }));
+  assert(
+    orphanedOverlays.stormHidden && orphanedOverlays.conePaths === 0 && orphanedOverlays.artPaths === 0 && orphanedOverlays.advisoryPaths === 0 && !orphanedOverlays.coneLegendVisible && !orphanedOverlays.artLegendVisible,
+    `storm overlays survived opening Statistics: ${JSON.stringify(orphanedOverlays)}`,
+  );
+  await openKatrinaPanel(page);
 
   await page.check('#art-mode-enabled');
   await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--animated').length === 20 && /20 plausible paths/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
