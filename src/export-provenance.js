@@ -8,7 +8,7 @@ export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-02T00:00:00Z',
   source_commit: '3acb8db075ee106e12beddb075a064b0d421cf0c',
-  manifest_sha256: 'd4cdc3accabd4404b8826db3df32c614ca6824bfa31d6c7aadddca14a3152d6f',
+  manifest_sha256: '5e53f17b84f1fb682717404a0386feb9b7a4e9bd20c10fb7a02954485b9d5b48',
   algorithm: 'SHA-256',
 });
 
@@ -64,7 +64,7 @@ const ARTIFACTS = Object.freeze({
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
     bytes: 3013,
-    sha256: 'f37d73a4a5c806374b172ebf6cbc875389671909101d27177c138521b9b3bd18',
+    sha256: '0c8cd92a5ceb2a90caf530b1026790931f9b6f311d0e0bb0c6388c5d3c0ea8ce',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-02',
     schema_version: 1,
@@ -102,7 +102,7 @@ export function buildExportProvenance({
   });
   const provenance = {
     schema_version: EXPORT_PROVENANCE_SCHEMA_VERSION,
-    app_version: '1.9.0',
+    app_version: '1.9.1',
     exported_at_utc: exportedAt || null,
     data_release: {
       ...RELEASE,

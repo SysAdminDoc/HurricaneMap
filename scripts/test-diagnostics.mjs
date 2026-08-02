@@ -26,7 +26,7 @@ await retryServiceWorkerRegistration({
 assert.equal(getServiceWorkerDiagnostics().registration, 'error');
 
 const bundle = buildSanitizedSupportBundle({
-  appVersion: '1.9.0',
+  appVersion: '1.9.1',
   dataSchemaVersion: 1,
   online: false,
   serviceWorker: getServiceWorkerDiagnostics(),
@@ -41,7 +41,7 @@ const bundle = buildSanitizedSupportBundle({
       },
     },
     scopes: [
-      { id: 'shell', required: true, cacheName: 'hm-shell-hm-v1.9.0', entries: 90, sizeBytes: 120000 },
+      { id: 'shell', required: true, cacheName: 'hm-shell-hm-v1.9.1', entries: 90, sizeBytes: 120000 },
       { id: 'radar', required: false, cacheName: 'hm-radar-v1', entries: 3, sizeBytes: 5000 },
     ],
   },
@@ -58,9 +58,9 @@ const bundle = buildSanitizedSupportBundle({
 });
 const serialized = JSON.stringify(bundle);
 assert.equal(bundle.schema_version, 1);
-assert.equal(bundle.app.version, '1.9.0');
+assert.equal(bundle.app.version, '1.9.1');
 assert.equal(bundle.storage.radar_pack_count, 1);
-assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.0');
+assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.1');
 assert.equal(bundle.errors.length, 1);
 assert.match(bundle.errors[0].message, /\[path\]/);
 assert.doesNotMatch(serialized, /Alice|Private Street|private-name|private\.png|latitude|longitude|address|saved.?view|preparedness/i);
