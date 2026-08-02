@@ -347,6 +347,8 @@ export const STRINGS = {
     'panel.similarStorms': 'Similar storms',
     'panel.playTrack': 'Play track',
     'panel.pauseTrack': 'Pause track',
+    'panel.resumeTrack': 'Resume track animation',
+    'panel.loadingPlayback': 'Loading playback…',
     'panel.speed': 'Speed',
     'panel.exportTrack': 'Export track',
 
@@ -361,6 +363,7 @@ export const STRINGS = {
     'stats.deadliest': 'Deadliest',
     'stats.costliest': 'Costliest',
     'stats.climatologyChart': 'Annual climatology',
+    'climatology.loading': 'Computing 174-year climatology…',
     'stats.decadeTrends': 'Decade trends',
     'stats.climateTrends': 'Climate trends',
 
@@ -433,10 +436,18 @@ export const STRINGS = {
     'onthisdate.meta': 'Recorded U.S. landfalls within seven calendar days of {0}.',
     'onthisdate.empty': 'No nearby landfall anniversaries.',
     'onthisdate.emptyDetail': 'No recorded U.S. hurricane or tropical-storm landfalls fall within seven calendar days of today ({0}).',
+    'onthisdate.loading': 'Finding historical landfalls near today…',
+    'onthisdate.offsetToday': 'today',
+    'onthisdate.offsetIn': 'in {0}d',
+    'onthisdate.offsetAgo': '{0}d ago',
+    'onthisdate.atState': 'at {0}',
+    'onthisdate.unnamedYear': '{0} unnamed',
+    'onthisdate.showDetails': 'Show full storm details',
 
     // State panel
     'state.title': 'State Details',
     'state.noLandfalls': 'No landfalls on record for this state.',
+    'state.unknown': 'Unknown',
 
     // Glossary
     'glossary.title': 'Glossary',
@@ -1113,6 +1124,8 @@ export const STRINGS = {
     'panel.similarStorms': 'Huracanes similares',
     'panel.playTrack': 'Reproducir trayectoria',
     'panel.pauseTrack': 'Pausar trayectoria',
+    'panel.resumeTrack': 'Reanudar animación de la trayectoria',
+    'panel.loadingPlayback': 'Cargando reproducción…',
     'panel.speed': 'Velocidad',
     'panel.exportTrack': 'Exportar trayectoria',
 
@@ -1127,6 +1140,7 @@ export const STRINGS = {
     'stats.deadliest': 'Más mortífero',
     'stats.costliest': 'Más costoso',
     'stats.climatologyChart': 'Climatología anual',
+    'climatology.loading': 'Calculando la climatología de 174 años…',
     'stats.decadeTrends': 'Tendencias por década',
     'stats.climateTrends': 'Tendencias climáticas',
 
@@ -1199,10 +1213,18 @@ export const STRINGS = {
     'onthisdate.meta': 'Toques de tierra registrados dentro de siete días calendario de {0}.',
     'onthisdate.empty': 'Sin aniversarios cercanos de toque de tierra.',
     'onthisdate.emptyDetail': 'Ningún toque de tierra registrado cae dentro de siete días calendario de hoy ({0}).',
+    'onthisdate.loading': 'Buscando toques de tierra históricos cerca de hoy…',
+    'onthisdate.offsetToday': 'hoy',
+    'onthisdate.offsetIn': 'en {0} d',
+    'onthisdate.offsetAgo': 'hace {0} d',
+    'onthisdate.atState': 'en {0}',
+    'onthisdate.unnamedYear': '{0} sin nombre',
+    'onthisdate.showDetails': 'Mostrar detalles completos de la tormenta',
 
     // State panel
     'state.title': 'Detalles del estado',
     'state.noLandfalls': 'Sin toques de tierra registrados para este estado.',
+    'state.unknown': 'Desconocido',
 
     // Glossary
     'glossary.title': 'Glosario',
@@ -1864,6 +1886,8 @@ export const STRINGS = {
     'panel.similarStorms': 'Siklòn ki sanble',
     'panel.playTrack': 'Jwe chemen',
     'panel.pauseTrack': 'Poz chemen',
+    'panel.resumeTrack': 'Rekòmanse animasyon chemen an',
+    'panel.loadingPlayback': 'Ap chaje lekti chemen an…',
     'panel.exportTrack': 'Ekspòte chemen',
     'stats.title': 'Estatistik',
     'stats.landfalls': 'Touche tè',
@@ -2006,6 +2030,7 @@ export const STRINGS = {
     'stats.majors': 'Majè (Kat 3+)',
     'stats.totalACE': 'ACE total',
     'stats.climatologyChart': 'Klimatoloji anyèl',
+    'climatology.loading': 'Ap kalkile klimatoloji 174 ane a…',
     'stats.decadeTrends': 'Tandans pa deseni',
     'stats.climateTrends': 'Tandans klimatik',
 
@@ -2055,8 +2080,17 @@ export const STRINGS = {
     'month.12': 'Desanm',
 
     // On this date / glossary
+    'onthisdate.loading': 'Ap chèche touche tè istorik ki toupre jodi a…',
+    'onthisdate.offsetToday': 'jodi a',
+    'onthisdate.offsetIn': 'nan {0} jou',
+    'onthisdate.offsetAgo': '{0} jou pase',
+    'onthisdate.atState': 'nan {0}',
+    'onthisdate.unnamedYear': '{0} san non',
+    'onthisdate.showDetails': 'Montre tout detay siklòn nan',
     'onthisdate.meta': 'Fwa siklòn touche tè Ozetazini nan sèt jou kalandriye {0}.',
     'onthisdate.emptyDetail': 'Pa gen okenn siklòn oswa tanpèt twopikal ki touche tè Ozetazini nan sèt jou kalandriye jodi a ({0}).',
+
+    'state.unknown': 'Enkoni',
     'glossary.searchPlaceholder': 'Chèche tèm…',
 
     // Errors

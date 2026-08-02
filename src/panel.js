@@ -184,7 +184,7 @@ function render(storm, landfall, allStorms) {
         ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">Radar</button>`
         : '';
       return `<li>
-        <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${escapeHtml(lf.state || 'Unknown')}${inferred}</span>
+        <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${escapeHtml(lf.state || t('state.unknown'))}${inferred}</span>
         <span class="when">${formatTime(lf.t)}${radarBtn}</span>
       </li>`;
     }).join('')
@@ -518,8 +518,8 @@ function render(storm, landfall, allStorms) {
       playBtn.classList.toggle('is-playing', playing);
       playBtn.classList.toggle('is-paused', paused);
       playBtn.setAttribute('aria-pressed', String(playing));
-      playBtn.title = playing ? t('panel.pauseTrack') : paused ? 'Resume track animation' : 'Animate the storm traveling its track';
-      if (playLabel) playLabel.textContent = playing ? t('panel.pauseTrack') : paused ? 'Resume track animation' : t('panel.playTrack');
+      playBtn.title = playing ? t('panel.pauseTrack') : paused ? t('panel.resumeTrack') : t('panel.playTrack');
+      if (playLabel) playLabel.textContent = playing ? t('panel.pauseTrack') : paused ? t('panel.resumeTrack') : t('panel.playTrack');
     };
 
     playBtn.addEventListener('click', async () => {
@@ -530,7 +530,7 @@ function render(storm, landfall, allStorms) {
         return;
       }
       playBtn.disabled = true;
-      if (playLabel) playLabel.textContent = 'Loading playback...';
+      if (playLabel) playLabel.textContent = t('panel.loadingPlayback');
       try {
         enterPlaybackMapMode();
         await anim.play(storm, {

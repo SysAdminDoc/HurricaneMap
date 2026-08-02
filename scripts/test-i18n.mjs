@@ -85,4 +85,35 @@ for (const relativePath of localizedWorkflowFiles) {
   assert(source.includes("from './i18n.js'"), `${relativePath} must source visible workflow copy from i18n.js`);
 }
 
+const localizedSurfaceContracts = [
+  {
+    path: '../src/on-this-date.js',
+    keys: [
+      'onthisdate.loading', 'onthisdate.offsetToday', 'onthisdate.offsetIn',
+      'onthisdate.offsetAgo', 'onthisdate.atState', 'onthisdate.unnamedYear',
+      'onthisdate.showDetails', 'state.unknown',
+    ],
+    forbidden: ['Finding historical landfalls near today...', '${lf.year} unnamed', '</strong> at ', 'Show full storm details'],
+  },
+  {
+    path: '../src/climatology.js',
+    keys: ['climatology.loading'],
+    forbidden: ['Computing 174-year climatology…'],
+  },
+  {
+    path: '../src/panel.js',
+    keys: ['state.unknown', 'panel.resumeTrack', 'panel.loadingPlayback'],
+    forbidden: ['Resume track animation', 'Loading playback...'],
+  },
+];
+for (const contract of localizedSurfaceContracts) {
+  const source = readFileSync(new URL(contract.path, import.meta.url), 'utf8');
+  for (const key of contract.keys) {
+    assert(source.includes(`t('${key}'`), `${contract.path} must render ${key} through t()`);
+  }
+  for (const literal of contract.forbidden) {
+    assert(!source.includes(literal), `${contract.path} still contains untranslated visible copy: ${literal}`);
+  }
+}
+
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);

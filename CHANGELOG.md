@@ -24,6 +24,7 @@ All notable changes to HurricaneMap.
 - Advisory replay now frames its issued forecast, cone, and comparison track in view, re-fitting only when a later step leaves the current map bounds.
 - Preparedness checklist and household controls now update in place, preserving keyboard focus while progress and supply totals change.
 - Map overlay geometry and legends now share theme-invariant basemap color tokens, keeping forecast, best-track, cone, ensemble, and evacuation markers aligned in every UI theme.
+- On-this-date loading, relative-day, state, unnamed-storm, and playback/climatology status copy now comes from the English, Spanish, and Haitian Creole catalogs, with live locale rerender coverage.
 - Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
 
 ### Changed

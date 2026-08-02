@@ -1493,6 +1493,23 @@ try {
   assert(localeStrings.es !== localeStrings.before && /Cargando/.test(localeStrings.es), `ES dynamic string did not switch: ${localeStrings.es}`);
   assert(localeStrings.ht !== localeStrings.before && /chaje/.test(localeStrings.ht), `HT dynamic string did not switch: ${localeStrings.ht}`);
 
+  await clickHeaderAction(page, '#toggle-on-this-date');
+  await page.waitForFunction(() => {
+    const panel = document.querySelector('#on-this-date-panel');
+    return panel && !panel.hidden && /On this date in history/.test(document.querySelector('#on-this-date-body')?.textContent || '');
+  }, { timeout: 15000 });
+  await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('es'));
+  await page.waitForFunction(() => /Esta fecha en la historia/.test(document.querySelector('#on-this-date-body')?.textContent || ''), { timeout: 10000 });
+  const onThisDateEs = await page.textContent('#on-this-date-body');
+  assert(!/Finding historical|\btoday\b|\bunnamed\b|Show full storm details/.test(onThisDateEs), `On-this-date Spanish surface retained English copy: ${onThisDateEs}`);
+  await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('ht'));
+  await page.waitForFunction(() => /Jou sa a nan istwa/.test(document.querySelector('#on-this-date-body')?.textContent || ''), { timeout: 10000 });
+  const onThisDateHt = await page.textContent('#on-this-date-body');
+  assert(!/Finding historical|\btoday\b|\bunnamed\b|Show full storm details/.test(onThisDateHt), `On-this-date Haitian Creole surface retained English copy: ${onThisDateHt}`);
+  await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('en'));
+  await page.click('#close-on-this-date');
+  await page.waitForFunction(() => document.querySelector('#on-this-date-panel')?.hidden, { timeout: 5000 });
+
   // Versioned saved views restore bounded filters, units, and comparison IDs
   // without persisting addresses or arbitrary location coordinates.
   await page.evaluate(() => {

@@ -4,6 +4,7 @@
 // for the life of the page session.
 import { getLandfalls, ensureStormsLoaded, getStorm } from './data.js';
 import { computeACE } from './metrics.js';
+import { t } from './i18n.js';
 
 let _cache = null;
 
@@ -63,7 +64,7 @@ async function buildClimatology() {
 // (top 3 ACE years) with vertical guide lines.
 export async function renderClimatologyChart(host) {
   if (!host) return;
-  host.innerHTML = `<div class="clim-loading">Computing 174-year climatology…</div>`;
+  host.innerHTML = `<div class="clim-loading">${t('climatology.loading')}</div>`;
   const { series, yearMin, yearMax } = await buildClimatology();
 
   const W = 640, H = 220;

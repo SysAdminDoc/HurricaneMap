@@ -16,6 +16,10 @@ closeBtn.addEventListener('click', () => {
   hidePanel('on-this-date-panel');
 });
 
+document.addEventListener('hm-locale:change', () => {
+  if (!panel.hidden) showOnThisDate();
+});
+
 /** Compute ISO month-day string (e.g., "09-15" for September 15). */
 function getMonthDay(dateStr) {
   const d = new Date(dateStr);
@@ -66,14 +70,14 @@ function calendarDistanceDays(lfDate, targetMonthDay) {
 }
 
 function formatCalendarOffset(days) {
-  if (days === 0) return 'today';
+  if (days === 0) return t('onthisdate.offsetToday');
   const abs = Math.abs(days);
-  return days > 0 ? `in ${abs}d` : `${abs}d ago`;
+  return days > 0 ? t('onthisdate.offsetIn', abs) : t('onthisdate.offsetAgo', abs);
 }
 
 export async function showOnThisDate() {
   showPanel('on-this-date-panel');
-  body.innerHTML = '<div class="state-loading">Finding historical landfalls near today...</div>';
+  body.innerHTML = `<div class="state-loading">${t('onthisdate.loading')}</div>`;
   
   await ensureStormsLoaded();
   const landfalls = getLandfalls();
@@ -116,14 +120,15 @@ export async function showOnThisDate() {
           const date = formatTime(lf.t);
           const stormName = lf.name && lf.name !== 'UNNAMED'
             ? lf.name
-            : `${lf.year} unnamed`;
+            : t('onthisdate.unnamedYear', lf.year);
           const daysFromToday = calendarDistanceDays(lf.t, todayMonthDay);
+          const state = escapeHtml(lf.state || t('state.unknown'));
           return `
             <li class="otd-item">
               <div class="otd-header">
                 <span class="otd-year">${lf.year}</span>
-                <button class="otd-link" data-storm-id="${lf.storm_id}" title="Show full storm details">
-                  <strong>${escapeHtml(stormName)}</strong> at ${escapeHtml(lf.state || 'Unknown')}
+                <button class="otd-link" data-storm-id="${lf.storm_id}" title="${escapeHtml(t('onthisdate.showDetails'))}">
+                  <strong>${escapeHtml(stormName)}</strong> ${t('onthisdate.atState', state)}
                 </button>
               </div>
               <div class="otd-details">
