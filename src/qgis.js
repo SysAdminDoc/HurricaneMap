@@ -1,6 +1,7 @@
 // P12.3 — QGIS layer export: Export filtered storms as GeoJSON ready for QGIS import.
 
 import { ensureStormsLoaded, filterLandfalls, getAllStorms, getCoverageYearRange, getLandfalls } from './data.js';
+import { buildExportProvenance } from './export-provenance.js';
 import { presentCategory, roundMetric } from './metric-presenters.js';
 
 export async function exportQGISGeoJSON(filters) {
@@ -120,6 +121,22 @@ export function buildQGISGeoJSON({
         'Wind speeds are in knots (kt); convert to mph with kt x 1.15078',
         'For pre-1945 data, see HURDAT2 documentation on data quality',
       ],
+      provenance: buildExportProvenance({
+        artifactPaths: [
+          'data/landfalls.json',
+          'data/storms.json',
+          'data/metadata.json',
+          'data/hurdat2-sources.json',
+          'data/hurdat2-atlantic.txt',
+          'data/hurdat2-nepac.txt',
+        ],
+        exportedAt,
+        methodology: [
+          'LineString features use the shipped best-track storm geometry when available.',
+          'Point features represent the shipped landfall records selected by the supplied filters.',
+          'Coordinates are rounded WGS 84 longitude/latitude pairs in RFC 7946 order.',
+        ],
+      }),
     },
   };
 }

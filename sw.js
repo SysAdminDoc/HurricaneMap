@@ -80,6 +80,7 @@ const SHELL_ASSETS = [
   './src/compare.js',
   './src/decade-trends.js',
   './src/export.js',
+  './src/export-provenance.js',
   './src/exposure.js',
   './src/filter-state.js',
   './src/geodesy.js',

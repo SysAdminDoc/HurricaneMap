@@ -16,6 +16,8 @@ const document = buildQGISGeoJSON({
 
 assert.equal(document.type, 'FeatureCollection');
 assert.equal(Object.hasOwn(document, 'crs'), false, 'RFC 7946 forbids alternate CRS declarations');
+assert.equal(document.metadata.provenance.schema_version, 1);
+assert.equal(document.metadata.provenance.data_release.manifest_sha256.length, 64);
 assert(Array.isArray(document.features) && document.features.length > landfalls.length);
 for (const [index, feature] of document.features.entries()) {
   assert.equal(feature.type, 'Feature', `feature ${index} has the wrong type`);

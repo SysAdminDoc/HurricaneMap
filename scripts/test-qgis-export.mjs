@@ -42,6 +42,9 @@ assert.equal(geojson.type, 'FeatureCollection');
 assert.equal(Object.hasOwn(geojson, 'crs'), false);
 assert.equal(geojson.metadata.filters.years, '2005-2005');
 assert.equal(geojson.metadata.filters.categories, '3');
+assert.equal(geojson.metadata.provenance.schema_version, 1);
+assert.equal(geojson.metadata.provenance.exported_at_utc, '2026-05-05T00:00:00.000Z');
+assert(geojson.metadata.provenance.data_release.artifacts.some(artifact => artifact.path === 'data/storms.json'));
 
 const track = geojson.features.find(feature => feature.properties.feature_type === 'track');
 assert.equal(track.geometry.type, 'LineString');

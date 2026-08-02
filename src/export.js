@@ -1,12 +1,15 @@
 // P12.1 — Publication-ready export: One-click export of filtered dataset as CSV with documentation
 
 import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
+import { buildExportProvenance } from './export-provenance.js';
 import { presentCategory, roundMetric } from './metric-presenters.js';
 
-export function exportPublicationCSV(filters) {
+export function buildPublicationCSV(filters, {
+  generatedAt = new Date().toISOString(),
+  landfalls = getLandfalls(),
+} = {}) {
   // Get all landfalls and filter them
-  const allLandfalls = getLandfalls();
-  const filtered = filterLandfalls(allLandfalls, filters);
+  const filtered = filterLandfalls(landfalls, filters);
   
   // Build CSV with comprehensive headers
   const headers = [
@@ -61,8 +64,23 @@ export function exportPublicationCSV(filters) {
   // Add data dictionary as comments
   const uniqueStorms = new Set(filtered.map(lf => lf.storm_id)).size;
   const [coverageMin, coverageMax] = getCoverageYearRange();
+  const provenance = buildExportProvenance({
+    artifactPaths: [
+      'data/landfalls.json',
+      'data/metadata.json',
+      'data/hurdat2-sources.json',
+      'data/hurdat2-atlantic.txt',
+      'data/hurdat2-nepac.txt',
+    ],
+    exportedAt: generatedAt,
+    methodology: [
+      'Landfalls are the shipped NOAA/NHC HURDAT2-derived records selected by the supplied filters.',
+      'UTC month, day, and hour fields are derived from each record timestamp.',
+      'Wind speeds are converted from knots with mph = knots × 1.15078.',
+    ],
+  });
   const dataDictionary = `# HurricaneMap Publication-Ready Export
-# Generated: ${new Date().toISOString()}
+# Generated: ${generatedAt}
 # Data source: NOAA NHC HURDAT2 (Public Domain)
 # Attribution: "Data from NOAA National Hurricane Center HURDAT2 best-track database, 1851-present"
 #
@@ -102,15 +120,24 @@ export function exportPublicationCSV(filters) {
 # - State: ${filters.state || 'All'}
 # - Result: ${filtered.length} landfall records from ${uniqueStorms} unique storms
 #
+# Provenance (JSON, schema v1): ${JSON.stringify(provenance)}
+#
 `;
   
   csv = dataDictionary + '\n' + csv;
   
-  // Download as file
-  const timestamp = new Date().toISOString().split('T')[0];
-  const filename = `HurricaneMap-Export-${timestamp}.csv`;
-  
-  downloadCSV(csv, filename);
+  const timestamp = generatedAt.split('T')[0];
+  return {
+    csv,
+    filename: `HurricaneMap-Export-${timestamp}.csv`,
+    provenance,
+  };
+}
+
+export function exportPublicationCSV(filters) {
+  const result = buildPublicationCSV(filters);
+  downloadCSV(result.csv, result.filename);
+  return result;
 }
 
 function downloadCSV(content, filename) {

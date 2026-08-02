@@ -306,6 +306,8 @@ node scripts/generate-release-manifest.mjs --generated-at 2026-08-02T00:00:00Z -
 
 QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude order, geometry structure, coordinate bounds, and prohibition on alternate `crs` declarations.
 
+Every research export (publication CSV, statistical Markdown report, QGIS GeoJSON, and SVG track) carries a schema-versioned provenance block. It records the app version, export time, data-release timestamp, release-manifest SHA-256, source commit, the relevant artifact byte counts/hashes/source URLs/dates, and the export methodology. It contains no saved views, preparedness state, addresses, or local filesystem paths. Run `npm run check:export-provenance` to verify the embedded release identity against the checked-in manifest, and `npm run test:export-provenance` to exercise all four export formats.
+
 ### Notebook analysis
 
 The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, Pillow, and Jupyter Notebook environment. From the repository root, install everything with one command:

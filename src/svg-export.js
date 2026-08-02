@@ -1,4 +1,5 @@
 import { ensureStormsLoaded, getStorm, categoryColor, categoryLabel, windToCategory } from './data.js';
+import { buildExportProvenance } from './export-provenance.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 
 const SVG_W = 800;
@@ -69,9 +70,7 @@ function buildLegend() {
   }).join('\n    ');
 }
 
-export async function exportTrackSVG(stormId) {
-  await ensureStormsLoaded();
-  const storm = getStorm(stormId);
+export function buildTrackSVG(storm, { exportedAt = new Date().toISOString() } = {}) {
   if (!storm || !storm.track?.length) return null;
 
   const bounds = computeBounds(storm.track);
@@ -81,6 +80,22 @@ export async function exportTrackSVG(stormId) {
 
   const name = formatStormName(storm.name);
   const title = escapeHtml(`${name} (${storm.year})`);
+  const provenance = buildExportProvenance({
+    artifactPaths: [
+      'data/storms.json',
+      'data/metadata.json',
+      'data/hurdat2-sources.json',
+      'data/hurdat2-atlantic.txt',
+      'data/hurdat2-nepac.txt',
+    ],
+    exportedAt,
+    methodology: [
+      'The SVG renders the shipped HURDAT2 best-track positions for one storm.',
+      'Track segments are colored by sustained-wind category; landfall points are marked separately.',
+      'Coordinates are projected into a bounded 800 by 500 publication view.',
+    ],
+  });
+  const provenanceJson = JSON.stringify(provenance).replaceAll(']]>', ']]]]><![CDATA[>');
 
   const trackLines = segs.map(s =>
     `<line x1="${s.x1.toFixed(1)}" y1="${s.y1.toFixed(1)}" x2="${s.x2.toFixed(1)}" y2="${s.y2.toFixed(1)}" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round"/>`
@@ -92,6 +107,7 @@ export async function exportTrackSVG(stormId) {
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SVG_W} ${SVG_H}" width="${SVG_W}" height="${SVG_H}">
+  <metadata id="hurricanemap-provenance"><![CDATA[${provenanceJson}]]></metadata>
   <rect width="${SVG_W}" height="${SVG_H}" fill="#11111b"/>
   <text x="${PAD}" y="24" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#cdd6f4">${title}</text>
   <text x="${PAD}" y="40" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6c7086">HURDAT2 best-track · HurricaneMap · NOAA/NHC</text>
@@ -107,6 +123,16 @@ export async function exportTrackSVG(stormId) {
   <text x="${PAD}" y="${SVG_H - 8}" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#585b70">Data: NOAA National Hurricane Center HURDAT2 · https://www.nhc.noaa.gov/data/</text>
 </svg>`;
 
+  return svg;
+}
+
+export async function exportTrackSVG(stormId) {
+  await ensureStormsLoaded();
+  const storm = getStorm(stormId);
+  const svg = buildTrackSVG(storm);
+  if (!svg) return null;
+
+  const name = formatStormName(storm.name);
   const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
