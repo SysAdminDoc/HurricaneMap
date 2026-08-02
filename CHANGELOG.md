@@ -2,7 +2,7 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.8.0 - Advisory replay and globe isolation (2026-08-02)
 
 ### Added
 - Storms can now replay the forecasts NHC actually issued: for U.S.-landfalling Atlantic storms of 2020-2024, the storm panel steps through every archived advisory, drawing the issued forecast track, its cone, and the final best track together, with the verified track and intensity error at each lead and a link to that advisory's own forecast discussion. Forecast positions, intensities, and issue times are read verbatim from NHC's archived ATCF a-decks; preliminary operational data is labelled apart from the final HURDAT2 best track, storms outside the era say so instead of offering an empty control, and the dataset carries per-storm source URLs and SHA-256 provenance under a published JSON Schema.
