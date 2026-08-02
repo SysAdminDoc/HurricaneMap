@@ -14,13 +14,17 @@
 
 const SW_VERSION = 'hm-v1.9.0';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
-const DATA_CACHE = 'hm-data-v2';
+const DATA_CACHE_PREFIX = 'hm-data-';
+const DATA_CACHE = `${DATA_CACHE_PREFIX}${SW_VERSION}`;
 const TILE_CACHE = 'hm-tiles-v1';
 const RADAR_CACHE = 'hm-radar-v1';
-const DATA_DB = 'hm-offline-data-v2';
+const DATA_DB_PREFIX = 'hm-offline-data-';
+const DATA_DB = `${DATA_DB_PREFIX}${SW_VERSION}`;
 const DATA_STORE = 'responses';
 const DATA_DB_VERSION = 1;
-const LEGACY_DATA_DBS = ['hm-offline-data-v1'];
+const LEGACY_DATA_CACHES = ['hm-data-v1', 'hm-data-v2'];
+const LEGACY_DATA_DBS = ['hm-offline-data-v1', 'hm-offline-data-v2'];
+const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
 
 const SHELL_ASSETS = [
   './',
@@ -168,13 +172,7 @@ const OFFLINE_DATA_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(SHELL_CACHE);
-    // Use individual fetches so one missing file doesn't abort the install.
-    await Promise.all(SHELL_ASSETS.map(async (url) => {
-      try {
-        const res = await fetch(url, { cache: 'reload' });
-        if (res.ok) await cache.put(url, res);
-      } catch { /* offline-first install — ignore */ }
-    }));
+    await precacheShell(cache);
     await precacheOfflineData();
   })());
 });
@@ -182,11 +180,16 @@ self.addEventListener('install', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
+    return;
+  }
+  if (event.data?.type === 'REPAIR_OFFLINE_DATA') {
+    event.waitUntil(repairOfflineData(event));
   }
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
+    await validateReleaseBundle();
     const keys = await caches.keys();
     await Promise.all(keys.map((k) => {
       if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE) return caches.delete(k);
@@ -310,21 +313,148 @@ async function offlineDataWhileRevalidate(req, event) {
   return cached || cacheHit || (await refresh) || Response.error();
 }
 
+async function precacheShell(cache) {
+  await Promise.all(SHELL_ASSETS.map(async (url) => {
+    const req = new Request(url, { cache: 'reload' });
+    const res = await fetch(req);
+    if (!res.ok) throw new Error(`Required shell asset failed: ${url} (${res.status})`);
+    if (url === './sw.js') {
+      const source = await res.clone().text();
+      if (!source.includes(`const SW_VERSION = '${SW_VERSION}'`)) {
+        throw new Error(`Shell service worker does not declare ${SW_VERSION}`);
+      }
+    }
+    await cache.put(req, res);
+  }));
+}
+
 async function precacheOfflineData() {
   const cache = await caches.open(DATA_CACHE);
-  await Promise.all(OFFLINE_DATA_ASSETS.map(async (url) => {
-    try {
-      const req = new Request(url, { cache: 'reload' });
-      const res = await fetch(req);
-      if (!res.ok) return;
-      await Promise.all([
-        cache.put(req, res.clone()).catch(() => {}),
-        writeOfflineResponse(req, res.clone()).catch(() => {}),
-      ]);
-    } catch {
-      /* Keep install resilient when a data sidecar is temporarily unavailable. */
+  const manifestRequest = new Request('./data/release-manifest.json', { cache: 'reload' });
+  const manifestResponse = await fetch(manifestRequest);
+  if (!manifestResponse.ok) throw new Error(`Required release manifest failed (${manifestResponse.status})`);
+  const manifestBytes = await manifestResponse.clone().arrayBuffer();
+  const manifest = parseReleaseManifest(new TextDecoder().decode(manifestBytes));
+  const artifacts = assertReleaseManifest(manifest);
+
+  for (const url of OFFLINE_DATA_ASSETS) {
+    const req = url === './data/release-manifest.json'
+      ? manifestRequest
+      : new Request(url, { cache: 'reload' });
+    const res = url === './data/release-manifest.json' ? manifestResponse : await fetch(req);
+    if (!res.ok) throw new Error(`Required offline asset failed: ${url} (${res.status})`);
+    const key = cacheKeyFor(req);
+    const artifact = artifacts.get(key);
+    if (key.startsWith('data/') && key !== 'data/release-manifest.json') {
+      await assertResponseMatchesArtifact(res, artifact, key);
     }
+    await cache.put(req, res.clone());
+    await writeOfflineResponse(req, res.clone());
+  }
+
+  await cache.put(RELEASE_MARKER_PATH, new Response(JSON.stringify({
+    schema_version: 1,
+    sw_version: SW_VERSION,
+    shell_cache: SHELL_CACHE,
+    data_cache: DATA_CACHE,
+    data_db: DATA_DB,
+    source_commit: manifest.source_commit,
+    manifest_sha256: await sha256Hex(manifestBytes),
+    manifest_generated_at_utc: manifest.generated_at_utc,
+    verified_at_utc: new Date().toISOString(),
+  }), {
+    headers: { 'content-type': 'application/json' },
   }));
+}
+
+function parseReleaseManifest(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error('Release manifest is not valid JSON');
+  }
+}
+
+function assertReleaseManifest(manifest) {
+  if (manifest?.schema_version !== 1 || manifest.algorithm !== 'SHA-256') {
+    throw new Error('Release manifest contract is unsupported');
+  }
+  if (!/^[a-f0-9]{40}$/.test(manifest.source_commit || '')) {
+    throw new Error('Release manifest has no source revision');
+  }
+  const artifacts = new Map((manifest.artifacts || []).map(artifact => [artifact.path, artifact]));
+  for (const url of OFFLINE_DATA_ASSETS) {
+    const key = new URL(url, self.location.href).pathname.replace(/^\//, '');
+    if (key.startsWith('data/') && key !== 'data/release-manifest.json' && !artifacts.has(key)) {
+      throw new Error(`Release manifest is missing required data artifact: ${key}`);
+    }
+  }
+  return artifacts;
+}
+
+async function assertResponseMatchesArtifact(response, artifact, key) {
+  if (!artifact || !Number.isInteger(artifact.bytes) || !/^[a-f0-9]{64}$/.test(artifact.sha256 || '')) {
+    throw new Error(`Release manifest has no valid checksum for ${key}`);
+  }
+  const body = await response.clone().arrayBuffer();
+  const digest = await sha256Hex(body);
+  if (body.byteLength !== artifact.bytes || digest !== artifact.sha256) {
+    throw new Error(`Offline asset checksum mismatch: ${key}`);
+  }
+}
+
+async function sha256Hex(body) {
+  const digest = await crypto.subtle.digest('SHA-256', body);
+  return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+}
+
+async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB } = {}) {
+  const dataCache = await caches.open(cacheName);
+  const markerResponse = await dataCache.match(RELEASE_MARKER_PATH);
+  if (!markerResponse) throw new Error('Offline release marker is missing');
+  const marker = parseReleaseManifest(await markerResponse.text());
+  if (marker.schema_version !== 1 || marker.sw_version !== SW_VERSION || marker.shell_cache !== SHELL_CACHE || marker.data_cache !== cacheName || marker.data_db !== dbName) {
+    throw new Error('Offline release tuple is incoherent');
+  }
+  const shellCache = await caches.open(SHELL_CACHE);
+  for (const asset of SHELL_ASSETS) {
+    if (!await shellCache.match(asset)) throw new Error(`Offline shell asset is missing: ${asset}`);
+  }
+  const manifestResponse = await dataCache.match('./data/release-manifest.json');
+  if (!manifestResponse) throw new Error('Offline release manifest is missing');
+  const manifestBytes = await manifestResponse.clone().arrayBuffer();
+  const manifest = parseReleaseManifest(new TextDecoder().decode(manifestBytes));
+  if (await sha256Hex(manifestBytes) !== marker.manifest_sha256) throw new Error('Offline release manifest hash is stale');
+  const artifacts = assertReleaseManifest(manifest);
+  for (const url of OFFLINE_DATA_ASSETS) {
+    const key = new URL(url, self.location.href).pathname.replace(/^\//, '');
+    const cached = await dataCache.match(url);
+    if (!cached) throw new Error(`Offline data asset is missing: ${key}`);
+    if (key.startsWith('data/') && key !== 'data/release-manifest.json') {
+      await assertResponseMatchesArtifact(cached, artifacts.get(key), key);
+    }
+  }
+  const keys = new Set(await idbListKeys(dbName));
+  for (const url of OFFLINE_DATA_ASSETS) {
+    const key = new URL(url, self.location.href).pathname.replace(/^\//, '');
+    if (!keys.has(key)) throw new Error(`Offline database record is missing: ${key}`);
+  }
+  return marker;
+}
+
+async function repairOfflineData(event) {
+  let result;
+  try {
+    const shellCache = await caches.open(SHELL_CACHE);
+    await precacheShell(shellCache);
+    await precacheOfflineData();
+    await validateReleaseBundle();
+    await pruneOfflineData();
+    result = { ok: true, sw_version: SW_VERSION };
+  } catch (error) {
+    result = { ok: false, error: String(error?.message || error).slice(0, 240) };
+  }
+  event.source?.postMessage({ type: 'OFFLINE_REPAIR_RESULT', ...result });
 }
 
 async function pruneOfflineData() {
@@ -332,6 +462,7 @@ async function pruneOfflineData() {
     const url = new URL(asset, self.location.href);
     return url.pathname.replace(/^\//, '');
   }));
+  allowed.add(cacheKeyFor(new Request(RELEASE_MARKER_PATH)));
   try {
     const cache = await caches.open(DATA_CACHE);
     const keys = await cache.keys();
@@ -340,14 +471,14 @@ async function pruneOfflineData() {
     )));
   } catch { /* best-effort */ }
   try {
-    await idbDeleteExcept(allowed);
+    await idbDeleteExcept(allowed, DATA_DB);
   } catch { /* IndexedDB may be unavailable */ }
 }
 
 async function readOfflineResponse(req) {
   let record = null;
   try {
-    record = await idbGet(cacheKeyFor(req));
+    record = await idbGet(cacheKeyFor(req), DATA_DB);
   } catch {
     return null;
   }
@@ -364,7 +495,7 @@ async function readOfflineResponse(req) {
   }
 }
 
-async function writeOfflineResponse(req, res) {
+async function writeOfflineResponse(req, res, dbName = DATA_DB) {
   const body = await res.arrayBuffer();
   const packed = await deflateBody(body);
   await idbPut({
@@ -376,7 +507,7 @@ async function writeOfflineResponse(req, res) {
     body: packed.body,
     encoding: packed.encoding,
     cachedAt: Date.now(),
-  });
+  }, dbName);
 }
 
 function cacheKeyFor(req) {
@@ -406,15 +537,17 @@ async function inflateBody(body, encoding) {
   ).arrayBuffer();
 }
 
-function openDataDb() {
+function openDataDb(dbName = DATA_DB) {
   return new Promise((resolve, reject) => {
     if (!('indexedDB' in self)) {
       reject(new Error('IndexedDB unavailable'));
       return;
     }
-    const request = indexedDB.open(DATA_DB, DATA_DB_VERSION);
+    const request = indexedDB.open(dbName, DATA_DB_VERSION);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore(DATA_STORE, { keyPath: 'key' });
+      if (!request.result.objectStoreNames.contains(DATA_STORE)) {
+        request.result.createObjectStore(DATA_STORE, { keyPath: 'key' });
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -423,14 +556,20 @@ function openDataDb() {
 
 async function deleteLegacyDataDbs() {
   if (!('indexedDB' in self)) return;
-  await Promise.all(LEGACY_DATA_DBS.map(name => new Promise(resolve => {
+  const names = new Set(LEGACY_DATA_DBS);
+  try {
+    for (const database of await indexedDB.databases()) {
+      if (database.name && database.name.startsWith(DATA_DB_PREFIX) && database.name !== DATA_DB) names.add(database.name);
+    }
+  } catch { /* databases() is optional; fixed legacy names still retire. */ }
+  await Promise.all([...names].map(name => new Promise(resolve => {
     const request = indexedDB.deleteDatabase(name);
     request.onsuccess = request.onerror = request.onblocked = () => resolve();
   })));
 }
 
-async function idbGet(key) {
-  const db = await openDataDb();
+async function idbGet(key, dbName = DATA_DB) {
+  const db = await openDataDb(dbName);
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DATA_STORE, 'readonly');
     const request = tx.objectStore(DATA_STORE).get(key);
@@ -444,8 +583,8 @@ async function idbGet(key) {
   });
 }
 
-async function idbPut(record) {
-  const db = await openDataDb();
+async function idbPut(record, dbName = DATA_DB) {
+  const db = await openDataDb(dbName);
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DATA_STORE, 'readwrite');
     tx.objectStore(DATA_STORE).put(record);
@@ -460,8 +599,23 @@ async function idbPut(record) {
   });
 }
 
-async function idbDeleteExcept(allowedKeys) {
-  const db = await openDataDb();
+async function idbListKeys(dbName = DATA_DB) {
+  const db = await openDataDb(dbName);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DATA_STORE, 'readonly');
+    const request = tx.objectStore(DATA_STORE).getAllKeys();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+    tx.oncomplete = () => db.close();
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
+}
+
+async function idbDeleteExcept(allowedKeys, dbName = DATA_DB) {
+  const db = await openDataDb(dbName);
   return new Promise((resolve, reject) => {
     const tx = db.transaction(DATA_STORE, 'readwrite');
     const request = tx.objectStore(DATA_STORE).openCursor();

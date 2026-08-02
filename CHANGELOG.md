@@ -11,6 +11,7 @@ All notable changes to HurricaneMap.
 - Reproducible core and full static distribution profiles now share one source commit and publish machine-readable capability metadata; core retains the complete offline historical app at about 19 MB, while full includes the 1,700+ archived radar frames.
 - Saved views can now be imported from versioned JSON with field-level preview errors, merge/replace choice, deterministic duplicate renaming, future-schema rejection, and atomic rollback after storage failures.
 - Settings now exposes actionable offline diagnostics for service-worker control, cache versions and sizes, persistence/quota, and optional-feed freshness, with scoped retry/refresh controls and a privacy-allowlisted JSON support bundle.
+- Offline releases now stage shell, data, database, and release-manifest identities as one hash-verified version tuple; profile packaging rewrites the manifest for the exact staged payload, diagnostics reports coherence, and users can repair required offline data without clearing optional tile/radar caches.
 
 ### Fixed
 - Managed side panels now return keyboard focus only after View Transitions settle, preventing intermittent focus loss to the document body.

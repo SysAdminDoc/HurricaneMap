@@ -4,12 +4,13 @@ import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
-  { id: 'data', cacheName: 'hm-data-v2', required: true },
+  { id: 'data', prefix: 'hm-data-', required: true },
   { id: 'tiles', cacheName: 'hm-tiles-v1', required: false },
   { id: 'radar', cacheName: 'hm-radar-v1', required: false },
 ]);
 export const MAX_RADAR_PACK_FRAMES = 120;
 const RADAR_PACKS_KEY = 'hm-radar-packs-v1';
+const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
 const QUOTA_HEADROOM = 0.95;
 
 export function formatStorageBytes(value) {
@@ -103,6 +104,54 @@ function emitStorageChange() {
   }
 }
 
+function selectCacheName(cacheNames, definition) {
+  const candidates = cacheNames.filter(name => definition.prefix
+    ? name.startsWith(definition.prefix)
+    : name === definition.cacheName);
+  if (!candidates.length) return null;
+  if (definition.id === 'data') {
+    const versioned = candidates.filter(name => name.startsWith('hm-data-hm-'));
+    return [...(versioned.length ? versioned : candidates)].sort().at(-1) || null;
+  }
+  return [...candidates].sort().at(-1) || null;
+}
+
+export async function inspectReleaseTuple({
+  cachesApi = globalThis.caches,
+  dataCacheName = null,
+  shellCacheName = null,
+} = {}) {
+  const base = {
+    state: 'unverified',
+    swVersion: null,
+    shellCache: shellCacheName,
+    dataCache: dataCacheName,
+    dataDb: null,
+    sourceCommit: null,
+    manifestSha256: null,
+    manifestGeneratedAt: null,
+  };
+  if (!cachesApi || !dataCacheName || !shellCacheName) return base;
+  try {
+    const cache = await cachesApi.open(dataCacheName);
+    const response = await cache.match(RELEASE_MARKER_PATH);
+    if (!response) return base;
+    const marker = await response.json();
+    const coherent = marker?.shell_cache === shellCacheName && marker?.data_cache === dataCacheName;
+    return {
+      ...base,
+      state: coherent ? 'coherent' : 'incoherent',
+      swVersion: typeof marker?.sw_version === 'string' ? marker.sw_version : null,
+      dataDb: typeof marker?.data_db === 'string' ? marker.data_db : null,
+      sourceCommit: typeof marker?.source_commit === 'string' ? marker.source_commit : null,
+      manifestSha256: typeof marker?.manifest_sha256 === 'string' ? marker.manifest_sha256 : null,
+      manifestGeneratedAt: typeof marker?.manifest_generated_at_utc === 'string' ? marker.manifest_generated_at_utc : null,
+    };
+  } catch {
+    return base;
+  }
+}
+
 export async function inspectStorage({
   storageApi = globalThis.navigator?.storage,
   cachesApi = globalThis.caches,
@@ -116,19 +165,23 @@ export async function inspectStorage({
   const cacheNames = cachesApi ? await cachesApi.keys().catch(() => []) : [];
   const scopes = [];
   for (const definition of STORAGE_SCOPES) {
-    const cacheName = definition.prefix
-      ? cacheNames.find(name => name.startsWith(definition.prefix)) || null
-      : definition.cacheName;
+    const cacheName = selectCacheName(cacheNames, definition);
     let cacheSnapshot = { entries: 0, sizeBytes: 0 };
     if (cacheName && cacheNames.includes(cacheName)) {
       cacheSnapshot = await inspectCache(cachesApi, cacheName);
     }
     scopes.push({ ...definition, cacheName, ...cacheSnapshot });
   }
+  const release = await inspectReleaseTuple({
+    cachesApi,
+    dataCacheName: scopes.find(scope => scope.id === 'data')?.cacheName,
+    shellCacheName: scopes.find(scope => scope.id === 'shell')?.cacheName,
+  });
   return {
     ...estimate,
     persisted,
     scopes,
+    release,
     packs: readPackIndex(packStorage),
   };
 }

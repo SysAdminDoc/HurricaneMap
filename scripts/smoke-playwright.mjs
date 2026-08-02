@@ -680,7 +680,7 @@ async function assertSettingsSurface(page, label) {
       storageScopes: document.querySelectorAll('#storage-manager .storage-scope').length,
       storageClearActions: document.querySelectorAll('#storage-manager [data-clear-storage]').length,
       diagnosticScopes: document.querySelectorAll('#offline-diagnostics .diagnostics-caches [role="listitem"]').length,
-      diagnosticActions: document.querySelectorAll('#offline-diagnostics [data-diagnostics-retry], #offline-diagnostics [data-diagnostics-refresh], #offline-diagnostics [data-diagnostics-export]').length,
+      diagnosticActions: document.querySelectorAll('#offline-diagnostics [data-diagnostics-repair], #offline-diagnostics [data-diagnostics-retry], #offline-diagnostics [data-diagnostics-refresh], #offline-diagnostics [data-diagnostics-export]').length,
       radioGroups: [...document.querySelectorAll('#settings-menu [role="radiogroup"]')].map(group => ({
         checked: group.querySelectorAll('[role="radio"][aria-checked="true"]').length,
         tabbable: [...group.querySelectorAll('[role="radio"]')].filter(radio => radio.tabIndex === 0).length,
@@ -697,7 +697,7 @@ async function assertSettingsSurface(page, label) {
   assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
   assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
   assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
-  assert(layout.diagnosticScopes === 4 && layout.diagnosticActions === 3, `${label}: offline diagnostics are incomplete`);
+  assert(layout.diagnosticScopes === 4 && layout.diagnosticActions === 4, `${label}: offline diagnostics are incomplete`);
   assert(layout.storageScopes === 4, `${label}: expected four storage scopes`);
   assert(layout.storageClearActions === 2, `${label}: only tile and radar scopes should be clearable`);
   assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
@@ -880,12 +880,14 @@ async function assertSupportBundleExport(page) {
   const bundle = JSON.parse(body);
   assert(bundle.schema_version === 1 && bundle.app?.version === expectedGeneratorVersion, 'support bundle is missing app/schema versions');
   assert(bundle.storage?.scopes?.length === 4, 'support bundle is missing cache scope versions and sizes');
+  assert(['coherent', 'unverified'].includes(bundle.release?.state), `support bundle returned an invalid release state: ${bundle.release?.state}`);
   assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');
   assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');
-  await page.evaluate(async () => {
+  const activeDataCache = 'hm-data-hm-v1.9.0';
+  await page.evaluate(async (dataCacheName) => {
     await (await caches.open('hm-tiles-v1')).put('/recoverable-tile', new Response('tile'));
-    await (await caches.open('hm-data-v2')).put('/protected-history', new Response('history'));
-  });
+    await (await caches.open(dataCacheName)).put('/protected-history', new Response('history'));
+  }, activeDataCache);
   await page.click('[data-clear-storage="tiles"]');
   await page.waitForSelector('#confirm-local-action[open]');
   assert(/Map tiles/.test(await page.locator('#confirm-local-action').textContent()), 'storage confirmation did not name its scope');
@@ -897,19 +899,19 @@ async function assertSupportBundleExport(page) {
   )), 'cancelling cache clearing removed data or lost invoker focus');
   await page.click('[data-clear-storage="tiles"]');
   await page.click('#confirm-local-action .confirm-action-submit');
-  await page.waitForFunction(async () => (
+  await page.waitForFunction(async (dataCacheName) => (
     !(await caches.keys()).includes('hm-tiles-v1') &&
-    (await caches.keys()).includes('hm-data-v2') &&
+    (await caches.keys()).includes(dataCacheName) &&
     document.activeElement?.matches('[data-clear-storage="tiles"]') &&
     /Map tiles.*cleared/i.test(document.querySelector('#map-announce')?.textContent || '')
-  ), { timeout: 10000 });
-  await page.evaluate(async () => {
+  ), activeDataCache, { timeout: 10000 });
+  await page.evaluate(async (dataCacheName) => {
     for (const key of ['hm-saved-views-v1', 'hm-search-history-v1', 'hm-prep-v1', 'hm-user-point-v2']) {
       localStorage.removeItem(key);
     }
-    await caches.delete('hm-data-v2');
+    await caches.delete(dataCacheName);
     document.querySelector('#settings-menu')?.hidePopover();
-  });
+  }, activeDataCache);
 }
 
 async function assertPremiumChrome(page, label) {

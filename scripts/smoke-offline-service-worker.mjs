@@ -94,6 +94,7 @@ try {
     for (const cacheName of [
       'hm-shell-hm-v0.9.0',
       'hm-data-v1',
+      'hm-data-v2',
       'hm-tiles-v0',
       'hm-radar-v0',
     ]) {
@@ -123,7 +124,8 @@ try {
     });
 
     await createDb('hm-offline-data-v1', { key: 'legacy/data.json' });
-    await createDb('hm-offline-data-v2', { key: 'data/obsolete.json' });
+    await createDb('hm-offline-data-v2', { key: 'legacy-v2/data.json' });
+    await createDb('hm-offline-data-hm-v1.9.0', { key: 'data/obsolete.json' });
   });
 
   await page.goto(baseUrl, { waitUntil: 'load' });
@@ -143,9 +145,20 @@ try {
     await page.reload({ waitUntil: 'load' });
   }
 
-  const migrationState = await page.evaluate(async () => {
+  const releaseTuple = await page.evaluate(async () => {
+    const dataCacheName = (await caches.keys()).find(name => name.startsWith('hm-data-hm-'));
+    if (!dataCacheName) throw new Error('versioned data cache was not installed');
+    const marker = await (await caches.open(dataCacheName)).match('./__hurricanemap-release.json');
+    if (!marker) throw new Error('offline release marker was not installed');
+    const tuple = await marker.json();
+    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.9.0') {
+      throw new Error(`offline release tuple is incoherent: ${JSON.stringify(tuple)}`);
+    }
+    return tuple;
+  });
+  const migrationState = await page.evaluate(async (dbName) => {
     const db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('hm-offline-data-v2', 1);
+      const request = indexedDB.open(dbName, 1);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
@@ -166,9 +179,9 @@ try {
     } finally {
       db.close();
     }
-  });
+  }, releaseTuple.data_db);
   const offlineKeys = migrationState.offlineKeys;
-  for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-tiles-v0', 'hm-radar-v0']) {
+  for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-data-v2', 'hm-tiles-v0', 'hm-radar-v0']) {
     assert(!migrationState.cacheKeys.includes(legacyCache), `legacy cache survived activation: ${legacyCache}`);
   }
   assert(!offlineKeys.includes('data/obsolete.json'), 'obsolete current-database record survived activation pruning');
@@ -177,11 +190,16 @@ try {
       !migrationState.databaseNames.includes('hm-offline-data-v1'),
       'legacy IndexedDB survived activation',
     );
+    assert(
+      !migrationState.databaseNames.includes('hm-offline-data-v2'),
+      'v2 fixed IndexedDB survived activation',
+    );
   }
   for (const required of [
     'data/landfalls.json',
     'data/stats.json',
     'data/us-states.geojson',
+    'data/hurdat2-sources.json',
     'data/hurdat2-atlantic.txt',
   ]) {
     assert(offlineKeys.includes(required), `offline IndexedDB store missing ${required}`);
@@ -190,6 +208,16 @@ try {
     offlineKeys.includes('data/storms.json.gz') || offlineKeys.includes('data/storms.json'),
     'offline IndexedDB store missing storms bundle',
   );
+  const diagnostics = await page.evaluate(async () => {
+    const module = await import('/src/diagnostics.js');
+    return module.collectOfflineDiagnostics();
+  });
+  assert(diagnostics.release?.state === 'coherent', `offline diagnostics did not report a coherent release: ${diagnostics.release?.state}`);
+  const repairResult = await page.evaluate(async () => {
+    const updates = await import('/src/sw-updates.js');
+    return updates.requestOfflineDataRepair({ timeoutMs: 30000 });
+  });
+  assert(repairResult?.ok === true, `offline data repair failed: ${repairResult?.error || 'unknown error'}`);
 
   // Optional cache pressure/clears must never remove the required historical
   // data store used by the offline app shell.

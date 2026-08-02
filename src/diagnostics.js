@@ -1,9 +1,11 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { getOptionalFeedStates } from './optional-feeds.js';
+import { announceLocalAction } from './confirm-action.js';
 import { formatStorageBytes, inspectStorage } from './storage-manager.js';
 import {
   getServiceWorkerDiagnostics,
+  requestOfflineDataRepair,
   retryServiceWorkerRegistration,
 } from './sw-updates.js';
 
@@ -30,6 +32,7 @@ export function buildSanitizedSupportBundle({
   online = true,
   serviceWorker = {},
   storage = {},
+  release = storage.release || {},
   feeds = [],
   now = Date.now(),
 } = {}) {
@@ -78,6 +81,16 @@ export function buildSanitizedSupportBundle({
         ? Object.keys(storage.packs).length
         : 0,
       scopes,
+    },
+    release: {
+      state: ['coherent', 'incoherent', 'unverified'].includes(release.state) ? release.state : 'unverified',
+      sw_version: release.swVersion ? String(release.swVersion) : null,
+      shell_cache: release.shellCache ? String(release.shellCache) : null,
+      data_cache: release.dataCache ? String(release.dataCache) : null,
+      data_db: release.dataDb ? String(release.dataDb) : null,
+      source_commit: /^[a-f0-9]{40}$/.test(release.sourceCommit || '') ? release.sourceCommit : null,
+      manifest_sha256: /^[a-f0-9]{64}$/.test(release.manifestSha256 || '') ? release.manifestSha256 : null,
+      manifest_generated_at_utc: typeof release.manifestGeneratedAt === 'string' ? release.manifestGeneratedAt : null,
     },
     optional_feeds: optionalFeeds,
     errors: lastError ? [lastError] : [],
@@ -151,6 +164,7 @@ export async function renderOfflineDiagnostics(host) {
       <span><strong>${escapeHtml(t('diagnostics.registration'))}</strong>${escapeHtml(t(`diagnostics.registration.${bundle.service_worker.registration}`))}</span>
       <span><strong>${escapeHtml(t('diagnostics.controller'))}</strong>${escapeHtml(t(`diagnostics.controller.${bundle.service_worker.controller}`))}</span>
       <span><strong>${escapeHtml(t('diagnostics.storage'))}</strong>${escapeHtml(formatStorageBytes(bundle.storage.usage_bytes))} / ${escapeHtml(formatStorageBytes(bundle.storage.quota_bytes))}</span>
+      <span><strong>${escapeHtml(t('diagnostics.release'))}</strong>${escapeHtml(t(`diagnostics.release.${bundle.release.state}`))}</span>
     </div>
     <div class="diagnostics-caches" role="list">
       ${bundle.storage.scopes.map(scope => `<span role="listitem"><strong>${escapeHtml(t(`storage.scope.${scope.id}`))}</strong><small>${escapeHtml(scope.cache_name || t('diagnostics.notInstalled'))} · ${scope.entries} · ${escapeHtml(formatStorageBytes(scope.size_bytes))}</small></span>`).join('')}
@@ -161,6 +175,7 @@ export async function renderOfflineDiagnostics(host) {
     </div>
     ${bundle.errors.length ? `<p class="diagnostics-error" role="status">${escapeHtml(bundle.errors[0].name)}: ${escapeHtml(bundle.errors[0].message)}</p>` : ''}
     <div class="diagnostics-actions">
+      <button class="settings-action" type="button" data-diagnostics-repair>${escapeHtml(t('diagnostics.repair'))}</button>
       <button class="settings-action" type="button" data-diagnostics-retry>${escapeHtml(t('diagnostics.retry'))}</button>
       <button class="settings-action" type="button" data-diagnostics-refresh>${escapeHtml(t('diagnostics.refresh'))}</button>
       <button class="settings-action" type="button" data-diagnostics-export>${escapeHtml(t('diagnostics.export'))}</button>
@@ -173,7 +188,15 @@ export function initOfflineDiagnostics(host = document.getElementById('offline-d
   if (!host) return;
   const refresh = () => renderOfflineDiagnostics(host);
   host.addEventListener('click', async event => {
-    if (event.target.closest('[data-diagnostics-retry]')) {
+    const repairButton = event.target.closest('[data-diagnostics-repair]');
+    if (repairButton) {
+      repairButton.disabled = true;
+      announceLocalAction(t('diagnostics.repairing'));
+      const result = await requestOfflineDataRepair();
+      announceLocalAction(t(result?.ok ? 'diagnostics.repaired' : 'diagnostics.repairFailed'));
+      repairButton.disabled = false;
+      await refresh();
+    } else if (event.target.closest('[data-diagnostics-retry]')) {
       await retryServiceWorkerRegistration();
       await refresh();
     } else if (event.target.closest('[data-diagnostics-refresh]')) {

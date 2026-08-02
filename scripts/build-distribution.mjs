@@ -1,5 +1,6 @@
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { copyFile, mkdir, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -95,7 +96,40 @@ export async function stageDistribution(profile, outputDirectory, { allowDirty =
   };
   await mkdir(path.join(output, 'data'), { recursive: true });
   await writeFile(path.join(output, 'data/distribution.json'), `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
+  await synchronizeReleaseManifest(output, description.source_commit);
   return { ...description, output, descriptor };
+}
+
+async function synchronizeReleaseManifest(output, sourceCommitValue) {
+  const manifestPath = path.join(output, 'data/release-manifest.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const dataFiles = (await walk(path.join(output, 'data')))
+    .map(file => path.relative(output, file).replaceAll('\\', '/'))
+    .filter(file => file !== 'data/release-manifest.json')
+    .sort();
+  const artifactsByPath = new Map((manifest.artifacts || []).map(artifact => [artifact.path, artifact]));
+  manifest.source_commit = sourceCommitValue;
+  manifest.artifacts = await Promise.all(dataFiles.map(async file => {
+    const artifact = artifactsByPath.get(file);
+    if (!artifact) throw new Error(`release manifest has no metadata for staged file ${file}`);
+    const bytes = await readFile(path.join(output, file));
+    return {
+      ...artifact,
+      path: file,
+      bytes: bytes.length,
+      sha256: createHash('sha256').update(bytes).digest('hex'),
+    };
+  }));
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+}
+
+async function walk(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const nested = await Promise.all(entries.map(async entry => {
+    const fullPath = path.join(directory, entry.name);
+    return entry.isDirectory() ? walk(fullPath) : [fullPath];
+  }));
+  return nested.flat();
 }
 
 async function main() {

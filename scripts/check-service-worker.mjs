@@ -67,6 +67,13 @@ for (const required of [
 if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/DecompressionStream/.test(source)) {
   errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
 }
+if (!/const\s+DATA_CACHE_PREFIX\s*=\s*['"]hm-data-['"]/.test(source) ||
+    !/const\s+DATA_CACHE\s*=\s*`\$\{DATA_CACHE_PREFIX\}\$\{SW_VERSION\}`/.test(source) ||
+    !/const\s+RELEASE_MARKER_PATH/.test(source) ||
+    !/validateReleaseBundle\(\)/.test(source) ||
+    !/Required release manifest failed/.test(source)) {
+  errors.push('sw.js must stage a versioned data cache and validate its release tuple before activation.');
+}
 if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR_CACHE_MAX_ENTRIES\)/.test(source)) {
   errors.push('sw.js must cap the on-demand radar cache.');
 }
@@ -74,9 +81,9 @@ if (!/pruneOfflineData\(\)/.test(source) || !/idbDeleteExcept/.test(source)) {
   errors.push('sw.js activate path must prune removed offline-data records.');
 }
 if (!/const\s+DATA_DB_VERSION\s*=\s*1/.test(source) ||
-    !/LEGACY_DATA_DBS\s*=\s*\[['"]hm-offline-data-v1['"]\]/.test(source) ||
+    !/LEGACY_DATA_DBS\s*=\s*\[['"]hm-offline-data-v1['"],\s*['"]hm-offline-data-v2['"]\]/.test(source) ||
     !/deleteLegacyDataDbs\(\)/.test(source)) {
-  errors.push('sw.js must version IndexedDB and remove the superseded v1 database during activation.');
+  errors.push('sw.js must version IndexedDB and remove superseded database generations during activation.');
 }
 
 const radarBranch = source.indexOf('if (isRadarAsset(url))');

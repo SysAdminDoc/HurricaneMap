@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -31,8 +32,15 @@ for (const required of [
 try {
   await stageDistribution('core', output, { allowDirty: true });
   const descriptor = JSON.parse(await readFile(path.join(output, 'data/distribution.json'), 'utf8'));
+  const releaseManifest = JSON.parse(await readFile(path.join(output, 'data/release-manifest.json'), 'utf8'));
   const radarManifest = JSON.parse(await readFile(path.join(output, 'data/radar/manifest.json'), 'utf8'));
   assert.equal(descriptor.profile, 'core');
+  assert.equal(releaseManifest.source_commit, descriptor.source_commit);
+  assert(!releaseManifest.artifacts.some(artifact => artifact.path.endsWith('.png')), 'core manifest must omit radar frame artifacts');
+  const distributionBytes = await readFile(path.join(output, 'data/distribution.json'));
+  const distributionArtifact = releaseManifest.artifacts.find(artifact => artifact.path === 'data/distribution.json');
+  assert.equal(distributionArtifact.bytes, distributionBytes.length);
+  assert.equal(distributionArtifact.sha256, createHash('sha256').update(distributionBytes).digest('hex'));
   assert.equal(descriptor.capabilities.historical_offline, true);
   assert.equal(descriptor.capabilities.bundled_radar, false);
   assert.equal(descriptor.capabilities.remote_radar, true);

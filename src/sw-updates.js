@@ -67,6 +67,51 @@ export async function retryServiceWorkerRegistration(options = lastRegistrationO
   }
 }
 
+export async function requestOfflineDataRepair({
+  navigatorRef = globalThis.navigator,
+  timeoutMs = 20_000,
+} = {}) {
+  const serviceWorker = navigatorRef?.serviceWorker;
+  if (!serviceWorker) return { ok: false, error: 'service-worker-unavailable' };
+  let worker = serviceWorker.controller;
+  if (!worker) {
+    try {
+      const ready = await Promise.race([
+        serviceWorker.ready,
+        new Promise(resolve => setTimeout(() => resolve(null), Math.min(Math.max(timeoutMs, 0), 2_000))),
+      ]);
+      worker = ready?.active || null;
+    } catch {
+      worker = null;
+    }
+  }
+  if (!worker?.postMessage) return { ok: false, error: 'service-worker-not-controlled' };
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      serviceWorker.removeEventListener?.('message', onMessage);
+      resolve(result);
+    };
+    const onMessage = event => {
+      if (event.data?.type !== 'OFFLINE_REPAIR_RESULT') return;
+      finish({
+        ok: Boolean(event.data.ok),
+        error: event.data.error ? String(event.data.error).slice(0, 240) : null,
+      });
+    };
+    const timer = setTimeout(() => finish({ ok: false, error: 'offline-repair-timeout' }), timeoutMs);
+    serviceWorker.addEventListener?.('message', onMessage);
+    try {
+      worker.postMessage({ type: 'REPAIR_OFFLINE_DATA' });
+    } catch (error) {
+      finish({ ok: false, error: String(error?.message || error).slice(0, 240) });
+    }
+  });
+}
+
 export function canRegisterServiceWorker({
   navigatorRef = globalThis.navigator,
   locationRef = globalThis.location,
