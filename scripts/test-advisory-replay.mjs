@@ -17,6 +17,7 @@ import {
 import {
   buildAdvisoryConeSamples,
   clipBestTrack,
+  getAdvisoryReplayPosition,
   getStormAdvisories,
   summarizeAdvisoryErrors,
 } from '../src/advisory-replay.js';
@@ -106,6 +107,21 @@ assert.equal(summary.longestLeadHours, 48, 'the longest verified lead drives the
 assert.equal(summary.longestLeadTrackErrorNmi, 90);
 assert.equal(summary.meanIntensityErrorKt, 10, 'null intensity errors must not count toward the mean');
 assert.equal(summarizeAdvisoryErrors({ e: [] }).meanTrackErrorNmi, null);
+
+const gappedReplay = {
+  advisories: [{ n: 1 }, { n: 3 }, { n: 4 }],
+};
+const gappedPosition = getAdvisoryReplayPosition(gappedReplay.advisories.length - 1, gappedReplay.advisories.length);
+assert.deepEqual(gappedPosition, { index: 2, number: 3, count: 3 });
+assert.ok(
+  Math.max(...gappedReplay.advisories.map(advisory => advisory.n)) >= gappedPosition.number,
+  'a missing NHC advisory number must not inflate the replay ordinal',
+);
+assert.equal(
+  getAdvisoryReplayPosition(99, gappedReplay.advisories.length).index,
+  gappedReplay.advisories.length - 1,
+  'presentation helper must clamp its index to the replay records',
+);
 
 const clipped = clipBestTrack(
   {

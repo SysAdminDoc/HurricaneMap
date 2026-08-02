@@ -1765,6 +1765,34 @@ try {
     firstAdvisory.actualPath && secondAdvisory.actualPath,
     'advisory replay never drew the best track it compares against',
   );
+  await page.locator('#advisory-replay-scrubber').evaluate(element => {
+    element.value = element.max;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await page.waitForFunction(() => {
+    const scrubber = document.querySelector('#advisory-replay-scrubber');
+    return scrubber?.value === scrubber?.max && scrubber?.getAttribute('aria-valuenow') === scrubber?.max;
+  }, { timeout: 10000 });
+  const finalAdvisory = await page.evaluate(() => {
+    const scrubber = document.querySelector('#advisory-replay-scrubber');
+    const meta = document.querySelector('#advisory-replay-meta')?.textContent || '';
+    const match = meta.match(/Advisory\s+(\d+)\s+of\s+(\d+)/i);
+    return {
+      ariaValueNow: Number(scrubber?.getAttribute('aria-valuenow')),
+      min: Number(scrubber?.min),
+      max: Number(scrubber?.max),
+      meta,
+      position: match ? [Number(match[1]), Number(match[2])] : null,
+    };
+  });
+  assert(
+    finalAdvisory.position && finalAdvisory.position[0] <= finalAdvisory.position[1],
+    `final advisory replay position is out of order: ${JSON.stringify(finalAdvisory)}`,
+  );
+  assert(
+    finalAdvisory.ariaValueNow >= finalAdvisory.min && finalAdvisory.ariaValueNow <= finalAdvisory.max,
+    `final advisory replay aria value is outside its range: ${JSON.stringify(finalAdvisory)}`,
+  );
   await page.uncheck('#advisory-replay-enabled');
   await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), { timeout: 5000 });
   await page.evaluate(() => { location.hash = '#storm=AL122005'; });

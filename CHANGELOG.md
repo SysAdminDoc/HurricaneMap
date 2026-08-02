@@ -19,6 +19,7 @@ All notable changes to HurricaneMap.
 - Device geolocation is now session-only by default, with pre-use privacy copy, explicit 24-hour persistence, legacy-coordinate purge, a clear control, and localized permission/timeout/unavailable recovery.
 - Brand-title ink is now independent from dark accent-fill tokens, and computed browser checks enforce readable header text and controls across the complete theme, palette, and high-contrast matrix.
 - Prep, evacuation, table, and nearby-storm regions now focus their heading on entry, return to a visible invoker on close, preserve focus through minimize/restore, and explicitly focus the map from the skip link.
+- Advisory replay positions now use the replay record ordinal while retaining the NHC advisory number separately, keeping gapped advisory series readable and the range scrubber's ARIA value valid.
 
 ### Changed
 - The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.

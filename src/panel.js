@@ -38,6 +38,7 @@ import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 import {
   clearAdvisoryReplay,
+  getAdvisoryReplayPosition,
   getStormAdvisories,
   loadAdvisories,
   renderAdvisory,
@@ -646,13 +647,17 @@ function wireAdvisoryReplay(storm) {
       return;
     }
     const { advisory, summary } = result;
-    scrubber.value = String(result.index);
-    scrubber.setAttribute('aria-valuenow', String(advisory.n));
-    scrubber.setAttribute('aria-valuetext', t('advisoryReplay.position', String(advisory.n), String(record.advisoryCount)));
-    prev.disabled = result.index <= 0;
-    next.disabled = result.index >= record.advisories.length - 1;
+    const replayPosition = getAdvisoryReplayPosition(result.index, record.advisories.length);
+    const positionText = t('advisoryReplay.position', String(replayPosition.number), String(replayPosition.count));
+    const nhcNumberText = t('advisoryReplay.nhcNumber', String(advisory.n));
+    scrubber.value = String(replayPosition.index);
+    scrubber.setAttribute('aria-valuenow', String(replayPosition.index));
+    scrubber.setAttribute('aria-valuetext', [positionText, nhcNumberText].join(' · '));
+    prev.disabled = replayPosition.index <= 0;
+    next.disabled = replayPosition.index >= replayPosition.count - 1;
     meta.textContent = [
-      t('advisoryReplay.position', String(advisory.n), String(record.advisoryCount)),
+      positionText,
+      nhcNumberText,
       t('advisoryReplay.issued', formatTime(advisory.t)),
     ].join(' · ');
     status.textContent = summary.verifiedLeads

@@ -36,6 +36,20 @@ export function getStormAdvisories(archive, stormId) {
   return archive?.storms?.[stormId] || null;
 }
 
+// The replay position is the record's ordinal, not the NHC advisory number.
+// NHC can issue special/intermediate advisories that have no matching OFCL
+// record, so advisory.n may be higher than the number of replayable records.
+export function getAdvisoryReplayPosition(index, advisoryCount) {
+  const count = Math.max(0, Math.trunc(Number(advisoryCount) || 0));
+  const maxIndex = Math.max(0, count - 1);
+  const safeIndex = Math.max(0, Math.min(Math.trunc(Number(index) || 0), maxIndex));
+  return {
+    index: safeIndex,
+    number: count ? safeIndex + 1 : 0,
+    count,
+  };
+}
+
 // The published radii table stops at 120 h. Later leads (NHC's 6- and 7-day
 // experimental forecasts) still plot as forecast positions, but they cannot
 // contribute to a cone without inventing a radius for them.
