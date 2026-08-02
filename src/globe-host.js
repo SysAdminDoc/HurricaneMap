@@ -7,7 +7,7 @@ const CESIUM_CSS_URL = `${CESIUM_BASE_URL}Widgets/widgets.css`;
 // A `Referrer-Policy: no-referrer` deployment leaves this empty, so the parent's
 // PING re-establishes it (see adoptParentOrigin) instead of failing closed.
 let parentOrigin = referrerOrigin(document.referrer);
-const ALLOWED_MESSAGES = new Set(['PING', 'INIT', 'TIMELINE', 'RESET', 'FOCUS']);
+const ALLOWED_MESSAGES = new Set(['PING', 'INIT', 'TIMELINE', 'LAYERS', 'RESET', 'FOCUS']);
 const MAX_SEGMENTS = 20_000;
 const MAX_CONES = 5_000;
 const MAX_TIMELINE = 10_000;
@@ -40,6 +40,11 @@ window.addEventListener('message', async event => {
     } else if (message.type === 'TIMELINE') {
       if (!Number.isInteger(message.payload?.index)) return;
       updateTimeline(message.payload.index);
+    } else if (message.type === 'LAYERS') {
+      if (!validLayersPayload(message.payload) || !currentDataset || !viewer) return;
+      const Cesium = await loadCesium();
+      renderDataset(Cesium, currentDataset, message.payload.showWindCones);
+      updateTimeline(message.payload.timelineIndex);
     } else if (message.type === 'RESET') {
       if (message.payload != null) return;
       flyToDataset(currentDataset);
@@ -94,6 +99,15 @@ function validInitPayload(payload) {
   if (dataset.focusStormId != null && typeof dataset.focusStormId !== 'string') return false;
   if (!dataset.timeline.every(Number.isFinite)) return false;
   return dataset.segments.every(validSegment) && dataset.windCones.every(validCone);
+}
+
+function validLayersPayload(payload) {
+  return payload &&
+    typeof payload === 'object' &&
+    !Array.isArray(payload) &&
+    typeof payload.showWindCones === 'boolean' &&
+    Number.isInteger(payload.timelineIndex) &&
+    Object.keys(payload).every(key => ['showWindCones', 'timelineIndex'].includes(key));
 }
 
 function validSegment(segment) {

@@ -247,6 +247,27 @@ try {
     desktopPixels.nonDarkPixels > 50_000 && desktopPixels.variedPixels > 50_000 && desktopPixels.saturatedPixels > 1_000,
     `desktop canvas appears blank or unrendered: ${JSON.stringify({ desktop, desktopPixels })}`,
   );
+  const midTimeline = Math.floor(Number(await page.locator('#globe3d-scrubber').getAttribute('max')) / 2);
+  await page.locator('#globe3d-scrubber').evaluate((element, value) => {
+    element.value = String(value);
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  }, midTimeline);
+  await page.waitForFunction(value => document.querySelector('#globe3d-scrubber')?.value === String(value), midTimeline, { timeout: 5000 });
+  await page.locator('#globe3d-wind-cones').evaluate(element => {
+    element.checked = false;
+    element.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.waitForTimeout(200);
+  const afterConesOff = await page.evaluate(() => ({
+    value: document.querySelector('#globe3d-scrubber')?.value,
+    ariaValueNow: document.querySelector('#globe3d-scrubber')?.getAttribute('aria-valuenow'),
+    conesChecked: document.querySelector('#globe3d-wind-cones')?.checked,
+  }));
+  assert(afterConesOff.value === String(midTimeline) && afterConesOff.ariaValueNow === String(midTimeline) && afterConesOff.conesChecked === false, `wind-cone toggle changed the timeline: ${JSON.stringify(afterConesOff)}`);
+  await page.locator('#globe3d-wind-cones').evaluate(element => {
+    element.checked = true;
+    element.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(700);
   const mobile = await page.evaluate(() => {

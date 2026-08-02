@@ -60,7 +60,7 @@ export function initGlobe3D() {
   els.scrubber?.addEventListener('input', () => updateTimeline(Number(els.scrubber.value || 0)));
   els.windCones?.addEventListener('change', () => {
     if (!currentDataset) return;
-    initializeHost(currentDataset);
+    updateLayers();
   });
   window.addEventListener('message', onHostMessage);
   els.frame?.addEventListener('load', () => {
@@ -327,7 +327,7 @@ function validErrorPayload(payload) {
 }
 
 function sendToHost(type, payload) {
-  if (!['PING', 'INIT', 'TIMELINE', 'RESET', 'FOCUS'].includes(type)) return;
+  if (!['PING', 'INIT', 'TIMELINE', 'LAYERS', 'RESET', 'FOCUS'].includes(type)) return;
   els.frame?.contentWindow?.postMessage({ protocol: GLOBE_PROTOCOL, type, payload }, '*');
 }
 
@@ -358,6 +358,16 @@ function initializeHost(dataset) {
     background,
   });
   updateTimeline(index);
+}
+
+function updateLayers() {
+  if (!currentDataset) return;
+  const max = Math.max(0, currentDataset.timeline.length - 1);
+  const index = Math.max(0, Math.min(Number(els.scrubber?.value ?? max), max));
+  sendToHost('LAYERS', {
+    showWindCones: Boolean(els.windCones?.checked),
+    timelineIndex: index,
+  });
 }
 
 function configureScrubber(dataset) {

@@ -23,6 +23,7 @@ All notable changes to HurricaneMap.
 - Storm-owned retrospective cone, risk-trajectory, and advisory overlays now clear when another managed panel opens, including their floating legends.
 - Advisory replay now frames its issued forecast, cone, and comparison track in view, re-fitting only when a later step leaves the current map bounds.
 - Preparedness checklist and household controls now update in place, preserving keyboard focus while progress and supply totals change.
+- Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
 
 ### Changed
 - The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.

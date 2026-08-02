@@ -30,5 +30,11 @@ assert.match(host, /if \(parentOrigin\) return origin === parentOrigin;/, 'host 
 assert.match(host, /origin === 'null'/, 'host must refuse to adopt an opaque embedder origin');
 assert.match(host, /validInitPayload/, 'host must validate initialization payloads before rendering');
 assert.match(controller, /validReadyPayload/, 'controller must validate host result payloads');
+assert.match(controller, /sendToHost\('LAYERS'/, 'controller must use LAYERS for wind-cone toggles');
+assert.match(controller, /showWindCones: Boolean\(els\.windCones\?\.checked\)/, 'LAYERS must carry the requested wind-cone state');
+assert.match(controller, /timelineIndex: index/, 'LAYERS must carry the current timeline index');
+assert.match(host, /message\.type === 'LAYERS'/, 'host must handle LAYERS without reinitializing the dataset');
+assert.match(host, /validLayersPayload/, 'host must validate LAYERS payloads');
+assert.match(host, /renderDataset\(Cesium, currentDataset, message\.payload\.showWindCones\);\s+updateTimeline\(message\.payload\.timelineIndex\);/, 'LAYERS must render and update time without a camera flight');
 
 console.log('globe isolation protocol ok (main CSP strict, opaque sandbox, versioned source/origin/type/payload allowlists)');
