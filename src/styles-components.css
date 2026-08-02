@@ -8732,6 +8732,12 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .advisory-replay-meta { color: var(--text) !important; font-weight: 600; }
 
+.advisory-replay-provenance {
+  margin: 0;
+  color: var(--subtext);
+  font-size: 0.72rem;
+}
+
 .advisory-replay-legend {
   display: flex;
   flex-wrap: wrap;

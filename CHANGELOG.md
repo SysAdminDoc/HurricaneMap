@@ -27,6 +27,7 @@ All notable changes to HurricaneMap.
 - On-this-date loading, relative-day, state, unnamed-storm, and playback/climatology status copy now comes from the English, Spanish, and Haitian Creole catalogs, with live locale rerender coverage.
 - On-this-date matching and relative labels now use UTC calendar arithmetic, eliminating daylight-saving shifts around the ±7-day window.
 - Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
+- Advisory replay now identifies archived post-tropical forecasts that fall outside the numbered NHC advisory series, with localized provenance copy and browser coverage for both non-zero and complete archives.
 
 ### Changed
 - The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.

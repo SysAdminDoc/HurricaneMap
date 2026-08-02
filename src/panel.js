@@ -342,6 +342,7 @@ function render(storm, landfall, allStorms) {
               <button type="button" class="advisory-replay-step" id="advisory-replay-next" aria-label="${t('advisoryReplay.next')}">▶</button>
             </div>
             <p class="advisory-replay-meta" id="advisory-replay-meta"></p>
+            <p class="advisory-replay-provenance" id="advisory-replay-provenance"></p>
             <ul class="advisory-replay-legend">
               <li><span class="advisory-swatch advisory-swatch--forecast"></span>${t('advisoryReplay.legendForecast')}</li>
               <li><span class="advisory-swatch advisory-swatch--actual"></span>${t('advisoryReplay.legendActual')}</li>
@@ -642,9 +643,10 @@ function wireAdvisoryReplay(storm) {
   const prev = document.getElementById('advisory-replay-prev');
   const next = document.getElementById('advisory-replay-next');
   const meta = document.getElementById('advisory-replay-meta');
+  const provenance = document.getElementById('advisory-replay-provenance');
   const discussion = document.getElementById('advisory-replay-discussion');
   const status = document.getElementById('advisory-replay-status');
-  if (!enabled || !steps || !scrubber || !prev || !next || !meta || !discussion || !status) return;
+  if (!enabled || !steps || !scrubber || !prev || !next || !meta || !provenance || !discussion || !status) return;
 
   const seq = ++advisoryReplaySeq;
   let record = null;
@@ -680,6 +682,11 @@ function wireAdvisoryReplay(storm) {
       nhcNumberText,
       t('advisoryReplay.issued', formatTime(advisory.t)),
     ].join(' · ');
+    provenance.textContent = record.unmatchedForecasts > 0
+      ? t('advisoryReplay.postTropical', String(record.unmatchedForecasts))
+      : record.missingDiscussions > 0
+        ? t('advisoryReplay.missingDiscussions', String(record.missingDiscussions))
+        : '';
     status.textContent = summary.verifiedLeads
       ? [
         t('advisoryReplay.verified', String(summary.verifiedLeads), String(summary.meanTrackErrorNmi)),
@@ -696,6 +703,7 @@ function wireAdvisoryReplay(storm) {
       clearAdvisoryReplay();
       hasFramedReplay = false;
       steps.hidden = true;
+      provenance.textContent = '';
       status.textContent = '';
       return;
     }
@@ -713,6 +721,7 @@ function wireAdvisoryReplay(storm) {
     coneEra = archive?.era?.coneEra || '2025';
     if (!record?.advisories?.length) {
       steps.hidden = true;
+      provenance.textContent = '';
       status.textContent = t('advisoryReplay.unavailable', archive?.era?.label || '');
       enabled.checked = false;
       return;

@@ -1812,6 +1812,32 @@ try {
   }
   await assertThemeContrastMatrix(page, { checkMapOverlays: true });
 
+  // The ingester retains the count of OFCL forecasts that continue after the
+  // numbered NHC advisory series. That provenance must be visible only for
+  // storms whose archive actually has such a post-tropical tail.
+  await openStormPanel(page, 'AL092021');
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(
+    () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
+    { timeout: 15000 },
+  );
+  const idaProvenance = await page.textContent('#advisory-replay-provenance');
+  assert(/10/.test(idaProvenance), `Ida replay did not report its ten post-tropical forecasts: ${idaProvenance}`);
+
+  await openStormPanel(page, 'AL132020');
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(
+    () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
+    { timeout: 15000 },
+  );
+  const lauraProvenance = await page.textContent('#advisory-replay-provenance');
+  assert(/5/.test(lauraProvenance), `Laura replay did not report its five post-tropical forecasts: ${lauraProvenance}`);
+
+  await openStormPanel(page, 'AL142024');
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15000 });
+  assert((await page.textContent('#advisory-replay-provenance')) === '', 'a complete replay incorrectly showed a provenance note');
+
   // Ian is inside the era: the issued forecast, its cone, and the best track it
   // is compared against must all render, and stepping must change the geometry.
   await openStormPanel(page, 'AL092022');
