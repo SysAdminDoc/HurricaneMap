@@ -26,6 +26,28 @@ try {
   process.exit(1);
 }
 
+// Init scripts run in EVERY frame, including the opaque-origin 3D-globe iframe
+// (sandbox="allow-scripts") where storage access throws SecurityError. Seed the
+// real document only.
+async function seedSettings(context, settings) {
+  await context.addInitScript(value => {
+    if (window.top !== window) return;
+    localStorage.setItem('hm-settings-v1', JSON.stringify(value));
+  }, settings);
+}
+
+// Playwright's own serviceWorkers:'block' shim is injected into that sandboxed
+// frame too and throws there. Product code inside the globe frame touches
+// neither storage nor service workers, so these are harness noise.
+const SANDBOX_HARNESS_ERROR = /lacks the 'allow-same-origin' flag/;
+
+function collectPageErrors(target, sink) {
+  target.on('pageerror', error => {
+    if (SANDBOX_HARNESS_ERROR.test(error.message)) return;
+    sink.push(error.message);
+  });
+}
+
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
 // Known-accepted axe rule ids (e.g. unavoidable map-canvas noise). Currently
 // empty — new violations should be fixed, not allowlisted, unless they come
@@ -854,9 +876,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     viewport: { width: scenario.width, height: scenario.height },
     serviceWorkers: 'block',
   });
-  await context.addInitScript((settings) => {
-    localStorage.setItem('hm-settings-v1', JSON.stringify(settings));
-  }, {
+  await seedSettings(context, {
     onboarded: true,
     theme: scenario.theme,
     highContrast: scenario.highContrast,
@@ -864,7 +884,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   });
   const page = await context.newPage();
   const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
+  collectPageErrors(page, pageErrors);
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
@@ -886,18 +906,16 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     serviceWorkers: 'block',
     reducedMotion: 'no-preference',
   });
-  await context.addInitScript(() => {
-    localStorage.setItem('hm-settings-v1', JSON.stringify({
-      onboarded: true,
-      theme: 'dark',
-      highContrast: false,
-      reducedMotion: false,
-      locale: 'en',
-    }));
+  await seedSettings(context, {
+    onboarded: true,
+    theme: 'dark',
+    highContrast: false,
+    reducedMotion: false,
+    locale: 'en',
   });
   const page = await context.newPage();
   const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
+  collectPageErrors(page, pageErrors);
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
@@ -989,9 +1007,7 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
       serviceWorkers: 'block',
       reducedMotion: 'reduce',
     });
-    await context.addInitScript(() => {
-      localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true, locale: 'en' }));
-    });
+    await seedSettings(context, { onboarded: true, locale: 'en' });
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -1062,13 +1078,7 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       serviceWorkers: 'block',
       reducedMotion: 'reduce',
     });
-    await context.addInitScript(language => {
-      localStorage.setItem('hm-settings-v1', JSON.stringify({
-        onboarded: true,
-        locale: language,
-        reducedMotion: true,
-      }));
-    }, locale);
+    await seedSettings(context, { onboarded: true, locale, reducedMotion: true });
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -1141,9 +1151,7 @@ async function assertSourceLanguageDisclosures(browser, baseUrl) {
       viewport: { width: 1200, height: 900 },
       serviceWorkers: 'block',
     });
-    await context.addInitScript(language => {
-      localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true, locale: language }));
-    }, locale);
+    await seedSettings(context, { onboarded: true, locale });
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -1299,12 +1307,10 @@ try {
     permissions: ['geolocation'],
     geolocation: { latitude: 25.7617, longitude: -80.1918 },
   });
-  await context.addInitScript(() => {
-    localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
-  });
+  await seedSettings(context, { onboarded: true });
   const page = await context.newPage();
   const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
+  collectPageErrors(page, pageErrors);
 
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
@@ -2062,12 +2068,10 @@ try {
     viewport: { width: 430, height: 900 },
     serviceWorkers: 'block',
   });
-  await mobileContext.addInitScript(() => {
-    localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
-  });
+  await seedSettings(mobileContext, { onboarded: true });
   const mobilePage = await mobileContext.newPage();
   const mobileErrors = [];
-  mobilePage.on('pageerror', error => mobileErrors.push(error.message));
+  collectPageErrors(mobilePage, mobileErrors);
 
   await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(mobilePage);

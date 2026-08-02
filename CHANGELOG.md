@@ -20,6 +20,7 @@ All notable changes to HurricaneMap.
 - Prep, evacuation, table, and nearby-storm regions now focus their heading on entry, return to a visible invoker on close, preserve focus through minimize/restore, and explicitly focus the map from the skip link.
 
 ### Changed
+- The optional 3D globe now runs in a least-privilege `sandbox="allow-scripts"` frame with its own document, so the application itself no longer grants `unsafe-eval`, `wasm-unsafe-eval`, or any third-party script host; the two documents exchange only a versioned `hm-globe-v1` envelope whose source, origin, message type, and payload shape are validated on both sides, and a build guard fails if that boundary regresses.
 - Application styles now use an explicit tokens, reset, base, shell, components, utilities, themes, and accessibility cascade with duplicate-rule validation and offline caching for every layer.
 - Toolchain reproducibility now declares Node.js 20+, pins the complete notebook/Pillow environment, audits lockfile and vendored-font licenses/hashes, and keeps the 759-landfall count synchronized across generated metadata and notebook documentation.
 - Deterministic Playwright screenshot comparisons now guard the atlas shell and Statistics panel with checked-in Windows baselines, masked live/map content, and an explicit baseline-refresh command.

@@ -1,13 +1,9 @@
 import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
-import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
 import { activateDialogFocus } from './dialog-focus.js';
 
-const CESIUM_VERSION = '1.143';
-const CESIUM_BASE_URL = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/`;
-const CESIUM_JS_URL = `${CESIUM_BASE_URL}Cesium.js`;
-const CESIUM_CSS_URL = `${CESIUM_BASE_URL}Widgets/widgets.css`;
-
+const GLOBE_PROTOCOL = 'hm-globe-v1';
+const ALLOWED_HOST_MESSAGES = new Set(['HOST_READY', 'READY', 'ERROR']);
 const MAX_GLOBE_STORMS = 80;
 const MIN_TRACK_HEIGHT_M = 80_000;
 const HEIGHT_PER_KT_M = 2_200;
@@ -29,17 +25,16 @@ const WIND_CONE_QUADRANTS = [
   { name: 'NW', startBearing: 270, endBearing: 360 },
 ];
 
-let cesiumPromise = null;
-let viewer = null;
-let cesiumApi = null;
-let renderedEntities = [];
 let currentDataset = null;
 let releaseGlobeFocus = null;
+let hostReady = false;
+let resolveHostReady = null;
+let hostReadyPromise = new Promise(resolve => { resolveHostReady = resolve; });
 
 const els = typeof document === 'undefined' ? {} : {
   panel: document.getElementById('globe3d-panel'),
   close: document.getElementById('close-globe3d'),
-  canvas: document.getElementById('globe3d-canvas'),
+  frame: document.getElementById('globe3d-frame'),
   status: document.getElementById('globe3d-status'),
   subtitle: document.getElementById('globe3d-subtitle'),
   scrubber: document.getElementById('globe3d-scrubber'),
@@ -60,13 +55,17 @@ export function initGlobe3D() {
   if (wired) return;
   wired = true;
   els.close?.addEventListener('click', closeGlobe3D);
-  els.reset?.addEventListener('click', () => flyToDataset(currentDataset));
-  els.focus?.addEventListener('click', () => flyToFocus(currentDataset));
+  els.reset?.addEventListener('click', () => sendToHost('RESET', null));
+  els.focus?.addEventListener('click', () => sendToHost('FOCUS', null));
   els.scrubber?.addEventListener('input', () => updateTimeline(Number(els.scrubber.value || 0)));
   els.windCones?.addEventListener('change', () => {
-    if (!cesiumApi || !currentDataset) return;
-    renderDataset(cesiumApi, currentDataset);
-    updateTimeline(Number(els.scrubber?.value || currentDataset.timeline.length - 1));
+    if (!currentDataset) return;
+    initializeHost(currentDataset);
+  });
+  window.addEventListener('message', onHostMessage);
+  els.frame?.addEventListener('load', () => {
+    hostReady = false;
+    hostReadyPromise = new Promise(resolve => { resolveHostReady = resolve; });
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !els.panel.hidden) {
@@ -77,7 +76,7 @@ export function initGlobe3D() {
 }
 
 export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) {
-  if (!els.panel || !els.canvas) return;
+  if (!els.panel || !els.frame) return;
   const generation = ++openGeneration;
   els.panel.hidden = false;
   els.panel.dataset.ready = 'false';
@@ -100,18 +99,12 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
   }
 
   try {
-    const Cesium = await loadCesium();
+    await waitForHost();
     if (generation !== openGeneration || els.panel.hidden) return;
-    cesiumApi = Cesium;
-    ensureViewer(Cesium);
     configureWindConeControl(dataset);
-    renderDataset(Cesium, dataset);
     configureScrubber(dataset);
-    updateTimeline(dataset.timeline.length - 1);
-    flyToDataset(dataset);
     updateSubtitle(dataset);
-    setStatus(t('globe.ready'));
-    els.panel.dataset.ready = 'true';
+    initializeHost(dataset);
   } catch (error) {
     if (generation !== openGeneration || els.panel.hidden) return;
     console.warn('3D globe failed to initialize:', error);
@@ -176,6 +169,7 @@ export function buildGlobeTrackDataset(storms, visibleLandfalls = [], options = 
         start,
         end,
         cat: categoryFromWind(wind),
+        color: categoryColor(categoryFromWind(wind)),
         wind_kt: wind,
         positions: [
           a.lon, a.lat, getTrackHeightMeters(a.wind || wind),
@@ -296,141 +290,74 @@ function offsetByBearing(lat, lon, distNm, bearingDeg) {
   return [lon + dLon, lat + dLat];
 }
 
-function loadCesium() {
-  if (window.Cesium) return Promise.resolve(window.Cesium);
-  if (cesiumPromise) return cesiumPromise;
-  cesiumPromise = new Promise((resolve, reject) => {
-    window.CESIUM_BASE_URL = CESIUM_BASE_URL;
+function onHostMessage(event) {
+  if (event.source !== els.frame?.contentWindow || event.origin !== 'null') return;
+  const message = event.data;
+  if (!message || typeof message !== 'object' || Array.isArray(message)) return;
+  if (message.protocol !== GLOBE_PROTOCOL || !ALLOWED_HOST_MESSAGES.has(message.type)) return;
+  if (!Object.keys(message).every(key => ['protocol', 'type', 'payload'].includes(key))) return;
+  if (message.type === 'HOST_READY' && message.payload === null) {
+    hostReady = true;
+    resolveHostReady?.();
+  } else if (message.type === 'READY' && validReadyPayload(message.payload)) {
+    els.panel.dataset.entities = String(message.payload.entities);
+    els.panel.dataset.windCones = String(message.payload.windCones);
+    els.panel.dataset.ready = 'true';
+    setStatus(t('globe.ready'));
+  } else if (message.type === 'ERROR' && validErrorPayload(message.payload)) {
+    console.warn('3D globe host failed:', message.payload.message);
+    setStatus(t('globe.error'));
+  }
+}
 
-    if (!document.querySelector(`link[href="${CESIUM_CSS_URL}"]`)) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = CESIUM_CSS_URL;
-      // Recompute BOTH hashes when bumping CESIUM_VERSION (see CLAUDE.md).
-      link.integrity = 'sha384-ghEeMdcWWzRv/BPeUcX835vcKDGrxvROXisl/Btpv3GeekBUXTSPVcFJpI1Tcrgp';
-      link.crossOrigin = 'anonymous';
-      document.head.appendChild(link);
-    }
+function validReadyPayload(payload) {
+  return payload &&
+    Number.isInteger(payload.entities) &&
+    payload.entities >= 0 &&
+    Number.isInteger(payload.windCones) &&
+    payload.windCones >= 0 &&
+    Object.keys(payload).every(key => ['entities', 'windCones'].includes(key));
+}
 
-    const script = document.createElement('script');
-    script.src = CESIUM_JS_URL;
-    script.integrity = 'sha384-6pySA8bzGAn2+aYh8KWmvzl5DRnspbScFYUbrFcu2ayckTxx8gyn+/WNvNbPM9iG';
-    script.crossOrigin = 'anonymous';
-    script.async = true;
-    script.onload = () => window.Cesium ? resolve(window.Cesium) : reject(new Error('Cesium global missing'));
-    script.onerror = () => {
-      cesiumPromise = null;
-      reject(new Error('Cesium CDN failed to load'));
-    };
-    document.head.appendChild(script);
+function validErrorPayload(payload) {
+  return payload &&
+    typeof payload.message === 'string' &&
+    payload.message.length <= 240 &&
+    Object.keys(payload).length === 1;
+}
+
+function sendToHost(type, payload) {
+  if (!['PING', 'INIT', 'TIMELINE', 'RESET', 'FOCUS'].includes(type)) return;
+  els.frame?.contentWindow?.postMessage({ protocol: GLOBE_PROTOCOL, type, payload }, '*');
+}
+
+async function waitForHost() {
+  if (hostReady) return;
+  // The host announces itself on load, but that announcement is lost if the frame
+  // is still parsing. Re-PING until it answers: the host replies to a PING even
+  // when its own unprompted announcement was dropped.
+  sendToHost('PING', null);
+  const retry = setInterval(() => sendToHost('PING', null), 250);
+  try {
+    await Promise.race([
+      hostReadyPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Globe host did not become ready')), 10_000)),
+    ]);
+  } finally {
+    clearInterval(retry);
+  }
+}
+
+function initializeHost(dataset) {
+  const index = Math.max(0, dataset.timeline.length - 1);
+  const background = getComputedStyle(document.documentElement).getPropertyValue('--globe-bg').trim() || '#050813';
+  sendToHost('INIT', {
+    dataset,
+    timelineIndex: index,
+    showWindCones: Boolean(els.windCones?.checked),
+    background,
   });
-  return cesiumPromise;
-}
-
-function ensureViewer(Cesium) {
-  if (viewer) {
-    viewer.resize();
-    return;
-  }
-  viewer = new Cesium.Viewer(els.canvas, {
-    animation: false,
-    baseLayer: false,
-    baseLayerPicker: false,
-    fullscreenButton: false,
-    geocoder: false,
-    homeButton: false,
-    infoBox: false,
-    navigationHelpButton: false,
-    sceneModePicker: false,
-    selectionIndicator: false,
-    timeline: false,
-    shouldAnimate: false,
-  });
-  const globeBg = getComputedStyle(document.documentElement).getPropertyValue('--globe-bg').trim() || '#050813';
-  viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString(globeBg);
-  viewer.scene.globe.showGroundAtmosphere = true;
-  viewer.scene.skyAtmosphere.show = true;
-  viewer.scene.requestRenderMode = true;
-  viewer.scene.maximumRenderTimeChange = Infinity;
-}
-
-function renderDataset(Cesium, dataset) {
-  for (const entity of renderedEntities) viewer.entities.remove(entity);
-  renderedEntities = [];
-
-  for (const segment of dataset.segments) {
-    const color = Cesium.Color.fromCssColorString(colorForCategory(segment.cat)).withAlpha(0.92);
-    const entity = viewer.entities.add({
-      name: `${formatStormName(segment.name)} ${segment.year}`,
-      polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArrayHeights(segment.positions),
-        width: segment.storm_id === dataset.focusStormId ? 7 : 3.4,
-        material: new Cesium.PolylineGlowMaterialProperty({
-          color,
-          glowPower: segment.storm_id === dataset.focusStormId ? 0.18 : 0.12,
-          taperPower: 0.65,
-        }),
-        arcType: Cesium.ArcType.GEODESIC,
-      },
-      description: `${escapeHtml(formatStormName(segment.name))} ${escapeHtml(segment.year)} · ${escapeHtml(segment.wind_kt)} kt`,
-    });
-    entity._hmEndIndex = segment.endIndex;
-    entity._hmStormId = segment.storm_id;
-    renderedEntities.push(entity);
-  }
-  if (els.windCones?.checked && dataset.windCones?.length) {
-    renderWindCones(Cesium, dataset);
-  }
-  els.panel.dataset.entities = String(renderedEntities.length);
-  els.panel.dataset.windCones = String(dataset.windCones?.length || 0);
-  viewer.scene.requestRender();
-}
-
-function renderWindCones(Cesium, dataset) {
-  for (const cone of dataset.windCones || []) {
-    const color = Cesium.Color.fromCssColorString(cone.color).withAlpha(cone.alpha);
-    const outlineColor = Cesium.Color.fromCssColorString(cone.color).withAlpha(Math.min(0.78, cone.alpha + 0.36));
-    const center = cone.center;
-    for (let i = 0; i < cone.ring.length; i++) {
-      const a = cone.ring[i];
-      const b = cone.ring[(i + 1) % cone.ring.length];
-      if (!a || !b) continue;
-      const entity = viewer.entities.add({
-        name: `${formatStormName(cone.name)} ${cone.year} ${cone.threshold} kt wind cone`,
-        polygon: {
-          hierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArrayHeights([
-            center[0], center[1], center[2],
-            a[0], a[1], a[2],
-            b[0], b[1], b[2],
-          ])),
-          perPositionHeight: true,
-          material: color,
-          outline: false,
-        },
-        description: `${escapeHtml(formatStormName(cone.name))} ${escapeHtml(cone.year)} · ${escapeHtml(cone.threshold)} kt wind-radii cone`,
-      });
-      entity._hmEndIndex = cone.endIndex;
-      entity._hmStormId = cone.storm_id;
-      entity._hmWindCone = true;
-      renderedEntities.push(entity);
-    }
-
-    const ringPositions = [];
-    for (const point of cone.ring) ringPositions.push(point[0], point[1], point[2]);
-    const outline = viewer.entities.add({
-      name: `${formatStormName(cone.name)} ${cone.year} ${cone.threshold} kt wind-radii outline`,
-      polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArrayHeights([...ringPositions, ...cone.ring[0]]),
-        width: cone.threshold === 64 ? 1.8 : 1.2,
-        material: outlineColor,
-        arcType: Cesium.ArcType.GEODESIC,
-      },
-    });
-    outline._hmEndIndex = cone.endIndex;
-    outline._hmStormId = cone.storm_id;
-    outline._hmWindCone = true;
-    renderedEntities.push(outline);
-  }
+  updateTimeline(index);
 }
 
 function configureScrubber(dataset) {
@@ -462,9 +389,7 @@ function configureWindConeControl(dataset) {
 function updateTimeline(index) {
   if (!currentDataset) return;
   const clamped = Math.max(0, Math.min(index, currentDataset.timeline.length - 1));
-  for (const entity of renderedEntities) {
-    entity.show = (entity._hmEndIndex ?? 0) <= clamped;
-  }
+  sendToHost('TIMELINE', { index: clamped });
   if (els.scrubber) {
     els.scrubber.value = String(clamped);
     els.scrubber.setAttribute('aria-valuenow', String(clamped));
@@ -475,24 +400,6 @@ function updateTimeline(index) {
     els.timeLabel.textContent = label;
     els.scrubber?.setAttribute('aria-valuetext', label);
   }
-  if (viewer) viewer.scene.requestRender();
-}
-
-function flyToDataset(dataset) {
-  if (!viewer || !dataset || !renderedEntities.length) return;
-  viewer.flyTo(renderedEntities, {
-    duration: 0.7,
-    offset: new window.Cesium.HeadingPitchRange(0, -0.72, 4_900_000),
-  });
-}
-
-function flyToFocus(dataset) {
-  if (!viewer || !dataset?.focusStormId) return flyToDataset(dataset);
-  const focused = renderedEntities.filter(entity => entity._hmStormId === dataset.focusStormId);
-  viewer.flyTo(focused.length ? focused : renderedEntities, {
-    duration: 0.7,
-    offset: new window.Cesium.HeadingPitchRange(0, -0.62, 2_400_000),
-  });
 }
 
 function updateSubtitle(dataset) {
@@ -521,8 +428,4 @@ function formatTimelineDate(value) {
     minute: '2-digit',
     timeZone: 'UTC',
   }) + ' UTC';
-}
-
-function colorForCategory(cat) {
-  return categoryColor(cat);
 }

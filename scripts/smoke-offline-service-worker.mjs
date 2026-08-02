@@ -77,6 +77,10 @@ try {
     serviceWorkers: 'allow',
   });
   await context.addInitScript(() => {
+    // Runs in EVERY frame, including the opaque-origin 3D-globe iframe
+    // (sandbox="allow-scripts") where storage access throws. Seed the real
+    // document only.
+    if (window.top !== window) return;
     localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
   });
   const page = await context.newPage();

@@ -178,11 +178,20 @@ try {
     serviceWorkers: 'block',
   });
   await context.addInitScript(() => {
+    // Init scripts run in EVERY frame, including the opaque-origin globe iframe
+    // where storage access throws SecurityError. Only seed the real document.
+    if (window.top !== window) return;
     localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
   });
   const page = await context.newPage();
   const pageErrors = [];
-  page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('pageerror', error => {
+    // Playwright's own serviceWorkers:'block' shim is injected into the sandboxed
+    // globe frame too and throws there. Product code in that frame touches neither
+    // storage nor service workers, so sandbox SecurityErrors are harness noise.
+    if (/lacks the 'allow-same-origin' flag/.test(error.message)) return;
+    pageErrors.push(error.message);
+  });
 
   await page.goto(`${baseUrl}/#storm=AL122005`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
@@ -195,15 +204,24 @@ try {
   await page.click('#toggle-globe3d');
   await page.waitForSelector('#globe3d-panel:not([hidden])', { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.id === 'close-globe3d'), '3D globe dialog did not focus its close button');
-  await page.waitForSelector('#globe3d-canvas canvas', { timeout: 90000 });
+  const globeFrame = page.frameLocator('#globe3d-frame');
+  await globeFrame.locator('#globe-host canvas').waitFor({ timeout: 90000 });
   await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.dataset.ready === 'true', { timeout: 90000 });
+
+  const isolation = await page.evaluate(() => ({
+    csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content || '',
+    sandbox: document.querySelector('#globe3d-frame')?.getAttribute('sandbox') ?? null,
+  }));
+  assert(!/unsafe-eval/.test(isolation.csp), `main-document CSP still allows eval: ${isolation.csp}`);
+  assert(!/cesium\.com/.test(isolation.csp), `main-document CSP still trusts cesium.com: ${isolation.csp}`);
+  assert(isolation.sandbox === 'allow-scripts', `globe frame sandbox is not least-privilege: ${isolation.sandbox}`);
 
   const desktop = await page.evaluate(() => {
     const panel = document.querySelector('#globe3d-panel');
-    const canvas = document.querySelector('#globe3d-canvas canvas');
+    const frame = document.querySelector('#globe3d-frame');
     const status = document.querySelector('#globe3d-status')?.textContent || '';
     const subtitle = document.querySelector('#globe3d-subtitle')?.textContent || '';
-    const box = canvas.getBoundingClientRect();
+    const box = frame.getBoundingClientRect();
     return {
       ready: panel.dataset.ready,
       entities: Number(panel.dataset.entities || 0),
@@ -216,7 +234,7 @@ try {
   });
 
   await page.locator('#globe3d-panel').screenshot({ path: path.join(visualSnapshotDir, 'desktop-globe.png'), animations: 'disabled' });
-  const desktopCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(visualSnapshotDir, 'desktop-globe-canvas.png'), animations: 'disabled' });
+  const desktopCanvasPng = await globeFrame.locator('#globe-host canvas').screenshot({ path: path.join(visualSnapshotDir, 'desktop-globe-canvas.png'), animations: 'disabled' });
   const desktopPixels = summarizePng(desktopCanvasPng);
 
   assert(desktop.ready === 'true', '3D globe did not mark itself ready');
@@ -232,7 +250,7 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(700);
   const mobile = await page.evaluate(() => {
-    const canvas = document.querySelector('#globe3d-canvas canvas');
+    const canvas = document.querySelector('#globe3d-frame');
     const topbar = document.querySelector('.globe3d-topbar');
     const c = canvas.getBoundingClientRect();
     const t = topbar.getBoundingClientRect();
@@ -246,7 +264,7 @@ try {
     };
   });
   await page.locator('#globe3d-panel').screenshot({ path: path.join(visualSnapshotDir, 'mobile-globe.png'), animations: 'disabled' });
-  const mobileCanvasPng = await page.locator('#globe3d-canvas canvas').screenshot({ path: path.join(visualSnapshotDir, 'mobile-globe-canvas.png'), animations: 'disabled' });
+  const mobileCanvasPng = await globeFrame.locator('#globe-host canvas').screenshot({ path: path.join(visualSnapshotDir, 'mobile-globe-canvas.png'), animations: 'disabled' });
   const mobilePixels = summarizePng(mobileCanvasPng);
   assert(mobile.canvasWidth >= 360 && mobile.canvasHeight >= 800, `mobile canvas is too small: ${mobile.canvasWidth}x${mobile.canvasHeight}`);
   assert(mobile.topbarWidth <= 374 && mobile.topbarHeight < 260, `mobile topbar overflows or covers too much canvas: ${mobile.topbarWidth}x${mobile.topbarHeight}`);
@@ -254,6 +272,19 @@ try {
   assert(
     mobilePixels.nonDarkPixels > 10_000 && mobilePixels.variedPixels > 10_000,
     `mobile canvas appears blank or unrendered: ${JSON.stringify({ mobile, mobilePixels })}`,
+  );
+  const readyBeforeRejectedMessage = await page.locator('#globe3d-panel').getAttribute('data-ready');
+  await globeFrame.locator('body').evaluate(() => {
+    window.parent.postMessage({
+      protocol: 'hm-globe-v1',
+      type: 'READY',
+      payload: { entities: -1, windCones: 'poisoned' },
+    }, new URL(document.referrer).origin);
+  });
+  await page.waitForTimeout(100);
+  assert(
+    await page.locator('#globe3d-panel').getAttribute('data-ready') === readyBeforeRejectedMessage,
+    'parent accepted an invalid globe-host payload',
   );
   await page.evaluate(() => {
     const dialog = document.querySelector('#globe3d-panel');

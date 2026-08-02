@@ -25,6 +25,7 @@ const LEGACY_DATA_DBS = ['hm-offline-data-v1'];
 const SHELL_ASSETS = [
   './',
   './index.html',
+  './globe.html',
   './manifest.webmanifest',
   './src/styles.css',
   './src/styles-tokens.css',
@@ -55,6 +56,8 @@ const SHELL_ASSETS = [
   './src/goes-realtime.js',
   './src/hwm.js',
   './src/globe3d.js',
+  './src/globe-host.js',
+  './src/globe-host.css',
   './src/keyboard.js',
   './src/chart.js',
   './src/chart-export.js',

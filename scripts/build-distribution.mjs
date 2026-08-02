@@ -8,6 +8,7 @@ const STATIC_ROOT_FILES = new Set([
   '.dockerignore',
   'Dockerfile',
   'THIRD_PARTY_NOTICES.txt',
+  'globe.html',
   'index.html',
   'manifest.webmanifest',
   'sw.js',

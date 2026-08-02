@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11111b" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cesium.com 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://cesium.com; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io https://cesium.com https://*.cesium.com; font-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self';" />
   <meta name="description" content="HurricaneMap — Interactive map of every U.S. hurricane landfall on record (1851-present), built from NOAA's HURDAT2 best-track database." />
   <meta property="og:title" content="HurricaneMap — 174 Years of U.S. Hurricane Landfalls" />
   <meta property="og:description" content="Interactive map of 595 storms and 759 landfall events drawn from NOAA's HURDAT2 database (1851-2025). Track animation, archived NEXRAD radar, storm comparison, and publication-ready exports." />
@@ -379,7 +379,7 @@
   </section>
 
   <section class="globe3d-panel" id="globe3d-panel" hidden role="dialog" aria-modal="true" aria-labelledby="globe3d-title" aria-describedby="globe3d-subtitle">
-    <div id="globe3d-canvas" class="globe3d-canvas" aria-label="Interactive 3D hurricane track globe" data-i18n-aria-label="globe.canvasLabel"></div>
+    <iframe id="globe3d-frame" class="globe3d-canvas" src="globe.html" sandbox="allow-scripts" title="Interactive 3D hurricane track globe" data-i18n-title="globe.canvasLabel"></iframe>
     <div class="globe3d-topbar glass">
       <div class="globe3d-heading">
         <h2 id="globe3d-title" data-i18n="globe.title">3D storm globe</h2>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cesium.com 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' https://cesium.com; img-src data: blob:; connect-src https://cesium.com https://*.cesium.com; worker-src blob:; object-src 'none'; base-uri 'none'; form-action 'none';" />
+  <title>HurricaneMap isolated 3D globe</title>
+  <link rel="stylesheet" href="src/globe-host.css" />
+</head>
+<body>
+  <div id="globe-host" aria-hidden="true"></div>
+  <script src="src/globe-host.js" defer></script>
+</body>
+</html>

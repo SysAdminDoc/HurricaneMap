@@ -1,0 +1,14 @@
+html,
+body,
+#globe-host,
+#globe-host .cesium-viewer,
+#globe-host .cesium-viewer-cesiumWidgetContainer,
+#globe-host .cesium-widget,
+#globe-host canvas {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  display: block;
+  background: #050813;
+}
