@@ -102,7 +102,12 @@ const localizedSurfaceContracts = [
   },
   {
     path: '../src/panel.js',
-    keys: ['state.unknown', 'panel.resumeTrack', 'panel.loadingPlayback'],
+    keys: ['state.unknown'],
+    forbidden: [],
+  },
+  {
+    path: '../src/panel-controls.js',
+    keys: ['panel.resumeTrack', 'panel.loadingPlayback'],
     forbidden: ['Resume track animation', 'Loading playback...'],
   },
 ];
