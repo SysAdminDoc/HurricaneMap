@@ -1950,6 +1950,22 @@ try {
 
   await clickHeaderAction(page, '#toggle-prep');
   await page.waitForSelector('#prep-panel:not([hidden]) #prep-household');
+  await page.focus('[data-prep-item="water"]');
+  await page.keyboard.press('Space');
+  await page.waitForFunction(() => document.querySelector('[data-prep-item="water"]')?.checked === true);
+  const checklistFocus = await page.evaluate(() => ({
+    checked: document.querySelector('[data-prep-item="water"]')?.checked,
+    focused: document.activeElement?.dataset?.prepItem || '',
+  }));
+  assert(checklistFocus.checked === true && checklistFocus.focused === 'water', `preparedness checkbox lost focus: ${JSON.stringify(checklistFocus)}`);
+  await page.keyboard.press('Space');
+  await page.focus('#prep-household');
+  for (let index = 0; index < 5; index += 1) await page.keyboard.press('ArrowUp');
+  const householdFocus = await page.evaluate(() => ({
+    value: document.querySelector('#prep-household')?.value || '',
+    focused: document.activeElement?.id || '',
+  }));
+  assert(householdFocus.value === '6' && householdFocus.focused === 'prep-household', `preparedness household input lost focus: ${JSON.stringify(householdFocus)}`);
   await page.fill('#prep-household', '4');
   await page.dispatchEvent('#prep-household', 'change');
   await page.selectOption('#prep-mode', 'home');

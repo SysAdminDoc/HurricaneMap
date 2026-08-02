@@ -93,6 +93,35 @@ function itemRows() {
   `).join('');
 }
 
+function totalsMarkup(supplies) {
+  return `
+    <div><strong>${supplies.waterGallons}</strong><span>${escapeHtml(t('prep.gallonsWater'))}</span><small>${supplies.waterLiters} L</small></div>
+    <div><strong>${supplies.foodPersonDays}</strong><span>${escapeHtml(t('prep.personDaysFood'))}</span><small>${escapeHtml(t('prep.forDays', supplies.days))}</small></div>
+  `;
+}
+
+function updatePrepView() {
+  const body = document.getElementById('prep-body');
+  if (!body || !state) return;
+  const supplies = calculatePrepSupplies(state.household, state.mode);
+  const completed = state.checked.length;
+  const percentage = Math.round(completed / PREP_ITEMS.length * 100);
+  const totals = body.querySelector('.prep-totals');
+  if (totals) totals.innerHTML = totalsMarkup(supplies);
+  const household = body.querySelector('#prep-household');
+  if (household) household.value = String(supplies.people);
+  const mode = body.querySelector('#prep-mode');
+  if (mode) mode.value = state.mode;
+  const checklistCount = body.querySelector('.prep-checklist-heading strong');
+  if (checklistCount) checklistCount.textContent = `${completed}/${PREP_ITEMS.length}`;
+  const progress = body.querySelector('.prep-progress');
+  if (progress) {
+    progress.setAttribute('aria-valuenow', String(completed));
+    const bar = progress.querySelector('span');
+    if (bar) bar.style.width = `${percentage}%`;
+  }
+}
+
 export function renderPrepPanel() {
   const body = document.getElementById('prep-body');
   if (!body) return;
@@ -111,10 +140,7 @@ export function renderPrepPanel() {
         <label>${escapeHtml(t('prep.household'))}<input id="prep-household" type="number" inputmode="numeric" min="1" max="${MAX_HOUSEHOLD}" value="${supplies.people}"></label>
         <label>${escapeHtml(t('prep.plan'))}<select id="prep-mode"><option value="go"${state.mode === 'go' ? ' selected' : ''}>${escapeHtml(t('prep.goKit'))}</option><option value="home"${state.mode === 'home' ? ' selected' : ''}>${escapeHtml(t('prep.homeKit'))}</option></select></label>
       </div>
-      <div class="prep-totals" role="status" aria-live="polite">
-        <div><strong>${supplies.waterGallons}</strong><span>${escapeHtml(t('prep.gallonsWater'))}</span><small>${supplies.waterLiters} L</small></div>
-        <div><strong>${supplies.foodPersonDays}</strong><span>${escapeHtml(t('prep.personDaysFood'))}</span><small>${escapeHtml(t('prep.forDays', supplies.days))}</small></div>
-      </div>
+      <div class="prep-totals" role="status" aria-live="polite">${totalsMarkup(supplies)}</div>
       <p class="prep-note">${escapeHtml(t('prep.waterNote'))}</p>
     </section>
     <section class="prep-checklist" aria-labelledby="prep-checklist-title">
@@ -146,7 +172,7 @@ function ensureWired() {
     }
     state = normalizePrepState(state);
     saveState(state);
-    renderPrepPanel();
+    updatePrepView();
   });
   panel.addEventListener('click', async event => {
     const resetButton = event.target.closest('#prep-reset');
