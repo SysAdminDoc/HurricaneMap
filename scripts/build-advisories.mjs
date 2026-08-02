@@ -4,11 +4,11 @@
 // the OFCL rows of NHC's archived ATCF a-decks — the same records the forecaster
 // issued at the time. Nothing is modelled, interpolated or synthesised here.
 //
-// The bounded initial era is 2020-2024. That window is not arbitrary: the
-// published cone radii the app draws with (`data/cone-radii.json` era "2025")
-// are computed from exactly the 2020-2024 forecast sample, so an advisory from
-// this era is drawn with its own error statistics rather than a neighbouring
-// era's.
+// The replay covers 2015-2024. The original 2020-2024 records use the NHC
+// five-year table published for 2025, whose sample is exactly 2020-2024. The
+// added 2015-2019 records instead carry the annual operational cone table for
+// the year in which each advisory was issued; those tables come from the NHC
+// annual verification reports and are never borrowed from a neighbouring year.
 
 import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -21,17 +21,50 @@ import { haversineKm, KM_PER_NAUTICAL_MILE } from '../src/geodesy.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outputPath = path.join(root, 'data', 'advisories.json');
 
+export const REPLAY_ERAS = Object.freeze([
+  Object.freeze({
+    startYear: 2015,
+    endYear: 2019,
+    label: '2015-2019',
+    coneEraByYear: Object.freeze({
+      2015: '2015',
+      2016: '2016',
+      2017: '2017',
+      2018: '2018',
+      2019: '2019',
+    }),
+  }),
+  Object.freeze({
+    startYear: 2020,
+    endYear: 2024,
+    label: '2020-2024',
+    coneEra: '2025',
+  }),
+]);
+
 export const ERA = Object.freeze({
-  startYear: 2020,
-  endYear: 2024,
-  coneEra: '2025',
-  label: '2020-2024',
+  startYear: REPLAY_ERAS[0].startYear,
+  endYear: REPLAY_ERAS.at(-1).endYear,
+  coneEra: 'per-record',
+  label: '2015-2024',
 });
+
+export function coneEraForYear(year) {
+  const numericYear = Number(year);
+  const era = REPLAY_ERAS.find(({ startYear, endYear }) => numericYear >= startYear && numericYear <= endYear);
+  if (!era) return null;
+  return era.coneEraByYear?.[numericYear] || era.coneEra || null;
+}
 
 // U.S.-landfalling Atlantic storms of the era. Each is present in HURDAT2 with
 // at least one attributed U.S. landfall, so every replay has a best track to sit
 // beside.
 export const STORM_IDS = Object.freeze([
+  'AL012015', 'AL022015',
+  'AL022016', 'AL032016', 'AL092016', 'AL112016', 'AL142016',
+  'AL032017', 'AL062017', 'AL092017', 'AL112017', 'AL152017', 'AL162017',
+  'AL012018', 'AL062018', 'AL072018', 'AL142018',
+  'AL022019', 'AL052019', 'AL112019', 'AL122019',
   'AL132020', 'AL192020', 'AL282020',
   'AL092021',
   'AL092022', 'AL172022',
@@ -120,13 +153,29 @@ export function parseAdvisoryIndex(html, atcfId) {
   return { numberByTime, discussionByNumber };
 }
 
-// An a-deck warning time is the synoptic analysis hour (00/06/12/18Z); NHC issues
-// the advisory built on it three hours later, and the archive index is stamped
-// with that issuance time. Exact synoptic stamps are accepted too, so a special
-// advisory issued off-cycle still resolves.
+// An a-deck warning time is usually the synoptic analysis hour (00/06/12/18Z);
+// NHC usually issues the advisory built on it three hours later, and the archive
+// index is stamped with that issuance time. Historical archive pages also carry
+// special advisories at the exact synoptic stamp or a nearby off-cycle minute,
+// so those are accepted before a nearest-time fallback is considered.
 export function advisoryNumberFor(adeckTime, numberByTime) {
-  const issued = new Date(Date.parse(adeckTime) + 3 * 3_600_000).toISOString().replace('.000Z', 'Z');
-  return numberByTime.get(issued) ?? numberByTime.get(adeckTime) ?? null;
+  const adeckMs = Date.parse(adeckTime);
+  if (!Number.isFinite(adeckMs)) return null;
+  const exact = numberByTime.get(adeckTime);
+  if (exact !== undefined) return exact;
+  const issued = new Date(adeckMs + 3 * 3_600_000).toISOString().replace('.000Z', 'Z');
+  const scheduled = numberByTime.get(issued);
+  if (scheduled !== undefined) return scheduled;
+  let nearest = null;
+  for (const [stamp, number] of numberByTime) {
+    const candidateMs = Date.parse(stamp);
+    const distance = Math.abs(candidateMs - (adeckMs + 3 * 3_600_000));
+    if (distance > 3 * 60 * 60_000) continue;
+    if (!nearest || distance < nearest.distance || (distance === nearest.distance && number < nearest.number)) {
+      nearest = { distance, number };
+    }
+  }
+  return nearest?.number ?? null;
 }
 
 // Verified against the post-season best track only where HURDAT2 carries a point
@@ -179,9 +228,8 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
   for (const stormId of STORM_IDS) {
     const storm = stormsById.get(stormId);
     if (!storm) throw new Error(`${stormId}: not present in storms.json`);
-    if (storm.year < ERA.startYear || storm.year > ERA.endYear) {
-      throw new Error(`${stormId}: ${storm.year} falls outside the documented ${ERA.label} era`);
-    }
+    const coneEra = coneEraForYear(storm.year);
+    if (!coneEra) throw new Error(`${stormId}: ${storm.year} falls outside the documented ${ERA.label} era`);
     const atcfId = stormId.toLowerCase();
     const sourceUrl = ADECK_URL(stormId);
     const archiveUrl = ARCHIVE_URL(storm.year, storm.name);
@@ -218,6 +266,7 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
       year: storm.year,
       basin: storm.basin,
       atcfId,
+      coneEra,
       sourceUrl,
       archiveUrl,
       sourceSubsetSha256: createHash('sha256').update(ofclSubset).digest('hex'),
@@ -235,6 +284,7 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
   return {
     schema: 1,
     era: ERA,
+    eras: REPLAY_ERAS,
     model: 'OFCL',
     labels: {
       forecast: 'Preliminary operational forecast as issued (ATCF a-deck, OFCL)',

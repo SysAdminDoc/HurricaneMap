@@ -3,7 +3,7 @@
   "$id": "https://sysadmindoc.github.io/HurricaneMap/schemas/advisories-v1.schema.json",
   "title": "HurricaneMap archived NHC advisory replay v1",
   "type": "object",
-  "required": ["schema", "era", "model", "labels", "definitions", "sources", "totals", "storms"],
+  "required": ["schema", "era", "eras", "model", "labels", "definitions", "sources", "totals", "storms"],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": 1 },
@@ -15,8 +15,29 @@
       "properties": {
         "startYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
         "endYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
-        "coneEra": { "type": "string", "pattern": "^\\d{4}$" },
+        "coneEra": { "type": "string", "pattern": "^(\\d{4}|per-record)$" },
         "label": { "type": "string", "minLength": 1 }
+      }
+    },
+    "eras": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["startYear", "endYear", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "startYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
+          "endYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
+          "label": { "type": "string", "minLength": 1 },
+          "coneEra": { "type": "string", "pattern": "^\\d{4}$" },
+          "coneEraByYear": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": { "pattern": "^\\d{4}$" },
+            "additionalProperties": { "type": "string", "pattern": "^\\d{4}$" }
+          }
+        }
       }
     },
     "labels": {
@@ -67,7 +88,7 @@
       "additionalProperties": {
         "type": "object",
         "required": [
-          "name", "year", "basin", "atcfId", "sourceUrl", "archiveUrl",
+          "name", "year", "basin", "atcfId", "coneEra", "sourceUrl", "archiveUrl",
           "sourceSubsetSha256", "advisoryCount", "unmatchedForecasts",
           "missingDiscussions", "advisories"
         ],
@@ -77,6 +98,7 @@
           "year": { "type": "integer", "minimum": 1990, "maximum": 2100 },
           "basin": { "type": "string", "enum": ["AL", "EP"] },
           "atcfId": { "type": "string", "pattern": "^[a-z]{2}\\d{6}$" },
+          "coneEra": { "type": "string", "pattern": "^\\d{4}$" },
           "sourceUrl": { "type": "string", "pattern": "^https://" },
           "archiveUrl": { "type": "string", "pattern": "^https://" },
           "sourceSubsetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },

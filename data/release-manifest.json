@@ -5,8 +5,8 @@
   "artifacts": [
     {
       "path": "data/advisories.json",
-      "bytes": 130064,
-      "sha256": "426db73742c82c8f3c416d449835f08ff3a88f0876d974a0e21796688a874b7b",
+      "bytes": 355467,
+      "sha256": "9861fcf15ed58d59a7b5fd28b30752a98ab7733502a476a488b6981d68d0e4a2",
       "source_url": "https://ftp.nhc.noaa.gov/atcf/archive/",
       "source_date": "2026-08-02",
       "generated_at_utc": "2026-08-02T00:00:00Z",
@@ -23,8 +23,8 @@
     },
     {
       "path": "data/cone-radii.json",
-      "bytes": 1391,
-      "sha256": "ef05cab9a319946593173bf3c30d792e00e88cfdef771c890ddfd5015966b6d7",
+      "bytes": 2732,
+      "sha256": "271ffbe08f09aaf93853d71c766be775cfc54fac3be7d6e9a4a6387e4512c8a5",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-07-16",
       "generated_at_utc": "2026-08-02T00:00:00Z",

@@ -250,11 +250,24 @@ function assert(condition, message) {
 
 async function clickHeaderAction(page, selector) {
   const action = page.locator(selector);
-  if (!await action.isVisible()) {
-    await page.click('#toggle-mobile-actions');
+  const direct = await action.isVisible();
+  if (!direct) {
+    const menu = page.locator('#mobile-actions-menu');
+    if (await menu.getAttribute('data-open') !== 'true') {
+      await page.locator('#toggle-mobile-actions').dispatchEvent('click');
+    }
     await page.waitForFunction(() => document.querySelector('#mobile-actions-menu')?.dataset.open === 'true');
+    // The panel manager deliberately restores focus to More when an action is
+    // invoked from this menu; keep that invoker explicit even while the menu's
+    // fixed geometry is settling.
+    await page.locator('#toggle-mobile-actions').focus();
+  } else {
+    await action.focus();
   }
-  await action.click();
+  // A managed panel can still be settling its header View Transition after the
+  // menu is open. Dispatch on the resolved DOM control so this helper remains
+  // independent of transient geometry and never needs pointer coordinates.
+  await action.dispatchEvent('click');
 }
 
 async function waitForAppReady(page) {
@@ -1805,9 +1818,9 @@ try {
   assert(outsideEra.checked === false, 'advisory replay stayed enabled for a storm it cannot replay');
   assert(outsideEra.stepsHidden === true, 'advisory replay left its stepper visible with no advisories');
   assert(outsideEra.shapes === 0, 'advisory replay drew geometry for a storm outside the archived era');
-  assert(/2020-2024/.test(outsideEra.status), `advisory replay did not name its covered era: ${outsideEra.status}`);
+  assert(/2015-2024/.test(outsideEra.status), `advisory replay did not name its covered era: ${outsideEra.status}`);
 
-  for (const stormId of ['AL022024', 'AL132020', 'AL142024', 'AL092022']) {
+  for (const stormId of ['AL022024', 'AL132020', 'AL142024', 'AL092022', 'AL092017']) {
     await assertAdvisoryForecastInViewport(page, stormId);
   }
   await assertThemeContrastMatrix(page, { checkMapOverlays: true });
@@ -1837,6 +1850,17 @@ try {
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15000 });
   assert((await page.textContent('#advisory-replay-provenance')) === '', 'a complete replay incorrectly showed a provenance note');
+
+  // Harvey exercises the expanded historical era: the replay record must carry
+  // the annual 2017 NHC cone table rather than falling back to the 2025 pool.
+  await openStormPanel(page, 'AL092017');
+  await page.check('#advisory-replay-enabled');
+  await page.waitForFunction(() => document.querySelector('path.advisory-cone-shape'), { timeout: 15000 });
+  const harveyConeEra = await page.evaluate(async () => {
+    const archive = await (await fetch('/data/advisories.json')).json();
+    return archive.storms.AL092017?.coneEra || null;
+  });
+  assert(harveyConeEra === '2017', `historical replay did not retain its annual cone era: ${harveyConeEra}`);
 
   // Ian is inside the era: the issued forecast, its cone, and the best track it
   // is compared against must all render, and stepping must change the geometry.

@@ -8,6 +8,30 @@
       "easternPacific": { "12": 26, "24": 42, "36": 54, "48": 69, "72": 100, "96": 143, "120": 182 },
       "source": "https://www.nhc.noaa.gov/verification/pdfs/Verification_2014.pdf"
     },
+    "2016": {
+      "sampleYears": "2011-2015",
+      "atlantic": { "12": 30, "24": 49, "36": 66, "48": 84, "72": 115, "96": 165, "120": 237 },
+      "easternPacific": { "12": 27, "24": 42, "36": 55, "48": 70, "72": 100, "96": 137, "120": 172 },
+      "source": "https://www.nhc.noaa.gov/verification/pdfs/Verification_2015.pdf"
+    },
+    "2017": {
+      "sampleYears": "2012-2016",
+      "atlantic": { "12": 29, "24": 45, "36": 63, "48": 78, "72": 107, "96": 159, "120": 211 },
+      "easternPacific": { "12": 25, "24": 40, "36": 51, "48": 66, "72": 93, "96": 116, "120": 151 },
+      "source": "https://www.nhc.noaa.gov/verification/pdfs/Verification_2016.pdf"
+    },
+    "2018": {
+      "sampleYears": "2013-2017",
+      "atlantic": { "12": 26, "24": 43, "36": 56, "48": 74, "72": 103, "96": 151, "120": 198 },
+      "easternPacific": { "12": 25, "24": 39, "36": 50, "48": 66, "72": 94, "96": 125, "120": 162 },
+      "source": "https://www.nhc.noaa.gov/verification/pdfs/Verification_2017.pdf"
+    },
+    "2019": {
+      "sampleYears": "2014-2018",
+      "atlantic": { "12": 26, "24": 41, "36": 54, "48": 68, "72": 102, "96": 151, "120": 198 },
+      "easternPacific": { "12": 25, "24": 38, "36": 48, "48": 62, "72": 88, "96": 115, "120": 145 },
+      "source": "https://www.nhc.noaa.gov/verification/pdfs/Verification_2018.pdf"
+    },
     "2025": {
       "sampleYears": "2020-2024",
       "atlantic": { "12": 26, "24": 39, "36": 52, "48": 67, "60": 83, "72": 100, "96": 142, "120": 213 },

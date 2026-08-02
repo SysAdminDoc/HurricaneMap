@@ -7,8 +7,10 @@ import { fileURLToPath } from 'node:url';
 
 import {
   ERA,
+  REPLAY_ERAS,
   STORM_IDS,
   advisoryNumberFor,
+  coneEraForYear,
   parseAdvisoryIndex,
   parseIssueTime,
   parseOfficialForecasts,
@@ -77,6 +79,16 @@ assert.equal(advisoryNumberFor('2024-10-05T18:00:00Z', index.numberByTime), 2);
 assert.equal(advisoryNumberFor('2024-10-07T00:00:00Z', index.numberByTime), null, 'a post-tropical tail must not be numbered');
 // A special advisory stamped at the synoptic hour itself still resolves.
 assert.equal(advisoryNumberFor('2024-10-05T15:00:00Z', index.numberByTime), 1);
+// Some older archive pages contain a special advisory at the exact synoptic
+// time and an off-cycle first issue a few minutes later; exact and nearest
+// historical matches must not skip the numbered series.
+const historicalIndex = new Map([
+  ['2017-07-31T10:00:00Z', 1],
+  ['2017-07-31T12:00:00Z', 2],
+  ['2017-07-31T15:00:00Z', 3],
+]);
+assert.equal(advisoryNumberFor('2017-07-31T06:00:00Z', historicalIndex), 1);
+assert.equal(advisoryNumberFor('2017-07-31T12:00:00Z', historicalIndex), 2);
 
 // --- verification against the best track ----------------------------------
 
@@ -156,24 +168,35 @@ assert.equal(archive.schema, 1);
 assert.equal(archive.model, 'OFCL');
 assert.equal(archive.era.startYear, ERA.startYear);
 assert.equal(archive.era.endYear, ERA.endYear);
+assert.equal(archive.era.label, ERA.label);
+assert.deepEqual(archive.eras, REPLAY_ERAS);
 assert.deepEqual(Object.keys(archive.storms).sort(), [...STORM_IDS].sort());
 assert.equal(archive.totals.storms, STORM_IDS.length);
 
 const storms = JSON.parse(await readFile(path.join(root, 'data/storms.json'), 'utf8'));
 const stormsById = new Map((Array.isArray(storms) ? storms : storms.storms).map(storm => [storm.id, storm]));
 const radii = JSON.parse(await readFile(path.join(root, 'data/cone-radii.json'), 'utf8'));
-assert.ok(radii.eras[archive.era.coneEra], 'the declared cone era must exist in cone-radii.json');
-assert.equal(
-  radii.eras[archive.era.coneEra].sampleYears,
-  `${ERA.startYear}-${ERA.endYear}`,
-  'the cone radii must be derived from the same years the replay covers',
-);
+for (const replayEra of REPLAY_ERAS) {
+  for (const coneEra of Object.values(replayEra.coneEraByYear || { _: replayEra.coneEra })) {
+    assert.ok(radii.eras[coneEra], `${coneEra}: declared cone era must exist in cone-radii.json`);
+  }
+}
+assert.equal(coneEraForYear(2014), null, 'years before the archive should remain unavailable');
+assert.equal(coneEraForYear(2015), '2015');
+assert.equal(coneEraForYear(2024), '2025');
 
 for (const [stormId, record] of Object.entries(archive.storms)) {
   const storm = stormsById.get(stormId);
   assert.ok(storm, `${stormId}: replayed storm is absent from storms.json`);
   assert.equal(record.name, storm.name, `${stormId}: name disagrees with HURDAT2`);
   assert.equal(record.year, storm.year, `${stormId}: year disagrees with HURDAT2`);
+  assert.equal(record.coneEra, coneEraForYear(record.year), `${stormId}: record must use its published cone era`);
+  assert.ok(radii.eras[record.coneEra], `${stormId}: record cone era is absent from cone-radii.json`);
+  if (record.year <= 2019) {
+    assert.equal(radii.eras[record.coneEra].sampleYears, `${record.year - 5}-${record.year - 1}`, `${stormId}: annual cone sample must precede the replay year`);
+  } else {
+    assert.equal(radii.eras[record.coneEra].sampleYears, '2020-2024', `${stormId}: initial-era cone sample must match its pooled era`);
+  }
   assert.ok(storm.year >= ERA.startYear && storm.year <= ERA.endYear, `${stormId}: outside the declared era`);
   assert.equal(record.advisories.length, record.advisoryCount, `${stormId}: advisory count disagrees with its own list`);
   assert.equal(record.advisories[0].n, 1, `${stormId}: replay must start at advisory 1`);

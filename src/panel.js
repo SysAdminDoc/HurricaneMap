@@ -718,7 +718,7 @@ function wireAdvisoryReplay(storm) {
     }
     if (seq !== advisoryReplaySeq) return;
     record = getStormAdvisories(archive, storm.id);
-    coneEra = archive?.era?.coneEra || '2025';
+    coneEra = record?.coneEra || archive?.era?.coneEra || '2025';
     if (!record?.advisories?.length) {
       steps.hidden = true;
       provenance.textContent = '';
