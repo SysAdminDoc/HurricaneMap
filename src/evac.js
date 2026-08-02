@@ -4,6 +4,7 @@
 
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
+import { getMapOverlayColor } from './map-colors.js';
 import { hidePanel, showPanel } from './panels.js';
 
 export const FLORIDA_ZONE_LAYER = 'https://services.arcgis.com/3wFbqsFPLeKqOlIK/arcgis/rest/services/KYZ_ZL_Vector_Enriched_Calculated_20230608/FeatureServer/46';
@@ -161,7 +162,7 @@ function markLocation(lat, lon) {
   if (!map || !L) return;
   if (locationMarker) locationMarker.remove();
   locationMarker = L.circleMarker([lat, lon], {
-    radius: 8, color: '#f9e2af', weight: 3, fillColor: '#fab387', fillOpacity: 0.9, className: 'evac-location-marker',
+    radius: 8, color: getMapOverlayColor('forecast'), weight: 3, fillColor: getMapOverlayColor('location'), fillOpacity: 0.9, className: 'evac-location-marker',
   }).addTo(map);
 }
 

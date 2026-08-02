@@ -5,6 +5,7 @@
 import { buildConeSamples, destinationPoint, loadConeRadii } from './cone-retro.js';
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { getMapOverlayColor } from './map-colors.js';
 import { prefersReducedMotion } from './settings.js';
 
 const DEFAULT_COUNT = 20;
@@ -97,7 +98,7 @@ export async function renderRiskTrajectories(storm, { map, era = '2026', count =
     layerGroup.clearLayers();
     trajectories.forEach((points, index) => {
       const polyline = window.L.polyline(points, {
-        color: index % 2 ? '#89b4fa' : '#cba6f7',
+        color: getMapOverlayColor(index % 2 ? 'cone' : 'ensemble'),
         weight: 1.45,
         opacity: 0.42,
         lineCap: 'round',

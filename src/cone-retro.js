@@ -5,6 +5,7 @@
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { getMapOverlayColor } from './map-colors.js';
 import {
   destinationPointNmi,
   initialBearingDeg,
@@ -172,9 +173,10 @@ export async function renderRetrospectiveCone(storm, { map, era = '2026', ellips
     if (samples.length < 2 || envelope.length < 3) throw new Error('Storm track is too short for a retrospective cone');
     ensureLayer(map);
     layerGroup.clearLayers();
+    const color = getMapOverlayColor(ellipse ? 'ensemble' : 'cone');
     window.L.polygon(envelope, {
-      color: ellipse ? '#cba6f7' : '#89b4fa',
-      fillColor: ellipse ? '#cba6f7' : '#89b4fa',
+      color,
+      fillColor: color,
       fillOpacity: 0.15,
       opacity: 0.9,
       weight: 2,
@@ -182,7 +184,7 @@ export async function renderRetrospectiveCone(storm, { map, era = '2026', ellips
       className: `cone-retro-shape ${ellipse ? 'cone-retro-shape--ellipse' : 'cone-retro-shape--circle'}`,
     }).bindTooltip(t('coneRetro.mapTooltip'), { sticky: true }).addTo(layerGroup);
     window.L.polyline(samples.map(point => [point.lat, point.lon]), {
-      color: ellipse ? '#cba6f7' : '#89b4fa',
+      color,
       weight: 1.5,
       dashArray: '3 5',
       opacity: 0.85,
@@ -191,7 +193,7 @@ export async function renderRetrospectiveCone(storm, { map, era = '2026', ellips
     for (const sample of samples.slice(1)) {
       window.L.circleMarker([sample.lat, sample.lon], {
         radius: 3,
-        color: ellipse ? '#cba6f7' : '#89b4fa',
+        color,
         fillOpacity: 1,
         className: 'cone-retro-lead',
       }).bindTooltip(escapeHtml(`${sample.hours} h · ${sample.radius} n mi`), { direction: 'top' }).addTo(layerGroup);

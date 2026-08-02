@@ -62,7 +62,7 @@ async function assertNoAxeViolations(page, label, include = null) {
   assert(!violations.length, `${label}: axe violations: ${violations.map(v => `${v.id} (${v.impact}, ${v.nodes.length} nodes, first: ${v.nodes[0]?.target?.[0]})`).join(' | ')}`);
 }
 
-async function assertThemeContrastMatrix(page) {
+async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}) {
   const combinations = [];
   for (const theme of ['dark', 'light']) {
     for (const palette of ['default', 'colorblind']) {
@@ -155,6 +155,30 @@ async function assertThemeContrastMatrix(page) {
     assert(Math.min(...audit.title) >= 4.5, `${label}: title contrast ${audit.title.map(value => value.toFixed(2)).join(', ')} is below 4.5:1`);
     const failedControls = audit.controls.filter(control => control.ratio < 4.5);
     assert(!failedControls.length, `${label}: header control contrast below 4.5:1: ${failedControls.map(control => `${control.id} ${control.ratio.toFixed(2)} (${control.color})`).join(', ')}`);
+    if (checkMapOverlays) {
+      if (!await page.locator('path.advisory-forecast-line').count()) {
+        await openStormPanel(page, 'AL142024');
+        await page.check('#advisory-replay-enabled');
+        await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-actual-line'), { timeout: 15000 });
+      }
+      const overlayColors = await page.evaluate(() => {
+        const normalize = value => String(value || '').replace(/\s+/g, '').toLowerCase();
+        const forecast = document.querySelector('path.advisory-forecast-line');
+        const actual = document.querySelector('path.advisory-actual-line');
+        const forecastSwatch = document.querySelector('.advisory-swatch--forecast');
+        const actualSwatch = document.querySelector('.advisory-swatch--actual');
+        return {
+          forecastStroke: normalize(forecast && getComputedStyle(forecast).stroke),
+          forecastSwatch: normalize(forecastSwatch && getComputedStyle(forecastSwatch).backgroundColor),
+          actualStroke: normalize(actual && getComputedStyle(actual).stroke),
+          actualSwatch: normalize(actualSwatch && getComputedStyle(actualSwatch).backgroundColor),
+        };
+      });
+      assert(overlayColors.forecastStroke && overlayColors.forecastStroke === overlayColors.forecastSwatch,
+        `${label}: forecast overlay and legend colors diverged: ${JSON.stringify(overlayColors)}`);
+      assert(overlayColors.actualStroke && overlayColors.actualStroke === overlayColors.actualSwatch,
+        `${label}: actual overlay and legend colors diverged: ${JSON.stringify(overlayColors)}`);
+    }
   }
 
   await page.evaluate(async () => {
@@ -1769,6 +1793,7 @@ try {
   for (const stormId of ['AL022024', 'AL132020', 'AL142024', 'AL092022']) {
     await assertAdvisoryForecastInViewport(page, stormId);
   }
+  await assertThemeContrastMatrix(page, { checkMapOverlays: true });
 
   // Ian is inside the era: the issued forecast, its cone, and the best track it
   // is compared against must all render, and stepping must change the geometry.

@@ -8755,9 +8755,9 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   border-radius: 2px;
 }
 
-.advisory-swatch--forecast { background: var(--yellow); }
+.advisory-swatch--forecast { background: var(--map-overlay-forecast); }
 
-.advisory-swatch--actual { background: var(--green); }
+.advisory-swatch--actual { background: var(--map-overlay-actual); }
 
 .advisory-replay-discussion a { color: var(--blue); }
 

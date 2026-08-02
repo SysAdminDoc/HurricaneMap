@@ -23,6 +23,7 @@ All notable changes to HurricaneMap.
 - Storm-owned retrospective cone, risk-trajectory, and advisory overlays now clear when another managed panel opens, including their floating legends.
 - Advisory replay now frames its issued forecast, cone, and comparison track in view, re-fitting only when a later step leaves the current map bounds.
 - Preparedness checklist and household controls now update in place, preserving keyboard focus while progress and supply totals change.
+- Map overlay geometry and legends now share theme-invariant basemap color tokens, keeping forecast, best-track, cone, ensemble, and evacuation markers aligned in every UI theme.
 - Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
 
 ### Changed

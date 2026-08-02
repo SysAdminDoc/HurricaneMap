@@ -38,6 +38,14 @@
   --red:     #f38ba8;
   --green:   #a6e3a1;
 
+  /* Geometry drawn on the permanently dark map; keep these independent from
+     light-theme panel/status tokens so legends always match the map. */
+  --map-overlay-forecast: #f9e2af;
+  --map-overlay-actual:   #a6e3a1;
+  --map-overlay-cone:     #89b4fa;
+  --map-overlay-ensemble: #cba6f7;
+  --map-overlay-location: #fab387;
+
   --cat-ts:  #74c7ec;  /* sapphire */
   --cat-1:   #a6e3a1;  /* green */
   --cat-2:   #f9e2af;  /* yellow */

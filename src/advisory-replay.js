@@ -11,6 +11,7 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { buildConeEnvelope, loadConeRadii } from './cone-retro.js';
+import { getMapOverlayColor } from './map-colors.js';
 
 const ADVISORIES_URL = new URL('../data/advisories.json', import.meta.url);
 
@@ -147,7 +148,7 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
     const actual = clipBestTrack(storm, advisory);
     if (actual.length >= 2) {
       window.L.polyline(actual, {
-        color: '#a6e3a1',
+        color: getMapOverlayColor('actual'),
         weight: 3,
         opacity: 0.95,
         className: 'advisory-actual-line',
@@ -156,8 +157,8 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
 
     if (envelope.length >= 3) {
       window.L.polygon(envelope, {
-        color: '#f9e2af',
-        fillColor: '#f9e2af',
+        color: getMapOverlayColor('forecast'),
+        fillColor: getMapOverlayColor('forecast'),
         fillOpacity: 0.12,
         opacity: 0.85,
         weight: 2,
@@ -169,7 +170,7 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
     const forecastLine = advisory.f.map(([, lat, lon]) => [lat, lon]);
     if (forecastLine.length >= 2) {
       window.L.polyline(forecastLine, {
-        color: '#f9e2af',
+        color: getMapOverlayColor('forecast'),
         weight: 2.5,
         opacity: 0.95,
         dashArray: '4 4',
@@ -185,8 +186,8 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
         : t('advisoryReplay.point', leadLabel(tau), String(wind));
       window.L.circleMarker([lat, lon], {
         radius: tau === 0 ? 5 : 3.5,
-        color: '#f9e2af',
-        fillColor: tau === 0 ? '#f9e2af' : '#1e1e2e',
+        color: getMapOverlayColor('forecast'),
+        fillColor: tau === 0 ? getMapOverlayColor('forecast') : '#1e1e2e',
         fillOpacity: 1,
         weight: 2,
         className: 'advisory-forecast-point',
