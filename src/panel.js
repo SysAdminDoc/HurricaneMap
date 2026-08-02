@@ -7,16 +7,15 @@ import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
 import { RadarOverlay } from './radar.js';
 import { renderIntensityChart } from './chart.js';
-import { exportChartAsPng, exportChartAsSvg } from './chart-export.js';
-import { togglePin, isPinned } from './compare.js';
-import { radiiCount, showWindField, hideWindField } from './windfield.js';
+import { isPinned } from './compare.js';
+import { radiiCount, hideWindField } from './windfield.js';
 import { hwmInfo, showHwm, hideHwm } from './hwm.js';
 import { hidePanel, minimizePanel, restorePanel, showPanel } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
-  COASTAL_CITIES, formatNumber, buildExports, downloadBlob,
+  COASTAL_CITIES, formatNumber,
   findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
-  computeCityReturnPeriods, findSimilarStorms, computeRIRiskScore, generateStormBiography,
+  findSimilarStorms, computeRIRiskScore, generateStormBiography,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -35,18 +34,12 @@ import {
   tornadoSearchUrl,
 } from './impact-utils.js';
 import { renderStormEventsSummary } from './storm-events.js';
-import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
-import {
-  clearAdvisoryReplay,
-  buildAdvisoryBounds,
-  getAdvisoryReplayPosition,
-  getStormAdvisories,
-  loadAdvisories,
-  renderAdvisory,
-} from './advisory-replay.js';
-import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
+import { clearRetrospectiveCone } from './cone-retro.js';
+import { clearAdvisoryReplay } from './advisory-replay.js';
+import { clearRiskTrajectories } from './art-mode.js';
 import { presentPressure } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
+import { formatClosest, wirePanelControls } from './panel-controls.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -428,334 +421,16 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
     .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
     .catch(() => { /* tide gauges are optional context */ });
 
-  // Chart export buttons (PNG / SVG).
-  const pngBtn = document.getElementById('chart-export-png');
-  const svgBtn = document.getElementById('chart-export-svg');
-  if (pngBtn) pngBtn.addEventListener('click', async () => {
-    const svgEl = panel.querySelector('.intensity-svg');
-    try {
-      await exportChartAsPng(svgEl, storm.name);
-      showToast(t('toast.chartSavedPNG'));
-    } catch { showToast(t('toast.exportFailedPNG'), 'warn'); }
+  wirePanelControls({
+    panel,
+    storm,
+    allStorms,
+    advisoryReplay,
+    getAnimator,
+    getRadar,
+    enterPlaybackMapMode,
+    leavePlaybackMapMode,
   });
-  if (svgBtn) svgBtn.addEventListener('click', () => {
-    const svgEl = panel.querySelector('.intensity-svg');
-    if (exportChartAsSvg(svgEl, storm.name)) showToast(t('toast.chartSavedSVG'));
-    else showToast(t('toast.exportFailedSVG'), 'warn');
-  });
-
-  // Closest-pass selector — recompute on city change.
-  const cityEl = document.getElementById('closest-city');
-  const cpValEl = document.getElementById('closest-pass-value');
-  const rpRowEl = document.getElementById('return-periods-row');
-  if (cityEl && cpValEl) {
-    const updateClosestPass = () => {
-      const city = COASTAL_CITIES.find(c => c.name === cityEl.value);
-      if (!city) return;
-      const ap = closestApproach(storm.track, city.lat, city.lon);
-      const rp = computeCityReturnPeriods(city, allStorms);
-      cpValEl.innerHTML = formatClosest(ap);
-      if (rpRowEl) rpRowEl.innerHTML = formatReturnPeriods(rp);
-    };
-    // Compute return periods for the initial city
-    updateClosestPass();
-    cityEl.addEventListener('change', updateClosestPass);
-  }
-
-  // Export menu — generate Blob client-side and trigger a download.
-  panel.querySelectorAll('.export-btn').forEach((btn) => {
-    if (btn.id === 'share-btn') return;
-    btn.addEventListener('click', async () => {
-      const kind = btn.dataset.export;
-      if (kind === 'svg_map') {
-        const { exportTrackSVG } = await import('./svg-export.js');
-        await exportTrackSVG(storm.id);
-        return;
-      }
-      const exports = buildExports(storm);
-      if (exports[kind]) downloadBlob(exports[kind]);
-    });
-  });
-
-  const shareBtn = document.getElementById('share-btn');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', async () => {
-      const url = window.location.href;
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'HurricaneMap', url });
-          return;
-        } catch (e) {
-          if (e.name === 'AbortError') return;
-        }
-      }
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast(t('toast.linkCopied'));
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = url;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); showToast(t('toast.linkCopied')); }
-        catch { showToast(t('toast.copyFailed'), 'warn'); }
-        document.body.removeChild(ta);
-      }
-    });
-  }
-
-  const playBtn = document.getElementById('play-anim-btn');
-  if (playBtn) {
-    const playLabel = playBtn.querySelector('.play-label');
-    const syncPlayButton = (state = {}) => {
-      const isThisStorm = state.stormId === storm.id;
-      const activeForThisStorm = isThisStorm && state.active;
-      const playing = isThisStorm && state.playing;
-      const paused = isThisStorm && (state.paused || state.ended);
-      document.body.classList.toggle('track-playback-active', activeForThisStorm);
-      if (!activeForThisStorm) leavePlaybackMapMode({ restore: true });
-      playBtn.classList.toggle('is-playing', playing);
-      playBtn.classList.toggle('is-paused', paused);
-      playBtn.setAttribute('aria-pressed', String(playing));
-      playBtn.title = playing ? t('panel.pauseTrack') : paused ? t('panel.resumeTrack') : t('panel.playTrack');
-      if (playLabel) playLabel.textContent = playing ? t('panel.pauseTrack') : paused ? t('panel.resumeTrack') : t('panel.playTrack');
-    };
-
-    playBtn.addEventListener('click', async () => {
-      const anim = getAnimator();
-      if (anim.isActiveFor(storm.id)) {
-        anim.togglePause();
-        syncPlayButton(anim.getPlaybackState());
-        return;
-      }
-      playBtn.disabled = true;
-      if (playLabel) playLabel.textContent = t('panel.loadingPlayback');
-      try {
-        enterPlaybackMapMode();
-        await anim.play(storm, {
-          onStateChange: syncPlayButton,
-          onEnd: () => syncPlayButton(anim.getPlaybackState()),
-        });
-      } catch (e) {
-        console.error('Failed to start track animation:', e);
-        showToast(t('toast.playbackFailed'), 'warn');
-        syncPlayButton({ active: false });
-      } finally {
-        playBtn.disabled = false;
-        syncPlayButton(anim.getPlaybackState());
-      }
-    });
-  }
-
-  // Wire each radar quick-button to fetch NEXRAD imagery for that specific landfall.
-  panel.querySelectorAll('.radar-quick-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.lfIdx, 10);
-      getRadar().show(storm, idx);
-    });
-  });
-
-  const pinBtn = document.getElementById('pin-btn');
-  if (pinBtn) {
-    pinBtn.addEventListener('click', async () => {
-      try {
-        const nowPinned = await togglePin(storm);
-        pinBtn.classList.toggle('pinned', nowPinned);
-        pinBtn.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
-      } catch (e) {
-        console.error('Failed to toggle pin:', e);
-        showToast(t('toast.pinFailed'), 'warn');
-      }
-    });
-  }
-
-  const wfCb = document.getElementById('wf-cb');
-  if (wfCb) {
-    wfCb.addEventListener('change', () => {
-      if (wfCb.checked) showWindField(storm);
-      else hideWindField();
-    });
-  }
-
-  wireAdvisoryReplay(storm, advisoryReplay);
-
-  const coneEnabled = document.getElementById('cone-retro-enabled');
-  const coneEra = document.getElementById('cone-retro-era');
-  const coneEllipse = document.getElementById('cone-retro-ellipse');
-  const coneStatus = document.getElementById('cone-retro-status');
-  if (coneEnabled && coneEra && coneEllipse && coneStatus) {
-    const syncCone = async () => {
-      coneEra.disabled = !coneEnabled.checked;
-      coneEllipse.disabled = !coneEnabled.checked;
-      if (!coneEnabled.checked) {
-        clearRetrospectiveCone();
-        coneStatus.textContent = '';
-        return;
-      }
-      coneStatus.textContent = t('coneRetro.loading');
-      const result = await renderRetrospectiveCone(storm, {
-        map: getMap(),
-        era: coneEra.value,
-        ellipse: coneEllipse.checked,
-      });
-      coneStatus.textContent = result.status === 'rendered'
-        ? t('coneRetro.ready', result.sampleCount)
-        : result.status === 'error' ? t('coneRetro.error') : '';
-    };
-    coneEnabled.addEventListener('change', syncCone);
-    coneEra.addEventListener('change', syncCone);
-    coneEllipse.addEventListener('change', syncCone);
-    syncCone();
-  }
-
-  const artEnabled = document.getElementById('art-mode-enabled');
-  const artEra = document.getElementById('art-mode-era');
-  const artStatus = document.getElementById('art-mode-status');
-  if (artEnabled && artEra && artStatus) {
-    const syncArt = async () => {
-      artEra.disabled = !artEnabled.checked;
-      if (!artEnabled.checked) {
-        clearRiskTrajectories();
-        artStatus.textContent = '';
-        return;
-      }
-      artStatus.textContent = t('art.loading');
-      const result = await renderRiskTrajectories(storm, { map: getMap(), era: artEra.value });
-      artStatus.textContent = result.status === 'rendered'
-        ? t(result.reduced ? 'art.readyStatic' : 'art.ready', result.pathCount)
-        : result.status === 'error' ? t('art.error') : '';
-    };
-    artEnabled.addEventListener('change', syncArt);
-    artEra.addEventListener('change', syncArt);
-  }
-}
-
-let advisoryReplaySeq = 0;
-
-// The archive covers a bounded era, so most storms have no replay at all. That
-// is stated outright rather than left as a dead control.
-function wireAdvisoryReplay(storm, initialReplay = null) {
-  const enabled = document.getElementById('advisory-replay-enabled');
-  const steps = document.getElementById('advisory-replay-steps');
-  const scrubber = document.getElementById('advisory-replay-scrubber');
-  const prev = document.getElementById('advisory-replay-prev');
-  const next = document.getElementById('advisory-replay-next');
-  const meta = document.getElementById('advisory-replay-meta');
-  const provenance = document.getElementById('advisory-replay-provenance');
-  const discussion = document.getElementById('advisory-replay-discussion');
-  const status = document.getElementById('advisory-replay-status');
-  if (!enabled || !steps || !scrubber || !prev || !next || !meta || !provenance || !discussion || !status) return;
-
-  const seq = ++advisoryReplaySeq;
-  let record = null;
-  let coneEra = '2025';
-  let hasFramedReplay = false;
-
-  const notifyReplayState = detail => {
-    document.dispatchEvent(new CustomEvent('advisory-replay:change', { detail }));
-  };
-
-  const show = async index => {
-    const result = await renderAdvisory(storm, { map: getMap(), record, coneEra, index });
-    if (seq !== advisoryReplaySeq) return;
-    if (result.status !== 'rendered') {
-      status.textContent = result.status === 'error' ? t('advisoryReplay.error') : '';
-      return;
-    }
-    const { advisory, summary } = result;
-    const map = getMap();
-    if (result.bounds && map) {
-      const mapBounds = map.getBounds();
-      if (!hasFramedReplay || !mapBounds.intersects(result.bounds)) {
-        map.fitBounds(result.bounds, { padding: [40, 40] });
-      }
-      hasFramedReplay = true;
-    }
-    const replayPosition = getAdvisoryReplayPosition(result.index, record.advisories.length);
-    const positionText = t('advisoryReplay.position', String(replayPosition.number), String(replayPosition.count));
-    const nhcNumberText = t('advisoryReplay.nhcNumber', String(advisory.n));
-    scrubber.value = String(replayPosition.index);
-    scrubber.setAttribute('aria-valuenow', String(replayPosition.index));
-    scrubber.setAttribute('aria-valuetext', [positionText, nhcNumberText].join(' · '));
-    prev.disabled = replayPosition.index <= 0;
-    next.disabled = replayPosition.index >= replayPosition.count - 1;
-    meta.textContent = [
-      positionText,
-      nhcNumberText,
-      t('advisoryReplay.issued', formatTime(advisory.t)),
-    ].join(' · ');
-    provenance.textContent = record.unmatchedForecasts > 0
-      ? t('advisoryReplay.postTropical', String(record.unmatchedForecasts))
-      : record.missingDiscussions > 0
-        ? t('advisoryReplay.missingDiscussions', String(record.missingDiscussions))
-        : '';
-    status.textContent = summary.verifiedLeads
-      ? [
-        t('advisoryReplay.verified', String(summary.verifiedLeads), String(summary.meanTrackErrorNmi)),
-        t('advisoryReplay.longest', String(summary.longestLeadHours), String(summary.longestLeadTrackErrorNmi)),
-      ].join(' ')
-      : t('advisoryReplay.unverified');
-    discussion.innerHTML = advisory.discussion
-      ? `<a href="${escapeHtml(safeExternalUrl(advisory.discussion))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('advisoryReplay.discussion'))}</a>`
-      : escapeHtml(t('advisoryReplay.noDiscussion'));
-    notifyReplayState({
-      active: true,
-      stormId: storm.id,
-      index: replayPosition.index,
-      coneEra,
-      advisoryNumber: advisory.n,
-      issueTime: advisory.t,
-    });
-  };
-
-  const sync = async () => {
-    if (!enabled.checked) {
-      clearAdvisoryReplay();
-      hasFramedReplay = false;
-      steps.hidden = true;
-      provenance.textContent = '';
-      status.textContent = '';
-      notifyReplayState({ active: false, stormId: storm.id });
-      return;
-    }
-    status.textContent = t('advisoryReplay.loading');
-    let archive;
-    try {
-      archive = await loadAdvisories();
-    } catch {
-      if (seq !== advisoryReplaySeq) return;
-      status.textContent = t('advisoryReplay.error');
-      return;
-    }
-    if (seq !== advisoryReplaySeq) return;
-    record = getStormAdvisories(archive, storm.id);
-    coneEra = record?.coneEra || archive?.era?.coneEra || '2025';
-    if (!record?.advisories?.length) {
-      steps.hidden = true;
-      provenance.textContent = '';
-      status.textContent = t('advisoryReplay.unavailable', archive?.era?.label || '');
-      enabled.checked = false;
-      notifyReplayState({ active: false, stormId: storm.id });
-      return;
-    }
-    steps.hidden = false;
-    scrubber.max = String(record.advisories.length - 1);
-    const recordConeEra = record.coneEra || archive?.era?.coneEra || '2025';
-    coneEra = initialReplay?.coneEra === recordConeEra ? initialReplay.coneEra : recordConeEra;
-    scrubber.value = String(initialReplay?.index ?? 0);
-    await show(Number(scrubber.value));
-  };
-
-  enabled.addEventListener('change', sync);
-  scrubber.addEventListener('input', () => { if (record) show(Number(scrubber.value || 0)); });
-  prev.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) - 1); });
-  next.addEventListener('click', () => { if (record) show(Number(scrubber.value || 0) + 1); });
-  if (initialReplay?.stormId === storm.id) {
-    enabled.checked = true;
-    sync();
-  }
 }
 
 // Map a U.S. state name to a representative city in COASTAL_CITIES so the
@@ -793,29 +468,6 @@ function pickDefaultCity(storm) {
   return storm.basin === 'EP'
     ? COASTAL_CITIES.find(x => x.name === 'Honolulu, HI') || COASTAL_CITIES[0]
     : COASTAL_CITIES[0];
-}
-
-function formatClosest(approach) {
-  if (!approach) return '—';
-  const mi = Math.round(approach.distance_mi);
-  const km = Math.round(approach.distance_km);
-  const r = approach.track_point;
-  const wind = r.wind != null ? formatWind(r.wind) : '—';
-  const date = formatTime(r.t);
-  return `<strong>${mi.toLocaleString()} mi</strong> <span class="cp-meta-inline">(${km.toLocaleString()} km) · ${wind} · ${date}</span>`;
-}
-
-function formatReturnPeriods(rp) {
-  if (!rp) return '';
-  const items = [];
-  if (rp.cat5_years) items.push(`Cat 5: ~${rp.cat5_years}y`);
-  else if (rp.cat5_count === 0) items.push('Cat 5: never');
-  if (rp.cat3_years) items.push(`Cat 3+: ~${rp.cat3_years}y`);
-  else if (rp.cat3_count === 0) items.push('Cat 3+: never');
-  if (rp.cat1_years) items.push(`Cat 1+: ~${rp.cat1_years}y`);
-  else if (rp.cat1_count === 0) items.push('Cat 1+: never');
-  if (items.length === 0) return '';
-  return `<span class="return-periods-label">Return period (50 km radius):</span> ${items.join(' • ')}`;
 }
 
 function renderExposureStatTile(exposure) {
@@ -864,26 +516,6 @@ function renderSimilarStorms(host, similarStorms) {
     });
     row.style.cursor = 'pointer';
   });
-}
-
-function showToast(msg, tone = 'info') {
-  let host = document.getElementById('hm-toast-host');
-  if (!host) {
-    host = document.createElement('div');
-    host.id = 'hm-toast-host';
-    host.className = 'hm-toast-host';
-    document.body.appendChild(host);
-  }
-  const el = document.createElement('div');
-  el.className = `hm-toast hm-toast--${tone}`;
-  el.setAttribute('role', tone === 'warn' ? 'alert' : 'status');
-  el.textContent = msg;
-  host.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('is-visible'));
-  setTimeout(() => {
-    el.classList.remove('is-visible');
-    setTimeout(() => el.remove(), 240);
-  }, 2200);
 }
 
 // Wikipedia article URL — best-effort. Tries the standard article naming pattern;

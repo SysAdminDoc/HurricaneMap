@@ -335,10 +335,12 @@ HurricaneMap/
 ├── manifest.es.webmanifest # Spanish PWA labels/shortcuts
 ├── manifest.ht.webmanifest # Haitian Creole PWA labels/shortcuts
 ├── src/
-│   ├── main.js             # app boot, filters, search, UI wiring
+│   ├── main.js             # app boot, canonical filters/hash, data/map orchestration
+│   ├── shell-ui.js         # injected top-level control and export wiring
 │   ├── data.js             # JSON loaders + index helpers
 │   ├── map.js              # Leaflet map, markers, tracks
-│   ├── panel.js            # storm details + Wikipedia/YouTube/NOAA links
+│   ├── panel.js            # storm data composition + Wikipedia/YouTube/NOAA links
+│   ├── panel-controls.js   # rendered storm controls, replay, and panel exports
 │   ├── animation.js        # spinning hurricane glyph + wind-field disk along the track
 │   ├── radar.js            # NEXRAD overlay — local manifest first, IEM fallback
 │   ├── stats.js            # state hotspot / decade / category breakdowns
@@ -368,6 +370,10 @@ HurricaneMap/
 │   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
 └── examplemap.png          # design reference
 ```
+
+### Module ownership
+
+`main.js` is the only owner of canonical filters, shared-hash state, visible-landfall state, and map redraw orchestration. `shell-ui.js` owns top-level DOM actions through injected loaders and callbacks; it does not calculate filters or metrics. `panel.js` owns storm markup/data composition, while `panel-controls.js` owns listeners for controls created by that markup, including replay, playback, and panel exports. `export.js`, `report.js`, `qgis.js`, and `svg-export.js` remain the format-specific serialization owners. New work should extend the existing owner or add a focused boundary rather than duplicating filter state or metric calculations.
 
 ## How landfalls are detected
 

@@ -25,10 +25,8 @@ import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
 import { initStorageManager } from './storage-manager.js';
 import { initOfflineDiagnostics } from './diagnostics.js';
-import { activateDialogFocus } from './dialog-focus.js';
-import { initSearchController } from './search-controller.js';
 import { createFilterController } from './filter-controller.js';
-import { wireShellNavigation } from './shell-navigation.js';
+import { wireApplicationShell } from './shell-ui.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
 import { purgeLegacyUserPoint } from './user-point.js';
 import { initManifestLocale } from './manifest-locale.js';
@@ -162,6 +160,7 @@ const els = {
   toggleOnThisDateBtn: document.getElementById('toggle-on-this-date'),
   toggleGlobeBtn: document.getElementById('toggle-globe3d'),
   toggleInfoBtn: document.getElementById('toggle-info'),
+  glossaryBtn: document.getElementById('toggle-glossary'),
   toggleMobileActionsBtn: document.getElementById('toggle-mobile-actions'),
   mobileActionsMenu: document.getElementById('mobile-actions-menu'),
   exportBtn: document.getElementById('export-publication'),
@@ -346,7 +345,30 @@ async function boot() {
   restoreExtendedView(restored);
   syncFilterUiFromState();
   applyFilters();
-  wireUI();
+  wireApplicationShell({
+    elements: els,
+    filters,
+    filterController,
+    load: {
+      stats: loadStats,
+      compare: loadCompare,
+      onThisDate: loadOnThisDate,
+      globe3d: loadGlobe3D,
+      export: loadExport,
+      report: loadReport,
+      qgis: loadQgis,
+      tableView: loadTableView,
+      prep: loadPrep,
+      evac: loadEvac,
+      poster: loadPoster,
+      spatialSearch: loadSpatialSearch,
+    },
+    onLandfallClick,
+    getVisibleLandfalls: () => currentVisibleLandfalls,
+    getOpenStormId: () => openStormId,
+    openGlossary: openGlossaryLazy,
+    refreshTimelineScope,
+  });
   wireSettingsControls();
   initOptionalFeedDiagnostics();
   initStorageManager();
@@ -777,160 +799,6 @@ document.addEventListener('storm-panel:close', () => {
   advisoryReplayState = null;
   writeHash();
 });
-
-function wireUI() {
-  wireShellNavigation({
-    filtersButton: els.toggleFiltersBtn,
-    filtersPanel: els.filtersPanel,
-    mobileActionsButton: els.toggleMobileActionsBtn,
-    mobileActionsMenu: els.mobileActionsMenu,
-  });
-  filterController.wire();
-
-  initSearchController({
-    input: els.searchInput,
-    results: els.searchResults,
-    onSelect: onLandfallClick,
-  });
-
-  // Stats panel toggle
-  els.toggleStatsBtn.addEventListener('click', async () => {
-    const { toggleStats } = await loadStats();
-    toggleStats();
-  });
-
-  // Compare panel is loaded on first use; pinning from a storm panel imports
-  // the same module, so the tray and pinned state stay shared.
-  els.toggleCompareBtn?.addEventListener('click', async () => {
-    const { openComparePanel } = await loadCompare();
-    openComparePanel();
-  });
-
-  // On this date panel
-  els.toggleOnThisDateBtn.addEventListener('click', async () => {
-    const { showOnThisDate } = await loadOnThisDate();
-    showOnThisDate();
-  });
-
-  // Opt-in 3D globe view. Cesium loads only when the user opens this mode.
-  els.toggleGlobeBtn?.addEventListener('click', async () => {
-    const globe = await loadGlobe3D();
-    globe.initGlobe3D();
-    globe.openGlobe3D({ landfalls: currentVisibleLandfalls, focusStormId: openStormId });
-  });
-
-  // Info modal
-  let releaseInfoFocus = null;
-  const closeInfoModal = () => {
-    els.infoModal.hidden = true;
-    releaseInfoFocus?.();
-    releaseInfoFocus = null;
-  };
-  els.toggleInfoBtn.addEventListener('click', () => {
-    els.infoModal.hidden = false;
-    releaseInfoFocus = activateDialogFocus(els.infoModal, { initialFocus: '#close-info' });
-  });
-  els.closeInfo.addEventListener('click', closeInfoModal);
-  els.infoModal.addEventListener('click', (e) => {
-    if (e.target === els.infoModal) closeInfoModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !els.infoModal.hidden) {
-      e.preventDefault();
-      closeInfoModal();
-    }
-  });
-
-  // Export button
-  if (els.exportBtn) {
-    els.exportBtn.addEventListener('click', async () => {
-      const { exportPublicationCSV } = await loadExport();
-      exportPublicationCSV(filters);
-    });
-  }
-
-  // Report button
-  if (els.reportBtn) {
-    els.reportBtn.addEventListener('click', async () => {
-      const { generateStatisticalReport, downloadReportAsText } = await loadReport();
-      const { markdown, title } = generateStatisticalReport(filters);
-      downloadReportAsText(markdown, title);
-    });
-  }
-
-  // QGIS export button
-  if (els.qgisBtn) {
-    els.qgisBtn.addEventListener('click', async () => {
-      try {
-        const { exportQGISGeoJSON } = await loadQgis();
-        await exportQGISGeoJSON(filters);
-      } catch (error) {
-        console.error('QGIS export failed:', error);
-      }
-    });
-  }
-
-  if (els.tableViewBtn) {
-    els.tableViewBtn.addEventListener('click', async () => {
-      const tv = await loadTableView();
-      if (tv.isOpen()) { tv.hide(); return; }
-      tv.show(currentVisibleLandfalls, (lf) => onLandfallClick(lf, null));
-    });
-  }
-
-  els.prepBtn?.addEventListener('click', async () => {
-    const { openPrepPanel } = await loadPrep();
-    openPrepPanel();
-  });
-
-  // Desktop presents secondary actions inline in a horizontal rail. Return
-  // the rail to its primary controls after activating one so Filters and the
-  // other core views never remain scrolled underneath the title block.
-  els.headerActions?.addEventListener('click', event => {
-    if (innerWidth <= 720 || !event.target.closest('.mobile-actions-menu > .icon-btn')) return;
-    requestAnimationFrame(() => { els.headerActions.scrollLeft = 0; });
-  });
-
-  els.evacBtn?.addEventListener('click', async () => {
-    const { openEvacPanel } = await loadEvac();
-    await openEvacPanel();
-  });
-
-  els.posterBtn?.addEventListener('click', async () => {
-    const { openPoster } = await loadPoster();
-    await openPoster({
-      landfalls: currentVisibleLandfalls,
-      filters: { ...filters, categories: new Set(filters.categories) },
-      returnFocus: els.toggleMobileActionsBtn,
-    });
-  });
-
-  const spatialBtn = document.getElementById('toggle-spatial-search');
-  if (spatialBtn) {
-    spatialBtn.addEventListener('click', async () => {
-      const { toggleSpatialMode } = await loadSpatialSearch();
-      toggleSpatialMode();
-    });
-    // Synced via event so exits from the results panel's × (which also turns
-    // the mode off) can't leave the toolbar button stuck pressed.
-    document.addEventListener('spatial-mode:change', (e) => {
-      const on = Boolean(e.detail?.active);
-      spatialBtn.setAttribute('aria-pressed', String(on));
-      spatialBtn.classList.toggle('active', on);
-    });
-  }
-
-  // The state deep-dive rescopes the bottom timeline to one state; restore the
-  // filter-driven scope whenever that panel goes away.
-  document.addEventListener('hm-panel:hidden', (e) => {
-    if (e.detail?.id === 'state-panel') refreshTimelineScope(true);
-  });
-
-  const glossaryBtn = document.getElementById('toggle-glossary');
-  if (glossaryBtn) {
-    glossaryBtn.addEventListener('click', openGlossaryLazy);
-  }
-}
 
 boot().catch(err => {
   console.error('[boot] Boot failed', err);
