@@ -17,6 +17,7 @@ All notable changes to HurricaneMap.
 - Research exports now carry a schema-versioned release-provenance block binding the app version, export time, release-manifest hash/source commit, relevant artifact hashes and source dates, and methodology across CSV, Markdown, QGIS GeoJSON, and SVG track output.
 - Advisory replay links now preserve a versioned storm, zero-based replay ordinal, and cone-era state; reloads restore the same issued forecast and final-best-track comparison, while malformed or mismatched state falls back to the ordinary storm panel.
 - PWA manifests now declare a stable relative identity/scope and localized `en`/`es`/`ht` names, screenshots, and shortcuts; core/full packaging and browser contracts verify every referenced asset.
+- The starter analysis notebook now has an offline release gate that validates the 595-storm, 759-landfall, and 374 hurricane-strength data/provenance contract, executes twice in disposable directories, and detects non-deterministic CSV output.
 
 ### Fixed
 - Managed side panels now return keyboard focus only after View Transitions settle, preventing intermittent focus loss to the document body.

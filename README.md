@@ -318,7 +318,13 @@ The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, 
 python -m pip install -r requirements-notebooks.txt
 ```
 
-Then run `python -m notebook notebooks/analysis-starter.ipynb`. Pillow is included because the repository's radar-transparency, placeholder-branding, and radar preprocessing tools import `PIL`; keeping it in the same pinned environment avoids a separate undocumented setup path.
+Then run `python -m notebook notebooks/analysis-starter.ipynb`. The release gate can execute the same notebook twice without network access, using disposable output directories, and verify the 595-storm, 759-landfall, 374-hurricane-strength, and release-provenance contract:
+
+```bash
+npm run test:notebook
+```
+
+Pillow is included because the repository's radar-transparency, placeholder-branding, and radar preprocessing tools import `PIL`; keeping it in the same pinned environment avoids a separate undocumented setup path. If notebook execution packages are absent, the command reports them separately from a data-contract failure.
 
 ## Project layout
 

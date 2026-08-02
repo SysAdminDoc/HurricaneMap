@@ -26,6 +26,14 @@ python -m pip install -r requirements-notebooks.txt
 python -m notebook notebooks/analysis-starter.ipynb
 ```
 
+The release gate runs the same notebook offline in two disposable output directories and checks that both runs produce identical CSV bytes and the checked-in provenance contract:
+
+```bash
+npm run test:notebook
+```
+
+The command validates 595 storms, 759 landfall events, 374 hurricane-strength landfalls, and the release-manifest hashes before executing. If the optional notebook runtime is not installed, it reports the missing packages separately and still reports data-contract failures distinctly.
+
 **What you'll learn:**
 - How to structure landfall data for analysis
 - Pandas filtering and groupby workflows
@@ -37,6 +45,8 @@ python -m notebook notebooks/analysis-starter.ipynb
 The notebooks expect HurricaneMap's data files in the `data/` directory:
 - `data/landfalls.json` — 759 landfall events (flat list)
 - `data/storms.json` — Full track + metadata for every storm
+- `data/metadata.json` — generator, source-lock, coverage, and output provenance
+- `data/release-manifest.json` — byte and SHA-256 identities for the shipped release
 - `data/impacts.json` — Deaths and damage figures (partial coverage)
 
 **For Google Colab:** The notebook includes code to download these files automatically.
