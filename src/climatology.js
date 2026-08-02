@@ -8,43 +8,34 @@ import { t } from './i18n.js';
 
 let _cache = null;
 
-// Build per-year aggregates. Walks every loaded storm exactly once.
-async function buildClimatology() {
-  if (_cache) return _cache;
-  await ensureStormsLoaded();
-  const lf = getLandfalls();
+// Pure aggregation helper kept separate from the data loader so fixed-fixture
+// tests can exercise the year buckets without a browser or the full dataset.
+export function buildClimatologySeries(landfalls, getStormById, computeAce = computeACE) {
+  const lf = Array.isArray(landfalls) ? landfalls : [];
+  if (!lf.length) return { series: [], yearMin: null, yearMax: null };
+
   const yearMin = lf.reduce((a, b) => Math.min(a, b.year), 3000);
   const yearMax = lf.reduce((a, b) => Math.max(a, b.year), 0);
-  // Map: year -> { ace, named: Set, landfalls }
   const m = new Map();
   for (let y = yearMin; y <= yearMax; y++) m.set(y, { ace: 0, named: new Set(), landfalls: 0 });
 
-  // Named-storm + ACE: walk every storm with a track. NOTE: getStorm() is
-  // populated by ensureStormsLoaded() from the generated storm bundle.
-  // For seasons before NHC naming (pre-1950), HURDAT2 still IDs storms.
-  // We approximate "named storm" as "storm with peak winds >= 34kt at some
-  // point in track" (i.e. tropical-storm or stronger). This matches NOAA's
-  // post-1950 naming threshold and gives a sensible pre-naming-era proxy.
-  // Iterate by storm-id from the landfall list to drive lookups.
   const seenStormIds = new Set();
   for (const l of lf) {
     if (seenStormIds.has(l.storm_id)) continue;
     seenStormIds.add(l.storm_id);
-    const s = getStorm(l.storm_id);
+    const s = getStormById?.(l.storm_id);
     if (!s || !s.track) continue;
-    // ACE: storm contributes to its year-of-occurrence (use first track timestamp).
     const firstT = s.track[0]?.t;
     const yr = firstT ? new Date(firstT).getUTCFullYear() : l.year;
     const bucket = m.get(yr) || (m.set(yr, { ace: 0, named: new Set(), landfalls: 0 }), m.get(yr));
     try {
-      const ace = computeACE(s.track);
+      const ace = computeAce(s.track);
       if (Number.isFinite(ace?.value)) bucket.ace += ace.value;
     } catch (e) { /* ignore */ }
-    // Named-storm: peak wind >= 34kt
     const peak = s.track.reduce((a, p) => Math.max(a, p.wind || 0), 0);
     if (peak >= 34) bucket.named.add(l.storm_id);
   }
-  // Landfalls per year — count rows directly.
+
   for (const l of lf) {
     const b = m.get(l.year) || (m.set(l.year, { ace: 0, named: new Set(), landfalls: 0 }), m.get(l.year));
     b.landfalls += 1;
@@ -55,7 +46,14 @@ async function buildClimatology() {
     const b = m.get(y) || { ace: 0, named: new Set(), landfalls: 0 };
     series.push({ year: y, ace: b.ace, named: b.named.size, landfalls: b.landfalls });
   }
-  _cache = { series, yearMin, yearMax };
+  return { series, yearMin, yearMax };
+}
+
+// Build per-year aggregates. Walks every loaded storm exactly once.
+async function buildClimatology() {
+  if (_cache) return _cache;
+  await ensureStormsLoaded();
+  _cache = buildClimatologySeries(getLandfalls(), getStorm, computeACE);
   return _cache;
 }
 

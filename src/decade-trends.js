@@ -12,18 +12,19 @@ import {
 
 let _cache = null;
 
-// Compute decade-level aggregates with details.
-async function buildDecadeTrends() {
-  if (_cache) return _cache;
-  await ensureStormsLoaded();
-  const stats = getStats();
-  if (!stats) return null;
-
-  const lf = getLandfalls();
+// Pure decade bucketing helper. The browser-facing loader below supplies the
+// data accessors; fixed-fixture tests can supply Maps instead.
+export function buildDecadeTrendSeries(
+  landfalls,
+  getStormById,
+  getImpactsById,
+  { computeAce = computeACE } = {},
+) {
+  const lf = Array.isArray(landfalls) ? landfalls : [];
+  if (!lf.length) return [];
   const yearMin = lf.reduce((a, b) => Math.min(a, b.year), 3000);
   const yearMax = lf.reduce((a, b) => Math.max(a, b.year), 0);
 
-  // Decade buckets: 1850s = decade 185, 1860s = decade 186, etc.
   const decades = new Map();
   for (let y = Math.floor(yearMin / 10) * 10; y <= yearMax; y += 10) {
     const decadeLabel = Math.floor(y / 10);
@@ -40,68 +41,64 @@ async function buildDecadeTrends() {
     });
   }
 
-  // Walk all landfalls and storms.
   const seenStormIds = new Set();
-  for (const lf of getLandfalls()) {
-    if (seenStormIds.has(lf.storm_id)) continue;
-    seenStormIds.add(lf.storm_id);
-    
-    const s = getStorm(lf.storm_id);
-    if (!s || !s.track) continue;
+  for (const landfall of lf) {
+    if (seenStormIds.has(landfall.storm_id)) continue;
+    seenStormIds.add(landfall.storm_id);
 
-    const yr = lf.year;
-    const decadeLabel = Math.floor(yr / 10);
+    const storm = getStormById?.(landfall.storm_id);
+    if (!storm || !storm.track) continue;
+    const decadeLabel = Math.floor(landfall.year / 10);
     const bucket = decades.get(decadeLabel);
     if (!bucket) continue;
 
-    // Named storms (>= 34kt)
-    const peak = s.track.reduce((a, p) => Math.max(a, p.wind || 0), 0);
-    if (peak >= 34) {
-      bucket.named.add(lf.storm_id);
-    }
+    const peak = storm.track.reduce((a, p) => Math.max(a, p.wind || 0), 0);
+    if (peak >= 34) bucket.named.add(landfall.storm_id);
+    if (peak >= 96) bucket.major += 1;
 
-    // Major hurricanes (>= 96kt, Cat 3+)
-    if (peak >= 96) {
-      bucket.major += 1;
-    }
-
-    // ACE
     try {
-      const ace = computeACE(s.track);
+      const ace = computeAce(storm.track);
       if (Number.isFinite(ace?.value)) bucket.ace += ace.value;
     } catch (e) { /* ignore */ }
 
-    // Track deadliest and costliest for later ranking.
-    const impacts = getImpactsFor(lf.storm_id);
+    const impacts = getImpactsById?.(landfall.storm_id);
     if (impacts) {
       const deaths = getFatalityCount(impacts);
       const damages = getDamageMillions(impacts);
       if (Number.isFinite(deaths) && deaths > 0) {
-        bucket.deathlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, deaths, rawDeaths: getRawFatalityText(impacts) });
+        bucket.deathlyStorms.push({
+          id: landfall.storm_id,
+          name: storm.name,
+          year: landfall.year,
+          deaths,
+          rawDeaths: getRawFatalityText(impacts),
+        });
       }
       if (Number.isFinite(damages) && damages > 0) {
-        bucket.costlyStorms.push({ id: lf.storm_id, name: s.name, year: yr, damages, rawDamages: getRawDamageText(impacts) });
+        bucket.costlyStorms.push({
+          id: landfall.storm_id,
+          name: storm.name,
+          year: landfall.year,
+          damages,
+          rawDamages: getRawDamageText(impacts),
+        });
       }
     }
   }
 
-  // Landfalls per decade (already counted in stats, but for clarity):
-  for (const lf of getLandfalls()) {
-    const decadeLabel = Math.floor(lf.year / 10);
+  for (const landfall of lf) {
+    const decadeLabel = Math.floor(landfall.year / 10);
     const bucket = decades.get(decadeLabel);
     if (bucket) bucket.totalLF += 1;
   }
 
-  // Sort and pick top deadly/costly.
   const series = [];
   for (const [decadeLabel, bucket] of decades) {
     bucket.deathlyStorms.sort((a, b) => b.deaths - a.deaths);
     bucket.costlyStorms.sort((a, b) => b.damages - a.damages);
-    
-    const majorPct = bucket.named.size > 0 
+    const majorPct = bucket.named.size > 0
       ? ((bucket.major / bucket.named.size) * 100).toFixed(0)
       : '0';
-    
     series.push({
       decadeLabel,
       decade: `${bucket.decade * 10}s`,
@@ -113,8 +110,17 @@ async function buildDecadeTrends() {
       costliest: bucket.costlyStorms[0] || null,
     });
   }
+  return series.sort((a, b) => a.decadeLabel - b.decadeLabel);
+}
 
-  _cache = series.sort((a, b) => a.decadeLabel - b.decadeLabel);
+// Compute decade-level aggregates with details.
+async function buildDecadeTrends() {
+  if (_cache) return _cache;
+  await ensureStormsLoaded();
+  const stats = getStats();
+  if (!stats) return null;
+
+  _cache = buildDecadeTrendSeries(getLandfalls(), getStorm, getImpactsFor);
   return _cache;
 }
 
