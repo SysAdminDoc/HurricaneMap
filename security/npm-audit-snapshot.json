@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-08-02T00:00:00Z",
+  "expires_at_utc": "2026-09-30T00:00:00Z",
+  "lockfile_sha256": "0215dea70592d0dee684fd33dcc2c81b337821338b70b59579426cc507690412",
+  "command": "npm audit --json --audit-level=high",
+  "audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 38,
+        "optional": 27,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 38
+      }
+    }
+  }
+}

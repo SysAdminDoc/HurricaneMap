@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-08-02T00:00:00Z",
+  "vendors": [
+    {
+      "id": "leaflet",
+      "kind": "vendored",
+      "name": "Leaflet",
+      "version": "1.9.4",
+      "files": {
+        "vendor/leaflet.js": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+        "vendor/leaflet.css": "337bfca5cabd03b39815b2700febe2b3b7edf55921c59cd49f88ecb328212303",
+        "vendor/leaflet-heat.js": "eb952aae5806a1102729f291bab887dde783ace859819a354827a776e73e486a"
+      },
+      "license": "BSD-2-Clause",
+      "source_url": "https://github.com/Leaflet/Leaflet/tree/v1.9.4",
+      "decision": "time-bounded-exception",
+      "reviewed_at_utc": "2026-08-02T00:00:00Z",
+      "review_expires_at_utc": "2026-09-30T00:00:00Z",
+      "advisories": [
+        {
+          "id": "CVE-2025-69993",
+          "severity": "high",
+          "url": "https://security-tracker.debian.org/tracker/CVE-2025-69993",
+          "rationale": "Application-owned popup content is built as DOM nodes and the popup sink regression gate rejects string HTML; this narrows the reported bindPopup path but does not remove the upstream advisory.",
+          "next_action": "Re-evaluate the first maintained Leaflet release that addresses the advisory and replace the complete vendored asset set before the exception expires."
+        }
+      ]
+    },
+    {
+      "id": "cesium",
+      "kind": "remote-sri",
+      "name": "CesiumJS",
+      "version": "1.143",
+      "assets": {
+        "javascript": {
+          "url": "https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Cesium.js",
+          "integrity": "sha384-6pySA8bzGAn2+aYh8KWmvzl5DRnspbScFYUbrFcu2ayckTxx8gyn+/WNvNbPM9iG"
+        },
+        "stylesheet": {
+          "url": "https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Widgets/widgets.css",
+          "integrity": "sha384-ghEeMdcWWzRv/BPeUcX835vcKDGrxvROXisl/Btpv3GeekBUXTSPVcFJpI1Tcrgp"
+        }
+      },
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/CesiumGS/cesium/releases/tag/1.143",
+      "decision": "pinned-sri-isolation",
+      "reviewed_at_utc": "2026-08-02T00:00:00Z",
+      "review_expires_at_utc": "2026-09-30T00:00:00Z",
+      "advisories": [],
+      "rationale": "Cesium is optional, loaded only in the opaque sandboxed globe document, and both remote assets use exact SRI hashes.",
+      "next_action": "Review the pinned Cesium release and SRI pair before the review expiry or before changing the isolated globe boundary."
+    }
+  ]
+}
