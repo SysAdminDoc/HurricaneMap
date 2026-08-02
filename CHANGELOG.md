@@ -25,6 +25,7 @@ All notable changes to HurricaneMap.
 - Preparedness checklist and household controls now update in place, preserving keyboard focus while progress and supply totals change.
 - Map overlay geometry and legends now share theme-invariant basemap color tokens, keeping forecast, best-track, cone, ensemble, and evacuation markers aligned in every UI theme.
 - On-this-date loading, relative-day, state, unnamed-storm, and playback/climatology status copy now comes from the English, Spanish, and Haitian Creole catalogs, with live locale rerender coverage.
+- On-this-date matching and relative labels now use UTC calendar arithmetic, eliminating daylight-saving shifts around the ±7-day window.
 - Globe wind-cone toggles now use a layer-only protocol update, preserving the current timeline position and camera instead of reinitializing the scene.
 
 ### Changed

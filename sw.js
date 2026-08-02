@@ -47,6 +47,7 @@ const SHELL_ASSETS = [
   './src/map.js',
   './src/map-colors.js',
   './src/metric-presenters.js',
+  './src/on-this-date-utils.js',
   './src/panel.js',
   './src/panels.js',
   './src/stats.js',

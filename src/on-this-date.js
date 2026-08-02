@@ -7,6 +7,7 @@ import { hidePanel, showPanel } from './panels.js';
 import { formatWind } from './settings.js';
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { calendarDistanceDays, isWithinDaysOfToday } from './on-this-date-utils.js';
 
 const panel = document.getElementById('on-this-date-panel');
 const body = document.getElementById('on-this-date-body');
@@ -26,47 +27,6 @@ function getMonthDay(dateStr) {
   const m = String(d.getUTCMonth() + 1).padStart(2, '0');
   const day = String(d.getUTCDate()).padStart(2, '0');
   return `${m}-${day}`;
-}
-
-/** Check if a landfall date is within ±7 days of the given month-day. */
-function isWithinDaysOfToday(lfDate, targetMonthDay, daysOffset = 7) {
-  const lfDateObj = new Date(lfDate);
-  const lfMonth = lfDateObj.getUTCMonth();
-  const lfDay = lfDateObj.getUTCDate();
-  
-  const targetParts = targetMonthDay.split('-');
-  const targetMonth = parseInt(targetParts[0], 10) - 1;
-  const targetDay = parseInt(targetParts[1], 10);
-  
-  // Day-of-year distance (0-365, wraps at year boundary)
-  // Create dates in a leap year (2024) to handle Feb 29 correctly
-  const lfDoyDate = new Date(2024, lfMonth, lfDay);
-  const targetDoyDate = new Date(2024, targetMonth, targetDay);
-  const lfDoy = Math.floor((lfDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
-  const targetDoy = Math.floor((targetDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
-  
-  let diff = Math.abs(lfDoy - targetDoy);
-  // Wrap around year boundary (365/366 days)
-  const daysInYear = 366; // 2024 is a leap year
-  if (diff > daysInYear / 2) {
-    diff = daysInYear - diff;
-  }
-  return diff <= daysOffset;
-}
-
-function calendarDistanceDays(lfDate, targetMonthDay) {
-  const lfDateObj = new Date(lfDate);
-  const lfMonth = lfDateObj.getUTCMonth();
-  const lfDay = lfDateObj.getUTCDate();
-  const [targetMonthRaw, targetDayRaw] = targetMonthDay.split('-').map(Number);
-  const lfDoyDate = new Date(2024, lfMonth, lfDay);
-  const targetDoyDate = new Date(2024, targetMonthRaw - 1, targetDayRaw);
-  const lfDoy = Math.floor((lfDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
-  const targetDoy = Math.floor((targetDoyDate - new Date(2024, 0, 1)) / (24 * 60 * 60 * 1000));
-  const raw = lfDoy - targetDoy;
-  if (raw > 183) return raw - 366;
-  if (raw < -183) return raw + 366;
-  return raw;
 }
 
 function formatCalendarOffset(days) {
