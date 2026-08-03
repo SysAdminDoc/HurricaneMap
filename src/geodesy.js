@@ -31,6 +31,33 @@ function angularDistance(lat1, lon1, lat2, lon2) {
   return 2 * Math.asin(Math.sqrt(Math.max(0, Math.min(1, haversine))));
 }
 
+function unitVector(lat, lon) {
+  const phi = toRadians(lat);
+  const lambda = toRadians(lon);
+  const cosPhi = Math.cos(phi);
+  return [
+    cosPhi * Math.cos(lambda),
+    cosPhi * Math.sin(lambda),
+    Math.sin(phi),
+  ];
+}
+
+function greatCirclePoint(start, end, fraction, segmentAngle) {
+  const a = unitVector(start.lat, start.lon);
+  const b = unitVector(end.lat, end.lon);
+  const omega = segmentAngle ?? Math.acos(clampUnit(a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
+  if (omega === 0 || Math.sin(omega) === 0) return [start.lon, start.lat];
+  const weightA = Math.sin((1 - fraction) * omega) / Math.sin(omega);
+  const weightB = Math.sin(fraction * omega) / Math.sin(omega);
+  const x = weightA * a[0] + weightB * b[0];
+  const y = weightA * a[1] + weightB * b[1];
+  const z = weightA * a[2] + weightB * b[2];
+  return [
+    normalizeLongitude(toDegrees(Math.atan2(y, x))),
+    toDegrees(Math.atan2(z, Math.hypot(x, y))),
+  ];
+}
+
 export function haversineKm(lat1, lon1, lat2, lon2) {
   return EARTH_RADIUS_KM * angularDistance(lat1, lon1, lat2, lon2);
 }
@@ -65,15 +92,23 @@ export function destinationPointNmi(lat, lon, bearing, distanceNmi) {
   return destinationPointKm(lat, lon, bearing, Number(distanceNmi) * KM_PER_NAUTICAL_MILE);
 }
 
-// Shortest great-circle distance from a point to a finite great-circle
+// Shortest great-circle distance and projected point on a finite great-circle
 // segment. GeoJSON positions use [longitude, latitude].
-export function pointToSegmentDistanceKm(lat, lon, start, end) {
+export function pointToSegmentProjectionKm(lat, lon, start, end) {
   const a = { lat: Number(start?.[1]), lon: Number(start?.[0]) };
   const b = { lat: Number(end?.[1]), lon: Number(end?.[0]) };
   const point = { lat: Number(lat), lon: Number(lon) };
-  if (![a.lat, a.lon, b.lat, b.lon, point.lat, point.lon].every(Number.isFinite)) return Infinity;
+  if (![a.lat, a.lon, b.lat, b.lon, point.lat, point.lon].every(Number.isFinite)) {
+    return { distance_km: Infinity, fraction: null, point: null };
+  }
   const segmentAngle = angularDistance(a.lat, a.lon, b.lat, b.lon);
-  if (segmentAngle === 0) return haversineKm(point.lat, point.lon, a.lat, a.lon);
+  if (segmentAngle === 0) {
+    return {
+      distance_km: haversineKm(point.lat, point.lon, a.lat, a.lon),
+      fraction: 0,
+      point: [a.lon, a.lat],
+    };
+  }
 
   const pointAngle = angularDistance(a.lat, a.lon, point.lat, point.lon);
   const bearingDelta = toRadians(
@@ -86,10 +121,22 @@ export function pointToSegmentDistanceKm(lat, lon, start, end) {
     Math.cos(pointAngle),
   );
   if (alongTrackAngle < 0 || alongTrackAngle > segmentAngle) {
-    return Math.min(
-      haversineKm(point.lat, point.lon, a.lat, a.lon),
-      haversineKm(point.lat, point.lon, b.lat, b.lon),
-    );
+    const distanceA = haversineKm(point.lat, point.lon, a.lat, a.lon);
+    const distanceB = haversineKm(point.lat, point.lon, b.lat, b.lon);
+    return distanceA <= distanceB
+      ? { distance_km: distanceA, fraction: 0, point: [a.lon, a.lat] }
+      : { distance_km: distanceB, fraction: 1, point: [b.lon, b.lat] };
   }
-  return Math.abs(crossTrackAngle) * EARTH_RADIUS_KM;
+  const fraction = Math.max(0, Math.min(1, alongTrackAngle / segmentAngle));
+  return {
+    distance_km: Math.abs(crossTrackAngle) * EARTH_RADIUS_KM,
+    fraction,
+    point: greatCirclePoint(a, b, fraction, segmentAngle),
+  };
+}
+
+// Shortest great-circle distance from a point to a finite great-circle
+// segment. GeoJSON positions use [longitude, latitude].
+export function pointToSegmentDistanceKm(lat, lon, start, end) {
+  return pointToSegmentProjectionKm(lat, lon, start, end).distance_km;
 }

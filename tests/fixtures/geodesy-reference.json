@@ -11,5 +11,21 @@
     { "name": "equatorial cross track", "point": [1, 0.5], "start": [0, 0], "end": [0, 1], "expected_km": 111.19508023353288 },
     { "name": "antimeridian cross track", "point": [10.1, 180], "start": [10, 179.5], "end": [10, -179.5], "expected_km": 11.078021415690563 },
     { "name": "beyond endpoint", "point": [0, 2], "start": [0, 0], "end": [0, 1], "expected_km": 111.1950802335329 }
+  ],
+  "closest_approach_vectors": [
+    {
+      "name": "interpolated equatorial midpoint",
+      "target": [1, 0.5],
+      "track": [
+        { "t": "2026-01-01T00:00:00Z", "lat": 0, "lon": 0, "wind": 40, "pres": 1000 },
+        { "t": "2026-01-01T12:00:00Z", "lat": 0, "lon": 1, "wind": 80, "pres": 980 }
+      ],
+      "expected_km": 111.19508023353288,
+      "expected_fraction": 0.5,
+      "expected_lat": 0,
+      "expected_lon": 0.5,
+      "expected_wind": 60,
+      "expected_time": "2026-01-01T06:00:00.000Z"
+    }
   ]
 }

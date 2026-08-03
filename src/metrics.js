@@ -7,6 +7,7 @@ import { presentNumber } from './metric-presenters.js';
 import {
   haversineKm as geodesicDistanceKm,
   initialBearingDeg,
+  pointToSegmentProjectionKm,
 } from './geodesy.js';
 
 // Derived intensity metrics + spatial queries.
@@ -149,55 +150,121 @@ export function compassLabel(deg) {
   return COMPASS_8[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
 }
 
+function interpolateTrackPoint(start, end, projectedPoint, fraction, startIdx, endIdx) {
+  const point = {
+    ...start,
+    lat: projectedPoint[1],
+    lon: projectedPoint[0],
+    interpolated: true,
+    segment_start_idx: startIdx,
+    segment_end_idx: endIdx,
+    segment_fraction: fraction,
+  };
+  for (const field of ['wind', 'pres']) {
+    if (Number.isFinite(start[field]) && Number.isFinite(end[field])) {
+      point[field] = start[field] + (end[field] - start[field]) * fraction;
+    }
+  }
+  const startTime = Date.parse(start.t);
+  const endTime = Date.parse(end.t);
+  if (Number.isFinite(startTime) && Number.isFinite(endTime)) {
+    point.t = new Date(startTime + (endTime - startTime) * fraction).toISOString();
+  }
+  return point;
+}
+
 /** Closest approach of a storm track to a target lat/lon.
- *  Returns the nearest track-point index + distance (km, mi) + the obs at
- *  that point. Returns null if track is empty. */
+ *  Returns the closest segment/point index + distance (km, mi) + the
+ *  interpolated observation at that location. Returns null if no usable
+ *  track coordinates exist. */
 export function closestApproach(track, targetLat, targetLon) {
-  if (!Array.isArray(track) || track.length === 0) return null;
-  let bestIdx = 0;
+  if (!Array.isArray(track) || track.length === 0
+    || !Number.isFinite(Number(targetLat)) || !Number.isFinite(Number(targetLon))) return null;
+  let bestIdx = null;
   let bestKm = Infinity;
+  let bestPoint = null;
+  let bestSegment = null;
+  let previous = null;
+
+  const consider = (distanceKm, idx, point, segment = null) => {
+    if (!Number.isFinite(distanceKm) || distanceKm >= bestKm) return;
+    bestKm = distanceKm;
+    bestIdx = idx;
+    bestPoint = point;
+    bestSegment = segment;
+  };
+
   for (let i = 0; i < track.length; i++) {
     const r = track[i];
-    if (r.lat == null || r.lon == null) continue;
+    if (!Number.isFinite(Number(r?.lat)) || !Number.isFinite(Number(r?.lon))) {
+      previous = null;
+      continue;
+    }
     const km = haversineKm(r.lat, r.lon, targetLat, targetLon);
-    if (km < bestKm) { bestKm = km; bestIdx = i; }
+    consider(km, i, r);
+
+    if (previous) {
+      const projection = pointToSegmentProjectionKm(
+        targetLat,
+        targetLon,
+        [previous.record.lon, previous.record.lat],
+        [r.lon, r.lat],
+      );
+      const fraction = projection.fraction;
+      const atStart = fraction == null || fraction <= 1e-9;
+      const atEnd = fraction != null && fraction >= 1 - 1e-9;
+      const point = atStart
+        ? previous.record
+        : atEnd
+          ? r
+          : interpolateTrackPoint(
+            previous.record,
+            r,
+            projection.point,
+            fraction,
+            previous.index,
+            i,
+          );
+      const idx = atEnd || (fraction != null && fraction > 0.5) ? i : previous.index;
+      consider(projection.distance_km, idx, point, {
+        start_idx: previous.index,
+        end_idx: i,
+        fraction,
+      });
+    }
+    previous = { index: i, record: r };
   }
   if (bestKm === Infinity) return null;
-  const point = track[bestIdx];
-  return {
+  const result = {
     idx: bestIdx,
     distance_km: bestKm,
     distance_mi: kmToMi(bestKm),
-    track_point: point,
+    track_point: bestPoint,
   };
+  if (bestSegment) result.segment = bestSegment;
+  return result;
 }
 
 /** Compute empirical return periods for a given city across all historical storms.
- *  For each category (1, 3, 5), counts the number of storms that made a landfall
+ *  For each category (1, 3, 5), counts the number of storms whose track passed
  *  within 50 km (31 mi) of the city at that intensity or stronger, then computes
  *  the average years between such events.
  *  Returns { cat1_years, cat3_years, cat5_years } with null for "never" cases.
  */
 export function computeCityReturnPeriods(city, allStorms) {
   const RADIUS_KM = 50;
-  const CATEGORIES = { 1: 1, 3: 3, 5: 5 };
-  
-  const landfallsByCategory = { 1: [], 3: [], 5: [] };
-  
-  // Scan all storms for landfalls within radius at each category. One event
-  // per storm per tier — multi-landfall loopers (Keys/Gulf) otherwise push
-  // duplicate years, creating zero-length intervals that deflate the mean.
+  const stormsByCategory = { 1: [], 3: [], 5: [] };
+
+  // One event per storm per tier. A segment-aware closest approach avoids
+  // missing a city between two six-hourly fixes and keeps multi-pass storms
+  // from contributing duplicate years.
   for (const storm of allStorms) {
-    const landfalls = storm.us_landfalls || [];
-    let best = 0;
-    for (const lf of landfalls) {
-      const dist = haversineKm(lf.lat, lf.lon, city.lat, city.lon);
-      if (dist > RADIUS_KM) continue;
-      if (lf.category >= 1 && lf.category > best) best = lf.category;
-    }
-    if (best >= 1) landfallsByCategory[1].push(storm.year);
-    if (best >= 3) landfallsByCategory[3].push(storm.year);
-    if (best >= 5) landfallsByCategory[5].push(storm.year);
+    const approach = closestApproach(storm.track, city.lat, city.lon);
+    if (!approach || approach.distance_km > RADIUS_KM) continue;
+    const category = windToCategory(approach.track_point?.wind);
+    if (category >= 1) stormsByCategory[1].push(storm.year);
+    if (category >= 3) stormsByCategory[3].push(storm.year);
+    if (category >= 5) stormsByCategory[5].push(storm.year);
   }
   
   // Compute return periods (years between events)
@@ -214,12 +281,12 @@ export function computeCityReturnPeriods(city, allStorms) {
   };
   
   return {
-    cat1_years: computeReturnPeriod(landfallsByCategory[1]),
-    cat3_years: computeReturnPeriod(landfallsByCategory[3]),
-    cat5_years: computeReturnPeriod(landfallsByCategory[5]),
-    cat1_count: landfallsByCategory[1].length,
-    cat3_count: landfallsByCategory[3].length,
-    cat5_count: landfallsByCategory[5].length,
+    cat1_years: computeReturnPeriod(stormsByCategory[1]),
+    cat3_years: computeReturnPeriod(stormsByCategory[3]),
+    cat5_years: computeReturnPeriod(stormsByCategory[5]),
+    cat1_count: stormsByCategory[1].length,
+    cat3_count: stormsByCategory[3].length,
+    cat5_count: stormsByCategory[5].length,
   };
 }
 
