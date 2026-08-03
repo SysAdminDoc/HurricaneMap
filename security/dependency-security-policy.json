@@ -14,16 +14,17 @@
       },
       "license": "BSD-2-Clause",
       "source_url": "https://github.com/Leaflet/Leaflet/tree/v1.9.4",
-      "decision": "time-bounded-exception",
+      "decision": "disputed-upstream",
       "reviewed_at_utc": "2026-08-02T00:00:00Z",
-      "review_expires_at_utc": "2026-09-30T00:00:00Z",
       "advisories": [
         {
           "id": "CVE-2025-69993",
           "severity": "high",
           "url": "https://security-tracker.debian.org/tracker/CVE-2025-69993",
-          "rationale": "Application-owned popup content is built as DOM nodes and the popup sink regression gate rejects string HTML; this narrows the reported bindPopup path but does not remove the upstream advisory.",
-          "next_action": "Re-evaluate the first maintained Leaflet release that addresses the advisory and replace the complete vendored asset set before the exception expires."
+          "rationale": "Leaflet maintainers have formally disputed this advisory as documented, intentional behavior. Application-owned popup content is built as DOM nodes, tooltip interpolation is escaped, and the popup sink regression gate rejects string HTML.",
+          "upstream_position_url": "https://github.com/Leaflet/Leaflet/issues/10214",
+          "compensating_control": "check:popup-sinks",
+          "next_action": "Revisit only if Leaflet changes its upstream position or the application adds a new Leaflet content sink."
         }
       ]
     },

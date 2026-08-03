@@ -1300,6 +1300,54 @@ async function assertActivePopupDomSafety(page) {
   );
 }
 
+async function assertAdvisoryTooltipDomSafety(page) {
+  const result = await page.evaluate(async () => {
+    const { ensureStormsLoaded, getStorm } = await import('/src/data.js');
+    const { getMap } = await import('/src/map.js');
+    const { clearAdvisoryReplay, renderAdvisory } = await import('/src/advisory-replay.js');
+    await ensureStormsLoaded();
+    const storm = getStorm('AL142024');
+    const poison = '<img src=x onerror="window.__hmAdvisoryPoisoned=true">';
+    window.__hmAdvisoryPoisoned = false;
+    const record = {
+      unmatchedForecasts: 0,
+      missingDiscussions: 0,
+      advisories: [{
+        t: '2024-09-24T00:00:00Z',
+        n: 1,
+        f: [
+          [0, storm.track[0].lat, storm.track[0].lon, poison],
+          [6, storm.track[1].lat, storm.track[1].lon, poison],
+        ],
+        e: [],
+        discussion: null,
+      }],
+    };
+    const rendered = await renderAdvisory(storm, { map: getMap(), record, coneEra: '2025' });
+    getMap().eachLayer(layer => {
+      if (typeof layer.openTooltip === 'function') layer.openTooltip();
+    });
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const tooltips = [...document.querySelectorAll('.leaflet-tooltip')];
+    const snapshot = {
+      status: rendered.status,
+      text: tooltips.map(tooltip => tooltip.textContent || '').join(' '),
+      dangerousElements: tooltips.reduce((total, tooltip) => total + tooltip.querySelectorAll('img,svg,script,iframe,object').length, 0),
+      eventAttributes: tooltips.flatMap(tooltip => [...tooltip.querySelectorAll('*')].flatMap(element =>
+        [...element.attributes].filter(attribute => /^on/i.test(attribute.name)).map(attribute => attribute.name)
+      )),
+      poisoned: window.__hmAdvisoryPoisoned,
+    };
+    clearAdvisoryReplay();
+    document.querySelectorAll('.leaflet-tooltip').forEach(tooltip => tooltip.remove());
+    return snapshot;
+  });
+  assert(result.status === 'rendered', `advisory poison fixture did not render: ${JSON.stringify(result)}`);
+  assert(result.text.includes('<img src=x onerror='), `advisory tooltip did not preserve poisoned text as text: ${JSON.stringify(result)}`);
+  assert(result.dangerousElements === 0, `advisory tooltip created executable elements: ${JSON.stringify(result)}`);
+  assert(result.eventAttributes.length === 0 && !result.poisoned, `advisory tooltip created executable attributes: ${JSON.stringify(result)}`);
+}
+
 async function assertLocationPrivacyFlow(page) {
   await page.evaluate(async () => {
     const spatial = await import('/src/spatial-search.js');
@@ -1396,6 +1444,7 @@ try {
   await page.goto(`${baseUrl}/#c=bad&s=NotAState`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
   await assertActivePopupDomSafety(page);
+  await assertAdvisoryTooltipDomSafety(page);
   await assertLocationPrivacyFlow(page);
 
   const migratedSettings = await page.evaluate(

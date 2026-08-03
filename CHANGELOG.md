@@ -7,6 +7,7 @@ All notable changes to HurricaneMap.
 ### Fixed
 - Closest-approach and city return-period queries now measure the great-circle track segments between HURDAT2 fixes, interpolate the location and intensity at the true closest point, and cover the Miami, Cape Hatteras, New York, and segment-only regression cases.
 - The Cloudflare Worker now permits same-origin geolocation while continuing to deny microphone and camera access, and its policy test locks the complete security-header contract.
+- Leaflet’s disputed upstream advisory is now represented as a permanent, cited security decision with `check:popup-sinks` as its compensating control; the Playwright smoke injects a poisoned advisory fixture and verifies it stays inert text.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 

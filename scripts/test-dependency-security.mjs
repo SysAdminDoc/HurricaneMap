@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   findHighRiskFindings,
@@ -18,4 +19,11 @@ assert.deepEqual(validateAuditSnapshot({
 }, 'b'.repeat(64), new Date('2026-08-02T00:00:00Z')).errors, [
   'npm audit snapshot does not match package-lock.json',
 ], 'offline snapshots must be bound to the lockfile');
+const policy = JSON.parse(await readFile(new URL('../security/dependency-security-policy.json', import.meta.url), 'utf8'));
+const leaflet = policy.vendors.find(vendor => vendor.id === 'leaflet');
+const leafletAdvisory = leaflet.advisories.find(advisory => advisory.id === 'CVE-2025-69993');
+assert.equal(leaflet.decision, 'disputed-upstream', 'Leaflet must use the permanent disputed-upstream decision');
+assert.equal(Object.hasOwn(leaflet, 'review_expires_at_utc'), false, 'disputed Leaflet advisories must not expire');
+assert.equal(leafletAdvisory.upstream_position_url, 'https://github.com/Leaflet/Leaflet/issues/10214');
+assert.equal(leafletAdvisory.compensating_control, 'check:popup-sinks');
 console.log('dependency security helpers ok (JSON parsing, severity gate, lock binding)');

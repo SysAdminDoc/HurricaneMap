@@ -134,10 +134,12 @@ async function validateVendorPolicy(policy) {
       errors.push('THIRD_PARTY_NOTICES.txt does not record the reviewed Leaflet version');
     }
     for (const advisory of leaflet.advisories || []) {
-      if (!['high', 'critical'].includes(advisory.severity) || leaflet.decision !== 'time-bounded-exception') {
-        errors.push(`Leaflet advisory ${advisory.id} lacks a time-bounded exception decision`);
+      if (!['high', 'critical'].includes(advisory.severity) || leaflet.decision !== 'disputed-upstream') {
+        errors.push(`Leaflet advisory ${advisory.id} lacks a disputed-upstream decision`);
       }
-      if (!advisory.rationale || !advisory.next_action) errors.push(`Leaflet advisory ${advisory.id} lacks rationale or next action`);
+      if (!advisory.rationale || !advisory.next_action || !advisory.upstream_position_url || advisory.compensating_control !== 'check:popup-sinks') {
+        errors.push(`Leaflet advisory ${advisory.id} lacks its upstream citation or popup-sink compensating control`);
+      }
     }
   }
 
@@ -163,6 +165,12 @@ async function validateVendorPolicy(policy) {
 
 function validateReviewWindow(vendor) {
   if (!validIso(vendor.reviewed_at_utc)) return [`${vendor.id} reviewed_at_utc is invalid`];
+  if (vendor.decision === 'disputed-upstream') {
+    if (Object.prototype.hasOwnProperty.call(vendor, 'review_expires_at_utc')) {
+      return [`${vendor.id} disputed-upstream decision must not have a review expiry`];
+    }
+    return [];
+  }
   if (!validIso(vendor.review_expires_at_utc)) return [`${vendor.id} review_expires_at_utc is invalid`];
   if (Date.parse(vendor.review_expires_at_utc) <= Date.parse(vendor.reviewed_at_utc)) return [`${vendor.id} review expiry must follow its review date`];
   if (Date.parse(vendor.review_expires_at_utc) <= Date.now()) return [`${vendor.id} security review expired at ${vendor.review_expires_at_utc}`];
