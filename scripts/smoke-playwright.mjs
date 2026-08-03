@@ -1153,7 +1153,7 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
 }
 
 async function assertLocalizedWorkflowChrome(browser, baseUrl) {
-  for (const locale of ['es', 'ht']) {
+  for (const locale of ['en', 'es', 'ht']) {
     const context = await browser.newContext({
       viewport: { width: 1200, height: 900 },
       serviceWorkers: 'block',
@@ -1164,6 +1164,7 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
       await waitForAppReady(page);
+      await assertNoAxeViolations(page, `${locale} main view (WCAG 2.2 AA)`);
       const expected = await page.evaluate(async () => {
         const { getLocale, t } = await import('/src/i18n.js');
         return {
@@ -1195,6 +1196,7 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       await page.waitForSelector('#settings-menu:popover-open #saved-views-manager', { timeout: 5_000 });
       assert((await page.locator('#settings-saved-views-title').textContent()) === expected.savedTitle, `${locale}: saved-view heading is not localized`);
       assert((await page.locator('#saved-views-manager .settings-help').textContent()) === expected.savedEmpty, `${locale}: saved-view empty state is not localized`);
+      await assertNoAxeViolations(page, `${locale} settings (WCAG 2.2 AA)`, '#settings-menu');
       await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
 
       await clickHeaderAction(page, '#toggle-table-view');
@@ -1216,6 +1218,9 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       await page.waitForSelector('#stats-panel:not([hidden]) .seasonal-outlook-banner', { timeout: 10_000 });
       assert((await page.locator('.sob-label').textContent()) === expected.seasonalLabel, `${locale}: seasonal heading is not localized`);
       assert((await page.locator('.sob-details summary').textContent()) === expected.seasonalHistory, `${locale}: seasonal disclosure is not localized`);
+
+      await openKatrinaPanel(page);
+      await assertNoAxeViolations(page, `${locale} storm panel (WCAG 2.2 AA)`, '#storm-panel');
     } finally {
       await context.close();
     }

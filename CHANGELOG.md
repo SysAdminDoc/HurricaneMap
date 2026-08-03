@@ -11,6 +11,8 @@ All notable changes to HurricaneMap.
 - The linked self-hosting, Cloudflare, GOES, quality-plan, and licensing documents are now publishable GitHub files, with a build gate ensuring every relative README link resolves to a tracked target.
 - All browser data and optional-feed requests now share finite, per-feed `AbortSignal.timeout()` budgets, including radar probes and the module worker, with a static guard against reintroducing bare `fetch()` calls.
 - The i18n contract now verifies that each supported locale updates the document language metadata used by screen readers.
+- The browser accessibility smoke now scans the main view, settings, and storm panel independently in English, Spanish, and Haitian Creole.
+- The saved-view file picker now has an explicit localized label, keeping the expanded settings surface axe-clean.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 

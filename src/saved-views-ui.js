@@ -28,7 +28,8 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
         <button class="settings-action" data-action="save" type="button">${escapeHtml(t('savedViews.saveCurrent'))}</button>
         <button class="settings-action" data-action="export" type="button"${views.length ? '' : ' disabled'}>${escapeHtml(t('savedViews.exportJson'))}</button>
         <button class="settings-action" data-action="choose-import" type="button">${escapeHtml(t('savedViews.importJson'))}</button>
-        <input class="visually-hidden" data-saved-view-file type="file" accept=".json,application/json" />
+        <label class="sr-only" for="saved-view-file">${escapeHtml(t('savedViews.importJson'))}</label>
+        <input id="saved-view-file" class="visually-hidden" data-saved-view-file type="file" accept=".json,application/json" />
       </div>
       <div class="saved-view-status" role="status" aria-live="polite"></div>
       ${preview ? importPreviewMarkup(preview, importMode) : ''}
