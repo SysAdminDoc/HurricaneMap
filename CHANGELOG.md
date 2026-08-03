@@ -10,6 +10,7 @@ All notable changes to HurricaneMap.
 - Leaflet’s disputed upstream advisory is now represented as a permanent, cited security decision with `check:popup-sinks` as its compensating control; the Playwright smoke injects a poisoned advisory fixture and verifies it stays inert text.
 - The linked self-hosting, Cloudflare, GOES, quality-plan, and licensing documents are now publishable GitHub files, with a build gate ensuring every relative README link resolves to a tracked target.
 - All browser data and optional-feed requests now share finite, per-feed `AbortSignal.timeout()` budgets, including radar probes and the module worker, with a static guard against reintroducing bare `fetch()` calls.
+- The i18n contract now verifies that each supported locale updates the document language metadata used by screen readers.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 

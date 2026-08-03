@@ -1,8 +1,13 @@
 // Locale contract: every locale carries the full key set (no silent EN
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
-import { STRINGS, interpolate, t } from '../src/i18n.js';
+import { getLocale, setLocale, STRINGS, interpolate, t } from '../src/i18n.js';
 import { readFileSync } from 'node:fs';
+
+globalThis.document = {
+  documentElement: { lang: 'en' },
+  dispatchEvent() {},
+};
 
 function assert(condition, message) {
   if (!condition) {
@@ -37,6 +42,11 @@ assert(t('status.landfalls', 42) === '42 landfalls', 'placeholder substitution f
 assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated placeholders should all resolve');
 assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
 assert(t('nonexistent.key') === 'nonexistent.key', 'unknown keys should echo the key');
+for (const locale of ['en', 'es', 'ht']) {
+  setLocale(locale);
+  assert(getLocale() === locale, `setLocale did not select ${locale}`);
+  assert(document.documentElement.lang === locale, `document language did not update to ${locale}`);
+}
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const staticKeys = [...html.matchAll(/data-i18n(?:-html|-title|-placeholder|-aria-label)?="([^"]+)"/g)]
