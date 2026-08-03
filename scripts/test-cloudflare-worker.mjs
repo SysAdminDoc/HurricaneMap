@@ -37,6 +37,8 @@ const response = applyResponseHeaders(new Response('ok', {
   },
 }), cachePolicyFor('/src/main.js'));
 assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff', 'worker should set nosniff');
+assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin-when-cross-origin', 'worker should set the referrer policy');
+assert.equal(response.headers.get('Permissions-Policy'), 'geolocation=(self), microphone=(), camera=()', 'worker should preserve same-origin geolocation and deny unused sensors');
 assert.match(response.headers.get('Vary'), /Accept-Encoding/, 'worker should vary on compression support');
 assert.match(response.headers.get('Cloudflare-CDN-Cache-Control'), /stale-while-revalidate/, 'worker should set Cloudflare CDN cache policy');
 

@@ -147,7 +147,7 @@ export function applyResponseHeaders(response, policy) {
   headers.set('Vary', appendVary(headers.get('Vary'), 'Accept-Encoding'));
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  headers.set('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

@@ -6,6 +6,7 @@ All notable changes to HurricaneMap.
 
 ### Fixed
 - Closest-approach and city return-period queries now measure the great-circle track segments between HURDAT2 fixes, interpolate the location and intensity at the true closest point, and cover the Miami, Cape Hatteras, New York, and segment-only regression cases.
+- The Cloudflare Worker now permits same-origin geolocation while continuing to deny microphone and camera access, and its policy test locks the complete security-header contract.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 
