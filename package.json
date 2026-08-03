@@ -11,6 +11,7 @@
     "check:syntax": "node scripts/check-syntax.mjs",
     "check:sw": "node scripts/check-service-worker.mjs",
     "check:styles": "node scripts/check-style-layers.mjs",
+    "check:readme-links": "node scripts/check-readme-links.mjs",
     "check:release-truth": "node scripts/check-release-truth.mjs",
     "check:licenses": "node scripts/check-licenses.mjs",
     "check:security": "node scripts/check-dependency-security.mjs",

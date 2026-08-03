@@ -46,6 +46,9 @@ audit-*.png
 # Markdown files local-only (except README)
 *.md
 !README.md
+!docs/
+!docs/**/*.md
+!LICENSE.md
 
 # AI config
 AGENTS.md
