@@ -96,6 +96,7 @@ const SHELL_ASSETS = [
   './src/impact-coverage.js',
   './src/inflation.js',
   './src/metrics.js',
+  './src/network.js',
   './src/manifest-locale.js',
   './src/perf.js',
   './src/prep.js',

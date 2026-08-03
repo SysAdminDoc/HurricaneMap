@@ -9,6 +9,7 @@ All notable changes to HurricaneMap.
 - The Cloudflare Worker now permits same-origin geolocation while continuing to deny microphone and camera access, and its policy test locks the complete security-header contract.
 - Leaflet’s disputed upstream advisory is now represented as a permanent, cited security decision with `check:popup-sinks` as its compensating control; the Playwright smoke injects a poisoned advisory fixture and verifies it stays inert text.
 - The linked self-hosting, Cloudflare, GOES, quality-plan, and licensing documents are now publishable GitHub files, with a build gate ensuring every relative README link resolves to a tracked target.
+- All browser data and optional-feed requests now share finite, per-feed `AbortSignal.timeout()` budgets, including radar probes and the module worker, with a static guard against reintroducing bare `fetch()` calls.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 

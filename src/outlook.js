@@ -5,6 +5,7 @@
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const BASINS = ['atl', 'pac', 'cpac'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -112,7 +113,11 @@ export async function extractKmlFromKmz(input) {
 async function fetchBasin(basin, force) {
   const cached = cache.get(basin);
   if (!force && cached && Date.now() - cached.fetchedAt < CACHE_MS) return cached.points;
-  const response = await fetch(`/nhc/outlook/${basin}.kmz`, { cache: 'no-cache' });
+  const response = await fetchWithTimeout(
+    `/nhc/outlook/${basin}.kmz`,
+    { cache: 'no-cache' },
+    REQUEST_TIMEOUT_MS.active,
+  );
   if (!response.ok) {
     const error = new Error(`NHC ${basin} outlook returned ${response.status}`);
     error.responseStatus = response.status;

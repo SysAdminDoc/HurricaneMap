@@ -1,12 +1,13 @@
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const DATA_URL = new URL('../data/forecast-skill.json', import.meta.url);
 let dataPromise = null;
 
 export async function loadForecastSkill() {
   if (!dataPromise) {
-    dataPromise = fetch(DATA_URL).then(response => {
+    dataPromise = fetchWithTimeout(DATA_URL, {}, REQUEST_TIMEOUT_MS.data).then(response => {
       if (!response.ok) throw new Error(`Forecast skill data returned ${response.status}`);
       return response.json();
     }).catch(error => {

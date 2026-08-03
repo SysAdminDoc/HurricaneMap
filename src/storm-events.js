@@ -1,12 +1,13 @@
 // NOAA/NCEI Storm Events summary for hurricane landfall windows.
 
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 let stormEventsPromise = null;
 
 export async function loadStormEvents() {
   if (!stormEventsPromise) {
-    stormEventsPromise = fetch('./data/storm-events.json', { cache: 'no-cache' })
+    stormEventsPromise = fetchWithTimeout('./data/storm-events.json', { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.data)
       .then(response => {
         if (!response.ok) throw new Error(`Storm Events data returned ${response.status}`);
         return response.json();

@@ -31,6 +31,7 @@ export function isRetired(name, year) {
 // metadata.json  — generated data provenance, coverage, and source details.
 import { assertSupportedDataSchema } from './schema-contract.js';
 import { presentCategory, roundMetric } from './metric-presenters.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const DATA = {
   landfalls: [],
@@ -49,7 +50,7 @@ let stormsPromise = null;
 async function fetchJson(url, { optional = false, fallback = null, priority } = {}) {
   try {
     const init = priority ? { priority } : {};
-    const response = await fetch(url, init);
+    const response = await fetchWithTimeout(url, init, REQUEST_TIMEOUT_MS.data);
     if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
     return await response.json();
   } catch (error) {
@@ -93,7 +94,7 @@ export function getBillionsFor(stormId) {
 
 function loadStormsViaWorker() {
   return new Promise((resolve) => {
-    const worker = new Worker('src/storms-worker.js');
+    const worker = new Worker('src/storms-worker.js', { type: 'module' });
     worker.addEventListener('message', (e) => {
       worker.terminate();
       if (e.data.ok && Array.isArray(e.data.storms)) resolve(e.data.storms);
@@ -107,7 +108,7 @@ function loadStormsViaWorker() {
 async function fetchStormsCompressed() {
   if (typeof DecompressionStream !== 'function') return fetchJson('data/storms.json');
   try {
-    const res = await fetch('data/storms.json.gz');
+    const res = await fetchWithTimeout('data/storms.json.gz', {}, REQUEST_TIMEOUT_MS.data);
     if (!res.ok) throw new Error(res.status);
     const ds = new DecompressionStream('gzip');
     const reader = res.body.pipeThrough(ds).getReader();

@@ -7,6 +7,7 @@
 // zone (no geometry math needed); zone polygons come from the CORS-enabled
 // api.weather.gov /zones endpoint and are cached for the session.
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const API_BASE = 'https://api.weather.gov';
 const TROPICAL_EVENTS = [
@@ -15,7 +16,6 @@ const TROPICAL_EVENTS = [
   'Tropical Storm Warning',
   'Tropical Storm Watch',
 ];
-const REQUEST_TIMEOUT_MS = 12 * 1000;
 const ALERTS_CACHE_MS = 10 * 60 * 1000;
 const ZONE_FETCH_CONCURRENCY = 8;
 const MAX_ZONES = 250;
@@ -118,29 +118,22 @@ export function hazardLabel(hazard) {
   return t(`alerts.${hazard}`);
 }
 
-async function fetchWithTimeout(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: { Accept: 'application/geo+json' },
-    });
-    if (!response.ok) {
-      const error = new Error(`${url} returned ${response.status}`);
-      error.responseStatus = response.status;
-      throw error;
-    }
-    return await response.json();
-  } finally {
-    clearTimeout(timeout);
+async function fetchAlertsJson(url) {
+  const response = await fetchWithTimeout(url, {
+    headers: { Accept: 'application/geo+json' },
+  }, REQUEST_TIMEOUT_MS.alerts);
+  if (!response.ok) {
+    const error = new Error(`${url} returned ${response.status}`);
+    error.responseStatus = response.status;
+    throw error;
   }
+  return response.json();
 }
 
 async function fetchActiveAlerts(force = false) {
   const now = Date.now();
   if (!force && alertsCache && now - alertsCache.fetchedAt < ALERTS_CACHE_MS) return alertsCache.features;
-  const data = await fetchWithTimeout(buildAlertsUrl());
+  const data = await fetchAlertsJson(buildAlertsUrl());
   const features = Array.isArray(data?.features) ? data.features : [];
   alertsCache = { fetchedAt: now, features };
   return features;
@@ -160,7 +153,7 @@ async function resolveZoneGeometries(zoneIds) {
       const zoneId = missing[cursor];
       cursor += 1;
       try {
-        const data = await fetchWithTimeout(buildZoneUrl(zoneId));
+        const data = await fetchAlertsJson(buildZoneUrl(zoneId));
         if (data?.geometry) zoneGeometryCache.set(zoneId, data.geometry);
       } catch {
         // Missing/renamed zone — skip; the rest of the overlay still renders.

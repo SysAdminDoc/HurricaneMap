@@ -6,6 +6,8 @@
 // the result as a first-pass planning metric, not a census-block exposure
 // model.
 
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+
 const NM2_TO_SQMI = 1.324293337;
 const DEFAULT_LANDFALL_WINDOW_HOURS = 18;
 
@@ -55,7 +57,7 @@ export function buildStateDensityIndex(usStatesGeojson) {
 
 export async function ensureExposureDensitiesLoaded(url = './data/us-states.geojson') {
   if (cachedStateDensities) return cachedStateDensities;
-  const res = await fetch(url, { cache: 'force-cache' });
+  const res = await fetchWithTimeout(url, { cache: 'force-cache' }, REQUEST_TIMEOUT_MS.data);
   if (!res.ok) throw new Error(`Population density index unavailable (${res.status})`);
   cachedStateDensities = buildStateDensityIndex(await res.json());
   return cachedStateDensities;

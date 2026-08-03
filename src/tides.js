@@ -14,19 +14,19 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
 } from './optional-feeds.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 const MAX_STATIONS = 3;
 const MAX_KM = 150;
 const WINDOW_HOURS = 48;
-const REQUEST_TIMEOUT_MS = 12_000;
 const REQUEST_ATTEMPTS = 2;
 
 let stationsPromise = null;
 
 function loadStations() {
   if (!stationsPromise) {
-    stationsPromise = fetch('data/tide-stations.json')
+    stationsPromise = fetchWithTimeout('data/tide-stations.json', {}, REQUEST_TIMEOUT_MS.data)
       .then(res => (res.ok ? res.json() : null))
       .catch(() => null);
   }
@@ -90,21 +90,17 @@ export function peakResidual(observed, predicted, { centerTime = null, windowHou
 
 export async function fetchWithRetry(url, {
   attempts = REQUEST_ATTEMPTS,
-  timeoutMs = REQUEST_TIMEOUT_MS,
-  fetchImpl = fetch,
+  timeoutMs = REQUEST_TIMEOUT_MS.tides,
+  fetchImpl = globalThis.fetch,
 } = {}) {
   let lastResponse = null;
   for (let attempt = 0; attempt < attempts; attempt++) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetchImpl(url, { signal: controller.signal, cache: 'no-cache' });
+      const response = await fetchWithTimeout(url, { cache: 'no-cache' }, timeoutMs, fetchImpl);
       lastResponse = response;
       if (response.ok || (response.status < 500 && response.status !== 429)) return response;
     } catch {
       // Retry timeouts and transient network failures.
-    } finally {
-      clearTimeout(timeout);
     }
   }
   return lastResponse;

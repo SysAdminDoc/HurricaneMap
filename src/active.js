@@ -26,6 +26,7 @@ import { loadUserPoint } from './user-point.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
 import { getSetting } from './settings.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { clearTropicalOutlook, renderTropicalOutlook } from './outlook.js';
 import { clearMarineWarnings, renderMarineWarnings } from './marine-warnings.js';
 import {
@@ -41,7 +42,6 @@ const L = window.L;
 const NHC_DIRECT = 'https://www.nhc.noaa.gov/CurrentStorms.json';
 const NHC_CF_PROXY = '/nhc/CurrentStorms.json';
 const NHC_FALLBACK = 'https://corsproxy.io/?url=' + encodeURIComponent(NHC_DIRECT);
-const REQUEST_TIMEOUT_MS = 12 * 1000;
 
 let layerGroup = null;
 let badgeEl = null;
@@ -180,24 +180,12 @@ function resolveProxyUrl() {
   return NHC_CF_PROXY;
 }
 
-async function tryFetch(url, signal) {
-  const response = await fetch(url, { cache: 'no-cache', signal });
+async function tryFetch(url) {
+  const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
   if (response.status === 429) return { ok: false, status: 429, storms: [] };
   if (!response.ok) return { ok: false, status: response.status || 0, storms: [] };
   const data = await response.json();
   return { ok: true, status: response.status, storms: (data && data.activeStorms) || [] };
-}
-
-async function tryFetchWithTimeout(url) {
-  // Per-attempt controller: a hung primary must not consume the fallback's
-  // abort budget too.
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    return await tryFetch(url, controller.signal);
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 async function fetchCurrentStorms() {
@@ -205,14 +193,14 @@ async function fetchCurrentStorms() {
   const fallbackUrl = primaryUrl === NHC_CF_PROXY ? NHC_FALLBACK : NHC_CF_PROXY;
   let primary = null;
   try {
-    primary = await tryFetchWithTimeout(primaryUrl);
+    primary = await tryFetch(primaryUrl);
     // Honor rate-limit backoff without hammering the fallback.
     if (primary.ok || primary.status === 429) return primary;
   } catch { /* primary threw — fall through to fallback */ }
   // Hosts without the Cloudflare /nhc/ route (e.g. GitHub Pages) return 404
   // here rather than throwing, so non-ok results must also trigger fallback.
   try {
-    return await tryFetchWithTimeout(fallbackUrl);
+    return await tryFetch(fallbackUrl);
   } catch (error) {
     return primary || { ok: false, status: 0, storms: [], error };
   }

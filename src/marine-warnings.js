@@ -4,6 +4,7 @@
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const URLS = ['/nhc/marine/atlantic.kml', '/nhc/marine/pacific.kml'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -45,7 +46,7 @@ export function parseMarineWarningKml(kml) {
 async function fetchWarnings(force) {
   if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) return cache.features;
   const results = await Promise.allSettled(URLS.map(async url => {
-    const response = await fetch(url, { cache: 'no-cache' });
+    const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
     if (!response.ok) {
       const error = new Error(`${url} returned ${response.status}`);
       error.responseStatus = response.status;

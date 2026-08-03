@@ -1,3 +1,5 @@
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+
 // NHC Peak Storm Surge forecast layer for active storms.
 //
 // Source: mapservices.weather.noaa.gov NHC_PeakStormSurge MapServer
@@ -75,7 +77,11 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
     let features = cache && now - cache.fetchedAt < CACHE_MS ? cache.features : null;
     const cacheOrigin = features ? 'memory' : 'network';
     if (!features) {
-      const response = await fetch(buildPeakSurgeQueryUrl(), { cache: 'no-cache' });
+      const response = await fetchWithTimeout(
+        buildPeakSurgeQueryUrl(),
+        { cache: 'no-cache' },
+        REQUEST_TIMEOUT_MS.active,
+      );
       if (generation !== renderGeneration) return { status: 'stale', featureCount: 0 };
       if (!response.ok) {
         const error = new Error(`peak surge query returned ${response.status}`);

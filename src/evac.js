@@ -6,12 +6,12 @@ import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
 import { getMapOverlayColor } from './map-colors.js';
 import { hidePanel, showPanel } from './panels.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 export const FLORIDA_ZONE_LAYER = 'https://services.arcgis.com/3wFbqsFPLeKqOlIK/arcgis/rest/services/KYZ_ZL_Vector_Enriched_Calculated_20230608/FeatureServer/46';
 export const ARCGIS_GEOCODER = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates';
 export const FLORIDA_KNOW_YOUR_ZONE = 'https://www.floridadisaster.org/knowyourzone/';
 
-const REQUEST_TIMEOUT_MS = 12000;
 const FLORIDA_BOUNDS = { west: -87.75, south: 24.35, east: -79.75, north: 31.15 };
 
 function finiteCoordinate(value) {
@@ -169,13 +169,16 @@ function markLocation(lat, lon) {
 async function fetchJson(url) {
   requestController?.abort();
   requestController = new AbortController();
-  const timeout = setTimeout(() => requestController?.abort(), REQUEST_TIMEOUT_MS);
+  const controller = requestController;
   try {
-    const response = await fetch(url, { signal: requestController.signal, headers: { Accept: 'application/json' } });
+    const response = await fetchWithTimeout(url, {
+      signal: controller.signal,
+      headers: { Accept: 'application/json' },
+    }, REQUEST_TIMEOUT_MS.evacuation);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return await response.json();
   } finally {
-    clearTimeout(timeout);
+    if (requestController === controller) requestController = null;
   }
 }
 

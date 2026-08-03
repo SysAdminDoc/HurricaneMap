@@ -12,6 +12,7 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
 } from './optional-feeds.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const CPC_URL = 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
 
@@ -52,7 +53,7 @@ export async function fetchSeasonalOutlook() {
   // missing file degrades to the link-only banner.
   beginOptionalFeed('seasonal', { cacheOrigin: 'bundled' });
   try {
-    const response = await fetch('data/outlook.json');
+    const response = await fetchWithTimeout('data/outlook.json', {}, REQUEST_TIMEOUT_MS.data);
     if (response.ok) {
       const data = await response.json();
       if (data && Number.isInteger(data.season) && Array.isArray(data.sources)) {

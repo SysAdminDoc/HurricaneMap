@@ -7,6 +7,7 @@ import { hidePanel, showPanel } from './panels.js';
 import { redraw } from './timeline.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const panel = document.getElementById('state-panel');
 const body = document.getElementById('state-body');
@@ -31,7 +32,7 @@ export async function enableStateClicks(map) {
     map.createPane('statesPane');
     map.getPane('statesPane').style.zIndex = 350;
   }
-  stateBoundariesPromise = fetch('data/us-states.geojson')
+  stateBoundariesPromise = fetchWithTimeout('data/us-states.geojson', {}, REQUEST_TIMEOUT_MS.data)
     .then(r => r.json())
     .then(gj => {
       stateLayer = L.geoJSON(gj, {

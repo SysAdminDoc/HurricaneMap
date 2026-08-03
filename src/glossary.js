@@ -1,6 +1,7 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { activateDialogFocus } from './dialog-focus.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // Glossary management — meteorological and hurricane terminology.
 //
@@ -16,7 +17,7 @@ let releaseGlossaryFocus = null;
 export async function loadGlossary() {
   if (glossaryData) return glossaryData;
   try {
-    const resp = await fetch('./data/glossary.json');
+    const resp = await fetchWithTimeout('./data/glossary.json', {}, REQUEST_TIMEOUT_MS.data);
     if (!resp.ok) throw new Error(`glossary.json: ${resp.status}`);
     glossaryData = await resp.json();
     // Build lookup map for quick access

@@ -43,6 +43,7 @@ import {
 } from './optional-feeds.js';
 import { cacheRadarPack, isQuotaExceededError } from './storage-manager.js';
 import { buildRadarProbeTimes } from './radar-utils.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -63,7 +64,7 @@ let manifestPromise = null;
 function loadManifest() {
   if (manifest) return Promise.resolve(manifest);
   if (manifestPromise) return manifestPromise;
-  manifestPromise = fetch(MANIFEST_URL)
+  manifestPromise = fetchWithTimeout(MANIFEST_URL, {}, REQUEST_TIMEOUT_MS.data)
     .then(r => r.ok ? r.json() : {})
     .catch(() => ({}))
     .then(m => { manifest = m; return m; });
@@ -141,7 +142,7 @@ async function findRemoteNearest(region, target, maxMinutes = 60) {
   for (const probe of buildRadarProbeTimes(target, maxMinutes, 5)) {
     const url = buildIemUrl(region, probe);
     try {
-      const r = await fetch(url, { method: 'HEAD' });
+      const r = await fetchWithTimeout(url, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
       if (r.ok) return { url, date: probe, source: 'remote' };
     } catch (_) { /* keep probing */ }
   }
@@ -341,7 +342,7 @@ export class RadarOverlay {
     this.setStatus('Loading…');
     beginOptionalFeed('radar');
     try {
-      const r = await fetch(url, { method: 'HEAD' });
+      const r = await fetchWithTimeout(url, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
       if (session !== this.session) return;
       if (!r.ok) {
         failOptionalFeed('radar', { responseStatus: r.status });
@@ -406,7 +407,7 @@ export class RadarOverlay {
         const d = roundToMinutes(new Date(start.getTime() + m * 60 * 1000), 5);
         const u = buildIemUrl(this.region, d);
         try {
-          const r = await fetch(u, { method: 'HEAD' });
+          const r = await fetchWithTimeout(u, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
           if (r.ok) frames.push({ ts: dateToStamp(d), date: d, url: u });
         } catch (_) { /* skip */ }
       }

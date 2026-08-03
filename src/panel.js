@@ -40,6 +40,7 @@ import { clearRiskTrajectories } from './art-mode.js';
 import { presentPressure } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
 import { formatClosest, wirePanelControls } from './panel-controls.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -709,7 +710,7 @@ async function renderHwmRow(host, storm) {
 let rainfallPromise = null;
 function loadRainfall() {
   if (!rainfallPromise) {
-    rainfallPromise = fetch('./data/rainfall.json')
+    rainfallPromise = fetchWithTimeout('./data/rainfall.json', {}, REQUEST_TIMEOUT_MS.data)
       .then(res => res.ok ? res.json() : null)
       .catch(() => null);
   }

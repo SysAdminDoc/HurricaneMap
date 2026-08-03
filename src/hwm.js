@@ -4,6 +4,7 @@
 // data/surge-obs/<STORMID>.json ([[lat, lon, elev_ft, env], ...]).
 import { getMap } from './map.js';
 import { t } from './i18n.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 let indexPromise = null;
 let layerGroup = null;
@@ -12,7 +13,7 @@ let renderGeneration = 0;
 
 function loadIndex() {
   if (!indexPromise) {
-    indexPromise = fetch('data/surge-obs/index.json')
+    indexPromise = fetchWithTimeout('data/surge-obs/index.json', {}, REQUEST_TIMEOUT_MS.data)
       .then(res => (res.ok ? res.json() : null))
       .catch(() => null);
   }
@@ -35,7 +36,7 @@ function elevationColor(ft) {
 export async function showHwm(stormId) {
   const generation = ++renderGeneration;
   removeLayerGroup();
-  const response = await fetch(`data/surge-obs/${stormId}.json`).catch(() => null);
+  const response = await fetchWithTimeout(`data/surge-obs/${stormId}.json`, {}, REQUEST_TIMEOUT_MS.data).catch(() => null);
   if (generation !== renderGeneration) return 0;
   if (!response?.ok) return 0;
   const points = await response.json();

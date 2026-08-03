@@ -58,7 +58,13 @@ const retried = await fetchWithRetry('https://example.test/tides', {
   fetchImpl: (_url, { signal }) => {
     attempts += 1;
     if (attempts === 1) {
-      return new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true }));
+      return new Promise((resolve, reject) => {
+        const keepAlive = setTimeout(() => reject(new Error('test request unexpectedly resolved')), 1000);
+        signal.addEventListener('abort', () => {
+          clearTimeout(keepAlive);
+          reject(new Error('aborted'));
+        }, { once: true });
+      });
     }
     return Promise.resolve({ ok: true, status: 200 });
   },

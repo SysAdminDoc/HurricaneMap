@@ -1,3 +1,5 @@
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+
 // Official NHC forecast context for active storms.
 //
 // Uses Esri/NHC's active-hurricane FeatureServer GeoJSON layers:
@@ -198,7 +200,11 @@ async function fetchOfficialForecastLayers(activeStorms, { force = false } = {})
 }
 
 async function fetchFeatureLayer(layerId) {
-  const response = await fetch(buildNHCFeatureQueryUrl(layerId), { cache: 'no-cache' });
+  const response = await fetchWithTimeout(
+    buildNHCFeatureQueryUrl(layerId),
+    { cache: 'no-cache' },
+    REQUEST_TIMEOUT_MS.cone,
+  );
   if (!response.ok) {
     const error = new Error(`NHC layer ${layerId} returned ${response.status}`);
     error.responseStatus = response.status;

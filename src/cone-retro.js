@@ -11,6 +11,7 @@ import {
   initialBearingDeg,
   toDegrees,
 } from './geodesy.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const RADII_URL = new URL('../data/cone-radii.json', import.meta.url);
 let radiiPromise = null;
@@ -21,7 +22,7 @@ let renderGeneration = 0;
 
 export async function loadConeRadii() {
   if (!radiiPromise) {
-    radiiPromise = fetch(RADII_URL).then(response => {
+    radiiPromise = fetchWithTimeout(RADII_URL, {}, REQUEST_TIMEOUT_MS.cone).then(response => {
       if (!response.ok) throw new Error(`Cone radii returned ${response.status}`);
       return response.json();
     }).catch(error => {

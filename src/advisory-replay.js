@@ -12,6 +12,7 @@ import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { buildConeEnvelope, loadConeRadii } from './cone-retro.js';
 import { getMapOverlayColor } from './map-colors.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const ADVISORIES_URL = new URL('../data/advisories.json', import.meta.url);
 
@@ -22,7 +23,7 @@ let renderGeneration = 0;
 
 export async function loadAdvisories() {
   if (!advisoriesPromise) {
-    advisoriesPromise = fetch(ADVISORIES_URL).then(response => {
+    advisoriesPromise = fetchWithTimeout(ADVISORIES_URL, {}, REQUEST_TIMEOUT_MS.advisory).then(response => {
       if (!response.ok) throw new Error(`Advisory archive returned ${response.status}`);
       return response.json();
     }).catch(error => {

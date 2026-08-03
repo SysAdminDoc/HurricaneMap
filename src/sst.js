@@ -1,4 +1,5 @@
 import { getMap } from './map.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const L = window.L;
 
@@ -32,7 +33,7 @@ function resolveLatestTime() {
   if (!latestTimePromise) {
     latestTimePromise = (async () => {
       try {
-        const response = await fetch(LATEST_TIME_PROBE);
+        const response = await fetchWithTimeout(LATEST_TIME_PROBE, {}, REQUEST_TIMEOUT_MS.default);
         if (response.ok) {
           const data = await response.json();
           const iso = data?.table?.rows?.[0]?.[0];
