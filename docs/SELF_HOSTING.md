@@ -19,8 +19,9 @@ Open `http://127.0.0.1:8080/`.
 ## Notes
 
 - The container runs as a non-root `hurricanemap` user.
+- The Docker base is pinned to `python:3.12-alpine@sha256:6d43704baacd1bfbe7c295d7f13079d5d8104ed33568873133f8fc69980419df`; update it only as an intentional, reviewed image refresh.
 - Port `8080` is exposed.
-- The bundled `serve.py` adds the primary-document security headers, including `form-action 'none'` and `frame-ancestors 'self'`, to `/` and `/index.html`.
+- The bundled `serve.py` applies `Cache-Control: no-cache`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin` to every response. It adds the primary-document CSP, including `form-action 'none'` and `frame-ancestors 'self'`, to `/` and `/index.html`. Plain `python -m http.server` does not provide these deployment headers and is not equivalent.
 - The healthcheck requests `/data/metadata.json`, which verifies both the web server and the generated data bundle.
 - The image includes the committed `data/` directory, including historical radar frames. This makes self-hosting useful in offline or poor-connectivity environments, but it also means the image can be large.
 - `.dockerignore` excludes local development artifacts, node modules, temporary Playwright outputs, git metadata, and untracked screenshots.

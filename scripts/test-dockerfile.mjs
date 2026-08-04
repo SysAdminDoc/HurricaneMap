@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 const dockerfile = await readFile(new URL('../Dockerfile', import.meta.url), 'utf8');
 const dockerignore = await readFile(new URL('../.dockerignore', import.meta.url), 'utf8');
 
-assert.match(dockerfile, /^FROM python:3\.12-alpine/m, 'Dockerfile should use the lightweight Python 3.12 Alpine runtime');
+assert.match(dockerfile, /^FROM python:3\.12-alpine@sha256:[a-f0-9]{64}$/m, 'Dockerfile should use a digest-pinned lightweight Python 3.12 Alpine runtime');
 assert.match(dockerfile, /WORKDIR \/app/, 'Dockerfile should serve from /app');
 assert.match(dockerfile, /EXPOSE 8080/, 'Dockerfile should expose port 8080');
 assert.match(dockerfile, /USER hurricanemap/, 'Dockerfile should run as a non-root user');

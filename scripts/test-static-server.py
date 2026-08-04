@@ -36,16 +36,20 @@ try:
     assert primary.status == 200
     assert "form-action 'none'" in csp
     assert "frame-ancestors 'self'" in csp
+    assert 'https://www.fema.gov' in csp
+    assert primary.getheader('Cache-Control') == 'no-cache'
     assert primary.getheader('X-Content-Type-Options') == 'nosniff'
     assert primary.getheader('Referrer-Policy') == 'strict-origin-when-cross-origin'
 
     globe = fetch('/globe.html')
     assert globe.status == 200
     assert globe.getheader('Content-Security-Policy') is None
+    assert globe.getheader('Cache-Control') == 'no-cache'
 
     data = fetch('/data/metadata.json')
     assert data.status == 200
     assert data.getheader('Content-Security-Policy') is None
+    assert data.getheader('Cache-Control') == 'no-cache'
 finally:
     server.shutdown()
     server.server_close()

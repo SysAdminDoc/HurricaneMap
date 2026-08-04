@@ -13,9 +13,10 @@ CONTENT_SECURITY_POLICY = (
     "https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org "
     "https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com "
     "https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu "
-    "https://www.nhc.noaa.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; "
+    "https://www.nhc.noaa.gov https://www.fema.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; "
     "frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self';"
 )
+CACHE_CONTROL = 'no-cache'
 
 
 class HurricaneMapHandler(SimpleHTTPRequestHandler):
@@ -23,6 +24,7 @@ class HurricaneMapHandler(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == '/' or path.endswith('/index.html'):
             self.send_header('Content-Security-Policy', CONTENT_SECURITY_POLICY)
+        self.send_header('Cache-Control', CACHE_CONTROL)
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Referrer-Policy', 'strict-origin-when-cross-origin')
         super().end_headers()
