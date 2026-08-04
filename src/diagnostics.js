@@ -5,6 +5,7 @@ import { announceLocalAction } from './confirm-action.js';
 import { formatStorageBytes, inspectStorage } from './storage-manager.js';
 import {
   getServiceWorkerDiagnostics,
+  requestOfflineIntegrityCheck,
   requestOfflineDataRepair,
   retryServiceWorkerRegistration,
 } from './sw-updates.js';
@@ -58,6 +59,9 @@ export function buildSanitizedSupportBundle({
         message: sanitizeDiagnosticText(serviceWorker.lastError.message),
       }
     : null;
+  const integrityState = ['intact', 'evicted', 'stale-but-valid', 'invalid', 'unverified'].includes(serviceWorker.offlineIntegrity)
+    ? serviceWorker.offlineIntegrity
+    : 'unverified';
   return {
     schema_version: SUPPORT_BUNDLE_SCHEMA_VERSION,
     generated_at: generatedAt,
@@ -72,6 +76,11 @@ export function buildSanitizedSupportBundle({
       controller: String(serviceWorker.controller || 'uncontrolled'),
       scope: serviceWorker.scope ? sanitizeDiagnosticText(serviceWorker.scope) : null,
       script_url: serviceWorker.scriptUrl ? '[service-worker-script]' : null,
+    },
+    offline_integrity: {
+      state: integrityState,
+      error: serviceWorker.offlineIntegrityError ? sanitizeDiagnosticText(serviceWorker.offlineIntegrityError) : null,
+      checked_at_utc: typeof serviceWorker.offlineIntegrityCheckedAt === 'string' ? serviceWorker.offlineIntegrityCheckedAt : null,
     },
     storage: {
       persisted: Boolean(storage.persisted),
@@ -165,6 +174,7 @@ export async function renderOfflineDiagnostics(host) {
       <span><strong>${escapeHtml(t('diagnostics.controller'))}</strong>${escapeHtml(t(`diagnostics.controller.${bundle.service_worker.controller}`))}</span>
       <span><strong>${escapeHtml(t('diagnostics.storage'))}</strong>${escapeHtml(formatStorageBytes(bundle.storage.usage_bytes))} / ${escapeHtml(formatStorageBytes(bundle.storage.quota_bytes))}</span>
       <span><strong>${escapeHtml(t('diagnostics.release'))}</strong>${escapeHtml(t(`diagnostics.release.${bundle.release.state}`))}</span>
+      <span><strong>${escapeHtml(t('diagnostics.integrity'))}</strong>${escapeHtml(t(`diagnostics.integrity.${bundle.offline_integrity.state}`))}</span>
     </div>
     <div class="diagnostics-caches" role="list">
       ${bundle.storage.scopes.map(scope => `<span role="listitem"><strong>${escapeHtml(t(`storage.scope.${scope.id}`))}</strong><small>${escapeHtml(scope.cache_name || t('diagnostics.notInstalled'))} · ${scope.entries} · ${escapeHtml(formatStorageBytes(scope.size_bytes))}</small></span>`).join('')}
@@ -174,8 +184,9 @@ export async function renderOfflineDiagnostics(host) {
       <span>${bundle.optional_feeds.map(feed => `${escapeHtml(feed.id)}: ${escapeHtml(formatDiagnosticAge(feed.last_success_age_ms))}`).join(' · ')}</span>
     </div>
     ${bundle.errors.length ? `<p class="diagnostics-error" role="status">${escapeHtml(bundle.errors[0].name)}: ${escapeHtml(bundle.errors[0].message)}</p>` : ''}
+    ${bundle.offline_integrity.error ? `<p class="diagnostics-error" role="status">${escapeHtml(t('diagnostics.integrityDetail'))}: ${escapeHtml(bundle.offline_integrity.error)}</p>` : ''}
     <div class="diagnostics-actions">
-      <button class="settings-action" type="button" data-diagnostics-repair>${escapeHtml(t('diagnostics.repair'))}</button>
+      <button class="settings-action" type="button" data-diagnostics-repair>${escapeHtml(bundle.offline_integrity.state === 'intact' ? t('diagnostics.repair') : t('diagnostics.repairNow'))}</button>
       <button class="settings-action" type="button" data-diagnostics-retry>${escapeHtml(t('diagnostics.retry'))}</button>
       <button class="settings-action" type="button" data-diagnostics-refresh>${escapeHtml(t('diagnostics.refresh'))}</button>
       <button class="settings-action" type="button" data-diagnostics-export>${escapeHtml(t('diagnostics.export'))}</button>
@@ -193,11 +204,13 @@ export function initOfflineDiagnostics(host = document.getElementById('offline-d
       repairButton.disabled = true;
       announceLocalAction(t('diagnostics.repairing'));
       const result = await requestOfflineDataRepair();
+      await requestOfflineIntegrityCheck();
       announceLocalAction(t(result?.ok ? 'diagnostics.repaired' : 'diagnostics.repairFailed'));
       repairButton.disabled = false;
       await refresh();
     } else if (event.target.closest('[data-diagnostics-retry]')) {
       await retryServiceWorkerRegistration();
+      await requestOfflineIntegrityCheck();
       await refresh();
     } else if (event.target.closest('[data-diagnostics-refresh]')) {
       await refresh();

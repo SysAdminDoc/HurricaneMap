@@ -198,6 +198,10 @@ self.addEventListener('message', (event) => {
   }
   if (event.data?.type === 'REPAIR_OFFLINE_DATA') {
     event.waitUntil(repairOfflineData(event));
+    return;
+  }
+  if (event.data?.type === 'CHECK_OFFLINE_INTEGRITY') {
+    event.waitUntil(reportOfflineIntegrity(event));
   }
 });
 
@@ -445,12 +449,12 @@ async function sha256Hex(body) {
   return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
 }
 
-async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB } = {}) {
+async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB, strictTuple = true } = {}) {
   const dataCache = await caches.open(cacheName);
   const markerResponse = await dataCache.match(RELEASE_MARKER_PATH);
   if (!markerResponse) throw new Error('Offline release marker is missing');
   const marker = parseReleaseManifest(await markerResponse.text());
-  if (marker.schema_version !== 1 || marker.sw_version !== SW_VERSION || marker.shell_cache !== SHELL_CACHE || marker.data_cache !== cacheName || marker.data_db !== dbName) {
+  if (marker.schema_version !== 1 || (strictTuple && (marker.sw_version !== SW_VERSION || marker.shell_cache !== SHELL_CACHE || marker.data_cache !== cacheName || marker.data_db !== dbName))) {
     throw new Error('Offline release tuple is incoherent');
   }
   const shellCache = await caches.open(SHELL_CACHE);
@@ -475,6 +479,61 @@ async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB 
     if (!keys.has(key)) throw new Error(`Offline database record is missing: ${key}`);
   }
   return marker;
+}
+
+async function classifyOfflineIntegrity() {
+  const checkedAt = new Date().toISOString();
+  const cacheNames = await caches.keys().catch(() => []);
+  if (!cacheNames.includes(SHELL_CACHE) || !cacheNames.includes(DATA_CACHE)) {
+    return { state: 'evicted', checked_at_utc: checkedAt, error: 'Offline shell or data cache is missing' };
+  }
+  try {
+    const dataCache = await caches.open(DATA_CACHE);
+    if (!await dataCache.match(RELEASE_MARKER_PATH)) {
+      return { state: 'evicted', checked_at_utc: checkedAt, error: 'Offline release marker is missing' };
+    }
+    try {
+      await validateReleaseBundle();
+      return { state: 'intact', checked_at_utc: checkedAt, error: null };
+    } catch (strictError) {
+      try {
+        await validateReleaseBundle({ strictTuple: false });
+        return {
+          state: 'stale-but-valid',
+          checked_at_utc: checkedAt,
+          error: String(strictError?.message || strictError).slice(0, 240),
+        };
+      } catch (relaxedError) {
+        const message = String(relaxedError?.message || relaxedError).slice(0, 240);
+        return {
+          state: /missing|unavailable/i.test(message) ? 'evicted' : 'invalid',
+          checked_at_utc: checkedAt,
+          error: message,
+        };
+      }
+    }
+  } catch (error) {
+    const message = String(error?.message || error).slice(0, 240);
+    return {
+      state: /missing|unavailable/i.test(message) ? 'evicted' : 'invalid',
+      checked_at_utc: checkedAt,
+      error: message,
+    };
+  }
+}
+
+async function reportOfflineIntegrity(event) {
+  let result;
+  try {
+    result = await classifyOfflineIntegrity();
+  } catch (error) {
+    result = {
+      state: 'invalid',
+      checked_at_utc: new Date().toISOString(),
+      error: String(error?.message || error).slice(0, 240),
+    };
+  }
+  event.source?.postMessage({ type: 'OFFLINE_INTEGRITY_RESULT', ...result });
 }
 
 async function repairOfflineData(event) {

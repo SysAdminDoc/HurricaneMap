@@ -225,6 +225,33 @@ export function selectBoundedRadarFrames(frames, limit = MAX_RADAR_PACK_FRAMES) 
   ));
 }
 
+export async function inspectRadarFrameCache(frames, {
+  cachesApi = globalThis.caches,
+  cacheName = 'hm-radar-v1',
+} = {}) {
+  const urls = [...new Set(
+    (Array.isArray(frames) ? frames : [])
+      .map(frame => typeof frame === 'string' ? frame : frame?.url)
+      .filter(url => typeof url === 'string' && /(?:^|\/)data\/radar\/.+\.png(?:\?|$)/.test(url)),
+  )];
+  const base = { state: 'unavailable', cached: 0, total: urls.length, urls };
+  if (!urls.length || !cachesApi) return base;
+  const cacheNames = await cachesApi.keys().catch(() => []);
+  if (!cacheNames.includes(cacheName)) return { ...base, state: 'empty' };
+  try {
+    const cache = await cachesApi.open(cacheName);
+    const cached = await Promise.all(urls.map(url => cache.match(url).then(Boolean).catch(() => false)));
+    const cachedCount = cached.filter(Boolean).length;
+    return {
+      ...base,
+      state: cachedCount === 0 ? 'empty' : cachedCount === urls.length ? 'complete' : 'partial',
+      cached: cachedCount,
+    };
+  } catch {
+    return base;
+  }
+}
+
 function readPackIndex(storage = globalThis.localStorage) {
   try {
     const parsed = JSON.parse(storage?.getItem(RADAR_PACKS_KEY) || '{}');

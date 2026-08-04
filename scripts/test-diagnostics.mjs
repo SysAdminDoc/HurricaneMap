@@ -6,6 +6,7 @@ import {
 } from '../src/diagnostics.js';
 import {
   getServiceWorkerDiagnostics,
+  requestOfflineIntegrityCheck,
   retryServiceWorkerRegistration,
 } from '../src/sw-updates.js';
 
@@ -61,6 +62,11 @@ assert.equal(bundle.schema_version, 1);
 assert.equal(bundle.app.version, '1.9.1');
 assert.equal(bundle.storage.radar_pack_count, 1);
 assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.1');
+assert.deepEqual(bundle.offline_integrity, {
+  state: 'unverified',
+  error: null,
+  checked_at_utc: null,
+});
 assert.equal(bundle.errors.length, 1);
 assert.match(bundle.errors[0].message, /\[path\]/);
 assert.doesNotMatch(serialized, /Alice|Private Street|private-name|private\.png|latitude|longitude|address|saved.?view|preparedness/i);
@@ -82,5 +88,36 @@ await retryServiceWorkerRegistration({
 });
 assert.equal(getServiceWorkerDiagnostics().registration, 'registered');
 assert.equal(getServiceWorkerDiagnostics().controller, 'controlled');
+
+const integrityListeners = new Set();
+const integrityNavigator = {
+  serviceWorker: {
+    controller: {
+      postMessage(message) {
+        if (message.type !== 'CHECK_OFFLINE_INTEGRITY') return;
+        queueMicrotask(() => integrityListeners.forEach(listener => listener({
+          data: {
+            type: 'OFFLINE_INTEGRITY_RESULT',
+            state: 'stale-but-valid',
+            error: 'old release tuple',
+            checked_at_utc: '2026-08-03T00:00:00.000Z',
+          },
+        })));
+      },
+    },
+    addEventListener(type, listener) {
+      if (type === 'message') integrityListeners.add(listener);
+    },
+    removeEventListener(type, listener) {
+      if (type === 'message') integrityListeners.delete(listener);
+    },
+  },
+};
+const integrityResult = await requestOfflineIntegrityCheck({ navigatorRef: integrityNavigator, documentRef: null });
+assert.deepEqual(integrityResult, {
+  state: 'stale-but-valid',
+  error: 'old release tuple',
+  checkedAt: '2026-08-03T00:00:00.000Z',
+});
 
 console.log('offline diagnostics ok (registration retry, cache/version bundle, privacy redaction)');

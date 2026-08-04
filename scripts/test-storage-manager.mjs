@@ -10,6 +10,7 @@ import {
   clearOptionalStorageScope,
   formatStorageBytes,
   inspectStorage,
+  inspectRadarFrameCache,
   isQuotaExceededError,
   selectBoundedRadarFrames,
   summarizeStorageEstimate,
@@ -87,6 +88,16 @@ const saved = await cacheRadarPack('AL012026', manyFrames.slice(0, 3), {
 });
 assert.equal(saved.saved, 3);
 assert.equal((await successfulCaches.open('hm-radar-v1')).values.size, 3);
+const radarCacheState = await inspectRadarFrameCache(
+  [...manyFrames.slice(0, 3), { url: 'data/radar/Test/not-cached.png' }],
+  { cachesApi: successfulCaches },
+);
+assert.deepEqual(
+  { state: radarCacheState.state, cached: radarCacheState.cached, total: radarCacheState.total },
+  { state: 'partial', cached: 3, total: 4 },
+);
+const emptyRadarCacheState = await inspectRadarFrameCache(manyFrames.slice(0, 1), { cachesApi: new FakeCaches() });
+assert.equal(emptyRadarCacheState.state, 'empty');
 
 const sourceBodies = new Map([
   [SOURCE_BUNDLE_ASSETS[0], 'atlantic source'],

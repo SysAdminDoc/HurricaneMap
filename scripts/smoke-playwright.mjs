@@ -290,6 +290,10 @@ async function openKatrinaPanel(page) {
     await panel.showStorm(landfall);
   });
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+  await page.waitForFunction(() => {
+    const status = document.querySelector('#radar-cache-status');
+    return status && ['complete', 'partial', 'empty', 'unavailable'].includes(status.dataset.state);
+  }, { timeout: 10000 });
 }
 
 async function openStormPanel(page, stormId) {

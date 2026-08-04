@@ -2295,6 +2295,20 @@ label > input[type="checkbox"] {
   color: var(--subtext);
 }
 
+.radar-cache-status {
+  margin-top: 0.45rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--surface0);
+  border-radius: 6px;
+  color: var(--subtext);
+  font-size: 0.72rem;
+}
+
+.radar-cache-status[data-state="complete"] { color: var(--green); }
+.radar-cache-status[data-state="partial"] { color: var(--yellow); }
+.radar-cache-status[data-state="empty"],
+.radar-cache-status[data-state="unavailable"] { color: var(--subtext); }
+
 .radar-close { color: var(--subtext); }
 
 @media (max-width: 720px) {

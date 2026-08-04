@@ -216,11 +216,28 @@ try {
     return module.collectOfflineDiagnostics();
   });
   assert(diagnostics.release?.state === 'coherent', `offline diagnostics did not report a coherent release: ${diagnostics.release?.state}`);
+  const integrityBeforeEviction = await page.evaluate(async () => {
+    const updates = await import('/src/sw-updates.js');
+    return updates.requestOfflineIntegrityCheck({ timeoutMs: 30000 });
+  });
+  assert(integrityBeforeEviction?.state === 'intact', `launch integrity check did not report intact: ${JSON.stringify(integrityBeforeEviction)}`);
+  const evicted = await page.evaluate(async cacheName => caches.delete(cacheName), releaseTuple.data_cache);
+  assert(evicted, `offline data cache could not be evicted for repair smoke: ${releaseTuple.data_cache}`);
+  const integrityAfterEviction = await page.evaluate(async () => {
+    const updates = await import('/src/sw-updates.js');
+    return updates.requestOfflineIntegrityCheck({ timeoutMs: 30000 });
+  });
+  assert(integrityAfterEviction?.state === 'evicted', `integrity check did not classify an evicted cache: ${JSON.stringify(integrityAfterEviction)}`);
   const repairResult = await page.evaluate(async () => {
     const updates = await import('/src/sw-updates.js');
     return updates.requestOfflineDataRepair({ timeoutMs: 30000 });
   });
   assert(repairResult?.ok === true, `offline data repair failed: ${repairResult?.error || 'unknown error'}`);
+  const integrityAfterRepair = await page.evaluate(async () => {
+    const updates = await import('/src/sw-updates.js');
+    return updates.requestOfflineIntegrityCheck({ timeoutMs: 30000 });
+  });
+  assert(integrityAfterRepair?.state === 'intact', `integrity repair did not restore an intact bundle: ${JSON.stringify(integrityAfterRepair)}`);
 
   const sourcePack = await page.evaluate(async () => {
     const storage = await import('/src/storage-manager.js');

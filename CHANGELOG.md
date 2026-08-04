@@ -6,6 +6,7 @@ All notable changes to HurricaneMap.
 
 ### Fixed
 - The offline core now installs only runtime data; raw Atlantic/Eastern Pacific HURDAT2 text and the full release manifest are an integrity-checked, user-initiated source bundle capped at 13 MB, with storage diagnostics and distribution metadata reporting the optional payload separately.
+- Offline launches now classify the shell/data tuple as intact, evicted, stale-but-valid, or invalid and offer an explicit repair action; each storm panel reports its cached radar-frame coverage.
 - High-contrast defaults now follow `prefers-contrast: more` until a local choice is made, and Windows `forced-colors` receives system-colored map controls, legends, panels, and focus rings with browser axe coverage.
 - The components stylesheet now follows the declared cascade without `!important`; desktop trend tables, mobile playback targets, reduced-motion settings, and light/dark operational surfaces retain their tested behavior through normal layer-specific rules.
 - Closest-approach and city return-period queries now measure the great-circle track segments between HURDAT2 fixes, interpolate the location and intensity at the true closest point, and cover the Miami, Cape Hatteras, New York, and segment-only regression cases.

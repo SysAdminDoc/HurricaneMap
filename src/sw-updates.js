@@ -9,6 +9,9 @@ let serviceWorkerDiagnostics = Object.freeze({
   controller: 'uncontrolled',
   scope: null,
   scriptUrl: null,
+  offlineIntegrity: 'unverified',
+  offlineIntegrityError: null,
+  offlineIntegrityCheckedAt: null,
   lastError: null,
 });
 
@@ -73,18 +76,7 @@ export async function requestOfflineDataRepair({
 } = {}) {
   const serviceWorker = navigatorRef?.serviceWorker;
   if (!serviceWorker) return { ok: false, error: 'service-worker-unavailable' };
-  let worker = serviceWorker.controller;
-  if (!worker) {
-    try {
-      const ready = await Promise.race([
-        serviceWorker.ready,
-        new Promise(resolve => setTimeout(() => resolve(null), Math.min(Math.max(timeoutMs, 0), 2_000))),
-      ]);
-      worker = ready?.active || null;
-    } catch {
-      worker = null;
-    }
-  }
+  const worker = await resolveActiveWorker(serviceWorker, timeoutMs);
   if (!worker?.postMessage) return { ok: false, error: 'service-worker-not-controlled' };
   return new Promise(resolve => {
     let settled = false;
@@ -110,6 +102,69 @@ export async function requestOfflineDataRepair({
       finish({ ok: false, error: String(error?.message || error).slice(0, 240) });
     }
   });
+}
+
+export async function requestOfflineIntegrityCheck({
+  navigatorRef = globalThis.navigator,
+  documentRef = globalThis.document,
+  timeoutMs = 10_000,
+} = {}) {
+  const serviceWorker = navigatorRef?.serviceWorker;
+  if (!serviceWorker) return publishIntegrity({ state: 'unverified', error: 'service-worker-unavailable' }, documentRef);
+  const worker = await resolveActiveWorker(serviceWorker, timeoutMs);
+  if (!worker?.postMessage) return publishIntegrity({ state: 'unverified', error: 'service-worker-not-controlled' }, documentRef);
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      serviceWorker.removeEventListener?.('message', onMessage);
+      resolve(publishIntegrity(result, documentRef));
+    };
+    const onMessage = event => {
+      if (event.data?.type !== 'OFFLINE_INTEGRITY_RESULT') return;
+      finish({
+        state: ['intact', 'evicted', 'stale-but-valid', 'invalid'].includes(event.data.state)
+          ? event.data.state
+          : 'invalid',
+        error: event.data.error ? String(event.data.error).slice(0, 240) : null,
+        checkedAt: typeof event.data.checked_at_utc === 'string' ? event.data.checked_at_utc : null,
+      });
+    };
+    const timer = setTimeout(() => finish({ state: 'unverified', error: 'offline-integrity-timeout' }), timeoutMs);
+    serviceWorker.addEventListener?.('message', onMessage);
+    try {
+      worker.postMessage({ type: 'CHECK_OFFLINE_INTEGRITY' });
+    } catch (error) {
+      finish({ state: 'unverified', error: String(error?.message || error).slice(0, 240) });
+    }
+  });
+}
+
+function publishIntegrity({ state = 'unverified', error = null, checkedAt = null } = {}, documentRef) {
+  publishDiagnostics({
+    offlineIntegrity: state,
+    offlineIntegrityError: error ? String(error).slice(0, 240) : null,
+    offlineIntegrityCheckedAt: checkedAt,
+  }, documentRef);
+  return { state, error: error ? String(error).slice(0, 240) : null, checkedAt };
+}
+
+async function resolveActiveWorker(serviceWorker, timeoutMs) {
+  let worker = serviceWorker.controller;
+  if (!worker) {
+    try {
+      const ready = await Promise.race([
+        serviceWorker.ready,
+        new Promise(resolve => setTimeout(() => resolve(null), Math.min(Math.max(timeoutMs, 0), 2_000))),
+      ]);
+      worker = ready?.active || null;
+    } catch {
+      worker = null;
+    }
+  }
+  return worker;
 }
 
 export function canRegisterServiceWorker({
@@ -219,7 +274,7 @@ export function initServiceWorkerUpdates({
 
   windowRef.addEventListener('load', () => {
     retryServiceWorkerRegistration({ navigatorRef, documentRef, locationRef, swPath })
-      .then((registration) => {
+      .then(async (registration) => {
         if (!registration) return;
         if (registration.waiting && serviceWorker.controller) {
           waitingWorker = registration.waiting;
@@ -235,6 +290,7 @@ export function initServiceWorkerUpdates({
             prompt?.show();
           });
         });
+        await requestOfflineIntegrityCheck({ navigatorRef, documentRef });
       });
   });
 }

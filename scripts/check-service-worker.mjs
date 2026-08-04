@@ -88,6 +88,11 @@ for (const sourceAsset of [
 if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/DecompressionStream/.test(source)) {
   errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
 }
+if (!/CHECK_OFFLINE_INTEGRITY/.test(source) ||
+    !/OFFLINE_INTEGRITY_RESULT/.test(source) ||
+    !/classifyOfflineIntegrity/.test(source)) {
+  errors.push('sw.js must report launch-time offline integrity states.');
+}
 if (!/const\s+DATA_CACHE_PREFIX\s*=\s*['"]hm-data-['"]/.test(source) ||
     !/const\s+DATA_CACHE\s*=\s*`\$\{DATA_CACHE_PREFIX\}\$\{SW_VERSION\}`/.test(source) ||
     !/const\s+RELEASE_MARKER_PATH/.test(source) ||

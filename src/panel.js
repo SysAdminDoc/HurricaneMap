@@ -5,7 +5,7 @@ import {
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
-import { RadarOverlay } from './radar.js';
+import { RadarOverlay, getStormRadarFrames } from './radar.js';
 import { renderIntensityChart } from './chart.js';
 import { isPinned } from './compare.js';
 import { radiiCount, hideWindField } from './windfield.js';
@@ -41,6 +41,7 @@ import { presentPressure } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
 import { formatClosest, wirePanelControls } from './panel-controls.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { inspectRadarFrameCache } from './storage-manager.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -74,6 +75,31 @@ let radar = null;
 function getRadar() {
   if (!radar) radar = new RadarOverlay(getMap());
   return radar;
+}
+
+async function refreshRadarCacheStatus(stormId) {
+  const host = document.getElementById('radar-cache-status');
+  if (!host || host.dataset.stormId !== stormId) return;
+  try {
+    const frameSet = await getStormRadarFrames(stormId);
+    const state = await inspectRadarFrameCache(frameSet?.frames || []);
+    if (!host.isConnected || host.dataset.stormId !== stormId) return;
+    host.dataset.state = state.state;
+    if (state.state === 'complete') {
+      host.textContent = t('radar.cacheComplete', state.cached, state.total);
+    } else if (state.state === 'partial') {
+      host.textContent = t('radar.cachePartial', state.cached, state.total);
+    } else if (state.state === 'empty') {
+      host.textContent = t('radar.cacheEmpty', state.total);
+    } else {
+      host.textContent = t('radar.cacheUnavailable');
+    }
+  } catch {
+    if (host.isConnected && host.dataset.stormId === stormId) {
+      host.dataset.state = 'unavailable';
+      host.textContent = t('radar.cacheUnavailable');
+    }
+  }
 }
 
 closeBtn.addEventListener('click', () => {
@@ -297,6 +323,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
       <section class="storm-resources-cluster" aria-label="Storm resources">
         <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
         <ul class="landfall-list">${landfallsHtml}</ul>
+        <div class="radar-cache-status" id="radar-cache-status" data-storm-id="${escapeHtml(storm.id)}" role="status" aria-live="polite">${escapeHtml(t('radar.cacheChecking'))}</div>
 
         <div class="action-row">
           ${wikiUrl ? `<a class="action-btn primary" href="${escapeHtml(wikiUrl)}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
@@ -418,6 +445,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
   renderHwmRow(document.getElementById('hwm-row-host'), storm);
   renderForecastSkill(document.getElementById('forecast-skill-host'), storm);
+  refreshRadarCacheStatus(storm.id);
   import('./tides.js')
     .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
     .catch(() => { /* tide gauges are optional context */ });
