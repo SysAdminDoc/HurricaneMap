@@ -11,6 +11,7 @@ All notable changes to HurricaneMap.
 - The primary document now denies form submissions in its meta CSP; the Cloudflare Worker and bundled self-hosting server add the response CSP with same-origin framing protection.
 - Evacuation guidance now discloses Esri address transmission, offers a coordinate-only Florida path, probes the pinned Florida layer before querying it, labels outage/invalid-response fallback, and records official source links for North Carolina, South Carolina, Georgia, Texas, Virginia, Maryland, and Massachusetts.
 - The no-build startup path now preloads every declared CSS layer, both local fonts, and the static boot module graph; the bundle audit enforces a two-wave first-paint request budget and high-priority main/data hints.
+- Storm track playback can now be rendered and downloaded as a self-contained WebM with selectable frame rate and duration, storm dates, category legend, and NOAA attribution; unsupported browsers receive an explicit availability explanation.
 
 ### Fixed
 - The checked-in AOML detailed continental-U.S. landfall table now provides a build-time ground-truth artifact and reports a 16/16 (100.0% precision, 100.0% recall) hurricane-strength match for 1983–1990; inferred tropical-storm candidates remain separately scoped, and HURDAT2 `C` closest-approach records cannot be promoted to inferred landfalls.

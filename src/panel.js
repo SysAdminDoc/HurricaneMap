@@ -349,7 +349,28 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
           <button class="export-btn" data-export="svg_map" title="SVG track map — publication-quality vector graphic">SVG map</button>
           <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
         </div>
-
+        <section class="video-export-control" aria-labelledby="video-export-title" aria-describedby="video-export-description">
+          <h3 id="video-export-title">${t('panel.videoExport')}</h3>
+          <p id="video-export-description">${t('panel.videoExportDescription')}</p>
+          <div class="video-export-options">
+            <label for="video-export-fps">${t('panel.videoExportFps')}</label>
+            <select id="video-export-fps">
+              <option value="24">${t('panel.videoExportFpsValue', '24')}</option>
+              <option value="30" selected>${t('panel.videoExportFpsValue', '30')}</option>
+              <option value="60">${t('panel.videoExportFpsValue', '60')}</option>
+            </select>
+            <label for="video-export-duration">${t('panel.videoExportDuration')}</label>
+            <select id="video-export-duration">
+              <option value="5">${t('panel.videoExportSeconds', '5')}</option>
+              <option value="10" selected>${t('panel.videoExportSeconds', '10')}</option>
+              <option value="15">${t('panel.videoExportSeconds', '15')}</option>
+              <option value="30">${t('panel.videoExportSeconds', '30')}</option>
+            </select>
+            <button class="text-btn" id="video-export-btn" type="button" hidden>${t('panel.videoExportButton')}</button>
+          </div>
+          <p class="video-export-status" id="video-export-status" role="status" aria-live="polite"></p>
+          <p class="video-export-unavailable" id="video-export-unavailable" role="status" hidden></p>
+        </section>
         <div id="forecast-skill-host"></div>
 
         <section class="advisory-replay-control" aria-labelledby="advisory-replay-title">

@@ -75,6 +75,7 @@ const SHELL_ASSETS = [
   './src/chart.js',
   './src/chart-export.js',
   './src/animation.js',
+  './src/video-export.js',
   './src/art-mode.js',
   './src/active.js',
   './src/active-polling.js',

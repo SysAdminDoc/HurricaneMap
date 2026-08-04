@@ -296,6 +296,36 @@ async function openKatrinaPanel(page) {
   }, { timeout: 10000 });
 }
 
+async function assertVideoExport(page) {
+  const button = page.locator('#video-export-btn');
+  await page.waitForFunction(() => {
+    const download = document.querySelector('#video-export-btn');
+    const unavailable = document.querySelector('#video-export-unavailable');
+    return download && unavailable && (!download.hidden || !unavailable.hidden);
+  }, { timeout: 10000 });
+
+  if (await button.isHidden()) {
+    const unavailable = await page.textContent('#video-export-unavailable');
+    assert(/Video export unavailable/i.test(unavailable || ''), `video export fallback is not explained: ${unavailable}`);
+    return;
+  }
+
+  await page.selectOption('#video-export-fps', '24');
+  await page.selectOption('#video-export-duration', '5');
+  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+  await button.click();
+  const download = await downloadPromise;
+  assert(
+    download.suggestedFilename() === 'HurricaneMap-Katrina-2005-track.webm',
+    `video export filename was incorrect: ${download.suggestedFilename()}`,
+  );
+  await page.waitForFunction(
+    () => /download started/i.test(document.querySelector('#video-export-status')?.textContent || ''),
+    { timeout: 10000 },
+  );
+  await download.delete();
+}
+
 async function openStormPanel(page, stormId) {
   await page.evaluate(async id => {
     const data = await import('/src/data.js');
@@ -1935,6 +1965,7 @@ try {
   await assertNoAxeViolations(page, 'storm panel (WCAG 2.2 AA)', '#storm-panel');
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
+  await assertVideoExport(page);
   // Live permalink navigation: assigning a new hash in an open tab must
   // apply it without a reload (hashchange listener).
   await page.evaluate(() => { location.hash = '#storm=AL092022'; });

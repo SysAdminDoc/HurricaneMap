@@ -386,6 +386,18 @@ export const STRINGS = {
     'panel.loadingPlayback': 'Loading playback…',
     'panel.speed': 'Speed',
     'panel.exportTrack': 'Export track',
+    'panel.videoExport': 'Video export',
+    'panel.videoExportDescription': 'Create a WebM of this storm’s track with its dates, category legend, and NOAA attribution.',
+    'panel.videoExportFps': 'Frame rate',
+    'panel.videoExportFpsValue': '{0} fps',
+    'panel.videoExportDuration': 'Duration',
+    'panel.videoExportSeconds': '{0} seconds',
+    'panel.videoExportButton': 'Download WebM',
+    'panel.videoExportUnavailable': 'Video export unavailable: this browser needs Canvas capture and WebM MediaRecorder support.',
+    'panel.videoExportPreparing': 'Preparing WebM export…',
+    'panel.videoExportProgress': 'Rendering video: {0}%',
+    'panel.videoExportReady': 'Video ready — download started.',
+    'panel.videoExportFailed': 'Video export failed. Try a shorter duration.',
 
     // Stats panel
     'stats.title': 'Statistics',
@@ -641,6 +653,8 @@ export const STRINGS = {
     'toast.copyFailed': 'Copy failed — select the address bar',
     'toast.playbackFailed': 'Track playback failed',
     'toast.pinFailed': 'Failed to pin storm',
+    'toast.videoSaved': 'Video saved as WebM',
+    'toast.videoFailed': 'Video export failed',
 
     // Boot failure
     'boot.errorTitle': 'HurricaneMap could not load its data.',
@@ -1214,6 +1228,18 @@ export const STRINGS = {
     'panel.loadingPlayback': 'Cargando reproducción…',
     'panel.speed': 'Velocidad',
     'panel.exportTrack': 'Exportar trayectoria',
+    'panel.videoExport': 'Exportar video',
+    'panel.videoExportDescription': 'Cree un WebM de la trayectoria de esta tormenta con sus fechas, leyenda de categorías y atribución de NOAA.',
+    'panel.videoExportFps': 'Velocidad de fotogramas',
+    'panel.videoExportFpsValue': '{0} fps',
+    'panel.videoExportDuration': 'Duración',
+    'panel.videoExportSeconds': '{0} segundos',
+    'panel.videoExportButton': 'Descargar WebM',
+    'panel.videoExportUnavailable': 'Exportación de video no disponible: este navegador necesita captura de Canvas y MediaRecorder WebM.',
+    'panel.videoExportPreparing': 'Preparando la exportación WebM…',
+    'panel.videoExportProgress': 'Renderizando video: {0}%',
+    'panel.videoExportReady': 'Video listo; comenzó la descarga.',
+    'panel.videoExportFailed': 'La exportación de video falló. Pruebe una duración más corta.',
 
     // Stats panel
     'stats.title': 'Estadísticas',
@@ -1469,6 +1495,8 @@ export const STRINGS = {
     'toast.copyFailed': 'Falló la copia — selecciona la barra de direcciones',
     'toast.playbackFailed': 'Falló la reproducción de la trayectoria',
     'toast.pinFailed': 'No se pudo fijar el huracán',
+    'toast.videoSaved': 'Video guardado como WebM',
+    'toast.videoFailed': 'Falló la exportación de video',
 
     // Boot failure
     'boot.errorTitle': 'HurricaneMap no pudo cargar sus datos.',
@@ -2026,6 +2054,18 @@ export const STRINGS = {
     'panel.resumeTrack': 'Rekòmanse animasyon chemen an',
     'panel.loadingPlayback': 'Ap chaje lekti chemen an…',
     'panel.exportTrack': 'Ekspòte chemen',
+    'panel.videoExport': 'Ekspòte videyo',
+    'panel.videoExportDescription': 'Kreye yon WebM sou chemen siklòn sa a ak dat li yo, lejann kategori yo, ak atribisyon NOAA.',
+    'panel.videoExportFps': 'Kantite imaj pa segonn',
+    'panel.videoExportFpsValue': '{0} imaj/s',
+    'panel.videoExportDuration': 'Dire',
+    'panel.videoExportSeconds': '{0} segonn',
+    'panel.videoExportButton': 'Telechaje WebM',
+    'panel.videoExportUnavailable': 'Ekspòtasyon videyo pa disponib: navigatè sa a bezwen kaptire Canvas ak MediaRecorder WebM.',
+    'panel.videoExportPreparing': 'Ap prepare ekspòtasyon WebM…',
+    'panel.videoExportProgress': 'Ap rann videyo a: {0}%',
+    'panel.videoExportReady': 'Videyo a pare; telechajman an kòmanse.',
+    'panel.videoExportFailed': 'Ekspòtasyon videyo a echwe. Eseye yon dire ki pi kout.',
     'stats.title': 'Estatistik',
     'stats.landfalls': 'Touche tè',
     'stats.strongest': 'Pi fò',
@@ -2277,6 +2317,8 @@ export const STRINGS = {
     'toast.copyFailed': 'Kopi a echwe — chwazi bar adrès la',
     'toast.playbackFailed': 'Lekti trajè a echwe',
     'toast.pinFailed': 'Nou pa t ka epengle siklòn nan',
+    'toast.videoSaved': 'Videyo a anrejistre kòm WebM',
+    'toast.videoFailed': 'Ekspòtasyon videyo a echwe',
 
     // Boot failure
     'boot.errorTitle': 'HurricaneMap pa t kapab chaje done li yo.',

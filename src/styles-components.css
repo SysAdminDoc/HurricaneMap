@@ -3715,6 +3715,60 @@ select {
   text-transform: uppercase;
 }
 
+.video-export-control {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  background: var(--surface-sunken);
+}
+
+.video-export-control h3,
+.video-export-control p { margin: 0; }
+
+.video-export-control h3 {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.video-export-control > p:first-of-type {
+  color: var(--subtext);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.video-export-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.video-export-options label {
+  color: var(--subtext);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.video-export-options select {
+  min-height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 8px;
+  background: var(--surface0);
+  color: var(--text);
+}
+
+.video-export-status,
+.video-export-unavailable {
+  color: var(--subtext);
+  font-size: 0.76rem;
+}
+
+.video-export-unavailable { color: var(--yellow); }
+
 .hm-toast-host {
   position: fixed;
   right: 18px;

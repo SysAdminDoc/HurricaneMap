@@ -69,6 +69,62 @@ function showToast(message, tone = 'info') {
   }, 2200);
 }
 
+function wireVideoExport(storm) {
+  const button = document.getElementById('video-export-btn');
+  const status = document.getElementById('video-export-status');
+  const unavailable = document.getElementById('video-export-unavailable');
+  const fps = document.getElementById('video-export-fps');
+  const duration = document.getElementById('video-export-duration');
+  if (!button || !status || !unavailable || !fps || !duration) return;
+
+  import('./video-export.js').then(video => {
+    if (!button.isConnected) return;
+    const support = video.getVideoExportSupport();
+    if (!support.available) {
+      unavailable.textContent = t('panel.videoExportUnavailable');
+      unavailable.hidden = false;
+      button.hidden = true;
+      return;
+    }
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      if (button.disabled) return;
+      button.disabled = true;
+      fps.disabled = true;
+      duration.disabled = true;
+      status.textContent = t('panel.videoExportPreparing');
+      try {
+        const result = await video.exportTrackVideo(storm, {
+          fps: Number(fps.value),
+          durationSeconds: Number(duration.value),
+        }, {
+          onProgress: percent => {
+            if (status.isConnected) status.textContent = t('panel.videoExportProgress', String(percent));
+          },
+        });
+        video.downloadVideo(result);
+        status.textContent = t('panel.videoExportReady');
+        showToast(t('toast.videoSaved'));
+      } catch (error) {
+        console.warn('Video export failed:', error);
+        status.textContent = t('panel.videoExportFailed');
+        showToast(t('toast.videoFailed'), 'warn');
+      } finally {
+        button.disabled = false;
+        fps.disabled = false;
+        duration.disabled = false;
+      }
+    });
+  }).catch(error => {
+    console.warn('Video export capability check failed:', error);
+    if (unavailable.isConnected) {
+      unavailable.textContent = t('panel.videoExportUnavailable');
+      unavailable.hidden = false;
+    }
+    button.hidden = true;
+  });
+}
+
 let advisoryReplaySequence = 0;
 
 function wireAdvisoryReplay(storm, initialReplay = null) {
@@ -204,6 +260,7 @@ export function wirePanelControls({
   enterPlaybackMapMode,
   leavePlaybackMapMode,
 }) {
+  wireVideoExport(storm);
   const pngButton = document.getElementById('chart-export-png');
   const svgButton = document.getElementById('chart-export-svg');
   if (pngButton) pngButton.addEventListener('click', async () => {
