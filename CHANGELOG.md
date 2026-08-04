@@ -7,6 +7,7 @@ All notable changes to HurricaneMap.
 ### Added
 - Copy-ready APA and BibTeX release citations now appear on every analytical side panel and About surface, travel with research and storm exports, and are emitted by the starter notebook from the same HURDAT2 revision/hash contract; shared URLs now pin the full release-manifest SHA-256.
 - Bundled data metadata now carries a lifecycle status for each source; the retired NOAA NCEI Billion-Dollar Disasters series is explicitly closed at 2024, validates against that end date, and renders closed-series copy separately from an unavailable feed.
+- Hand-maintained seasonal outlook and ENSO snapshots now carry issue/validity windows, with a 45-day in-season freshness warning, hard expiry gate, and visible validity dates plus a current NOAA CPC link in the stats card.
 
 ### Fixed
 - The checked-in AOML detailed continental-U.S. landfall table now provides a build-time ground-truth artifact and reports a 16/16 (100.0% precision, 100.0% recall) hurricane-strength match for 1983–1990; inferred tropical-storm candidates remain separately scoped, and HURDAT2 `C` closest-approach records cannot be promoted to inferred landfalls.

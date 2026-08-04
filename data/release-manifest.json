@@ -60,9 +60,9 @@
     },
     {
       "path": "data/enso.json",
-      "bytes": 3611,
-      "sha256": "f2c98c9bbdba98ae257c8157278a7ef3c7ee6759227916c9df3f0f55cc579c98",
-      "source_url": "https://psl.noaa.gov/gcos_wgsp/Timeseries/Nino34/",
+      "bytes": 3783,
+      "sha256": "2f812f4f9727b54922d8ad891082d592ca656d9112b1ed87d3d16d7f20f6f6c4",
+      "source_url": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php",
       "source_date": "2026-06-19",
       "generated_at_utc": "2026-08-03T00:00:00Z",
       "schema_version": 1
@@ -150,8 +150,8 @@
     },
     {
       "path": "data/outlook.json",
-      "bytes": 681,
-      "sha256": "2be0e046f7b0084ee0a81e7091caff91c784faa366c3029ff0c2e302712396f1",
+      "bytes": 808,
+      "sha256": "b27515fb10800abe0152ae3330ddc2c7f574e89c983ddc7560fdf0c4619603b6",
       "source_url": "https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml",
       "source_date": "2026-07-09",
       "generated_at_utc": "2026-08-03T00:00:00Z",

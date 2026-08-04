@@ -13,8 +13,15 @@ import {
   failOptionalFeed,
 } from './optional-feeds.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { getSnapshotStatus, parseSnapshotDate } from './snapshot-freshness.js';
 
 const CPC_URL = 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
+
+function hasValidSnapshotWindow(snapshot) {
+  const issued = parseSnapshotDate(snapshot?.issued);
+  const validUntil = parseSnapshotDate(snapshot?.valid_until);
+  return Boolean(issued && validUntil && issued <= validUntil);
+}
 
 const SKILL_DATA = {
   'above-normal': {
@@ -56,7 +63,13 @@ export async function fetchSeasonalOutlook() {
     const response = await fetchWithTimeout('data/outlook.json', {}, REQUEST_TIMEOUT_MS.data);
     if (response.ok) {
       const data = await response.json();
-      if (data && Number.isInteger(data.season) && Array.isArray(data.sources)) {
+      if (
+        data
+        && Number.isInteger(data.season)
+        && Array.isArray(data.sources)
+        && hasValidSnapshotWindow(data)
+        && data.sources.every(source => hasValidSnapshotWindow(source))
+      ) {
         base.current = data;
         completeOptionalFeed('seasonal', {
           itemCount: data.sources.length,
@@ -72,7 +85,7 @@ export async function fetchSeasonalOutlook() {
   return base;
 }
 
-function renderCurrentSeasonRows(current) {
+function renderCurrentSeasonRows(current, now = new Date()) {
   const editorial = value => {
     const keys = {
       Atlantic: 'seasonal.basinAtlantic',
@@ -83,6 +96,12 @@ function renderCurrentSeasonRows(current) {
     };
     return keys[value] ? t(keys[value]) : value;
   };
+  const status = getSnapshotStatus(current, now);
+  const statusNotice = status.expired
+    ? `<div class="sob-status sob-status--warning" role="status">${escapeHtml(t('seasonal.expired'))}</div>`
+    : status.stale
+      ? `<div class="sob-status sob-status--warning" role="status">${escapeHtml(t('seasonal.stale', status.daysOld))}</div>`
+      : '';
   const rows = current.sources.map(source => {
     const agency = escapeHtml(editorial(source.agency));
     const sourceUrl = safeExternalUrl(source.url);
@@ -93,7 +112,7 @@ function renderCurrentSeasonRows(current) {
     <div class="sob-row">
       ${agencyHtml}
       <span class="sob-numbers">${escapeHtml(t('seasonal.counts', source.named, source.hurricanes, source.majors))}</span>
-      <span class="sob-issued">${source.probability ? `${escapeHtml(editorial(source.probability))} · ` : ''}${escapeHtml(t('seasonal.issued', source.issued))}</span>
+      <span class="sob-issued">${source.probability ? `${escapeHtml(editorial(source.probability))} · ` : ''}${escapeHtml(t('seasonal.issued', source.issued))} · ${escapeHtml(t('seasonal.validUntil', source.valid_until))}</span>
     </div>`;
   }).join('');
   return `
@@ -102,11 +121,12 @@ function renderCurrentSeasonRows(current) {
         <strong>${escapeHtml(current.season)} ${escapeHtml(editorial(current.basin))}: ${escapeHtml(editorial(current.headline))}</strong>
         <span class="sob-enso">${escapeHtml(editorial(current.enso))}</span>
       </div>
+      ${statusNotice}
       ${rows}
     </div>`;
 }
 
-export function renderOutlookBanner(outlook) {
+export function renderOutlookBanner(outlook, { now = new Date() } = {}) {
   if (!outlook) return '';
 
   const skill = getSeasonalSkillMetrics();
@@ -121,7 +141,7 @@ export function renderOutlookBanner(outlook) {
         <span class="sob-label">${escapeHtml(t('seasonal.label'))}</span>
         <span class="sob-source">NOAA CPC</span>
       </div>
-      ${outlook.current ? renderCurrentSeasonRows(outlook.current) : ''}
+      ${outlook.current ? renderCurrentSeasonRows(outlook.current, now) : ''}
       <div class="sob-meta">
         <a href="${CPC_URL}" target="_blank" rel="noopener">${escapeHtml(t('seasonal.currentLink'))}</a>
       </div>

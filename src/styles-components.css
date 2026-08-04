@@ -8492,6 +8492,15 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   font-size: 10px;
 }
 
+.sob-status {
+  color: var(--subtext);
+  font-size: 10px;
+}
+
+.sob-status--warning {
+  color: var(--yellow, #f9e2af);
+}
+
 /* Tide-gauge panel section */
 .tides-block {
   display: grid;

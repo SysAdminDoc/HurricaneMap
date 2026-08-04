@@ -1,4 +1,9 @@
 {
+  "_meta": {
+    "issued": "2026-06-19",
+    "valid_until": "2026-08-31",
+    "url": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
+  },
   "1950": { "oni": -0.54, "phase": "la-nina" },
   "1951": { "oni": 0.70, "phase": "el-nino" },
   "1952": { "oni": -0.08, "phase": "neutral" },

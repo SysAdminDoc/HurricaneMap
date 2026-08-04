@@ -4,10 +4,23 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import { DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
+import {
+  getSnapshotStatus,
+  isInAtlanticHurricaneSeason,
+  parseSnapshotDate,
+  SNAPSHOT_MAX_AGE_DAYS,
+  utcDateOnly,
+} from '../src/snapshot-freshness.js';
 import { validateClosedSeriesRows, validateDatasetStatuses } from './dataset-status.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
+const warnings = [];
+const validationDateOverride = process.env.HURRICANEMAP_VALIDATION_DATE;
+const validationNow = validationDateOverride ? parseSnapshotDate(validationDateOverride) : new Date();
+if (validationDateOverride && !validationNow) {
+  errors.push('HURRICANEMAP_VALIDATION_DATE must be an ISO date (YYYY-MM-DD).');
+}
 let aomlGateSummary = null;
 
 async function readJson(relativePath) {
@@ -34,6 +47,64 @@ function isFiniteNumber(value) {
 
 function validIsoDate(value) {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
+}
+
+function validateSnapshotWindow(snapshot, label) {
+  if (!isObject(snapshot)) {
+    fail(`${label} must be an object.`);
+    return null;
+  }
+  const issued = parseSnapshotDate(snapshot.issued);
+  const validUntil = parseSnapshotDate(snapshot.valid_until);
+  if (!issued) fail(`${label}.issued must be an ISO date (YYYY-MM-DD).`);
+  if (!validUntil) fail(`${label}.valid_until must be an ISO date (YYYY-MM-DD).`);
+  if (issued && validUntil && issued > validUntil) {
+    fail(`${label}.issued must not be after valid_until.`);
+  }
+  const status = getSnapshotStatus(snapshot, validationNow || new Date());
+  const today = utcDateOnly(validationNow);
+  if (issued && today && issued > today) fail(`${label}.issued cannot be in the future.`);
+  if (status.expired) fail(`${label} is past valid_until ${snapshot.valid_until}; refresh the hand-maintained snapshot.`);
+  return status;
+}
+
+function validateHandMaintainedSnapshots(outlook, enso) {
+  if (!isObject(outlook)) return;
+  if (!Number.isInteger(outlook.season)) fail('data/outlook.json season must be an integer.');
+  if (!Array.isArray(outlook.sources) || !outlook.sources.length) {
+    fail('data/outlook.json sources must be a non-empty array.');
+  }
+  const outlookStatus = validateSnapshotWindow(outlook, 'data/outlook.json');
+  if (outlookStatus?.stale && isInAtlanticHurricaneSeason(outlook.season, validationNow || new Date())) {
+    warnings.push(
+      `data/outlook.json snapshot issued ${outlook.issued} is ${outlookStatus.daysOld} days old; `
+      + `refresh before using an in-season outlook (>${SNAPSHOT_MAX_AGE_DAYS} days).`,
+    );
+  }
+
+  const issuedDates = [];
+  for (const [index, source] of (outlook.sources || []).entries()) {
+    const label = `data/outlook.json sources[${index}]`;
+    const status = validateSnapshotWindow(source, label);
+    if (status?.issued) issuedDates.push(status.issued);
+    if (!isObject(source)) continue;
+    if (typeof source.agency !== 'string' || !source.agency.trim()) fail(`${label}.agency is required.`);
+    if (typeof source.url !== 'string' || !/^https:\/\//.test(source.url)) {
+      fail(`${label}.url must be an HTTPS URL.`);
+    }
+  }
+  if (issuedDates.length) {
+    const latest = issuedDates.reduce((current, candidate) => candidate > current ? candidate : current);
+    if (outlook.issued !== latest.toISOString().slice(0, 10)) {
+      fail('data/outlook.json.issued must match the latest source issued date.');
+    }
+  }
+
+  if (!isObject(enso)) return;
+  const ensoStatus = validateSnapshotWindow(enso._meta, 'data/enso.json _meta');
+  if (ensoStatus && (!enso._meta || typeof enso._meta.url !== 'string' || !/^https:\/\//.test(enso._meta.url))) {
+    fail('data/enso.json _meta.url must be an HTTPS URL.');
+  }
 }
 
 function validSha256(value) {
@@ -128,7 +199,7 @@ function ratio(numerator, denominator) {
   return denominator ? Math.round((numerator / denominator) * 1_000_000) / 1_000_000 : null;
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill, sourceLock, aoml] = await Promise.all([
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill, sourceLock, aoml, outlook, enso] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
@@ -140,6 +211,8 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billi
   readJson('data/forecast-skill.json'),
   readJson('data/hurdat2-sources.json'),
   readJson('data/aoml-landfalls.json'),
+  readJson('data/outlook.json'),
+  readJson('data/enso.json'),
 ]);
 
 try {
@@ -166,10 +239,14 @@ if (!isObject(billions)) fail('data/billions.json must contain an object.');
 if (!isObject(forecastSkill)) fail('data/forecast-skill.json must contain an object.');
 if (!isObject(sourceLock)) fail('data/hurdat2-sources.json must contain an object.');
 if (!isObject(aoml)) fail('data/aoml-landfalls.json must contain an object.');
+if (!isObject(outlook)) fail('data/outlook.json must contain an object.');
+if (!isObject(enso)) fail('data/enso.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
 }
+
+validateHandMaintainedSnapshots(outlook, enso);
 
 if (forecastSkill.schema !== 1) fail('forecast-skill.schema must be 1.');
 if (forecastSkill.model !== 'OFCL') fail('forecast-skill.model must identify official OFCL forecasts.');
@@ -819,6 +896,11 @@ if (aomlGateSummary) {
     + `precision=${formatMetric(inferredPrecision, aomlGateSummary.inferredMatched, aomlGateSummary.inferredHurricane.length)}, `
     + `recall=${formatMetric(inferredRecall, aomlGateSummary.inferredMatched, truthCount)}`,
   );
+}
+
+if (warnings.length) {
+  console.warn(`Data validation warnings (${warnings.length}):`);
+  for (const warning of warnings) console.warn(`- ${warning}`);
 }
 
 console.log(`data ok (${storms.length} storms, ${landfalls.length} landfalls, ${Object.keys(impacts).length} impact rows)`);

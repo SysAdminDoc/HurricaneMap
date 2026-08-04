@@ -130,6 +130,7 @@ const SHELL_ASSETS = [
   './src/sparkline.js',
   './src/season.js',
   './src/seasonal-outlook.js',
+  './src/snapshot-freshness.js',
   './src/storm-events.js',
   './src/storms-worker.js',
   './src/sst.js',

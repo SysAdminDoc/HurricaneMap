@@ -76,7 +76,7 @@ function sourceUrl(relative) {
   if (relative.startsWith('data/surge-obs/')) return 'https://api.tidesandcurrents.noaa.gov/api/prod/';
   if (relative === 'data/storm-events.json') return 'https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/';
   if (relative === 'data/rainfall.json') return 'https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html';
-  if (relative === 'data/enso.json') return 'https://psl.noaa.gov/gcos_wgsp/Timeseries/Nino34/';
+  if (relative === 'data/enso.json') return 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php';
   if (relative === 'data/outlook.json') return 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
   if (relative === 'data/distribution.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';

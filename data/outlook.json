@@ -3,10 +3,13 @@
   "basin": "Atlantic",
   "enso": "El Niño (strong)",
   "headline": "Below-normal season expected",
+  "issued": "2026-07-08",
+  "valid_until": "2026-09-30",
   "sources": [
     {
       "agency": "NOAA",
       "issued": "2026-05-21",
+      "valid_until": "2026-09-30",
       "probability": "55% chance below-normal",
       "named": "8–14",
       "hurricanes": "3–6",
@@ -16,6 +19,7 @@
     {
       "agency": "CSU (July update)",
       "issued": "2026-07-08",
+      "valid_until": "2026-09-30",
       "probability": null,
       "named": "9",
       "hurricanes": "4",
