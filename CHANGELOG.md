@@ -13,6 +13,7 @@ All notable changes to HurricaneMap.
 - The no-build startup path now preloads every declared CSS layer, both local fonts, and the static boot module graph; the bundle audit enforces a two-wave first-paint request budget and high-priority main/data hints.
 - Storm track playback can now be rendered and downloaded as a self-contained WebM with selectable frame rate and duration, storm dates, category legend, and NOAA attribution; unsupported browsers receive an explicit availability explanation.
 - Storm panels now include a keyboard-openable, localized textual track timeline with hazard milestones ordered first, complete chronological observations on demand, and polite playback time announcements for screen readers.
+- Online archived radar fallback now uses IEM's zoomable, cache-stable XYZ tiles with explicit 404/503 miss handling; bundled radar frames and offline packs remain full local PNGs.
 
 ### Fixed
 - The checked-in AOML detailed continental-U.S. landfall table now provides a build-time ground-truth artifact and reports a 16/16 (100.0% precision, 100.0% recall) hurricane-strength match for 1983–1990; inferred tropical-storm candidates remain separately scoped, and HURDAT2 `C` closest-approach records cannot be promoted to inferred landfalls.

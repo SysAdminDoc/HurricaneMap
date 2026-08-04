@@ -2199,6 +2199,12 @@ label > input[type="checkbox"] {
   pointer-events: none;
 }
 
+.radar-overlay-tile {
+  mix-blend-mode: screen;
+  filter: saturate(1.15) contrast(1.05);
+  pointer-events: none;
+}
+
 .radar-quick-btn {
   background: transparent;
   border: 1px solid var(--surface0);

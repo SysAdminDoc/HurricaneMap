@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
-import { buildRadarProbeTimes } from '../src/radar-utils.js';
+import {
+  buildIemRadarTileProbeUrl,
+  buildIemRadarTileUrl,
+  buildRadarProbeTimes,
+  isRadarFrameResponseAvailable,
+} from '../src/radar-utils.js';
 
 const target = new Date('2024-08-01T12:04:00Z');
 const probes = buildRadarProbeTimes(target);
@@ -13,4 +19,26 @@ assert.deepEqual(buildRadarProbeTimes(new Date('not a date')), []);
 assert.deepEqual(buildRadarProbeTimes(null), []);
 assert.deepEqual(buildRadarProbeTimes(new Date('2024-08-01T12:00:00Z'), 0), [new Date('2024-08-01T12:00:00Z')]);
 
-console.log('radar probing ok (nearest frame ordering and symmetric fallback bounds)');
+const tileUrl = buildIemRadarTileUrl('uscomp', 'n0r', '200508291110');
+assert.equal(
+  tileUrl,
+  'https://mesonet.agron.iastate.edu/c/tile.py/1.0.0/ridge::USCOMP-N0R-200508291110/{z}/{x}/{y}.png',
+  'archived radar should use IEM stable XYZ tiles',
+);
+assert.equal(
+  buildIemRadarTileProbeUrl('hicomp', 'n0q', '201908251200', { z: 3, x: 0, y: 3 }),
+  'https://mesonet.agron.iastate.edu/c/tile.py/1.0.0/ridge::HICOMP-N0Q-201908251200/3/0/3.png',
+  'availability probes should use a concrete in-coverage tile',
+);
+assert.throws(() => buildIemRadarTileUrl('us comp', 'n0r', '200508291110'), /invalid radar tile sector/);
+assert.throws(() => buildIemRadarTileUrl('uscomp', 'n0r', 'not-a-stamp'), /invalid radar tile timestamp/);
+assert.equal(isRadarFrameResponseAvailable({ ok: true, status: 200 }), true);
+assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 404 }), false, '404 should be a normal missing-frame result');
+assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 503 }), false, '503 should be a normal missing-frame result');
+assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 500 }), false);
+
+const csp = readFileSync('index.html', 'utf8').match(/Content-Security-Policy" content="([^"]+)/)?.[1] || '';
+assert.match(csp, /img-src[^;]*https:\/\/mesonet\.agron\.iastate\.edu/);
+assert.match(csp, /connect-src[^;]*https:\/\/mesonet\.agron\.iastate\.edu/);
+
+console.log('radar tiles ok (nearest probing, 404/503 misses, offline URL contract, CSP coverage)');

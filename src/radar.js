@@ -21,7 +21,8 @@
 //   }
 //
 // Coverage:
-//   uscomp (CONUS)        — n0r — Aug 1995 onward, 5-min cadence from Aug 2003
+//   uscomp (CONUS)        — n0r — Aug 1995 onward, 5-min cadence from Aug 2003;
+//                            modern online tiles use the canonical n0q layer
 //   hicomp (Hawaii)       — n0q — 2010 onward
 //   prcomp (Puerto Rico)  — n0q — 2010 onward
 //
@@ -42,20 +43,47 @@ import {
   failOptionalFeed,
 } from './optional-feeds.js';
 import { cacheRadarPack, isQuotaExceededError } from './storage-manager.js';
-import { buildRadarProbeTimes } from './radar-utils.js';
+import {
+  buildIemRadarTileProbeUrl,
+  buildIemRadarTileUrl,
+  buildRadarProbeTimes,
+  isRadarFrameResponseAvailable,
+} from './radar-utils.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
-const IEM_ROOT = 'https://mesonet.agron.iastate.edu/archive/data';
 const LOCAL_ROOT = 'data/radar';
 const MANIFEST_URL = 'data/radar/manifest.json';
 
 const REGIONS = {
-  uscomp: { bounds: [[24, -126], [50, -66]], product: 'n0r', earliestYear: 1995 },
-  hicomp: { bounds: [[15.44, -162.4], [24.44, -152.4]], product: 'n0q', earliestYear: 2010 },
-  prcomp: { bounds: [[13.1, -71.07], [23.1, -61.07]], product: 'n0q', earliestYear: 2010 },
+  uscomp: {
+    bounds: [[24, -126], [50, -66]],
+    product: 'n0r',
+    remoteProduct: 'n0q',
+    remoteProductStart: Date.UTC(2010, 10, 13, 16, 25),
+    sector: 'uscomp',
+    probeTile: { z: 3, x: 2, y: 3 },
+    maxNativeZoom: 7,
+    earliestYear: 1995,
+  },
+  hicomp: {
+    bounds: [[15.44, -162.4], [24.44, -152.4]],
+    product: 'n0q',
+    sector: 'hicomp',
+    probeTile: { z: 3, x: 0, y: 3 },
+    maxNativeZoom: 8,
+    earliestYear: 2010,
+  },
+  prcomp: {
+    bounds: [[13.1, -71.07], [23.1, -61.07]],
+    product: 'n0q',
+    sector: 'prcomp',
+    probeTile: { z: 3, x: 2, y: 3 },
+    maxNativeZoom: 8,
+    earliestYear: 2010,
+  },
 };
 
 let manifest = null;
@@ -117,33 +145,33 @@ function roundToMinutes(date, mins) {
   return new Date(Math.floor(ms / stepMs) * stepMs);
 }
 
-function buildIemUrl(region, date) {
-  const yyyy = date.getUTCFullYear();
-  const mm = pad2(date.getUTCMonth() + 1);
-  const dd = pad2(date.getUTCDate());
-  const stamp = dateToStamp(date);
-  return `${IEM_ROOT}/${yyyy}/${mm}/${dd}/GIS/${region}/${REGIONS[region].product}_${stamp}.png`;
+function buildLocalFrame(region, file, date) {
+  return { url: `${LOCAL_ROOT}/${file}`, source: 'local', date, region };
 }
 
-/** Resolve a frame URL: prefer local manifest entry, fall back to IEM. */
-function resolveFrameUrl(stormId, region, date) {
+function buildRemoteFrame(region, date) {
+  const config = REGIONS[region];
   const stamp = dateToStamp(date);
-  const entry = manifest?.[stormId];
-  const localPath = entry?.frames?.[stamp];
-  if (localPath) {
-    return { url: `${LOCAL_ROOT}/${localPath}`, source: 'local', date };
-  }
-  return { url: buildIemUrl(region, date), source: 'remote', date };
+  const product = config.remoteProduct && date.getTime() >= config.remoteProductStart
+    ? config.remoteProduct
+    : config.product;
+  return {
+    url: buildIemRadarTileUrl(config.sector, product, stamp),
+    probeUrl: buildIemRadarTileProbeUrl(config.sector, product, stamp, config.probeTile),
+    source: 'remote',
+    date,
+    region,
+  };
 }
 
 /** For ONLINE mode only: probe IEM for the nearest available five-minute frame
  *  on either side of the target. Returns null if nothing is within ±60 min. */
 async function findRemoteNearest(region, target, maxMinutes = 60) {
   for (const probe of buildRadarProbeTimes(target, maxMinutes, 5)) {
-    const url = buildIemUrl(region, probe);
+    const frame = buildRemoteFrame(region, probe);
     try {
-      const r = await fetchWithTimeout(url, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
-      if (r.ok) return { url, date: probe, source: 'remote' };
+      const r = await fetchWithTimeout(frame.probeUrl, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
+      if (isRadarFrameResponseAvailable(r)) return frame;
     } catch (_) { /* keep probing */ }
   }
   return null;
@@ -197,6 +225,8 @@ export class RadarOverlay {
           ts,
           date: stampToDate(ts),
           url: `${LOCAL_ROOT}/${file}`,
+          source: 'local',
+          region: this.region,
         }))
         .sort((a, b) => a.ts.localeCompare(b.ts));
     } else {
@@ -210,11 +240,7 @@ export class RadarOverlay {
     let landfallTs = stormEntry?.landfalls?.[String(lfIdx)];
     let frame = null;
     if (landfallTs && stormEntry.frames[landfallTs]) {
-      frame = {
-        url: `${LOCAL_ROOT}/${stormEntry.frames[landfallTs]}`,
-        date: stampToDate(landfallTs),
-        source: 'local',
-      };
+      frame = buildLocalFrame(this.region, stormEntry.frames[landfallTs], stampToDate(landfallTs));
     } else {
       // Fall back to remote walkback.
       const target = new Date(this.landfall.t);
@@ -228,7 +254,7 @@ export class RadarOverlay {
     }
 
     this.currentDate = frame.date;
-    this.draw(frame.url);
+    this.draw(frame);
     completeOptionalFeed('radar', {
       itemCount: this.localFrames.length || 1,
       cacheOrigin: frame.source === 'remote' ? 'network' : 'bundled',
@@ -238,13 +264,25 @@ export class RadarOverlay {
     this.map.setView([lf.lat, lf.lon], Math.max(this.map.getZoom(), 7), { animate: true });
   }
 
-  draw(url) {
+  draw(frame) {
     if (this.overlay) {
       this.map.removeLayer(this.overlay);
       this.overlay = null;
     }
-    const { bounds } = REGIONS[this.region];
-    this.overlay = L.imageOverlay(url, bounds, {
+    const config = REGIONS[this.region];
+    if (frame.source === 'remote') {
+      this.overlay = L.tileLayer(frame.url, {
+        opacity: 1.0,
+        className: 'radar-overlay-tile',
+        bounds: config.bounds,
+        maxNativeZoom: config.maxNativeZoom,
+        maxZoom: this.map.getMaxZoom(),
+        noWrap: true,
+        interactive: false,
+      }).addTo(this.map);
+      return;
+    }
+    this.overlay = L.imageOverlay(frame.url, config.bounds, {
       opacity: 1.0,
       className: 'radar-overlay-img',
       interactive: false,
@@ -253,7 +291,7 @@ export class RadarOverlay {
 
   timestampLabel(source = 'local') {
     if (!this.currentDate) return '';
-    const tag = source === 'remote' ? ' · live' : '';
+    const tag = source === 'remote' ? ' · online' : '';
     return formatTime(this.currentDate.toISOString()) + tag;
   }
 
@@ -330,7 +368,7 @@ export class RadarOverlay {
         return;
       }
       this.currentDate = next.date;
-      this.draw(next.url);
+      this.draw(next);
       this.panToTrackPoint(next.date);
       this.setStatus(this.timestampLabel('local'));
       return;
@@ -338,13 +376,13 @@ export class RadarOverlay {
     // Online stepper: 5-min steps.
     const session = this.session;
     const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
-    const url = buildIemUrl(this.region, next);
+    const frame = buildRemoteFrame(this.region, next);
     this.setStatus('Loading…');
     beginOptionalFeed('radar');
     try {
-      const r = await fetchWithTimeout(url, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
+      const r = await fetchWithTimeout(frame.probeUrl, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
       if (session !== this.session) return;
-      if (!r.ok) {
+      if (!isRadarFrameResponseAvailable(r)) {
         failOptionalFeed('radar', { responseStatus: r.status });
         this.setStatus(`No frame at ${formatTime(next.toISOString())}`);
         return;
@@ -356,7 +394,7 @@ export class RadarOverlay {
       return;
     }
     this.currentDate = next;
-    this.draw(url);
+    this.draw(frame);
     completeOptionalFeed('radar', { itemCount: 1 });
     this.setStatus(this.timestampLabel('remote'));
   }
@@ -405,10 +443,10 @@ export class RadarOverlay {
       for (let m = 0; m <= 60; m += 5) {
         if (session !== this.session || !this.loopPending) return;
         const d = roundToMinutes(new Date(start.getTime() + m * 60 * 1000), 5);
-        const u = buildIemUrl(this.region, d);
+        const frame = buildRemoteFrame(this.region, d);
         try {
-          const r = await fetchWithTimeout(u, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
-          if (r.ok) frames.push({ ts: dateToStamp(d), date: d, url: u });
+          const r = await fetchWithTimeout(frame.probeUrl, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
+          if (isRadarFrameResponseAvailable(r)) frames.push(frame);
         } catch (_) { /* skip */ }
       }
       if (session !== this.session || !this.loopPending) return;
@@ -426,9 +464,9 @@ export class RadarOverlay {
     const tick = () => {
       const f = frames[idx];
       this.currentDate = f.date;
-      this.draw(f.url);
+      this.draw(f);
       this.panToTrackPoint(f.date);
-      this.setStatus(`${this.timestampLabel(f.url.startsWith('http') ? 'remote' : 'local')} (${idx + 1}/${frames.length})`);
+      this.setStatus(`${this.timestampLabel(f.source)} (${idx + 1}/${frames.length})`);
       idx = (idx + 1) % frames.length;
     };
     tick();

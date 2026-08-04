@@ -18,7 +18,9 @@ Storage layout:
   data/radar/manifest.json                          unified index keyed by storm_id
 
 The manifest is what src/radar.js consults at runtime to decide whether
-to serve a local frame or fall back to live IEM URLs.
+to serve a local frame or fall back to IEM's archived XYZ tiles. This
+scraper intentionally keeps downloading the full GIS PNG endpoint: those
+files are the immutable offline path and are not replaced by remote tiles.
 
 Flags:
   --cadence MIN       Densify track-point fetches to MIN-minute cadence by
@@ -62,7 +64,9 @@ MANIFEST = RADAR_DIR / "manifest.json"
 LANDFALLS = DATA / "landfalls.json"
 STORMS = DATA / "storms.json"
 
-IEM_ROOT = "https://mesonet.agron.iastate.edu/archive/data"
+# Local archive downloads remain full georeferenced PNGs. The browser's
+# online fallback uses the stable /c/tile.py/1.0.0 endpoint instead.
+IEM_ARCHIVE_ROOT = "https://mesonet.agron.iastate.edu/archive/data"
 
 # Region: (folder, product, earliest_year, lat_min, lat_max, lon_min, lon_max)
 REGIONS = [
@@ -94,7 +98,7 @@ def round_to_minutes(dt: datetime, mins: int) -> datetime:
 
 def build_url(region: str, product: str, dt: datetime) -> str:
     stamp = dt.strftime("%Y%m%d%H%M")
-    return f"{IEM_ROOT}/{dt.year:04d}/{dt.month:02d}/{dt.day:02d}/GIS/{region}/{product}_{stamp}.png"
+    return f"{IEM_ARCHIVE_ROOT}/{dt.year:04d}/{dt.month:02d}/{dt.day:02d}/GIS/{region}/{product}_{stamp}.png"
 
 
 def head_ok(url: str, timeout: int = 15) -> bool:

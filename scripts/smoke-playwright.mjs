@@ -326,6 +326,76 @@ async function assertVideoExport(page) {
   await download.delete();
 }
 
+async function assertRadarRenderModes(page) {
+  await page.evaluate(async () => {
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmRemoteRadarSmoke = overlay;
+    await overlay.show({
+      id: '__smoke_remote_radar__',
+      name: 'SMOKE',
+      year: 2024,
+      us_landfalls: [{
+        t: '2024-08-01T12:05:00Z',
+        lat: 29.2,
+        lon: -89.6,
+        state: 'Louisiana',
+      }],
+      track: [],
+    }, 0);
+  });
+  await page.waitForFunction(() => {
+    const layer = window.__hmRemoteRadarSmoke?.overlay;
+    return layer instanceof window.L.TileLayer &&
+      Object.values(layer._tiles || {}).some(tile => tile.el?.complete && tile.el.naturalWidth > 0);
+  }, { timeout: 30000 });
+  const remote = await page.evaluate(() => {
+    const layer = window.__hmRemoteRadarSmoke?.overlay;
+    return {
+      isTileLayer: layer instanceof window.L.TileLayer,
+      template: layer?._url || '',
+      tileCount: Object.values(layer?._tiles || {}).filter(tile => tile.el?.complete && tile.el.naturalWidth > 0).length,
+    };
+  });
+  assert(remote.isTileLayer, 'remote radar did not render as a Leaflet tile layer');
+  assert(/ridge::USCOMP-N0Q-2024080112\d\d\/\{z\}\/\{x\}\/\{y\}\.png$/.test(remote.template), `remote radar tile template was incorrect: ${remote.template}`);
+  assert(remote.tileCount > 0, `remote radar tile layer loaded no tiles: ${JSON.stringify(remote)}`);
+
+  await page.evaluate(async () => {
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmLocalRadarSmoke = overlay;
+    await overlay.show({
+      id: 'AL122005',
+      name: 'KATRINA',
+      year: 2005,
+      us_landfalls: [{
+        t: '2005-08-29T11:10:00Z',
+        lat: 29.2,
+        lon: -89.6,
+        state: 'Louisiana',
+      }],
+      track: [],
+    }, 0);
+  });
+  const local = await page.evaluate(() => {
+    const layer = window.__hmLocalRadarSmoke?.overlay;
+    return {
+      isImageOverlay: layer instanceof window.L.ImageOverlay,
+      url: layer?._url || '',
+    };
+  });
+  assert(local.isImageOverlay && local.url.startsWith('data/radar/'), `local radar path changed: ${JSON.stringify(local)}`);
+  await page.evaluate(() => {
+    window.__hmRemoteRadarSmoke?.close();
+    window.__hmLocalRadarSmoke?.close();
+    delete window.__hmRemoteRadarSmoke;
+    delete window.__hmLocalRadarSmoke;
+  });
+}
+
 async function openStormPanel(page, stormId) {
   await page.evaluate(async id => {
     const data = await import('/src/data.js');
@@ -1982,6 +2052,7 @@ try {
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
   await assertVideoExport(page);
+  await assertRadarRenderModes(page);
   // Live permalink navigation: assigning a new hash in an open tab must
   // apply it without a reload (hashchange listener).
   await page.evaluate(() => { location.hash = '#storm=AL092022'; });
