@@ -23,7 +23,8 @@
   <link rel="stylesheet" href="src/styles.css" />
 </head>
 <body>
-  <a href="#map" class="skip-to-content" data-i18n="app.skipToMap">Skip to map</a>
+  <a href="#main" class="skip-to-content" data-i18n="app.skipToMap">Skip to map</a>
+  <main id="main" tabindex="-1">
   <div id="map" aria-label="Hurricane landfall map" data-i18n-aria-label="app.mapLabel" tabindex="-1"></div>
   <div id="map-announce" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -535,6 +536,8 @@
       <p class="palette-footer" data-i18n-html="shortcuts.footerHtml">Press <kbd>Esc</kbd> to close any open panel or dialog.</p>
     </div>
   </dialog>
+
+  </main>
 
   <script src="vendor/leaflet.js"></script>
   <script src="vendor/leaflet-heat.js"></script>

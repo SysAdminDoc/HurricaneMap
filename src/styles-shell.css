@@ -1,4 +1,13 @@
 /* Header — user-tuned offset to clear the left-edge map controls */
+main#main {
+  min-height: 100%;
+}
+
+main#main:focus {
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: -3px;
+}
+
 .app-header,
 header.app-header.glass {
   position: absolute;

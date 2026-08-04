@@ -111,8 +111,8 @@ if (!readme.includes(`${landfallCount} landfall events`)) {
 if (!notebooksReadme.includes(`${landfallCount} landfall events`)) {
   errors.push(`notebooks/README.md landfall coverage does not declare ${landfallCount} events`);
 }
-if (!/<a\s+href="#map"\s+class="skip-to-content"/i.test(indexHtml)) {
-  errors.push('index.html does not expose the skip-to-map link');
+if (!/<a\s+href="#main"\s+class="skip-to-content"/i.test(indexHtml) || !/<main\s+id="main"\s+tabindex="-1"/i.test(indexHtml)) {
+  errors.push('index.html does not expose the skip-to-main link and landmark');
 }
 if (!/<td>2\.4\.1 Bypass Blocks<\/td><td>A<\/td><td class="supports">Supports<\/td>/i.test(vpat)) {
   errors.push('VPAT does not mark WCAG 2.4.1 Bypass Blocks as supported');

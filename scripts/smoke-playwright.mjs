@@ -48,7 +48,7 @@ function collectPageErrors(target, sink) {
   });
 }
 
-const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'];
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice'];
 // Known-accepted axe rule ids (e.g. unavoidable map-canvas noise). Currently
 // empty — new violations should be fixed, not allowlisted, unless they come
 // from Leaflet internals we cannot control.
@@ -400,7 +400,7 @@ async function assertDialogAndKeyboardContracts(page) {
   assert(await page.evaluate(() => document.activeElement?.classList.contains('skip-to-content')), 'skip link is not the first keyboard stop');
   await page.keyboard.press('Enter');
   await page.waitForFunction(
-    () => document.activeElement?.id === 'map',
+    () => document.activeElement?.id === 'main',
     null,
     { timeout: 2000 },
   ).catch(async () => {
@@ -409,14 +409,17 @@ async function assertDialogAndKeyboardContracts(page) {
       activeId: document.activeElement?.id || '',
       activeClass: document.activeElement?.className || '',
     }));
-    throw new Error(`skip link did not focus the labeled map target: ${JSON.stringify(state)}`);
+    throw new Error(`skip link did not focus the main content target: ${JSON.stringify(state)}`);
   });
 
   const mapAlternative = await page.evaluate(() => ({
+    mainTabIndex: document.querySelector('#main')?.getAttribute('tabindex') || '',
+    mapInMain: document.querySelector('#map')?.closest('main')?.id || '',
     mapLabel: document.querySelector('#map')?.getAttribute('aria-label') || '',
     mapTabIndex: document.querySelector('#map')?.getAttribute('tabindex') || '',
     tableLabel: document.querySelector('#toggle-table-view')?.getAttribute('aria-label') || '',
   }));
+  assert(mapAlternative.mainTabIndex === '-1' && mapAlternative.mapInMain === 'main', `main landmark does not own the map or is not programmatically focusable: ${JSON.stringify(mapAlternative)}`);
   assert(mapAlternative.mapLabel && /^-?1$|^0$/.test(mapAlternative.mapTabIndex), `map target is not programmatically focusable: ${JSON.stringify(mapAlternative)}`);
   assert(/table/i.test(mapAlternative.tableLabel), `keyboard map alternative is not labeled: ${JSON.stringify(mapAlternative)}`);
 }

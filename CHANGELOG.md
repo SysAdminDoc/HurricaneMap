@@ -13,6 +13,8 @@ All notable changes to HurricaneMap.
 - The i18n contract now verifies that each supported locale updates the document language metadata used by screen readers.
 - The browser accessibility smoke now scans the main view, settings, and storm panel independently in English, Spanish, and Haitian Creole.
 - The saved-view file picker now has an explicit localized label, keeping the expanded settings surface axe-clean.
+- The application now exposes a focusable `<main>` landmark for skip-link navigation, and the accessibility smoke includes axe best-practice rules.
+- The dynamic timeline now stays inside the main landmark and exposes its localized region name.
 
 ## v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
 

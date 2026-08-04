@@ -95,7 +95,6 @@ async function openDeterministicApp(page) {
 
 function deterministicMasks(page) {
   return [
-    page.locator('#active-storms-pill'),
     page.locator('#active-storm-badge'),
     page.locator('.hm-toast'),
     page.locator('.header-tooltip'),

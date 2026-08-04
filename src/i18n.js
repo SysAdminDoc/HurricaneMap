@@ -677,7 +677,7 @@ export const STRINGS = {
     'tides.source': 'Source: NOAA Tides & Currents',
 
     // Static application shell
-    'app.skipToMap': 'Skip to map',
+    'app.skipToMap': 'Skip to main content',
     'app.mapLabel': 'Hurricane landfall map',
     'app.viewControls': 'View controls',
     'app.secondaryActions': 'Secondary actions',
@@ -1464,7 +1464,7 @@ export const STRINGS = {
     'tides.source': 'Fuente: NOAA Tides & Currents',
 
     // Interfaz estática
-    'app.skipToMap': 'Saltar al mapa',
+    'app.skipToMap': 'Saltar al contenido principal',
     'app.mapLabel': 'Mapa de toques de tierra de huracanes',
     'app.viewControls': 'Controles de vista',
     'app.secondaryActions': 'Acciones secundarias',
@@ -2231,7 +2231,7 @@ export const STRINGS = {
     'tides.source': 'Sous: NOAA Tides & Currents',
 
     // Entèfas estatik
-    'app.skipToMap': 'Ale sou kat la',
+    'app.skipToMap': 'Ale sou kontni prensipal la',
     'app.mapLabel': 'Kat kote siklòn touche tè',
     'app.viewControls': 'Kontwòl afichaj',
     'app.secondaryActions': 'Lòt aksyon',

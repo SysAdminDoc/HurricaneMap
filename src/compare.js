@@ -42,6 +42,8 @@ function ensureTray() {
     el = document.createElement('div');
     el.id = 'compare-tray';
     el.className = 'compare-tray glass';
+    el.setAttribute('role', 'region');
+    el.setAttribute('aria-label', t('compare.title'));
     el.hidden = true;
     el.innerHTML = `
       <span class="ct-title">Compare</span>
@@ -49,7 +51,7 @@ function ensureTray() {
       <button class="ct-btn primary" id="ct-open">View comparison</button>
       <button class="ct-btn" id="ct-clear" title="Remove all pins">Clear</button>
     `;
-    document.body.appendChild(el);
+    (document.querySelector('#main') || document.body).appendChild(el);
     el.querySelector('#ct-open').addEventListener('click', openComparePanel);
     el.querySelector('#ct-clear').addEventListener('click', clearAll);
   }

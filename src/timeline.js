@@ -50,6 +50,7 @@ export function mountTimeline(landfalls, callbacks) {
   host = document.createElement('section');
   host.className = 'timeline-ribbon glass';
   host.id = 'timeline';
+  host.setAttribute('aria-label', t('timeline.title'));
   host.innerHTML = `
     <button class="timeline-toggle icon-btn" id="timeline-toggle" title="${t('timeline.collapse')}" aria-label="${t('timeline.collapse')}" aria-expanded="true">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
@@ -72,7 +73,7 @@ export function mountTimeline(landfalls, callbacks) {
       </div>
     </div>
   `;
-  document.body.appendChild(host);
+  (document.querySelector('#main') || document.body).appendChild(host);
   document.body.classList.toggle('timeline-collapsed', collapsed);
 
   const toggle = host.querySelector('#timeline-toggle');

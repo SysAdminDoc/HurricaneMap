@@ -326,9 +326,9 @@ async function boot() {
   }
   const map = initMap();
   const skipLink = document.querySelector('.skip-to-content');
-  const mapTarget = document.getElementById('map');
+  const mainTarget = document.getElementById('main');
   skipLink?.addEventListener('click', () => {
-    requestAnimationFrame(() => mapTarget?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => mainTarget?.focus({ preventScroll: true }));
   });
   await loadInitial();
   syncYearBoundsFromData();
