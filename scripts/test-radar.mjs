@@ -7,6 +7,12 @@ import {
   buildRadarProbeTimes,
   isRadarFrameResponseAvailable,
 } from '../src/radar-utils.js';
+import {
+  RADAR_COLORBLIND_STOPS,
+  RADAR_REFLECTIVITY_STOPS,
+  nearestRadarStop,
+  remapRadarPixels,
+} from '../src/radar-palette.js';
 
 const target = new Date('2024-08-01T12:04:00Z');
 const probes = buildRadarProbeTimes(target);
@@ -37,8 +43,32 @@ assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 404 }), false, '
 assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 503 }), false, '503 should be a normal missing-frame result');
 assert.equal(isRadarFrameResponseAvailable({ ok: false, status: 500 }), false);
 
+assert.deepEqual(
+  RADAR_REFLECTIVITY_STOPS.map(stop => stop.dbz),
+  [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+  'the radar legend must retain the documented 5 dBZ intervals',
+);
+assert.equal(nearestRadarStop(0, 200, 0).dbz, 25, 'source green should classify as 25 dBZ');
+assert.equal(RADAR_COLORBLIND_STOPS.length, RADAR_REFLECTIVITY_STOPS.length);
+assert.notEqual(RADAR_COLORBLIND_STOPS[4].color, RADAR_REFLECTIVITY_STOPS[4].color, 'Cividis must differ from the source green');
+
+const sourcePixels = new Uint8ClampedArray([
+  0, 0, 0, 255,       // no echo
+  0, 200, 0, 255,     // 25 dBZ
+  0, 0, 0, 0,         // transparent tile background
+]);
+assert.deepEqual(
+  [...remapRadarPixels(sourcePixels, { colorblind: false })],
+  [...sourcePixels],
+  'the default radar palette must not rewrite source pixels',
+);
+const remapped = remapRadarPixels(sourcePixels);
+assert.deepEqual([...remapped.slice(0, 4)], [0, 0, 0, 255], 'black no-echo pixels must remain black');
+assert.deepEqual([...remapped.slice(8, 12)], [0, 0, 0, 0], 'transparent no-echo pixels must remain transparent');
+assert.deepEqual([...remapped.slice(4, 7)], RADAR_COLORBLIND_STOPS[4].rgb, '25 dBZ must use the Cividis LUT stop');
+
 const csp = readFileSync('index.html', 'utf8').match(/Content-Security-Policy" content="([^"]+)/)?.[1] || '';
 assert.match(csp, /img-src[^;]*https:\/\/mesonet\.agron\.iastate\.edu/);
 assert.match(csp, /connect-src[^;]*https:\/\/mesonet\.agron\.iastate\.edu/);
 
-console.log('radar tiles ok (nearest probing, 404/503 misses, offline URL contract, CSP coverage)');
+console.log('radar tiles ok (nearest probing, 404/503 misses, offline URL contract, LUT remap, CSP coverage)');

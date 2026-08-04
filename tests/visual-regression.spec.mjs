@@ -207,6 +207,52 @@ async function openVisualPlayback(page) {
   await page.locator('.anim-controls .anim-scrubber').fill('420');
 }
 
+async function openVisualColorblindRadar(page) {
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('palette', 'colorblind');
+  });
+  await page.waitForFunction(() => document.body.classList.contains('palette-colorblind'));
+  await closeVisualPanels(page);
+  await page.evaluate(() => {
+    const style = document.createElement('style');
+    style.id = 'hm-visual-radar-style';
+    style.textContent = `
+      #map .leaflet-overlay-pane,
+      #map .leaflet-overlay-pane img.radar-overlay-img {
+        visibility: visible !important;
+      }
+    `;
+    document.head.append(style);
+  });
+  await page.evaluate(async () => {
+    const data = await import('/src/data.js');
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    await data.ensureStormsLoaded();
+    const storm = data.getAllStorms().find(item => item.id === 'AL122005');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmVisualRadar = overlay;
+    await overlay.show(storm, 0);
+  });
+  await page.waitForSelector('#radar-controls:not([hidden]) .radar-legend', { timeout: 15_000 });
+  await page.waitForFunction(() => (
+    document.querySelector('#radar-controls .radar-legend')?.dataset.palette === 'colorblind' &&
+    window.__hmVisualRadar?.overlay?._url?.startsWith('data:image/png')
+  ), { timeout: 30_000 });
+}
+
+async function closeVisualColorblindRadar(page) {
+  await page.evaluate(async () => {
+    window.__hmVisualRadar?.close();
+    delete window.__hmVisualRadar;
+    document.querySelector('#hm-visual-radar-style')?.remove();
+    const settings = await import('/src/settings.js');
+    settings.setSetting('palette', 'default');
+  });
+  await page.waitForFunction(() => !document.body.classList.contains('palette-colorblind'));
+}
+
 test('stable atlas shell and statistics panel match approved baselines', async ({ page }) => {
   await openDeterministicApp(page);
   await expect(page).toHaveScreenshot('desktop-shell.png', {
@@ -237,6 +283,10 @@ test('critical desktop workflows remain pixel-stable across theme and panel stat
 
   await openVisualStorm(page);
   await expectMatrixScreenshot(page, 'matrix-desktop-storm.png');
+
+  await openVisualColorblindRadar(page);
+  await expectMatrixScreenshot(page, 'matrix-desktop-radar-colorblind.png');
+  await closeVisualColorblindRadar(page);
 
   await openVisualStats(page);
   await expectMatrixScreenshot(page, 'matrix-desktop-statistics.png');

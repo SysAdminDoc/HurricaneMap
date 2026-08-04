@@ -449,11 +449,59 @@ async function assertRadarRenderModes(page) {
     };
   });
   assert(local.isImageOverlay && local.url.startsWith('data/radar/'), `local radar path changed: ${JSON.stringify(local)}`);
+
+  await page.evaluate(async () => {
+    window.__hmRemoteRadarSmoke?.close();
+    window.__hmLocalRadarSmoke?.close();
+    const settings = await import('/src/settings.js');
+    settings.setSetting('palette', 'colorblind');
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmColorblindRadarSmoke = overlay;
+    await overlay.show({
+      id: '__smoke_colorblind_radar__',
+      name: 'SMOKE',
+      year: 2024,
+      us_landfalls: [{
+        t: '2024-08-01T12:05:00Z',
+        lat: 29.2,
+        lon: -89.6,
+        state: 'Louisiana',
+      }],
+      track: [],
+    }, 0);
+  });
+  await page.waitForFunction(() => {
+    const layer = window.__hmColorblindRadarSmoke?.overlay;
+    return layer instanceof window.L.TileLayer &&
+      Object.values(layer._tiles || {}).some(tile => tile.el?.tagName === 'CANVAS' && tile.el.__hmRadarPaletteApplied);
+  }, { timeout: 30000 });
+  const colorblind = await page.evaluate(() => {
+    const layer = window.__hmColorblindRadarSmoke?.overlay;
+    const canvases = Object.values(layer?._tiles || {}).filter(tile => tile.el?.tagName === 'CANVAS');
+    return {
+      isTileLayer: layer instanceof window.L.TileLayer,
+      palette: layer?.__hmRadarColorblind || false,
+      canvasCount: canvases.length,
+      appliedCount: canvases.filter(tile => tile.el.__hmRadarPaletteApplied).length,
+      legend: document.querySelector('#radar-controls .radar-legend')?.textContent || '',
+    };
+  });
+  assert(colorblind.isTileLayer && colorblind.palette, `colour-blind radar did not preserve the tile-layer contract: ${JSON.stringify(colorblind)}`);
+  assert(colorblind.appliedCount > 0, `colour-blind radar did not remap any canvas tiles: ${JSON.stringify(colorblind)}`);
+  assert(/Cividis/.test(colorblind.legend), `radar legend did not identify the colour-blind ramp: ${colorblind.legend}`);
   await page.evaluate(() => {
     window.__hmRemoteRadarSmoke?.close();
     window.__hmLocalRadarSmoke?.close();
+    window.__hmColorblindRadarSmoke?.close();
+  });
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('palette', 'default');
     delete window.__hmRemoteRadarSmoke;
     delete window.__hmLocalRadarSmoke;
+    delete window.__hmColorblindRadarSmoke;
   });
 }
 

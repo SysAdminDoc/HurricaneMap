@@ -2270,6 +2270,47 @@ label > input[type="checkbox"] {
   gap: 6px;
 }
 
+.radar-legend {
+  display: grid;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.radar-legend-title {
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.radar-legend-scale {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.radar-legend-stop {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--subtext);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 9px;
+}
+
+.radar-swatch {
+  display: block;
+  width: 100%;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--radar-swatch);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.radar-legend-note {
+  color: var(--subtext);
+  font-size: 9px;
+}
+
 .radar-btn {
   background: var(--mantle);
   border: 1px solid var(--surface0);

@@ -50,12 +50,46 @@ import {
   isRadarFrameResponseAvailable,
 } from './radar-utils.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { getSetting } from './settings.js';
+import {
+  RADAR_COLORBLIND_STOPS,
+  RADAR_REFLECTIVITY_STOPS,
+  createColorblindRadarTileLayer,
+  createRadarImageOverlay,
+} from './radar-palette.js';
+import { t } from './i18n.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
 const LOCAL_ROOT = 'data/radar';
 const MANIFEST_URL = 'data/radar/manifest.json';
+
+function isColorblindPalette() {
+  return getSetting('palette') === 'colorblind';
+}
+
+function radarLegendHtml(colorblind) {
+  const stops = colorblind ? RADAR_COLORBLIND_STOPS : RADAR_REFLECTIVITY_STOPS;
+  const visibleStops = [0, 2, 4, 6, 8, 10, stops.length - 1]
+    .filter((index, position, indexes) => indexes.indexOf(index) === position)
+    .map(index => stops[index]);
+  const paletteLabel = t(colorblind ? 'radar.paletteColorblind' : 'radar.paletteDefault');
+  return `
+    <div class="radar-legend" data-palette="${colorblind ? 'colorblind' : 'default'}" aria-label="${escapeHtml(t('radar.legendTitle'))}">
+      <div class="radar-legend-title">${escapeHtml(t('radar.legendTitle'))}</div>
+      <div class="radar-legend-scale" role="img" aria-label="${escapeHtml(paletteLabel)}">
+        ${visibleStops.map(stop => `
+          <span class="radar-legend-stop" data-dbz="${stop.dbz}">
+            <span class="radar-swatch" style="--radar-swatch:${stop.color}" aria-hidden="true"></span>
+            <span>${stop.dbz}</span>
+          </span>
+        `).join('')}
+      </div>
+      <div class="radar-legend-note">${escapeHtml(paletteLabel)}</div>
+    </div>
+  `;
+}
 
 const REGIONS = {
   uscomp: {
@@ -188,9 +222,17 @@ export class RadarOverlay {
     this.storm = null;
     this.stormId = null;
     this.localFrames = null;     // sorted array of {ts, date, url} for full-storm loop
+    this.currentFrame = null;
+    this.colorblind = isColorblindPalette();
     this.animTimer = null;
     this.loopPending = false;    // online loop probe in flight
     this.session = 0;            // bumped on show()/close() to cancel stale awaits
+    document.addEventListener('hm-settings:change', event => {
+      if (event.detail?.key !== 'palette') return;
+      this.colorblind = isColorblindPalette();
+      this.updateLegend();
+      if (this.currentFrame && this.region) this.draw(this.currentFrame);
+    });
   }
 
   available(landfall) {
@@ -206,6 +248,7 @@ export class RadarOverlay {
     // closes radar or opens another landfall meanwhile, this session token
     // stops the stale continuation from resurrecting the overlay.
     const session = ++this.session;
+    this.colorblind = isColorblindPalette();
     this.stopAnimation();
     beginOptionalFeed('radar', { cacheOrigin: 'bundled' });
     await loadManifest();
@@ -270,8 +313,9 @@ export class RadarOverlay {
       this.overlay = null;
     }
     const config = REGIONS[this.region];
+    this.currentFrame = frame;
     if (frame.source === 'remote') {
-      this.overlay = L.tileLayer(frame.url, {
+      const options = {
         opacity: 1.0,
         className: 'radar-overlay-tile',
         bounds: config.bounds,
@@ -279,14 +323,18 @@ export class RadarOverlay {
         maxZoom: this.map.getMaxZoom(),
         noWrap: true,
         interactive: false,
-      }).addTo(this.map);
+      };
+      this.overlay = this.colorblind
+        ? createColorblindRadarTileLayer(L, frame.url, options)
+        : L.tileLayer(frame.url, options);
+      this.overlay.addTo(this.map);
       return;
     }
-    this.overlay = L.imageOverlay(frame.url, config.bounds, {
+    this.overlay = createRadarImageOverlay(L, frame.url, config.bounds, {
       opacity: 1.0,
       className: 'radar-overlay-img',
       interactive: false,
-    }).addTo(this.map);
+    }, this.colorblind).addTo(this.map);
   }
 
   timestampLabel(source = 'local') {
@@ -319,6 +367,7 @@ export class RadarOverlay {
         ${totalFrames ? '<button class="radar-btn radar-save" data-act="save" title="Save a bounded offline radar pack for this storm">Save offline</button>' : ''}
         <button class="radar-btn radar-close" data-act="close" title="Close radar">×</button>
       </div>
+      ${radarLegendHtml(this.colorblind)}
       <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>
     `;
     this.controls = el;
@@ -327,6 +376,11 @@ export class RadarOverlay {
     el.querySelector('[data-act="loop"]').addEventListener('click', () => this.toggleLoop());
     el.querySelector('[data-act="save"]')?.addEventListener('click', event => this.saveOfflinePack(event.currentTarget));
     el.querySelector('[data-act="close"]').addEventListener('click', () => this.close());
+  }
+
+  updateLegend() {
+    const legend = this.controls?.querySelector('.radar-legend');
+    if (legend) legend.outerHTML = radarLegendHtml(this.colorblind);
   }
 
   async saveOfflinePack(button) {
@@ -496,5 +550,6 @@ export class RadarOverlay {
     this.stormId = null;
     this.currentDate = null;
     this.localFrames = null;
+    this.currentFrame = null;
   }
 }

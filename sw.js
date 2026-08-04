@@ -115,6 +115,7 @@ const SHELL_ASSETS = [
   './src/population.js',
   './src/qgis.js',
   './src/radar.js',
+  './src/radar-palette.js',
   './src/radar-utils.js',
   './src/report.js',
   './src/search-history.js',

@@ -14,6 +14,8 @@ import { categoryColor, formatTime, windToCategory, categoryLabel } from './data
 import { getStormRadarFrames } from './radar.js';
 import { formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { getSetting } from './settings.js';
+import { createRadarImageOverlay } from './radar-palette.js';
 
 const L = window.L;
 
@@ -66,9 +68,15 @@ export class TrackAnimator {
     this.radarBounds = null;
     this.radarEnabled = true;     // toggled via checkbox in controls
     this.lastRadarUrl = null;
+    this.lastRadarIso = null;
     this.controlsHost = null;
     this.stateCallback = null;
     this.lastAnnouncedBucket = -1;
+    document.addEventListener('hm-settings:change', event => {
+      if (event.detail?.key === 'palette' && this.radarLayer && this.lastRadarIso) {
+        this.updateRadar(this.lastRadarIso);
+      }
+    });
   }
 
   isPlaying() {
@@ -217,6 +225,7 @@ export class TrackAnimator {
    *  or the storm is between US-coverage windows. */
   updateRadar(simIso) {
     if (!this.radarEnabled || !this.radarFrames || !this.radarBounds) return;
+    this.lastRadarIso = simIso;
     const simMs = new Date(simIso).getTime();
     let best = null;
     for (const f of this.radarFrames) {
@@ -229,16 +238,20 @@ export class TrackAnimator {
         this.map.removeLayer(this.radarLayer);
         this.radarLayer = null;
         this.lastRadarUrl = null;
+        this.lastRadarIso = null;
       }
       return;
     }
-    if (best.url === this.lastRadarUrl) return;
-    if (!this.radarLayer) {
-      this.radarLayer = L.imageOverlay(best.url, this.radarBounds, {
+    const colorblind = getSetting('palette') === 'colorblind';
+    const paletteChanged = this.radarLayer && this.radarLayer.__hmRadarColorblind !== colorblind;
+    if (best.url === this.lastRadarUrl && !paletteChanged) return;
+    if (!this.radarLayer || paletteChanged || colorblind) {
+      if (this.radarLayer) this.map.removeLayer(this.radarLayer);
+      this.radarLayer = createRadarImageOverlay(L, best.url, this.radarBounds, {
         opacity: 1.0,
         className: 'radar-overlay-img',
         interactive: false,
-      });
+      }, colorblind);
       this.radarLayer.addTo(this.map);
     } else {
       this.radarLayer.setUrl(best.url);
@@ -462,6 +475,7 @@ export class TrackAnimator {
     this.radarFrames = null;
     this.radarBounds = null;
     this.lastRadarUrl = null;
+    this.lastRadarIso = null;
     this.controlsHost = null;
     this.lastAnnouncedBucket = -1;
     this.stateCallback = null;
