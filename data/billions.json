@@ -520,14 +520,22 @@
   "event": "Hurricane Iniki (September 1992)"
  },
  "_meta": {
-  "generated": "2026-07-09",
+  "dataset_id": "ncei-billions",
+  "end_date": "2024-12-31",
+  "generated": "2026-08-03",
   "matched_events": 65,
   "note": "Product retired 2025-05-08; data frozen at calendar year 2024. Costs are millions USD, CPI-adjusted to 2024.",
   "product": "NOAA NCEI U.S. Billion-Dollar Weather and Climate Disasters",
+  "retirement_citation": {
+   "date": "2025-05-08",
+   "title": "Billion Dollar Weather and Climate Disasters",
+   "url": "https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters"
+  },
   "skipped_events": [
    "Hurricane Marilyn (September 1995)",
    "Typhoon Mawar (May 2023)"
   ],
-  "source": "https://www.ncei.noaa.gov/access/billions/events-US-1980-2024.csv"
+  "source": "https://www.ncei.noaa.gov/access/billions/events-US-1980-2024.csv",
+  "status": "closed"
  }
 }

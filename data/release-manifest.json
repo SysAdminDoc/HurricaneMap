@@ -33,8 +33,8 @@
     },
     {
       "path": "data/billions.json",
-      "bytes": 13132,
-      "sha256": "a75bd95f7f424cf44bd6496f9ef28cd2749d304307ce5e2384cfc230d4046027",
+      "bytes": 13490,
+      "sha256": "584ac7fb1c8c88a8ff4ff9dac8bd4bc2a84c4ac36a460b23da7d8e2437dbadce",
       "source_url": "https://www.ncei.noaa.gov/access/billions/",
       "source_date": "2026-07-09",
       "generated_at_utc": "2026-08-03T00:00:00Z",
@@ -132,8 +132,8 @@
     },
     {
       "path": "data/metadata.json",
-      "bytes": 3105,
-      "sha256": "32912867902cedbcdbfc5700ef23cb250c5604bfeadb382c9cbdaf5999b54116",
+      "bytes": 7154,
+      "sha256": "9571eba079e39aa456a03f12d64f28dba66ef7bfa5cb042f8dcfbdb2ede6a809",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-03",
       "generated_at_utc": "2026-08-03T00:00:00Z",

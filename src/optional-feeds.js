@@ -15,6 +15,18 @@ export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   seasonal: { labelKey: 'feeds.seasonal', source: 'NOAA CPC bundled outlook snapshot' },
 });
 
+export function getBundledDatasetStatus(metadata, datasetId) {
+  if (!Array.isArray(metadata?.datasets)) return null;
+  return metadata.datasets.find(dataset => dataset?.id === datasetId) || null;
+}
+
+export function getBundledDatasetState(status, available) {
+  if (!available) return 'unavailable';
+  if (status?.status === 'closed') return 'closed';
+  if (status?.status === 'deprecated') return 'deprecated';
+  return 'available';
+}
+
 const VALID_STATES = new Set([
   'idle', 'loading', 'success', 'empty', 'stale', 'offline', 'rate-limited', 'error',
 ]);

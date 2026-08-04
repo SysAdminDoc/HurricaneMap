@@ -5584,6 +5584,8 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 .im-row--missing .im-value { color: var(--subtext); font-style: italic; }
 
+.im-row--closed .im-value { color: var(--subtext); font-style: italic; }
+
 .settings-row {
   grid-template-columns: minmax(112px, 0.82fr) minmax(0, 1.65fr);
   align-items: center;

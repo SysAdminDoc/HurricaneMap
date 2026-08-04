@@ -1,7 +1,8 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
   ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
-  formatTime, getImpactsFor, getBillionsFor, getAllStorms, windToCategory,
+  formatTime, getImpactsFor, getBillionsFor, getAllStorms, getMetadata,
+  isDatasetAvailable, windToCategory,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
@@ -18,7 +19,10 @@ import {
   findSimilarStorms, computeRIRiskScore, generateStormBiography,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
-import { inflateUSD, formatMillionsUSD } from './inflation.js';
+import {
+  BILLIONS_DATASET_STATUS, NCEI_BILLIONS_DATASET_ID,
+  inflateUSD, formatMillionsUSD, isClosedSeries, seriesEndYear,
+} from './inflation.js';
 import { escapeHtml, formatStormName, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
 import {
@@ -42,6 +46,7 @@ import { renderForecastSkill } from './forecast-skill.js';
 import { formatClosest, wirePanelControls } from './panel-controls.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { inspectRadarFrameCache } from './storage-manager.js';
+import { getBundledDatasetState, getBundledDatasetStatus } from './optional-feeds.js';
 
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
@@ -616,12 +621,23 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
     }
   }
   const billions = getBillionsFor(storm.id);
+  const billionsStatus = getBundledDatasetStatus(getMetadata(), NCEI_BILLIONS_DATASET_ID) || BILLIONS_DATASET_STATUS;
+  const billionsState = getBundledDatasetState(billionsStatus, isDatasetAvailable(NCEI_BILLIONS_DATASET_ID));
+  const billionsEndYear = seriesEndYear(billionsStatus);
   if (billions && Number.isFinite(billions.cost_cpi_musd)) {
     const deaths = Number.isFinite(billions.deaths)
       ? ` · ${billions.deaths.toLocaleString()} ${t('impacts.deaths')}`
       : '';
     rows.push(`<div class="im-row"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${formatMillionsUSD(billions.cost_cpi_musd)} <span class="im-adj">(2024 USD${deaths})</span></span></div>`);
     sources.push(`<a href="https://www.ncei.noaa.gov/access/billions/" target="_blank" rel="noopener">${t('impacts.nceiSource')}</a>`);
+  } else if (billionsState === 'closed' && Number.isInteger(billionsEndYear) && Number(storm.year) > billionsEndYear) {
+    rows.push(`<div class="im-row im-row--closed"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${t('impacts.nceiClosed', billionsEndYear)}</span></div>`);
+    const retirementUrl = safeExternalUrl(billionsStatus.retirement_citation?.url);
+    if (retirementUrl) {
+      sources.push(`<a href="${retirementUrl}" target="_blank" rel="noopener">${t('impacts.nceiRetirementSource')}</a>`);
+    }
+  } else if (billionsState === 'unavailable') {
+    rows.push(`<div class="im-row im-row--missing"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${t('impacts.nceiUnavailable')}</span></div>`);
   }
   if (!im) {
     rows.push(`<div class="im-row im-row--missing"><span class="im-value">${t('impacts.missingRecord')}</span></div>`);

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 import { DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
+import { validateClosedSeriesRows, validateDatasetStatuses } from './dataset-status.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
@@ -330,6 +331,19 @@ if (metadata.schema_version !== DATA_SCHEMA_VERSION) {
   fail(`metadata.schema_version must be ${DATA_SCHEMA_VERSION}.`);
 }
 if (!validIsoDate(metadata.generated_at_utc)) fail('metadata.generated_at_utc must be an ISO timestamp.');
+const bundledDataPaths = new Set([
+  'data/advisories.json', 'data/aoml-landfalls.json', 'data/aoml-us-landfalls.html',
+  'data/billions.json', 'data/cone-radii.json', 'data/enso.json', 'data/forecast-skill.json',
+  'data/glossary.json', 'data/hurdat2-atlantic.txt', 'data/hurdat2-nepac.txt',
+  'data/hurdat2-sources.json', 'data/impacts.json', 'data/landfalls.json',
+  'data/ncei-billions-1980-2024.csv', 'data/outlook.json', 'data/rainfall.json',
+  'data/stats.json', 'data/storm-events.json', 'data/storms.json', 'data/storms.json.gz',
+  'data/tide-stations.json', 'data/us-states.geojson', 'data/radar/manifest.json',
+  'data/surge-obs/index.json',
+]);
+for (const error of validateDatasetStatuses(metadata.datasets, bundledDataPaths)) fail(error);
+const nceiDataset = metadata.datasets?.find(dataset => dataset.id === 'ncei-billions');
+for (const error of validateClosedSeriesRows(nceiDataset, billions, { idLabel: 'billions row' })) fail(error);
 if (!isObject(metadata.generator)) {
   fail('metadata.generator must contain generator details.');
 } else {
@@ -632,6 +646,14 @@ if (!isObject(aoml.validation)) {
 for (const [stormId, event] of Object.entries(billions)) {
   if (stormId === '_meta') {
     if (!isObject(event) || typeof event.source !== 'string') fail('billions.json _meta must record its source.');
+    if (event.dataset_id !== 'ncei-billions' || event.status !== 'closed' || event.end_date !== nceiDataset?.end_date) {
+      fail('billions.json _meta must identify the closed ncei-billions dataset and its end_date.');
+    }
+    const eventCitation = event.retirement_citation || {};
+    const metadataCitation = nceiDataset?.retirement_citation || {};
+    if (eventCitation.title !== metadataCitation.title || eventCitation.date !== metadataCitation.date || eventCitation.url !== metadataCitation.url) {
+      fail('billions.json _meta retirement_citation must match metadata.datasets ncei-billions.');
+    }
     continue;
   }
   if (!stormsById.has(stormId)) fail(`billions.json references unknown storm id ${stormId}.`);

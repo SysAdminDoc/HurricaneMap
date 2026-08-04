@@ -26,6 +26,11 @@ ROOT = Path(__file__).resolve().parent.parent
 CSV_URL = "https://www.ncei.noaa.gov/access/billions/events-US-1980-2024.csv"
 CSV_CACHE = ROOT / "data" / "ncei-billions-1980-2024.csv"
 OUT_PATH = ROOT / "data" / "billions.json"
+RETIREMENT_CITATION = {
+    "title": "Billion Dollar Weather and Climate Disasters",
+    "date": "2025-05-08",
+    "url": "https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters",
+}
 
 
 def fetch_csv() -> str:
@@ -134,6 +139,10 @@ def main():
         }
 
     out["_meta"] = {
+        "dataset_id": "ncei-billions",
+        "status": "closed",
+        "end_date": "2024-12-31",
+        "retirement_citation": RETIREMENT_CITATION,
         "source": CSV_URL,
         "product": "NOAA NCEI U.S. Billion-Dollar Weather and Climate Disasters",
         "note": "Product retired 2025-05-08; data frozen at calendar year 2024. Costs are millions USD, CPI-adjusted to 2024.",

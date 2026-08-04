@@ -41,6 +41,7 @@ const DATA = {
   metadata: null,
   impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
   billions: null,      // storm_id -> NCEI billion-dollar disaster event (frozen at 2024)
+  billionsAvailable: false,
   enso: null,          // year (string) -> ONI value
   aoml: null,          // AOML detailed landfall ground-truth artifact
 };
@@ -69,7 +70,7 @@ export async function loadInitial() {
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
-    fetchJson('data/billions.json', { optional: true, fallback: {} }),
+    fetchJson('data/billions.json', { optional: true, fallback: null }),
     fetchJson('data/enso.json', { optional: true, fallback: null }),
     fetchJson('data/aoml-landfalls.json', { optional: true, fallback: null }),
   ]);
@@ -80,7 +81,8 @@ export async function loadInitial() {
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;
   DATA.impacts = im || {};
-  DATA.billions = bn || {};
+  DATA.billions = bn && typeof bn === 'object' && !Array.isArray(bn) ? bn : {};
+  DATA.billionsAvailable = Boolean(bn && typeof bn === 'object' && !Array.isArray(bn));
   DATA.enso = enso && typeof enso === 'object' ? enso : null;
   DATA.aoml = aoml && typeof aoml === 'object' ? aoml : null;
   return DATA;
@@ -93,6 +95,11 @@ export function getImpactsFor(stormId) {
 export function getBillionsFor(stormId) {
   if (!stormId || stormId === '_meta') return null;
   return DATA.billions?.[stormId] || null;
+}
+
+export function isDatasetAvailable(datasetId) {
+  if (datasetId === 'ncei-billions') return DATA.billionsAvailable;
+  return true;
 }
 
 function loadStormsViaWorker() {

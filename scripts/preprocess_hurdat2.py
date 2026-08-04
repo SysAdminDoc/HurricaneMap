@@ -56,6 +56,138 @@ SIMILARITY_VECTOR_STATS = {
     "decay_min": -5,
 }
 
+# Lifecycle metadata is shipped with the generated build metadata so a
+# missing row can be distinguished from a source that has permanently ended.
+# `end_date` is the last date covered by this bundled snapshot; it is not an
+# expiry date for an active source. Closed/deprecated sources must also carry
+# a retirement citation.
+DATASET_STATUSES = [
+    {
+        "id": "hurdat2",
+        "label": "NOAA/NHC HURDAT2 best-track and derived landfall data",
+        "paths": [
+            "data/hurdat2-atlantic.txt",
+            "data/hurdat2-nepac.txt",
+            "data/hurdat2-sources.json",
+            "data/landfalls.json",
+            "data/stats.json",
+            "data/storms.json",
+            "data/storms.json.gz",
+        ],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "aoml-landfalls",
+        "label": "AOML detailed U.S. hurricane landfall table",
+        "paths": ["data/aoml-landfalls.json", "data/aoml-us-landfalls.html"],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "storm-impacts",
+        "label": "Community-sourced storm impacts",
+        "paths": ["data/impacts.json"],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "ncei-billions",
+        "label": "NOAA NCEI Billion-Dollar Weather and Climate Disasters",
+        "paths": ["data/billions.json", "data/ncei-billions-1980-2024.csv"],
+        "status": "closed",
+        "end_date": "2024-12-31",
+        "retirement_citation": {
+            "title": "Billion Dollar Weather and Climate Disasters",
+            "date": "2025-05-08",
+            "url": "https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters",
+        },
+    },
+    {
+        "id": "enso",
+        "label": "NOAA PSL Oceanic Niño Index snapshot",
+        "paths": ["data/enso.json"],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "seasonal-outlook",
+        "label": "NOAA/CPC and CSU seasonal outlook snapshot",
+        "paths": ["data/outlook.json"],
+        "status": "active",
+        "end_date": "2026-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "forecast-skill",
+        "label": "NOAA/NHC official forecast skill summary",
+        "paths": ["data/forecast-skill.json"],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "advisory-replay",
+        "label": "NHC archived advisory replay",
+        "paths": ["data/advisories.json", "data/cone-radii.json"],
+        "status": "active",
+        "end_date": "2024-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "storm-events",
+        "label": "NOAA/NCEI Storm Events coincidence data",
+        "paths": ["data/storm-events.json"],
+        "status": "active",
+        "end_date": "2025-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "rainfall",
+        "label": "NOAA tropical cyclone rainfall reports",
+        "paths": ["data/rainfall.json"],
+        "status": "active",
+        "end_date": "2024-12-31",
+        "retirement_citation": None,
+    },
+    {
+        "id": "radar-archive",
+        "label": "Iowa State IEM archived NEXRAD composites",
+        "paths": ["data/radar/manifest.json"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+    {
+        "id": "tide-stations",
+        "label": "NOAA CO-OPS tide-station index",
+        "paths": ["data/tide-stations.json", "data/surge-obs/index.json"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+    {
+        "id": "storm-boundaries",
+        "label": "U.S. Census state boundary polygons",
+        "paths": ["data/us-states.geojson"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+    {
+        "id": "glossary",
+        "label": "HurricaneMap glossary",
+        "paths": ["data/glossary.json"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+]
+
 # Saffir-Simpson categories from sustained wind in knots.
 def saffir_simpson(wind_kt: int) -> int:
     if wind_kt < 34:
@@ -335,6 +467,7 @@ def build_metadata(source_summaries, stats, outputs, generated_at, source_commit
             "runtime": f"Python {platform.python_version()}",
         },
         "sources": source_summaries,
+        "datasets": DATASET_STATUSES,
         "coverage": {
             "year_range": stats.get("year_range", [None, None]),
             "storm_count": stats.get("total_storms"),

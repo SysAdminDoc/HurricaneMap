@@ -50,6 +50,27 @@ const CPI = {
 const BASE_YEAR = 2024;
 const BASE_CPI = CPI[BASE_YEAR];
 
+export const NCEI_BILLIONS_DATASET_ID = 'ncei-billions';
+export const BILLIONS_DATASET_STATUS = Object.freeze({
+  id: NCEI_BILLIONS_DATASET_ID,
+  status: 'closed',
+  end_date: '2024-12-31',
+  retirement_citation: Object.freeze({
+    title: 'Billion Dollar Weather and Climate Disasters',
+    date: '2025-05-08',
+    url: 'https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters',
+  }),
+});
+
+export function isClosedSeries(status) {
+  return status?.status === 'closed';
+}
+
+export function seriesEndYear(status) {
+  const match = /^(\d{4})-\d{2}-\d{2}$/.exec(status?.end_date || '');
+  return match ? Number(match[1]) : null;
+}
+
 // Returns { real, factor } or null when out of range.
 export function inflateUSD(amountUSD, fromYear, toYear = BASE_YEAR) {
   if (amountUSD == null) return null;

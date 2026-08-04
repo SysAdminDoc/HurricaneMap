@@ -646,6 +646,9 @@ export const STRINGS = {
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Billion-dollar disaster',
     'impacts.nceiSource': 'Source: NOAA NCEI (frozen at 2024)',
+    'impacts.nceiClosed': 'No data — series ended {0}',
+    'impacts.nceiUnavailable': 'NOAA NCEI data unavailable',
+    'impacts.nceiRetirementSource': 'Why the series ended (NOAA NESDIS)',
     'impacts.deaths': 'deaths',
 
     // USGS high-water marks
@@ -1461,6 +1464,9 @@ export const STRINGS = {
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Desastre de mil millones',
     'impacts.nceiSource': 'Fuente: NOAA NCEI (congelado en 2024)',
+    'impacts.nceiClosed': 'Sin datos — la serie terminó en {0}',
+    'impacts.nceiUnavailable': 'Datos de NOAA NCEI no disponibles',
+    'impacts.nceiRetirementSource': 'Por qué terminó la serie (NOAA NESDIS)',
     'impacts.deaths': 'muertes',
 
     // USGS high-water marks
@@ -2256,6 +2262,9 @@ export const STRINGS = {
     // NCEI billion-dollar disasters
     'impacts.ncei': 'Dezas plizyè milya dola',
     'impacts.nceiSource': 'Sous: NOAA NCEI (fikse nan 2024)',
+    'impacts.nceiClosed': 'Pa gen done — seri a fini an {0}',
+    'impacts.nceiUnavailable': 'Done NOAA NCEI yo pa disponib',
+    'impacts.nceiRetirementSource': 'Poukisa seri a fini (NOAA NESDIS)',
     'impacts.deaths': 'moun ki mouri',
 
     // USGS high-water marks
