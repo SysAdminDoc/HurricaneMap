@@ -3435,6 +3435,20 @@ select {
   white-space: nowrap;
 }
 
+.storage-scope-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.storage-source-save {
+  width: auto;
+  min-height: 34px;
+  padding: 0.3rem 0.65rem;
+  white-space: nowrap;
+}
+
 .offline-diagnostics {
   display: grid;
   gap: 0.5rem;

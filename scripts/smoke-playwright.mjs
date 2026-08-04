@@ -657,7 +657,7 @@ async function assertSettingsSurface(page, label) {
     if (menu && !menu.matches(':popover-open')) menu.showPopover();
   });
   await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
-  await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 4, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 5, { timeout: 5000 });
   await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', { timeout: 10000 });
   const layout = await page.evaluate(() => {
     const menu = document.querySelector('#settings-menu');
@@ -682,6 +682,7 @@ async function assertSettingsSurface(page, label) {
       helperCount: document.querySelectorAll('#settings-menu .settings-help, #settings-menu .settings-toggle-copy small').length,
       storageScopes: document.querySelectorAll('#storage-manager .storage-scope').length,
       storageClearActions: document.querySelectorAll('#storage-manager [data-clear-storage]').length,
+      sourceBundleActions: document.querySelectorAll('#storage-manager [data-cache-source-bundle]').length,
       diagnosticScopes: document.querySelectorAll('#offline-diagnostics .diagnostics-caches [role="listitem"]').length,
       diagnosticActions: document.querySelectorAll('#offline-diagnostics [data-diagnostics-repair], #offline-diagnostics [data-diagnostics-retry], #offline-diagnostics [data-diagnostics-refresh], #offline-diagnostics [data-diagnostics-export]').length,
       radioGroups: [...document.querySelectorAll('#settings-menu [role="radiogroup"]')].map(group => ({
@@ -700,9 +701,10 @@ async function assertSettingsSurface(page, label) {
   assert(layout.menu.bottom <= layout.viewport.height + 0.5, `${label}: settings menu escapes bottom edge`);
   assert(layout.menu.height <= layout.viewport.height - 16, `${label}: settings menu leaves no map context (${layout.menu.height}px)`);
   assert(layout.helperCount >= 9, `${label}: settings helper copy did not render (${layout.helperCount})`);
-  assert(layout.diagnosticScopes === 4 && layout.diagnosticActions === 4, `${label}: offline diagnostics are incomplete`);
-  assert(layout.storageScopes === 4, `${label}: expected four storage scopes`);
-  assert(layout.storageClearActions === 2, `${label}: only tile and radar scopes should be clearable`);
+  assert(layout.diagnosticScopes === 5 && layout.diagnosticActions === 4, `${label}: offline diagnostics are incomplete`);
+  assert(layout.storageScopes === 5, `${label}: expected five storage scopes`);
+  assert(layout.storageClearActions === 3, `${label}: only optional storage scopes should be clearable`);
+  assert(layout.sourceBundleActions === 1, `${label}: source bundle must be user-initiated`);
   assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
   assert(layout.radioGroups.every(group => group.checked === 1 && group.tabbable === 1), `${label}: settings radios do not use one checked/tabbable item per group`);
   const cramped = layout.focusables.filter(item => item.height < 34);
@@ -882,7 +884,7 @@ async function assertSupportBundleExport(page) {
   const body = Buffer.concat(chunks).toString('utf8');
   const bundle = JSON.parse(body);
   assert(bundle.schema_version === 1 && bundle.app?.version === expectedGeneratorVersion, 'support bundle is missing app/schema versions');
-  assert(bundle.storage?.scopes?.length === 4, 'support bundle is missing cache scope versions and sizes');
+  assert(bundle.storage?.scopes?.length === 5, 'support bundle is missing cache scope versions and sizes');
   assert(['coherent', 'unverified'].includes(bundle.release?.state), `support bundle returned an invalid release state: ${bundle.release?.state}`);
   assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');
   assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');

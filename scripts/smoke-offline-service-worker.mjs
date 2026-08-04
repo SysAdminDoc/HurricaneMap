@@ -184,6 +184,7 @@ try {
   for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-data-v2', 'hm-tiles-v0', 'hm-radar-v0']) {
     assert(!migrationState.cacheKeys.includes(legacyCache), `legacy cache survived activation: ${legacyCache}`);
   }
+  assert(!migrationState.cacheKeys.includes('hm-source-bundle-v1'), 'source bundle was installed without a user action');
   assert(!offlineKeys.includes('data/obsolete.json'), 'obsolete current-database record survived activation pruning');
   if (migrationState.databaseNames.length) {
     assert(
@@ -200,9 +201,11 @@ try {
     'data/stats.json',
     'data/us-states.geojson',
     'data/hurdat2-sources.json',
-    'data/hurdat2-atlantic.txt',
   ]) {
     assert(offlineKeys.includes(required), `offline IndexedDB store missing ${required}`);
+  }
+  for (const omitted of ['data/hurdat2-atlantic.txt', 'data/hurdat2-nepac.txt', 'data/release-manifest.json']) {
+    assert(!offlineKeys.includes(omitted), `optional source asset was installed as mandatory data: ${omitted}`);
   }
   assert(
     offlineKeys.includes('data/storms.json.gz') || offlineKeys.includes('data/storms.json'),
@@ -219,11 +222,29 @@ try {
   });
   assert(repairResult?.ok === true, `offline data repair failed: ${repairResult?.error || 'unknown error'}`);
 
+  const sourcePack = await page.evaluate(async () => {
+    const storage = await import('/src/storage-manager.js');
+    return storage.cacheSourceBundle();
+  });
+  assert(sourcePack?.saved === 3 && sourcePack.bytes > 11 * 1024 * 1024, 'source bundle did not save the bounded optional payload');
+  const sourceState = await page.evaluate(async () => {
+    const cache = await caches.open('hm-source-bundle-v1');
+    const keys = (await cache.keys()).map(request => new URL(request.url).pathname);
+    const dataRequests = await (await caches.open('hm-data-hm-v1.9.1')).keys();
+    return {
+      keys,
+      dataKeys: dataRequests.map(request => new URL(request.url).pathname),
+    };
+  });
+  assert(sourceState.keys.length === 4 && sourceState.keys.some(key => key.endsWith('__hurricanemap-source-bundle.json')), 'source bundle cache is missing its marker or assets');
+  assert(!sourceState.dataKeys.some(key => ['/data/hurdat2-atlantic.txt', '/data/hurdat2-nepac.txt', '/data/release-manifest.json'].includes(key)), `source bundle leaked into mandatory data cache: ${JSON.stringify(sourceState.dataKeys)}`);
+
   // Optional cache pressure/clears must never remove the required historical
   // data store used by the offline app shell.
   await page.evaluate(async () => {
     await caches.delete('hm-radar-v1');
     await caches.delete('hm-tiles-v1');
+    await caches.delete('hm-source-bundle-v1');
   });
 
   await context.setOffline(true);

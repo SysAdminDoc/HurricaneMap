@@ -25,7 +25,7 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md). It covers regression automation, data contracts, URL state, data provenance, service-worker update UX, accessibility coverage, visual snapshots, and maintainability work.
 
-The app uses an offline-first service worker. Historical lookup data is preinstalled into compressed IndexedDB with CacheStorage fallback, while large local radar PNGs are cached on demand. Settings reports browser usage/quota and protects the core shell/data scopes while allowing tile or radar cleanup; an opened radar timeline can save an explicit, bounded per-storm offline pack. When shell or offline-data assets change, bump `SW_VERSION` in `sw.js`; installed users will then see an in-app reload prompt instead of silently staying on stale UI.
+The app uses an offline-first service worker. Runtime historical lookup data is preinstalled into compressed IndexedDB with CacheStorage fallback, while large local radar PNGs and the raw HURDAT2/release-manifest source bundle are cached only after an explicit user action. Settings reports browser usage/quota, protects the core shell/data scopes, and exposes a 13 MB cap for the optional source bundle alongside independent tile/radar cleanup; an opened radar timeline can save an explicit, bounded per-storm offline pack. When shell or offline-data assets change, bump `SW_VERSION` in `sw.js`; installed users will then see an in-app reload prompt instead of silently staying on stale UI.
 
 Persisted browser state has an explicit compatibility contract: settings, search history, and preparedness data use schema-versioned envelopes; legacy unversioned records migrate in place, while unknown future versions remain untouched and load safe defaults. Shared URL hashes emit `v=1`, continue to accept legacy unversioned links, and ignore unsupported future versions. Advisory replay adds a bounded `replay=1.STORM_ID.ORDINAL.CONE_ERA` sub-state, so a copied link reopens the same issued forecast beside the final HURDAT2 track without storing user location or local state. Generated data must match the schema in `src/schema-contract.js`, and service-worker activation removes superseded caches and IndexedDB generations only after the replacement shell and offline data install.
 
@@ -261,7 +261,7 @@ Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directo
 
 ### Distribution profiles
 
-Run `npm run dist:core` for an approximately 19 MB static deployment containing the complete historical catalogue and offline application without bundled radar PNGs. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write `data/distribution.json` with the source commit and capability flags. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
+Run `npm run dist:core` for the complete historical catalogue and offline application without bundled radar PNGs. Its deployable payload is still about 19 MB because the three-file source bundle remains available for an explicit download, but the mandatory service-worker install is about 7 MB; `data/distribution.json` reports both byte totals and the 13 MB source-pack cap. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write `data/distribution.json` with the source commit and capability flags. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
 
 The PWA manifests use the stable relative identity and scope `./`, so installs remain tied to the deployed app root on GitHub Pages, a subpath, or self-hosting. `manifest.webmanifest`, `manifest.es.webmanifest`, and `manifest.ht.webmanifest` localize installed names, screenshots, and shortcuts for the three supported interface locales; the app switches the manifest link when the locale changes. `npm run check:manifests` and the distribution/browser checks verify that every icon, screenshot, and shortcut target resolves in both profiles.
 
@@ -300,7 +300,7 @@ Perfect for:
 
 See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 
-Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, STAC documents, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
+Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, STAC documents, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version; it travels with the raw HURDAT2 files in the optional source bundle and is fetched transiently by the service worker only to verify the runtime subset. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
 
 ```bash
 node scripts/generate-release-manifest.mjs --generated-at 2026-08-02T00:00:00Z --source-commit "$(git rev-parse HEAD)"
@@ -349,8 +349,8 @@ HurricaneMap/
 │   ├── styles.css          # explicit cascade-layer entry point
 │   └── styles-*.css        # tokens, base, shell, components, themes, accessibility
 ├── data/
-│   ├── hurdat2-atlantic.txt    # raw NOAA Atlantic best-track (1851–2025)
-│   ├── hurdat2-nepac.txt       # raw NOAA Eastern Pacific best-track (1949–2025)
+│   ├── hurdat2-atlantic.txt    # optional source bundle: raw NOAA Atlantic best-track
+│   ├── hurdat2-nepac.txt       # optional source bundle: raw NOAA Eastern Pacific best-track
 │   ├── us-states.geojson       # US state polygons (point-in-polygon attribution)
 │   ├── landfalls.json          # flat list, one entry per US landfall event
 │   ├── storms.json             # full track + metadata for every US-landfalling storm
@@ -415,7 +415,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 
 ### Data build provenance
 
-Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and is also included in offline releases.
+Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and remains in the mandatory runtime data; the two raw best-track files are available from Settings as a bounded, user-initiated source bundle.
 
 ### Open Data License Clarity
 

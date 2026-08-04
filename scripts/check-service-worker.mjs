@@ -26,6 +26,7 @@ if (!/addEventListener\(\s*['"]message['"]/.test(source) || !/SKIP_WAITING/.test
 
 const shellAssets = parseAssetArray('SHELL_ASSETS');
 const offlineDataAssets = parseAssetArray('OFFLINE_DATA_ASSETS');
+const sourceBundleAssets = parseAssetArray('SOURCE_BUNDLE_ASSETS');
 
 if (!shellAssets) {
   console.error('sw.js does not define SHELL_ASSETS.');
@@ -35,8 +36,16 @@ if (!offlineDataAssets) {
   console.error('sw.js does not define OFFLINE_DATA_ASSETS.');
   process.exit(1);
 }
+if (!sourceBundleAssets) {
+  console.error('sw.js does not define SOURCE_BUNDLE_ASSETS.');
+  process.exit(1);
+}
 
-const assets = [...shellAssets, ...offlineDataAssets];
+const assets = [
+  ['shell', shellAssets],
+  ['offline data', offlineDataAssets],
+  ['source bundle', sourceBundleAssets],
+];
 const errors = [];
 const seen = new Set();
 
@@ -63,6 +72,18 @@ for (const required of [
     errors.push(`OFFLINE_DATA_ASSETS is missing required historical dataset: ${required}`);
   }
 }
+for (const sourceAsset of [
+  './data/hurdat2-atlantic.txt',
+  './data/hurdat2-nepac.txt',
+  './data/release-manifest.json',
+]) {
+  if (!sourceBundleAssets.includes(sourceAsset)) {
+    errors.push(`SOURCE_BUNDLE_ASSETS is missing optional source asset: ${sourceAsset}`);
+  }
+  if (offlineDataAssets.includes(sourceAsset)) {
+    errors.push(`${sourceAsset} must not be precached as mandatory offline data`);
+  }
+}
 
 if (!/indexedDB\.open/.test(source) || !/CompressionStream/.test(source) || !/DecompressionStream/.test(source)) {
   errors.push('sw.js offline data path must use IndexedDB plus compression/decompression support.');
@@ -71,7 +92,10 @@ if (!/const\s+DATA_CACHE_PREFIX\s*=\s*['"]hm-data-['"]/.test(source) ||
     !/const\s+DATA_CACHE\s*=\s*`\$\{DATA_CACHE_PREFIX\}\$\{SW_VERSION\}`/.test(source) ||
     !/const\s+RELEASE_MARKER_PATH/.test(source) ||
     !/validateReleaseBundle\(\)/.test(source) ||
-    !/Required release manifest failed/.test(source)) {
+    !/Required release manifest failed/.test(source) ||
+    !/const\s+SOURCE_BUNDLE_CACHE\s*=\s*['"]hm-source-bundle-v1['"]/.test(source) ||
+    !/SOURCE_BUNDLE_MARKER_PATH/.test(source) ||
+    !/sourceBundleWhileRevalidate/.test(source)) {
   errors.push('sw.js must stage a versioned data cache and validate its release tuple before activation.');
 }
 if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR_CACHE_MAX_ENTRIES\)/.test(source)) {
@@ -92,24 +116,26 @@ if (radarBranch < 0 || shellBranch < 0 || radarBranch > shellBranch) {
   errors.push('fetch handler must route radar PNGs before generic shell/image caching.');
 }
 
-for (const asset of assets) {
-  if (seen.has(asset)) {
-    errors.push(`Duplicate shell asset: ${asset}`);
-    continue;
-  }
-  seen.add(asset);
+for (const [label, collection] of assets) {
+  for (const asset of collection) {
+    if (seen.has(asset)) {
+      errors.push(`Duplicate ${label} asset: ${asset}`);
+      continue;
+    }
+    seen.add(asset);
 
-  if (asset === './') continue;
-  const normalized = path.normalize(asset.replace(/^\.\//, ''));
-  const resolved = path.resolve(root, normalized);
-  if (!resolved.startsWith(root)) {
-    errors.push(`Shell asset escapes repository root: ${asset}`);
-    continue;
-  }
-  try {
-    await access(resolved);
-  } catch {
-    errors.push(`Shell asset is missing: ${asset}`);
+    if (asset === './') continue;
+    const normalized = path.normalize(asset.replace(/^\.\//, ''));
+    const resolved = path.resolve(root, normalized);
+    if (!resolved.startsWith(root)) {
+      errors.push(`${label} asset escapes repository root: ${asset}`);
+      continue;
+    }
+    try {
+      await access(resolved);
+    } catch {
+      errors.push(`${label} asset is missing: ${asset}`);
+    }
   }
 }
 
@@ -118,7 +144,7 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`service worker ok (${versionMatch[1]}, ${shellAssets.length} shell assets, ${offlineDataAssets.length} offline data assets)`);
+console.log(`service worker ok (${versionMatch[1]}, ${shellAssets.length} shell assets, ${offlineDataAssets.length} offline data assets, ${sourceBundleAssets.length} source assets)`);
 
 function parseAssetArray(name) {
   const match = source.match(new RegExp(`const\\s+${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`));

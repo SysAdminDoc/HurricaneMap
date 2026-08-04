@@ -18,6 +18,18 @@ const STATIC_ROOT_FILES = new Set([
   'sw.js',
 ]);
 const STATIC_PREFIXES = ['branding/', 'data/', 'fonts/', 'schemas/', 'src/', 'vendor/'];
+export const SOURCE_BUNDLE_FILES = new Set([
+  'data/hurdat2-atlantic.txt',
+  'data/hurdat2-nepac.txt',
+  'data/release-manifest.json',
+]);
+export const SOURCE_BUNDLE_MAX_BYTES = 13 * 1024 * 1024;
+const SERVICE_WORKER_SOURCE = await readFile(path.join(root, 'sw.js'), 'utf8');
+const MANDATORY_INSTALL_FILES = new Set([
+  'sw.js',
+  ...parseServiceWorkerAssets('SHELL_ASSETS'),
+  ...parseServiceWorkerAssets('OFFLINE_DATA_ASSETS'),
+].map(file => file.replace(/^\.\//, '')).filter(Boolean));
 
 function git(args) {
   return execFileSync('git', args, {
@@ -49,12 +61,24 @@ export async function describeDistribution(profile) {
     bytes: (await stat(path.join(root, file))).size,
   })));
   const radarFiles = measured.filter(item => item.file.startsWith('data/radar/') && item.file.endsWith('.png'));
+  const sourceBundleFiles = measured.filter(item => SOURCE_BUNDLE_FILES.has(item.file));
+  const sourceBundleBytes = sourceBundleFiles.reduce((sum, item) => sum + item.bytes, 0);
+  if (sourceBundleBytes > SOURCE_BUNDLE_MAX_BYTES) {
+    throw new Error(`source bundle exceeds ${SOURCE_BUNDLE_MAX_BYTES} bytes (${sourceBundleBytes})`);
+  }
+  const mandatoryFiles = measured.filter(item => MANDATORY_INSTALL_FILES.has(item.file) && !SOURCE_BUNDLE_FILES.has(item.file));
+  const mandatoryBytes = mandatoryFiles.reduce((sum, item) => sum + item.bytes, 0);
   return {
     profile,
     source_commit: sourceCommit(),
     files: measured.map(item => item.file),
     file_count: measured.length,
     bytes: measured.reduce((sum, item) => sum + item.bytes, 0),
+    mandatory_bytes: mandatoryBytes,
+    mandatory_file_count: mandatoryFiles.length,
+    source_bundle_bytes: sourceBundleBytes,
+    source_bundle_file_count: sourceBundleFiles.length,
+    source_bundle_max_bytes: SOURCE_BUNDLE_MAX_BYTES,
     radar_file_count: radarFiles.length,
     radar_bytes: radarFiles.reduce((sum, item) => sum + item.bytes, 0),
   };
@@ -89,10 +113,16 @@ export async function stageDistribution(profile, outputDirectory, { allowDirty =
       historical_offline: true,
       bundled_radar: profile === 'full',
       remote_radar: true,
+      source_bundle: true,
     },
     payload: {
       file_count: description.file_count,
       bytes: description.bytes,
+      mandatory_bytes: description.mandatory_bytes,
+      mandatory_file_count: description.mandatory_file_count,
+      source_bundle_bytes: description.source_bundle_bytes,
+      source_bundle_file_count: description.source_bundle_file_count,
+      source_bundle_max_bytes: description.source_bundle_max_bytes,
       radar_file_count: description.radar_file_count,
       radar_bytes: description.radar_bytes,
     },
@@ -124,6 +154,12 @@ async function synchronizeReleaseManifest(output, sourceCommitValue) {
     };
   }));
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+}
+
+function parseServiceWorkerAssets(name) {
+  const match = SERVICE_WORKER_SOURCE.match(new RegExp(`const\\s+${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`));
+  if (!match) throw new Error(`sw.js does not define ${name}`);
+  return [...match[1].matchAll(/['"](\.\/[^'"]*)['"]/g)].map(asset => asset[1]);
 }
 
 async function walk(directory) {

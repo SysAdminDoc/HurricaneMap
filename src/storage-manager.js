@@ -7,8 +7,17 @@ export const STORAGE_SCOPES = Object.freeze([
   { id: 'data', prefix: 'hm-data-', required: true },
   { id: 'tiles', cacheName: 'hm-tiles-v1', required: false },
   { id: 'radar', cacheName: 'hm-radar-v1', required: false },
+  { id: 'source', prefix: 'hm-source-', required: false },
 ]);
 export const MAX_RADAR_PACK_FRAMES = 120;
+export const MAX_SOURCE_BUNDLE_BYTES = 13 * 1024 * 1024;
+export const SOURCE_BUNDLE_ASSETS = Object.freeze([
+  './data/hurdat2-atlantic.txt',
+  './data/hurdat2-nepac.txt',
+  './data/release-manifest.json',
+]);
+export const SOURCE_BUNDLE_CACHE = 'hm-source-bundle-v1';
+const SOURCE_BUNDLE_MARKER_PATH = './__hurricanemap-source-bundle.json';
 const RADAR_PACKS_KEY = 'hm-radar-packs-v1';
 const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
 const QUOTA_HEADROOM = 0.95;
@@ -66,6 +75,141 @@ async function inspectCache(cachesApi, cacheName) {
   } catch {
     return { entries: 0, sizeBytes: null };
   }
+}
+
+async function responseBytes(response) {
+  return response.clone().arrayBuffer();
+}
+
+async function sha256Hex(body) {
+  if (!globalThis.crypto?.subtle) throw new Error('Browser checksum support is unavailable');
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', body);
+  return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+}
+
+function sourceBundleKey(asset) {
+  return new URL(asset, globalThis.location?.href || 'https://hurricanemap.invalid/').pathname.replace(/^\//, '');
+}
+
+function parseSourceManifest(text) {
+  let manifest;
+  try {
+    manifest = JSON.parse(text);
+  } catch {
+    throw new Error('Source bundle release manifest is not valid JSON');
+  }
+  if (manifest?.schema_version !== 1 || manifest.algorithm !== 'SHA-256' || !/^[a-f0-9]{40}$/.test(manifest.source_commit || '')) {
+    throw new Error('Source bundle release manifest contract is unsupported');
+  }
+  const artifacts = new Map((manifest.artifacts || []).map(artifact => [artifact.path, artifact]));
+  for (const asset of SOURCE_BUNDLE_ASSETS) {
+    const key = sourceBundleKey(asset);
+    if (key === 'data/release-manifest.json') continue;
+    const artifact = artifacts.get(key);
+    if (!artifact || !Number.isInteger(artifact.bytes) || !/^[a-f0-9]{64}$/.test(artifact.sha256 || '')) {
+      throw new Error(`Source bundle release manifest is missing ${key}`);
+    }
+  }
+  return { manifest, artifacts };
+}
+
+export async function cacheSourceBundle({
+  cachesApi = globalThis.caches,
+  fetchImpl = globalThis.fetch,
+  storageApi = globalThis.navigator?.storage,
+  onProgress = () => {},
+} = {}) {
+  if (!cachesApi || typeof fetchImpl !== 'function') {
+    throw new Error('Source bundle storage is unavailable');
+  }
+  const cache = await cachesApi.open(SOURCE_BUNDLE_CACHE);
+  const previous = new Map();
+  for (const asset of [...SOURCE_BUNDLE_ASSETS, SOURCE_BUNDLE_MARKER_PATH]) {
+    previous.set(asset, await cache.match(asset));
+  }
+
+  const staged = [];
+  let totalBytes = 0;
+  try {
+    let manifestRecord = null;
+    for (const [index, asset] of SOURCE_BUNDLE_ASSETS.entries()) {
+      const response = await fetchImpl(asset, {
+        cache: 'no-cache',
+        headers: { 'x-hurricanemap-source-bundle': 'refresh' },
+      });
+      if (!response?.ok) throw new Error(`Source bundle asset returned ${response?.status || 0}: ${asset}`);
+      const body = await responseBytes(response);
+      totalBytes += body.byteLength;
+      if (totalBytes > MAX_SOURCE_BUNDLE_BYTES) {
+        throw new Error(`Source bundle exceeds ${formatStorageBytes(MAX_SOURCE_BUNDLE_BYTES)}`);
+      }
+      if (asset.endsWith('release-manifest.json')) {
+        manifestRecord = parseSourceManifest(new TextDecoder().decode(body));
+      }
+      staged.push({ asset, response, body, index });
+      onProgress({ saved: index + 1, total: SOURCE_BUNDLE_ASSETS.length, index, bytes: totalBytes });
+    }
+
+    const manifestEntry = staged.find(entry => entry.asset.endsWith('release-manifest.json'));
+    const parsedManifest = manifestRecord || parseSourceManifest(new TextDecoder().decode(manifestEntry.body));
+    const artifactRecords = [];
+    for (const entry of staged) {
+      const artifact = parsedManifest.artifacts.get(sourceBundleKey(entry.asset));
+      const digest = await sha256Hex(entry.body);
+      if (artifact && (entry.body.byteLength !== artifact.bytes || digest !== artifact.sha256)) {
+        throw new Error(`Source bundle checksum mismatch: ${sourceBundleKey(entry.asset)}`);
+      }
+      artifactRecords.push({ path: sourceBundleKey(entry.asset), bytes: entry.body.byteLength, sha256: digest });
+    }
+
+    const previousBytes = await Promise.all([...SOURCE_BUNDLE_ASSETS].map(async asset => {
+      const response = previous.get(asset);
+      return response ? (await responseBytes(response)).byteLength : 0;
+    })).then(values => values.reduce((sum, value) => sum + value, 0));
+    const estimate = await readStorageEstimate(storageApi);
+    if (
+      estimate.usage != null &&
+      estimate.quota != null &&
+      estimate.usage - previousBytes + totalBytes > estimate.quota * QUOTA_HEADROOM
+    ) {
+      const quotaError = new Error('Source bundle would exceed storage quota');
+      quotaError.name = 'QuotaExceededError';
+      throw quotaError;
+    }
+
+    for (const entry of staged) await cache.put(entry.asset, entry.response.clone());
+    const marker = {
+      schema_version: 1,
+      cache_name: SOURCE_BUNDLE_CACHE,
+      assets: artifactRecords,
+      bytes: totalBytes,
+      max_bytes: MAX_SOURCE_BUNDLE_BYTES,
+      source_commit: parsedManifest.manifest.source_commit,
+      manifest_sha256: await sha256Hex(staged.find(entry => entry.asset.endsWith('release-manifest.json')).body),
+      manifest_generated_at_utc: parsedManifest.manifest.generated_at_utc,
+      saved_at_utc: new Date().toISOString(),
+    };
+    await cache.put(SOURCE_BUNDLE_MARKER_PATH, new Response(JSON.stringify(marker), {
+      headers: { 'content-type': 'application/json' },
+    }));
+  } catch (error) {
+    await Promise.all([...previous.entries()].map(async ([asset, response]) => {
+      if (response) await cache.put(asset, response.clone()).catch(() => {});
+      else await cache.delete(asset).catch(() => false);
+    }));
+    if (isQuotaExceededError(error)) {
+      const quotaError = new Error('Not enough browser storage for this source bundle');
+      quotaError.name = 'QuotaExceededError';
+      throw quotaError;
+    }
+    throw error;
+  }
+  emitStorageChange();
+  return {
+    saved: SOURCE_BUNDLE_ASSETS.length,
+    total: SOURCE_BUNDLE_ASSETS.length,
+    bytes: totalBytes,
+  };
 }
 
 export function selectBoundedRadarFrames(frames, limit = MAX_RADAR_PACK_FRAMES) {
@@ -195,7 +339,10 @@ export async function clearOptionalStorageScope(scopeId, {
   if (!scope) throw new Error(`Unknown storage scope: ${scopeId}`);
   if (scope.required) throw new Error(`Required storage scope cannot be cleared: ${scopeId}`);
   if (!cachesApi) return false;
-  const removed = await cachesApi.delete(scope.cacheName);
+  const cacheNames = await cachesApi.keys().catch(() => []);
+  const cacheName = scope.cacheName || selectCacheName(cacheNames, scope);
+  if (!cacheName) return false;
+  const removed = await cachesApi.delete(cacheName);
   if (scopeId === 'radar') writePackIndex({}, packStorage);
   if (notify) emitStorageChange();
   return removed;
@@ -287,7 +434,10 @@ export async function renderStorageManager(host) {
       ${snapshot.scopes.map(scope => `
         <div class="storage-scope" role="listitem">
           <span><strong>${escapeHtml(scopeLabel(scope))}</strong><small>${escapeHtml(t(scope.required ? 'storage.required' : 'storage.optional'))} · ${scope.entries} ${escapeHtml(t('storage.entries'))} · ${escapeHtml(formatStorageBytes(scope.sizeBytes))}</small></span>
-          ${scope.required ? '' : `<button class="settings-action storage-clear" type="button" data-clear-storage="${escapeHtml(scope.id)}">${escapeHtml(t('storage.clear'))}</button>`}
+          ${scope.required ? '' : `<span class="storage-scope-actions">
+            ${scope.id === 'source' ? `<button class="settings-action storage-source-save" type="button" data-cache-source-bundle>${escapeHtml(t(scope.entries ? 'storage.sourceRefresh' : 'storage.sourceSave'))}</button>` : ''}
+            <button class="settings-action storage-clear" type="button" data-clear-storage="${escapeHtml(scope.id)}">${escapeHtml(t('storage.clear'))}</button>
+          </span>`}
         </div>`).join('')}
     </div>
     <p class="storage-action-status" role="status" aria-live="polite"></p>
@@ -298,6 +448,21 @@ export function initStorageManager(host = document.getElementById('storage-manag
   if (!host) return;
   const refresh = () => renderStorageManager(host);
   host.addEventListener('click', async event => {
+    const sourceButton = event.target.closest?.('[data-cache-source-bundle]');
+    if (sourceButton) {
+      sourceButton.disabled = true;
+      const label = scopeLabel({ id: 'source' });
+      const result = await cacheSourceBundle().catch(error => ({ error }));
+      await refresh();
+      const status = host.querySelector('.storage-action-status');
+      const message = result.error
+        ? t('storage.sourceFailed', label)
+        : t('storage.sourceComplete', formatStorageBytes(result.bytes));
+      if (status) status.textContent = message;
+      announceLocalAction(message);
+      host.querySelector('[data-cache-source-bundle]')?.focus({ preventScroll: true });
+      return;
+    }
     const button = event.target.closest?.('[data-clear-storage]');
     if (!button) return;
     const scopeId = button.dataset.clearStorage;

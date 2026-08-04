@@ -16,6 +16,10 @@ const [core, full] = await Promise.all([
 
 assert.equal(core.source_commit, full.source_commit, 'profiles must identify the same source commit');
 assert.equal(core.radar_file_count, 0, 'core distribution must omit radar PNGs');
+assert(core.mandatory_bytes < 10 * 1024 * 1024, `core mandatory install is unexpectedly large: ${core.mandatory_bytes}`);
+assert(core.source_bundle_bytes > 11 * 1024 * 1024, `source bundle is unexpectedly small: ${core.source_bundle_bytes}`);
+assert(core.source_bundle_bytes <= core.source_bundle_max_bytes, 'source bundle exceeds its declared size cap');
+assert.equal(core.source_bundle_file_count, 3, 'source bundle must contain both raw basins and the release manifest');
 assert(full.radar_file_count >= 1600, 'full distribution must retain the bundled radar archive');
 assert(core.bytes < 35 * 1024 * 1024, `core distribution is unexpectedly large: ${core.bytes}`);
 assert(full.bytes > 450 * 1024 * 1024, `full distribution is unexpectedly small: ${full.bytes}`);
@@ -33,6 +37,9 @@ for (const required of [
   'branding/screenshot-narrow.png',
   'data/landfalls.json',
   'data/storms.json.gz',
+  'data/hurdat2-atlantic.txt',
+  'data/hurdat2-nepac.txt',
+  'data/release-manifest.json',
   'data/radar/manifest.json',
   'data/stac/catalog.json',
   'data/stac/collections/hurdat2.json',
@@ -58,6 +65,11 @@ try {
   assert.equal(descriptor.capabilities.historical_offline, true);
   assert.equal(descriptor.capabilities.bundled_radar, false);
   assert.equal(descriptor.capabilities.remote_radar, true);
+  assert.equal(descriptor.capabilities.source_bundle, true);
+  assert.equal(descriptor.payload.mandatory_bytes, core.mandatory_bytes);
+  assert.equal(descriptor.payload.mandatory_file_count, core.mandatory_file_count);
+  assert.equal(descriptor.payload.source_bundle_bytes, core.source_bundle_bytes);
+  assert.equal(descriptor.payload.source_bundle_max_bytes, core.source_bundle_max_bytes);
   assert.deepEqual(radarManifest, {}, 'core radar manifest must not claim bundled frames');
   const stac = await validateStac({ root: output, profile: 'core' });
   assert.equal(stac.collections, 2);

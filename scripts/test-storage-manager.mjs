@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
+import { createHash, webcrypto } from 'node:crypto';
 
 import {
   MAX_RADAR_PACK_FRAMES,
+  SOURCE_BUNDLE_ASSETS,
+  SOURCE_BUNDLE_CACHE,
+  cacheSourceBundle,
   cacheRadarPack,
   clearOptionalStorageScope,
   formatStorageBytes,
@@ -10,6 +14,8 @@ import {
   selectBoundedRadarFrames,
   summarizeStorageEstimate,
 } from '../src/storage-manager.js';
+
+globalThis.crypto ||= webcrypto;
 
 assert.equal(formatStorageBytes(0), '0 B');
 assert.equal(formatStorageBytes(1536), '1.5 KB');
@@ -82,6 +88,34 @@ const saved = await cacheRadarPack('AL012026', manyFrames.slice(0, 3), {
 assert.equal(saved.saved, 3);
 assert.equal((await successfulCaches.open('hm-radar-v1')).values.size, 3);
 
+const sourceBodies = new Map([
+  [SOURCE_BUNDLE_ASSETS[0], 'atlantic source'],
+  [SOURCE_BUNDLE_ASSETS[1], 'nepac source'],
+]);
+const sourceManifest = JSON.stringify({
+  schema_version: 1,
+  generated_at_utc: '2026-08-02T00:00:00Z',
+  source_commit: '0123456789abcdef0123456789abcdef01234567',
+  algorithm: 'SHA-256',
+  artifacts: [...sourceBodies.entries()].map(([path, body]) => ({
+    path: new URL(path, 'https://example.test/').pathname.replace(/^\//, ''),
+    bytes: Buffer.byteLength(body),
+    sha256: createHash('sha256').update(body).digest('hex'),
+    source_url: 'https://example.test/source',
+    source_date: '2026-08-02',
+    schema_version: 'HURDAT2-current',
+  })),
+});
+const sourceCaches = new FakeCaches();
+const sourceResult = await cacheSourceBundle({
+  cachesApi: sourceCaches,
+  fetchImpl: async asset => new Response(asset.endsWith('release-manifest.json') ? sourceManifest : sourceBodies.get(asset)),
+  storageApi: { estimate: async () => ({ usage: 10, quota: 1_000_000 }) },
+});
+assert.equal(sourceResult.saved, 3);
+assert.equal(sourceResult.bytes, Buffer.byteLength(sourceBodies.get(SOURCE_BUNDLE_ASSETS[0])) + Buffer.byteLength(sourceBodies.get(SOURCE_BUNDLE_ASSETS[1])) + Buffer.byteLength(sourceManifest));
+assert.equal((await sourceCaches.open(SOURCE_BUNDLE_CACHE)).values.size, 4, 'source pack must include its integrity marker');
+
 const quotaCaches = new FakeCaches();
 quotaCaches.caches.set('hm-radar-v1', new FakeCache({ failAt: 2 }));
 const core = await quotaCaches.open('hm-data-v2');
@@ -104,5 +138,7 @@ await assert.rejects(
 );
 await clearOptionalStorageScope('radar', { cachesApi: successfulCaches, packStorage: null });
 assert.equal((await successfulCaches.keys()).includes('hm-radar-v1'), false);
+await clearOptionalStorageScope('source', { cachesApi: sourceCaches });
+assert.equal((await sourceCaches.keys()).includes(SOURCE_BUNDLE_CACHE), false);
 
-console.log('storage manager ok (quota rollback, required-data guard, bounded radar packs)');
+console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs)');

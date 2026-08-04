@@ -6,6 +6,8 @@
 //     stale-while-revalidate, with CacheStorage fallback.
 //   - Local radar PNGs                                → cache-first on demand;
 //     not preinstalled because the archive is intentionally large.
+//   - Source bundle (raw HURDAT2 + release manifest)  → cache-first only after
+//     an explicit user action; the bounded pack is never part of the core.
 //   - Map tiles (CartoDB, OSM)                       → stale-while-revalidate,
 //     capped at TILE_CACHE_MAX_ENTRIES (oldest evicted first).
 //   - Everything else                                → network-first, fall back to cache.
@@ -18,6 +20,8 @@ const DATA_CACHE_PREFIX = 'hm-data-';
 const DATA_CACHE = `${DATA_CACHE_PREFIX}${SW_VERSION}`;
 const TILE_CACHE = 'hm-tiles-v1';
 const RADAR_CACHE = 'hm-radar-v1';
+const SOURCE_BUNDLE_CACHE = 'hm-source-bundle-v1';
+const SOURCE_BUNDLE_MARKER_PATH = './__hurricanemap-source-bundle.json';
 const DATA_DB_PREFIX = 'hm-offline-data-';
 const DATA_DB = `${DATA_DB_PREFIX}${SW_VERSION}`;
 const DATA_STORE = 'responses';
@@ -157,7 +161,6 @@ const OFFLINE_DATA_ASSETS = [
   './data/stats.json',
   './data/metadata.json',
   './data/distribution.json',
-  './data/release-manifest.json',
   './data/impacts.json',
   './data/billions.json',
   './data/glossary.json',
@@ -165,8 +168,6 @@ const OFFLINE_DATA_ASSETS = [
   './data/rainfall.json',
   './data/us-states.geojson',
   './data/hurdat2-sources.json',
-  './data/hurdat2-atlantic.txt',
-  './data/hurdat2-nepac.txt',
   './data/radar/manifest.json',
   './schemas/metadata-v1.schema.json',
   './schemas/landfalls-v1.schema.json',
@@ -174,6 +175,12 @@ const OFFLINE_DATA_ASSETS = [
   './schemas/impacts-v1.schema.json',
   './schemas/saved-views-v1.schema.json',
   './schemas/release-manifest-v1.schema.json',
+];
+
+const SOURCE_BUNDLE_ASSETS = [
+  './data/hurdat2-atlantic.txt',
+  './data/hurdat2-nepac.txt',
+  './data/release-manifest.json',
 ];
 
 self.addEventListener('install', (event) => {
@@ -199,12 +206,13 @@ self.addEventListener('activate', (event) => {
     await validateReleaseBundle();
     const keys = await caches.keys();
     await Promise.all(keys.map((k) => {
-      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE) return caches.delete(k);
+      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
     }));
     if (self.registration.navigationPreload) {
       await self.registration.navigationPreload.enable();
     }
     await pruneOfflineData();
+    await pruneSourceBundle();
     await deleteLegacyDataDbs();
     self.clients.claim();
   })());
@@ -229,6 +237,11 @@ function isRadarAsset(url) {
   return /\/data\/radar\/.+\.png$/.test(url.pathname);
 }
 
+function isSourceBundleAsset(url) {
+  if (url.origin !== location.origin) return false;
+  return SOURCE_BUNDLE_ASSETS.some(asset => new URL(asset, self.location.href).pathname === url.pathname);
+}
+
 function isTile(url) {
   return /tile\.openstreetmap|cartocdn|basemaps\.cartocdn|stamen|tile\.opentopomap/.test(url.host);
 }
@@ -242,6 +255,8 @@ self.addEventListener('fetch', (event) => {
 
   if (isRadarAsset(url)) {
     event.respondWith(cacheFirst(req, RADAR_CACHE, event));
+  } else if (isSourceBundleAsset(url)) {
+    event.respondWith(sourceBundleWhileRevalidate(req, event));
   } else if (isShell(url)) {
     event.respondWith(staleWhileRevalidate(req, SHELL_CACHE, event));
   } else if (isData(url)) {
@@ -320,6 +335,20 @@ async function offlineDataWhileRevalidate(req, event) {
   return cached || cacheHit || (await refresh) || Response.error();
 }
 
+async function sourceBundleWhileRevalidate(req, event) {
+  const cacheNames = await caches.keys().catch(() => []);
+  const cache = cacheNames.includes(SOURCE_BUNDLE_CACHE)
+    ? await caches.open(SOURCE_BUNDLE_CACHE)
+    : null;
+  const refresh = req.headers.get('x-hurricanemap-source-bundle') === 'refresh';
+  const hit = refresh || !cache ? null : await cache.match(req);
+  const response = hit || await fetch(req).catch(() => null);
+  if (event && typeof event.waitUntil === 'function' && !hit) {
+    event.waitUntil(Promise.resolve(response));
+  }
+  return response || Response.error();
+}
+
 async function precacheShell(cache) {
   await Promise.all(SHELL_ASSETS.map(async (url) => {
     const req = new Request(url, { cache: 'reload' });
@@ -343,17 +372,17 @@ async function precacheOfflineData() {
   const manifestBytes = await manifestResponse.clone().arrayBuffer();
   const manifest = parseReleaseManifest(new TextDecoder().decode(manifestBytes));
   const artifacts = assertReleaseManifest(manifest);
+  const runtimeArtifacts = {};
 
   for (const url of OFFLINE_DATA_ASSETS) {
-    const req = url === './data/release-manifest.json'
-      ? manifestRequest
-      : new Request(url, { cache: 'reload' });
-    const res = url === './data/release-manifest.json' ? manifestResponse : await fetch(req);
+    const req = new Request(url, { cache: 'reload' });
+    const res = await fetch(req);
     if (!res.ok) throw new Error(`Required offline asset failed: ${url} (${res.status})`);
     const key = cacheKeyFor(req);
     const artifact = artifacts.get(key);
-    if (key.startsWith('data/') && key !== 'data/release-manifest.json') {
+    if (key.startsWith('data/')) {
       await assertResponseMatchesArtifact(res, artifact, key);
+      runtimeArtifacts[key] = artifact;
     }
     await cache.put(req, res.clone());
     await writeOfflineResponse(req, res.clone());
@@ -368,6 +397,7 @@ async function precacheOfflineData() {
     source_commit: manifest.source_commit,
     manifest_sha256: await sha256Hex(manifestBytes),
     manifest_generated_at_utc: manifest.generated_at_utc,
+    runtime_artifacts: runtimeArtifacts,
     verified_at_utc: new Date().toISOString(),
   }), {
     headers: { 'content-type': 'application/json' },
@@ -427,17 +457,15 @@ async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB 
   for (const asset of SHELL_ASSETS) {
     if (!await shellCache.match(asset)) throw new Error(`Offline shell asset is missing: ${asset}`);
   }
-  const manifestResponse = await dataCache.match('./data/release-manifest.json');
-  if (!manifestResponse) throw new Error('Offline release manifest is missing');
-  const manifestBytes = await manifestResponse.clone().arrayBuffer();
-  const manifest = parseReleaseManifest(new TextDecoder().decode(manifestBytes));
-  if (await sha256Hex(manifestBytes) !== marker.manifest_sha256) throw new Error('Offline release manifest hash is stale');
-  const artifacts = assertReleaseManifest(manifest);
+  const artifacts = new Map(Object.entries(marker.runtime_artifacts || {}));
+  if (!artifacts.size || !/^[a-f0-9]{64}$/.test(marker.manifest_sha256 || '')) {
+    throw new Error('Offline runtime manifest is missing');
+  }
   for (const url of OFFLINE_DATA_ASSETS) {
     const key = new URL(url, self.location.href).pathname.replace(/^\//, '');
     const cached = await dataCache.match(url);
     if (!cached) throw new Error(`Offline data asset is missing: ${key}`);
-    if (key.startsWith('data/') && key !== 'data/release-manifest.json') {
+    if (key.startsWith('data/')) {
       await assertResponseMatchesArtifact(cached, artifacts.get(key), key);
     }
   }
@@ -480,6 +508,23 @@ async function pruneOfflineData() {
   try {
     await idbDeleteExcept(allowed, DATA_DB);
   } catch { /* IndexedDB may be unavailable */ }
+}
+
+async function pruneSourceBundle() {
+  const cacheNames = await caches.keys().catch(() => []);
+  if (!cacheNames.includes(SOURCE_BUNDLE_CACHE)) return;
+  const allowed = new Set(SOURCE_BUNDLE_ASSETS.map(asset => {
+    const url = new URL(asset, self.location.href);
+    return url.pathname.replace(/^\//, '');
+  }));
+  allowed.add(cacheKeyFor(new Request(SOURCE_BUNDLE_MARKER_PATH)));
+  try {
+    const cache = await caches.open(SOURCE_BUNDLE_CACHE);
+    const keys = await cache.keys();
+    await Promise.all(keys.map(request => (
+      allowed.has(cacheKeyFor(request)) ? undefined : cache.delete(request)
+    )));
+  } catch { /* best-effort */ }
 }
 
 async function readOfflineResponse(req) {
