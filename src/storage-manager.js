@@ -1,6 +1,7 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
+import { isIosSafari, showIosInstallCoachmark } from './onboarding.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
@@ -452,11 +453,17 @@ export async function renderStorageManager(host) {
     ? t('storage.unavailable')
     : `${formatStorageBytes(snapshot.usage)} / ${formatStorageBytes(snapshot.quota)}${snapshot.percent == null ? '' : ` (${snapshot.percent}%)`}`;
   const packCount = Object.keys(snapshot.packs).length;
+  const iosInstallGuide = isIosSafari() ? `
+    <div class="storage-install-guide">
+      <p class="settings-help">${escapeHtml(t('storage.iosInstallHelp'))}</p>
+      <button class="settings-action storage-ios-install" type="button" data-ios-install-guide aria-haspopup="dialog">${escapeHtml(t('storage.iosInstallAction'))}</button>
+    </div>` : '';
   host.innerHTML = `
     <div class="storage-summary">
       <strong>${escapeHtml(usage)}</strong>
       <span>${escapeHtml(snapshot.persisted ? t('storage.persisted') : t('storage.bestEffort'))}</span>
     </div>
+    ${iosInstallGuide}
     <div class="storage-scopes" role="list">
       ${snapshot.scopes.map(scope => `
         <div class="storage-scope" role="listitem">
@@ -475,6 +482,17 @@ export function initStorageManager(host = document.getElementById('storage-manag
   if (!host) return;
   const refresh = () => renderStorageManager(host);
   host.addEventListener('click', async event => {
+    const installGuideButton = event.target.closest?.('[data-ios-install-guide]');
+    if (installGuideButton) {
+      const settingsMenu = document.getElementById('settings-menu');
+      const settingsButton = document.getElementById('toggle-settings');
+      if (settingsMenu?.matches(':popover-open')) {
+        try { settingsMenu.hidePopover(); } catch { /* already closed */ }
+        settingsButton?.setAttribute('aria-expanded', 'false');
+      }
+      showIosInstallCoachmark({ returnFocus: settingsButton });
+      return;
+    }
     const sourceButton = event.target.closest?.('[data-cache-source-bundle]');
     if (sourceButton) {
       sourceButton.disabled = true;

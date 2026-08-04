@@ -1504,6 +1504,89 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
   }
 }
 
+async function assertIosInstallGuide(browser, baseUrl) {
+  const iosSafariUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
+  for (const locale of ['en', 'es', 'ht']) {
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      userAgent: iosSafariUserAgent,
+      serviceWorkers: 'block',
+      reducedMotion: 'reduce',
+    });
+    await context.addInitScript(() => {
+      Object.defineProperty(navigator, 'standalone', { configurable: true, value: false });
+    });
+    await seedSettings(context, { onboarded: true, locale, reducedMotion: true });
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
+      await page.waitForSelector('#storage-manager [data-ios-install-guide]', { timeout: 5000 });
+      const expected = await page.evaluate(async () => {
+        const { t } = await import('/src/i18n.js');
+        return {
+          help: t('storage.iosInstallHelp'),
+          action: t('storage.iosInstallAction'),
+          title: t('onboarding.iosInstallTitle'),
+          body: t('onboarding.iosInstallBody'),
+          steps: [
+            t('onboarding.iosInstallStepShare'),
+            t('onboarding.iosInstallStepAdd'),
+            t('onboarding.iosInstallStepOpen'),
+          ],
+          note: t('onboarding.iosInstallNote'),
+          dismiss: t('onboarding.iosInstallDismiss'),
+        };
+      });
+      assert(await page.locator('#storage-manager .storage-install-guide .settings-help').textContent() === expected.help, `${locale}: iOS install help is not localized`);
+      assert(await page.locator('[data-ios-install-guide]').textContent() === expected.action, `${locale}: iOS install action is not localized`);
+      await page.locator('[data-ios-install-guide]').dispatchEvent('click');
+      await page.waitForSelector('.ios-install-overlay', { timeout: 5000 });
+      const dialog = await page.evaluate(() => ({
+        role: document.querySelector('.ios-install-overlay')?.getAttribute('role'),
+        modal: document.querySelector('.ios-install-overlay')?.getAttribute('aria-modal'),
+        title: document.querySelector('#ios-install-title')?.textContent || '',
+        body: document.querySelector('#ios-install-body')?.textContent || '',
+        steps: [...document.querySelectorAll('.ios-install-steps li')].map(item => item.textContent || ''),
+        note: document.querySelector('#ios-install-note')?.textContent || '',
+        dismiss: document.querySelector('.ios-install-dismiss')?.textContent || '',
+        activeId: document.activeElement?.className || '',
+      }));
+      assert(dialog.role === 'dialog' && dialog.modal === 'true', `${locale}: iOS install guide is not a modal dialog`);
+      assert(dialog.title === expected.title && dialog.body === expected.body, `${locale}: iOS install copy is not localized`);
+      assert(JSON.stringify(dialog.steps) === JSON.stringify(expected.steps), `${locale}: iOS install steps are not localized`);
+      assert(dialog.note === expected.note && dialog.dismiss === expected.dismiss, `${locale}: iOS install dismissal copy is not localized`);
+      assert(dialog.activeId.includes('ios-install-dismiss'), `${locale}: iOS install guide did not focus its dismiss control`);
+      await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+      await page.waitForSelector('.ios-install-overlay', { state: 'detached', timeout: 5000 });
+    } finally {
+      await context.close();
+    }
+  }
+
+  const standaloneContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    userAgent: iosSafariUserAgent,
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await standaloneContext.addInitScript(() => {
+    Object.defineProperty(navigator, 'standalone', { configurable: true, value: true });
+  });
+  await seedSettings(standaloneContext, { onboarded: true, locale: 'en', reducedMotion: true });
+  const standalonePage = await standaloneContext.newPage();
+  try {
+    await standalonePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(standalonePage);
+    await standalonePage.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
+    await standalonePage.waitForSelector('#storage-manager .storage-summary', { timeout: 5000 });
+    assert(await standalonePage.locator('[data-ios-install-guide]').count() === 0, 'standalone iOS Safari still shows the install guide');
+  } finally {
+    await standaloneContext.close();
+  }
+}
+
 async function assertSourceLanguageDisclosures(browser, baseUrl) {
   const expected = {
     es: /fuente en inglés/i,
@@ -2943,6 +3026,7 @@ try {
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
   await assertManagedPanelFocusContracts(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
+  await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
   await assertForcedColorsContract(browser, baseUrl);
 

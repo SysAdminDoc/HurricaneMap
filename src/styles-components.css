@@ -3542,6 +3542,27 @@ select {
   text-align: right;
 }
 
+.storage-install-guide {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+  padding: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--atlas-cyan) 30%, var(--surface2));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--atlas-cyan-soft) 70%, transparent);
+}
+
+.storage-install-guide .settings-help {
+  margin: 0;
+}
+
+.storage-ios-install {
+  width: auto;
+  min-height: 44px;
+  justify-self: start;
+  white-space: nowrap;
+}
+
 .storage-scope {
   display: flex;
   align-items: center;
@@ -4205,6 +4226,36 @@ kbd {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.ios-install-card {
+  top: 50%;
+  left: 50%;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  transform: translate(-50%, -50%);
+}
+
+.ios-install-steps {
+  margin: 0 0 14px;
+  padding-left: 1.3rem;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ios-install-steps li + li {
+  margin-top: 5px;
+}
+
+.ios-install-note {
+  margin-bottom: 16px;
+  color: var(--foreground-muted);
+}
+
+.ios-install-dismiss {
+  min-height: 44px;
+  margin-left: auto;
 }
 
 .onb-nav {

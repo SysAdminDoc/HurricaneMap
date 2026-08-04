@@ -44,6 +44,112 @@ export function maybeStartOnboarding({ force = false } = {}) {
   requestAnimationFrame(() => start());
 }
 
+export function isIosSafari() {
+  const browser = typeof navigator === 'undefined' ? {} : navigator;
+  const userAgent = String(browser.userAgent || '');
+  const platform = String(browser.platform || '');
+  const iosDevice = /iPad|iPhone|iPod/i.test(userAgent) ||
+    /iPad|iPhone|iPod/i.test(platform) ||
+    (platform === 'MacIntel' && Number(browser.maxTouchPoints || 0) > 1);
+  const safari = /Safari/i.test(userAgent) && !/(CriOS|FxiOS|EdgiOS|OPiOS|GSA|DuckDuckGo)/i.test(userAgent);
+  const standalone = browser.standalone === true ||
+    (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches
+    ));
+  return iosDevice && safari && !standalone;
+}
+
+let iosInstallOverlay = null;
+
+export function showIosInstallCoachmark({ returnFocus = document.activeElement } = {}) {
+  if (!isIosSafari() || iosInstallOverlay) return false;
+
+  const previousFocus = returnFocus;
+  const overlay = document.createElement('div');
+  overlay.className = 'onb-overlay ios-install-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-labelledby', 'ios-install-title');
+  overlay.setAttribute('aria-describedby', 'ios-install-body ios-install-note');
+
+  const card = document.createElement('div');
+  card.className = 'onb-card glass ios-install-card';
+  card.setAttribute('role', 'document');
+
+  const title = document.createElement('h2');
+  title.className = 'onb-title';
+  title.id = 'ios-install-title';
+  title.textContent = t('onboarding.iosInstallTitle');
+
+  const body = document.createElement('p');
+  body.className = 'onb-body';
+  body.id = 'ios-install-body';
+  body.textContent = t('onboarding.iosInstallBody');
+
+  const steps = document.createElement('ol');
+  steps.className = 'ios-install-steps';
+  for (const key of [
+    'onboarding.iosInstallStepShare',
+    'onboarding.iosInstallStepAdd',
+    'onboarding.iosInstallStepOpen',
+  ]) {
+    const item = document.createElement('li');
+    item.textContent = t(key);
+    steps.appendChild(item);
+  }
+
+  const note = document.createElement('p');
+  note.className = 'onb-body ios-install-note';
+  note.id = 'ios-install-note';
+  note.textContent = t('onboarding.iosInstallNote');
+
+  const actions = document.createElement('div');
+  actions.className = 'onb-actions';
+  const dismiss = document.createElement('button');
+  dismiss.className = 'onb-next action-btn primary ios-install-dismiss';
+  dismiss.type = 'button';
+  dismiss.textContent = t('onboarding.iosInstallDismiss');
+  actions.appendChild(dismiss);
+
+  card.append(title, body, steps, note, actions);
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  iosInstallOverlay = overlay;
+
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    overlay.classList.add('fade-out');
+    document.removeEventListener('keydown', onKeydown);
+    window.setTimeout(() => {
+      overlay.remove();
+      iosInstallOverlay = null;
+      if (previousFocus?.isConnected && typeof previousFocus.focus === 'function') {
+        previousFocus.focus({ preventScroll: true });
+      }
+    }, 220);
+  };
+  const onKeydown = event => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      close();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    dismiss.focus({ preventScroll: true });
+  };
+  dismiss.addEventListener('click', close);
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener('keydown', onKeydown);
+  dismiss.focus({ preventScroll: true });
+  return true;
+}
+
 function start() {
   const STEPS = getSteps();
   let idx = 0;

@@ -17,6 +17,7 @@ All notable changes to HurricaneMap.
 - Online archived radar fallback now uses IEM's zoomable, cache-stable XYZ tiles with explicit 404/503 miss handling; bundled radar frames and offline packs remain full local PNGs.
 - The colour-blind palette now remaps archived PNGs and online IEM radar tiles to a Cividis reflectivity ramp, with a matching dBZ legend and playback coverage.
 - The mobile header action rail now exposes clipped controls with a visible edge cue and keyboard Home/End/arrow scrolling, while preserving full focus reachability at 390 px.
+- iPhone and iPad Safari users now get an intent-triggered, localized offline-install guide from Storage; it explains Share → Add to Home Screen, returns focus on dismissal, and stays hidden in standalone mode.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 
 ### Fixed
