@@ -25,7 +25,7 @@ assert set(locked) == {
 }
 
 metadata = json.loads((ROOT / "data/metadata.json").read_text(encoding="utf-8"))
-assert metadata["generated_at_utc"] == "2026-08-02T00:00:00Z"
+assert metadata["generated_at_utc"] == "2026-08-03T00:00:00Z"
 assert len(metadata["generator"]["source_commit"]) == 40
 assert metadata["generator"]["source_manifest"] == "data/hurdat2-sources.json"
 assert all("sha256" in output for output in metadata["outputs"].values())

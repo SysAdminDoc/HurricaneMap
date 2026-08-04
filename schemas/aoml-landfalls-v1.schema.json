@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sysadmindoc.github.io/HurricaneMap/schemas/aoml-landfalls-v1.schema.json",
+  "title": "HurricaneMap AOML landfall ground truth v1",
+  "$defs": {
+    "yearRange": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 1800, "maximum": 2100 },
+        { "type": "integer", "minimum": 1800, "maximum": 2100 }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "metric": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "source": {
+      "type": "object",
+      "required": ["url", "local_path", "source_date", "revision", "sha256", "bytes", "encoding", "coverage_year_ranges"],
+      "properties": {
+        "url": { "const": "https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html" },
+        "local_path": { "const": "data/aoml-us-landfalls.html" },
+        "source_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "revision": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "encoding": { "const": "ISO-8859-1" },
+        "coverage_year_ranges": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/yearRange" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "id", "storm_id", "storm_number", "name", "year", "t", "lat", "lon",
+        "max_wind_kt", "category", "rmw_nm", "central_pressure_mb",
+        "central_pressure_estimated", "oci_mb", "size_nm", "states_raw",
+        "states_affected", "markers", "direct_landfall"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "storm_id": { "type": "string", "pattern": "^AL\\d{6}$" },
+        "storm_number": { "type": "integer", "minimum": 1, "maximum": 99 },
+        "name": { "type": ["string", "null"] },
+        "year": { "type": "integer", "minimum": 1800, "maximum": 2100 },
+        "t": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+        "max_wind_kt": { "type": ["integer", "null"], "minimum": 0 },
+        "category": { "type": ["integer", "null"], "minimum": -1, "maximum": 5 },
+        "rmw_nm": { "type": ["integer", "null"], "minimum": 0 },
+        "central_pressure_mb": { "type": ["integer", "null"], "minimum": 0 },
+        "central_pressure_estimated": { "type": "boolean" },
+        "oci_mb": { "type": ["integer", "null"], "minimum": 0 },
+        "size_nm": { "type": ["integer", "null"], "minimum": 0 },
+        "states_raw": { "type": "string" },
+        "states_affected": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "markers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["$", "#", "&", "%", "*"] }
+        },
+        "direct_landfall": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "required": ["schema_version", "generated_at_utc", "source", "methodology", "records", "validation"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
+    "source": { "$ref": "#/$defs/source" },
+    "methodology": {
+      "type": "object",
+      "required": ["description", "marker_notes", "direct_landfall_rule", "storm_id_rule"],
+      "properties": {
+        "description": { "type": "string", "minLength": 1 },
+        "marker_notes": {
+          "type": "object",
+          "required": ["$", "#", "&", "%", "*"],
+          "properties": {
+            "$": { "type": "string", "minLength": 1 },
+            "#": { "type": "string", "minLength": 1 },
+            "&": { "type": "string", "minLength": 1 },
+            "%": { "type": "string", "minLength": 1 },
+            "*": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "direct_landfall_rule": { "type": "string", "minLength": 1 },
+        "storm_id_rule": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "records": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/record" } },
+    "validation": {
+      "type": "object",
+      "required": ["scope", "ground_truth", "detected", "inferred"],
+      "properties": {
+        "scope": {
+          "type": "object",
+          "required": ["start_year", "end_year", "geography", "minimum_category", "matching"],
+          "properties": {
+            "start_year": { "type": "integer" },
+            "end_year": { "type": "integer" },
+            "geography": { "const": "continental U.S." },
+            "minimum_category": { "const": 1 },
+            "matching": {
+              "type": "object",
+              "required": ["storm_id", "time_window_hours", "distance_km"],
+              "properties": {
+                "storm_id": { "const": "exact" },
+                "time_window_hours": { "type": "number", "exclusiveMinimum": 0 },
+                "distance_km": { "type": "number", "exclusiveMinimum": 0 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "ground_truth": {
+          "type": "object",
+          "required": ["record_count", "direct_landfall_count"],
+          "properties": {
+            "record_count": { "type": "integer", "minimum": 0 },
+            "direct_landfall_count": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "detected": {
+          "type": "object",
+          "required": ["record_count", "matched_count", "precision", "recall"],
+          "properties": {
+            "record_count": { "type": "integer", "minimum": 0 },
+            "matched_count": { "type": "integer", "minimum": 0 },
+            "precision": { "$ref": "#/$defs/metric" },
+            "recall": { "$ref": "#/$defs/metric" }
+          },
+          "additionalProperties": false
+        },
+        "inferred": {
+          "type": "object",
+          "required": ["candidate_count", "hurricane_strength_candidate_count", "matched_count", "precision", "recall", "scope_note"],
+          "properties": {
+            "candidate_count": { "type": "integer", "minimum": 0 },
+            "hurricane_strength_candidate_count": { "type": "integer", "minimum": 0 },
+            "matched_count": { "type": "integer", "minimum": 0 },
+            "precision": { "$ref": "#/$defs/metric" },
+            "recall": { "$ref": "#/$defs/metric" },
+            "scope_note": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

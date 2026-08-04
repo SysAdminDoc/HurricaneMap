@@ -20,6 +20,7 @@ if (!/^[a-f0-9]{40}$/.test(sourceCommit)) {
 }
 
 const metadata = JSON.parse(await readFile(path.join(dataRoot, 'metadata.json'), 'utf8'));
+const aoml = JSON.parse(await readFile(path.join(dataRoot, 'aoml-landfalls.json'), 'utf8'));
 const sourceLock = JSON.parse(await readFile(path.join(dataRoot, 'hurdat2-sources.json'), 'utf8'));
 const files = (await walk(dataRoot))
   .map(file => path.relative(root, file).replaceAll('\\', '/'))
@@ -34,7 +35,7 @@ for (const relative of files) {
     bytes: bytes.length,
     sha256: createHash('sha256').update(bytes).digest('hex'),
     source_url: sourceUrl(relative),
-    source_date: sourceDate(relative, metadata),
+    source_date: sourceDate(relative, metadata, aoml),
     generated_at_utc: generatedAt,
     schema_version: schemaVersion(relative, bytes),
   });
@@ -65,6 +66,7 @@ async function walk(directory) {
 function sourceUrl(relative) {
   const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
   if (lockedSource) return lockedSource.source_url;
+  if (relative === 'data/aoml-landfalls.json' || relative === 'data/aoml-us-landfalls.html') return 'https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html';
   if (relative === 'data/hurdat2-sources.json') return 'https://www.nhc.noaa.gov/data/hurdat/';
   if (relative.startsWith('data/stac/')) return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative.startsWith('data/radar/')) return 'https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/';
@@ -81,11 +83,12 @@ function sourceUrl(relative) {
   return 'https://www.nhc.noaa.gov/data/hurdat/';
 }
 
-function sourceDate(relative, buildMetadata) {
+function sourceDate(relative, buildMetadata, aomlData) {
   const radarStamp = relative.match(/t_(\d{4})(\d{2})(\d{2})\d{4}\.png$/);
   if (radarStamp) return `${radarStamp[1]}-${radarStamp[2]}-${radarStamp[3]}`;
   const lockedSource = sourceLock.sources?.find(source => source.local_path === relative);
   if (lockedSource) return lockedSource.source_date;
+  if (relative === 'data/aoml-landfalls.json' || relative === 'data/aoml-us-landfalls.html') return aomlData.source.source_date;
   if (relative === 'data/hurdat2-sources.json') return sourceLock.sources.map(source => source.source_date).sort().at(-1);
   if (relative.startsWith('data/stac/')) return generatedAt.slice(0, 10);
   if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
@@ -109,6 +112,8 @@ function schemaVersion(relative, bytes) {
   if (relative === 'data/landfalls.json') return 1;
   if (relative === 'data/storms.json' || relative === 'data/storms.json.gz') return 1;
   if (relative === 'data/impacts.json') return 1;
+  if (relative === 'data/aoml-landfalls.json') return 1;
+  if (relative === 'data/aoml-us-landfalls.html') return 'AOML-HTML-current';
   if (relative.endsWith('.txt')) return 'HURDAT2-current';
   if (relative.endsWith('.png')) return 'IEM-NEXRAD-mosaic';
   if (relative.endsWith('.gz')) return 1;

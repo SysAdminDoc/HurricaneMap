@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Fixed
+- The checked-in AOML detailed continental-U.S. landfall table now provides a build-time ground-truth artifact and reports a 16/16 (100.0% precision, 100.0% recall) hurricane-strength match for 1983–1990; inferred tropical-storm candidates remain separately scoped, and HURDAT2 `C` closest-approach records cannot be promoted to inferred landfalls.
 - The offline core now installs only runtime data; raw Atlantic/Eastern Pacific HURDAT2 text and the full release manifest are an integrity-checked, user-initiated source bundle capped at 13 MB, with storage diagnostics and distribution metadata reporting the optional payload separately.
 - Offline launches now classify the shell/data tuple as intact, evicted, stale-but-valid, or invalid and offer an explicit repair action; each storm panel reports its cached radar-frame coverage.
 - High-contrast defaults now follow `prefers-contrast: more` until a local choice is made, and Windows `forced-colors` receives system-colored map controls, legends, panels, and focus rings with browser axe coverage.

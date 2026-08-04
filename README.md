@@ -369,6 +369,8 @@ HurricaneMap/
 ├── scripts/
 │   ├── refresh-hurdat2.mjs   # NOAA HURDAT2 detector/downloader for local refreshes
 │   ├── preprocess_hurdat2.py   # HURDAT2 parser + landfall attribution + stats roll-up
+│   ├── build_aoml_landfalls.py # AOML HTML ground-truth parser + landfall validation
+│   ├── test_aoml_landfalls.py  # Offline parser, metric, and C-marker contract tests
 │   ├── scrape_impacts.py       # Wikipedia impact scraper + normalized fatality/damage fields
 │   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
 └── examplemap.png          # design reference
@@ -388,8 +390,11 @@ For storms without an `L` marker — most commonly EPac/CPac storms hitting Hawa
 2. Whenever the track transitions from offshore → onshore while at TS+ intensity, that's a landfall.
 3. If both endpoints are offshore but the great-circle segment crosses land (which happens with small islands like Kauai), sample 10 mid-segment positions and place the inferred landfall at the first one inside a state polygon. Wind/pressure interpolated linearly.
 4. EPac-basin inferred landfalls are restricted to coastal Pacific states (HI, CA, OR, WA, AK) — otherwise EPac storms tracking up through Mexico produce spurious "landfalls" in landlocked Arizona / New Mexico.
+5. HURDAT2 `C` records mean closest approach without a subsequent landfall; the record and its adjacent track segments are excluded from inferred promotion.
 
 Inferred landfalls are flagged with an `inferred` tag in the storm panel so you can tell them apart from official `L`-marker landfalls.
+
+The build also ingests the [AOML detailed continental U.S. landfall table](https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html) as an independent ground-truth artifact. For the comparable 1983–1990 continental, hurricane-strength scope, the current release matches 16 of 16 reference rows (100.0% precision and 100.0% recall). The same report identifies three inferred tropical-storm candidates in that window separately because the AOML reference rows are hurricane-only.
 
 ## Saffir-Simpson at landfall
 
@@ -415,7 +420,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 
 ### Data build provenance
 
-Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, and coverage counts. The About dialog surfaces this build summary so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and remains in the mandatory runtime data; the two raw best-track files are available from Settings as a bounded, user-initiated source bundle.
+Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, and coverage counts. `scripts/build_aoml_landfalls.py` keeps the exact AOML HTML source in `data/aoml-us-landfalls.html`, emits normalized rows in `data/aoml-landfalls.json`, and records the reproducible 1983–1990 precision/recall gate. The About dialog surfaces this build summary and measured check so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and remains in the mandatory runtime data; the two raw best-track files are available from Settings as a bounded, user-initiated source bundle.
 
 ### Open Data License Clarity
 
@@ -424,6 +429,7 @@ Every preprocessing run writes `data/metadata.json` alongside the generated land
 | Dataset | Source | License | Citation |
 | --- | --- | --- | --- |
 | **HURDAT2 Best-Track** | [NOAA National Hurricane Center](https://www.nhc.noaa.gov/data/) | Public Domain (U.S. Govt) | Landsea, C. W. & Franklin, 2013 |
+| **Detailed U.S. Landfalls** | [AOML Hurricane Research Division](https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html) | Public Domain (U.S. Govt) | AOML detailed impact/landfall table |
 | **NEXRAD Radar Archive** | [Iowa State IEM](https://mesonet.agron.iastate.edu/) | Public Domain | Acknowledgment required |
 | **Population Density (GPWv4)** | [SEDAC, Columbia University](https://sedac.ciesin.columbia.edu/) | CC BY 4.0 | [See attribution](LICENSE.md#population-density) |
 | **State Boundaries** | [U.S. Census Bureau TIGER](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) | Public Domain | Acknowledgment required |

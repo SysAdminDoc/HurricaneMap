@@ -6,8 +6,8 @@
   "description": "A serverless STAC catalog for the HURDAT2 and archived radar assets distributed with HurricaneMap.",
   "license": "various",
   "hurricanemap:project_license": "MIT",
-  "hurricanemap:source_commit": "3acb8db075ee106e12beddb075a064b0d421cf0c",
-  "hurricanemap:generated_at_utc": "2026-08-02T00:00:00Z",
+  "hurricanemap:source_commit": "a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1",
+  "hurricanemap:generated_at_utc": "2026-08-03T00:00:00Z",
   "hurricanemap:distribution": [
     "core",
     "full"

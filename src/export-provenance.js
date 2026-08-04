@@ -6,9 +6,9 @@
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
 
 const RELEASE = Object.freeze({
-  generated_at_utc: '2026-08-02T00:00:00Z',
-  source_commit: '3acb8db075ee106e12beddb075a064b0d421cf0c',
-  manifest_sha256: '5e53f17b84f1fb682717404a0386feb9b7a4e9bd20c10fb7a02954485b9d5b48',
+  generated_at_utc: '2026-08-03T00:00:00Z',
+  source_commit: 'a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1',
+  manifest_sha256: '88838960fa706f85fb34b99e68d6fcbdd3e1a9e552732fe4fa67b15044767a01',
   algorithm: 'SHA-256',
 });
 
@@ -55,18 +55,18 @@ const ARTIFACTS = Object.freeze({
   }),
   'data/landfalls.json': Object.freeze({
     path: 'data/landfalls.json',
-    bytes: 129824,
-    sha256: '45accf325a95d241f768cb8c93a1d67064d4ba2b16da458209048369ab1f452f',
+    bytes: 142671,
+    sha256: '7361e307cfd43dda7a36b32e2babb8ae244d4fc5f6be3f6a95fbc48b7a1aadd1',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-02',
+    source_date: '2026-08-03',
     schema_version: 1,
   }),
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
-    bytes: 3013,
-    sha256: '0c8cd92a5ceb2a90caf530b1026790931f9b6f311d0e0bb0c6388c5d3c0ea8ce',
+    bytes: 3105,
+    sha256: '32912867902cedbcdbfc5700ef23cb250c5604bfeadb382c9cbdaf5999b54116',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-02',
+    source_date: '2026-08-03',
     schema_version: 1,
   }),
   'data/storms.json': Object.freeze({
@@ -74,7 +74,7 @@ const ARTIFACTS = Object.freeze({
     bytes: 2299081,
     sha256: '8c462a5c9fa8e49bf79a5ff26b97cc68c1fd4b1dfa77f822373f16920c74ed4b',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-02',
+    source_date: '2026-08-03',
     schema_version: 1,
   }),
   'data/storms.json.gz': Object.freeze({
@@ -82,7 +82,7 @@ const ARTIFACTS = Object.freeze({
     bytes: 234595,
     sha256: '13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-02',
+    source_date: '2026-08-03',
     schema_version: 1,
   }),
 });

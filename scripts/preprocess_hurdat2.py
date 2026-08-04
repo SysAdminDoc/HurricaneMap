@@ -346,7 +346,7 @@ def build_metadata(source_summaries, stats, outputs, generated_at, source_commit
         "outputs": output_files,
         "methodology": {
             "explicit_landfall_marker": "HURDAT2 records with rec_id L inside or near U.S. state polygons.",
-            "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons.",
+            "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons; HURDAT2 C (closest approach without a landfall) records and adjacent segments are excluded.",
             "category_rule": "Saffir-Simpson category is computed from sustained wind in knots at U.S. landfall.",
         },
     }
@@ -685,6 +685,98 @@ def state_at_point(lon, lat, states):
     return None
 
 
+def infer_landfall_candidates(track, states, basin):
+    """Find TS+ water-to-land candidates without promoting HURDAT2 C records.
+
+    HURDAT2's ``C`` identifier means closest approach to a coast without a
+    subsequent center landfall.  Treat those records as an explicit negative
+    signal for the heuristic: neither a C endpoint nor a segment touching one
+    may become an inferred landfall.
+    """
+    if not track:
+        return []
+
+    EP_COASTAL_OK = {
+        "Hawaii", "California", "Oregon", "Washington", "Alaska",
+    }
+    allowed_states = EP_COASTAL_OK if basin == "EP" else None
+    candidates = []
+
+    def allowed(state):
+        return state and (allowed_states is None or state in allowed_states)
+
+    def append_candidate(record, state, *, lat=None, lon=None, wind=None, pres=None, status=None):
+        if not allowed(state):
+            return
+        wind = record["wind"] if wind is None else wind
+        pres = record["pres"] if pres is None else pres
+        status = record["status"] if status is None else status
+        candidates.append({
+            "t": record["t"],
+            "lat": record["lat"] if lat is None else lat,
+            "lon": record["lon"] if lon is None else lon,
+            "wind": wind,
+            "pres": pres,
+            "status": status,
+            "category": saffir_simpson(wind or 0),
+            "state": state,
+            "inferred": True,
+        })
+
+    first = track[0]
+    prev_state = None
+    if first.get("rec") != "C":
+        prev_state = state_at_point(first["lon"], first["lat"], states)
+        if prev_state and first["status"] in ("HU", "TS", "SS"):
+            append_candidate(first, prev_state)
+
+    for i in range(1, len(track)):
+        a = track[i - 1]
+        b = track[i]
+        here_state = state_at_point(b["lon"], b["lat"], states)
+
+        # A C point is a closest-approach declaration, not a landfall.  Skip
+        # both adjacent segments so interpolation cannot turn it into one.
+        if a.get("rec") == "C" or b.get("rec") == "C":
+            prev_state = here_state
+            continue
+
+        # Direct entry on a synoptic point.
+        if here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
+            append_candidate(b, here_state)
+        # Mid-segment crossing: both endpoints offshore but segment grazes land.
+        elif not here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
+            for k in range(1, 10):
+                fraction = k / 10.0
+                mid_lon = a["lon"] + (b["lon"] - a["lon"]) * fraction
+                mid_lat = a["lat"] + (b["lat"] - a["lat"]) * fraction
+                mid_state = state_at_point(mid_lon, mid_lat, states)
+                if not allowed(mid_state):
+                    continue
+                # Interpolate wind/pres linearly.
+                w_a = a["wind"] or 0
+                w_b = b["wind"] or 0
+                p_a = a["pres"] or 0
+                p_b = b["pres"] or 0
+                wind = int(round(w_a + (w_b - w_a) * fraction)) if (w_a or w_b) else None
+                pres = int(round(p_a + (p_b - p_a) * fraction)) if (p_a or p_b) else None
+                # Pick the higher-intensity status.
+                status = a["status"] if w_a >= w_b else b["status"]
+                append_candidate(
+                    b,
+                    mid_state,
+                    lat=round(mid_lat, 2),
+                    lon=round(mid_lon, 2),
+                    wind=wind,
+                    pres=pres,
+                    status=status,
+                )
+                break
+        prev_state = here_state
+
+    return candidates
+
+
 def parse_args() -> tuple[str, str]:
     parser = argparse.ArgumentParser(description="Build deterministic HurricaneMap HURDAT2 data artifacts.")
     parser.add_argument(
@@ -757,70 +849,8 @@ def main():
                     "inferred": False,
                 })
 
-            # If the storm has no explicit US L record (e.g. Hawaii/Pacific
-            # storms, or 1971-1990 gap years), look for water->land transitions
-            # in the track. This catches storms like Iniki (1992) on Kauai.
-            # We also sample mid-segment positions because HURDAT2 records are
-            # 6-hourly and a fast-moving storm can cross a small island in <6h.
-            # For Pacific-basin storms, we only allow inferred landfalls in
-            # coastal Pacific states — otherwise EPac storms tracking up through
-            # Mexico generate spurious "landfalls" in landlocked Arizona/NM.
-            EP_COASTAL_OK = {
-                "Hawaii", "California", "Oregon", "Washington", "Alaska",
-            }
-            allowed_states = EP_COASTAL_OK if storm["basin"] == "EP" else None
             if not us_landfalls:
-                track = storm["track"]
-                prev_state = None
-                if track:
-                    prev_state = state_at_point(track[0]["lon"], track[0]["lat"], states)
-                    if prev_state and track[0]["status"] in ("HU", "TS", "SS"):
-                        if allowed_states is None or prev_state in allowed_states:
-                            us_landfalls.append({
-                                "t": track[0]["t"], "lat": track[0]["lat"], "lon": track[0]["lon"],
-                                "wind": track[0]["wind"], "pres": track[0]["pres"],
-                                "status": track[0]["status"],
-                                "category": saffir_simpson(track[0]["wind"] or 0),
-                                "state": prev_state, "inferred": True,
-                            })
-                for i in range(1, len(track)):
-                    a = track[i - 1]
-                    b = track[i]
-                    here_state = state_at_point(b["lon"], b["lat"], states)
-                    # Direct entry on a synoptic point.
-                    if here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
-                        if allowed_states is None or here_state in allowed_states:
-                            us_landfalls.append({
-                                "t": b["t"], "lat": b["lat"], "lon": b["lon"],
-                                "wind": b["wind"], "pres": b["pres"], "status": b["status"],
-                                "category": saffir_simpson(b["wind"] or 0),
-                                "state": here_state, "inferred": True,
-                            })
-                    # Mid-segment crossing: both endpoints offshore but segment grazes land.
-                    elif not here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
-                        for k in range(1, 10):
-                            f = k / 10.0
-                            mlon = a["lon"] + (b["lon"] - a["lon"]) * f
-                            mlat = a["lat"] + (b["lat"] - a["lat"]) * f
-                            mid_state = state_at_point(mlon, mlat, states)
-                            if mid_state and (allowed_states is None or mid_state in allowed_states):
-                                # Interpolate wind/pres linearly.
-                                w_a = a["wind"] or 0
-                                w_b = b["wind"] or 0
-                                p_a = a["pres"] or 0
-                                p_b = b["pres"] or 0
-                                wind = int(round(w_a + (w_b - w_a) * f)) if (w_a or w_b) else None
-                                pres = int(round(p_a + (p_b - p_a) * f)) if (p_a or p_b) else None
-                                # Pick the higher-intensity status.
-                                status = a["status"] if (w_a >= w_b) else b["status"]
-                                us_landfalls.append({
-                                    "t": b["t"], "lat": round(mlat, 2), "lon": round(mlon, 2),
-                                    "wind": wind, "pres": pres, "status": status,
-                                    "category": saffir_simpson(wind or 0),
-                                    "state": mid_state, "inferred": True,
-                                })
-                                break
-                    prev_state = here_state
+                us_landfalls = infer_landfall_candidates(storm["track"], states, storm["basin"])
 
             if not us_landfalls:
                 continue
@@ -887,6 +917,7 @@ def main():
                     "status": lf["status"],
                     "category": lf["category"],
                     "state": lf["state"],
+                    "inferred": lf.get("inferred", False),
                 })
 
     print(f"US-landfalling storms: {len(storms_with_us_landfall)}", file=sys.stderr)

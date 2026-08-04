@@ -64,6 +64,7 @@ for (const required of [
   './data/storms.json.gz',
   './data/stats.json',
   './data/metadata.json',
+  './data/aoml-landfalls.json',
   './data/us-states.geojson',
   './data/hurdat2-sources.json',
   './data/radar/manifest.json',

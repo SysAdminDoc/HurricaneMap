@@ -59,7 +59,7 @@
       "file:size": 234595,
       "file:checksum": "sha256:13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "hurricanemap:source_date": "2026-08-02",
+      "hurricanemap:source_date": "2026-08-03",
       "hurricanemap:license": "public-domain",
       "hurricanemap:distribution": [
         "core",
@@ -73,10 +73,10 @@
       "roles": [
         "data"
       ],
-      "file:size": 129824,
-      "file:checksum": "sha256:45accf325a95d241f768cb8c93a1d67064d4ba2b16da458209048369ab1f452f",
+      "file:size": 142671,
+      "file:checksum": "sha256:7361e307cfd43dda7a36b32e2babb8ae244d4fc5f6be3f6a95fbc48b7a1aadd1",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "hurricanemap:source_date": "2026-08-02",
+      "hurricanemap:source_date": "2026-08-03",
       "hurricanemap:license": "public-domain",
       "hurricanemap:distribution": [
         "core",

@@ -1624,8 +1624,10 @@ try {
     return modal && !modal.hidden && text.includes('hurdat2-atlantic.txt') && text.includes('1851-2025');
   }, { timeout: 5000 });
   const provenanceText = await page.textContent('#data-provenance-body');
+  const aboutText = await page.textContent('#info-modal');
   assert(/595\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
   assert(/759\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
+  assert(/16 of 16/.test(aboutText) && /100\.0% precision/.test(aboutText), 'About did not render the measured AOML ground-truth result.');
   assert(
     expectedGeneratorVersion && provenanceText.includes(`HurricaneMap ${expectedGeneratorVersion}`),
     'About provenance did not render the generator app version.',

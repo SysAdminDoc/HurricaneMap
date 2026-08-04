@@ -42,6 +42,7 @@ const DATA = {
   impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
   billions: null,      // storm_id -> NCEI billion-dollar disaster event (frozen at 2024)
   enso: null,          // year (string) -> ONI value
+  aoml: null,          // AOML detailed landfall ground-truth artifact
 };
 
 let stormsLoaded = false;
@@ -63,13 +64,14 @@ async function fetchJson(url, { optional = false, fallback = null, priority } = 
 }
 
 export async function loadInitial() {
-  const [lf, st, md, im, bn, enso] = await Promise.all([
+  const [lf, st, md, im, bn, enso, aoml] = await Promise.all([
     fetchJson('data/landfalls.json', { priority: 'high' }),
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
     fetchJson('data/billions.json', { optional: true, fallback: {} }),
     fetchJson('data/enso.json', { optional: true, fallback: null }),
+    fetchJson('data/aoml-landfalls.json', { optional: true, fallback: null }),
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
   if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
@@ -80,6 +82,7 @@ export async function loadInitial() {
   DATA.impacts = im || {};
   DATA.billions = bn || {};
   DATA.enso = enso && typeof enso === 'object' ? enso : null;
+  DATA.aoml = aoml && typeof aoml === 'object' ? aoml : null;
   return DATA;
 }
 
@@ -171,6 +174,10 @@ export function getStats() {
 
 export function getMetadata() {
   return DATA.metadata;
+}
+
+export function getAomlValidation() {
+  return DATA.aoml?.validation || null;
 }
 
 export function getCoverageYearRange(metadata = DATA.metadata, {

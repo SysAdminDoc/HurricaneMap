@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-08-02T00:00:00Z",
+  "generated_at_utc": "2026-08-03T00:00:00Z",
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.9.1",
-    "source_commit": "3acb8db075ee106e12beddb075a064b0d421cf0c",
+    "source_commit": "a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1",
     "source_manifest": "data/hurdat2-sources.json",
     "runtime": "Python 3.12.10"
   },
@@ -61,32 +61,32 @@
   "outputs": {
     "landfalls": {
       "path": "data/landfalls.json",
-      "size_bytes": 129824,
-      "modified_utc": "2026-08-02T00:00:00Z",
-      "sha256": "45accf325a95d241f768cb8c93a1d67064d4ba2b16da458209048369ab1f452f"
+      "size_bytes": 142671,
+      "modified_utc": "2026-08-03T00:00:00Z",
+      "sha256": "7361e307cfd43dda7a36b32e2babb8ae244d4fc5f6be3f6a95fbc48b7a1aadd1"
     },
     "storms": {
       "path": "data/storms.json",
       "size_bytes": 2299081,
-      "modified_utc": "2026-08-02T00:00:00Z",
+      "modified_utc": "2026-08-03T00:00:00Z",
       "sha256": "8c462a5c9fa8e49bf79a5ff26b97cc68c1fd4b1dfa77f822373f16920c74ed4b"
     },
     "storms_gzip": {
       "path": "data/storms.json.gz",
       "size_bytes": 234595,
-      "modified_utc": "2026-08-02T00:00:00Z",
+      "modified_utc": "2026-08-03T00:00:00Z",
       "sha256": "13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a"
     },
     "stats": {
       "path": "data/stats.json",
       "size_bytes": 8364,
-      "modified_utc": "2026-08-02T00:00:00Z",
+      "modified_utc": "2026-08-03T00:00:00Z",
       "sha256": "721d16f10f1590d02a4c496dcbaf2a2908cff13afa5567a8f14b31284c301f70"
     }
   },
   "methodology": {
     "explicit_landfall_marker": "HURDAT2 records with rec_id L inside or near U.S. state polygons.",
-    "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons.",
+    "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons; HURDAT2 C (closest approach without a landfall) records and adjacent segments are excluded.",
     "category_rule": "Saffir-Simpson category is computed from sustained wind in knots at U.S. landfall."
   }
 }

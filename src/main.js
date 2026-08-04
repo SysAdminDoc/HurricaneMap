@@ -1,6 +1,6 @@
 // HurricaneMap entry point.
 import {
-  loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
+  loadInitial, getLandfalls, getStats, getMetadata, getAomlValidation, filterLandfalls,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
@@ -172,6 +172,7 @@ const els = {
   posterBtn: document.getElementById('toggle-poster'),
   infoModal: document.getElementById('info-modal'),
   closeInfo: document.getElementById('close-info'),
+  aomlValidation: document.getElementById('aoml-validation'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
   loading: document.getElementById('loading'),
 };
@@ -246,6 +247,31 @@ function formatMetadataDateTime(value) {
 
 function formatNumber(value) {
   return Number.isFinite(value) ? value.toLocaleString() : 'Unavailable';
+}
+
+function formatValidationPercent(value) {
+  return Number.isFinite(value) ? (value * 100).toFixed(1) : 'Unavailable';
+}
+
+function renderAomlValidation() {
+  if (!els.aomlValidation) return;
+  const validation = getAomlValidation();
+  if (!validation?.detected || !validation.ground_truth || !validation.scope) {
+    els.aomlValidation.innerHTML = t('about.aomlValidationUnavailable');
+    return;
+  }
+  const detected = validation.detected;
+  const truthCount = validation.ground_truth.record_count;
+  els.aomlValidation.innerHTML = t(
+    'about.aomlValidationHtml',
+    escapeHtml(detected.matched_count),
+    escapeHtml(truthCount),
+    escapeHtml(validation.scope.start_year),
+    escapeHtml(validation.scope.end_year),
+    escapeHtml(formatValidationPercent(detected.precision)),
+    escapeHtml(formatValidationPercent(detected.recall)),
+    escapeHtml(validation.inferred?.candidate_count ?? 0),
+  );
 }
 
 function renderDataProvenance() {
@@ -331,6 +357,7 @@ async function boot() {
     requestAnimationFrame(() => mainTarget?.focus({ preventScroll: true }));
   });
   await loadInitial();
+  renderAomlValidation();
   syncYearBoundsFromData();
   populateStateFilter();
   // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.

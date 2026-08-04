@@ -7,6 +7,7 @@ import { DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
+let aomlGateSummary = null;
 
 async function readJson(relativePath) {
   const fullPath = path.join(root, relativePath);
@@ -76,7 +77,57 @@ function assertImpactNumber(value, label) {
   }
 }
 
-const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill, sourceLock] = await Promise.all([
+const NON_CONTINENTAL_STATES = new Set([
+  'Alaska', 'American Samoa', 'Guam', 'Hawaii', 'Northern Mariana Islands',
+  'Puerto Rico', 'U.S. Virgin Islands',
+]);
+const AOML_START_YEAR = 1983;
+const AOML_END_YEAR = 1990;
+const AOML_MIN_CATEGORY = 1;
+const AOML_MATCH_TIME_HOURS = 12;
+const AOML_MATCH_DISTANCE_KM = 125;
+
+function haversineKm(a, b) {
+  const toRadians = value => value * Math.PI / 180;
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+  const dLat = lat2 - lat1;
+  const dLon = toRadians(b.lon) - toRadians(a.lon);
+  const term = Math.sin(dLat / 2) ** 2
+    + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * 6371.0088 * Math.asin(Math.min(1, Math.sqrt(term)));
+}
+
+function matchAomlRecords(truth, predictions) {
+  const pairs = [];
+  truth.forEach((truthRecord, truthIndex) => {
+    predictions.forEach((prediction, predictionIndex) => {
+      if (prediction.storm_id !== truthRecord.storm_id) return;
+      const timeHours = Math.abs(Date.parse(prediction.t) - Date.parse(truthRecord.t)) / (3600 * 1000);
+      const distanceKm = haversineKm(truthRecord, prediction);
+      if (timeHours <= AOML_MATCH_TIME_HOURS && distanceKm <= AOML_MATCH_DISTANCE_KM) {
+        pairs.push({ timeHours, distanceKm, truthIndex, predictionIndex });
+      }
+    });
+  });
+  pairs.sort((a, b) => a.timeHours - b.timeHours || a.distanceKm - b.distanceKm);
+  const usedTruth = new Set();
+  const usedPredictions = new Set();
+  let matched = 0;
+  for (const pair of pairs) {
+    if (usedTruth.has(pair.truthIndex) || usedPredictions.has(pair.predictionIndex)) continue;
+    usedTruth.add(pair.truthIndex);
+    usedPredictions.add(pair.predictionIndex);
+    matched += 1;
+  }
+  return matched;
+}
+
+function ratio(numerator, denominator) {
+  return denominator ? Math.round((numerator / denominator) * 1_000_000) / 1_000_000 : null;
+}
+
+const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billions, forecastSkill, sourceLock, aoml] = await Promise.all([
   readJson('data/landfalls.json'),
   readJson('data/storms.json'),
   readJson('data/stats.json'),
@@ -87,6 +138,7 @@ const [landfalls, storms, stats, impacts, glossary, metadata, stormEvents, billi
   readJson('data/billions.json'),
   readJson('data/forecast-skill.json'),
   readJson('data/hurdat2-sources.json'),
+  readJson('data/aoml-landfalls.json'),
 ]);
 
 try {
@@ -112,6 +164,7 @@ if (!isObject(stormEvents)) fail('data/storm-events.json must contain an object.
 if (!isObject(billions)) fail('data/billions.json must contain an object.');
 if (!isObject(forecastSkill)) fail('data/forecast-skill.json must contain an object.');
 if (!isObject(sourceLock)) fail('data/hurdat2-sources.json must contain an object.');
+if (!isObject(aoml)) fail('data/aoml-landfalls.json must contain an object.');
 
 if (errors.length) {
   printErrorsAndExit();
@@ -454,6 +507,128 @@ for (const landfall of landfalls) {
   }
 }
 
+if (aoml.schema_version !== 1) fail('aoml-landfalls.schema_version must be 1.');
+if (!validIsoDate(aoml.generated_at_utc)) fail('aoml-landfalls.generated_at_utc must be an ISO timestamp.');
+if (!isObject(aoml.source)) {
+  fail('aoml-landfalls.source must be an object.');
+} else {
+  if (aoml.source.url !== 'https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html') {
+    fail('aoml-landfalls.source.url must identify the current AOML detailed table.');
+  }
+  if (aoml.source.local_path !== 'data/aoml-us-landfalls.html') fail('aoml-landfalls.source.local_path must identify the checked-in HTML source.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(aoml.source.source_date || '')) fail('aoml-landfalls.source.source_date must be an absolute date.');
+  if (typeof aoml.source.revision !== 'string' || !aoml.source.revision) fail('aoml-landfalls.source.revision is required.');
+  if (aoml.source.encoding !== 'ISO-8859-1') fail('aoml-landfalls.source.encoding must preserve the page declaration.');
+  if (!Number.isInteger(aoml.source.bytes) || aoml.source.bytes <= 0) fail('aoml-landfalls.source.bytes must be positive.');
+  if (!validSha256(aoml.source.sha256)) fail('aoml-landfalls.source.sha256 must be a SHA-256 digest.');
+  if (!Array.isArray(aoml.source.coverage_year_ranges) || aoml.source.coverage_year_ranges.length !== 2) {
+    fail('aoml-landfalls.source.coverage_year_ranges must contain two declared year ranges.');
+  }
+  try {
+    const digest = await sha256File(aoml.source.local_path);
+    if (digest.bytes !== aoml.source.bytes || digest.sha256 !== aoml.source.sha256) {
+      fail('aoml-landfalls.source does not match the checked-in HTML source bytes.');
+    }
+  } catch (error) {
+    fail(`aoml-landfalls.source.local_path could not be read: ${error.message}`);
+  }
+}
+
+if (!isObject(aoml.methodology)) fail('aoml-landfalls.methodology must be an object.');
+if (!Array.isArray(aoml.records) || aoml.records.length === 0) {
+  fail('aoml-landfalls.records must be a non-empty array.');
+} else {
+  const recordIds = new Set();
+  for (const [index, record] of aoml.records.entries()) {
+    const label = `aoml-landfalls.records[${index}]`;
+    if (!isObject(record)) {
+      fail(`${label} must be an object.`);
+      continue;
+    }
+    if (typeof record.id !== 'string' || !record.id) fail(`${label}.id is required.`);
+    if (recordIds.has(record.id)) fail(`${label}.id is duplicated.`);
+    recordIds.add(record.id);
+    if (!/^AL\d{6}$/.test(record.storm_id || '')) fail(`${label}.storm_id must be an Atlantic HURDAT2 identifier.`);
+    if (!Number.isInteger(record.storm_number) || record.storm_number < 1 || record.storm_number > 99) fail(`${label}.storm_number is invalid.`);
+    if (!Number.isInteger(record.year) || record.year < 1800 || record.year > 2100) fail(`${label}.year is invalid.`);
+    if (record.storm_id !== `AL${String(record.storm_number).padStart(2, '0')}${record.year}`) fail(`${label}.storm_id does not match storm_number/year.`);
+    if (!validOptionalString(record.name)) fail(`${label}.name must be a string or null.`);
+    if (!validIsoDate(record.t)) fail(`${label}.t must be an ISO timestamp.`);
+    assertNumberInRange(record.lat, -90, 90, `${label}.lat`);
+    assertNumberInRange(record.lon, -180, 180, `${label}.lon`);
+    for (const field of ['max_wind_kt', 'rmw_nm', 'central_pressure_mb', 'oci_mb', 'size_nm']) {
+      if (record[field] != null && (!Number.isInteger(record[field]) || record[field] < 0)) fail(`${label}.${field} must be a non-negative integer or null.`);
+    }
+    if (record.category != null && !validCategory(record.category)) fail(`${label}.category must be -1..5 or null.`);
+    if (typeof record.central_pressure_estimated !== 'boolean') fail(`${label}.central_pressure_estimated must be boolean.`);
+    if (typeof record.states_raw !== 'string') fail(`${label}.states_raw must be a string.`);
+    if (!Array.isArray(record.states_affected) || record.states_affected.some(state => typeof state !== 'string' || !state)) {
+      fail(`${label}.states_affected must be a string array.`);
+    }
+    if (!Array.isArray(record.markers) || record.markers.some(marker => !['$', '#', '&', '%', '*'].includes(marker))) {
+      fail(`${label}.markers contains an unsupported marker.`);
+    }
+    const expectedDirect = !record.markers?.some(marker => marker === '*' || marker === '#');
+    if (record.direct_landfall !== expectedDirect) fail(`${label}.direct_landfall does not match its marker set.`);
+  }
+}
+
+if (!isObject(aoml.validation)) {
+  fail('aoml-landfalls.validation must be an object.');
+} else {
+  const truth = (aoml.records || []).filter(record => (
+    record.year >= AOML_START_YEAR
+    && record.year <= AOML_END_YEAR
+    && record.direct_landfall
+    && (record.category || 0) >= AOML_MIN_CATEGORY
+  ));
+  const predictions = (landfalls || []).filter(record => (
+    record.year >= AOML_START_YEAR
+    && record.year <= AOML_END_YEAR
+    && record.category >= AOML_MIN_CATEGORY
+    && !NON_CONTINENTAL_STATES.has(record.state)
+  ));
+  const inferred = (landfalls || []).filter(record => (
+    record.year >= AOML_START_YEAR
+    && record.year <= AOML_END_YEAR
+    && record.inferred === true
+  ));
+  const inferredHurricane = inferred.filter(record => (
+    record.category >= AOML_MIN_CATEGORY && !NON_CONTINENTAL_STATES.has(record.state)
+  ));
+  const matched = matchAomlRecords(truth, predictions);
+  const inferredMatched = matchAomlRecords(truth, inferredHurricane);
+  const expectedScope = {
+    start_year: AOML_START_YEAR,
+    end_year: AOML_END_YEAR,
+    geography: 'continental U.S.',
+    minimum_category: AOML_MIN_CATEGORY,
+    matching: { storm_id: 'exact', time_window_hours: AOML_MATCH_TIME_HOURS, distance_km: AOML_MATCH_DISTANCE_KM },
+  };
+  const expectedDetected = {
+    record_count: predictions.length,
+    matched_count: matched,
+    precision: ratio(matched, predictions.length),
+    recall: ratio(matched, truth.length),
+  };
+  const expectedInferred = {
+    candidate_count: inferred.length,
+    hurricane_strength_candidate_count: inferredHurricane.length,
+    matched_count: inferredMatched,
+    precision: ratio(inferredMatched, inferredHurricane.length),
+    recall: ratio(inferredMatched, truth.length),
+  };
+  if (JSON.stringify(aoml.validation.scope) !== JSON.stringify(expectedScope)) fail('aoml validation scope does not match the build gate.');
+  if (aoml.validation.ground_truth?.record_count !== truth.length || aoml.validation.ground_truth?.direct_landfall_count !== truth.length) {
+    fail('aoml validation ground_truth counts do not match the source rows.');
+  }
+  if (JSON.stringify(aoml.validation.detected) !== JSON.stringify(expectedDetected)) fail('aoml validation detected metrics are stale or incorrect.');
+  for (const field of ['candidate_count', 'hurricane_strength_candidate_count', 'matched_count', 'precision', 'recall']) {
+    if (aoml.validation.inferred?.[field] !== expectedInferred[field]) fail(`aoml validation inferred.${field} is stale or incorrect.`);
+  }
+  aomlGateSummary = { truth, predictions, matched, inferred, inferredHurricane, inferredMatched };
+}
+
 for (const [stormId, event] of Object.entries(billions)) {
   if (stormId === '_meta') {
     if (!isObject(event) || typeof event.source !== 'string') fail('billions.json _meta must record its source.');
@@ -603,6 +778,25 @@ if (!isObject(stormEvents.storms)) {
 
 if (errors.length) {
   printErrorsAndExit();
+}
+
+if (aomlGateSummary) {
+  const truthCount = aomlGateSummary.truth.length;
+  const detectedPrecision = ratio(aomlGateSummary.matched, aomlGateSummary.predictions.length);
+  const detectedRecall = ratio(aomlGateSummary.matched, truthCount);
+  const inferredPrecision = ratio(aomlGateSummary.inferredMatched, aomlGateSummary.inferredHurricane.length);
+  const inferredRecall = ratio(aomlGateSummary.inferredMatched, truthCount);
+  const formatMetric = (value, numerator, denominator) => value == null
+    ? `not-defined (${numerator} candidates)`
+    : `${(value * 100).toFixed(1)}% (${numerator}/${denominator})`;
+  console.log(
+    'AOML 1983-1990 ground-truth gate (continental, category >= 1): '
+    + `precision=${formatMetric(detectedPrecision, aomlGateSummary.matched, aomlGateSummary.predictions.length)}, `
+    + `recall=${formatMetric(detectedRecall, aomlGateSummary.matched, truthCount)}; `
+    + `inferred hurricane candidates=${aomlGateSummary.inferredHurricane.length}, `
+    + `precision=${formatMetric(inferredPrecision, aomlGateSummary.inferredMatched, aomlGateSummary.inferredHurricane.length)}, `
+    + `recall=${formatMetric(inferredRecall, aomlGateSummary.inferredMatched, truthCount)}`,
+  );
 }
 
 console.log(`data ok (${storms.length} storms, ${landfalls.length} landfalls, ${Object.keys(impacts).length} impact rows)`);
