@@ -1146,7 +1146,7 @@ async function assertSupportBundleExport(page) {
   assert(['coherent', 'unverified'].includes(bundle.release?.state), `support bundle returned an invalid release state: ${bundle.release?.state}`);
   assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');
   assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');
-  const activeDataCache = 'hm-data-hm-v1.9.1';
+  const activeDataCache = 'hm-data-hm-v1.9.2';
   await page.evaluate(async (dataCacheName) => {
     await (await caches.open('hm-tiles-v1')).put('/recoverable-tile', new Response('tile'));
     await (await caches.open(dataCacheName)).put('/protected-history', new Response('history'));

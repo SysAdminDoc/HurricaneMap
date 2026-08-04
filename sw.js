@@ -14,7 +14,7 @@
 //
 // Bump SW_VERSION on every release to flush the static shell.
 
-const SW_VERSION = 'hm-v1.9.1';
+const SW_VERSION = 'hm-v1.9.2';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE_PREFIX = 'hm-data-';
 const DATA_CACHE = `${DATA_CACHE_PREFIX}${SW_VERSION}`;

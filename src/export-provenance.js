@@ -4,12 +4,12 @@
 // the full 1,700+ artifact manifest at runtime.
 
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
-export const APP_VERSION = '1.9.1';
+export const APP_VERSION = '1.9.2';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-03T00:00:00Z',
   source_commit: 'a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1',
-  manifest_sha256: 'd7bb9af287e0d1b1c5a770a8c0eedafeba89745b340c757b2e003b12c3f71701',
+  manifest_sha256: 'cd42cd0acc7b9515a4065190fde050c3afdf97abb0b10917fd79ae627fd30ffc',
   algorithm: 'SHA-256',
 });
 
@@ -65,7 +65,7 @@ const ARTIFACTS = Object.freeze({
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
     bytes: 7154,
-    sha256: '9571eba079e39aa456a03f12d64f28dba66ef7bfa5cb042f8dcfbdb2ede6a809',
+    sha256: '72dbdc35eb03f264492fe894bc8c15ddb43bffaefa0885452c28f58cd2d8e060',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-03',
     schema_version: 1,

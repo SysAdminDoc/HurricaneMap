@@ -147,7 +147,7 @@ try {
 
     await createDb('hm-offline-data-v1', { key: 'legacy/data.json' });
     await createDb('hm-offline-data-v2', { key: 'legacy-v2/data.json' });
-    await createDb('hm-offline-data-hm-v1.9.1', { key: 'data/obsolete.json' });
+    await createDb('hm-offline-data-hm-v1.9.2', { key: 'data/obsolete.json' });
   });
 
   await page.goto(baseUrl, { waitUntil: 'load' });
@@ -180,7 +180,7 @@ try {
     const marker = await (await caches.open(dataCacheName)).match('./__hurricanemap-release.json');
     if (!marker) throw new Error('offline release marker was not installed');
     const tuple = await marker.json();
-    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.9.1') {
+    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.9.2') {
       throw new Error(`offline release tuple is incoherent: ${JSON.stringify(tuple)}`);
     }
     return tuple;
@@ -277,7 +277,7 @@ try {
   const sourceState = await page.evaluate(async () => {
     const cache = await caches.open('hm-source-bundle-v1');
     const keys = (await cache.keys()).map(request => new URL(request.url).pathname);
-    const dataRequests = await (await caches.open('hm-data-hm-v1.9.1')).keys();
+    const dataRequests = await (await caches.open('hm-data-hm-v1.9.2')).keys();
     return {
       keys,
       dataKeys: dataRequests.map(request => new URL(request.url).pathname),

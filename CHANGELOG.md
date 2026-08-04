@@ -2,7 +2,7 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.9.2 — Acceptance hardening and release hygiene (2026-08-03)
 
 ### Added
 - Copy-ready APA and BibTeX release citations now appear on every analytical side panel and About surface, travel with research and storm exports, and are emitted by the starter notebook from the same HURDAT2 revision/hash contract; shared URLs now pin the full release-manifest SHA-256.

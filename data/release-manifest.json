@@ -133,7 +133,7 @@
     {
       "path": "data/metadata.json",
       "bytes": 7154,
-      "sha256": "9571eba079e39aa456a03f12d64f28dba66ef7bfa5cb042f8dcfbdb2ede6a809",
+      "sha256": "72dbdc35eb03f264492fe894bc8c15ddb43bffaefa0885452c28f58cd2d8e060",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-03",
       "generated_at_utc": "2026-08-03T00:00:00Z",

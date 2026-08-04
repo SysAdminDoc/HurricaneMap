@@ -41,7 +41,7 @@ const storms = [{
 
 function assertProvenance(provenance, label) {
   assert.equal(provenance.schema_version, 1, `${label}: provenance schema version`);
-  assert.equal(provenance.app_version, '1.9.1', `${label}: app version`);
+  assert.equal(provenance.app_version, '1.9.2', `${label}: app version`);
   assert.equal(provenance.exported_at_utc, exportedAt, `${label}: export timestamp`);
   assert(provenance.data_release.source_commit.length === 40, `${label}: source commit`);
   assert(provenance.data_release.manifest_sha256.length === 64, `${label}: manifest hash`);

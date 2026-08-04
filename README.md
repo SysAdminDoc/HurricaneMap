@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.9.1-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.9.2-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -82,10 +82,10 @@ npm run build
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
-## What's new in v1.9.1 - Advisory replay expansion, radar reliability, and standards catalog (2026-08-02)
+## What's new in v1.9.2 - Acceptance hardening and release hygiene (2026-08-03)
 
-- **Advisory replay:** for U.S.-landfalling Atlantic storms of 2015-2024, storm panels step through every advisory NHC issued — the forecast track and cone as published, beside the final best track, with the verified track and intensity error at each lead and a link to that advisory's own forecast discussion. Positions, intensities, and issue times come verbatim from the archived ATCF a-decks; nothing is reconstructed. 2015-2019 records use the operational cone radii published for each individual year in NHC annual verification reports; 2020-2024 records use the NHC five-year table based on that exact 2020-2024 sample.
-- **Globe isolation:** the optional 3D globe moved into a least-privilege sandboxed frame, so the application document no longer grants `unsafe-eval` or any third-party script host.
+- **Playwright acceptance:** offline tests route a service-worker-owned IEM tile through the browser context, and ARIA snapshots cover storm details, settings, and advisory replay in English, Spanish, and Haitian Creole.
+- **Visual and release checks:** the 16 Windows/Chromium visual baselines are lossless WebP, while platform-aware runners skip them clearly on Linux/macOS and release metadata stays synchronized across the app shell and data bundle.
 
 Earlier release history is maintained in the [CHANGELOG](CHANGELOG.md).
 
