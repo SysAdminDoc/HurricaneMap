@@ -84,6 +84,7 @@ const OFFLINE_DATA_ASSETS = [
   './data/us-states.geojson',
   './data/hurdat2-sources.json',
   './data/radar/manifest.json',
+  './data/stac/catalog.json',
   './schemas/metadata-v1.schema.json',
   './schemas/aoml-landfalls-v1.schema.json',
   './schemas/landfalls-v1.schema.json',

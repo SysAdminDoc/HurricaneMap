@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { STAC_FILE_EXTENSION, STAC_VERSION } from './generate-stac-catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const INDEX_PATH = 'index.html';
 const CATALOG_PATH = 'data/stac/catalog.json';
 const COLLECTION_PATHS = new Map([
   ['hurdat2', 'data/stac/collections/hurdat2.json'],
@@ -15,6 +16,7 @@ const COLLECTION_PATHS = new Map([
 export async function validateStac({ root = ROOT, profile = 'full' } = {}) {
   if (!['core', 'full'].includes(profile)) throw new Error(`unknown STAC profile: ${profile}`);
   currentProfile = profile;
+  await validateDiscoveryLink(root);
   const catalog = await readJson(root, CATALOG_PATH);
   validateCatalog(catalog);
   const childLinks = linksFor(catalog, 'child');
@@ -101,6 +103,30 @@ function validateCatalog(catalog) {
   if (!Array.isArray(catalog['hurricanemap:distribution']) || catalog['hurricanemap:distribution'].length !== 2) {
     throw new Error('STAC catalog distribution metadata is invalid');
   }
+}
+
+async function validateDiscoveryLink(root) {
+  let html;
+  try {
+    html = await readFile(path.join(root, INDEX_PATH), 'utf8');
+  } catch (error) {
+    throw new Error(`unable to read STAC discovery entry point ${INDEX_PATH}: ${error.message}`);
+  }
+  const link = (html.match(/<link\b[^>]*>/gi) || []).find(tag => {
+    const rel = htmlAttribute(tag, 'rel').split(/\s+/).filter(Boolean).map(value => value.toLowerCase());
+    return rel.includes('alternate') && htmlAttribute(tag, 'type').toLowerCase() === 'application/json';
+  });
+  if (!link) throw new Error('index.html is missing its application/json STAC alternate link');
+  const href = htmlAttribute(link, 'href');
+  const target = resolveHref(INDEX_PATH, href, root);
+  if (target.relative !== CATALOG_PATH) {
+    throw new Error(`index.html STAC alternate link must resolve to ${CATALOG_PATH}: ${href}`);
+  }
+  await readJson(root, target.relative);
+}
+
+function htmlAttribute(tag, name) {
+  return tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1] || '';
 }
 
 async function validateCollection(collection, expectedId, collectionPath, root) {

@@ -201,6 +201,7 @@ try {
     'data/stats.json',
     'data/us-states.geojson',
     'data/hurdat2-sources.json',
+    'data/stac/catalog.json',
   ]) {
     assert(offlineKeys.includes(required), `offline IndexedDB store missing ${required}`);
   }
