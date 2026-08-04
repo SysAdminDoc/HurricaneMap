@@ -278,22 +278,83 @@ async function waitForAppReady(page) {
   }, { timeout: 20000 });
 }
 
-async function openKatrinaPanel(page) {
-  await page.evaluate(async () => {
+const femaRouteStates = new WeakMap();
+const FEMA_SMOKE_ROWS = [
+  {
+    femaDeclarationString: 'DR-1603-LA',
+    disasterNumber: 1603,
+    state: 'LA',
+    declarationType: 'DR',
+    declarationDate: '2005-08-29T00:00:00.000Z',
+    incidentType: 'Hurricane',
+    declarationTitle: 'HURRICANE KATRINA',
+    incidentBeginDate: '2005-08-23T00:00:00.000Z',
+    incidentEndDate: '2005-09-15T00:00:00.000Z',
+    designatedArea: 'Orleans (Parish)',
+  },
+  {
+    femaDeclarationString: 'DR-1603-LA',
+    disasterNumber: 1603,
+    state: 'LA',
+    declarationType: 'DR',
+    declarationDate: '2005-08-29T00:00:00.000Z',
+    incidentType: 'Hurricane',
+    declarationTitle: 'HURRICANE KATRINA',
+    incidentBeginDate: '2005-08-23T00:00:00.000Z',
+    incidentEndDate: '2005-09-15T00:00:00.000Z',
+    designatedArea: 'Jefferson (Parish)',
+  },
+  {
+    femaDeclarationString: 'EM-3263-DE',
+    disasterNumber: 3263,
+    state: 'DE',
+    declarationType: 'EM',
+    declarationDate: '2005-08-30T00:00:00.000Z',
+    incidentType: 'Hurricane',
+    declarationTitle: 'HURRICANE KATRINA EVACUATION',
+    incidentBeginDate: '2005-08-25T00:00:00.000Z',
+    incidentEndDate: '2005-09-02T00:00:00.000Z',
+    designatedArea: 'Statewide (State)',
+  },
+];
+
+async function installFemaRoute(page) {
+  if (femaRouteStates.has(page)) return femaRouteStates.get(page);
+  const state = { status: 200, rows: FEMA_SMOKE_ROWS };
+  femaRouteStates.set(page, state);
+  await page.route('https://www.fema.gov/**', route => route.fulfill({
+    status: state.status,
+    contentType: 'application/json',
+    body: state.status === 200
+      ? JSON.stringify({ DisasterDeclarationsSummaries: state.rows })
+      : 'unavailable',
+  }));
+  return state;
+}
+
+async function openStormPanel(page, stormId) {
+  await installFemaRoute(page);
+  await page.evaluate(async id => {
     const data = await import('/src/data.js');
     const panel = await import('/src/panel.js');
     await data.ensureStormsLoaded();
-    const storm = data.getAllStorms().find(item => item.year === 2005 && String(item.name).toUpperCase() === 'KATRINA');
-    if (!storm) throw new Error('Katrina 2005 not found');
-    const landfall = data.getLandfalls().find(item => item.storm_id === storm.id);
-    if (!landfall) throw new Error('Katrina 2005 landfall not found');
+    const landfall = data.getLandfalls().find(item => item.storm_id === id);
+    if (!landfall) throw new Error(`Storm ${id} not found`);
     await panel.showStorm(landfall);
-  });
+  }, stormId);
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
   await page.waitForFunction(() => {
     const status = document.querySelector('#radar-cache-status');
     return status && ['complete', 'partial', 'empty', 'unavailable'].includes(status.dataset.state);
   }, { timeout: 10000 });
+  await page.waitForFunction(() => {
+    const status = document.querySelector('#fema-context');
+    return status && ['success', 'empty', 'error', 'stale', 'offline'].includes(status.dataset.state);
+  }, { timeout: 15000 });
+}
+
+async function openKatrinaPanel(page) {
+  await openStormPanel(page, 'AL122005');
 }
 
 async function assertVideoExport(page) {
@@ -394,21 +455,6 @@ async function assertRadarRenderModes(page) {
     delete window.__hmRemoteRadarSmoke;
     delete window.__hmLocalRadarSmoke;
   });
-}
-
-async function openStormPanel(page, stormId) {
-  await page.evaluate(async id => {
-    const data = await import('/src/data.js');
-    const panel = await import('/src/panel.js');
-    await data.ensureStormsLoaded();
-    const landfall = data.getLandfalls().find(item => item.storm_id === id);
-    if (!landfall) throw new Error(`${id} landfall not found`);
-    await panel.showStorm(landfall);
-  }, stormId);
-  await page.waitForFunction(() => (
-    document.querySelector('#storm-panel')?.hidden === false &&
-    document.querySelector('#advisory-replay-enabled')
-  ), { timeout: 15000 });
 }
 
 async function assertAdvisoryForecastInViewport(page, stormId) {
@@ -2051,6 +2097,22 @@ try {
   await assertNoAxeViolations(page, 'storm panel (WCAG 2.2 AA)', '#storm-panel');
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
+  const femaContext = await page.evaluate(() => ({
+    state: document.querySelector('#fema-context')?.dataset.state || '',
+    text: document.querySelector('#fema-context')?.textContent?.replace(/\s+/g, ' ').trim() || '',
+    links: [...document.querySelectorAll('#fema-context a')].map(link => link.href),
+  }));
+  assert(femaContext.state === 'success' && /LA/.test(femaContext.text) && /Orleans/.test(femaContext.text) && /DR/.test(femaContext.text), `FEMA declaration cards did not render: ${JSON.stringify(femaContext)}`);
+  assert(femaContext.links.includes('https://www.fema.gov/disaster/1603') && femaContext.links.includes('https://www.fema.gov/disaster/3263'), `FEMA record links were not grounded to FEMA: ${JSON.stringify(femaContext.links)}`);
+  const femaSmokeState = femaRouteStates.get(page);
+  femaSmokeState.rows = [];
+  await page.evaluate(async () => (await import('/src/fema.js')).clearFemaCache());
+  await openKatrinaPanel(page);
+  const femaEmptyText = await page.textContent('#fema-context');
+  assert(/No FEMA declaration found/.test(femaEmptyText || ''), `FEMA unmatched state was blank or mislabeled: ${femaEmptyText}`);
+  femaSmokeState.rows = FEMA_SMOKE_ROWS;
+  await page.evaluate(async () => (await import('/src/fema.js')).clearFemaCache());
+  await openKatrinaPanel(page);
   await assertVideoExport(page);
   await assertRadarRenderModes(page);
   // Live permalink navigation: assigning a new hash in an open tab must

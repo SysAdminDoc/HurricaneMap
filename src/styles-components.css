@@ -2317,6 +2317,77 @@ label > input[type="checkbox"] {
 .radar-cache-status[data-state="empty"],
 .radar-cache-status[data-state="unavailable"] { color: var(--subtext); }
 
+.fema-context {
+  display: grid;
+  gap: 7px;
+  margin-top: 2px;
+  padding: 9px 10px;
+  border: 1px solid var(--surface1);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface0) 72%, transparent);
+}
+
+.fema-context-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fema-context-heading h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+}
+
+.fema-context-heading a,
+.fema-record-link { color: var(--sapphire); font-size: 0.68rem; }
+
+.fema-context-body,
+.fema-service-note,
+.fema-status { margin: 0; color: var(--subtext); font-size: 0.72rem; line-height: 1.4; }
+
+.fema-context[data-state="loading"] .fema-context-body { color: var(--subtext); }
+.fema-context[data-state="success"] .fema-context-summary { color: var(--green); }
+.fema-context[data-state="error"] .fema-status { color: var(--yellow); }
+
+.fema-declaration-list { display: grid; gap: 7px; margin-top: 6px; }
+
+.fema-declaration {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--surface1);
+  border-radius: 6px;
+  background: var(--surface0);
+}
+
+.fema-declaration-heading { display: grid; gap: 2px; min-width: 0; }
+.fema-declaration-heading strong { color: var(--text); font-size: 0.75rem; }
+.fema-declaration-heading span { color: var(--subtext); font-size: 0.69rem; overflow-wrap: anywhere; }
+
+.fema-declaration-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 8px;
+  margin: 0;
+}
+
+.fema-declaration-meta div { min-width: 0; }
+.fema-declaration-meta dt { color: var(--subtext); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.fema-declaration-meta dd { margin: 1px 0 0; color: var(--text); font-size: 0.69rem; overflow-wrap: anywhere; }
+
+.fema-areas { display: grid; gap: 3px; }
+.fema-areas-label { color: var(--subtext); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.fema-state-list { display: grid; gap: 3px; }
+.fema-state-group { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 5px; color: var(--text); font-size: 0.68rem; line-height: 1.35; }
+.fema-state-group strong { color: var(--lavender); }
+.fema-state-group span { overflow-wrap: anywhere; }
+.fema-no-area { color: var(--subtext); font-size: 0.68rem; }
+.fema-record-link { justify-self: start; }
+.fema-service-note { margin-top: 2px; font-size: 0.63rem; }
+
 .radar-close { color: var(--subtext); }
 
 @media (max-width: 720px) {

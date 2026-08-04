@@ -11,6 +11,7 @@ export const REQUEST_TIMEOUT_MS = Object.freeze({
   cone: 12_000,
   evacuation: 12_000,
   radar: 8_000,
+  fema: 12_000,
   tides: 12_000,
 });
 
