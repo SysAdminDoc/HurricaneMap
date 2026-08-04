@@ -10,24 +10,26 @@
 
 import { closeAllPanels } from './panels.js';
 import { activateDialogFocus } from './dialog-focus.js';
+import { filterByMacro } from './filter-state.js';
 
 const palette = document.getElementById('keyboard-palette');
 const paletteClose = palette?.querySelector('.palette-close');
 let releasePaletteFocus = null;
 
-export function init() {
-  setupGlobalShortcuts();
+export function init({ filters, onFilterChange } = {}) {
+  setupGlobalShortcuts({ filters, onFilterChange });
   setupPaletteHandlers();
   setupFocusHighlight();
 }
 
-function setupGlobalShortcuts() {
+function setupGlobalShortcuts({ filters, onFilterChange } = {}) {
   document.addEventListener('keydown', (e) => {
     if (e.defaultPrevented) return;
-    // Ctrl/Cmd + M: Major hurricanes only
-    if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+    // Ctrl + M: Major hurricanes only. Cmd + M remains the macOS minimize
+    // window shortcut and must never be claimed by the page.
+    if (e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'm') {
       e.preventDefault();
-      filterMajorOnly();
+      filterMajorOnly(filters, onFilterChange);
     }
     // ?: Open shortcuts palette
     else if ((e.key === '?' || (e.key === '/' && e.shiftKey)) && !isInputFocused()) {
@@ -104,12 +106,9 @@ function closePalette() {
   releasePaletteFocus = null;
 }
 
-function filterMajorOnly() {
-  // Filter to Category 3, 4, 5 only
-  // This needs to be coordinated with main.js filters
-  if (typeof window.filterByMacro === 'function') {
-    window.filterByMacro('major');
-  }
+function filterMajorOnly(filters, onFilterChange) {
+  if (!filters || !filterByMacro(filters, 'major')) return;
+  onFilterChange?.();
 }
 
 function isInputFocused() {

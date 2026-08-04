@@ -20,6 +20,7 @@ All notable changes to HurricaneMap.
 - iPhone and iPad Safari users now get an intent-triggered, localized offline-install guide from Storage; it explains Share → Add to Home Screen, returns focus on dismissal, and stays hidden in standalone mode.
 - The STAC catalog is now discoverable from the HTML entry point, validated in core/full distributions, and retained in the required offline data pack.
 - README now keeps current-release highlights and sends older release history to the changelog; the quality plan now reflects shipped modularization and visual-regression work.
+- Dead translation keys and an unused logo generator are gone; the source-tree distribution descriptor no longer pretends to have a commit, Inter is the primary UI font, IEM radar tiles use the bounded tile cache, and Ctrl+M now reaches the filter module without a window global while Cmd+M remains available to macOS.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 
 ### Fixed

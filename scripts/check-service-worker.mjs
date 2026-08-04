@@ -113,6 +113,9 @@ if (!/const\s+DATA_CACHE_PREFIX\s*=\s*['"]hm-data-['"]/.test(source) ||
 if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR_CACHE_MAX_ENTRIES\)/.test(source)) {
   errors.push('sw.js must cap the on-demand radar cache.');
 }
+if (/stamen|opentopomap/.test(source) || !source.includes('mesonet\\.agron\\.iastate\\.edu')) {
+  errors.push('sw.js tile caching must cover the app\'s IEM radar tiles without dead host matchers.');
+}
 if (!/pruneOfflineData\(\)/.test(source) || !/idbDeleteExcept/.test(source)) {
   errors.push('sw.js activate path must prune removed offline-data records.');
 }

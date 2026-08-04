@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "profile": "full",
-  "source_commit": "source-tree",
   "capabilities": {
     "historical_offline": true,
     "bundled_radar": true,

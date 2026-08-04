@@ -2,7 +2,7 @@
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
 import { getLocale, setLocale, STRINGS, interpolate, t } from '../src/i18n.js';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 
 globalThis.document = {
   documentElement: { lang: 'en' },
@@ -37,7 +37,7 @@ for (const locale of locales) {
   }
 }
 
-assert(t('month.1') === 'January', 'default locale should resolve English');
+assert(t('category.1') === 'Category 1', 'default locale should resolve English');
 assert(t('status.landfalls', 42) === '42 landfalls', 'placeholder substitution failed');
 assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated placeholders should all resolve');
 assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
@@ -54,6 +54,30 @@ const staticKeys = [...html.matchAll(/data-i18n(?:-html|-title|-placeholder|-ari
 for (const key of staticKeys) {
   assert(Object.hasOwn(STRINGS.en, key), `index.html references unknown key: ${key}`);
 }
+
+// Keep the catalog from accumulating copy that no UI surface can render. A
+// dynamic template or concatenated key is treated as a reference to its
+// complete namespace, while static calls are checked as exact keys.
+const referencedKeys = new Set(staticKeys);
+const dynamicPrefixes = [];
+const sourceFiles = readdirSync(new URL('../src/', import.meta.url), { withFileTypes: true })
+  .filter(entry => entry.isFile() && entry.name.endsWith('.js') && entry.name !== 'i18n.js')
+  .map(entry => readFileSync(new URL(`../src/${entry.name}`, import.meta.url), 'utf8'))
+  .concat(html)
+  .map(source => source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/gm, '$1'));
+for (const source of sourceFiles) {
+  for (const match of source.matchAll(/\bt\(\s*['"]([^'"]+)['"]/g)) referencedKeys.add(match[1]);
+  for (const match of source.matchAll(/\bt\(\s*`([^`$]*)\$\{/g)) dynamicPrefixes.push(match[1]);
+  for (const match of source.matchAll(/\bt\(\s*['"]([^'"]+)['"]\s*\+/g)) dynamicPrefixes.push(match[1]);
+}
+for (const key of enKeys) {
+  const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const exactKey = new RegExp(`(?:^|[^\\w.-])${escapedKey}(?=$|[^\\w.-])`);
+  if (sourceFiles.some(source => exactKey.test(source))) referencedKeys.add(key);
+  if (dynamicPrefixes.some(prefix => key.startsWith(prefix))) referencedKeys.add(key);
+}
+const orphanKeys = enKeys.filter(key => !referencedKeys.has(key));
+assert(!orphanKeys.length, `English catalog contains orphan keys: ${orphanKeys.join(', ')}`);
 
 const glossary = JSON.parse(readFileSync(new URL('../data/glossary.json', import.meta.url), 'utf8'));
 assert(glossary.length > 0 && glossary.every(entry => entry.language === 'en'), 'glossary rows must declare their English source language');

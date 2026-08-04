@@ -38,7 +38,7 @@ export function resetPrimaryFilters(filters, {
   filters.retiredOnly = defaults.retiredOnly;
 }
 
-export function setCategoryMacro(filters, mode) {
+export function filterByMacro(filters, mode) {
   if (mode === 'major') {
     filters.categories = new Set(['3', '4', '5']);
     return true;

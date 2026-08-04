@@ -18,9 +18,6 @@ import {
   viewOptionsFromDecoded, currentDataRevision,
 } from './url-state.js';
 import { initCitationUI, mountCitationHost } from './citation-ui.js';
-import {
-  setCategoryMacro,
-} from './filter-state.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
 import { initOptionalFeedDiagnostics } from './optional-feeds.js';
@@ -449,16 +446,15 @@ async function boot() {
   );
   renderDataProvenance();
   
-  // Initialize keyboard shortcuts and navigation
-  // Wire macro filter functions to window
-  window.filterByMacro = (mode) => {
-    if (setCategoryMacro(filters, mode)) {
-      syncFilterUiFromState();
-      applyFilters();
-    }
-  };
+  // Initialize keyboard shortcuts and navigation.
   deferNonCritical(() => {
-    loadKeyboard().then(({ init }) => init()).catch(() => { /* non-fatal */ });
+    loadKeyboard().then(({ init }) => init({
+      filters,
+      onFilterChange: () => {
+        syncFilterUiFromState();
+        applyFilters();
+      },
+    })).catch(() => { /* non-fatal */ });
   });
   
   els.loading.classList.add('fade-out');

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { categoryStrength } from '../src/data.js';
 import { createDefaultFilters } from '../src/url-state.js';
 import {
@@ -7,12 +8,16 @@ import {
   isYearFiltered,
   resetPrimaryFilters,
   resetYearRange,
-  setCategoryMacro,
+  filterByMacro,
   setYearRange,
   toggleCategory,
 } from '../src/filter-state.js';
 
 const defaults = { yearMinDefault: 1851, yearMaxDefault: 2025 };
+const keyboardSource = readFileSync(new URL('../src/keyboard.js', import.meta.url), 'utf8');
+assert.match(keyboardSource, /import \{ filterByMacro \} from '\.\/filter-state\.js';/, 'keyboard shortcut must import the macro filter');
+assert.match(keyboardSource, /e\.ctrlKey && !e\.metaKey/, 'Cmd+M must remain available to macOS');
+assert.doesNotMatch(keyboardSource, /window\.filterByMacro/, 'macro filtering must not cross a window global');
 
 assert.deepEqual(
   [0, -1, 1, 2, 3, 4, 5].sort((a, b) => categoryStrength(a) - categoryStrength(b)),
@@ -52,11 +57,11 @@ function cats(filters) {
 
 {
   const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
-  assert.equal(setCategoryMacro(filters, 'major'), true);
+  assert.equal(filterByMacro(filters, 'major'), true);
   assert.deepEqual(cats(filters), ['3', '4', '5']);
-  assert.equal(setCategoryMacro(filters, 'tropical'), true);
+  assert.equal(filterByMacro(filters, 'tropical'), true);
   assert.deepEqual(cats(filters), ['ts']);
-  assert.equal(setCategoryMacro(filters, 'unknown'), false);
+  assert.equal(filterByMacro(filters, 'unknown'), false);
   assert.deepEqual(cats(filters), ['ts']);
 }
 

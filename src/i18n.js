@@ -353,7 +353,6 @@ export const STRINGS = {
     'filters.title': 'Filters',
     'filters.yearRange': 'Year range',
     'filters.category': 'Category',
-    'filters.categoryTS': 'Tropical Storm at landfall',
     'filters.state': 'State',
     'filters.searchStorm': 'Search storm',
     'filters.searchPlaceholder': 'e.g. Katrina, 2005, Helene…',
@@ -368,22 +367,10 @@ export const STRINGS = {
     // Storm panel
     'panel.title': 'Storm details',
     'panel.close': 'Close',
-    'panel.track': 'Track',
-    'panel.intensity': 'Intensity',
     'panel.peakWind': 'Peak wind',
     'panel.minPressure': 'Min pressure',
-    'panel.formed': 'Formed',
-    'panel.dissipated': 'Dissipated',
-    'panel.track_km': 'Track length',
     'panel.landfalls': 'U.S. landfalls',
-    'panel.ACE': 'Accumulated Cyclone Energy',
-    'panel.forwardSpeed': 'Forward speed',
-    'panel.rapidIntensification': 'Rapid intensification',
-    'panel.explosiveDeepening': 'Explosive deepening',
     'panel.daysAtIntensity': 'Days at intensity',
-    'panel.closestApproach': 'Closest approach to coast',
-    'panel.casualties': 'Casualties',
-    'panel.damages': 'Damages',
     'panel.impacts': 'Impacts',
     'panel.similarStorms': 'Similar storms',
     'panel.playTrack': 'Play track',
@@ -391,7 +378,6 @@ export const STRINGS = {
     'panel.resumeTrack': 'Resume track animation',
     'panel.loadingPlayback': 'Loading playback…',
     'panel.playbackFrame': 'Track time: {0}',
-    'panel.speed': 'Speed',
     'panel.exportTrack': 'Export track',
     'panel.videoExport': 'Video export',
     'panel.videoExportDescription': 'Create a WebM of this storm’s track with its dates, category legend, and NOAA attribution.',
@@ -408,11 +394,7 @@ export const STRINGS = {
 
     // Stats panel
     'stats.title': 'Statistics',
-    'stats.seasonSummary': 'Season summary',
-    'stats.namedStorms': 'Named storms',
-    'stats.majors': 'Majors (Cat 3+)',
     'stats.totalACE': 'Total ACE',
-    'stats.landfalls': 'Landfalls',
     'stats.strongest': 'Strongest',
     'stats.deadliest': 'Deadliest',
     'stats.costliest': 'Costliest',
@@ -423,25 +405,13 @@ export const STRINGS = {
 
     // Comparison panel
     'compare.title': 'Compare Storms',
-    'compare.pin': 'Pin',
     'compare.unpin': 'Unpin',
-    'compare.selectUpTo4': 'Select up to 4 storms to compare',
-    'compare.noStorms': 'No storms pinned. Click the pin icon in a storm panel to add.',
 
     // Buttons & actions
     'btn.clearYearFilter': 'Reset',
-    'btn.share': '🔗 Share view',
     'btn.exportCSV': 'CSV',
-    'btn.exportGeoJSON': 'GeoJSON',
-    'btn.exportKML': 'KML',
-    'btn.exportPNG': 'PNG',
-    'btn.exportSVG': 'SVG',
-    'btn.showMoreResults': 'Show more',
-    'btn.recentlyViewed': 'Recently viewed',
 
     // Status messages
-    'status.loading': 'Loading…',
-    'status.noResults': 'No storms found',
     'status.stormCount': '{0} storms · {1} landfalls',
     'status.landfalls': '{0} landfalls',
     'status.landfallsOf': '{0} of {1} landfalls',
@@ -458,12 +428,8 @@ export const STRINGS = {
     'status.feedNextCheck': '{0} - next check {1} UTC',
 
     // Toasts
-    'toast.copiedLink': 'Copied to clipboard',
-    'toast.exportedFile': 'Downloaded {0}',
 
     // Categories
-    'category.-1': 'Tropical Storm',
-    'category.0': 'Tropical Depression',
     'category.ts': 'Tropical Storm',
     'category.1': 'Category 1',
     'category.2': 'Category 2',
@@ -472,18 +438,6 @@ export const STRINGS = {
     'category.5': 'Category 5',
 
     // Months
-    'month.1': 'January',
-    'month.2': 'February',
-    'month.3': 'March',
-    'month.4': 'April',
-    'month.5': 'May',
-    'month.6': 'June',
-    'month.7': 'July',
-    'month.8': 'August',
-    'month.9': 'September',
-    'month.10': 'October',
-    'month.11': 'November',
-    'month.12': 'December',
 
     // On this date
     'onthisdate.title': 'On this date in history',
@@ -636,10 +590,6 @@ export const STRINGS = {
 
     // About / info modal
     'about.title': 'About HurricaneMap',
-    'about.description': 'HurricaneMap is an interactive 174-year atlas of U.S. hurricane landfalls (1851–2025) from HURDAT2, enhanced with advanced analytics, live active-storm tracking, and climate trend analysis.',
-    'about.dataSource': 'Data source: National Hurricane Center HURDAT2',
-    'about.github': 'GitHub',
-    'about.privacy': 'All data processing happens in your browser. No tracking, no accounts, no servers.',
     'citation.title': 'Cite this release',
     'citation.description': 'Copy a reproducible citation with the HURDAT2 revision, source hashes, app version, and access date.',
     'citation.apa': 'APA',
@@ -741,7 +691,6 @@ export const STRINGS = {
     'spatial.hint': 'Right-click (long-press on touch) anywhere on the map, or use your device location.',
     'spatial.useMyLocation': 'Use my location',
     'spatial.locating': 'Locating…',
-    'spatial.denied': 'Location unavailable — right-click the map instead',
     'spatial.locationPrivacy': 'Your coordinates center this search and add distance to active storms. They stay in this tab session unless you opt in below.',
     'spatial.rememberLocation': 'Remember on this device for 24 hours',
     'spatial.rememberHelp': 'Stores only latitude and longitude. Saved views never include them.',
@@ -1249,7 +1198,6 @@ export const STRINGS = {
     'filters.title': 'Filtros',
     'filters.yearRange': 'Rango de años',
     'filters.category': 'Categoría',
-    'filters.categoryTS': 'Tormenta tropical al tocar tierra',
     'filters.state': 'Estado',
     'filters.searchStorm': 'Buscar huracán',
     'filters.searchPlaceholder': 'p. ej. Katrina, 2005, Helene…',
@@ -1264,22 +1212,10 @@ export const STRINGS = {
     // Storm panel
     'panel.title': 'Detalles de la tormenta',
     'panel.close': 'Cerrar',
-    'panel.track': 'Trayectoria',
-    'panel.intensity': 'Intensidad',
     'panel.peakWind': 'Viento máximo',
     'panel.minPressure': 'Presión mínima',
-    'panel.formed': 'Formado',
-    'panel.dissipated': 'Disipado',
-    'panel.track_km': 'Longitud de la trayectoria',
     'panel.landfalls': 'Toques de tierra en EE. UU.',
-    'panel.ACE': 'Energía ciclónica acumulada',
-    'panel.forwardSpeed': 'Velocidad de avance',
-    'panel.rapidIntensification': 'Intensificación rápida',
-    'panel.explosiveDeepening': 'Profundización explosiva',
     'panel.daysAtIntensity': 'Días con esta intensidad',
-    'panel.closestApproach': 'Aproximación más cercana a la costa',
-    'panel.casualties': 'Víctimas mortales',
-    'panel.damages': 'Daños',
     'panel.impacts': 'Impactos',
     'panel.similarStorms': 'Huracanes similares',
     'panel.playTrack': 'Reproducir trayectoria',
@@ -1287,7 +1223,6 @@ export const STRINGS = {
     'panel.resumeTrack': 'Reanudar animación de la trayectoria',
     'panel.loadingPlayback': 'Cargando reproducción…',
     'panel.playbackFrame': 'Hora de la trayectoria: {0}',
-    'panel.speed': 'Velocidad',
     'panel.exportTrack': 'Exportar trayectoria',
     'panel.videoExport': 'Exportar video',
     'panel.videoExportDescription': 'Cree un WebM de la trayectoria de esta tormenta con sus fechas, leyenda de categorías y atribución de NOAA.',
@@ -1304,11 +1239,7 @@ export const STRINGS = {
 
     // Stats panel
     'stats.title': 'Estadísticas',
-    'stats.seasonSummary': 'Resumen de la temporada',
-    'stats.namedStorms': 'Tormentas con nombre',
-    'stats.majors': 'Mayores (Cat 3+)',
     'stats.totalACE': 'ACE total',
-    'stats.landfalls': 'Toques de tierra',
     'stats.strongest': 'Más fuerte',
     'stats.deadliest': 'Más mortífero',
     'stats.costliest': 'Más costoso',
@@ -1319,25 +1250,13 @@ export const STRINGS = {
 
     // Comparison panel
     'compare.title': 'Comparar huracanes',
-    'compare.pin': 'Fijar',
     'compare.unpin': 'Desfijar',
-    'compare.selectUpTo4': 'Selecciona hasta 4 huracanes para comparar',
-    'compare.noStorms': 'Sin huracanes fijados. Haz clic en el icono de alfiler en un panel de huracán para agregar.',
 
     // Buttons & actions
     'btn.clearYearFilter': 'Restablecer',
-    'btn.share': '🔗 Compartir vista',
     'btn.exportCSV': 'CSV',
-    'btn.exportGeoJSON': 'GeoJSON',
-    'btn.exportKML': 'KML',
-    'btn.exportPNG': 'PNG',
-    'btn.exportSVG': 'SVG',
-    'btn.showMoreResults': 'Mostrar más',
-    'btn.recentlyViewed': 'Visto recientemente',
 
     // Status messages
-    'status.loading': 'Cargando…',
-    'status.noResults': 'No se encontraron huracanes',
     'status.stormCount': '{0} huracanes · {1} toques de tierra',
     'status.landfalls': '{0} toques de tierra',
     'status.landfallsOf': '{0} de {1} toques de tierra',
@@ -1354,12 +1273,8 @@ export const STRINGS = {
     'status.feedNextCheck': '{0} - próxima comprobación a las {1} UTC',
 
     // Toasts
-    'toast.copiedLink': 'Copiado al portapapeles',
-    'toast.exportedFile': 'Descargado {0}',
 
     // Categories
-    'category.-1': 'Tormenta tropical',
-    'category.0': 'Depresión tropical',
     'category.ts': 'Tormenta tropical',
     'category.1': 'Categoría 1',
     'category.2': 'Categoría 2',
@@ -1368,18 +1283,6 @@ export const STRINGS = {
     'category.5': 'Categoría 5',
 
     // Months
-    'month.1': 'Enero',
-    'month.2': 'Febrero',
-    'month.3': 'Marzo',
-    'month.4': 'Abril',
-    'month.5': 'Mayo',
-    'month.6': 'Junio',
-    'month.7': 'Julio',
-    'month.8': 'Agosto',
-    'month.9': 'Septiembre',
-    'month.10': 'Octubre',
-    'month.11': 'Noviembre',
-    'month.12': 'Diciembre',
 
     // On this date
     'onthisdate.title': 'Esta fecha en la historia',
@@ -1532,10 +1435,6 @@ export const STRINGS = {
 
     // About / info modal
     'about.title': 'Acerca de HurricaneMap',
-    'about.description': 'HurricaneMap es un atlas interactivo de 174 años de huracanes que azotaron Estados Unidos (1851–2025) desde HURDAT2, mejorado con análisis avanzado, seguimiento de tormentas activas en tiempo real y análisis de tendencias climáticas.',
-    'about.dataSource': 'Fuente de datos: Centro Nacional de Huracanes HURDAT2',
-    'about.github': 'GitHub',
-    'about.privacy': 'Todo el procesamiento de datos ocurre en tu navegador. Sin rastreo, sin cuentas, sin servidores.',
     'citation.title': 'Citar esta versión',
     'citation.description': 'Copia una cita reproducible con la revisión HURDAT2, los hashes de origen, la versión de la aplicación y la fecha de acceso.',
     'citation.apa': 'APA',
@@ -1637,7 +1536,6 @@ export const STRINGS = {
     'spatial.hint': 'Haz clic derecho (mantén pulsado en táctil) en el mapa, o usa la ubicación de tu dispositivo.',
     'spatial.useMyLocation': 'Usar mi ubicación',
     'spatial.locating': 'Localizando…',
-    'spatial.denied': 'Ubicación no disponible — haz clic derecho en el mapa',
     'spatial.locationPrivacy': 'Tus coordenadas centran esta búsqueda y añaden la distancia a tormentas activas. Permanecen solo durante esta sesión de pestaña salvo que aceptes guardarlas abajo.',
     'spatial.rememberLocation': 'Recordar en este dispositivo durante 24 horas',
     'spatial.rememberHelp': 'Solo guarda latitud y longitud. Las vistas guardadas nunca las incluyen.',
@@ -2140,7 +2038,6 @@ export const STRINGS = {
     'filters.title': 'Filtè',
     'filters.yearRange': 'Ane',
     'filters.category': 'Kategori',
-    'filters.categoryTS': 'Tanpèt twopikal lè li touche tè',
     'filters.state': 'Eta',
     'filters.searchStorm': 'Chèche siklòn',
     'filters.searchPlaceholder': 'pa egz. Katrina, 2005, Helene…',
@@ -2153,14 +2050,9 @@ export const STRINGS = {
     'filters.resetFilters': 'Remèt filtè yo',
     'panel.title': 'Detay siklòn',
     'panel.close': 'Fèmen',
-    'panel.track': 'Chemen',
-    'panel.intensity': 'Entansite',
     'panel.peakWind': 'Van maksimòm',
     'panel.minPressure': 'Presyon minimòm',
-    'panel.formed': 'Fòme',
-    'panel.dissipated': 'Disparèt',
     'panel.landfalls': 'Touche tè Etazini',
-    'panel.ACE': 'Enèji siklòn akimile',
     'panel.impacts': 'Enpak',
     'panel.similarStorms': 'Siklòn ki sanble',
     'panel.playTrack': 'Jwe chemen',
@@ -2182,17 +2074,11 @@ export const STRINGS = {
     'panel.videoExportReady': 'Videyo a pare; telechajman an kòmanse.',
     'panel.videoExportFailed': 'Ekspòtasyon videyo a echwe. Eseye yon dire ki pi kout.',
     'stats.title': 'Estatistik',
-    'stats.landfalls': 'Touche tè',
     'stats.strongest': 'Pi fò',
     'stats.deadliest': 'Pi mòtèl',
     'stats.costliest': 'Pi chè',
     'compare.title': 'Konpare siklòn',
-    'compare.noStorms': 'Pa gen siklòn tache. Klike sou ikòn epeng nan yon panno siklòn pou ajoute.',
     'btn.clearYearFilter': 'Remèt',
-    'btn.share': '🔗 Pataje vi',
-    'status.loading': 'Chajman…',
-    'status.noResults': 'Pa jwenn siklòn',
-    'toast.copiedLink': 'Kopye nan plas-papye',
     'category.ts': 'Tanpèt twopikal',
     'category.1': 'Kategori 1',
     'category.2': 'Kategori 2',
@@ -2328,10 +2214,6 @@ export const STRINGS = {
     'stormevents.title': 'Evènman tanpèt bò kote siklòn touche tè',
     'stormevents.unavailable': 'Dosye NOAA kòmanse nan 1950; done tònad pa disponib pou siklòn sa a.',
     'about.title': 'Konsènan HurricaneMap',
-    'about.description': 'HurricaneMap se yon atlas entèaktif 174 ane siklòn ki frape Etazini (1851–2025) soti nan HURDAT2.',
-    'about.dataSource': 'Sous done: Sant Nasyonal Siklòn HURDAT2',
-    'about.github': 'GitHub',
-    'about.privacy': 'Tout tretman done fèt nan navigatè w. Pa gen swivi, pa gen kont, pa gen sèvè.',
     'citation.title': 'Site vèsyon sa a',
     'citation.description': 'Kopye yon sitasyon ki ka verifye ak revizyon HURDAT2, hash sous yo, vèsyon aplikasyon an ak dat aksè a.',
     'citation.apa': 'APA',
@@ -2341,20 +2223,9 @@ export const STRINGS = {
     'citation.copyFailed': 'Kopi a echwe — chwazi tèks sitasyon an.',
 
     // Storm panel metrics
-    'panel.track_km': 'Longè trajè a',
-    'panel.forwardSpeed': 'Vitès deplasman',
-    'panel.rapidIntensification': 'Entansifikasyon rapid',
-    'panel.explosiveDeepening': 'Apwofondisman eksplozif',
     'panel.daysAtIntensity': 'Jou nan entansite sa a',
-    'panel.closestApproach': 'Pwen ki pi pre kòt la',
-    'panel.casualties': 'Viktim',
-    'panel.damages': 'Dega',
-    'panel.speed': 'Vitès',
 
     // Statistics
-    'stats.seasonSummary': 'Rezime sezon an',
-    'stats.namedStorms': 'Tanpèt ki gen non',
-    'stats.majors': 'Majè (Kat 3+)',
     'stats.totalACE': 'ACE total',
     'stats.climatologyChart': 'Klimatoloji anyèl',
     'climatology.loading': 'Ap kalkile klimatoloji 174 ane a…',
@@ -2362,18 +2233,10 @@ export const STRINGS = {
     'stats.climateTrends': 'Tandans klimatik',
 
     // Compare
-    'compare.pin': 'Epengle',
     'compare.unpin': 'Retire',
-    'compare.selectUpTo4': 'Chwazi jiska 4 siklòn pou konpare',
 
     // Buttons & status
     'btn.exportCSV': 'CSV',
-    'btn.exportGeoJSON': 'GeoJSON',
-    'btn.exportKML': 'KML',
-    'btn.exportPNG': 'PNG',
-    'btn.exportSVG': 'SVG',
-    'btn.showMoreResults': 'Montre plis',
-    'btn.recentlyViewed': 'Gade dènyèman',
     'status.stormCount': '{0} siklòn · {1} fwa yo touche tè',
     'status.landfalls': '{0} fwa yo touche tè',
     'status.landfallsOf': '{0} sou {1} fwa yo touche tè',
@@ -2388,23 +2251,8 @@ export const STRINGS = {
     'status.feedHourly': '{0} - verifikasyon chak èdtan',
     'status.noActiveStorms': 'Pa gen siklòn aktif',
     'status.feedNextCheck': '{0} - pwochen verifikasyon a {1} UTC',
-    'toast.exportedFile': 'Telechaje {0}',
-    'category.-1': 'Tanpèt twopikal',
-    'category.0': 'Depresyon twopikal',
 
     // Months
-    'month.1': 'Janvye',
-    'month.2': 'Fevriye',
-    'month.3': 'Mas',
-    'month.4': 'Avril',
-    'month.5': 'Me',
-    'month.6': 'Jen',
-    'month.7': 'Jiyè',
-    'month.8': 'Out',
-    'month.9': 'Septanm',
-    'month.10': 'Oktòb',
-    'month.11': 'Novanm',
-    'month.12': 'Desanm',
 
     // On this date / glossary
     'onthisdate.loading': 'Ap chèche touche tè istorik ki toupre jodi a…',
@@ -2513,7 +2361,6 @@ export const STRINGS = {
     'spatial.hint': 'Klike dwat (peze kenbe sou ekran taktil) sou kat la, oswa itilize pozisyon aparèy ou.',
     'spatial.useMyLocation': 'Itilize pozisyon mwen',
     'spatial.locating': 'Ap chache pozisyon…',
-    'spatial.denied': 'Pozisyon pa disponib — klike dwat sou kat la',
     'spatial.locationPrivacy': 'Kowòdone ou yo santre rechèch sa a epi ajoute distans pou siklòn aktif yo. Yo rete sèlman pandan sesyon onglet sa a sof si ou chwazi sonje yo anba a.',
     'spatial.rememberLocation': 'Sonje sou aparèy sa a pandan 24 èdtan',
     'spatial.rememberHelp': 'Li sere sèlman latitid ak lonjitid. Vizyalizasyon ki anrejistre pa janm gen yo.',

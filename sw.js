@@ -204,7 +204,7 @@ function isSourceBundleAsset(url) {
 }
 
 function isTile(url) {
-  return /tile\.openstreetmap|cartocdn|basemaps\.cartocdn|stamen|tile\.opentopomap/.test(url.host);
+  return /tile\.openstreetmap|cartocdn|mesonet\.agron\.iastate\.edu/.test(url.host);
 }
 
 self.addEventListener('fetch', (event) => {
