@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 const layers = ['tokens', 'reset', 'base', 'shell', 'components', 'utilities', 'themes', 'accessibility'];
 const entry = await readFile(new URL('../src/styles.css', import.meta.url), 'utf8');
 const expectedOrder = `@layer ${layers.join(', ')};`;
+const COMPONENTS_IMPORTANT_CAP = 0;
 const errors = [];
 if (!entry.startsWith(expectedOrder)) errors.push('styles.css does not declare the approved cascade order');
 
@@ -48,6 +49,10 @@ for (const layer of layers) {
   const importRule = `@import url('./styles-${layer}.css') layer(${layer});`;
   if (!entry.includes(importRule)) errors.push(`styles.css is missing ${layer} layer import`);
   const css = await readFile(new URL(`../src/styles-${layer}.css`, import.meta.url), 'utf8');
+  const importantCount = (css.match(/!important\b/g) || []).length;
+  if (layer === 'components' && importantCount > COMPONENTS_IMPORTANT_CAP) {
+    errors.push(`components layer has ${importantCount} !important declarations; cap is ${COMPONENTS_IMPORTANT_CAP}`);
+  }
   const rules = topLevelBlocks(css);
   if (!css.trim()) errors.push(`${layer} layer is empty`);
   ruleCount += rules.length;

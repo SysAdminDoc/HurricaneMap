@@ -58,10 +58,12 @@ html.light-theme {
   .glass {
     backdrop-filter: blur(12px) saturate(130%);
   }
+}
 
-  .icon-btn {
-    background: rgba(255, 255, 255, 0.4);
-  }
+html.light-theme .icon-btn {
+  background: var(--surface-control);
+  border-color: var(--border-subtle);
+  color: var(--foreground);
 }
 
 html.light-theme {
@@ -166,11 +168,18 @@ html.light-theme #map .leaflet-tile-pane {
 }
 
 html.light-theme .app-header,
-html.light-theme .atlas-context-rail,
 html.light-theme .mobile-actions-menu {
   --atlas-panel-strong: rgba(248, 250, 255, 0.98);
   --atlas-edge: rgba(53, 95, 126, 0.2);
   --atlas-cyan: #087d91;
   --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
   background: color-mix(in srgb, var(--surface-panel) 97%, transparent) !important;
+}
+
+html.light-theme .atlas-context-rail {
+  --atlas-panel-strong: rgba(248, 250, 255, 0.98);
+  --atlas-edge: rgba(53, 95, 126, 0.2);
+  --atlas-cyan: #087d91;
+  --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
+  background: rgba(7, 21, 39, 0.9);
 }

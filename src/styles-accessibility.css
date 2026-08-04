@@ -463,3 +463,21 @@ html.high-contrast:not(.light-theme) {
 html.high-contrast #map .leaflet-tile-pane {
   filter: none;
 }
+
+/* The JS setting applies .reduce-motion even when the OS preference is not
+   set. Keep this accessibility contract after component and theme motion
+   declarations so it remains a normal layer-governed override. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+  transition-duration: 0.01ms;
+  scroll-behavior: auto;
+}
+
+.reduce-motion .hurricane-glyph,
+.reduce-motion .ab-pulse,
+.reduce-motion .loading .spinner {
+  animation: none;
+}

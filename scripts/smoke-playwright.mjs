@@ -2225,6 +2225,7 @@ try {
     JSON.parse(localStorage.getItem('hm-prep-v1')).state.checked.length === 0 &&
     document.activeElement?.id === 'prep-reset'
   ));
+  await page.waitForFunction(() => /items cleared/i.test(document.querySelector('#map-announce')?.textContent || ''), { timeout: 5000 });
   const prepReset = await page.evaluate(() => ({
     state: JSON.parse(localStorage.getItem('hm-prep-v1')).state,
     focused: document.activeElement?.id,
