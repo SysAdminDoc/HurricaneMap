@@ -29,6 +29,9 @@ const DATA_DB_VERSION = 1;
 const LEGACY_DATA_CACHES = ['hm-data-v1', 'hm-data-v2'];
 const LEGACY_DATA_DBS = ['hm-offline-data-v1', 'hm-offline-data-v2'];
 const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
+const RELEASE_LOCK_NAME = `hurricanemap-release-${SW_VERSION}`;
+const WORKER_BASE_URL = new URL('./', import.meta.url);
+const MODULE_ENTRYPOINTS = ['./src/main.js'];
 
 const SHELL_ASSETS = [
   './',
@@ -46,106 +49,8 @@ const SHELL_ASSETS = [
   './src/styles-utilities.css',
   './src/styles-themes.css',
   './src/styles-accessibility.css',
-  './src/main.js',
-  './src/outlook.js',
-  './src/marine-warnings.js',
-  './src/data.js',
-  './src/dialog-focus.js',
-  './src/diagnostics.js',
-  './src/confirm-action.js',
-  './src/errors.js',
-  './src/map.js',
-  './src/map-colors.js',
-  './src/metric-presenters.js',
-  './src/on-this-date-utils.js',
-  './src/panel.js',
-  './src/panel-controls.js',
-  './src/panels.js',
-  './src/stats.js',
-  './src/state.js',
-  './src/sw-updates.js',
-  './src/on-this-date.js',
-  './src/glossary.js',
-  './src/goes-realtime.js',
-  './src/hwm.js',
-  './src/globe3d.js',
   './src/globe-host.js',
   './src/globe-host.css',
-  './src/keyboard.js',
-  './src/chart.js',
-  './src/chart-export.js',
-  './src/animation.js',
-  './src/video-export.js',
-  './src/art-mode.js',
-  './src/active.js',
-  './src/active-polling.js',
-  './src/alerts.js',
-  './src/peak-surge.js',
-  './src/climatology.js',
-  './src/cone.js',
-  './src/cone-retro.js',
-  './src/advisory-replay.js',
-  './src/compare.js',
-  './src/citation.js',
-  './src/citation-ui.js',
-  './src/decade-trends.js',
-  './src/export.js',
-  './src/export-provenance.js',
-  './src/exposure.js',
-  './src/fema.js',
-  './src/fema-panel.js',
-  './src/filter-state.js',
-  './src/geodesy.js',
-  './src/filter-controller.js',
-  './src/forecast-skill.js',
-  './src/fuzzy.js',
-  './src/html-utils.js',
-  './src/i18n.js',
-  './src/impact-utils.js',
-  './src/impact-coverage.js',
-  './src/inflation.js',
-  './src/metrics.js',
-  './src/network.js',
-  './src/manifest-locale.js',
-  './src/perf.js',
-  './src/prep.js',
-  './src/evac.js',
-  './src/poster.js',
-  './src/tooltips.js',
-  './src/population.js',
-  './src/qgis.js',
-  './src/radar.js',
-  './src/radar-palette.js',
-  './src/radar-utils.js',
-  './src/report.js',
-  './src/search-history.js',
-  './src/schema-contract.js',
-  './src/search-controller.js',
-  './src/saved-views.js',
-  './src/saved-views-ui.js',
-  './src/spatial-search.js',
-  './src/settings.js',
-  './src/shell-navigation.js',
-  './src/shell-ui.js',
-  './src/storage-manager.js',
-  './src/onboarding.js',
-  './src/optional-feeds.js',
-  './src/timeline.js',
-  './src/sparkline.js',
-  './src/season.js',
-  './src/seasonal-outlook.js',
-  './src/snapshot-freshness.js',
-  './src/storm-events.js',
-  './src/storms-worker.js',
-  './src/sst.js',
-  './src/svg-export.js',
-  './src/surge.js',
-  './src/table-view.js',
-  './src/tides.js',
-  './src/url-state.js',
-  './src/user-point.js',
-  './src/windfield.js',
-  './src/wind-context.js',
   './branding/favicon.png',
   './branding/logo-192.png',
   './vendor/leaflet.css',
@@ -154,6 +59,8 @@ const SHELL_ASSETS = [
   './fonts/inter-latin.woff2',
   './fonts/jetbrains-mono-latin.woff2',
 ];
+
+const MODULE_IMPORT_RE = /\bimport(?:\s+(?:(?:[\s\S]*?\sfrom\s+)?['"]([^'"]+)['"])|\s*\(\s*['"]([^'"]+)['"]\s*\))/g;
 
 const OFFLINE_DATA_ASSETS = [
   './data/landfalls.json',
@@ -192,12 +99,52 @@ const SOURCE_BUNDLE_ASSETS = [
   './data/release-manifest.json',
 ];
 
+async function withReleaseLock(task) {
+  const locks = self.navigator?.locks;
+  if (!locks?.request) return task();
+  return locks.request(RELEASE_LOCK_NAME, { mode: 'exclusive' }, task);
+}
+
+function assetPathFor(url) {
+  if (url.origin !== WORKER_BASE_URL.origin || !url.pathname.startsWith(WORKER_BASE_URL.pathname)) {
+    throw new Error(`Module import escapes the application origin: ${url.href}`);
+  }
+  return `./${url.pathname.slice(WORKER_BASE_URL.pathname.length)}`;
+}
+
+async function discoverModuleGraph() {
+  const assets = new Set();
+  const queue = MODULE_ENTRYPOINTS.map(asset => ({
+    asset,
+    url: new URL(asset, WORKER_BASE_URL),
+  }));
+  while (queue.length) {
+    const current = queue.shift();
+    if (assets.has(current.asset)) continue;
+    assets.add(current.asset);
+    const response = await fetch(new Request(current.url, { cache: 'reload' }));
+    if (!response.ok) throw new Error(`Required module failed: ${current.asset} (${response.status})`);
+    const source = await response.text();
+    MODULE_IMPORT_RE.lastIndex = 0;
+    for (const match of source.matchAll(MODULE_IMPORT_RE)) {
+      const specifier = match[1] || match[2];
+      if (!specifier?.startsWith('.')) continue;
+      const importedUrl = new URL(specifier, current.url);
+      if (importedUrl.origin !== WORKER_BASE_URL.origin) continue;
+      const asset = assetPathFor(importedUrl);
+      if (!assets.has(asset)) queue.push({ asset, url: importedUrl });
+    }
+  }
+  return [...assets];
+}
+
 self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
+  event.waitUntil(withReleaseLock(async () => {
     const cache = await caches.open(SHELL_CACHE);
     await precacheShell(cache);
     await precacheOfflineData();
-  })());
+    await validateReleaseBundle();
+  }));
 });
 
 self.addEventListener('message', (event) => {
@@ -215,7 +162,7 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
+  event.waitUntil(withReleaseLock(async () => {
     await validateReleaseBundle();
     const keys = await caches.keys();
     await Promise.all(keys.map((k) => {
@@ -228,7 +175,7 @@ self.addEventListener('activate', (event) => {
     await pruneSourceBundle();
     await deleteLegacyDataDbs();
     self.clients.claim();
-  })());
+  }));
 });
 
 function isShell(url) {
@@ -363,7 +310,8 @@ async function sourceBundleWhileRevalidate(req, event) {
 }
 
 async function precacheShell(cache) {
-  await Promise.all(SHELL_ASSETS.map(async (url) => {
+  const assets = [...new Set([...SHELL_ASSETS, ...await discoverModuleGraph()])];
+  await Promise.all(assets.map(async (url) => {
     const req = new Request(url, { cache: 'reload' });
     const res = await fetch(req);
     if (!res.ok) throw new Error(`Required shell asset failed: ${url} (${res.status})`);
@@ -548,12 +496,14 @@ async function reportOfflineIntegrity(event) {
 async function repairOfflineData(event) {
   let result;
   try {
-    const shellCache = await caches.open(SHELL_CACHE);
-    await precacheShell(shellCache);
-    await precacheOfflineData();
-    await validateReleaseBundle();
-    await pruneOfflineData();
-    result = { ok: true, sw_version: SW_VERSION };
+    result = await withReleaseLock(async () => {
+      const shellCache = await caches.open(SHELL_CACHE);
+      await precacheShell(shellCache);
+      await precacheOfflineData();
+      await validateReleaseBundle();
+      await pruneOfflineData();
+      return { ok: true, sw_version: SW_VERSION };
+    });
   } catch (error) {
     result = { ok: false, error: String(error?.message || error).slice(0, 240) };
   }

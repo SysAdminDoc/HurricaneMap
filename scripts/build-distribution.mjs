@@ -26,9 +26,13 @@ export const SOURCE_BUNDLE_FILES = new Set([
 ]);
 export const SOURCE_BUNDLE_MAX_BYTES = 13 * 1024 * 1024;
 const SERVICE_WORKER_SOURCE = await readFile(path.join(root, 'sw.js'), 'utf8');
+const APPLICATION_MODULES = git(['ls-files', '--', 'src'])
+  .split(/\r?\n/)
+  .filter(file => file.endsWith('.js'));
 const MANDATORY_INSTALL_FILES = new Set([
   'sw.js',
   ...parseServiceWorkerAssets('SHELL_ASSETS'),
+  ...APPLICATION_MODULES,
   ...parseServiceWorkerAssets('OFFLINE_DATA_ASSETS'),
 ].map(file => file.replace(/^\.\//, '')).filter(Boolean));
 

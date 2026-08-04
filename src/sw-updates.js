@@ -46,7 +46,10 @@ export async function retryServiceWorkerRegistration(options = lastRegistrationO
   }, documentRef);
   if (!supported) return null;
   try {
-    const registration = await navigatorRef.serviceWorker.register(swPath);
+    const registration = await navigatorRef.serviceWorker.register(swPath, {
+      type: 'module',
+      updateViaCache: 'none',
+    });
     publishDiagnostics({
       supported: true,
       registration: 'registered',

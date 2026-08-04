@@ -72,13 +72,17 @@ assert.match(bundle.errors[0].message, /\[path\]/);
 assert.doesNotMatch(serialized, /Alice|Private Street|private-name|private\.png|latitude|longitude|address|saved.?view|preparedness/i);
 assert.equal(sanitizeDiagnosticText('https://example.test/private'), '[url]');
 
+let successfulRegistrationOptions = null;
 const successfulNavigator = {
   serviceWorker: {
     controller: { state: 'activated' },
-    register: async () => ({
+    register: async (_path, options) => {
+      successfulRegistrationOptions = options;
+      return {
       scope: 'https://example.test/',
       active: { scriptURL: 'https://example.test/sw.js' },
-    }),
+      };
+    },
   },
 };
 await retryServiceWorkerRegistration({
@@ -88,6 +92,10 @@ await retryServiceWorkerRegistration({
 });
 assert.equal(getServiceWorkerDiagnostics().registration, 'registered');
 assert.equal(getServiceWorkerDiagnostics().controller, 'controlled');
+assert.deepEqual(successfulRegistrationOptions, {
+  type: 'module',
+  updateViaCache: 'none',
+}, 'service worker registration must use module scripts and bypass stale HTTP cache');
 
 const integrityListeners = new Set();
 const integrityNavigator = {

@@ -1,4 +1,4 @@
-import { access, readFile, readdir } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,11 +25,16 @@ if (!/addEventListener\(\s*['"]message['"]/.test(source) || !/SKIP_WAITING/.test
 }
 
 const shellAssets = parseAssetArray('SHELL_ASSETS');
+const moduleEntrypoints = parseAssetArray('MODULE_ENTRYPOINTS');
 const offlineDataAssets = parseAssetArray('OFFLINE_DATA_ASSETS');
 const sourceBundleAssets = parseAssetArray('SOURCE_BUNDLE_ASSETS');
 
 if (!shellAssets) {
   console.error('sw.js does not define SHELL_ASSETS.');
+  process.exit(1);
+}
+if (!moduleEntrypoints) {
+  console.error('sw.js does not define MODULE_ENTRYPOINTS.');
   process.exit(1);
 }
 if (!offlineDataAssets) {
@@ -43,19 +48,20 @@ if (!sourceBundleAssets) {
 
 const assets = [
   ['shell', shellAssets],
+  ['module entrypoint', moduleEntrypoints],
   ['offline data', offlineDataAssets],
   ['source bundle', sourceBundleAssets],
 ];
 const errors = [];
 const seen = new Set();
 
-const srcModules = (await readdir(path.join(root, 'src'), { withFileTypes: true }))
-  .filter(entry => entry.isFile() && entry.name.endsWith('.js'))
-  .map(entry => `./src/${entry.name}`)
-  .sort();
-for (const modulePath of srcModules) {
-  if (!shellAssets.includes(modulePath)) {
-    errors.push(`SHELL_ASSETS is missing application module: ${modulePath}`);
+const moduleGraph = await deriveModuleGraph(moduleEntrypoints, errors);
+if (!moduleGraph.length) {
+  errors.push('MODULE_ENTRYPOINTS did not produce a discoverable application graph.');
+}
+for (const shellAsset of shellAssets) {
+  if (shellAsset.startsWith('./src/') && shellAsset.endsWith('.js') && shellAsset !== './src/globe-host.js') {
+    errors.push(`SHELL_ASSETS must not hand-enumerate application module: ${shellAsset}`);
   }
 }
 
@@ -115,6 +121,16 @@ if (!/const\s+DATA_DB_VERSION\s*=\s*1/.test(source) ||
     !/deleteLegacyDataDbs\(\)/.test(source)) {
   errors.push('sw.js must version IndexedDB and remove superseded database generations during activation.');
 }
+if (!/import\.meta\.url/.test(source) ||
+    !/MODULE_ENTRYPOINTS/.test(source) ||
+    !/discoverModuleGraph\(\)/.test(source)) {
+  errors.push('module service worker must derive its application shell from MODULE_ENTRYPOINTS and import.meta.url.');
+}
+if (!/RELEASE_LOCK_NAME/.test(source) ||
+    !/navigator(?:\?\.)?locks/.test(source) ||
+    !/withReleaseLock/.test(source)) {
+  errors.push('service worker install/validation handshake must use a Web Lock when available.');
+}
 
 const radarBranch = source.indexOf('if (isRadarAsset(url))');
 const shellBranch = source.indexOf('if (isShell(url))');
@@ -150,10 +166,42 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`service worker ok (${versionMatch[1]}, ${shellAssets.length} shell assets, ${offlineDataAssets.length} offline data assets, ${sourceBundleAssets.length} source assets)`);
+console.log(`service worker ok (${versionMatch[1]}, ${shellAssets.length} static shell assets, ${moduleGraph.length} derived modules, ${offlineDataAssets.length} offline data assets, ${sourceBundleAssets.length} source assets)`);
 
 function parseAssetArray(name) {
   const match = source.match(new RegExp(`const\\s+${name}\\s*=\\s*\\[([\\s\\S]*?)\\];`));
   if (!match) return null;
   return [...match[1].matchAll(/['"](\.\/[^'"]*)['"]/g)].map(assetMatch => assetMatch[1]);
+}
+
+async function deriveModuleGraph(entrypoints, errors) {
+  const graph = new Set();
+  const queue = [...entrypoints];
+  const importPattern = /\bimport(?:\s+(?:(?:[\s\S]*?\sfrom\s+)?['"]([^'"]+)['"])|\s*\(\s*['"]([^'"]+)['"]\s*\))/g;
+  while (queue.length) {
+    const current = queue.shift();
+    if (graph.has(current)) continue;
+    graph.add(current);
+    const filePath = path.join(root, current.replace(/^\.\//, ''));
+    let moduleSource;
+    try {
+      moduleSource = await readFile(filePath, 'utf8');
+    } catch {
+      errors.push(`derived module graph is missing ${current}`);
+      continue;
+    }
+    importPattern.lastIndex = 0;
+    for (const match of moduleSource.matchAll(importPattern)) {
+      const specifier = match[1] || match[2];
+      if (!specifier?.startsWith('.')) continue;
+      const resolved = path.posix.normalize(path.posix.join(
+        path.posix.dirname(current.replace(/^\.\//, '')),
+        specifier,
+      ));
+      if (!resolved.startsWith('src/') || !resolved.endsWith('.js')) continue;
+      const asset = `./${resolved}`;
+      if (!graph.has(asset)) queue.push(asset);
+    }
+  }
+  return [...graph].sort();
 }
