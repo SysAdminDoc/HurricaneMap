@@ -48,8 +48,7 @@ import { renderTrackTimeline } from './table-view.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { inspectRadarFrameCache } from './storage-manager.js';
 import { getBundledDatasetState, getBundledDatasetStatus } from './optional-feeds.js';
-import { FEMA_SOURCE_URL, fetchFemaDeclarations, formatFemaDate } from './fema.js';
-
+import { cancelFemaRequest, loadFemaContext } from './fema-panel.js';
 const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
 const stickyHeader = document.getElementById('panel-sticky-header');
@@ -59,7 +58,6 @@ function getAnimator() {
   if (!animator) animator = new TrackAnimator(getMap());
   return animator;
 }
-
 let playbackAutoMinimized = false;
 function enterPlaybackMapMode() {
   if (!panel || panel.hidden) return;
@@ -75,102 +73,11 @@ function leavePlaybackMapMode({ restore = false } = {}) {
   }
   playbackAutoMinimized = false;
 }
-
 let radar = null;
-let femaController = null;
 function getRadar() {
   if (!radar) radar = new RadarOverlay(getMap());
   return radar;
 }
-
-function cancelFemaRequest() {
-  if (femaController) femaController.abort();
-  femaController = null;
-}
-
-function femaLocale() {
-  return document.documentElement?.lang || undefined;
-}
-
-function renderFemaDeclaration(record) {
-  const dateStart = formatFemaDate(record.incidentBeginDate, femaLocale());
-  const dateEnd = formatFemaDate(record.incidentEndDate, femaLocale());
-  const declared = formatFemaDate(record.declarationDate, femaLocale());
-  const dateLabel = dateStart && dateEnd && dateStart !== dateEnd
-    ? t('panel.femaDateRange', dateStart, dateEnd)
-    : dateStart || dateEnd || t('panel.femaDateUnavailable');
-  const states = record.states.length
-    ? record.states.map(group => `
-        <div class="fema-state-group">
-          <strong>${escapeHtml(group.state || t('state.unknown'))}</strong>
-          <span>${escapeHtml(group.areas.length ? group.areas.join(', ') : t('panel.femaNoArea'))}</span>
-        </div>`).join('')
-    : `<span class="fema-no-area">${t('panel.femaNoArea')}</span>`;
-  const recordLink = safeExternalUrl(record.recordUrl, { hosts: ['www.fema.gov'] });
-  return `
-    <article class="fema-declaration">
-      <div class="fema-declaration-heading">
-        <strong>${escapeHtml(record.declarationType || t('panel.femaDeclaration'))}</strong>
-        <span>${escapeHtml(record.title || t('panel.femaUntitled'))}</span>
-      </div>
-      <dl class="fema-declaration-meta">
-        <div><dt>${t('panel.femaIncident')}</dt><dd>${escapeHtml(record.incidentType || t('panel.femaUnknown'))}</dd></div>
-        <div><dt>${t('panel.femaDates')}</dt><dd>${escapeHtml(dateLabel)}</dd></div>
-        ${declared ? `<div><dt>${t('panel.femaDeclared')}</dt><dd>${escapeHtml(declared)}</dd></div>` : ''}
-      </dl>
-      <div class="fema-areas">
-        <span class="fema-areas-label">${t('panel.femaAreas')}</span>
-        <div class="fema-state-list">${states}</div>
-      </div>
-      ${recordLink ? `<a class="fema-record-link" href="${recordLink}" target="_blank" rel="noopener">${t('panel.femaRecord')}</a>` : ''}
-    </article>`;
-}
-
-function renderFemaContext(host, result) {
-  if (!host) return;
-  host.dataset.state = result.status;
-  const bodyHost = host.querySelector('.fema-context-body');
-  if (!bodyHost) return;
-  if (result.status === 'success' && result.records.length) {
-    bodyHost.innerHTML = `
-      <p class="fema-context-summary">${escapeHtml(t('panel.femaFound', result.records.length))}</p>
-      <div class="fema-declaration-list">${result.records.map(renderFemaDeclaration).join('')}</div>
-      <p class="fema-service-note">${t('panel.femaServiceNote')}</p>`;
-    return;
-  }
-  if (result.status === 'empty') {
-    bodyHost.innerHTML = `
-      <p class="fema-status fema-status--empty">${t('panel.femaNoMatch')}</p>
-      <p class="fema-service-note">${t('panel.femaNoMatchHelp')}</p>`;
-    return;
-  }
-  const sourceUrl = safeExternalUrl(FEMA_SOURCE_URL, { hosts: ['www.fema.gov'] });
-  const source = sourceUrl
-    ? `<a href="${sourceUrl}" target="_blank" rel="noopener">${t('panel.femaSource')}</a>`
-    : t('panel.femaSource');
-  bodyHost.innerHTML = `
-    <p class="fema-status fema-status--error">${t('panel.femaUnavailable')}</p>
-    <p class="fema-service-note">${t('panel.femaUnavailableHelp', source)}</p>`;
-}
-
-async function loadFemaContext(storm, renderSeq) {
-  const host = document.getElementById('fema-context');
-  if (!host) return;
-  cancelFemaRequest();
-  femaController = new AbortController();
-  const controller = femaController;
-  try {
-    const result = await fetchFemaDeclarations(storm, { signal: controller.signal });
-    if (renderSeq !== showStormSeq || !host.isConnected || controller !== femaController) return;
-    renderFemaContext(host, result);
-  } catch {
-    if (renderSeq !== showStormSeq || !host.isConnected || controller !== femaController) return;
-    renderFemaContext(host, { status: 'error', records: [] });
-  } finally {
-    if (controller === femaController) femaController = null;
-  }
-}
-
 async function refreshRadarCacheStatus(stormId) {
   const host = document.getElementById('radar-cache-status');
   if (!host || host.dataset.stormId !== stormId) return;
@@ -195,7 +102,6 @@ async function refreshRadarCacheStatus(stormId) {
     }
   }
 }
-
 closeBtn.addEventListener('click', () => {
   hidePanel('storm-panel');
   cancelFemaRequest();
@@ -209,7 +115,6 @@ closeBtn.addEventListener('click', () => {
   clearAdvisoryReplay();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
-
 // Other managed panels hide the storm panel through panels.js. Keep map-owned
 // storm overlays tied to that panel rather than leaving orphaned geometry and
 // legends over the newly opened surface.
@@ -219,9 +124,7 @@ document.addEventListener('hm-panel:hidden', event => {
   clearRiskTrajectories();
   clearAdvisoryReplay();
 });
-
 let showStormSeq = 0;
-
 export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   // Sequence guard: rapid marker clicks interleave across the awaits below
   // (storms.json / exposure-index loads); only the latest click may render.
@@ -268,7 +171,6 @@ export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   const allStorms = getAllStorms();
   render(storm, landfall, allStorms, advisoryReplay, seq);
 }
-
 function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = showStormSeq) {
   const niceName = formatStormName(storm.name);
   const isUnnamed = !storm.name || storm.name === 'UNNAMED';
@@ -422,7 +324,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
         <section class="fema-context" id="fema-context" data-state="loading" aria-labelledby="fema-context-title">
           <div class="fema-context-heading">
             <h3 id="fema-context-title">${t('panel.femaTitle')}</h3>
-            <a href="${safeExternalUrl(FEMA_SOURCE_URL, { hosts: ['www.fema.gov'] })}" target="_blank" rel="noopener">${t('panel.femaSource')}</a>
+            <a href="https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries" target="_blank" rel="noopener">${t('panel.femaSource')}</a>
           </div>
           <div class="fema-context-body" role="status" aria-live="polite">${t('panel.femaLoading')}</div>
         </section>
@@ -569,7 +471,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   renderTrackTimeline(document.getElementById('track-timeline-host'), storm);
   renderForecastSkill(document.getElementById('forecast-skill-host'), storm);
   refreshRadarCacheStatus(storm.id);
-  loadFemaContext(storm, renderSeq);
+  loadFemaContext(storm, renderSeq, currentSeq => currentSeq === showStormSeq);
   import('./tides.js')
     .then(({ renderTidesBlock }) => renderTidesBlock(document.getElementById('tides-host'), storm))
     .catch(() => { /* tide gauges are optional context */ });

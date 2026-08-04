@@ -93,6 +93,7 @@ const SHELL_ASSETS = [
   './src/export-provenance.js',
   './src/exposure.js',
   './src/fema.js',
+  './src/fema-panel.js',
   './src/filter-state.js',
   './src/geodesy.js',
   './src/filter-controller.js',
