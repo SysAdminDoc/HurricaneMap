@@ -373,9 +373,10 @@
     <div id="prep-body"></div>
   </section>
 
-  <section class="evac-panel glass" id="evac-panel" hidden role="region" aria-labelledby="evac-panel-title" aria-label="Evacuation zone lookup" data-i18n-aria-label="evac.title">
+  <section class="evac-panel glass" id="evac-panel" hidden role="region" aria-labelledby="evac-panel-title" aria-describedby="evac-disclosure" aria-label="Evacuation zone lookup" data-i18n-aria-label="evac.title">
     <button class="close-btn" id="close-evac" aria-label="Close evacuation zone lookup" data-i18n-aria-label="evac.close">×</button>
     <h2 id="evac-panel-title" data-i18n="evac.title">Evacuation zone lookup</h2>
+    <p class="visually-hidden" id="evac-disclosure" data-i18n="evac.disclosure">Privacy: typed addresses are sent to Esri's World Geocoding Service. The map-point option sends latitude/longitude only to Florida's ArcGIS zone layer; HurricaneMap stores neither.</p>
     <div id="evac-body"></div>
   </section>
 

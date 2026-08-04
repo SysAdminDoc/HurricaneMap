@@ -1,6 +1,8 @@
-// Florida evacuation-zone lookup. Queries the state-published ArcGIS layer
-// directly and fails back to official state resources when either service is
-// unavailable. Address text is never stored by HurricaneMap.
+// Evacuation-zone lookup. Florida has a state-published ArcGIS layer that this
+// module can query directly; other states remain labelled official link-outs
+// because their zone boundaries and lookup services are state/local specific.
+// Typed addresses go to Esri's World Geocoding Service; map-point checks send
+// only coordinates to Florida's zone layer, and HurricaneMap stores neither.
 
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
@@ -11,6 +13,66 @@ import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 export const FLORIDA_ZONE_LAYER = 'https://services.arcgis.com/3wFbqsFPLeKqOlIK/arcgis/rest/services/KYZ_ZL_Vector_Enriched_Calculated_20230608/FeatureServer/46';
 export const ARCGIS_GEOCODER = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates';
 export const FLORIDA_KNOW_YOUR_ZONE = 'https://www.floridadisaster.org/knowyourzone/';
+export const FLORIDA_ZONE_LAYER_METADATA = `${FLORIDA_ZONE_LAYER}?f=json`;
+
+export const EVACUATION_SOURCES = Object.freeze({
+  FL: Object.freeze({
+    code: 'FL',
+    labelKey: 'evac.florida',
+    authority: 'Florida Division of Emergency Management',
+    officialUrl: FLORIDA_KNOW_YOUR_ZONE,
+    directLayer: true,
+  }),
+  NC: Object.freeze({
+    code: 'NC',
+    labelKey: 'evac.northCarolina',
+    authority: 'North Carolina Department of Public Safety / Emergency Management',
+    officialUrl: 'https://www.ncdps.gov/our-organization/emergency-management/emergency-preparedness/know-your-zone',
+    directLayer: false,
+  }),
+  SC: Object.freeze({
+    code: 'SC',
+    labelKey: 'evac.southCarolina',
+    authority: 'South Carolina Emergency Management Division',
+    officialUrl: 'https://scemd.org/prepare/know-your-zone/',
+    directLayer: false,
+  }),
+  GA: Object.freeze({
+    code: 'GA',
+    labelKey: 'evac.georgia',
+    authority: 'Georgia Emergency Management and Homeland Security Agency',
+    officialUrl: 'https://gema.georgia.gov/hurricanes',
+    directLayer: false,
+  }),
+  TX: Object.freeze({
+    code: 'TX',
+    labelKey: 'evac.texas',
+    authority: 'Texas Division of Emergency Management / Texas Hurricane Center',
+    officialUrl: 'https://gov.texas.gov/hurricane',
+    directLayer: false,
+  }),
+  VA: Object.freeze({
+    code: 'VA',
+    labelKey: 'evac.virginia',
+    authority: 'Virginia Department of Emergency Management',
+    officialUrl: 'https://vdem.virginia.gov/know-your-zone/',
+    directLayer: false,
+  }),
+  MD: Object.freeze({
+    code: 'MD',
+    labelKey: 'evac.maryland',
+    authority: 'Maryland Emergency Management Agency',
+    officialUrl: 'https://mdem.maryland.gov/action/Pages/know-your-zone-md.aspx',
+    directLayer: false,
+  }),
+  MA: Object.freeze({
+    code: 'MA',
+    labelKey: 'evac.massachusetts',
+    authority: 'Massachusetts Emergency Management Agency',
+    officialUrl: 'https://www.mass.gov/info-details/hurricane-evacuation-zones',
+    directLayer: false,
+  }),
+});
 
 const FLORIDA_BOUNDS = { west: -87.75, south: 24.35, east: -79.75, north: 31.15 };
 
@@ -32,6 +94,10 @@ export function buildFloridaZoneQueryUrl(lat, lon) {
   url.searchParams.set('outFields', 'EZone,County_Nam,STATUS,Edit_Date,EM_Web,EZone_2');
   url.searchParams.set('returnGeometry', 'false');
   return url.href;
+}
+
+export function buildFloridaLayerMetadataUrl() {
+  return FLORIDA_ZONE_LAYER_METADATA;
 }
 
 export function buildFloridaGeocodeUrl(address) {
@@ -66,6 +132,25 @@ export function parseFloridaZoneResponse(payload) {
   };
 }
 
+export function parseFloridaLayerMetadata(payload) {
+  if (!payload || typeof payload !== 'object' || payload.error) return null;
+  if (payload.type !== 'Feature Layer' || !Array.isArray(payload.fields)) return null;
+  const name = cleanText(payload.name, 120);
+  const geometryType = cleanText(payload.geometryType, 80);
+  if (!name || !geometryType || payload.fields.length === 0) return null;
+  return {
+    name,
+    geometryType,
+    fieldCount: payload.fields.length,
+  };
+}
+
+export function classifyFloridaLayerAvailability(payload) {
+  if (payload?.error) return { available: false, reason: 'service-error' };
+  if (!parseFloridaLayerMetadata(payload)) return { available: false, reason: 'invalid-response' };
+  return { available: true, reason: 'available' };
+}
+
 function isInFloridaBounds(lat, lon) {
   return lat >= FLORIDA_BOUNDS.south && lat <= FLORIDA_BOUNDS.north
     && lon >= FLORIDA_BOUNDS.west && lon <= FLORIDA_BOUNDS.east;
@@ -91,15 +176,15 @@ function normalizeOfficialUrl(value) {
 }
 
 function officialLinks() {
+  const links = Object.values(EVACUATION_SOURCES).map(source => {
+    const url = safeExternalUrl(source.officialUrl);
+    if (!url) return '';
+    return `<a href="${url}" target="_blank" rel="noopener" title="${escapeHtml(source.authority)}" aria-label="${escapeHtml(`${t(source.labelKey)} — ${source.authority}`)}">${escapeHtml(t(source.labelKey))}</a>`;
+  }).join('');
   return `
     <div class="evac-linkouts" aria-labelledby="evac-other-states">
       <h3 id="evac-other-states">${escapeHtml(t('evac.otherStates'))}</h3>
-      <div>
-        <a href="${FLORIDA_KNOW_YOUR_ZONE}" target="_blank" rel="noopener">${escapeHtml(t('evac.florida'))}</a>
-        <a href="https://vdem.virginia.gov/know-your-zone/" target="_blank" rel="noopener">${escapeHtml(t('evac.virginia'))}</a>
-        <a href="https://mdem.maryland.gov/action/Pages/know-your-zone-md.aspx" target="_blank" rel="noopener">${escapeHtml(t('evac.maryland'))}</a>
-        <a href="https://www.mass.gov/info-details/hurricane-evacuation-zones" target="_blank" rel="noopener">${escapeHtml(t('evac.massachusetts'))}</a>
-      </div>
+      <div>${links}</div>
     </div>`;
 }
 
@@ -182,10 +267,47 @@ async function fetchJson(url) {
   }
 }
 
+let floridaLayerProbe = { checkedAt: 0, result: null };
+const FLORIDA_LAYER_PROBE_TTL_MS = 5 * 60 * 1000;
+
+export async function probeFloridaZoneLayer({ force = false, fetcher = fetchJson } = {}) {
+  const now = Date.now();
+  if (!force && floridaLayerProbe.result && now - floridaLayerProbe.checkedAt < FLORIDA_LAYER_PROBE_TTL_MS) {
+    return floridaLayerProbe.result;
+  }
+  try {
+    const payload = await fetcher(buildFloridaLayerMetadataUrl());
+    const result = classifyFloridaLayerAvailability(payload);
+    floridaLayerProbe = { checkedAt: now, result };
+    return result;
+  } catch (error) {
+    const result = { available: false, reason: error?.name === 'AbortError' ? 'cancelled' : 'unreachable' };
+    floridaLayerProbe = { checkedAt: now, result };
+    return result;
+  }
+}
+
+function layerFailureMessage(status) {
+  return status?.reason === 'invalid-response'
+    ? t('evac.layerInvalid')
+    : t('evac.layerUnavailable');
+}
+
 export async function lookupFloridaPoint(lat, lon, { locationLabel = '' } = {}) {
   setStatus(t('evac.loading'));
   try {
+    const layerStatus = await probeFloridaZoneLayer();
+    if (!layerStatus.available) {
+      markLocation(lat, lon);
+      renderFailure(layerFailureMessage(layerStatus));
+      return null;
+    }
     const payload = await fetchJson(buildFloridaZoneQueryUrl(lat, lon));
+    if (payload?.error) {
+      markLocation(lat, lon);
+      renderFailure(t('evac.layerUnavailable'));
+      return null;
+    }
     const zone = parseFloridaZoneResponse(payload);
     markLocation(lat, lon);
     if (!zone) {
@@ -195,8 +317,9 @@ export async function lookupFloridaPoint(lat, lon, { locationLabel = '' } = {}) 
     renderZone(zone, locationLabel);
     return zone;
   } catch (error) {
-    if (error?.name !== 'AbortError') console.warn('Florida evacuation-zone lookup failed:', error);
-    renderFailure(t('evac.error'));
+    if (error?.name === 'AbortError') return null;
+    console.warn('Florida evacuation-zone lookup failed:', error);
+    renderFailure(t('evac.layerUnavailable'));
     return null;
   }
 }

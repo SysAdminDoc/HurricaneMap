@@ -2355,17 +2355,34 @@ try {
   await page.click('#close-prep');
 
   let evacServiceDown = false;
-  await page.route('https://geocode.arcgis.com/**', route => route.fulfill({
-    status: 200,
-    contentType: 'application/json',
-    body: JSON.stringify({ candidates: [{
-      address: '1100 Washington Ave, Miami Beach, Florida',
-      location: { x: -80.1332, y: 25.7823 },
-      attributes: { Region: 'FL', Match_addr: '1100 Washington Ave, Miami Beach, Florida' },
-    }] }),
-  }));
+  let evacGeocodeCalls = 0;
+  await page.route('https://geocode.arcgis.com/**', route => {
+    evacGeocodeCalls += 1;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ candidates: [{
+        address: '1100 Washington Ave, Miami Beach, Florida',
+        location: { x: -80.1332, y: 25.7823 },
+        attributes: { Region: 'FL', Match_addr: '1100 Washington Ave, Miami Beach, Florida' },
+      }] }),
+    });
+  });
   await page.route('https://services.arcgis.com/**', route => {
     if (evacServiceDown) return route.fulfill({ status: 503, body: 'unavailable' });
+    const requestUrl = new URL(route.request().url());
+    if (requestUrl.pathname.endsWith('/FeatureServer/46') && requestUrl.searchParams.get('f') === 'json') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          type: 'Feature Layer',
+          name: 'Florida evacuation zones',
+          geometryType: 'esriGeometryPolygon',
+          fields: [{ name: 'EZone' }, { name: 'County_Nam' }],
+        }),
+      });
+    }
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -2377,6 +2394,8 @@ try {
   });
   await clickHeaderAction(page, '#toggle-evac');
   await page.waitForSelector('#evac-panel:not([hidden]) #evac-address-input');
+  const evacDisclosure = await page.textContent('#evac-disclosure');
+  assert(/Esri.*World Geocoding Service/i.test(evacDisclosure) && /latitude\/longitude/i.test(evacDisclosure), `evacuation privacy disclosure is incomplete: ${evacDisclosure}`);
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
   await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', { timeout: 5000 });
@@ -2384,23 +2403,25 @@ try {
   assert(/MIAMI-DADE/.test(evacAddressResult) && /not an evacuation order/i.test(evacAddressResult), `address zone result is incomplete: ${evacAddressResult}`);
   assert(await page.getAttribute('#evac-result a', 'href') === 'https://www.floridadisaster.org/knowyourzone/', 'zone result did not link to official Florida verification');
 
+  const geocodeCallsBeforeMap = evacGeocodeCalls;
   await page.click('#evac-map-pick');
   await page.evaluate(async () => {
     const { getMap } = await import('/src/map.js');
     getMap().fire('click', { latlng: { lat: 25.7617, lng: -80.1918 } });
   });
   await page.waitForFunction(() => /Selected map point/.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  assert(evacGeocodeCalls === geocodeCallsBeforeMap, 'map-point lookup unexpectedly sent another address to the geocoder');
   assert(await page.locator('.evac-location-marker').count() === 1, 'map zone lookup did not mark the selected point');
 
   evacServiceDown = true;
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
-  await page.waitForFunction(() => /unavailable right now/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => /Layer unavailable/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
   const evacFallback = await page.evaluate(() => ({
     links: [...document.querySelectorAll('.evac-linkouts a')].map(link => link.textContent.trim()),
     floridaHref: document.querySelector('.evac-linkouts a')?.href || '',
   }));
-  assert(evacFallback.links.length === 4 && evacFallback.links.includes('Virginia'), `service failure did not preserve state link-outs: ${JSON.stringify(evacFallback)}`);
+  assert(evacFallback.links.length === 8 && ['North Carolina', 'South Carolina', 'Georgia', 'Texas', 'Virginia'].every(state => evacFallback.links.includes(state)), `service failure did not preserve state link-outs: ${JSON.stringify(evacFallback)}`);
   assert(evacFallback.floridaHref === 'https://www.floridadisaster.org/knowyourzone/', 'failure fallback is missing the official Florida link');
   await assertNoAxeViolations(page, 'evacuation zone panel (WCAG 2.2 AA)', '#evac-panel');
   await page.click('#close-evac');
