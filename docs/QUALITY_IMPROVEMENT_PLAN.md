@@ -16,12 +16,12 @@ This plan tracks the quality, reliability, accessibility, and maintainability im
 | Q6 | Local release verification | Build, test, smoke, and data-refresh checks run locally before release. | [x] | `npm test`, `npm run build`, and `node scripts/refresh-hurdat2.mjs --dry-run` cover release checks without remote workflows. | Keep branch protection and release uploads managed from the local machine. |
 | Q7 | Service-worker update UX | Users get a calm "Update available" prompt when a new shell is installed. | [x] | `src/sw-updates.js` detects waiting service workers, shows a persistent reload prompt, and smoke coverage verifies the prompt UI. | Keep release notes clear about when `SW_VERSION` should be bumped. |
 | Q8 | Accessibility coverage | Focus, modal, chart, contrast, reduced-motion, and screen-reader states are testable. | [~] | Smoke test covers Escape routing across settings and panels. | Add automated focus-order and reduced-motion checks. |
-| Q9 | UI module decomposition | Large UI modules are split by state, render, event binding, and export responsibilities. | [ ] | Plan documented. | Split `main.js` filter/search/hash responsibilities first. |
-| Q10 | Chart/export parity | Visible metrics and downloaded metrics use the same adapters and formatting. | [~] | Compare CSV contract covered by smoke test. | Add shared metric presenters for panel, charts, and CSV exports. |
+| Q9 | UI module decomposition | Large UI modules are split by state, render, event binding, and export responsibilities. | [~] | URL/filter state, search, shell, panel controls, and metric presentation now have focused boundaries. | Finish the remaining canonical filter orchestration and compare-export extraction from `main.js`/`compare.js`. |
+| Q10 | Chart/export parity | Visible metrics and downloaded metrics use the same adapters and formatting. | [~] | Compare CSV contract and shared metric presenters are covered by smoke and focused presenter tests. | Add field-level parity tests between visible metric text and exported CSV values. |
 | Q11 | Data-build provenance | UI and README show source dates, generator version, and data attribution clearly. | [x] | `data/metadata.json` is generated during preprocessing, validated, loaded by the app, surfaced in About, and documented in README; impact rows now carry scraper provenance. | Add a release checklist entry for source refresh cadence. |
 | Q12 | Secondary-data error/offline states | Optional feeds fail calmly with retry/help copy and clear degraded-mode messaging. | [ ] | Plan documented. | Audit active storms, glossary, seasonal outlook, radar, and population layers. |
-| Q13 | Visual regression snapshots | Desktop/mobile/high-contrast screenshots catch layout drift. | [~] | Playwright smoke now asserts side-panel bounds at 430px, 640px, 720px, 860px, and 1120px across dark, light, and high-contrast themes. | Add screenshot baselines for map, panels, settings, compare, stats, and mobile. |
-| Q14 | Maintainability docs | Contributors have clear commands, data contracts, release steps, and known risk areas. | [~] | README quality commands and this plan. | Add architecture notes for module ownership and release/cache bump procedure. |
+| Q13 | Visual regression snapshots | Desktop/mobile/high-contrast screenshots catch layout drift. | [x] | Playwright snapshots cover shell, storm, statistics, comparison, settings, advisory replay, playback, and theme states across desktop and mobile matrices. | Keep the checked-in baselines synchronized with intentional visual changes. |
+| Q14 | Maintainability docs | Contributors have clear commands, data contracts, release steps, and known risk areas. | [x] | README documents module ownership, data contracts, quality commands, and service-worker cache bump procedure. | Keep architecture and release guidance synchronized as ownership changes. |
 
 ## Implementation Phases
 
@@ -59,21 +59,21 @@ Status: `[~]`
 
 ### Phase D - Modularization and Metric Parity
 
-Status: `[ ]`
+Status: `[~]`
 
-- [ ] Split `main.js` into filter state, URL state, search controller, and shell wiring modules.
+- [~] Split `main.js` into filter state, URL state, search controller, and shell wiring modules; the remaining canonical filter orchestration stays in `main.js` by design.
 - [ ] Split comparison export formatting from comparison panel rendering.
-- [ ] Introduce shared metric presenter functions used by storm panel, stats, charts, and CSV exports.
+- [x] Introduce shared metric presenter functions used by storm panel, stats, charts, and CSV exports.
 - [ ] Add tests that compare visible metric text against exported CSV values where practical.
 
 ### Phase E - Visual Regression and Documentation
 
-Status: `[~]`
+Status: `[x]`
 
 - [x] Add side-panel viewport/theme layout assertions for 430px, 640px, 720px, 860px, and 1120px.
-- [ ] Add Playwright screenshot baselines for desktop, mobile, stats, compare, settings, high contrast, and storm panel.
-- [ ] Document module ownership and data contracts.
-- [ ] Document release process, service-worker cache bump rules, and verification checklist.
+- [x] Add Playwright screenshot baselines for desktop, mobile, stats, compare, settings, high contrast, and storm panel.
+- [x] Document module ownership and data contracts.
+- [x] Document release process, service-worker cache bump rules, and verification checklist.
 - [x] Add provenance details to About and README after metadata generation lands.
 
 ## Current Verification Commands
