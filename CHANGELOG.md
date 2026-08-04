@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Fixed
+- High-contrast defaults now follow `prefers-contrast: more` until a local choice is made, and Windows `forced-colors` receives system-colored map controls, legends, panels, and focus rings with browser axe coverage.
 - The components stylesheet now follows the declared cascade without `!important`; desktop trend tables, mobile playback targets, reduced-motion settings, and light/dark operational surfaces retain their tested behavior through normal layer-specific rules.
 - Closest-approach and city return-period queries now measure the great-circle track segments between HURDAT2 fixes, interpolate the location and intensity at the true closest point, and cover the Miami, Cape Hatteras, New York, and segment-only regression cases.
 - The Cloudflare Worker now permits same-origin geolocation while continuing to deny microphone and camera access, and its policy test locks the complete security-header contract.

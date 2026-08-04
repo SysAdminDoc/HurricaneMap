@@ -23,7 +23,7 @@ const DEFAULTS = {
   marineWarnings: false,  // Opt in to broad 0-24 hour marine wind-warning polygons
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' | 'ht'
-  highContrast: false,     // WCAG AAA 7:1+ contrast, bolder fonts, enhanced focus
+  highContrast: false,     // WCAG AAA 7:1+ contrast; OS contrast seeds an unset value
   reducedMotion: false,    // In-app override: reduce animations independent of OS setting
   onboarded: false,
 };
@@ -49,20 +49,32 @@ const BOOLEAN_KEYS = new Set([
 let _state = null;
 let themeMediaQuery = null;
 let themeMediaListenerAttached = false;
+let contrastMediaQuery = null;
+let contrastMediaListenerAttached = false;
+
+export function prefersMoreContrast() {
+  return typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-contrast: more)').matches;
+}
+
+function createDefaultSettings() {
+  return { ...DEFAULTS, highContrast: prefersMoreContrast() };
+}
 
 function load() {
   if (_state) return _state;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      _state = { ...DEFAULTS };
+      _state = createDefaultSettings();
       return _state;
     }
     const migration = migrateSettingsRecord(JSON.parse(raw));
     _state = migration.value;
     if (migration.shouldPersist) save();
   } catch {
-    _state = { ...DEFAULTS };
+    _state = createDefaultSettings();
   }
   return _state;
 }
@@ -138,6 +150,32 @@ function attachSystemThemeListener() {
     themeMediaQuery.addListener(onSystemThemeChange);
   }
   themeMediaListenerAttached = true;
+}
+
+function attachSystemContrastListener() {
+  if (contrastMediaListenerAttached ||
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function') {
+    return;
+  }
+  contrastMediaQuery = window.matchMedia('(prefers-contrast: more)');
+  const onSystemContrastChange = () => {
+    // An explicit setting always wins over the operating system default.
+    if (hasStoredSetting('highContrast')) return;
+    const nextValue = prefersMoreContrast();
+    const state = load();
+    if (state.highContrast === nextValue) return;
+    _state = { ...state, highContrast: nextValue };
+    document.dispatchEvent(new CustomEvent('hm-settings:change', {
+      detail: { key: 'highContrast', value: nextValue },
+    }));
+  };
+  if (typeof contrastMediaQuery.addEventListener === 'function') {
+    contrastMediaQuery.addEventListener('change', onSystemContrastChange);
+  } else if (typeof contrastMediaQuery.addListener === 'function') {
+    contrastMediaQuery.addListener(onSystemContrastChange);
+  }
+  contrastMediaListenerAttached = true;
 }
 
 // --- Wind-unit conversion ----------------------------------------------------
@@ -219,6 +257,7 @@ export function applyPaletteToBody() {
 // Apply theme to html element root
 export function applyThemeToRoot() {
   attachSystemThemeListener();
+  attachSystemContrastListener();
   const theme = getSetting('theme');
   const effectiveTheme = getEffectiveTheme();
   document.documentElement.classList.toggle('light-theme', effectiveTheme === 'light');
@@ -244,7 +283,7 @@ export function prefersReducedMotion() {
 
 export function normalizeSettings(raw) {
   const source = raw && typeof raw === 'object' ? raw : {};
-  const next = { ...DEFAULTS };
+  const next = createDefaultSettings();
   for (const [key, allowed] of Object.entries(VALID_VALUES)) {
     if (allowed.has(source[key])) next[key] = source[key];
   }

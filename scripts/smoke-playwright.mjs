@@ -1272,6 +1272,108 @@ async function assertSourceLanguageDisclosures(browser, baseUrl) {
   }
 }
 
+async function assertForcedColorsContract(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1200, height: 900 },
+    serviceWorkers: 'block',
+    forcedColors: 'active',
+  });
+  // Playwright exposes forced-colors but not prefers-contrast on every
+  // Chromium channel. Seed the OS contrast query so this run also proves the
+  // unset high-contrast setting adopts the system default.
+  await context.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    const listeners = new Set();
+    const contrastMedia = {
+      matches: true,
+      media: '(prefers-contrast: more)',
+      onchange: null,
+      addEventListener(type, listener) { if (type === 'change') listeners.add(listener); },
+      removeEventListener(type, listener) { if (type === 'change') listeners.delete(listener); },
+      addListener(listener) { listeners.add(listener); },
+      removeListener(listener) { listeners.delete(listener); },
+      dispatchEvent(event) { listeners.forEach(listener => listener.call(this, event)); return true; },
+    };
+    window.__hmContrastMedia = contrastMedia;
+    window.matchMedia = query => query === '(prefers-contrast: more)' ? contrastMedia : nativeMatchMedia(query);
+  });
+  await seedSettings(context, { schema_version: 1, settings: { onboarded: true, locale: 'en' } });
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForFunction(() => window.matchMedia('(forced-colors: active)').matches);
+    const systemState = await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      return {
+        forcedColors: window.matchMedia('(forced-colors: active)').matches,
+        prefersContrast: window.matchMedia('(prefers-contrast: more)').matches,
+        highContrast: settings.getSetting('highContrast'),
+        classApplied: document.documentElement.classList.contains('high-contrast'),
+      };
+    });
+    assert(systemState.forcedColors && systemState.prefersContrast && systemState.highContrast && systemState.classApplied,
+      `forced-colors did not seed high contrast: ${JSON.stringify(systemState)}`);
+    await page.evaluate(() => {
+      window.__hmContrastMedia.matches = false;
+      window.__hmContrastMedia.dispatchEvent({ type: 'change' });
+    });
+    await page.waitForFunction(() => !document.documentElement.classList.contains('high-contrast'));
+    await page.evaluate(() => {
+      window.__hmContrastMedia.matches = true;
+      window.__hmContrastMedia.dispatchEvent({ type: 'change' });
+    });
+    await page.waitForFunction(() => document.documentElement.classList.contains('high-contrast'));
+
+    const legend = await page.evaluate(() => {
+      const element = document.querySelector('.filter-legend');
+      const style = element ? getComputedStyle(element) : null;
+      const rect = element?.getBoundingClientRect();
+      return {
+        text: element?.textContent?.replace(/\s+/g, ' ').trim() || '',
+        width: rect?.width || 0,
+        height: rect?.height || 0,
+        color: style?.color || '',
+        background: style?.backgroundColor || '',
+        border: style?.borderTopColor || '',
+        forcedColorAdjust: style?.forcedColorAdjust || '',
+      };
+    });
+    assert(legend.text && /Saffir-Simpson/.test(legend.text) && legend.width > 0 && legend.height > 0,
+      `forced-colors legend did not render: ${JSON.stringify(legend)}`);
+    assert(!/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(`${legend.color} ${legend.background} ${legend.border}`),
+      `forced-colors legend has transparent system chrome: ${JSON.stringify(legend)}`);
+    assert(legend.forcedColorAdjust === 'auto', `forced-colors legend did not use system colors: ${JSON.stringify(legend)}`);
+    await assertNoAxeViolations(page, 'forced-colors main view (WCAG 2.2 AA)');
+
+    await openKatrinaPanel(page);
+    const panel = await page.evaluate(() => {
+      const elements = [
+        document.querySelector('#storm-panel'),
+        document.querySelector('.leaflet-control-zoom a'),
+      ];
+      return elements.map(element => {
+        const style = element ? getComputedStyle(element) : null;
+        const rect = element?.getBoundingClientRect();
+        return {
+          width: rect?.width || 0,
+          height: rect?.height || 0,
+          color: style?.color || '',
+          background: style?.backgroundColor || '',
+          border: style?.borderTopColor || '',
+          forcedColorAdjust: style?.forcedColorAdjust || '',
+        };
+      });
+    });
+    assert(panel.every(surface => surface.width > 0 && surface.height > 0 &&
+      !/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(`${surface.color} ${surface.background} ${surface.border}`) &&
+      surface.forcedColorAdjust === 'auto'), `forced-colors panel/control is not legible: ${JSON.stringify(panel)}`);
+    await assertNoAxeViolations(page, 'forced-colors storm panel (WCAG 2.2 AA)', '#storm-panel');
+  } finally {
+    await context.close();
+  }
+}
+
 async function assertActivePopupDomSafety(page) {
   const result = await page.evaluate(async () => {
     const { activeStormCardElement } = await import('/src/active.js');
@@ -2516,6 +2618,7 @@ try {
   await assertManagedPanelFocusContracts(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
+  await assertForcedColorsContract(browser, baseUrl);
 
   await browser.close();
 
