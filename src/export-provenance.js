@@ -4,6 +4,7 @@
 // the full 1,700+ artifact manifest at runtime.
 
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
+export const APP_VERSION = '1.9.1';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-03T00:00:00Z',
@@ -89,6 +90,38 @@ const ARTIFACTS = Object.freeze({
 
 const ALL_ARTIFACT_PATHS = Object.freeze(Object.keys(ARTIFACTS));
 
+const CITATION_SOURCE_ARTIFACTS = Object.freeze([
+  Object.freeze({
+    label: 'Atlantic',
+    artifact: ARTIFACTS['data/hurdat2-atlantic.txt'],
+  }),
+  Object.freeze({
+    label: 'Eastern Pacific',
+    artifact: ARTIFACTS['data/hurdat2-nepac.txt'],
+  }),
+]);
+
+export function getDataReleasePin() {
+  return RELEASE.manifest_sha256;
+}
+
+export function getDataReleaseCitationMetadata() {
+  const revisionDates = [...new Set(CITATION_SOURCE_ARTIFACTS.map(({ artifact }) => artifact.source_date))];
+  return {
+    app_version: APP_VERSION,
+    release_pin: getDataReleasePin(),
+    generated_at_utc: RELEASE.generated_at_utc,
+    source_commit: RELEASE.source_commit,
+    revision_dates: revisionDates,
+    sources: CITATION_SOURCE_ARTIFACTS.map(({ label, artifact }) => ({
+      label,
+      source_date: artifact.source_date,
+      source_url: artifact.source_url,
+      sha256: artifact.sha256,
+    })),
+  };
+}
+
 export function buildExportProvenance({
   artifactPaths = ALL_ARTIFACT_PATHS,
   methodology = [],
@@ -102,7 +135,7 @@ export function buildExportProvenance({
   });
   const provenance = {
     schema_version: EXPORT_PROVENANCE_SCHEMA_VERSION,
-    app_version: '1.9.1',
+    app_version: APP_VERSION,
     exported_at_utc: exportedAt || null,
     data_release: {
       ...RELEASE,

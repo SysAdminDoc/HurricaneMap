@@ -4,6 +4,7 @@ import {
 } from './impact-utils.js';
 import { windToCategory, categoryLabel } from './data.js';
 import { presentNumber } from './metric-presenters.js';
+import { buildCitation, citationCommentLines } from './citation.js';
 import {
   haversineKm as geodesicDistanceKm,
   initialBearingDeg,
@@ -299,16 +300,17 @@ export function formatNumber(n, decimals = 0) {
 export function buildExports(storm) {
   const safeName = (storm.name && storm.name !== 'UNNAMED' ? storm.name : 'unnamed').toLowerCase();
   const baseFilename = `hurricanemap-${storm.id}-${safeName}-${storm.year}`;
+  const citation = buildCitation();
 
   return {
-    csv: { filename: `${baseFilename}.csv`, mime: 'text/csv', body: exportCSV(storm) },
-    csv_publication: { filename: `${baseFilename}-publication.csv`, mime: 'text/csv', body: exportCSVPublication(storm) },
-    geojson: { filename: `${baseFilename}.geojson`, mime: 'application/geo+json', body: exportGeoJSON(storm) },
-    kml: { filename: `${baseFilename}.kml`, mime: 'application/vnd.google-earth.kml+xml', body: exportKML(storm) },
+    csv: { filename: `${baseFilename}.csv`, mime: 'text/csv', body: exportCSV(storm, citation) },
+    csv_publication: { filename: `${baseFilename}-publication.csv`, mime: 'text/csv', body: exportCSVPublication(storm, citation) },
+    geojson: { filename: `${baseFilename}.geojson`, mime: 'application/geo+json', body: exportGeoJSON(storm, citation) },
+    kml: { filename: `${baseFilename}.kml`, mime: 'application/vnd.google-earth.kml+xml', body: exportKML(storm, citation) },
   };
 }
 
-function exportCSV(storm) {
+function exportCSV(storm, citation = buildCitation()) {
   const rows = [['time_utc', 'lat', 'lon', 'wind_kt', 'pres_mb', 'status', 'category', 'is_landfall']];
   const lfTimes = new Set((storm.us_landfalls || []).map(lf => lf.t));
   for (const r of storm.track) {
@@ -323,10 +325,10 @@ function exportCSV(storm) {
       lfTimes.has(r.t) ? '1' : '0',
     ]);
   }
-  return rows.map(r => r.map(csvEscape).join(',')).join('\n');
+  return [...citationCommentLines(citation), '', ...rows.map(r => r.map(csvEscape).join(','))].join('\n');
 }
 
-function exportCSVPublication(storm) {
+function exportCSVPublication(storm, citation = buildCitation()) {
   // Publication-ready CSV with metadata header and data dictionary
   const safeName = storm.name && storm.name !== 'UNNAMED' ? storm.name : 'Unnamed';
   const headerLines = [
@@ -353,6 +355,8 @@ function exportCSVPublication(storm) {
     `# - Landfalls include both explicit (L marker) and inferred detections`,
     `# - Pre-aircraft (pre-1944) and pre-satellite (pre-1960s) data are less complete`,
     `# - For citations and complete methodology, see https://github.com/SysAdminDoc/HurricaneMap`,
+    `#`,
+    ...citationCommentLines(citation),
     `#`,
   ];
   
@@ -381,7 +385,7 @@ function csvEscape(v) {
   return s;
 }
 
-function exportGeoJSON(storm) {
+function exportGeoJSON(storm, citation = buildCitation()) {
   const trackCoords = storm.track
     .filter(r => r.lat != null && r.lon != null)
     .map(r => [r.lon, r.lat]);
@@ -426,10 +430,14 @@ function exportGeoJSON(storm) {
       geometry: { type: 'Point', coordinates: [lf.lon, lf.lat] },
     })),
   ];
-  return JSON.stringify({ type: 'FeatureCollection', features }, null, 2);
+  return JSON.stringify({
+    type: 'FeatureCollection',
+    features,
+    metadata: { citation: { apa: citation.apa, bibtex: citation.bibtex, url: citation.url } },
+  }, null, 2);
 }
 
-function exportKML(storm) {
+function exportKML(storm, citation = buildCitation()) {
   const xml = (s) => String(s ?? '').replace(/[<>&"']/g, c => ({
     '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;',
   })[c]);
@@ -451,7 +459,9 @@ function exportKML(storm) {
 <kml xmlns="http://www.opengis.net/kml/2.2">
 <Document>
   <name>${xml(heading)} — track</name>
-  <description>HurricaneMap export. Source: NOAA HURDAT2.</description>
+  <description>HurricaneMap export. Source: NOAA HURDAT2.
+APA citation: ${xml(citation.apa)}
+BibTeX citation: ${xml(citation.bibtex)}</description>
   <Style id="trackStyle">
     <LineStyle><color>ff58c4f3</color><width>3</width></LineStyle>
   </Style>

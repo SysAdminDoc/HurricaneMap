@@ -586,6 +586,13 @@ export const STRINGS = {
     'about.dataSource': 'Data source: National Hurricane Center HURDAT2',
     'about.github': 'GitHub',
     'about.privacy': 'All data processing happens in your browser. No tracking, no accounts, no servers.',
+    'citation.title': 'Cite this release',
+    'citation.description': 'Copy a reproducible citation with the HURDAT2 revision, source hashes, app version, and access date.',
+    'citation.apa': 'APA',
+    'citation.bibtex': 'BibTeX',
+    'citation.copy': 'Copy',
+    'citation.copied': 'Citation copied.',
+    'citation.copyFailed': 'Copy failed — select the citation text.',
 
     // Errors
     'error.unexpected': 'Something went wrong — a feature may be unavailable. Check the browser console for details.',
@@ -1394,6 +1401,13 @@ export const STRINGS = {
     'about.dataSource': 'Fuente de datos: Centro Nacional de Huracanes HURDAT2',
     'about.github': 'GitHub',
     'about.privacy': 'Todo el procesamiento de datos ocurre en tu navegador. Sin rastreo, sin cuentas, sin servidores.',
+    'citation.title': 'Citar esta versión',
+    'citation.description': 'Copia una cita reproducible con la revisión HURDAT2, los hashes de origen, la versión de la aplicación y la fecha de acceso.',
+    'citation.apa': 'APA',
+    'citation.bibtex': 'BibTeX',
+    'citation.copy': 'Copiar',
+    'citation.copied': 'Cita copiada.',
+    'citation.copyFailed': 'No se pudo copiar — selecciona el texto de la cita.',
 
     // Errors
     'error.unexpected': 'Algo salió mal — una función puede no estar disponible. Revisa la consola del navegador para más detalles.',
@@ -2102,6 +2116,13 @@ export const STRINGS = {
     'about.dataSource': 'Sous done: Sant Nasyonal Siklòn HURDAT2',
     'about.github': 'GitHub',
     'about.privacy': 'Tout tretman done fèt nan navigatè w. Pa gen swivi, pa gen kont, pa gen sèvè.',
+    'citation.title': 'Site vèsyon sa a',
+    'citation.description': 'Kopye yon sitasyon ki ka verifye ak revizyon HURDAT2, hash sous yo, vèsyon aplikasyon an ak dat aksè a.',
+    'citation.apa': 'APA',
+    'citation.bibtex': 'BibTeX',
+    'citation.copy': 'Kopye',
+    'citation.copied': 'Sitasyon an kopye.',
+    'citation.copyFailed': 'Kopi a echwe — chwazi tèks sitasyon an.',
 
     // Storm panel metrics
     'panel.track_km': 'Longè trajè a',

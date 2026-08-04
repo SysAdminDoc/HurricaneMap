@@ -3,6 +3,7 @@
 // minimize button that collapses it to a slim edge tab (keeping the map fully
 // visible) and a restore bar to bring it back.
 import { t } from './i18n.js';
+import { renderCitationBlock } from './citation-ui.js';
 
 const PANEL_IDS = ['storm-panel', 'stats-panel', 'compare-panel', 'state-panel', 'on-this-date-panel', 'table-view-panel', 'prep-panel', 'evac-panel', 'spatial-results'];
 const PANEL_BUTTONS = {
@@ -94,6 +95,15 @@ function ensurePanelChrome(el) {
   el.prepend(minBtn);
 }
 
+function ensurePanelCitation(el) {
+  if (!el || el.dataset.panelCitation) return;
+  el.dataset.panelCitation = '1';
+  const host = document.createElement('div');
+  host.className = 'panel-citation-host';
+  host.innerHTML = renderCitationBlock();
+  el.appendChild(host);
+}
+
 function setPanelState() {
   // A minimized panel intentionally does NOT count as open: the map lanes
   // (timeline width, zoom controls, season shelf) reclaim the full viewport.
@@ -163,6 +173,7 @@ export function showPanel(id) {
     if (el) {
       panelInvokers.set(id, invoker);
       ensurePanelChrome(el);
+      ensurePanelCitation(el);
       el.classList.remove('minimized');
       el.hidden = false;
       document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id } }));

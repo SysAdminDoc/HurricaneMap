@@ -808,6 +808,7 @@ async function assertDesktopPanelSystem(page, label) {
   };
 
   await assertPanelFit('#storm-panel', 'storm panel');
+  assert(await page.locator('#storm-panel .citation-block').count() === 1, `${label}: storm panel did not expose a release citation`);
 
   await page.evaluate(async () => {
     const state = await import('/src/state.js');
@@ -830,6 +831,7 @@ async function assertDesktopPanelSystem(page, label) {
   await page.click('#toggle-stats');
   await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
   await assertPanelFit('#stats-panel', 'statistics panel');
+  assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
   const outlookLayout = await page.evaluate(() => {
     const rect = (selector) => {
       const element = document.querySelector(selector);
@@ -1604,7 +1606,7 @@ try {
     })),
     visible: document.querySelector('#visible-count')?.textContent || '',
   }));
-  assert(restored.hash === '', `invalid default hash was not cleaned: ${restored.hash}`);
+  assert(/^#v=1&rel=[a-f0-9]{64}$/.test(restored.hash), `invalid default hash was not canonicalized to the current data release: ${restored.hash}`);
   assert(restored.state === '', `invalid state filter was not cleared: ${restored.state}`);
   assert(restored.categories.length === 6 && restored.categories.every(category => category.on && category.pressed === 'true'), 'invalid category hash did not restore default categories');
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
@@ -1628,6 +1630,7 @@ try {
   assert(/595\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
   assert(/759\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
   assert(/16 of 16/.test(aboutText) && /100\.0% precision/.test(aboutText), 'About did not render the measured AOML ground-truth result.');
+  assert(/Cite this release/.test(aboutText) && /@software\{hurricanemap_/.test(aboutText), 'About did not render copy-paste APA and BibTeX citations.');
   assert(
     expectedGeneratorVersion && provenanceText.includes(`HurricaneMap ${expectedGeneratorVersion}`),
     'About provenance did not render the generator app version.',

@@ -9598,3 +9598,65 @@ html:not(.light-theme) #map .leaflet-tile-pane {
     display: block;
   }
 }
+
+/* Copy-paste release citations stay compact when closed but remain available
+ * on every analytical panel and export surface. */
+.panel-citation-host,
+.citation-host {
+  margin: 16px 0 0;
+}
+
+.citation-block {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.citation-block summary {
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.citation-description,
+.citation-status {
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.citation-field {
+  margin-top: 10px;
+}
+
+.citation-field-heading {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.citation-field-heading label {
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.citation-copy-btn {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+}
+
+.citation-field textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--text);
+  font: 0.72rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  min-height: 72px;
+  padding: 7px;
+  resize: vertical;
+  width: 100%;
+}

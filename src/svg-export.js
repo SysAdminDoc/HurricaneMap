@@ -1,5 +1,6 @@
 import { ensureStormsLoaded, getStorm, categoryColor, categoryLabel, windToCategory } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
+import { buildCitation } from './citation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 
 const SVG_W = 800;
@@ -95,7 +96,10 @@ export function buildTrackSVG(storm, { exportedAt = new Date().toISOString() } =
       'Coordinates are projected into a bounded 800 by 500 publication view.',
     ],
   });
+  const citation = buildCitation({ accessDate: exportedAt });
   const provenanceJson = JSON.stringify(provenance).replaceAll(']]>', ']]]]><![CDATA[>');
+  const citationJson = JSON.stringify({ apa: citation.apa, bibtex: citation.bibtex, url: citation.url })
+    .replaceAll(']]>', ']]]]><![CDATA[>');
 
   const trackLines = segs.map(s =>
     `<line x1="${s.x1.toFixed(1)}" y1="${s.y1.toFixed(1)}" x2="${s.x2.toFixed(1)}" y2="${s.y2.toFixed(1)}" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round"/>`
@@ -108,6 +112,7 @@ export function buildTrackSVG(storm, { exportedAt = new Date().toISOString() } =
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SVG_W} ${SVG_H}" width="${SVG_W}" height="${SVG_H}">
   <metadata id="hurricanemap-provenance"><![CDATA[${provenanceJson}]]></metadata>
+  <metadata id="hurricanemap-citation"><![CDATA[${citationJson}]]></metadata>
   <rect width="${SVG_W}" height="${SVG_H}" fill="#11111b"/>
   <text x="${PAD}" y="24" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#cdd6f4">${title}</text>
   <text x="${PAD}" y="40" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6c7086">HURDAT2 best-track · HurricaneMap · NOAA/NHC</text>

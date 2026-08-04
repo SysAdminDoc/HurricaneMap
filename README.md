@@ -27,7 +27,7 @@ The active quality improvement tracker lives in [`docs/QUALITY_IMPROVEMENT_PLAN.
 
 The app uses an offline-first service worker. Runtime historical lookup data is preinstalled into compressed IndexedDB with CacheStorage fallback, while large local radar PNGs and the raw HURDAT2/release-manifest source bundle are cached only after an explicit user action. Each launch verifies the shell/data release tuple and labels it intact, evicted, stale-but-valid, or invalid; diagnostics offers one-click repair, and storm panels report how many radar frames are cached. Settings reports browser usage/quota, protects the core shell/data scopes, and exposes a 13 MB cap for the optional source bundle alongside independent tile/radar cleanup; an opened radar timeline can save an explicit, bounded per-storm offline pack. When shell or offline-data assets change, bump `SW_VERSION` in `sw.js`; installed users will then see an in-app reload prompt instead of silently staying on stale UI.
 
-Persisted browser state has an explicit compatibility contract: settings, search history, and preparedness data use schema-versioned envelopes; legacy unversioned records migrate in place, while unknown future versions remain untouched and load safe defaults. Shared URL hashes emit `v=1`, continue to accept legacy unversioned links, and ignore unsupported future versions. Advisory replay adds a bounded `replay=1.STORM_ID.ORDINAL.CONE_ERA` sub-state, so a copied link reopens the same issued forecast beside the final HURDAT2 track without storing user location or local state. Generated data must match the schema in `src/schema-contract.js`, and service-worker activation removes superseded caches and IndexedDB generations only after the replacement shell and offline data install.
+Persisted browser state has an explicit compatibility contract: settings, search history, and preparedness data use schema-versioned envelopes; legacy unversioned records migrate in place, while unknown future versions remain untouched and load safe defaults. Shared URL hashes emit `v=1` plus the full release-manifest SHA-256 as `rel=...`, continue to accept legacy unversioned links, and ignore unsupported future versions. Advisory replay adds a bounded `replay=1.STORM_ID.ORDINAL.CONE_ERA` sub-state, so a copied link reopens the same issued forecast beside the final HURDAT2 track without storing user location or local state. Generated data must match the schema in `src/schema-contract.js`, and service-worker activation removes superseded caches and IndexedDB generations only after the replacement shell and offline data install.
 
 The settings menu can save up to 20 named views on the current device. A view restores filters, map-layer choices, display units, and up to four comparison storms; it can be deleted or exported as versioned JSON. Saved views never include evacuation addresses, selected points, or other location coordinates.
 
@@ -300,6 +300,8 @@ Perfect for:
 
 See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
 
+Every analytical panel and the About surface includes a collapsed **Cite this release** control with copy-ready APA and BibTeX text. Both formats carry the HURDAT2 revision date, Atlantic and Eastern Pacific source SHA-256 values, HurricaneMap version, access date, and a release-pinned URL. The storm-panel Share view link carries the same `rel` pin alongside its filters, opened storm, comparison set, and advisory replay state.
+
 Versioned JSON Schema 2020-12 contracts for build metadata, storms, landfalls, normalized impacts, saved-view exports, STAC documents, and the release checksum manifest are published under `schemas/`. `data/release-manifest.json` records every shipped data artifact’s byte count, SHA-256, source URL/date, generated timestamp, and schema version; it travels with the raw HURDAT2 files in the optional source bundle and is fetched transiently by the service worker only to verify the runtime subset. `npm run validate:schemas` and `npm run check:release-manifest` enforce these contracts; after an intentional data refresh, regenerate checksums with an explicit reproducible timestamp, for example:
 
 ```bash
@@ -310,7 +312,7 @@ QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude or
 
 The static [`data/stac/catalog.json`](data/stac/catalog.json) exposes HURDAT2 tracks/landfalls and archived NEXRAD frames as a standards-based [STAC 1.0.0](https://github.com/radiantearth/stac-spec) catalog. Collection and item links are relative, so the catalog works from a checked-out repository, a core release, or a full release without a server. Each asset records its source URL/date, public-domain license, release availability, byte count, and SHA-256; radar PNG assets are marked `full` while their spatially indexed metadata remains in `core`. Run `npm run check:stac` to validate navigation, geometry, manifest coverage, and asset checksums; regenerate the deterministic files with `npm run generate:stac` before regenerating the release manifest.
 
-Every research export (publication CSV, statistical Markdown report, QGIS GeoJSON, and SVG track) carries a schema-versioned provenance block. It records the app version, export time, data-release timestamp, release-manifest SHA-256, source commit, the relevant artifact byte counts/hashes/source URLs/dates, and the export methodology. It contains no saved views, preparedness state, addresses, or local filesystem paths. Run `npm run check:export-provenance` to verify the embedded release identity against the checked-in manifest, and `npm run test:export-provenance` to exercise all four export formats.
+Every research export (publication CSV, statistical Markdown report, QGIS GeoJSON, SVG track, and storm CSV/GeoJSON/KML exports) carries a schema-versioned provenance block or citation metadata. It records the app version, export time, data-release timestamp, release-manifest SHA-256, source commit, the relevant artifact byte counts/hashes/source URLs/dates, and the export methodology, with copy-ready APA and BibTeX text. It contains no saved views, preparedness state, addresses, or local filesystem paths. Run `npm run check:export-provenance` to verify the embedded release identity against the checked-in manifest, `npm run test:export-provenance` for provenance, and `npm run test:citation` for citation parity.
 
 ### Notebook analysis
 
@@ -320,7 +322,7 @@ The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, 
 python -m pip install -r requirements-notebooks.txt
 ```
 
-Then run `python -m notebook notebooks/analysis-starter.ipynb`. The release gate can execute the same notebook twice without network access, using disposable output directories, and verify the 595-storm, 759-landfall, 374-hurricane-strength, and release-provenance contract:
+Then run `python -m notebook notebooks/analysis-starter.ipynb`. The setup cell emits the same APA and BibTeX release citation as the browser and exports. The release gate can execute the same notebook twice without network access, using disposable output directories, and verify the 595-storm, 759-landfall, 374-hurricane-strength, and release-provenance contract:
 
 ```bash
 npm run test:notebook
@@ -340,6 +342,8 @@ HurricaneMap/
 │   ├── main.js             # app boot, canonical filters/hash, data/map orchestration
 │   ├── shell-ui.js         # injected top-level control and export wiring
 │   ├── data.js             # JSON loaders + index helpers
+│   ├── citation.js         # release citation and data-pin authority
+│   ├── citation-ui.js      # shared APA/BibTeX panel controls
 │   ├── map.js              # Leaflet map, markers, tracks
 │   ├── panel.js            # storm data composition + Wikipedia/YouTube/NOAA links
 │   ├── panel-controls.js   # rendered storm controls, replay, and panel exports
@@ -378,7 +382,7 @@ HurricaneMap/
 
 ### Module ownership
 
-`main.js` is the only owner of canonical filters, shared-hash state, visible-landfall state, and map redraw orchestration. `shell-ui.js` owns top-level DOM actions through injected loaders and callbacks; it does not calculate filters or metrics. `panel.js` owns storm markup/data composition, while `panel-controls.js` owns listeners for controls created by that markup, including replay, playback, and panel exports. `export.js`, `report.js`, `qgis.js`, and `svg-export.js` remain the format-specific serialization owners. New work should extend the existing owner or add a focused boundary rather than duplicating filter state or metric calculations.
+`main.js` is the only owner of canonical filters, shared-hash state, visible-landfall state, and map redraw orchestration. `shell-ui.js` owns top-level DOM actions through injected loaders and callbacks; it does not calculate filters or metrics. `panel.js` owns storm markup/data composition, while `panel-controls.js` owns listeners for controls created by that markup, including replay, playback, and panel exports. `citation.js` owns the release citation and permalink identity; `citation-ui.js` mounts its shared controls. `export.js`, `report.js`, `qgis.js`, and `svg-export.js` remain the format-specific serialization owners. New work should extend the existing owner or add a focused boundary rather than duplicating filter state or metric calculations.
 
 ## How landfalls are detected
 

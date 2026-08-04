@@ -85,6 +85,8 @@ const SHELL_ASSETS = [
   './src/cone-retro.js',
   './src/advisory-replay.js',
   './src/compare.js',
+  './src/citation.js',
+  './src/citation-ui.js',
   './src/decade-trends.js',
   './src/export.js',
   './src/export-provenance.js',

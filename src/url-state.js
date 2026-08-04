@@ -1,4 +1,5 @@
 import { URL_STATE_VERSION } from './schema-contract.js';
+import { getDataReleasePin } from './export-provenance.js';
 
 export const YEAR_FALLBACK_MIN = 1851;
 export const YEAR_FALLBACK_MAX = 2025;
@@ -13,6 +14,7 @@ const ADVISORY_REPLAY_STATE_VERSION = '1';
 const ADVISORY_CONE_ERAS = new Set(Array.from({ length: 11 }, (_, index) => String(2015 + index)));
 const MAX_ADVISORY_REPLAY_INDEX = 999;
 const MAX_HASH_LENGTH = 2048;
+const DATA_RELEASE_PATTERN = /^[a-f0-9]{64}$/;
 
 export { ADVISORY_REPLAY_STATE_VERSION };
 
@@ -43,6 +45,7 @@ export function encodeHashState(filters, {
   advisoryReplay = null,
   windUnit = 'kt',
   damageMode = 'real',
+  dataRevision = '',
   yearMinDefault = YEAR_FALLBACK_MIN,
   yearMaxDefault = YEAR_FALLBACK_MAX,
 } = {}) {
@@ -57,6 +60,7 @@ export function encodeHashState(filters, {
     p: '',
     u: 'kt',
     d: 'real',
+    rel: '',
   };
   const current = {
     y: `${filters.yearMin}-${filters.yearMax}`,
@@ -69,6 +73,7 @@ export function encodeHashState(filters, {
     p: normalizeComparisonIds(comparisonIds).join(','),
     u: VALID_UNITS.has(windUnit) ? windUnit : 'kt',
     d: VALID_DAMAGE_MODES.has(damageMode) ? damageMode : 'real',
+    rel: normalizeDataRevision(dataRevision),
     replay: encodeAdvisoryReplayState(advisoryReplay, { stormId: openStormId }),
   };
   const parts = [];
@@ -138,17 +143,27 @@ export function decodeHashState(hash) {
 
 export function viewOptionsFromDecoded(decoded) {
   if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) {
-    return { comparisonIds: [], windUnit: null, damageMode: null, advisoryReplay: null };
+    return { comparisonIds: [], windUnit: null, damageMode: null, advisoryReplay: null, dataRevision: null };
   }
   const versioned = decoded.v === URL_STATE_VERSION;
   return {
     comparisonIds: normalizeComparisonIds(String(decoded.p || '').split(',')),
     windUnit: VALID_UNITS.has(decoded.u) ? decoded.u : versioned ? 'kt' : null,
     damageMode: VALID_DAMAGE_MODES.has(decoded.d) ? decoded.d : versioned ? 'real' : null,
+    dataRevision: normalizeDataRevision(decoded.rel) || null,
     advisoryReplay: versioned
       ? decodeAdvisoryReplayState(decoded.replay, { stormId: decoded.storm })
       : null,
   };
+}
+
+export function normalizeDataRevision(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return DATA_RELEASE_PATTERN.test(normalized) ? normalized : '';
+}
+
+export function currentDataRevision() {
+  return getDataReleasePin();
 }
 
 function normalizeComparisonIds(ids) {

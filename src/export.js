@@ -2,6 +2,7 @@
 
 import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
+import { buildCitation, citationCommentLines } from './citation.js';
 import { presentCategory, roundMetric } from './metric-presenters.js';
 
 export function buildPublicationCSV(filters, {
@@ -64,6 +65,7 @@ export function buildPublicationCSV(filters, {
   // Add data dictionary as comments
   const uniqueStorms = new Set(filtered.map(lf => lf.storm_id)).size;
   const [coverageMin, coverageMax] = getCoverageYearRange();
+  const citation = buildCitation({ accessDate: generatedAt });
   const provenance = buildExportProvenance({
     artifactPaths: [
       'data/landfalls.json',
@@ -114,6 +116,8 @@ export function buildPublicationCSV(filters, {
 # HURDAT2 data is Public Domain (released by NOAA/NHC).
 # This export provided as-is; please cite original HURDAT2 source in publications.
 #
+${citationCommentLines(citation).join('\n')}
+#
 # Filters applied:
 # - Years: ${filters.yearMin}-${filters.yearMax}
 # - Categories: ${Array.from(filters.categories).sort().join(', ') || 'All'}
@@ -131,6 +135,7 @@ export function buildPublicationCSV(filters, {
     csv,
     filename: `HurricaneMap-Export-${timestamp}.csv`,
     provenance,
+    citation,
   };
 }
 

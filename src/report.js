@@ -2,6 +2,7 @@
 
 import { filterLandfalls, getCoverageYearRange, getImpactsFor, getLandfalls } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
+import { buildCitation } from './citation.js';
 import { getDamageMillions, getFatalityCount } from './impact-utils.js';
 import {
   presentCategory,
@@ -20,6 +21,7 @@ export function generateStatisticalReport(filters, {
   const parsedGeneratedDate = new Date(generatedAt);
   const generatedDate = Number.isNaN(parsedGeneratedDate.getTime()) ? new Date() : parsedGeneratedDate;
   const generatedIso = generatedDate.toISOString();
+  const citation = buildCitation({ accessDate: generatedIso });
 
   const title = buildFilterTitle(filters, coverageYearRange);
   const timestamp = generatedDate.toLocaleDateString('en-US', {
@@ -131,6 +133,16 @@ Historical hurricane landfall data sourced from **NOAA's National Hurricane Cent
 
 **Citation:** Landsea, C. W., and J. L. Franklin, 2013: The Atlantic Hurricane Database Re-analysis Project: Documentation for the 1851-2012 Alterations and Additions to the HURDAT2 Database. NOAA Technical Memorandum NWS NHC-7.
 
+## Copy-Paste Release Citation
+
+**APA:** ${citation.apa}
+
+**BibTeX:**
+
+\`\`\`bibtex
+${citation.bibtex}
+\`\`\`
+
 ### Methodology Notes
 
 - **Landfalls** are identified as points where the cyclone center crosses a U.S. state boundary or coastline (HURDAT2 \`L\` marker or inferred via point-in-polygon).
@@ -154,6 +166,7 @@ ${JSON.stringify(provenance, null, 2)}
     markdown,
     title: `Hurricane-Summary-${generatedIso.split('T')[0]}`,
     provenance,
+    citation,
   };
 }
 

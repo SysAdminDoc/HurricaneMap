@@ -2,6 +2,7 @@
 
 import { ensureStormsLoaded, filterLandfalls, getAllStorms, getCoverageYearRange, getLandfalls } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
+import { buildCitation } from './citation.js';
 import { presentCategory, roundMetric } from './metric-presenters.js';
 
 export async function exportQGISGeoJSON(filters) {
@@ -24,6 +25,7 @@ export function buildQGISGeoJSON({
   const filteredLandfalls = Array.isArray(landfalls)
     ? landfalls.filter(hasFiniteLatLon)
     : [];
+  const citation = buildCitation({ accessDate: exportedAt });
   const stormsById = new Map(
     (Array.isArray(storms) ? storms : [])
       .filter(storm => storm?.id)
@@ -109,6 +111,11 @@ export function buildQGISGeoJSON({
       source: 'HurricaneMap - NOAA NHC HURDAT2 Best-Track Database',
       license: 'Public Domain (NOAA/NHC)',
       attribution: 'Data from NOAA National Hurricane Center HURDAT2 best-track database, 1851-present',
+      citation: {
+        apa: citation.apa,
+        bibtex: citation.bibtex,
+        url: citation.url,
+      },
       filters: {
         years: formatYearRange(filters),
         categories: formatCategories(filters.categories),

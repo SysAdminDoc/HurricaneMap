@@ -15,8 +15,9 @@ import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
   applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
   normalizeAdvisoryReplayState,
-  viewOptionsFromDecoded,
+  viewOptionsFromDecoded, currentDataRevision,
 } from './url-state.js';
+import { initCitationUI, mountCitationHost } from './citation-ui.js';
 import {
   setCategoryMacro,
 } from './filter-state.js';
@@ -128,6 +129,7 @@ function writeHash() {
     damageMode: getSetting('damageMode'),
     yearMinDefault: YEAR_MIN_DEFAULT,
     yearMaxDefault: YEAR_MAX_DEFAULT,
+    dataRevision: currentDataRevision(),
   });
   // Skip the no-op replaceState when nothing actually changed.
   const cur = location.hash || '';
@@ -336,6 +338,8 @@ async function boot() {
   if (hasStoredSetting('locale')) setLocale(getSetting('locale'));
   initManifestLocale(getLocale());
   translateStaticElements();
+  initCitationUI();
+  mountCitationHost(document.getElementById('about-citation-host'));
 
   // Start performance monitoring early
   initPerformanceMonitoring();
@@ -410,6 +414,7 @@ async function boot() {
       damageMode: getSetting('damageMode'),
       yearMinDefault: YEAR_MIN_DEFAULT,
       yearMaxDefault: YEAR_MAX_DEFAULT,
+      dataRevision: currentDataRevision(),
     }) || '#v=1',
     restoreHash: hash => { location.hash = hash; },
   });

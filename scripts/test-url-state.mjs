@@ -155,12 +155,14 @@ console.log('url state ok');
     comparisonIds: ['AL122005', 'EP012024'],
     windUnit: 'mph',
     damageMode: 'nominal',
+    dataRevision: null,
     advisoryReplay: null,
   });
   assert.deepEqual(viewOptionsFromDecoded(decodeHashState('#v=1')), {
     comparisonIds: [],
     windUnit: 'kt',
     damageMode: 'real',
+    dataRevision: null,
     advisoryReplay: null,
   });
   assert.equal(decodeHashState(`#v=1&x=${'a'.repeat(2050)}`), null);
