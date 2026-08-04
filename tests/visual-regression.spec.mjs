@@ -73,6 +73,7 @@ async function openDeterministicApp(page) {
     const loading = document.querySelector('#loading');
     return loading?.style.display === 'none' && /\d/.test(document.querySelector('#visible-count')?.textContent || '');
   }, { timeout: 20_000 });
+  await page.waitForFunction(() => document.querySelector('.header-actions')?.dataset.scrollable !== undefined, { timeout: 5_000 });
   await page.addStyleTag({ content: `
     *, *::before, *::after {
       animation: none !important;

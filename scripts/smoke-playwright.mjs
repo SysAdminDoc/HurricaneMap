@@ -686,6 +686,60 @@ async function assertMobileTargetSizes(page, label) {
   assert(!undersized.length, `${label}: interactive targets below 44x44px: ${JSON.stringify(undersized)}`);
 }
 
+async function assertMobileHeaderReachability(page, label, { requireOverflow = false } = {}) {
+  const state = await page.evaluate(() => {
+    const rail = document.querySelector('.header-actions');
+    if (!rail) return { error: 'header action rail is missing' };
+    const buttons = [...rail.querySelectorAll(':scope > button.icon-btn')];
+    const visibleInRail = button => {
+      const railRect = rail.getBoundingClientRect();
+      const rect = button.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 &&
+        rect.left >= railRect.left - 0.5 && rect.right <= railRect.right + 0.5;
+    };
+    const dispatchKey = key => rail.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    const initialScroll = rail.scrollLeft;
+    rail.focus();
+    dispatchKey('ArrowRight');
+    const arrowRightScroll = rail.scrollLeft;
+    dispatchKey('End');
+    const endScroll = rail.scrollLeft;
+    const endVisible = visibleInRail(buttons.at(-1));
+    dispatchKey('Home');
+    const homeScroll = rail.scrollLeft;
+    const homeVisible = visibleInRail(buttons[0]);
+    const eachButtonReachable = buttons.map(button => {
+      button.focus();
+      return visibleInRail(button);
+    });
+    return {
+      buttonCount: buttons.length,
+      tabIndex: rail.tabIndex,
+      shortcuts: rail.getAttribute('aria-keyshortcuts') || '',
+      scrollable: rail.dataset.scrollable === 'true',
+      initialScroll,
+      arrowRightScroll,
+      endScroll,
+      homeScroll,
+      maxScroll: Math.max(0, rail.scrollWidth - rail.clientWidth),
+      endVisible,
+      homeVisible,
+      eachButtonReachable,
+    };
+  });
+  assert(!state.error, `${label}: ${state.error}`);
+  assert(state.buttonCount >= 9, `${label}: expected all primary header actions, got ${state.buttonCount}`);
+  assert(state.tabIndex === 0, `${label}: header action rail is not keyboard-focusable`);
+  assert(/ArrowLeft/.test(state.shortcuts) && /ArrowRight/.test(state.shortcuts) && /Home/.test(state.shortcuts) && /End/.test(state.shortcuts), `${label}: header rail keyboard shortcuts are incomplete`);
+  if (requireOverflow) {
+    assert(state.scrollable, `${label}: header action rail does not expose horizontal overflow`);
+    assert(state.arrowRightScroll > state.initialScroll, `${label}: ArrowRight did not advance the header action rail`);
+    assert(state.endScroll >= state.maxScroll - 1, `${label}: End did not reach the header action rail end`);
+    assert(state.homeScroll <= 1, `${label}: Home did not return the header action rail to its start`);
+  }
+  assert(state.endVisible && state.homeVisible && state.eachButtonReachable.every(Boolean), `${label}: one or more primary header actions cannot be brought fully into view`);
+}
+
 function rectsIntersect(a, b) {
   return a && b &&
     a.left < b.right &&
@@ -1178,6 +1232,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
+    if (scenario.width <= 720) await assertMobileHeaderReachability(page, `${scenario.label} header`, { requireOverflow: scenario.width <= 430 });
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, scenario.label);
     await assertSettingsSurface(page, scenario.label);
@@ -1209,6 +1264,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
+    if (width <= 720) await assertMobileHeaderReachability(page, `${name} header`, { requireOverflow: width <= 430 });
     await assertThemeContrastMatrix(page);
     await captureVisualSnapshot(page, `${name}-dark`);
 

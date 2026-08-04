@@ -16,6 +16,7 @@ All notable changes to HurricaneMap.
 - Storm panels now include a keyboard-openable, localized textual track timeline with hazard milestones ordered first, complete chronological observations on demand, and polite playback time announcements for screen readers.
 - Online archived radar fallback now uses IEM's zoomable, cache-stable XYZ tiles with explicit 404/503 miss handling; bundled radar frames and offline packs remain full local PNGs.
 - The colour-blind palette now remaps archived PNGs and online IEM radar tiles to a Cividis reflectivity ramp, with a matching dBZ legend and playback coverage.
+- The mobile header action rail now exposes clipped controls with a visible edge cue and keyboard Home/End/arrow scrolling, while preserving full focus reachability at 390 px.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 
 ### Fixed

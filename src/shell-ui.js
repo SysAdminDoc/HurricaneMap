@@ -114,6 +114,36 @@ export function wireApplicationShell({
     requestAnimationFrame(() => { els.headerActions.scrollLeft = 0; });
   });
 
+  const updateHeaderActionRail = () => {
+    const rail = els.headerActions;
+    if (!rail) return;
+    const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
+    const scrollable = maxScroll > 1;
+    rail.dataset.scrollable = String(scrollable);
+    rail.dataset.scrollStart = String(!scrollable || rail.scrollLeft <= 1);
+    rail.dataset.scrollEnd = String(!scrollable || rail.scrollLeft >= maxScroll - 1);
+  };
+
+  els.headerActions?.addEventListener('scroll', updateHeaderActionRail, { passive: true });
+  els.headerActions?.addEventListener('keydown', event => {
+    const rail = els.headerActions;
+    if (!rail || innerWidth > 720 || event.target !== rail) return;
+    const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
+    if (maxScroll <= 1) return;
+    const page = Math.max(120, Math.round(rail.clientWidth * 0.72));
+    let target = null;
+    if (event.key === 'ArrowRight') target = Math.min(maxScroll, rail.scrollLeft + page);
+    if (event.key === 'ArrowLeft') target = Math.max(0, rail.scrollLeft - page);
+    if (event.key === 'Home') target = 0;
+    if (event.key === 'End') target = maxScroll;
+    if (target === null) return;
+    event.preventDefault();
+    rail.scrollTo({ left: target, behavior: 'auto' });
+    updateHeaderActionRail();
+  });
+  window.addEventListener('resize', updateHeaderActionRail, { passive: true });
+  requestAnimationFrame(updateHeaderActionRail);
+
   els.evacBtn?.addEventListener('click', async () => {
     const { openEvacPanel } = await load.evac();
     await openEvacPanel();

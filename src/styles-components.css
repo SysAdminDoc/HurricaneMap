@@ -9478,6 +9478,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 }
 
 .header-actions {
+  position: relative;
   gap: 5px;
   overflow: visible;
 }
@@ -9854,6 +9855,53 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 }
 
 @media (max-width: 720px) {
+  .header-actions {
+    padding-inline-end: 34px;
+    scroll-padding-inline-end: 34px;
+  }
+
+  .header-actions:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 3px;
+  }
+
+  .header-actions[data-scrollable="true"]::before,
+  .header-actions[data-scrollable="true"]::after {
+    position: absolute;
+    top: 2px;
+    bottom: 4px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    width: 30px;
+    color: var(--atlas-cyan);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .header-actions[data-scrollable="true"]::before {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 3px;
+    content: '‹';
+    background: linear-gradient(90deg, var(--surface-panel) 8%, color-mix(in srgb, var(--surface-panel) 72%, transparent) 54%, transparent);
+  }
+
+  .header-actions[data-scrollable="true"]::after {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 3px;
+    content: '›';
+    background: linear-gradient(270deg, var(--surface-panel) 8%, color-mix(in srgb, var(--surface-panel) 72%, transparent) 54%, transparent);
+  }
+
+  .header-actions[data-scroll-start="true"]::before,
+  .header-actions[data-scroll-end="true"]::after {
+    display: none;
+  }
+
   #toggle-filters { order: 1; }
   #toggle-stats { order: 2; }
   #toggle-on-this-date { order: 3; }
