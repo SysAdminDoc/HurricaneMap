@@ -1,0 +1,169 @@
+- dialog "Configuración":
+  - heading "Configuración" [level=2]
+  - paragraph: Ajusta unidades, accesibilidad y capas de tormentas activas. Los cambios quedan en este dispositivo.
+  - region "Lectura":
+    - heading "Lectura" [level=3]
+    - text: Unidades de viento
+    - paragraph: Se usa en paneles, gráficos y exportaciones.
+    - radiogroup "Unidad de viento":
+      - radio "Nudos" [checked]
+      - radio "mph"
+      - radio "km/h"
+    - text: Cifras de daños
+    - paragraph: Compara pérdidas históricas como fueron reportadas o ajustadas por IPC.
+    - radiogroup "Ajuste de daños":
+      - radio "Nominal"
+      - radio /USD \d+/ [checked]
+    - text: Idioma
+    - paragraph: Actualiza las etiquetas sin cambiar los datos.
+    - radiogroup "Idioma":
+      - radio "English"
+      - radio "Español" [checked]
+      - radio "Kreyòl"
+  - region "Apariencia":
+    - heading "Apariencia" [level=3]
+    - text: Tema
+    - paragraph: Elige la interfaz del mapa que funcione mejor con tu iluminación.
+    - radiogroup "Tema":
+      - radio "Oscuro" [checked]
+      - radio "Claro"
+      - radio "Sistema"
+    - text: Paleta de colores
+    - paragraph: Mantiene el significado de las categorías en el mapa y los paneles.
+    - radiogroup "Paleta de colores":
+      - radio "Predeterminada" [checked]
+      - radio "Daltonismo"
+    - checkbox "Modo de alto contraste Refuerza texto, bordes y enfoques."
+    - text: Modo de alto contraste Refuerza texto, bordes y enfoques.
+    - checkbox "Reducir movimiento Mantiene cambios claros con menos animación." [checked]
+    - text: Reducir movimiento Mantiene cambios claros con menos animación.
+  - region "Ayudas de tormentas activas":
+    - heading "Ayudas de tormentas activas" [level=3]
+    - checkbox "Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible." [checked]
+    - text: Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible.
+    - checkbox "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación." [checked]
+    - text: Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.
+    - checkbox /Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–\d+ horas\./
+    - text: /Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–\d+ horas\./
+    - checkbox "Fondo satelital GOES Agrega imágenes en vivo detrás de tormentas activas cuando están disponibles."
+    - text: Fondo satelital GOES Agrega imágenes en vivo detrás de tormentas activas cuando están disponibles.
+    - button "Reproducir gira de bienvenida"
+  - region "Diagnóstico de datos opcionales":
+    - heading "Diagnóstico de datos opcionales" [level=3]
+    - paragraph: Estado de fuentes en vivo y bajo demanda. Si una actualización falla, se conservan y etiquetan los últimos datos válidos disponibles.
+    - list:
+      - listitem:
+        - strong: Tormentas activas
+        - text: "/No disponible NOAA NHC CurrentStorms Último éxito: No programado Próximo intento: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Origen: Red/"
+      - listitem:
+        - strong: Geometría oficial del pronóstico
+        - text: "No solicitado NOAA NHC official forecast GIS Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Perspectiva tropical
+        - text: "No disponible NOAA NHC Tropical Weather Outlook Último éxito: No programado Próximo intento: No programado Origen: Red"
+      - listitem:
+        - strong: Avisos marinos
+        - text: "No solicitado NOAA NHC Marine Wind Warnings Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Alertas costeras e interiores
+        - text: "No solicitado NOAA/NWS active alerts Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Pronóstico de marejada máxima
+        - text: "No solicitado NOAA NHC Peak Storm Surge Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Imágenes GOES
+        - text: "No solicitado NOAA/NESDIS/STAR GOES Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Mareógrafos
+        - text: "No solicitado NOAA CO-OPS Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Radar archivado
+        - text: "No solicitado Iowa State IEM NEXRAD archive Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Declaraciones federales de desastre
+        - text: "No disponible FEMA Disaster Declarations Summaries Último éxito: No programado Próximo intento: No programado Origen: Red"
+      - listitem:
+        - strong: Guía de viento del NHC
+        - text: "No solicitado NOAA NHC tropical weather summary GIS Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+      - listitem:
+        - strong: Perspectiva estacional
+        - text: "No solicitado NOAA CPC bundled outlook snapshot Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+  - region "Almacenamiento sin conexión":
+    - heading "Almacenamiento sin conexión" [level=3]
+    - paragraph: Los datos históricos principales están protegidos. Los archivos de origen forman un paquete opcional guardado por el usuario; los mosaicos y paquetes de radar se pueden borrar por separado.
+    - strong: 0 B / 6.0 GB (0%)
+    - text: Almacenamiento administrado por el navegador
+    - list:
+      - listitem:
+        - strong: Aplicación
+        - text: Protegido · 0 elementos · 0 B
+      - listitem:
+        - strong: Datos históricos
+        - text: Protegido · 0 elementos · 0 B
+      - listitem:
+        - strong: Mosaicos del mapa
+        - text: Opcional · 0 elementos · 0 B
+        - button "Borrar"
+      - listitem:
+        - strong: Paquetes de radar
+        - text: Opcional · 0 elementos · 0 B
+        - button "Borrar"
+      - listitem:
+        - strong: Paquete de origen
+        - text: Opcional · 0 elementos · 0 B
+        - button "Guardar paquete de origen"
+        - button "Borrar"
+    - status
+    - paragraph: "Paquetes de radar guardados: 0"
+  - region "Diagnóstico sin conexión":
+    - heading "Diagnóstico sin conexión" [level=3]
+    - paragraph: Estado del service worker, caché, almacenamiento y fuentes para solucionar problemas sin conexión.
+    - strong: Registro
+    - text: Falló
+    - strong: Control de la página
+    - text: Sin controlar
+    - strong: Almacenamiento
+    - text: 0 B / 6.0 GB
+    - strong: Paquete de lanzamiento
+    - text: No verificado
+    - strong: Integridad al iniciar
+    - text: Sin comprobar
+    - list:
+      - listitem:
+        - strong: Aplicación
+        - text: no instalado · 0 · 0 B
+      - listitem:
+        - strong: Datos históricos
+        - text: no instalado · 0 · 0 B
+      - listitem:
+        - strong: Mosaicos del mapa
+        - text: no instalado · 0 · 0 B
+      - listitem:
+        - strong: Paquetes de radar
+        - text: no instalado · 0 · 0 B
+      - listitem:
+        - strong: Paquete de origen
+        - text: no instalado · 0 · 0 B
+    - strong: Antigüedad de fuentes opcionales
+    - text: "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito"
+    - status: "TypeError: Cannot read properties of undefined (reading 'scope')"
+    - button "Reparar ahora"
+    - button "Reintentar service worker"
+    - button "Actualizar diagnóstico"
+    - button "Exportar JSON de soporte"
+    - paragraph: La exportación incluye solo versiones y errores técnicos; nunca ubicaciones, direcciones, búsquedas, vistas guardadas ni respuestas de preparación.
+  - region "Vistas guardadas":
+    - heading "Vistas guardadas" [level=3]
+    - paragraph: /Las vistas guardadas nunca incluyen direcciones ni ubicaciones seleccionadas\. La ubicación del dispositivo permanece solo durante la sesión, salvo que decidas recordarla durante \d+ horas\./
+    - text: Nombre de la vista guardada
+    - textbox "Nombre de la vista guardada":
+      - /placeholder: Nombre de la vista
+    - button "Guardar actual"
+    - button "Exportar JSON" [disabled]
+    - button "Importar JSON"
+    - text: Importar JSON
+    - button "Importar JSON"
+    - status
+    - list:
+      - listitem: No hay vistas guardadas en este dispositivo.
+  - text: Guardado en este dispositivo. Sin cuenta, perfil de seguimiento ni sincronización en la nube.

@@ -1,0 +1,169 @@
+- dialog "Paramèt":
+  - heading "Paramèt" [level=2]
+  - paragraph: Ajiste inite, aksè, ak kouch tanpèt aktif. Chanjman yo rete sou aparèy sa a.
+  - region "Lekti":
+    - heading "Lekti" [level=3]
+    - text: Inite van
+    - paragraph: Itilize nan panno, graf, ak ekspòtasyon.
+    - radiogroup "Inite van":
+      - radio "Ne" [checked]
+      - radio "mph"
+      - radio "km/h"
+    - text: Chif domaj
+    - paragraph: Konpare pèt istorik jan yo rapòte yo oswa ajiste ak CPI.
+    - radiogroup "Ajisteman domaj":
+      - radio "Nominal"
+      - radio /USD \d+/ [checked]
+    - text: Lang
+    - paragraph: Mete etikèt yo ajou san chanje done yo.
+    - radiogroup "Lang":
+      - radio "English"
+      - radio "Español"
+      - radio "Kreyòl" [checked]
+  - region "Aparans":
+    - heading "Aparans" [level=3]
+    - text: Tèm
+    - paragraph: Chwazi aparans kat la pou limyè kote w ye a.
+    - radiogroup "Tèm":
+      - radio "Fonse" [checked]
+      - radio "Klè"
+      - radio "Sistèm"
+    - text: Palèt koulè
+    - paragraph: Kenbe siyifikasyon kategori yo menm sou kat ak panno.
+    - radiogroup "Palèt koulè":
+      - radio "Pa defo" [checked]
+      - radio "Pou je ki pa wè koulè"
+    - checkbox "Gwo kontrast Fè tèks, bòdi, ak konsantrasyon pi fò."
+    - text: Gwo kontrast Fè tèks, bòdi, ak konsantrasyon pi fò.
+    - checkbox "Diminye mouvman Kenbe chanjman yo klè ak mwens animasyon." [checked]
+    - text: Diminye mouvman Kenbe chanjman yo klè ak mwens animasyon.
+  - region "Èd pou tanpèt aktif":
+    - heading "Èd pou tanpèt aktif" [level=3]
+    - checkbox "Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib." [checked]
+    - text: Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib.
+    - checkbox "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme." [checked]
+    - text: Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.
+    - checkbox /Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–\d+ èdtan sou lanmè\./
+    - text: /Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–\d+ èdtan sou lanmè\./
+    - checkbox "Fon satelit GOES Ajoute imaj an dirèk dèyè tanpèt aktif lè li disponib."
+    - text: Fon satelit GOES Ajoute imaj an dirèk dèyè tanpèt aktif lè li disponib.
+    - button "Rejwe vizit byenveni"
+  - region "Dyagnostik done opsyonèl":
+    - heading "Dyagnostik done opsyonèl" [level=3]
+    - paragraph: Eta sous an dirèk ak sou demann. Lè yon mizajou echwe, dènye bon done yo rete ak yon etikèt si yo disponib.
+    - list:
+      - listitem:
+        - strong: Tanpèt aktif
+        - text: "/Pa disponib NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Orijin: Rezo/"
+      - listitem:
+        - strong: Jewometri previzyon ofisyèl
+        - text: "Poko mande NOAA NHC official forecast GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Pèspektiv twopikal
+        - text: "Pa disponib NOAA NHC Tropical Weather Outlook Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo"
+      - listitem:
+        - strong: Avètisman sou lanmè
+        - text: "Poko mande NOAA NHC Marine Wind Warnings Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Avètisman kot ak andedan tè
+        - text: "Poko mande NOAA/NWS active alerts Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Previzyon pi gwo mare tanpèt
+        - text: "Poko mande NOAA NHC Peak Storm Surge Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Imaj GOES
+        - text: "Poko mande NOAA/NESDIS/STAR GOES Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Mezi mare
+        - text: "Poko mande NOAA CO-OPS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Achiv rada
+        - text: "Poko mande Iowa State IEM NEXRAD archive Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Deklarasyon federal pou katastwòf
+        - text: "Pa disponib FEMA Disaster Declarations Summaries Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo"
+      - listitem:
+        - strong: Gid van NHC
+        - text: "Poko mande NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+      - listitem:
+        - strong: Pèspektiv sezon an
+        - text: "Poko mande NOAA CPC bundled outlook snapshot Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+  - region "Depo san entènèt":
+    - heading "Depo san entènèt" [level=3]
+    - paragraph: Done istorik prensipal yo pwoteje. Fichye sous yo se yon pake opsyonèl itilizatè a sove; mozayik kat ak pake rada yo ka efase apa.
+    - strong: 0 B / 6.0 GB (0%)
+    - text: Depo navigatè a jere
+    - list:
+      - listitem:
+        - strong: Aplikasyon an
+        - text: Pwoteje · 0 eleman · 0 B
+      - listitem:
+        - strong: Done istorik
+        - text: Pwoteje · 0 eleman · 0 B
+      - listitem:
+        - strong: Mozayik kat
+        - text: Opsyonèl · 0 eleman · 0 B
+        - button "Efase"
+      - listitem:
+        - strong: Pake rada
+        - text: Opsyonèl · 0 eleman · 0 B
+        - button "Efase"
+      - listitem:
+        - strong: Pake sous
+        - text: Opsyonèl · 0 eleman · 0 B
+        - button "Sove pake sous"
+        - button "Efase"
+    - status
+    - paragraph: "Pake rada tanpèt ki sove: 0"
+  - region "Dyagnostik san entènèt":
+    - heading "Dyagnostik san entènèt" [level=3]
+    - paragraph: Eta service worker, kach, depo, ak sous pou rezoud pwoblèm san entènèt.
+    - strong: Anrejistreman
+    - text: Echwe
+    - strong: Kontwòl paj la
+    - text: Pa sou kontwòl
+    - strong: Depo
+    - text: 0 B / 6.0 GB
+    - strong: Pake lage a
+    - text: Poko verifye
+    - strong: Entegrite lè li lanse
+    - text: Poko tcheke
+    - list:
+      - listitem:
+        - strong: Aplikasyon an
+        - text: pa enstale · 0 · 0 B
+      - listitem:
+        - strong: Done istorik
+        - text: pa enstale · 0 · 0 B
+      - listitem:
+        - strong: Mozayik kat
+        - text: pa enstale · 0 · 0 B
+      - listitem:
+        - strong: Pake rada
+        - text: pa enstale · 0 · 0 B
+      - listitem:
+        - strong: Pake sous
+        - text: pa enstale · 0 · 0 B
+    - strong: Laj sous opsyonèl yo
+    - text: "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi"
+    - status: "TypeError: Cannot read properties of undefined (reading 'scope')"
+    - button "Repare kounye a"
+    - button "Eseye service worker ankò"
+    - button "Rafrechi dyagnostik"
+    - button "Ekspòte JSON sipò"
+    - paragraph: Ekspòtasyon an gen sèlman vèsyon ak erè teknik—li pa janm gen pozisyon, adrès, rechèch, vizyalizasyon anrejistre, oswa repons preparasyon.
+  - region "Vizyalizasyon anrejistre":
+    - heading "Vizyalizasyon anrejistre" [level=3]
+    - paragraph: /Vizyalizasyon anrejistre pa janm gen adrès oswa pozisyon ou chwazi\. Pozisyon aparèy la rete sèlman pandan sesyon an sof si ou chwazi sonje li pandan \d+ èdtan\./
+    - text: Non vizyalizasyon anrejistre a
+    - textbox "Non vizyalizasyon anrejistre a":
+      - /placeholder: Non vizyalizasyon an
+    - button "Anrejistre sa a"
+    - button "Ekspòte JSON" [disabled]
+    - button "Enpòte JSON"
+    - text: Enpòte JSON
+    - button "Enpòte JSON"
+    - status
+    - list:
+      - listitem: Pa gen vizyalizasyon anrejistre sou aparèy sa a.
+  - text: Sove sou aparèy sa a. Pa gen kont, pwofil swivi, oswa senkronizasyon nwaj.

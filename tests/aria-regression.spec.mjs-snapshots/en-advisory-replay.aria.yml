@@ -1,0 +1,17 @@
+- region "Advisory replay":
+  - heading "Advisory replay" [level=3]
+  - checkbox "Replay issued forecasts" [checked]
+  - text: Replay issued forecasts
+  - paragraph: Steps through the forecasts NHC actually issued for this storm, read verbatim from the archived ATCF advisory record, beside the final best track.
+  - button "Previous advisory" [disabled]: ◀
+  - slider "Advisory number": "0"
+  - button "Next advisory": ▶
+  - paragraph: "/Advisory 1 of \\d+ · NHC advisory #1 · Issued Oct 5, \\d+, \\d+:\\d+ PM UTC/"
+  - paragraph
+  - list:
+    - listitem: Preliminary forecast as issued
+    - listitem: Final best track (HURDAT2)
+  - paragraph:
+    - link "Read the forecast discussion":
+      - /url: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.001.shtml
+  - status: /Verified at 9 leads · mean track error \d+\.\d+ n mi At \d+ h the forecast center was \d+\.\d+ n mi from where the storm actually was\./

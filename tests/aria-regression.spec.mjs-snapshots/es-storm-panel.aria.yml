@@ -1,0 +1,233 @@
+- region /Katrina \(\d+\)/:
+  - button "Minimizar detalles de la tormenta"
+  - button "Cerrar detalles de la tormenta": ×
+  - heading /Katrina \(\d+\)/ [level=2]
+  - text: "Cat 3 at landfall Peak intensity:"
+  - strong: /Cat 5 \d+ kt/
+  - text: Atlantic basin AL122005
+  - button "Reproducir trayectoria"
+  - button "📌 Pin to compare"
+  - region "Storm summary":
+    - text: /Texto educativo · fuente en inglés KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Viento máximo \d+ kt Presión mínima \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Toques de tierra en EE\. UU\. 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Closest pass to/
+    - combobox "Closest pass to":
+      - option "Miami, FL" [selected]
+      - option "Key West, FL"
+      - option "Tampa, FL"
+      - option "Jacksonville, FL"
+      - option "Daytona Beach, FL"
+      - option "Pensacola, FL"
+      - option "Mobile, AL"
+      - option "New Orleans, LA"
+      - option "Galveston, TX"
+      - option "Houston, TX"
+      - option "Corpus Christi, TX"
+      - option "Brownsville, TX"
+      - option "Savannah, GA"
+      - option "Charleston, SC"
+      - option "Wilmington, NC"
+      - option "Cape Hatteras, NC"
+      - option "Norfolk, VA"
+      - option "Washington, DC"
+      - option "New York, NY"
+      - option "Boston, MA"
+      - option "San Juan, PR"
+      - option "Honolulu, HI"
+      - option "Hilo, HI"
+      - option "San Diego, CA"
+      - option "Cabo San Lucas, MX"
+    - strong: /\d+ mi/
+    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Return period \\(\\d+ km radius\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - heading "Impactos" [level=3]
+    - text: /Víctimas mortales \d+,\d+ Daños \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Desastre de mil millones \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ muertes\)/
+    - 'link "Fuente: Wikipedia"':
+      - /url: https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29
+    - text: "· Confianza: alta ·"
+    - 'link /Fuente: NOAA NCEI \(congelado en \d+\)/':
+      - /url: https://www.ncei.noaa.gov/access/billions/
+    - heading "Eventos meteorológicos cerca del toque de tierra" [level=3]
+    - text: Tornado activity during landfall 1 report in Florida · strongest F2 Hail activity during landfall 0 reports
+    - list "Sample matching Storm Events":
+      - listitem: Tornado MONROE, Florida F2
+    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+[hmsp]+ before to \d+[hmsp]+ after U\.S\. landfall Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Source:/
+    - link "NOAA WPC TC Rainfall":
+      - /url: https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html
+    - heading "Mareógrafos (NOAA CO-OPS)" [level=3]
+    - button "Cargar niveles de agua cerca del toque de tierra"
+  - region "Storm analysis":
+    - heading "Huracanes similares" [level=3]
+    - list:
+      - listitem: /Ian \(\d+\) Cat 5 3 landfalls \d+%/
+      - listitem: /Belle \(\d+\) Cat 3 2 landfalls \d+%/
+      - listitem: /Carol \(\d+\) Cat 3 2 landfalls \d+%/
+      - listitem: /Unnamed \(\d+\) Cat 4 1 landfall \d+%/
+      - listitem: /Celia \(\d+\) Cat 4 1 landfall \d+%/
+    - heading "Días con esta intensidad" [level=3]
+    - 'img /Días con esta intensidad: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
+    - text: "Total tracked: 7.5 days"
+    - heading "Intensity over time" [level=3]
+    - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+    - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
+    - button "⤓ PNG"
+    - button "⤓ SVG"
+  - region "Storm resources":
+    - heading "U.S. landfalls (chronological)" [level=3]
+    - list:
+      - listitem:
+        - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+      - listitem:
+        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
+      - listitem:
+        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+    - status: "/Caché de radar: no hay imágenes guardadas \\(\\d+ disponibles\\)/"
+    - region "Contexto federal del desastre":
+      - heading "Contexto federal del desastre" [level=3]
+      - link "Fuente FEMA":
+        - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
+      - status:
+        - paragraph: Las declaraciones de FEMA no están disponibles ahora.
+        - paragraph:
+          - text: No se puede confirmar una declaración hasta que responda la fuente.
+          - link "Fuente FEMA":
+            - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
+    - link "Wikipedia":
+      - /url: https://en.wikipedia.org/wiki/Special:Search?go=Go&search=Hurricane%20Katrina%20(2005)
+    - link "YouTube footage":
+      - /url: https://www.youtube.com/results?search_query=hurricane%20Katrina%202005%20landfall
+    - link "NOAA report":
+      - /url: https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl
+    - link "NHC archive":
+      - /url: https://www.nhc.noaa.gov/archive/2005/AL122005.shtml
+    - link "Tornadoes (NOAA)":
+      - /url: https://www.ncei.noaa.gov/stormevents/listevents.jsp?eventType=%28C%29+Tornado&beginDate_mm=08&beginDate_dd=23&beginDate_yyyy=2005&endDate_mm=08&endDate_dd=31&endDate_yyyy=2005&statefips=12%2CFLORIDA%2C22%2CLOUISIANA
+    - link "Recon archive":
+      - /url: https://tropicalatlantic.com/recon/?archive=2005&storm=Katrina
+    - text: "Exportar trayectoria:"
+    - button "CSV"
+    - button "CSV (publication)"
+    - button "GeoJSON"
+    - button "KML"
+    - button "SVG map"
+    - button "🔗 Share view"
+    - region "Exportar video":
+      - heading "Exportar video" [level=3]
+      - paragraph: Cree un WebM de la trayectoria de esta tormenta con sus fechas, leyenda de categorías y atribución de NOAA.
+      - text: Velocidad de fotogramas
+      - combobox "Velocidad de fotogramas":
+        - option /\d+ fps/
+        - option /\d+ fps/ [selected]
+        - option /\d+ fps/
+      - text: Duración
+      - combobox "Duración":
+        - option "5 segundos"
+        - option /\d+ segundos/ [selected]
+        - option /\d+ segundos/
+        - option /\d+ segundos/
+      - button "Descargar WebM"
+      - status
+    - region "Destreza real de pronóstico del NHC":
+      - heading "Destreza real de pronóstico del NHC" [level=3]
+      - text: Medido
+      - paragraph: /Atlántico · \d+-\d+ · pronósticos oficiales OFCL/
+      - paragraph: Medido con pronósticos oficiales archivados frente a la trayectoria final del análisis posterior a la temporada. Son promedios de cuenca, no una puntuación de Katrina.
+      - table /Atlántico · \d+-\d+ · pronósticos oficiales OFCL/:
+        - caption: /Atlántico · \d+-\d+ · pronósticos oficiales OFCL/
+        - rowgroup:
+          - row "Plazo Trayectoria mn Intensidad kt Muestra N":
+            - columnheader "Plazo"
+            - columnheader "Trayectoria mn"
+            - columnheader "Intensidad kt"
+            - columnheader "Muestra N"
+        - rowgroup:
+          - row /0 h 6\.9 1\.3 \d+/:
+            - rowheader "0 h"
+            - cell "6.9"
+            - cell "1.3"
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ 5\.0 \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell "5.0"
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ 7\.1 \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell "7.1"
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ 8\.5 \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell "8.5"
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ 9\.9 \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell "9.9"
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ h \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ h/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+      - paragraph: Trayectoria es el error medio de posición por gran círculo; intensidad es el error absoluto medio del viento máximo.
+      - paragraph: "/Versión de trayectoria final: \\d+-\\d+-\\d+/"
+      - paragraph:
+        - link "Tabla quinquenal del NHC":
+          - /url: https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf
+        - text: ·
+        - link "Archivo de errores individuales":
+          - /url: https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_ATL_TI_errors.txt
+        - text: ·
+        - link "Definiciones":
+          - /url: https://www.nhc.noaa.gov/verification/verify2.shtml
+    - group: /Línea de tiempo textual de la trayectoria \d+ observaciones · \d+ momentos de peligro/
+    - region "Repetición de avisos":
+      - heading "Repetición de avisos" [level=3]
+      - checkbox "Repetir los pronósticos emitidos"
+      - text: Repetir los pronósticos emitidos
+      - paragraph: Recorre los pronósticos que el NHC emitió realmente para esta tormenta, tomados literalmente del registro ATCF archivado, junto a la mejor trayectoria final.
+      - status
+    - region "Reconstrucción ilustrativa del cono":
+      - heading "Reconstrucción ilustrativa del cono" [level=3]
+      - checkbox "Mostrar cono educativo"
+      - text: Mostrar cono educativo Época de estadísticas de error
+      - combobox "Época de estadísticas de error" [disabled]:
+        - option /\d+/ [selected]
+        - option /\d+/
+        - option /\d+/
+      - checkbox /Método ilustrativo de elipses de \d+/ [disabled]
+      - text: /Método ilustrativo de elipses de \d+/
+      - paragraph: Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico y los impactos pueden ocurrir mucho más allá del cono.
+      - status
+    - region "Trayectorias de riesgo animadas":
+      - heading "Trayectorias de riesgo animadas" [level=3]
+      - checkbox /Mostrar \d+ rutas plausibles/
+      - text: /Mostrar \d+ rutas plausibles Época de estadísticas de error/
+      - combobox "Época de estadísticas de error" [disabled]:
+        - option /\d+/ [selected]
+        - option /\d+/
+        - option /\d+/
+      - paragraph: Varias rutas muestreadas del centro comunican incertidumbre sin un límite rígido. Son posibilidades educativas, no pronósticos ni límites de impacto.
+      - status
+    - checkbox /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - text: /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - checkbox /🌊 Mostrar marcas de agua alta observadas \(\d+ mediciones USGS\)/
+    - text: /🌊 Mostrar marcas de agua alta observadas \(\d+ mediciones USGS\)/
+  - group: Citar esta versión

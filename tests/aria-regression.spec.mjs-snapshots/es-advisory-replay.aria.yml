@@ -1,0 +1,17 @@
+- region "Repetición de avisos":
+  - heading "Repetición de avisos" [level=3]
+  - checkbox "Repetir los pronósticos emitidos" [checked]
+  - text: Repetir los pronósticos emitidos
+  - paragraph: Recorre los pronósticos que el NHC emitió realmente para esta tormenta, tomados literalmente del registro ATCF archivado, junto a la mejor trayectoria final.
+  - button "Aviso anterior" [disabled]: ◀
+  - slider "Número de aviso": "0"
+  - button "Aviso siguiente": ▶
+  - paragraph: /Aviso 1 de \d+ · Aviso NHC n\.º 1 · Emitido Oct 5, \d+, \d+:\d+ PM UTC/
+  - paragraph
+  - list:
+    - listitem: Pronóstico preliminar tal como se emitió
+    - listitem: Mejor trayectoria final (HURDAT2)
+  - paragraph:
+    - link "Leer la discusión del pronóstico":
+      - /url: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.001.shtml
+  - status: /Verificado en 9 plazos · error medio de trayectoria \d+\.\d+ mn A las \d+ h el centro pronosticado estaba a \d+\.\d+ mn de donde realmente estuvo la tormenta\./

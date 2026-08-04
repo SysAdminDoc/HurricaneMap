@@ -107,6 +107,7 @@ async function expectMatrixScreenshot(page, name) {
     animations: 'disabled',
     mask: deterministicMasks(page),
     maskColor: '#071426',
+    quality: 100,
     maxDiffPixelRatio: 0.001,
   });
 }
@@ -256,8 +257,9 @@ async function closeVisualColorblindRadar(page) {
 
 test('stable atlas shell and statistics panel match approved baselines', async ({ page }) => {
   await openDeterministicApp(page);
-  await expect(page).toHaveScreenshot('desktop-shell.png', {
+  await expect(page).toHaveScreenshot('desktop-shell.webp', {
     animations: 'disabled',
+    quality: 100,
     maxDiffPixelRatio: 0.001,
   });
 
@@ -272,44 +274,45 @@ test('stable atlas shell and statistics panel match approved baselines', async (
       backdrop-filter: none !important;
     }
   ` });
-  await expect(page).toHaveScreenshot('desktop-statistics.png', {
+  await expect(page).toHaveScreenshot('desktop-statistics.webp', {
     animations: 'disabled',
+    quality: 100,
     maxDiffPixelRatio: 0.001,
   });
 });
 
 test('critical desktop workflows remain pixel-stable across theme and panel states', async ({ page }) => {
   await openDeterministicApp(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-shell-dark.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-shell-dark.webp');
 
   await openVisualStorm(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-storm.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-storm.webp');
 
   await openVisualColorblindRadar(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-radar-colorblind.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-radar-colorblind.webp');
   await closeVisualColorblindRadar(page);
 
   await openVisualStats(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-statistics.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-statistics.webp');
 
   await openVisualCompare(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-compare.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-compare.webp');
 
   await openVisualSettings(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-settings.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-settings.webp');
 
   await openVisualReplay(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-advisory-replay.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-advisory-replay.webp');
 
   await openVisualPlayback(page);
-  await expectMatrixScreenshot(page, 'matrix-desktop-track-playback.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-track-playback.webp');
 
   await closeVisualPanels(page);
   await setVisualTheme(page, 'light');
-  await expectMatrixScreenshot(page, 'matrix-desktop-shell-light.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-shell-light.webp');
 
   await setVisualTheme(page, 'dark', true);
-  await expectMatrixScreenshot(page, 'matrix-desktop-shell-high-contrast.png');
+  await expectMatrixScreenshot(page, 'matrix-desktop-shell-high-contrast.webp');
 });
 
 test.describe('critical mobile workflows', () => {
@@ -317,15 +320,15 @@ test.describe('critical mobile workflows', () => {
 
   test('remain pixel-stable in the compact shell', async ({ page }) => {
     await openDeterministicApp(page);
-    await expectMatrixScreenshot(page, 'matrix-mobile-shell-dark.png');
+    await expectMatrixScreenshot(page, 'matrix-mobile-shell-dark.webp');
 
     await openVisualStorm(page);
-    await expectMatrixScreenshot(page, 'matrix-mobile-storm.png');
+    await expectMatrixScreenshot(page, 'matrix-mobile-storm.webp');
 
     await openVisualStats(page);
-    await expectMatrixScreenshot(page, 'matrix-mobile-statistics.png');
+    await expectMatrixScreenshot(page, 'matrix-mobile-statistics.webp');
 
     await openVisualSettings(page);
-    await expectMatrixScreenshot(page, 'matrix-mobile-settings.png');
+    await expectMatrixScreenshot(page, 'matrix-mobile-settings.webp');
   });
 });

@@ -1,0 +1,17 @@
+- region "Repetisyon avi yo":
+  - heading "Repetisyon avi yo" [level=3]
+  - checkbox "Repase previzyon yo te bay yo" [checked]
+  - text: Repase previzyon yo te bay yo
+  - paragraph: Li pase nan previzyon NHC te reyelman bay pou tanpèt sa a, jan yo ekri nan achiv ATCF la, akote dèyè trajektò final la.
+  - button "Avi anvan" [disabled]: ◀
+  - slider "Nimewo avi": "0"
+  - button "Avi apre": ▶
+  - paragraph: /Avi 1 sou \d+ · Nimewo avi NHC 1 · Bay Oct 5, \d+, \d+:\d+ PM UTC/
+  - paragraph
+  - list:
+    - listitem: Previzyon preliminè jan yo te bay li
+    - listitem: Trajektò final (HURDAT2)
+  - paragraph:
+    - link "Li diskisyon previzyon an":
+      - /url: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.001.shtml
+  - status: /Verifye sou 9 dele · erè trajektò mwayen \d+\.\d+ mn Nan \d+ è, sant previzyon an te \d+\.\d+ mn lwen kote tanpèt la te ye vre\./

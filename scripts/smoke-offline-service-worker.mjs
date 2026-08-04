@@ -61,6 +61,8 @@ const server = createServer(async (request, response) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address();
 const baseUrl = `http://127.0.0.1:${port}`;
+const SW_TILE_URL = 'https://mesonet.agron.iastate.edu/c/tile.py/1.0.0/ridge::500::0.0/0/0/0.png';
+const SW_TILE_RESPONSE = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -75,6 +77,26 @@ try {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 860 },
     serviceWorkers: 'allow',
+  });
+  const routedServiceWorkerRequests = [];
+  await context.route('**/*', async route => {
+    const request = route.request();
+    if (request.serviceWorker()) {
+      routedServiceWorkerRequests.push(request.url());
+      if (request.url() === SW_TILE_URL) {
+        await route.fulfill({
+          status: 200,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'no-store',
+            'Content-Type': 'image/png',
+          },
+          body: SW_TILE_RESPONSE,
+        });
+        return;
+      }
+    }
+    await route.continue();
   });
   await context.addInitScript(() => {
     // Runs in EVERY frame, including the opaque-origin 3D-globe iframe
@@ -144,6 +166,13 @@ try {
   if (!(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)))) {
     await page.reload({ waitUntil: 'load' });
   }
+
+  const routedTile = await page.evaluate(async url => {
+    const response = await fetch(url, { cache: 'no-store' });
+    return { ok: response.ok, status: response.status, contentType: response.headers.get('content-type') };
+  }, SW_TILE_URL);
+  assert(routedTile.ok && routedTile.status === 200 && routedTile.contentType === 'image/png', `service-worker route probe failed: ${JSON.stringify(routedTile)}`);
+  assert(routedServiceWorkerRequests.includes(SW_TILE_URL), 'service-worker-owned tile request was not observed by browserContext.route');
 
   const releaseTuple = await page.evaluate(async () => {
     const dataCacheName = (await caches.keys()).find(name => name.startsWith('hm-data-hm-'));
@@ -321,7 +350,7 @@ try {
   await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
-  console.log(`offline service worker ok (${distribution.profile} profile, ${offlineKeys.length} data records, ${offlineResult.storms} storms, legacy storage removed, optional caches absent)`);
+  console.log(`offline service worker ok (${distribution.profile} profile, ${offlineKeys.length} data records, ${offlineResult.storms} storms, direct SW route probe passed, legacy storage removed, optional caches absent)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

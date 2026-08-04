@@ -1,0 +1,169 @@
+- dialog "Settings":
+  - heading "Settings" [level=2]
+  - paragraph: Tune units, accessibility, and live-storm layers. Changes stay on this device.
+  - region "Reading":
+    - heading "Reading" [level=3]
+    - text: Wind units
+    - paragraph: Used in panels, charts, and exports.
+    - radiogroup "Wind unit":
+      - radio "Knots" [checked]
+      - radio "mph"
+      - radio "km/h"
+    - text: Damage figures
+    - paragraph: Compare historical losses either as reported or CPI-adjusted.
+    - radiogroup "Damage adjustment":
+      - radio "Nominal"
+      - radio /\d+ USD/ [checked]
+    - text: Language
+    - paragraph: Updates interface labels without changing data.
+    - radiogroup "Language":
+      - radio "English" [checked]
+      - radio "Español"
+      - radio "Kreyòl"
+  - region "Appearance":
+    - heading "Appearance" [level=3]
+    - text: Theme
+    - paragraph: Choose the map chrome that fits your lighting.
+    - radiogroup "Theme":
+      - radio "Dark" [checked]
+      - radio "Light"
+      - radio "System"
+    - text: Color palette
+    - paragraph: Keeps category color meaning consistent across the map and panels.
+    - radiogroup "Color palette":
+      - radio "Default" [checked]
+      - radio "Colorblind"
+    - checkbox "High-contrast mode Strengthens text, borders, and focus outlines."
+    - text: High-contrast mode Strengthens text, borders, and focus outlines.
+    - checkbox "Reduce motion Keeps state changes clear with less animation." [checked]
+    - text: Reduce motion Keeps state changes clear with less animation.
+  - region "Live storm aids":
+    - heading "Live storm aids" [level=3]
+    - checkbox "NHC forecast cone and track Appears only when official active-storm geometry is available." [checked]
+    - text: NHC forecast cone and track Appears only when official active-storm geometry is available.
+    - checkbox "NHC tropical outlook Shows current official disturbance areas and formation chances." [checked]
+    - text: NHC tropical outlook Shows current official disturbance areas and formation chances.
+    - checkbox /Marine wind-warning outlook Shows NHC 0–\d+ hour offshore wind-warning risk zones\./
+    - text: /Marine wind-warning outlook Shows NHC 0–\d+ hour offshore wind-warning risk zones\./
+    - checkbox "GOES satellite backdrop Adds live imagery behind active storms when tiles are reachable."
+    - text: GOES satellite backdrop Adds live imagery behind active storms when tiles are reachable.
+    - button "Replay welcome tour"
+  - region "Optional data diagnostics":
+    - heading "Optional data diagnostics" [level=3]
+    - paragraph: Live and on-demand source health. Failed refreshes retain labeled last-good data when available.
+    - list:
+      - listitem:
+        - strong: Active storms
+        - text: "/Unavailable NOAA NHC CurrentStorms Last success: Not scheduled Next retry: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Origin: Network/"
+      - listitem:
+        - strong: Official forecast geometry
+        - text: "Not requested NOAA NHC official forecast GIS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Tropical outlook
+        - text: "Unavailable NOAA NHC Tropical Weather Outlook Last success: Not scheduled Next retry: Not scheduled Origin: Network"
+      - listitem:
+        - strong: Marine warnings
+        - text: "Not requested NOAA NHC Marine Wind Warnings Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Coastal and inland alerts
+        - text: "Not requested NOAA/NWS active alerts Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Peak surge forecast
+        - text: "Not requested NOAA NHC Peak Storm Surge Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: GOES imagery
+        - text: "Not requested NOAA/NESDIS/STAR GOES Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Tide gauges
+        - text: "Not requested NOAA CO-OPS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Archived radar
+        - text: "Not requested Iowa State IEM NEXRAD archive Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Federal disaster declarations
+        - text: "Unavailable FEMA Disaster Declarations Summaries Last success: Not scheduled Next retry: Not scheduled Origin: Network"
+      - listitem:
+        - strong: NHC wind guidance
+        - text: "Not requested NOAA NHC tropical weather summary GIS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+      - listitem:
+        - strong: Seasonal outlook
+        - text: "Not requested NOAA CPC bundled outlook snapshot Last success: Not scheduled Next retry: Not scheduled Origin: None"
+  - region "Offline storage":
+    - heading "Offline storage" [level=3]
+    - paragraph: Core historical data is protected. Source files are an optional, user-saved bundle; map tiles and radar packs can be cleared independently.
+    - strong: 0 B / 6.0 GB (0%)
+    - text: Browser-managed storage
+    - list:
+      - listitem:
+        - strong: Application shell
+        - text: Protected · 0 entries · 0 B
+      - listitem:
+        - strong: Historical data
+        - text: Protected · 0 entries · 0 B
+      - listitem:
+        - strong: Map tiles
+        - text: Optional · 0 entries · 0 B
+        - button "Clear"
+      - listitem:
+        - strong: Radar packs
+        - text: Optional · 0 entries · 0 B
+        - button "Clear"
+      - listitem:
+        - strong: Source bundle
+        - text: Optional · 0 entries · 0 B
+        - button "Save source bundle"
+        - button "Clear"
+    - status
+    - paragraph: "Saved storm radar packs: 0"
+  - region "Offline diagnostics":
+    - heading "Offline diagnostics" [level=3]
+    - paragraph: Service worker, cache, storage, and source readiness for troubleshooting offline use.
+    - strong: Registration
+    - text: Failed
+    - strong: Page control
+    - text: Not controlled
+    - strong: Storage
+    - text: 0 B / 6.0 GB
+    - strong: Release bundle
+    - text: Not verified
+    - strong: Launch integrity
+    - text: Not checked
+    - list:
+      - listitem:
+        - strong: Application shell
+        - text: not installed · 0 · 0 B
+      - listitem:
+        - strong: Historical data
+        - text: not installed · 0 · 0 B
+      - listitem:
+        - strong: Map tiles
+        - text: not installed · 0 · 0 B
+      - listitem:
+        - strong: Radar packs
+        - text: not installed · 0 · 0 B
+      - listitem:
+        - strong: Source bundle
+        - text: not installed · 0 · 0 B
+    - strong: Optional-feed age
+    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful"
+    - status: "TypeError: Cannot read properties of undefined (reading 'scope')"
+    - button "Repair now"
+    - button "Retry service worker"
+    - button "Refresh diagnostics"
+    - button "Export support JSON"
+    - paragraph: The export includes versions and technical errors only—never locations, addresses, searches, saved views, or preparedness answers.
+  - region "Saved views":
+    - heading "Saved views" [level=3]
+    - paragraph: /Saved views never include addresses or selected locations\. Device location stays session-only unless you explicitly remember it for \d+ hours\./
+    - text: Saved view name
+    - textbox "Saved view name":
+      - /placeholder: View name
+    - button "Save current"
+    - button "Export JSON" [disabled]
+    - button "Import JSON"
+    - text: Import JSON
+    - button "Import JSON"
+    - status
+    - list:
+      - listitem: No saved views on this device.
+  - text: Saved on this device. No account, tracking profile, or cloud sync.

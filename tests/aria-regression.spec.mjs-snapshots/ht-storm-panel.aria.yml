@@ -1,0 +1,233 @@
+- region /Katrina \(\d+\)/:
+  - button "Minimize detay siklòn"
+  - button "Fèmen detay siklòn": ×
+  - heading /Katrina \(\d+\)/ [level=2]
+  - text: "Cat 3 at landfall Peak intensity:"
+  - strong: /Cat 5 \d+ kt/
+  - text: Atlantic basin AL122005
+  - button "Jwe chemen"
+  - button "📌 Pin to compare"
+  - region "Storm summary":
+    - text: /Tèks edikatif · sous anglè KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Van maksimòm \d+ kt Presyon minimòm \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Touche tè Etazini 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Closest pass to/
+    - combobox "Closest pass to":
+      - option "Miami, FL" [selected]
+      - option "Key West, FL"
+      - option "Tampa, FL"
+      - option "Jacksonville, FL"
+      - option "Daytona Beach, FL"
+      - option "Pensacola, FL"
+      - option "Mobile, AL"
+      - option "New Orleans, LA"
+      - option "Galveston, TX"
+      - option "Houston, TX"
+      - option "Corpus Christi, TX"
+      - option "Brownsville, TX"
+      - option "Savannah, GA"
+      - option "Charleston, SC"
+      - option "Wilmington, NC"
+      - option "Cape Hatteras, NC"
+      - option "Norfolk, VA"
+      - option "Washington, DC"
+      - option "New York, NY"
+      - option "Boston, MA"
+      - option "San Juan, PR"
+      - option "Honolulu, HI"
+      - option "Hilo, HI"
+      - option "San Diego, CA"
+      - option "Cabo San Lucas, MX"
+    - strong: /\d+ mi/
+    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Return period \\(\\d+ km radius\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - heading "Enpak" [level=3]
+    - text: /Viktim \d+,\d+ Dega \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Dezas plizyè milya dola \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ moun ki mouri\)/
+    - 'link "Sous: Wikipedya"':
+      - /url: https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29
+    - text: "· Konfyans: wo ·"
+    - 'link /Sous: NOAA NCEI \(fikse nan \d+\)/':
+      - /url: https://www.ncei.noaa.gov/access/billions/
+    - heading "Evènman tanpèt bò kote siklòn touche tè" [level=3]
+    - text: Tornado activity during landfall 1 report in Florida · strongest F2 Hail activity during landfall 0 reports
+    - list "Sample matching Storm Events":
+      - listitem: Tornado MONROE, Florida F2
+    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+[hmsp]+ before to \d+[hmsp]+ after U\.S\. landfall Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Source:/
+    - link "NOAA WPC TC Rainfall":
+      - /url: https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html
+    - heading "Estasyon mare (NOAA CO-OPS)" [level=3]
+    - button "Chaje nivo dlo bò kote li touche tè"
+  - region "Storm analysis":
+    - heading "Siklòn ki sanble" [level=3]
+    - list:
+      - listitem: /Ian \(\d+\) Cat 5 3 landfalls \d+%/
+      - listitem: /Belle \(\d+\) Cat 3 2 landfalls \d+%/
+      - listitem: /Carol \(\d+\) Cat 3 2 landfalls \d+%/
+      - listitem: /Unnamed \(\d+\) Cat 4 1 landfall \d+%/
+      - listitem: /Celia \(\d+\) Cat 4 1 landfall \d+%/
+    - heading "Jou nan entansite sa a" [level=3]
+    - 'img /Jou nan entansite sa a: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
+    - text: "Total tracked: 7.5 days"
+    - heading "Intensity over time" [level=3]
+    - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+    - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
+    - button "⤓ PNG"
+    - button "⤓ SVG"
+  - region "Storm resources":
+    - heading "U.S. landfalls (chronological)" [level=3]
+    - list:
+      - listitem:
+        - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+      - listitem:
+        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
+      - listitem:
+        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+    - status: "/Kach rada: pa gen imaj ki sove \\(\\d+ disponib\\)/"
+    - region "Kontèks federal katastwòf la":
+      - heading "Kontèks federal katastwòf la" [level=3]
+      - link "Sous FEMA":
+        - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
+      - status:
+        - paragraph: Deklarasyon FEMA yo pa disponib kounye a.
+        - paragraph:
+          - text: Nou pa ka konfime yon deklarasyon jouk sous la reponn.
+          - link "Sous FEMA":
+            - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
+    - link "Wikipedia":
+      - /url: https://en.wikipedia.org/wiki/Special:Search?go=Go&search=Hurricane%20Katrina%20(2005)
+    - link "YouTube footage":
+      - /url: https://www.youtube.com/results?search_query=hurricane%20Katrina%202005%20landfall
+    - link "NOAA report":
+      - /url: https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl
+    - link "NHC archive":
+      - /url: https://www.nhc.noaa.gov/archive/2005/AL122005.shtml
+    - link "Tornadoes (NOAA)":
+      - /url: https://www.ncei.noaa.gov/stormevents/listevents.jsp?eventType=%28C%29+Tornado&beginDate_mm=08&beginDate_dd=23&beginDate_yyyy=2005&endDate_mm=08&endDate_dd=31&endDate_yyyy=2005&statefips=12%2CFLORIDA%2C22%2CLOUISIANA
+    - link "Recon archive":
+      - /url: https://tropicalatlantic.com/recon/?archive=2005&storm=Katrina
+    - text: "Ekspòte chemen:"
+    - button "CSV"
+    - button "CSV (publication)"
+    - button "GeoJSON"
+    - button "KML"
+    - button "SVG map"
+    - button "🔗 Share view"
+    - region "Ekspòte videyo":
+      - heading "Ekspòte videyo" [level=3]
+      - paragraph: Kreye yon WebM sou chemen siklòn sa a ak dat li yo, lejann kategori yo, ak atribisyon NOAA.
+      - text: Kantite imaj pa segonn
+      - combobox "Kantite imaj pa segonn":
+        - option /\d+ imaj\/s/
+        - option /\d+ imaj\/s/ [selected]
+        - option /\d+ imaj\/s/
+      - text: Dire
+      - combobox "Dire":
+        - option "5 segonn"
+        - option /\d+ segonn/ [selected]
+        - option /\d+ segonn/
+        - option /\d+ segonn/
+      - button "Telechaje WebM"
+      - status
+    - region "Konpetans reyèl previzyon NHC":
+      - heading "Konpetans reyèl previzyon NHC" [level=3]
+      - text: Mezire
+      - paragraph: /Atlantik · \d+-\d+ · previzyon ofisyèl OFCL/
+      - paragraph: Mezire ak previzyon ofisyèl achive yo kont chemen final apre sezon an. Sa yo se mwayèn pou basen an, pa yon nòt pou Katrina.
+      - table /Atlantik · \d+-\d+ · previzyon ofisyèl OFCL/:
+        - caption: /Atlantik · \d+-\d+ · previzyon ofisyèl OFCL/
+        - rowgroup:
+          - row "Delè Chemen n mi Entansite kt Echantiyon N":
+            - columnheader "Delè"
+            - columnheader "Chemen n mi"
+            - columnheader "Entansite kt"
+            - columnheader "Echantiyon N"
+        - rowgroup:
+          - row /0 è 6\.9 1\.3 \d+/:
+            - rowheader "0 è"
+            - cell "6.9"
+            - cell "1.3"
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ 5\.0 \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell "5.0"
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ 7\.1 \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell "7.1"
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ 8\.5 \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell "8.5"
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ 9\.9 \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell "9.9"
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+          - row /\d+ è \d+\.\d+ \d+\.\d+ \d+/:
+            - rowheader /\d+ è/
+            - cell /\d+\.\d+/
+            - cell /\d+\.\d+/
+            - cell /\d+/
+      - paragraph: Chemen se mwayèn erè pozisyon sou gwo sèk; entansite se mwayèn erè absoli van maksimòm.
+      - paragraph: "/Vèsyon chemen final: \\d+-\\d+-\\d+/"
+      - paragraph:
+        - link "Tablo senk ane NHC":
+          - /url: https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf
+        - text: ·
+        - link "Fichye erè endividyèl":
+          - /url: https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_ATL_TI_errors.txt
+        - text: ·
+        - link "Definisyon":
+          - /url: https://www.nhc.noaa.gov/verification/verify2.shtml
+    - group: /Liy tan tèks chemen an \d+ obsèvasyon · \d+ pwen danje/
+    - region "Repetisyon avi yo":
+      - heading "Repetisyon avi yo" [level=3]
+      - checkbox "Repase previzyon yo te bay yo"
+      - text: Repase previzyon yo te bay yo
+      - paragraph: Li pase nan previzyon NHC te reyelman bay pou tanpèt sa a, jan yo ekri nan achiv ATCF la, akote dèyè trajektò final la.
+      - status
+    - region "Rekonstriksyon kòn pou ilistrasyon":
+      - heading "Rekonstriksyon kòn pou ilistrasyon" [level=3]
+      - checkbox "Montre kòn edikatif"
+      - text: Montre kòn edikatif Epòk estatistik erè
+      - combobox "Epòk estatistik erè" [disabled]:
+        - option /\d+/ [selected]
+        - option /\d+/
+        - option /\d+/
+      - checkbox /Metòd elips \d+ pou ilistrasyon/ [disabled]
+      - text: /Metòd elips \d+ pou ilistrasyon/
+      - paragraph: Aplike reyon erè NHC pibliye yo sou chemen sant obsève a pou konparezon. Li pa yon previzyon istorik, epi konsekans yo ka rive lwen deyò nenpòt kòn.
+      - status
+    - region "Chemen risk anime":
+      - heading "Chemen risk anime" [level=3]
+      - checkbox /Montre \d+ chemen posib/
+      - text: /Montre \d+ chemen posib Epòk estatistik erè/
+      - combobox "Epòk estatistik erè" [disabled]:
+        - option /\d+/ [selected]
+        - option /\d+/
+        - option /\d+/
+      - paragraph: Plizyè chemen sant echantiyonnen kominike ensètitid san yon limit di. Yo se posiblite edikatif, pa previzyon oswa limit konsekans.
+      - status
+    - checkbox /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - text: /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - checkbox /🌊 Montre mak dlo wo obsève \(\d+ mezi USGS\)/
+    - text: /🌊 Montre mak dlo wo obsève \(\d+ mezi USGS\)/
+  - group: Site vèsyon sa a

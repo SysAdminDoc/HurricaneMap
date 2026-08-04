@@ -22,6 +22,7 @@ All notable changes to HurricaneMap.
 - README now keeps current-release highlights and sends older release history to the changelog; the quality plan now reflects shipped modularization and visual-regression work.
 - Dead translation keys and an unused logo generator are gone; the source-tree distribution descriptor no longer pretends to have a commit, Inter is the primary UI font, IEM radar tiles use the bounded tile cache, and Ctrl+M now reaches the filter module without a window global while Cmd+M remains available to macOS.
 - Visual regression now reports and skips non-Windows runs instead of creating false OS-specific baseline failures; the Docker Python base is digest-pinned, and the documented local server supplies no-cache and security headers.
+- Playwright acceptance now routes a service-worker-owned IEM tile through the browser context, snapshots storm/settings/advisory-replay ARIA trees in English, Spanish, and Haitian Creole, and stores the 16 Windows visual baselines as lossless WebP.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 
 ### Fixed
