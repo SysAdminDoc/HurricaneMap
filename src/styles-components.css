@@ -414,6 +414,8 @@ label > input[type="checkbox"] {
   .stat-grid { grid-template-columns: 1fr; }
   .panel-section-h3 { font-size: 11px; }
   .landfall-list-item { padding: 6px 4px; }
+  .track-timeline > summary { align-items: flex-start; flex-direction: column; }
+  .track-timeline-row { grid-template-columns: 1fr; }
 }
 
 @container side-panel (max-width: 300px) {
@@ -6886,6 +6888,111 @@ body.side-panel-open .leaflet-top.leaflet-right {
 .table-view-table tr[data-sid]:hover { background: var(--surface0); }
 
 .table-view-count { margin-top: 8px; color: var(--subtext); font-size: 12px; text-align: right; }
+
+.track-timeline {
+  margin-top: 8px;
+  border: 1px solid var(--surface1);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface0) 72%, transparent);
+}
+
+.track-timeline > summary,
+.track-timeline-observations > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+  list-style-position: inside;
+}
+
+.track-timeline > summary:focus-visible,
+.track-timeline-observations > summary:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: -2px;
+  border-radius: 9px;
+}
+
+.track-timeline > summary::marker,
+.track-timeline-observations > summary::marker { color: var(--lavender); }
+
+.track-timeline-count {
+  color: var(--subtext);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.track-timeline-body {
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--surface1);
+}
+
+.track-timeline-intro,
+.track-timeline-empty {
+  margin: 10px 0;
+  color: var(--subtext);
+  font-size: 11px;
+}
+
+.track-timeline-body h4 {
+  margin: 12px 0 6px;
+  color: var(--subtext);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.track-timeline-list {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.track-timeline-row {
+  display: grid;
+  grid-template-columns: minmax(125px, 0.7fr) minmax(0, 1.3fr);
+  gap: 8px;
+  padding: 7px 8px;
+  border-left: 2px solid var(--surface1);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--mantle) 72%, transparent);
+  font-size: 11px;
+}
+
+.track-timeline-row--milestone { border-left-color: var(--lavender); }
+
+.track-timeline-row time {
+  color: var(--subtext);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.track-timeline-row-detail {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.track-timeline-row-detail strong { color: var(--text); }
+.track-timeline-row-detail span { color: var(--subtext); }
+
+.track-timeline-observations {
+  margin-top: 10px;
+  border-top: 1px solid var(--surface1);
+}
+
+.track-timeline-observations > summary {
+  padding: 8px 0;
+  font-size: 11px;
+}
+
+.track-timeline-observations .track-timeline-list { padding-bottom: 2px; }
 
 .panel-info-card { padding: 12px; border: 1px solid var(--surface1); border-radius: 10px; background: var(--surface0); margin-top: 8px; }
 

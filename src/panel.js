@@ -44,6 +44,7 @@ import { clearRiskTrajectories } from './art-mode.js';
 import { presentPressure } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
 import { formatClosest, wirePanelControls } from './panel-controls.js';
+import { renderTrackTimeline } from './table-view.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { inspectRadarFrameCache } from './storage-manager.js';
 import { getBundledDatasetState, getBundledDatasetStatus } from './optional-feeds.js';
@@ -52,7 +53,6 @@ const panel = document.getElementById('storm-panel');
 const body = document.getElementById('panel-body');
 const stickyHeader = document.getElementById('panel-sticky-header');
 const closeBtn = document.getElementById('close-panel');
-
 let animator = null;
 function getAnimator() {
   if (!animator) animator = new TrackAnimator(getMap());
@@ -60,7 +60,6 @@ function getAnimator() {
 }
 
 let playbackAutoMinimized = false;
-
 function enterPlaybackMapMode() {
   if (!panel || panel.hidden) return;
   playbackAutoMinimized = !panel.classList.contains('minimized');
@@ -372,7 +371,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
           <p class="video-export-unavailable" id="video-export-unavailable" role="status" hidden></p>
         </section>
         <div id="forecast-skill-host"></div>
-
+        <div id="track-timeline-host"></div>
         <section class="advisory-replay-control" aria-labelledby="advisory-replay-title">
           <div class="cone-retro-heading">
             <h3 id="advisory-replay-title">${t('advisoryReplay.title')}</h3>
@@ -398,7 +397,6 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
           </div>
           <p class="cone-retro-status" id="advisory-replay-status" role="status" aria-live="polite"></p>
         </section>
-
         <section class="cone-retro-control" aria-labelledby="cone-retro-title">
           <div class="cone-retro-heading">
             <h3 id="cone-retro-title">${t('coneRetro.title')}</h3>
@@ -470,6 +468,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null) {
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
   renderHwmRow(document.getElementById('hwm-row-host'), storm);
+  renderTrackTimeline(document.getElementById('track-timeline-host'), storm);
   renderForecastSkill(document.getElementById('forecast-skill-host'), storm);
   refreshRadarCacheStatus(storm.id);
   import('./tides.js')

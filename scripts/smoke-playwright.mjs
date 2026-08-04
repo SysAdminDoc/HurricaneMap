@@ -604,6 +604,10 @@ async function assertPlaybackMapMode(page, label, snapshotName = null) {
       !controls.hidden &&
       getComputedStyle(controls).display !== 'none';
   }, { timeout: 10000 });
+  await page.waitForFunction(() => {
+    const live = document.querySelector('.anim-live-region');
+    return live?.getAttribute('role') === 'status' && Boolean(live.textContent?.trim());
+  }, { timeout: 5000 });
   await page.waitForTimeout(220);
 
   const layout = await page.evaluate(() => {
@@ -1216,6 +1220,8 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
           tableLabel: t('table.filteredLabel'),
           tableYear: t('table.column.year'),
           tableCount: t('table.countMany', (759).toLocaleString(getLocale())),
+          trackTitle: t('table.trackTimelineTitle'),
+          trackHighlights: t('table.trackHighlights'),
           spatialTitle: t('spatial.title'),
           spatialClose: t('spatial.close'),
           seasonalLabel: t('seasonal.label'),
@@ -1247,6 +1253,16 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       assert((await page.locator('.table-view-count').textContent()) === expected.tableCount, `${locale}: table count is not locale-aware`);
       await page.locator('#close-table-view').focus();
       await page.keyboard.press('Enter');
+
+      await openKatrinaPanel(page);
+      const trackTimeline = page.locator('#track-timeline-host .track-timeline');
+      await trackTimeline.locator(':scope > summary').focus();
+      await page.keyboard.press('Enter');
+      await page.waitForSelector('#track-timeline-host .track-timeline-highlights li', { timeout: 5000 });
+      assert((await trackTimeline.locator(':scope > summary').textContent()).includes(expected.trackTitle), `${locale}: track timeline title is not localized`);
+      assert((await trackTimeline.locator('h4').textContent()) === expected.trackHighlights, `${locale}: track timeline highlights are not localized`);
+      assert(await trackTimeline.locator('.track-timeline-row').count() > 0, `${locale}: track timeline rendered no rows`);
+      await assertNoAxeViolations(page, `${locale} track timeline (WCAG 2.2 AA)`, '#storm-panel');
 
       await clickHeaderAction(page, '#toggle-spatial-search');
       await page.waitForSelector('#spatial-results:not([hidden]) h3', { timeout: 5_000 });

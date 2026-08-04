@@ -13,6 +13,7 @@
 import { categoryColor, formatTime, windToCategory, categoryLabel } from './data.js';
 import { getStormRadarFrames } from './radar.js';
 import { formatStormName } from './html-utils.js';
+import { t } from './i18n.js';
 
 const L = window.L;
 
@@ -67,6 +68,7 @@ export class TrackAnimator {
     this.lastRadarUrl = null;
     this.controlsHost = null;
     this.stateCallback = null;
+    this.lastAnnouncedBucket = -1;
   }
 
   isPlaying() {
@@ -133,6 +135,7 @@ export class TrackAnimator {
     this.lastRadarUrl = null;
     this.controlsHost = controlsHost || null;
     this.stateCallback = typeof onStateChange === 'function' ? onStateChange : null;
+    this.lastAnnouncedBucket = -1;
 
     const first = this.densifiedTrack[0];
     this.marker = L.marker([first.lat, first.lon], {
@@ -313,6 +316,7 @@ export class TrackAnimator {
         <div class="anim-title"></div>
         <div class="anim-meta"></div>
       </div>
+      <div class="anim-live-region visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
       <button class="anim-btn anim-close" data-act="close" title="Close animation" aria-label="Close animation">Close</button>
     `;
     el.hidden = false;
@@ -363,14 +367,20 @@ export class TrackAnimator {
     });
   }
 
-  updateControlsHud(sample, t, fromScrub = false) {
+  updateControlsHud(sample, progress, fromScrub = false) {
     if (!this.controls) return;
     const cat = windToCategory(sample.wind);
     const wind = sample.wind != null ? Math.round(sample.wind) : null;
     const meta = `${formatTime(sample.t)} · ${categoryLabel(cat)} · ${sample.status} · ${wind ?? '?'} kt`;
     this.controls.querySelector('.anim-meta').textContent = meta;
+    const liveRegion = this.controls.querySelector('.anim-live-region');
+    const announcementBucket = Math.min(10, Math.floor(progress * 10));
+    if (liveRegion && (fromScrub || announcementBucket !== this.lastAnnouncedBucket)) {
+      liveRegion.textContent = t('panel.playbackFrame', formatTime(sample.t));
+      this.lastAnnouncedBucket = announcementBucket;
+    }
     if (!fromScrub) {
-      this.controls.querySelector('.anim-scrubber').value = String(Math.round(t * 1000));
+      this.controls.querySelector('.anim-scrubber').value = String(Math.round(progress * 1000));
     }
   }
 
@@ -453,6 +463,7 @@ export class TrackAnimator {
     this.radarBounds = null;
     this.lastRadarUrl = null;
     this.controlsHost = null;
+    this.lastAnnouncedBucket = -1;
     this.stateCallback = null;
     this.paused = false;
     this.elapsed = 0;
