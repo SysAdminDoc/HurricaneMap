@@ -1,5 +1,10 @@
 const DEFAULT_ORIGIN = 'https://sysadmindoc.github.io/HurricaneMap';
 
+// GitHub Pages does not emit a response CSP. Keep this header in lockstep with
+// index.html's meta policy, adding the directives that only response headers
+// can enforce for the primary document.
+export const MAIN_CONTENT_SECURITY_POLICY = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu https://www.nhc.noaa.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self';";
+
 const POLICIES = {
   html: {
     browser: 'public, max-age=0, must-revalidate',
@@ -58,14 +63,17 @@ export default {
     const cache = caches.default;
 
     const cached = await cache.match(cacheKey);
-    if (cached) return toRequestMethod(tagCacheStatus(cached, 'HIT'), request.method);
+    if (cached) {
+      const cachedWithHeaders = applyResponseHeaders(cached, policy, requestUrl.pathname);
+      return toRequestMethod(tagCacheStatus(cachedWithHeaders, 'HIT'), request.method);
+    }
 
     const originRequest = new Request(originUrl.href, request);
     const response = await fetch(originRequest, {
       cf: cloudflareFetchOptions(requestUrl.pathname, policy),
     });
 
-    const finalResponse = applyResponseHeaders(response, policy);
+    const finalResponse = applyResponseHeaders(response, policy, requestUrl.pathname);
     if (!isHead && finalResponse.ok && policy.edgeTtl > 0) {
       ctx.waitUntil(cache.put(cacheKey, finalResponse.clone()));
     }
@@ -137,7 +145,7 @@ export function originUrlFor(requestUrl, env = {}) {
   return origin;
 }
 
-export function applyResponseHeaders(response, policy) {
+export function applyResponseHeaders(response, policy, pathname = null) {
   const headers = new Headers(response.headers);
   const browserPolicy = response.ok ? policy.browser : 'no-store';
   const edgePolicy = response.ok ? policy.edge : 'no-store';
@@ -148,6 +156,13 @@ export function applyResponseHeaders(response, policy) {
   headers.set('X-Content-Type-Options', 'nosniff');
   headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   headers.set('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
+  const normalizedPath = pathname ? normalizePath(pathname) : null;
+  const contentType = headers.get('Content-Type') || '';
+  const isPrimaryDocument = normalizedPath === '/'
+    || normalizedPath?.endsWith('/')
+    || normalizedPath?.endsWith('/index.html')
+    || (!normalizedPath && /^text\/html\b/i.test(contentType));
+  if (isPrimaryDocument) headers.set('Content-Security-Policy', MAIN_CONTENT_SECURITY_POLICY);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

@@ -31,6 +31,8 @@ Persisted browser state has an explicit compatibility contract: settings, search
 
 The settings menu can save up to 20 named views on the current device. A view restores filters, map-layer choices, display units, and up to four comparison storms; it can be deleted or exported as versioned JSON. Saved views never include evacuation addresses, selected points, or other location coordinates.
 
+The primary document denies form submissions with its CSP. The Cloudflare Worker and the bundled self-hosting server also emit the response CSP, including `frame-ancestors 'self'`; deployments using another CDN or static server must preserve that response header because `frame-ancestors` cannot be enforced from a meta tag.
+
 Local verification:
 
 ```bash

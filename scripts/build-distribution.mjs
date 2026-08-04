@@ -15,6 +15,7 @@ const STATIC_ROOT_FILES = new Set([
   'manifest.webmanifest',
   'manifest.es.webmanifest',
   'manifest.ht.webmanifest',
+  'serve.py',
   'sw.js',
 ]);
 const STATIC_PREFIXES = ['branding/', 'data/', 'fonts/', 'schemas/', 'src/', 'vendor/'];

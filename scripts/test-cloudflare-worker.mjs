@@ -1,13 +1,22 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   applyResponseHeaders,
   cachePolicyFor,
   classifyAsset,
   cloudflareFetchOptions,
+  MAIN_CONTENT_SECURITY_POLICY,
   nhcProxyTargetFor,
   originUrlFor,
 } from '../cloudflare/worker.js';
+
+const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const metaCsp = indexHtml.match(/Content-Security-Policy" content="([^"]+)"/)?.[1] || '';
+assert(metaCsp, 'index.html should declare its meta CSP');
+for (const directive of metaCsp.split(';').map(part => part.trim()).filter(Boolean)) {
+  assert(MAIN_CONTENT_SECURITY_POLICY.includes(directive), `worker CSP dropped index.html directive: ${directive}`);
+}
 
 assert.equal(classifyAsset('/'), 'html', 'root should be treated as HTML');
 assert.equal(classifyAsset('/index.html'), 'html', 'index.html should be treated as HTML');
@@ -41,6 +50,13 @@ assert.equal(response.headers.get('Referrer-Policy'), 'strict-origin-when-cross-
 assert.equal(response.headers.get('Permissions-Policy'), 'geolocation=(self), microphone=(), camera=()', 'worker should preserve same-origin geolocation and deny unused sensors');
 assert.match(response.headers.get('Vary'), /Accept-Encoding/, 'worker should vary on compression support');
 assert.match(response.headers.get('Cloudflare-CDN-Cache-Control'), /stale-while-revalidate/, 'worker should set Cloudflare CDN cache policy');
+
+const htmlResponse = applyResponseHeaders(new Response('<!doctype html>', {
+  headers: { 'Content-Type': 'text/html; charset=utf-8' },
+}), cachePolicyFor('/'), '/');
+assert.equal(htmlResponse.headers.get('Content-Security-Policy'), MAIN_CONTENT_SECURITY_POLICY, 'primary HTML should receive the complete response CSP');
+assert.match(htmlResponse.headers.get('Content-Security-Policy'), /form-action 'none'/, 'primary HTML CSP should deny form submissions');
+assert.match(htmlResponse.headers.get('Content-Security-Policy'), /frame-ancestors 'self'/, 'primary HTML CSP should restrict framing to same origin');
 
 const errorResponse = applyResponseHeaders(new Response('missing', { status: 404 }), cachePolicyFor('/data/radar/missing.png'));
 assert.equal(errorResponse.headers.get('Cache-Control'), 'no-store', 'error responses must not be pinned in browser caches');

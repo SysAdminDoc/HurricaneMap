@@ -30,6 +30,7 @@ for (const required of [
   'manifest.es.webmanifest',
   'manifest.ht.webmanifest',
   'example.png',
+  'serve.py',
   'branding/logo-192.png',
   'branding/logo-512.png',
   'branding/logo-192-maskable.png',
