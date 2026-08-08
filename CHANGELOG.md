@@ -26,6 +26,7 @@ All notable changes to HurricaneMap.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 
 ### Fixed
+- The npm dependency graph now resolves the `fast-uri` high-severity advisory to patched release 3.1.5, with a regenerated lockfile-bound audit snapshot.
 - The checked-in AOML detailed continental-U.S. landfall table now provides a build-time ground-truth artifact and reports a 16/16 (100.0% precision, 100.0% recall) hurricane-strength match for 1983–1990; inferred tropical-storm candidates remain separately scoped, and HURDAT2 `C` closest-approach records cannot be promoted to inferred landfalls.
 - The offline core now installs only runtime data; raw Atlantic/Eastern Pacific HURDAT2 text and the full release manifest are an integrity-checked, user-initiated source bundle capped at 13 MB, with storage diagnostics and distribution metadata reporting the optional payload separately.
 - Offline launches now classify the shell/data tuple as intact, evicted, stale-but-valid, or invalid and offer an explicit repair action; each storm panel reports its cached radar-frame coverage.

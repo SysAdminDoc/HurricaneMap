@@ -17,7 +17,7 @@ import {
 const accessDate = '2026-08-03';
 const citation = buildCitation({ accessDate });
 assert.equal(citation.schema_version, 1);
-assert.match(citation.apa, /version 1\.9\.1/);
+assert.match(citation.apa, /version 1\.9\.2/);
 assert.match(citation.apa, /HURDAT2 revision 2026-02-27/);
 assert.match(citation.apa, /Atlantic SHA-256: 1b9b0c7beed5/);
 assert.match(citation.apa, /Eastern Pacific SHA-256: db65f8bc538/);
