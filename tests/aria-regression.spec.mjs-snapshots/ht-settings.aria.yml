@@ -55,39 +55,59 @@
       - listitem:
         - strong: Tanpèt aktif
         - text: "/Pa disponib NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Orijin: Rezo/"
+        - button "Eseye ankò"
       - listitem:
         - strong: Jewometri previzyon ofisyèl
         - text: "Poko mande NOAA NHC official forecast GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Pèspektiv twopikal
         - text: "Pa disponib NOAA NHC Tropical Weather Outlook Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo"
+        - button "Eseye ankò"
       - listitem:
         - strong: Avètisman sou lanmè
         - text: "Poko mande NOAA NHC Marine Wind Warnings Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Avètisman kot ak andedan tè
         - text: "Poko mande NOAA/NWS active alerts Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Previzyon pi gwo mare tanpèt
         - text: "Poko mande NOAA NHC Peak Storm Surge Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Imaj GOES
         - text: "Poko mande NOAA/NESDIS/STAR GOES Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Mezi mare
         - text: "Poko mande NOAA CO-OPS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Achiv rada
         - text: "Poko mande Iowa State IEM NEXRAD archive Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Deklarasyon federal pou katastwòf
         - text: "Pa disponib FEMA Disaster Declarations Summaries Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo"
+        - button "Eseye ankò"
       - listitem:
         - strong: Gid van NHC
         - text: "Poko mande NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
       - listitem:
         - strong: Pèspektiv sezon an
         - text: "Poko mande NOAA CPC bundled outlook snapshot Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Dansite popilasyon
+        - text: "Poko mande SEDAC GPWv4 population-density tiles Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Glosè
+        - text: "Poko mande HurricaneMap bundled glossary Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
   - region "Depo san entènèt":
     - heading "Depo san entènèt" [level=3]
     - paragraph: Done istorik prensipal yo pwoteje. Fichye sous yo se yon pake opsyonèl itilizatè a sove; mozayik kat ak pake rada yo ka efase apa.
@@ -119,7 +139,7 @@
     - heading "Dyagnostik san entènèt" [level=3]
     - paragraph: Eta service worker, kach, depo, ak sous pou rezoud pwoblèm san entènèt.
     - strong: Anrejistreman
-    - text: Echwe
+    - text: Anrejistre
     - strong: Kontwòl paj la
     - text: Pa sou kontwòl
     - strong: Depo
@@ -145,8 +165,7 @@
         - strong: Pake sous
         - text: pa enstale · 0 · 0 B
     - strong: Laj sous opsyonèl yo
-    - text: "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi"
-    - status: "TypeError: Cannot read properties of undefined (reading 'scope')"
+    - text: "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi"
     - button "Repare kounye a"
     - button "Eseye service worker ankò"
     - button "Rafrechi dyagnostik"

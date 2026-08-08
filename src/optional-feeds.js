@@ -14,6 +14,8 @@ export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   fema: { labelKey: 'feeds.fema', source: 'FEMA Disaster Declarations Summaries' },
   'wind-context': { labelKey: 'feeds.windContext', source: 'NOAA NHC tropical weather summary GIS' },
   seasonal: { labelKey: 'feeds.seasonal', source: 'NOAA CPC bundled outlook snapshot' },
+  population: { labelKey: 'feeds.population', source: 'SEDAC GPWv4 population-density tiles' },
+  glossary: { labelKey: 'feeds.glossary', source: 'HurricaneMap bundled glossary' },
 });
 
 export function getBundledDatasetStatus(metadata, datasetId) {
@@ -29,9 +31,11 @@ export function getBundledDatasetState(status, available) {
 }
 
 const VALID_STATES = new Set([
-  'idle', 'loading', 'success', 'empty', 'stale', 'offline', 'rate-limited', 'error',
+  'idle', 'loading', 'success', 'empty', 'stale', 'offline', 'rate-limited', 'malformed', 'timeout', 'error',
 ]);
 const VALID_ORIGINS = new Set(['none', 'network', 'memory', 'bundled', 'service-worker']);
+const retryHandlers = new Map();
+let requestSequence = 0;
 const states = new Map(
   Object.entries(OPTIONAL_FEED_DEFINITIONS).map(([id, definition]) => [
     id,
@@ -44,6 +48,8 @@ const states = new Map(
       nextRetryAt: null,
       cacheOrigin: 'none',
       itemCount: null,
+      responseStatus: 0,
+      requestId: 0,
     }),
   ]),
 );
@@ -53,8 +59,9 @@ function requireFeed(id) {
   return states.get(id);
 }
 
-function publish(id, patch) {
+function publish(id, patch, { allowRequestChange = false } = {}) {
   const previous = requireFeed(id);
+  if (!allowRequestChange && Number.isInteger(patch.requestId) && patch.requestId !== previous.requestId) return previous;
   const next = Object.freeze({
     ...previous,
     ...patch,
@@ -70,6 +77,41 @@ function publish(id, patch) {
   return next;
 }
 
+export function getOptionalFeedDefinition(id) {
+  const definition = OPTIONAL_FEED_DEFINITIONS[id];
+  if (!definition) throw new Error(`Unknown optional feed: ${id}`);
+  return { id, ...definition };
+}
+
+export function registerOptionalFeedRetry(id, handler) {
+  requireFeed(id);
+  if (typeof handler !== 'function') throw new TypeError(`Retry handler for ${id} must be a function`);
+  retryHandlers.set(id, handler);
+  return () => {
+    if (retryHandlers.get(id) === handler) retryHandlers.delete(id);
+  };
+}
+
+export async function retryOptionalFeed(id) {
+  requireFeed(id);
+  const handler = retryHandlers.get(id);
+  if (!handler) return { ok: false, error: 'retry-unavailable' };
+  try {
+    return { ok: true, value: await handler() };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+export function isOptionalFeedRequestCurrent(id, requestId) {
+  return requireFeed(id).requestId === requestId;
+}
+
+function nextRequestId() {
+  requestSequence += 1;
+  return requestSequence;
+}
+
 export function beginOptionalFeed(id, {
   source,
   cacheOrigin = 'network',
@@ -78,10 +120,12 @@ export function beginOptionalFeed(id, {
   return publish(id, {
     state: 'loading',
     detail: null,
+    responseStatus: 0,
+    requestId: nextRequestId(),
     source,
     cacheOrigin,
     nextRetryAt,
-  });
+  }, { allowRequestChange: true });
 }
 
 export function completeOptionalFeed(id, {
@@ -91,15 +135,18 @@ export function completeOptionalFeed(id, {
   itemCount = null,
   completedAt = Date.now(),
   nextRetryAt = null,
+  requestId,
 } = {}) {
   return publish(id, {
     state: empty ? 'empty' : 'success',
     detail: null,
+    responseStatus: 0,
     source,
     cacheOrigin,
     itemCount: Number.isFinite(itemCount) ? itemCount : null,
     lastSuccessAt: completedAt,
     nextRetryAt,
+    ...(Number.isInteger(requestId) ? { requestId } : {}),
   });
 }
 
@@ -110,7 +157,9 @@ export function classifyOptionalFeedFailure({
 } = {}) {
   if (!online) return 'offline';
   if (responseStatus === 429) return 'rate-limited';
-  if (error?.name === 'AbortError') return 'error';
+  if (error?.name === 'AbortError' || error?.name === 'CanceledError') return 'cancelled';
+  if (error?.name === 'TimeoutError' || /timeout|timed out|deadline/i.test(String(error?.message || ''))) return 'timeout';
+  if (error instanceof SyntaxError || /malformed|invalid json|unexpected token|parse/i.test(String(error?.message || ''))) return 'malformed';
   return 'error';
 }
 
@@ -121,16 +170,28 @@ export function failOptionalFeed(id, {
   source,
   cacheOrigin,
   nextRetryAt = null,
+  requestId,
 } = {}) {
   const previous = requireFeed(id);
   const failure = classifyOptionalFeedFailure({ responseStatus, error, online });
+  if (Number.isInteger(requestId) && requestId !== previous.requestId) return previous;
   const hasLastGood = Number.isFinite(previous.lastSuccessAt);
+  if (failure === 'cancelled') {
+    return publish(id, {
+      state: hasLastGood ? 'stale' : 'idle',
+      detail: null,
+      nextRetryAt: null,
+      requestId: nextRequestId(),
+    }, { allowRequestChange: true });
+  }
   return publish(id, {
     state: hasLastGood ? 'stale' : failure,
     detail: hasLastGood ? failure : null,
     source,
-    cacheOrigin,
+    cacheOrigin: cacheOrigin || previous.cacheOrigin,
+    responseStatus: Number.isInteger(responseStatus) ? responseStatus : 0,
     nextRetryAt,
+    ...(Number.isInteger(requestId) ? { requestId } : {}),
   });
 }
 
@@ -139,9 +200,22 @@ export function idleOptionalFeed(id) {
   return publish(id, {
     state: 'idle',
     detail: null,
+    responseStatus: 0,
     nextRetryAt: null,
+    requestId: nextRequestId(),
     cacheOrigin: previous.lastSuccessAt ? previous.cacheOrigin : 'none',
-  });
+  }, { allowRequestChange: true });
+}
+
+export function cancelOptionalFeed(id, { requestId } = {}) {
+  const previous = requireFeed(id);
+  if (Number.isInteger(requestId) && requestId !== previous.requestId) return previous;
+  return publish(id, {
+    state: Number.isFinite(previous.lastSuccessAt) ? 'stale' : 'idle',
+    detail: null,
+    nextRetryAt: null,
+    requestId: nextRequestId(),
+  }, { allowRequestChange: true });
 }
 
 export function reportOptionalFeedResult(id, result, options = {}) {
@@ -163,12 +237,14 @@ export function reportOptionalFeedResult(id, result, options = {}) {
       cacheOrigin: result.cacheOrigin || options.cacheOrigin,
     });
   }
+  if (status === 'aborted' || status === 'cancelled') return cancelOptionalFeed(id, options);
   if (status === 'stale') return requireFeed(id);
   return failOptionalFeed(id, {
     ...options,
     error: result?.error,
     responseStatus: result?.responseStatus || 0,
     cacheOrigin: result?.cacheOrigin || options.cacheOrigin,
+    requestId: result?.requestId ?? options.requestId,
   });
 }
 
@@ -194,17 +270,24 @@ export function renderOptionalFeedDiagnostics(host) {
   if (!host) return;
   host.innerHTML = getOptionalFeedStates().map(feed => {
     const definition = OPTIONAL_FEED_DEFINITIONS[feed.id];
+    const stateText = t(`feeds.state.${feed.state}`);
+    const detailText = feed.detail ? ` · ${t(`feeds.state.${feed.detail}`)}` : '';
+    const itemText = Number.isFinite(feed.itemCount) ? ` · ${t('feeds.items', feed.itemCount)}` : '';
+    const statusText = `${stateText}${detailText}${itemText}`;
     return `
       <div class="feed-diagnostic" role="listitem" data-feed="${escapeHtml(feed.id)}" data-state="${escapeHtml(feed.state)}">
         <div class="feed-diagnostic-head">
           <strong>${escapeHtml(t(definition.labelKey))}</strong>
-          <span class="feed-state">${escapeHtml(stateLabel(feed))}</span>
+          <span class="feed-state">${escapeHtml(statusText)}</span>
         </div>
         <div class="feed-diagnostic-meta">
           <span>${escapeHtml(feed.source)}</span>
           <span>${escapeHtml(t('feeds.lastSuccess'))}: ${escapeHtml(formatTime(feed.lastSuccessAt))}</span>
           <span>${escapeHtml(t('feeds.nextRetry'))}: ${escapeHtml(formatTime(feed.nextRetryAt))}</span>
           <span>${escapeHtml(t('feeds.cache'))}: ${escapeHtml(t(`feeds.cache.${feed.cacheOrigin}`))}</span>
+        </div>
+        <div class="feed-diagnostic-actions">
+          <button class="text-btn feed-retry" type="button" data-feed-retry="${escapeHtml(feed.id)}" ${feed.state === 'loading' ? 'disabled' : ''}>${escapeHtml(t('feeds.retry'))}</button>
         </div>
       </div>`;
   }).join('');
@@ -214,6 +297,13 @@ export function initOptionalFeedDiagnostics(host = document.getElementById('opti
   if (!host) return;
   const render = () => renderOptionalFeedDiagnostics(host);
   render();
+  host.addEventListener('click', async event => {
+    const button = event.target.closest('[data-feed-retry]');
+    if (!button) return;
+    button.disabled = true;
+    await retryOptionalFeed(button.dataset.feedRetry);
+    render();
+  });
   document.addEventListener('hm-optional-feed:change', render);
   document.addEventListener('hm-locale:change', render);
 }

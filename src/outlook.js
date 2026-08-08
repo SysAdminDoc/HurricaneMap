@@ -6,6 +6,13 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  idleOptionalFeed,
+} from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 const BASINS = ['atl', 'pac', 'cpac'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -15,6 +22,7 @@ let layerGroup = null;
 let layerMap = null;
 let legendEl = null;
 let renderGeneration = 0;
+let statusEl = null;
 
 export function decodeXml(value) {
   return String(value || '')
@@ -153,29 +161,46 @@ function updateLegend(points) {
   legendEl.hidden = false;
 }
 
+function ensureStatus(map) {
+  if (!statusEl || !document.body.contains(statusEl)) {
+    statusEl = document.createElement('div');
+    statusEl.id = 'nhc-outlook-status';
+    statusEl.className = 'optional-feed-status-overlay glass';
+    document.body.appendChild(statusEl);
+  }
+  mountOptionalFeedStatus(statusEl, 'outlook', {
+    onRetry: () => renderTropicalOutlook({ map, enabled: true, force: true }),
+  });
+}
+
 export async function renderTropicalOutlook({ map, enabled = true, force = false } = {}) {
   if (!map || !enabled) {
     clearTropicalOutlook();
+    idleOptionalFeed('outlook');
     return { status: 'idle', pointCount: 0 };
   }
   const generation = ++renderGeneration;
+  const request = beginOptionalFeed('outlook', { cacheOrigin: 'network' });
   ensureLayer(map);
+  ensureStatus(map);
   const cacheOrigin = BASINS.every(basin => {
     const cached = cache.get(basin);
     return !force && cached && Date.now() - cached.fetchedAt < CACHE_MS;
   }) ? 'memory' : 'network';
   const results = await Promise.allSettled(BASINS.map(basin => fetchBasin(basin, force)));
-  if (generation !== renderGeneration) return { status: 'stale', pointCount: 0 };
+  if (generation !== renderGeneration) return { status: 'stale', pointCount: 0, requestId: request.requestId };
   const points = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
   const failures = results.filter(result => result.status === 'rejected');
   if (!points.length && failures.length === results.length) {
     const error = failures[0]?.reason;
-    return {
+    const result = {
       status: 'error',
       pointCount: 0,
       error,
       responseStatus: error?.responseStatus || 0,
     };
+    failOptionalFeed('outlook', { ...result, requestId: request.requestId });
+    return result;
   }
   layerGroup.clearLayers();
   for (const point of points) {
@@ -194,15 +219,23 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     layerGroup.addLayer(marker);
   }
   updateLegend(points);
-  return {
+  const result = {
     status: points.length ? 'rendered' : 'empty',
     pointCount: points.length,
     cacheOrigin,
   };
+  completeOptionalFeed('outlook', {
+    empty: result.status === 'empty',
+    itemCount: points.length,
+    cacheOrigin,
+    requestId: request.requestId,
+  });
+  return result;
 }
 
 export function clearTropicalOutlook() {
   renderGeneration += 1;
   if (layerGroup) layerGroup.clearLayers();
   if (legendEl) legendEl.hidden = true;
+  if (statusEl) statusEl.hidden = true;
 }

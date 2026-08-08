@@ -41,7 +41,9 @@ import {
   beginOptionalFeed,
   completeOptionalFeed,
   failOptionalFeed,
+  idleOptionalFeed,
 } from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { cacheRadarPack, isQuotaExceededError } from './storage-manager.js';
 import {
   buildIemRadarTileProbeUrl,
@@ -199,16 +201,24 @@ function buildRemoteFrame(region, date) {
 }
 
 /** For ONLINE mode only: probe IEM for the nearest available five-minute frame
- *  on either side of the target. Returns null if nothing is within ±60 min. */
+ *  on either side of the target. Returns the frame or the last probe failure. */
 async function findRemoteNearest(region, target, maxMinutes = 60) {
+  let lastFailure = null;
   for (const probe of buildRadarProbeTimes(target, maxMinutes, 5)) {
     const frame = buildRemoteFrame(region, probe);
     try {
       const r = await fetchWithTimeout(frame.probeUrl, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
-      if (isRadarFrameResponseAvailable(r)) return frame;
-    } catch (_) { /* keep probing */ }
+      if (isRadarFrameResponseAvailable(r)) return { frame, error: null };
+      if (r.status && r.status !== 404) {
+        const error = new Error(`Radar probe returned ${r.status}`);
+        error.responseStatus = r.status;
+        lastFailure ||= error;
+      }
+    } catch (error) {
+      lastFailure ||= error;
+    }
   }
-  return null;
+  return { frame: null, error: lastFailure };
 }
 
 export class RadarOverlay {
@@ -223,6 +233,8 @@ export class RadarOverlay {
     this.stormId = null;
     this.localFrames = null;     // sorted array of {ts, date, url} for full-storm loop
     this.currentFrame = null;
+    this.landfallIndex = null;
+    this.feedRequestId = null;
     this.colorblind = isColorblindPalette();
     this.animTimer = null;
     this.loopPending = false;    // online loop probe in flight
@@ -250,13 +262,15 @@ export class RadarOverlay {
     const session = ++this.session;
     this.colorblind = isColorblindPalette();
     this.stopAnimation();
-    beginOptionalFeed('radar', { cacheOrigin: 'bundled' });
+    const request = beginOptionalFeed('radar', { cacheOrigin: 'bundled' });
+    this.feedRequestId = request.requestId;
     await loadManifest();
     if (session !== this.session) return;
     this.storm = storm;
     this.stormId = storm.id;
     const lf = storm.us_landfalls[lfIdx];
     this.landfall = { ...lf, year: storm.year };
+    this.landfallIndex = lfIdx;
     this.region = regionFor(this.landfall);
 
     // Pre-compute the sorted local frame list for this storm before building
@@ -287,11 +301,27 @@ export class RadarOverlay {
     } else {
       // Fall back to remote walkback.
       const target = new Date(this.landfall.t);
-      frame = await findRemoteNearest(this.region, target);
+      const remote = await findRemoteNearest(this.region, target);
       if (session !== this.session) return;
+      frame = remote.frame;
       if (!frame) {
-        completeOptionalFeed('radar', { empty: true, itemCount: 0, cacheOrigin: 'network' });
-        this.setStatus('No archived radar found within ±1 hour of landfall.');
+        if (remote.error) {
+          failOptionalFeed('radar', {
+            error: remote.error,
+            responseStatus: remote.error.responseStatus || 0,
+            cacheOrigin: 'network',
+            requestId: request.requestId,
+          });
+          this.setStatus('Radar archive could not be reached.');
+        } else {
+          completeOptionalFeed('radar', {
+            empty: true,
+            itemCount: 0,
+            cacheOrigin: 'network',
+            requestId: request.requestId,
+          });
+          this.setStatus('No archived radar found within ±1 hour of landfall.');
+        }
         return;
       }
     }
@@ -301,6 +331,7 @@ export class RadarOverlay {
     completeOptionalFeed('radar', {
       itemCount: this.localFrames.length || 1,
       cacheOrigin: frame.source === 'remote' ? 'network' : 'bundled',
+      requestId: request.requestId,
     });
     this.setStatus(this.timestampLabel(frame.source));
 
@@ -369,8 +400,12 @@ export class RadarOverlay {
       </div>
       ${radarLegendHtml(this.colorblind)}
       <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>
+      <div id="radar-feed-status" class="optional-feed-status-host"></div>
     `;
     this.controls = el;
+    mountOptionalFeedStatus(el.querySelector('#radar-feed-status'), 'radar', {
+      onRetry: () => this.storm ? this.show(this.storm, this.landfallIndex) : null,
+    });
     el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-1));
     el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(+1));
     el.querySelector('[data-act="loop"]').addEventListener('click', () => this.toggleLoop());
@@ -432,24 +467,25 @@ export class RadarOverlay {
     const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
     const frame = buildRemoteFrame(this.region, next);
     this.setStatus('Loading…');
-    beginOptionalFeed('radar');
+    const request = beginOptionalFeed('radar');
+    this.feedRequestId = request.requestId;
     try {
       const r = await fetchWithTimeout(frame.probeUrl, { method: 'HEAD' }, REQUEST_TIMEOUT_MS.radar);
       if (session !== this.session) return;
       if (!isRadarFrameResponseAvailable(r)) {
-        failOptionalFeed('radar', { responseStatus: r.status });
+        failOptionalFeed('radar', { responseStatus: r.status, requestId: request.requestId });
         this.setStatus(`No frame at ${formatTime(next.toISOString())}`);
         return;
       }
     } catch (error) {
       if (session !== this.session) return;
-      failOptionalFeed('radar', { error });
+      failOptionalFeed('radar', { error, requestId: request.requestId });
       this.setStatus(`Failed to load ${formatTime(next.toISOString())}`);
       return;
     }
     this.currentDate = next;
     this.draw(frame);
-    completeOptionalFeed('radar', { itemCount: 1 });
+    completeOptionalFeed('radar', { itemCount: 1, requestId: request.requestId });
     this.setStatus(this.timestampLabel('remote'));
   }
 
@@ -551,5 +587,7 @@ export class RadarOverlay {
     this.currentDate = null;
     this.localFrames = null;
     this.currentFrame = null;
+    idleOptionalFeed('radar');
+    this.feedRequestId = null;
   }
 }

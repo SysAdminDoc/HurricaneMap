@@ -86,9 +86,18 @@ async function openDeterministicApp(page) {
     #map > *,
     #active-storms-pill,
     #active-storm-badge,
+    #active-feed-status,
+    #nhc-outlook-status,
+    #marine-warning-status,
+    #glossary-feed-status,
+    .optional-feed-status-host,
     .hm-toast,
     .header-tooltip {
       visibility: hidden !important;
+    }
+    .optional-feed-status-host {
+      visibility: hidden !important;
+      display: none !important;
     }
   ` });
   await page.evaluate(() => document.fonts.ready);

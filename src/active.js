@@ -34,8 +34,10 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
   idleOptionalFeed,
+  isOptionalFeedRequestCurrent,
   reportOptionalFeedResult,
 } from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 const L = window.L;
 
@@ -52,10 +54,22 @@ let nextPollAt = null;
 let pollTimer = null;
 let pollingStarted = false;
 let consecutiveFailures = 0;
+let activeStatusEl = null;
+
+function ensureActiveFeedStatus() {
+  if (!activeStatusEl || !document.body.contains(activeStatusEl)) {
+    activeStatusEl = document.createElement('div');
+    activeStatusEl.id = 'active-feed-status';
+    activeStatusEl.className = 'optional-feed-status-overlay glass';
+    document.body.appendChild(activeStatusEl);
+  }
+  mountOptionalFeedStatus(activeStatusEl, 'active', { onRetry: fetchAndRender });
+}
 
 export async function startActiveStormPolling() {
   if (pollingStarted) return;
   pollingStarted = true;
+  ensureActiveFeedStatus();
 
   // Listen for active-storm context toggle changes.
   document.addEventListener('hm-settings:change', (e) => {
@@ -81,8 +95,9 @@ export async function startActiveStormPolling() {
 }
 
 async function fetchAndRender() {
-  beginOptionalFeed('active', { nextRetryAt: nextPollAt });
+  const request = beginOptionalFeed('active', { nextRetryAt: nextPollAt });
   const result = await fetchCurrentStorms();
+  if (!isOptionalFeedRequestCurrent('active', request.requestId)) return;
   const storms = result.storms || [];
   const countForStatus = result.ok ? storms.length : (lastStorms?.length || 0);
   const state = result.ok ? 'ok' : (result.status === 429 ? 'rate-limit' : 'error');
@@ -100,6 +115,7 @@ async function fetchAndRender() {
       responseStatus: result.status,
       error: result.error,
       nextRetryAt: nextPollAt,
+      requestId: request.requestId,
     });
     ensureBadge(countForStatus, {
       state,
@@ -127,6 +143,7 @@ async function fetchAndRender() {
     itemCount: storms.length,
     completedAt: lastSuccessfulFetchAt,
     nextRetryAt: nextPollAt,
+    requestId: request.requestId,
   });
   ensureBadge(storms.length, {
     state,
@@ -158,16 +175,11 @@ async function renderOperationalLayers() {
   const map = getMap();
   const outlookEnabled = getSetting('nhcOutlook');
   const marineEnabled = getSetting('marineWarnings');
-  if (outlookEnabled) beginOptionalFeed('outlook');
-  else idleOptionalFeed('outlook');
-  if (marineEnabled) beginOptionalFeed('marine');
-  else idleOptionalFeed('marine');
   const [outlookResult, marineResult] = await Promise.all([
     renderTropicalOutlook({ map, enabled: outlookEnabled }),
     renderMarineWarnings({ map, enabled: marineEnabled }),
   ]);
-  reportOptionalFeedResult('outlook', outlookResult);
-  reportOptionalFeedResult('marine', marineResult);
+  return { outlookResult, marineResult };
 }
 
 function resolveProxyUrl() {
@@ -376,10 +388,13 @@ async function renderActive(storms) {
   layerGroup.addTo(map);
 
   const officialConeEnabled = getSetting('nhcForecastCone');
+  let forecastRequest = null;
+  let alertsRequest = null;
+  let surgeRequest = null;
   if (officialConeEnabled) {
-    beginOptionalFeed('forecast');
-    beginOptionalFeed('alerts');
-    beginOptionalFeed('surge');
+    forecastRequest = beginOptionalFeed('forecast');
+    alertsRequest = beginOptionalFeed('alerts');
+    surgeRequest = beginOptionalFeed('surge');
   } else {
     idleOptionalFeed('forecast');
     idleOptionalFeed('alerts');
@@ -389,7 +404,7 @@ async function renderActive(storms) {
     map,
     enabled: officialConeEnabled,
   });
-  reportOptionalFeedResult('forecast', forecastResult);
+  reportOptionalFeedResult('forecast', forecastResult, { requestId: forecastRequest?.requestId });
 
   // 2026 cone standard: coastal + inland tropical watches/warnings travel
   // with the official cone toggle.
@@ -397,7 +412,7 @@ async function renderActive(storms) {
     map,
     enabled: officialConeEnabled,
   });
-  reportOptionalFeedResult('alerts', alertsResult);
+  reportOptionalFeedResult('alerts', alertsResult, { requestId: alertsRequest?.requestId });
 
   // Peak Storm Surge forecast (published during surge watches/warnings;
   // empty otherwise) — same toggle as the official cone context.
@@ -405,16 +420,17 @@ async function renderActive(storms) {
     map,
     enabled: officialConeEnabled,
   });
-  reportOptionalFeedResult('surge', surgeResult);
+  reportOptionalFeedResult('surge', surgeResult, { requestId: surgeRequest?.requestId });
 
   const goesEnabled = getSetting('goesRealtime');
   if (goesEnabled) {
-    beginOptionalFeed('goes');
+    const goesRequest = beginOptionalFeed('goes');
     const goesResult = await renderGoesRealtimeContext(storms, {
       map,
       enabled: true,
+      requestId: goesRequest.requestId,
     });
-    if (goesResult.status !== 'rendered') reportOptionalFeedResult('goes', goesResult);
+    if (goesResult.status !== 'rendered') reportOptionalFeedResult('goes', goesResult, { requestId: goesRequest.requestId });
   } else {
     hideGoesRealtimeContext();
     idleOptionalFeed('goes');

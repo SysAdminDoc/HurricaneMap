@@ -5,6 +5,13 @@
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  idleOptionalFeed,
+} from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 const URLS = ['/nhc/marine/atlantic.kml', '/nhc/marine/pacific.kml'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -20,6 +27,7 @@ let layerGroup = null;
 let layerMap = null;
 let legendEl = null;
 let renderGeneration = 0;
+let statusEl = null;
 
 function xmlText(value) {
   return String(value || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&amp;/g, '&').trim();
@@ -84,19 +92,34 @@ function updateLegend(risks) {
   legendEl.hidden = false;
 }
 
+function ensureStatus(map) {
+  if (!statusEl || !document.body.contains(statusEl)) {
+    statusEl = document.createElement('div');
+    statusEl.id = 'marine-warning-status';
+    statusEl.className = 'optional-feed-status-overlay glass';
+    document.body.appendChild(statusEl);
+  }
+  mountOptionalFeedStatus(statusEl, 'marine', {
+    onRetry: () => renderMarineWarnings({ map, enabled: true, force: true }),
+  });
+}
+
 export async function renderMarineWarnings({ map, enabled = false, force = false } = {}) {
   if (!map || !enabled) {
     clearMarineWarnings();
+    idleOptionalFeed('marine');
     return { status: 'idle', polygonCount: 0 };
   }
   const generation = ++renderGeneration;
+  const request = beginOptionalFeed('marine', { cacheOrigin: 'network' });
   ensureLayer(map);
+  ensureStatus(map);
   try {
     const cacheOrigin = !force && cache && Date.now() - cache.fetchedAt < CACHE_MS
       ? 'memory'
       : 'network';
     const features = await fetchWarnings(force);
-    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0 };
+    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0, requestId: request.requestId };
     layerGroup.clearLayers();
     const risks = new Set(features.map(feature => feature.properties.risk));
     const layer = window.L.geoJSON({ type: 'FeatureCollection', features }, {
@@ -105,15 +128,24 @@ export async function renderMarineWarnings({ map, enabled = false, force = false
     });
     layerGroup.addLayer(layer);
     updateLegend(risks);
-    return { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, cacheOrigin };
+    const result = { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, cacheOrigin };
+    completeOptionalFeed('marine', {
+      empty: result.status === 'empty',
+      itemCount: features.length,
+      cacheOrigin,
+      requestId: request.requestId,
+    });
+    return result;
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0 };
-    return {
+    const result = {
       status: 'error',
       polygonCount: 0,
       error,
       responseStatus: error.responseStatus || 0,
     };
+    failOptionalFeed('marine', { ...result, requestId: request.requestId });
+    return result;
   }
 }
 
@@ -121,4 +153,5 @@ export function clearMarineWarnings() {
   renderGeneration += 1;
   if (layerGroup) layerGroup.clearLayers();
   if (legendEl) legendEl.hidden = true;
+  if (statusEl) statusEl.hidden = true;
 }

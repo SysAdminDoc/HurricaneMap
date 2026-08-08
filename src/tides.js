@@ -14,6 +14,7 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
 } from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
@@ -27,8 +28,17 @@ let stationsPromise = null;
 function loadStations() {
   if (!stationsPromise) {
     stationsPromise = fetchWithTimeout('data/tide-stations.json', {}, REQUEST_TIMEOUT_MS.data)
-      .then(res => (res.ok ? res.json() : null))
-      .catch(() => null);
+      .then(res => {
+        if (!res.ok) {
+          const error = new Error(`tide station index returned ${res.status}`);
+          error.responseStatus = res.status;
+          throw error;
+        }
+        return res.json();
+      });
+    stationsPromise.catch(() => {
+      stationsPromise = null;
+    });
   }
   return stationsPromise;
 }
@@ -117,7 +127,12 @@ async function fetchStationSeries(station, landfallIso) {
     fetchWithRetry(buildDataUrl(station.id, 'hourly_height', landfallIso)),
     fetchWithRetry(buildDataUrl(station.id, 'predictions', landfallIso)),
   ]);
-  if (!obsRes?.ok || !predRes?.ok) return null;
+  if (!obsRes?.ok || !predRes?.ok) {
+    const response = !obsRes?.ok ? obsRes : predRes;
+    const error = new Error(`tide station ${station.id} returned ${response?.status || 0}`);
+    error.responseStatus = response?.status || 0;
+    throw error;
+  }
   const observed = exactWindow(parseSeries(await obsRes.json(), 'data'), centerTime);
   const predicted = exactWindow(parseSeries(await predRes.json(), 'predictions'), centerTime);
   if (observed.length < 12 || predicted.length < 12) return null;
@@ -175,28 +190,40 @@ export async function renderTidesBlock(host, storm) {
 
   host.innerHTML = `
     <h3 class="panel-section-h3">${t('tides.title')}</h3>
+    <div id="tides-feed-status" class="optional-feed-status-host"></div>
     <div class="tides-block">
       <button class="text-btn tide-load-btn" type="button">${t('tides.load')}</button>
     </div>`;
-  const wireLoadButton = () => host.querySelector('.tide-load-btn')?.addEventListener('click', async event => {
+  let loading = false;
+  const load = async event => {
+    if (loading) return;
+    loading = true;
     const block = host.querySelector('.tides-block');
-    event.target.disabled = true;
-    event.target.textContent = t('tides.loading');
-    beginOptionalFeed('tides');
+    if (!block) {
+      loading = false;
+      return;
+    }
+    if (event?.target) {
+      event.target.disabled = true;
+      event.target.textContent = t('tides.loading');
+    }
+    const request = beginOptionalFeed('tides');
     try {
       const stations = await loadStations();
       const nearby = nearestStations(stations, landfall.lat, landfall.lon);
-      const results = (await Promise.all(nearby.map(station => fetchStationSeries(station, landfall.t).catch(() => null))))
-        .filter(Boolean);
+      const settled = await Promise.allSettled(nearby.map(station => fetchStationSeries(station, landfall.t)));
+      const results = settled.filter(item => item.status === 'fulfilled').map(item => item.value).filter(Boolean);
       if (!host.isConnected) return;
       if (!results.length) {
-        completeOptionalFeed('tides', { empty: true, itemCount: 0 });
+        const failure = settled.find(item => item.status === 'rejected')?.reason;
+        if (failure) throw failure;
+        completeOptionalFeed('tides', { empty: true, itemCount: 0, requestId: request.requestId });
         block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
         wireLoadButton();
         return;
       }
       const landfallMs = Date.parse(landfall.t);
-      completeOptionalFeed('tides', { itemCount: results.length });
+      completeOptionalFeed('tides', { itemCount: results.length, requestId: request.requestId });
       block.innerHTML = `
         <div class="tide-legend">
           <span class="tide-key tide-key--observed">${t('tides.observed')}</span>
@@ -207,10 +234,15 @@ export async function renderTidesBlock(host, storm) {
         <div class="im-source"><a href="https://tidesandcurrents.noaa.gov/" target="_blank" rel="noopener">${t('tides.source')}</a></div>`;
     } catch (error) {
       if (!host.isConnected) return;
-      failOptionalFeed('tides', { error });
+      failOptionalFeed('tides', { error, responseStatus: error.responseStatus || 0, requestId: request.requestId });
       block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
       wireLoadButton();
     }
-  }, { once: true });
+    finally {
+      loading = false;
+    }
+  };
+  const wireLoadButton = () => host.querySelector('.tide-load-btn')?.addEventListener('click', load, { once: true });
+  mountOptionalFeedStatus(host.querySelector('#tides-feed-status'), 'tides', { onRetry: load });
   wireLoadButton();
 }

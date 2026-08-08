@@ -2,6 +2,13 @@ import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { activateDialogFocus } from './dialog-focus.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  isOptionalFeedRequestCurrent,
+} from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 // Glossary management — meteorological and hurricane terminology.
 //
@@ -15,17 +22,45 @@ let releaseGlossaryFocus = null;
 
 /** Fetch and cache the glossary. */
 export async function loadGlossary() {
-  if (glossaryData) return glossaryData;
+  if (glossaryData) {
+    completeOptionalFeed('glossary', {
+      cacheOrigin: 'memory',
+      itemCount: glossaryData.length,
+    });
+    return glossaryData;
+  }
+  const request = beginOptionalFeed('glossary', { cacheOrigin: 'bundled' });
   try {
     const resp = await fetchWithTimeout('./data/glossary.json', {}, REQUEST_TIMEOUT_MS.data);
-    if (!resp.ok) throw new Error(`glossary.json: ${resp.status}`);
-    glossaryData = await resp.json();
+    if (!resp.ok) {
+      const error = new Error(`glossary.json: ${resp.status}`);
+      error.responseStatus = resp.status;
+      throw error;
+    }
+    const data = await resp.json();
+    if (!Array.isArray(data) || data.some(item => !item || typeof item.term !== 'string' || typeof item.definition !== 'string')) {
+      throw new SyntaxError('glossary response is malformed');
+    }
+    if (!isOptionalFeedRequestCurrent('glossary', request.requestId)) return glossaryData || [];
+    glossaryData = data;
     // Build lookup map for quick access
     glossaryData.forEach(item => {
       glossaryCache[item.term.toLowerCase()] = item;
     });
+    completeOptionalFeed('glossary', {
+      cacheOrigin: 'bundled',
+      itemCount: glossaryData.length,
+      requestId: request.requestId,
+    });
     return glossaryData;
   } catch (err) {
+    if (!isOptionalFeedRequestCurrent('glossary', request.requestId)) return glossaryData || [];
+    failOptionalFeed('glossary', {
+      error: err,
+      responseStatus: err.responseStatus || 0,
+      cacheOrigin: 'bundled',
+      requestId: request.requestId,
+    });
     console.error('Failed to load glossary:', err);
     return [];
   }
@@ -72,6 +107,10 @@ export async function initGlossary() {
     </div>
   `;
   document.body.appendChild(modal);
+  const statusHost = document.createElement('div');
+  statusHost.id = 'glossary-feed-status';
+  statusHost.className = 'optional-feed-status-overlay glass';
+  document.body.appendChild(statusHost);
   
   // Wire up search
   const searchInput = document.getElementById('glossary-search');
@@ -96,6 +135,13 @@ export async function initGlossary() {
   };
   
   renderList();
+  mountOptionalFeedStatus(statusHost, 'glossary', {
+    onRetry: async () => {
+      const data = await loadGlossary();
+      renderList(data);
+      return data;
+    },
+  });
   
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.trim();

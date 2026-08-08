@@ -87,11 +87,12 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
         itemCount: loadedOverlays.length,
         completedAt: now,
         nextRetryAt: now + GOES_REFRESH_MS,
+        requestId: options.requestId,
       });
       return;
     }
     updateGoesStatus('error', sectorIds, now);
-    failOptionalFeed('goes', { nextRetryAt: now + GOES_REFRESH_MS });
+    failOptionalFeed('goes', { nextRetryAt: now + GOES_REFRESH_MS, requestId: options.requestId });
   };
   for (const sectorId of sectorIds) {
     const sector = GOES_SECTORS[sectorId];

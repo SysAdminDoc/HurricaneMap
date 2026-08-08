@@ -1,6 +1,7 @@
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
 import { FEMA_SOURCE_URL, fetchFemaDeclarations, formatFemaDate } from './fema.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 let femaController = null;
 
@@ -77,6 +78,16 @@ function renderFemaContext(host, result) {
 export async function loadFemaContext(storm, renderSeq, isCurrent = () => true) {
   const host = document.getElementById('fema-context');
   if (!host) return;
+  let statusHost = host.querySelector('#fema-feed-status');
+  if (!statusHost) {
+    statusHost = document.createElement('div');
+    statusHost.id = 'fema-feed-status';
+    statusHost.className = 'optional-feed-status-host';
+    host.querySelector('.fema-context-heading')?.after(statusHost);
+  }
+  mountOptionalFeedStatus(statusHost, 'fema', {
+    onRetry: () => loadFemaContext(storm, renderSeq, isCurrent),
+  });
   cancelFemaRequest();
   femaController = new AbortController();
   const controller = femaController;

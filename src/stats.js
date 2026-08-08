@@ -9,6 +9,10 @@ import { fetchSeasonalOutlook, renderOutlookBanner } from './seasonal-outlook.js
 import { escapeHtml } from './html-utils.js';
 import { presentCategory } from './metric-presenters.js';
 import { summarizeImpactCoverage } from './impact-coverage.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+
+let seasonalStatusCleanup = () => {};
+let seasonalRenderGeneration = 0;
 
 const panel = document.getElementById('stats-panel');
 const body = document.getElementById('stats-body');
@@ -169,14 +173,20 @@ function render() {
   // Fetch and render the current NOAA seasonal outlook
   const outlookHost = document.getElementById('seasonal-outlook-host');
   if (outlookHost) {
-    fetchSeasonalOutlook()
-      .then(outlook => {
-        outlookHost.innerHTML = renderOutlookBanner(outlook);
-      })
-      .catch(e => {
-        console.error('Seasonal outlook error:', e);
-        outlookHost.innerHTML = '';
-      });
+    const renderSeasonal = async () => {
+      const generation = ++seasonalRenderGeneration;
+      seasonalStatusCleanup();
+      const outlook = await fetchSeasonalOutlook();
+      if (!outlookHost.isConnected || generation !== seasonalRenderGeneration) return;
+      outlookHost.innerHTML = renderOutlookBanner(outlook);
+      const statusHost = outlookHost.querySelector('[data-feed-status="seasonal"]');
+      seasonalStatusCleanup = mountOptionalFeedStatus(statusHost, 'seasonal', { onRetry: renderSeasonal });
+    };
+    renderSeasonal().catch(e => {
+      console.error('Seasonal outlook error:', e);
+      seasonalStatusCleanup();
+      outlookHost.innerHTML = '';
+    });
   }
 }
 

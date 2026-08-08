@@ -38,24 +38,25 @@ export async function retryServiceWorkerRegistration(options = lastRegistrationO
     swPath = './sw.js',
   } = options;
   const supported = canRegisterServiceWorker({ navigatorRef, locationRef });
+  const serviceWorker = navigatorRef?.serviceWorker;
   publishDiagnostics({
     supported,
     registration: supported ? 'registering' : 'unsupported',
-    controller: navigatorRef?.serviceWorker?.controller ? 'controlled' : 'uncontrolled',
+    controller: serviceWorker?.controller ? 'controlled' : 'uncontrolled',
     lastError: null,
   }, documentRef);
   if (!supported) return null;
   try {
-    const registration = await navigatorRef.serviceWorker.register(swPath, {
+    const registration = await serviceWorker.register(swPath, {
       type: 'module',
       updateViaCache: 'none',
     });
     publishDiagnostics({
       supported: true,
       registration: 'registered',
-      controller: navigatorRef.serviceWorker.controller ? 'controlled' : 'uncontrolled',
-      scope: registration.scope || null,
-      scriptUrl: registration.active?.scriptURL || registration.waiting?.scriptURL || null,
+      controller: serviceWorker.controller ? 'controlled' : 'uncontrolled',
+      scope: registration?.scope || null,
+      scriptUrl: registration?.active?.scriptURL || registration?.waiting?.scriptURL || null,
       lastError: null,
     }, documentRef);
     return registration;
@@ -174,7 +175,8 @@ export function canRegisterServiceWorker({
   navigatorRef = globalThis.navigator,
   locationRef = globalThis.location,
 } = {}) {
-  if (!navigatorRef || !('serviceWorker' in navigatorRef)) return false;
+  const serviceWorker = navigatorRef?.serviceWorker;
+  if (!serviceWorker || typeof serviceWorker.register !== 'function') return false;
   if (!locationRef) return false;
   return (
     locationRef.protocol === 'https:' ||

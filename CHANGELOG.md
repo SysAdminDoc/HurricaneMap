@@ -25,6 +25,7 @@ All notable changes to HurricaneMap.
 - Playwright acceptance now routes a service-worker-owned IEM tile through the browser context, snapshots storm/settings/advisory-replay ARIA trees in English, Spanish, and Haitian Creole, and stores the 16 Windows visual baselines as lossless WebP.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 - Build tooling now uses Playwright 1.62.1 and esbuild 0.28.2, and the optional Cesium globe is refreshed to 1.144 with verified SRI and a renewed review window.
+- Optional feeds now share localized loading, empty, stale-last-good, offline, rate-limit, malformed, timeout, and retry presenters with request cancellation guards across active, map-layer, panel, glossary, seasonal, radar, tide, wind, FEMA, and population surfaces.
 
 ### Fixed
 - The npm dependency graph now resolves the `fast-uri` high-severity advisory to patched release 3.1.5, with a regenerated lockfile-bound audit snapshot.

@@ -55,39 +55,59 @@
       - listitem:
         - strong: Active storms
         - text: "/Unavailable NOAA NHC CurrentStorms Last success: Not scheduled Next retry: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Origin: Network/"
+        - button "Retry"
       - listitem:
         - strong: Official forecast geometry
         - text: "Not requested NOAA NHC official forecast GIS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Tropical outlook
         - text: "Unavailable NOAA NHC Tropical Weather Outlook Last success: Not scheduled Next retry: Not scheduled Origin: Network"
+        - button "Retry"
       - listitem:
         - strong: Marine warnings
         - text: "Not requested NOAA NHC Marine Wind Warnings Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Coastal and inland alerts
         - text: "Not requested NOAA/NWS active alerts Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Peak surge forecast
         - text: "Not requested NOAA NHC Peak Storm Surge Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: GOES imagery
         - text: "Not requested NOAA/NESDIS/STAR GOES Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Tide gauges
         - text: "Not requested NOAA CO-OPS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Archived radar
         - text: "Not requested Iowa State IEM NEXRAD archive Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Federal disaster declarations
         - text: "Unavailable FEMA Disaster Declarations Summaries Last success: Not scheduled Next retry: Not scheduled Origin: Network"
+        - button "Retry"
       - listitem:
         - strong: NHC wind guidance
         - text: "Not requested NOAA NHC tropical weather summary GIS Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
       - listitem:
         - strong: Seasonal outlook
         - text: "Not requested NOAA CPC bundled outlook snapshot Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
+      - listitem:
+        - strong: Population density
+        - text: "Not requested SEDAC GPWv4 population-density tiles Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
+      - listitem:
+        - strong: Glossary
+        - text: "Not requested HurricaneMap bundled glossary Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
   - region "Offline storage":
     - heading "Offline storage" [level=3]
     - paragraph: Core historical data is protected. Source files are an optional, user-saved bundle; map tiles and radar packs can be cleared independently.
@@ -119,7 +139,7 @@
     - heading "Offline diagnostics" [level=3]
     - paragraph: Service worker, cache, storage, and source readiness for troubleshooting offline use.
     - strong: Registration
-    - text: Failed
+    - text: Registered
     - strong: Page control
     - text: Not controlled
     - strong: Storage
@@ -145,8 +165,7 @@
         - strong: Source bundle
         - text: not installed · 0 · 0 B
     - strong: Optional-feed age
-    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful"
-    - status: "TypeError: Cannot read properties of undefined (reading 'scope')"
+    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful"
     - button "Repair now"
     - button "Retry service worker"
     - button "Refresh diagnostics"

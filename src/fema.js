@@ -214,20 +214,21 @@ export async function fetchFemaDeclarations(
   const cacheKey = query || `no-query:${stormName(storm) || 'unnamed'}`;
   const cached = femaCache.get(cacheKey);
   if (cached) {
-    beginOptionalFeed('fema', { cacheOrigin: 'memory' });
+    const request = beginOptionalFeed('fema', { cacheOrigin: 'memory' });
     completeOptionalFeed('fema', {
       empty: cached.status === 'empty',
       cacheOrigin: 'memory',
       itemCount: cached.records.length,
+      requestId: request.requestId,
     });
     return { ...cached, cacheOrigin: 'memory' };
   }
 
-  beginOptionalFeed('fema', { cacheOrigin: 'network' });
+  const request = beginOptionalFeed('fema', { cacheOrigin: 'network' });
   if (!query) {
     const result = emptyResult('no-match', 'memory');
     femaCache.set(cacheKey, result);
-    completeOptionalFeed('fema', { empty: true, cacheOrigin: 'memory', itemCount: 0 });
+    completeOptionalFeed('fema', { empty: true, cacheOrigin: 'memory', itemCount: 0, requestId: request.requestId });
     return result;
   }
 
@@ -239,7 +240,7 @@ export async function fetchFemaDeclarations(
       fetchImpl,
     );
     if (!response?.ok) {
-      failOptionalFeed('fema', { responseStatus: Number(response?.status) || 0 });
+      failOptionalFeed('fema', { responseStatus: Number(response?.status) || 0, requestId: request.requestId });
       return {
         status: 'error',
         records: [],
@@ -264,10 +265,11 @@ export async function fetchFemaDeclarations(
       empty: records.length === 0,
       cacheOrigin: 'network',
       itemCount: records.length,
+      requestId: request.requestId,
     });
     return result;
   } catch (error) {
-    failOptionalFeed('fema', { error });
+    failOptionalFeed('fema', { error, requestId: request.requestId });
     return { status: 'error', records: [], error, cacheOrigin: 'network' };
   }
 }

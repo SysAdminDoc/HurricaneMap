@@ -3523,6 +3523,102 @@ select {
   line-height: 1.35;
 }
 
+.optional-feed-status-host {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+  color: var(--subtext0);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.optional-feed-status-host[hidden] {
+  display: none;
+}
+
+.optional-feed-status-host:empty {
+  display: none;
+}
+
+.optional-feed-status-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.optional-feed-state {
+  color: var(--subtext1);
+  text-align: right;
+}
+
+.optional-feed-status-host[data-state="offline"] .optional-feed-state,
+.optional-feed-status-host[data-state="error"] .optional-feed-state,
+.optional-feed-status-host[data-state="malformed"] .optional-feed-state,
+.optional-feed-status-host[data-state="timeout"] .optional-feed-state,
+.optional-feed-status-host[data-state="rate-limited"] .optional-feed-state {
+  color: var(--red);
+}
+
+.optional-feed-status-host[data-state="stale"] .optional-feed-state {
+  color: var(--yellow);
+}
+
+.optional-feed-status-meta {
+  display: grid;
+  gap: 0.1rem;
+  color: var(--subtext0);
+}
+
+.optional-feed-last-good {
+  margin: 0;
+  color: var(--yellow);
+}
+
+.optional-feed-retry {
+  justify-self: start;
+  min-height: 44px;
+}
+
+.feed-retry {
+  min-height: 44px;
+}
+
+.optional-feed-status-overlay {
+  position: fixed;
+  z-index: 1200;
+  width: min(310px, calc(100vw - 2rem));
+  padding: 0.65rem 0.75rem;
+  pointer-events: auto;
+}
+
+#active-feed-status {
+  top: 5.5rem;
+  right: 1rem;
+}
+
+#nhc-outlook-status,
+#marine-warning-status {
+  bottom: 1rem;
+}
+
+#nhc-outlook-status {
+  left: 1rem;
+}
+
+#marine-warning-status {
+  right: 1rem;
+}
+
+#glossary-feed-status {
+  top: 5.5rem;
+  left: 1rem;
+}
+
+.optional-feed-status-overlay[hidden] {
+  display: none;
+}
+
 .storage-manager,
 .storage-scopes {
   display: grid;

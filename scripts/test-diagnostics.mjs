@@ -25,12 +25,35 @@ await retryServiceWorkerRegistration({
   locationRef: { protocol: 'https:', hostname: 'example.test' },
 });
 assert.equal(getServiceWorkerDiagnostics().registration, 'error');
+const failedServiceWorkerDiagnostics = getServiceWorkerDiagnostics();
+
+const blockedNavigator = { serviceWorker: { controller: null } };
+assert.equal(await retryServiceWorkerRegistration({
+  navigatorRef: blockedNavigator,
+  documentRef: null,
+  locationRef: { protocol: 'https:', hostname: 'example.test' },
+}), null);
+assert.equal(getServiceWorkerDiagnostics().registration, 'unsupported');
+
+const emptyRegistrationNavigator = {
+  serviceWorker: {
+    controller: null,
+    register: async () => undefined,
+  },
+};
+assert.equal(await retryServiceWorkerRegistration({
+  navigatorRef: emptyRegistrationNavigator,
+  documentRef: null,
+  locationRef: { protocol: 'https:', hostname: 'example.test' },
+}), undefined);
+assert.equal(getServiceWorkerDiagnostics().registration, 'registered');
+assert.equal(getServiceWorkerDiagnostics().scope, null);
 
 const bundle = buildSanitizedSupportBundle({
   appVersion: '1.9.2',
   dataSchemaVersion: 1,
   online: false,
-  serviceWorker: getServiceWorkerDiagnostics(),
+  serviceWorker: failedServiceWorkerDiagnostics,
   storage: {
     usage: 1024,
     quota: 4096,

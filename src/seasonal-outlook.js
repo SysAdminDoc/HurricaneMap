@@ -58,7 +58,7 @@ export async function fetchSeasonalOutlook() {
   // Static editorial snapshot of the current season's published outlooks
   // (data/outlook.json). Refresh it when NOAA/CSU issue updates; a stale or
   // missing file degrades to the link-only banner.
-  beginOptionalFeed('seasonal', { cacheOrigin: 'bundled' });
+  const request = beginOptionalFeed('seasonal', { cacheOrigin: 'bundled' });
   try {
     const response = await fetchWithTimeout('data/outlook.json', {}, REQUEST_TIMEOUT_MS.data);
     if (response.ok) {
@@ -74,13 +74,14 @@ export async function fetchSeasonalOutlook() {
         completeOptionalFeed('seasonal', {
           itemCount: data.sources.length,
           cacheOrigin: 'bundled',
+          requestId: request.requestId,
         });
         return base;
       }
     }
-    failOptionalFeed('seasonal', { responseStatus: response.status, cacheOrigin: 'bundled' });
+    failOptionalFeed('seasonal', { responseStatus: response.status, cacheOrigin: 'bundled', requestId: request.requestId });
   } catch (error) {
-    failOptionalFeed('seasonal', { error, cacheOrigin: 'bundled' });
+    failOptionalFeed('seasonal', { error, cacheOrigin: 'bundled', requestId: request.requestId });
   }
   return base;
 }
@@ -141,6 +142,7 @@ export function renderOutlookBanner(outlook, { now = new Date() } = {}) {
         <span class="sob-label">${escapeHtml(t('seasonal.label'))}</span>
         <span class="sob-source">NOAA CPC</span>
       </div>
+      <div class="optional-feed-status-host" data-feed-status="seasonal"></div>
       ${outlook.current ? renderCurrentSeasonRows(outlook.current, now) : ''}
       <div class="sob-meta">
         <a href="${CPC_URL}" target="_blank" rel="noopener">${escapeHtml(t('seasonal.currentLink'))}</a>

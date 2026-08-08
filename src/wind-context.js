@@ -3,13 +3,17 @@ import { getLocale, t } from './i18n.js';
 import { pointToSegmentDistanceKm } from './geodesy.js';
 import {
   beginOptionalFeed,
+  cancelOptionalFeed,
   completeOptionalFeed,
   failOptionalFeed,
+  isOptionalFeedRequestCurrent,
 } from './optional-feeds.js';
+import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
 const SERVICE_ROOT = 'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer';
 const PRODUCT_URL = 'https://www.nhc.noaa.gov/aboutnhcgraphics.shtml';
 const GIS_URL = 'https://www.nhc.noaa.gov/gis/';
+const statusMounts = new WeakMap();
 const MAX_PRODUCT_AGE_MS = 9 * 60 * 60 * 1000;
 const MAX_ARRIVAL_DISTANCE_KM = 75;
 
@@ -139,7 +143,7 @@ export async function loadWindContext(lat, lon, {
   now = Date.now(),
   signal,
 } = {}) {
-  beginOptionalFeed('wind-context');
+  const request = beginOptionalFeed('wind-context');
   const requests = [
     ...WIND_LAYERS.map(definition =>
       fetchJson(fetchImpl, buildWindProbabilityUrl(definition.layer, lat, lon), signal)
@@ -150,7 +154,10 @@ export async function loadWindContext(lat, lon, {
   ];
 
   const settled = await Promise.allSettled(requests);
-  if (signal?.aborted) return { status: 'aborted' };
+  if (signal?.aborted) {
+    cancelOptionalFeed('wind-context', { requestId: request.requestId });
+    return { status: 'aborted', requestId: request.requestId };
+  }
   const values = settled.filter(item => item.status === 'fulfilled').map(item => item.value).filter(Boolean);
   const probabilities = values.filter(item => Number.isFinite(item.knots));
   const arrivals = values.filter(item => item.kind);
@@ -161,17 +168,18 @@ export async function loadWindContext(lat, lon, {
       failOptionalFeed('wind-context', {
         error: failed.reason,
         responseStatus: failed.reason?.responseStatus || 0,
+        requestId: request.requestId,
       });
       const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
-      return { status: 'link-only', reason: offline ? 'offline' : 'unavailable' };
+      return { status: 'link-only', reason: offline ? 'offline' : 'unavailable', requestId: request.requestId };
     }
-    completeOptionalFeed('wind-context', { empty: true, itemCount: 0 });
-    return { status: 'link-only', reason: 'unavailable' };
+    completeOptionalFeed('wind-context', { empty: true, itemCount: 0, requestId: request.requestId });
+    return { status: 'link-only', reason: 'unavailable', requestId: request.requestId };
   }
 
   const issuedAt = Math.max(...values.map(item => item.issuedAt));
-  completeOptionalFeed('wind-context', { itemCount: probabilities.length + arrivals.length });
-  return { status: 'current', probabilities, arrivals, issuedAt };
+  completeOptionalFeed('wind-context', { itemCount: probabilities.length + arrivals.length, requestId: request.requestId });
+  return { status: 'current', probabilities, arrivals, issuedAt, requestId: request.requestId };
 }
 
 function sourceLinks() {
@@ -184,6 +192,7 @@ export function renderWindContext(host, result) {
   if (!result || result.status === 'loading') {
     host.innerHTML = `<section class="wind-context" aria-live="polite">
       <h4>${escapeHtml(t('windContext.title'))}</h4>
+      <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
       <p class="wind-context-status">${escapeHtml(t('windContext.loading'))}</p>
     </section>`;
     return;
@@ -192,6 +201,7 @@ export function renderWindContext(host, result) {
   if (result.status !== 'current') {
     host.innerHTML = `<section class="wind-context" aria-live="polite">
       <h4>${escapeHtml(t('windContext.title'))}</h4>
+      <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
       <p class="wind-context-status">${escapeHtml(t(`windContext.${result.reason === 'offline' ? 'offline' : 'unavailable'}`))}</p>
       <p class="wind-context-links">${sourceLinks()}</p>
       <p class="wind-context-disclaimer">${escapeHtml(t('windContext.disclaimer'))}</p>
@@ -218,6 +228,7 @@ export function renderWindContext(host, result) {
 
   host.innerHTML = `<section class="wind-context" aria-live="polite">
     <h4>${escapeHtml(t('windContext.title'))}</h4>
+    <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
     <p class="wind-context-issued">${escapeHtml(t('windContext.issued', issued))}</p>
     <h5>${escapeHtml(t('windContext.probability'))}</h5>
     <ul>${probabilityRows}</ul>
@@ -229,9 +240,24 @@ export function renderWindContext(host, result) {
   </section>`;
 }
 
+function mountWindStatus(host, lat, lon, options) {
+  if (!host) return;
+  statusMounts.get(host)?.();
+  const statusHost = host.querySelector('[data-feed-status="wind-context"]');
+  const cleanup = mountOptionalFeedStatus(statusHost, 'wind-context', {
+    onRetry: () => renderWindContextForPoint(host, lat, lon, { ...options, signal: undefined }),
+  });
+  statusMounts.set(host, cleanup);
+}
+
 export async function renderWindContextForPoint(host, lat, lon, options = {}) {
   renderWindContext(host, { status: 'loading' });
+  mountWindStatus(host, lat, lon, options);
   const result = await loadWindContext(lat, lon, options);
+  if (Number.isInteger(result.requestId) && !isOptionalFeedRequestCurrent('wind-context', result.requestId)) {
+    return { ...result, status: 'aborted', stale: true };
+  }
   renderWindContext(host, result);
+  if (result.status !== 'aborted') mountWindStatus(host, lat, lon, options);
   return result;
 }

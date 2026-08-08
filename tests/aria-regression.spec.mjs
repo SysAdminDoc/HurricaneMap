@@ -97,6 +97,87 @@ for (const locale of locales) {
   });
 }
 
+test('optional feed states stay localized, source-labelled, retryable, and cancellable', async ({ page }) => {
+  await page.route('https://**/*', route => route.abort());
+  await page.addInitScript(() => {
+    localStorage.setItem('hm-settings-v1', JSON.stringify({
+      onboarded: true,
+      theme: 'dark',
+      palette: 'default',
+      highContrast: false,
+      reducedMotion: true,
+      locale: 'en',
+    }));
+  });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    const ui = await import('/src/optional-feed-ui.js');
+    const host = document.createElement('div');
+    host.id = 'optional-feed-browser-fixture';
+    document.body.appendChild(host);
+    feeds.idleOptionalFeed('active');
+    ui.mountOptionalFeedStatus(host, 'active', {
+      onRetry: async () => {
+        const request = feeds.beginOptionalFeed('active');
+        feeds.completeOptionalFeed('active', {
+          requestId: request.requestId,
+          itemCount: 1,
+          completedAt: Date.now(),
+        });
+      },
+    });
+
+    const successRequest = feeds.beginOptionalFeed('active');
+    if (host.dataset.state !== 'loading' || !host.textContent.includes('NOAA NHC CurrentStorms')) {
+      throw new Error('loading state did not expose the localized source');
+    }
+    feeds.completeOptionalFeed('active', { requestId: successRequest.requestId, itemCount: 2, completedAt: Date.now() });
+    if (host.dataset.state !== 'success' || !host.textContent.includes('Last good')) {
+      throw new Error('success state did not expose last-good metadata');
+    }
+
+    feeds.idleOptionalFeed('forecast');
+    feeds.beginOptionalFeed('forecast');
+    feeds.failOptionalFeed('forecast', { responseStatus: 404 });
+    feeds.idleOptionalFeed('alerts');
+    feeds.beginOptionalFeed('alerts');
+    feeds.failOptionalFeed('alerts', { responseStatus: 429 });
+    feeds.idleOptionalFeed('surge');
+    feeds.beginOptionalFeed('surge');
+    feeds.failOptionalFeed('surge', { error: new SyntaxError('malformed JSON') });
+    feeds.idleOptionalFeed('goes');
+    feeds.beginOptionalFeed('goes');
+    feeds.failOptionalFeed('goes', { error: new Error('request timed out') });
+    feeds.idleOptionalFeed('tides');
+    feeds.beginOptionalFeed('tides');
+    feeds.failOptionalFeed('tides', { online: false });
+    if (feeds.getOptionalFeedState('forecast').state !== 'error'
+      || feeds.getOptionalFeedState('alerts').state !== 'rate-limited'
+      || feeds.getOptionalFeedState('surge').state !== 'malformed'
+      || feeds.getOptionalFeedState('goes').state !== 'timeout'
+      || feeds.getOptionalFeedState('tides').state !== 'offline') {
+      throw new Error('one or more degraded states were not classified');
+    }
+
+    const staleRequest = feeds.beginOptionalFeed('active');
+    feeds.failOptionalFeed('active', { responseStatus: 429, requestId: staleRequest.requestId });
+    if (host.dataset.state !== 'stale' || !host.textContent.includes('Showing the last-good result')) {
+      throw new Error('stale last-good state did not render its recovery notice');
+    }
+
+    const first = feeds.beginOptionalFeed('radar');
+    const second = feeds.beginOptionalFeed('radar');
+    feeds.completeOptionalFeed('radar', { requestId: first.requestId, itemCount: 1 });
+    if (feeds.getOptionalFeedState('radar').state !== 'loading') throw new Error('late completion won after cancellation replacement');
+    feeds.cancelOptionalFeed('radar', { requestId: second.requestId });
+  });
+
+  await page.evaluate(() => document.querySelector('#optional-feed-browser-fixture [data-optional-feed-retry]')?.click());
+  await page.waitForFunction(() => document.querySelector('#optional-feed-browser-fixture')?.dataset.state === 'success');
+  await expect(page.locator('#optional-feed-browser-fixture')).toContainText('Current');
+});
+
 async function openStorm(page, stormId) {
   await page.evaluate(async id => {
     const data = await import('/src/data.js');
