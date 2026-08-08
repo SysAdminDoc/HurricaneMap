@@ -26,4 +26,9 @@ assert.equal(leaflet.decision, 'disputed-upstream', 'Leaflet must use the perman
 assert.equal(Object.hasOwn(leaflet, 'review_expires_at_utc'), false, 'disputed Leaflet advisories must not expire');
 assert.equal(leafletAdvisory.upstream_position_url, 'https://github.com/Leaflet/Leaflet/issues/10214');
 assert.equal(leafletAdvisory.compensating_control, 'check:popup-sinks');
+const cesium = policy.vendors.find(vendor => vendor.id === 'cesium');
+assert.equal(cesium.decision, 'pinned-sri-isolation', 'Cesium must remain isolated behind the reviewed SRI policy');
+assert.match(cesium.assets.javascript.integrity, /^sha384-[A-Za-z0-9+/]+=*$/);
+assert.match(cesium.assets.stylesheet.integrity, /^sha384-[A-Za-z0-9+/]+=*$/);
+assert.ok(Date.parse(cesium.review_expires_at_utc) >= Date.parse('2026-09-30T00:00:00Z'), 'Cesium review must extend through the roadmap review window');
 console.log('dependency security helpers ok (JSON parsing, severity gate, lock binding)');

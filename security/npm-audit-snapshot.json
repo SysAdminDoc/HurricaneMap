@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_at_utc": "2026-08-08T00:00:00Z",
   "expires_at_utc": "2026-09-30T00:00:00Z",
-  "lockfile_sha256": "8720629db1b11f7586611d4343ffd3baaace32f145e48718e0afa5d9671ce7b2",
+  "lockfile_sha256": "b141e397041f4d40fca3f0963b4d961727cb6e4cb45590020915733b3d0fe6fb",
   "command": "npm audit --json --audit-level=high",
   "audit": {
     "auditReportVersion": 2,

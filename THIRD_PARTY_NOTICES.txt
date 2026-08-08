@@ -12,9 +12,9 @@ Security posture: CVE-2025-69993 is recorded as disputed upstream per
 https://github.com/Leaflet/Leaflet/issues/10214. Application-owned popup
 content is guarded by the check:popup-sinks compensating control.
 
-CesiumJS 1.143 (remote SRI-pinned assets only)
+CesiumJS 1.144 (remote SRI-pinned assets only)
 License: Apache-2.0
-Source: https://github.com/CesiumGS/cesium/releases/tag/1.143
+Source: https://github.com/CesiumGS/cesium/releases/tag/1.144
 The isolated globe host loads the exact JavaScript and stylesheet URLs and
 integrity values recorded in security/dependency-security-policy.json.
 
@@ -45,9 +45,9 @@ The complete npm dependency graph and resolved versions are recorded in
 package-lock.json. Direct tooling licenses are:
 
 - @axe-core/playwright 4.12.1: MPL-2.0
-- @playwright/test 1.62.0: Apache-2.0
-- playwright 1.62.0: Apache-2.0
-- esbuild 0.28.1: MIT
+- @playwright/test 1.62.1: Apache-2.0
+- playwright 1.62.1: Apache-2.0
+- esbuild 0.28.2: MIT
 - ajv 8.20.0: MIT
 
 Ajv's validation dependency graph also includes fast-uri under BSD-3-Clause.

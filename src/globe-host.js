@@ -1,5 +1,5 @@
 const PROTOCOL = 'hm-globe-v1';
-const CESIUM_VERSION = '1.143';
+const CESIUM_VERSION = '1.144';
 const CESIUM_BASE_URL = `https://cesium.com/downloads/cesiumjs/releases/${CESIUM_VERSION}/Build/Cesium/`;
 const CESIUM_JS_URL = `${CESIUM_BASE_URL}Cesium.js`;
 const CESIUM_CSS_URL = `${CESIUM_BASE_URL}Widgets/widgets.css`;
@@ -160,7 +160,7 @@ function loadCesium() {
 
     const script = document.createElement('script');
     script.src = CESIUM_JS_URL;
-    script.integrity = 'sha384-6pySA8bzGAn2+aYh8KWmvzl5DRnspbScFYUbrFcu2ayckTxx8gyn+/WNvNbPM9iG';
+    script.integrity = 'sha384-H7H47ZzeAn6uxYsb2NwFWi9i4aBOLgIaY1F3FHTId02di0GMUqNHFZUFX/wFyZbl';
     script.crossOrigin = 'anonymous';
     script.async = true;
     script.onload = () => window.Cesium ? resolve(window.Cesium) : reject(new Error('Cesium global missing'));
