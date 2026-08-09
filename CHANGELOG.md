@@ -27,6 +27,7 @@ All notable changes to HurricaneMap.
 - Build tooling now uses Playwright 1.62.1 and esbuild 0.28.2, and the optional Cesium globe is refreshed to 1.144 with verified SRI and a renewed review window.
 - Optional feeds now share localized loading, empty, stale-last-good, offline, rate-limit, malformed, timeout, and retry presenters with request cancellation guards across active, map-layer, panel, glossary, seasonal, radar, tide, wind, FEMA, and population surfaces.
 - Localized accessibility coverage now exercises desktop and mobile filters, search, statistics, comparison, tables, preparedness, evacuation, spatial search, on-this-date, storm/replay, globe fallback, action-rail focus, reduced motion, and forced colors with deterministic feed and clock fixtures.
+- The static STAC publication now uses the stable 1.1.0 core contract, declares the file extension on every catalog document, and validates source-tree/core/full relative-link navigation against synchronized release metadata.
 
 ### Fixed
 - The npm dependency graph now resolves the `fast-uri` high-severity advisory to patched release 3.1.5, with a regenerated lockfile-bound audit snapshot.

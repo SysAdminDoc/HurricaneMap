@@ -50,6 +50,13 @@ export async function validateStac({ root = ROOT, profile = 'full' } = {}) {
   }
   const radarManifest = await readJson(root, 'data/radar/manifest.json');
   const releaseManifest = await readJson(root, 'data/release-manifest.json');
+  if (catalog['hurricanemap:source_commit'] !== releaseManifest.source_commit || catalog['hurricanemap:generated_at_utc'] !== releaseManifest.generated_at_utc) {
+    throw new Error('STAC catalog provenance does not match the release manifest');
+  }
+  const expectedSchemaVersion = `STAC-${STAC_VERSION}`;
+  if (releaseManifest.artifacts.some(artifact => artifact.path.startsWith('data/stac/') && artifact.schema_version !== expectedSchemaVersion)) {
+    throw new Error(`release manifest contains a non-${expectedSchemaVersion} STAC artifact label`);
+  }
   const manifestFrames = flattenRadarManifest(radarManifest);
   const radarAssetCount = radarItems.reduce((count, { item }) => count + Object.keys(item.assets || {}).length, 0);
   if (profile === 'full') {
@@ -96,7 +103,7 @@ export async function validateStac({ root = ROOT, profile = 'full' } = {}) {
 }
 
 function validateCatalog(catalog) {
-  if (catalog.stac_version !== STAC_VERSION || catalog.type !== 'Catalog' || catalog.id !== 'hurricanemap') {
+  if (catalog.stac_version !== STAC_VERSION || catalog.type !== 'Catalog' || catalog.id !== 'hurricanemap' || !hasFileExtension(catalog)) {
     throw new Error('STAC catalog identity is invalid');
   }
   if (!Array.isArray(catalog.links) || !linksFor(catalog, 'self').length) throw new Error('STAC catalog must have links and a self link');
@@ -130,7 +137,7 @@ function htmlAttribute(tag, name) {
 }
 
 async function validateCollection(collection, expectedId, collectionPath, root) {
-  if (collection.stac_version !== STAC_VERSION || collection.type !== 'Collection' || collection.id !== expectedId) {
+  if (collection.stac_version !== STAC_VERSION || collection.type !== 'Collection' || collection.id !== expectedId || !hasFileExtension(collection)) {
     throw new Error(`invalid STAC collection identity: ${expectedId}`);
   }
   if (!collection.license || !collection.extent?.spatial?.bbox?.length || !collection.extent?.temporal?.interval?.length) {
@@ -150,7 +157,7 @@ async function validateCollection(collection, expectedId, collectionPath, root) 
 }
 
 async function validateItem(item, collectionId, itemPath, root) {
-  if (item.stac_version !== STAC_VERSION || item.type !== 'Feature' || item.collection !== collectionId || !item.id) {
+  if (item.stac_version !== STAC_VERSION || item.type !== 'Feature' || item.collection !== collectionId || !item.id || !hasFileExtension(item)) {
     throw new Error(`invalid STAC item identity: ${itemPath}`);
   }
   if (!Array.isArray(item.links) || !linksFor(item, 'self').length || !linksFor(item, 'collection').length) {
@@ -212,6 +219,10 @@ async function validateAsset(asset, label, fromPath, root) {
 
 function linksFor(document, rel) {
   return (document.links || []).filter(link => link.rel === rel);
+}
+
+function hasFileExtension(document) {
+  return Array.isArray(document.stac_extensions) && document.stac_extensions.includes(STAC_FILE_EXTENSION);
 }
 
 function resolveHref(fromPath, href, root = ROOT) {

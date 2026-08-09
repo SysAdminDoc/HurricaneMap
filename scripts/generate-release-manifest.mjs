@@ -107,7 +107,7 @@ function sourceDate(relative, buildMetadata, aomlData) {
 }
 
 function schemaVersion(relative, bytes) {
-  if (relative.startsWith('data/stac/')) return 'STAC-1.0.0';
+  if (relative.startsWith('data/stac/')) return 'STAC-1.1.0';
   if (relative === 'data/metadata.json') return 1;
   if (relative === 'data/landfalls.json') return 1;
   if (relative === 'data/storms.json' || relative === 'data/storms.json.gz') return 1;

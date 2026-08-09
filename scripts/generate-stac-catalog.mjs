@@ -4,7 +4,12 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const STAC_VERSION = '1.0.0';
+export const STAC_VERSION = '1.1.0';
+export const STAC_SCHEMA_URLS = Object.freeze({
+  catalog: 'https://schemas.stacspec.org/v1.1.0/catalog-spec/json-schema/catalog.json',
+  collection: 'https://schemas.stacspec.org/v1.1.0/collection-spec/json-schema/collection.json',
+  item: 'https://schemas.stacspec.org/v1.1.0/item-spec/json-schema/item.json',
+});
 export const STAC_FILE_EXTENSION = 'https://stac-extensions.github.io/file/v2.1.0/schema.json';
 export const DISTRIBUTIONS = ['core', 'full'];
 export const RADAR_REGIONS = {
@@ -125,7 +130,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
     type: 'Feature',
     id: 'hurdat2-data',
     collection: 'hurdat2',
-    geometry: null,
+    geometry: polygonForBbox(trackExtent.bbox),
     bbox: trackExtent.bbox,
     properties: {
       datetime: null,
@@ -162,6 +167,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
   const radarTimes = radarFrames.map(frame => frame.datetime).sort();
   const hurdat2Collection = {
     stac_version: STAC_VERSION,
+    stac_extensions: [STAC_FILE_EXTENSION],
     type: 'Collection',
     id: 'hurdat2',
     title: 'HURDAT2 storm tracks and US landfalls',
@@ -188,6 +194,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
   };
   const radarCollection = {
     stac_version: STAC_VERSION,
+    stac_extensions: [STAC_FILE_EXTENSION],
     type: 'Collection',
     id: 'radar',
     title: 'Archived NEXRAD composite frames',
@@ -228,6 +235,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
 
   add(CATALOG_PATH, {
     stac_version: STAC_VERSION,
+    stac_extensions: [STAC_FILE_EXTENSION],
     type: 'Catalog',
     id: 'hurricanemap',
     title: 'HurricaneMap static data catalog',

@@ -1,12 +1,38 @@
 {
-  "stac_version": "1.0.0",
+  "stac_version": "1.1.0",
   "stac_extensions": [
     "https://stac-extensions.github.io/file/v2.1.0/schema.json"
   ],
   "type": "Feature",
   "id": "hurdat2-data",
   "collection": "hurdat2",
-  "geometry": null,
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -165.8,
+          8.5
+        ],
+        [
+          -165.8,
+          81
+        ],
+        [
+          63,
+          81
+        ],
+        [
+          63,
+          8.5
+        ],
+        [
+          -165.8,
+          8.5
+        ]
+      ]
+    ]
+  },
   "bbox": [
     -165.8,
     8.5,
