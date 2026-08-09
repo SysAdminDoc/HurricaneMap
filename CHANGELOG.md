@@ -2,6 +2,14 @@
 
 All notable changes to HurricaneMap.
 
+## v1.9.3 — Metric parity and maintainability (2026-08-08)
+
+### Added
+- Comparison cards, tables, and CSV exports now consume one typed metric-row contract with shared locale/unit presentation and field-level parity tests; filter-control and About provenance DOM ownership is isolated from the main boot orchestrator.
+
+### Fixed
+- Noncritical About, optional-feed, storage, and offline-diagnostics modules now load lazily so the initial shell stays below the 100 KB gzip budget; the 3D globe owns Escape handling and reliably restores focus to its opener.
+
 ## v1.9.2 — Acceptance hardening and release hygiene (2026-08-03)
 
 ### Added
@@ -29,7 +37,6 @@ All notable changes to HurricaneMap.
 - Optional feeds now share localized loading, empty, stale-last-good, offline, rate-limit, malformed, timeout, and retry presenters with request cancellation guards across active, map-layer, panel, glossary, seasonal, radar, tide, wind, FEMA, and population surfaces.
 - Localized accessibility coverage now exercises desktop and mobile filters, search, statistics, comparison, tables, preparedness, evacuation, spatial search, on-this-date, storm/replay, globe fallback, action-rail focus, reduced motion, and forced colors with deterministic feed and clock fixtures.
 - The static STAC publication now uses the stable 1.1.0 core contract, declares the file extension on every catalog document, and validates source-tree/core/full relative-link navigation against synchronized release metadata.
-- Comparison cards, tables, and CSV exports now consume one typed metric-row contract with shared locale/unit presentation and field-level parity tests; filter-control and About provenance DOM ownership is isolated from the main boot orchestrator.
 
 ### Fixed
 - The npm dependency graph now resolves the `fast-uri` high-severity advisory to patched release 3.1.5, with a regenerated lockfile-bound audit snapshot.

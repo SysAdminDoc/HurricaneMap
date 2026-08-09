@@ -4,12 +4,12 @@
 // the full 1,700+ artifact manifest at runtime.
 
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
-export const APP_VERSION = '1.9.2';
+export const APP_VERSION = '1.9.3';
 
 const RELEASE = Object.freeze({
-  generated_at_utc: '2026-08-03T00:00:00Z',
-  source_commit: '7962084d4c7f7c065ff8ddacad29aa2d1a8e3692',
-  manifest_sha256: '73effc8e4a1907b68c746b05d7ad4f7fb76490d11ca5061380aea724b5f65d9e',
+  generated_at_utc: '2026-08-08T00:00:00Z',
+  source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
+  manifest_sha256: 'acc16858f43b582a7a57fe7186d7c7391eff8ac44a8a42c03812e7f8dcf79c1a',
   algorithm: 'SHA-256',
 });
 
@@ -25,9 +25,9 @@ const ARTIFACTS = Object.freeze({
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
     bytes: 16897,
-    sha256: '91575e2a0f3b2269c234310023a894f841cb8edc8924455930d51fa00e77c175',
+    sha256: '8f538f561ec6bd16781602674978bf9a16c1e909f62d404fce5e5b523c8be320',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
-    source_date: '2026-08-03',
+    source_date: '2026-08-08',
     schema_version: 1,
   }),
   'data/hurdat2-atlantic.txt': Object.freeze({
@@ -67,15 +67,15 @@ const ARTIFACTS = Object.freeze({
     bytes: 142671,
     sha256: '7361e307cfd43dda7a36b32e2babb8ae244d4fc5f6be3f6a95fbc48b7a1aadd1',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-03',
+    source_date: '2026-08-08',
     schema_version: 1,
   }),
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
     bytes: 7344,
-    sha256: '83ad36c2d86cb3d5ba0821a97baf80bc93cfba97dad8bc67de8ae87ec80f9f6f',
+    sha256: '1bc885a96b28fb30eac1ecbe7607ca7e87a22cf5947f39f636be4142e8f5bcf9',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-03',
+    source_date: '2026-08-08',
     schema_version: 1,
   }),
   'data/storms.json': Object.freeze({
@@ -83,7 +83,7 @@ const ARTIFACTS = Object.freeze({
     bytes: 2299081,
     sha256: '8c462a5c9fa8e49bf79a5ff26b97cc68c1fd4b1dfa77f822373f16920c74ed4b',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-03',
+    source_date: '2026-08-08',
     schema_version: 1,
   }),
   'data/storms.json.gz': Object.freeze({
@@ -91,15 +91,15 @@ const ARTIFACTS = Object.freeze({
     bytes: 234595,
     sha256: '13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
-    source_date: '2026-08-03',
+    source_date: '2026-08-08',
     schema_version: 1,
   }),
 });
 
 const COVERAGE = Object.freeze({
   schema_version: 1,
-  generated_at_utc: '2026-08-03T00:00:00Z',
-  source_commit: 'a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1',
+  generated_at_utc: '2026-08-08T00:00:00Z',
+  source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
   catalog: Object.freeze({
     basins: ['AL', 'EP'],
     year_range: [1851, 2025],

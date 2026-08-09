@@ -30,7 +30,7 @@ const inspected = await inspectStorage({
     persisted: async () => true,
   },
   cachesApi: {
-    keys: async () => ['hm-shell-hm-v1.9.2'],
+    keys: async () => ['hm-shell-hm-v1.9.3'],
     open: async () => ({
       keys: async () => [new Request('https://example.test/index.html')],
       match: async () => new Response('12345', { headers: { 'content-length': '5' } }),

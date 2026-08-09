@@ -20,15 +20,11 @@ import {
 import { initCitationUI, mountCitationHost } from './citation-ui.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
-import { initOptionalFeedDiagnostics } from './optional-feeds.js';
-import { initStorageManager } from './storage-manager.js';
-import { initOfflineDiagnostics } from './diagnostics.js';
 import { createFilterController } from './filter-controller.js';
 import { wireApplicationShell } from './shell-ui.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
 import { purgeLegacyUserPoint } from './user-point.js';
 import { initManifestLocale } from './manifest-locale.js';
-import { createAboutRenderer } from './about-ui.js';
 
 initGlobalErrorSurface();
 purgeLegacyUserPoint();
@@ -81,6 +77,9 @@ const loadPrep = once(() => import('./prep.js'));
 const loadEvac = once(() => import('./evac.js'));
 const loadPoster = once(() => import('./poster.js'));
 const loadSST = once(() => import('./sst.js'));
+const loadOptionalFeeds = once(() => import('./optional-feeds.js'));
+const loadStorageManager = once(() => import('./storage-manager.js'));
+const loadOfflineDiagnostics = once(() => import('./diagnostics.js'));
 
 async function showStormLazy(landfall, options = {}) {
   const { showStorm } = await loadPanel();
@@ -178,11 +177,21 @@ const els = {
   loading: document.getElementById('loading'),
 };
 
-const aboutRenderer = createAboutRenderer({
-  aomlValidation: els.aomlValidation,
-  dataProvenanceBody: els.dataProvenanceBody,
-  archiveCoverageBody: els.archiveCoverageBody,
+const loadAboutRenderer = once(async () => {
+  const { createAboutRenderer } = await import('./about-ui.js');
+  return createAboutRenderer({
+    aomlValidation: els.aomlValidation,
+    dataProvenanceBody: els.dataProvenanceBody,
+    archiveCoverageBody: els.archiveCoverageBody,
+  });
 });
+
+async function renderAbout() {
+  const aboutRenderer = await loadAboutRenderer();
+  aboutRenderer.renderAomlValidation();
+  aboutRenderer.renderDataProvenance();
+  aboutRenderer.renderArchiveCoverage();
+}
 
 const filterController = createFilterController({
   filters,
@@ -258,7 +267,7 @@ async function boot() {
     requestAnimationFrame(() => mainTarget?.focus({ preventScroll: true }));
   });
   await loadInitial();
-  aboutRenderer.renderAomlValidation();
+  await renderAbout();
   syncYearBoundsFromData();
   filterController.populateStateFilter(getStats()?.by_state);
   // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.
@@ -298,9 +307,21 @@ async function boot() {
     refreshTimelineScope,
   });
   wireSettingsControls();
-  initOptionalFeedDiagnostics();
-  initStorageManager();
-  initOfflineDiagnostics();
+  deferNonCritical(async () => {
+    try {
+      const [{ initOptionalFeedDiagnostics }, { initStorageManager }, { initOfflineDiagnostics }] = await Promise.all([
+        loadOptionalFeeds(),
+        loadStorageManager(),
+        loadOfflineDiagnostics(),
+      ]);
+      initOptionalFeedDiagnostics();
+      initStorageManager();
+      initOfflineDiagnostics();
+    } catch {
+      // Offline diagnostics are non-critical; the map remains usable if their
+      // optional module chunk cannot be loaded.
+    }
+  });
   initSavedViewsUI({
     host: document.getElementById('saved-views-manager'),
     getCurrentHash: () => encodeHashState(filters, {
@@ -344,9 +365,7 @@ async function boot() {
     getStats().total_storms.toLocaleString(),
     getStats().total_landfall_events.toLocaleString(),
   );
-  aboutRenderer.renderDataProvenance();
-  aboutRenderer.renderArchiveCoverage();
-  
+
   // Initialize keyboard shortcuts and navigation.
   deferNonCritical(() => {
     loadKeyboard().then(({ init }) => init({

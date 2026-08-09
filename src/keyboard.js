@@ -128,6 +128,7 @@ function isBlockingSurfaceOpen() {
     document.querySelector('#settings-menu:popover-open') ||
     document.querySelector('#info-modal:not([hidden])') ||
     document.querySelector('#glossary-modal:not([hidden])') ||
+    document.querySelector('#globe3d-panel:not([hidden])') ||
     document.querySelector('.onb-overlay')
   );
 }

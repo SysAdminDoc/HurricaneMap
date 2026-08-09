@@ -50,7 +50,7 @@ assert.equal(getServiceWorkerDiagnostics().registration, 'registered');
 assert.equal(getServiceWorkerDiagnostics().scope, null);
 
 const bundle = buildSanitizedSupportBundle({
-  appVersion: '1.9.2',
+  appVersion: '1.9.3',
   dataSchemaVersion: 1,
   online: false,
   serviceWorker: failedServiceWorkerDiagnostics,
@@ -65,7 +65,7 @@ const bundle = buildSanitizedSupportBundle({
       },
     },
     scopes: [
-      { id: 'shell', required: true, cacheName: 'hm-shell-hm-v1.9.2', entries: 90, sizeBytes: 120000 },
+      { id: 'shell', required: true, cacheName: 'hm-shell-hm-v1.9.3', entries: 90, sizeBytes: 120000 },
       { id: 'radar', required: false, cacheName: 'hm-radar-v1', entries: 3, sizeBytes: 5000 },
     ],
   },
@@ -104,12 +104,12 @@ const bundle = buildSanitizedSupportBundle({
 });
 const serialized = JSON.stringify(bundle);
 assert.equal(bundle.schema_version, 1);
-assert.equal(bundle.app.version, '1.9.2');
+assert.equal(bundle.app.version, '1.9.3');
 assert.equal(bundle.storage.radar_pack_count, 1);
 assert.equal(bundle.coverage.available, true);
 assert.equal(bundle.coverage.catalog.storm_count, 595);
 assert.equal(bundle.coverage.datasets[0].availability.frames, 1703);
-assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.2');
+assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.3');
 assert.deepEqual(bundle.offline_integrity, {
   state: 'unverified',
   error: null,

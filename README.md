@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.9.2-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.9.3-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -82,8 +82,9 @@ npm run build
 - **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
-## What's new in v1.9.2 - Acceptance hardening and release hygiene (2026-08-03)
+## What's new in v1.9.3 - Metric parity and maintainability (2026-08-08)
 
+- **Metric parity:** comparison cards, side-by-side rows, and CSV exports now share one typed metric contract with unit-aware formatting for derived ACE, translation, and rapid-intensification values, backed by field-level parity checks across locales and wind units.
 - **Archive coverage:** `data/coverage.json` records each bundled dataset's source/revision, basin and year range, measured records/storms/frames/advisories/marks, lifecycle/value status, end date, and core/full distribution. The About dialog and offline diagnostics render the same facts, and exports plus STAC summaries carry the key coverage counts.
 - **Playwright acceptance:** offline tests route a service-worker-owned IEM tile through the browser context, and ARIA snapshots cover storm details, settings, and advisory replay in English, Spanish, and Haitian Creole.
 - **Visual and release checks:** the 16 Windows/Chromium visual baselines are lossless WebP, while platform-aware runners skip them clearly on Linux/macOS and release metadata stays synchronized across the app shell and data bundle.
@@ -167,7 +168,7 @@ Versioned JSON Schema 2020-12 contracts for build metadata, archive coverage, st
 
 ```bash
 npm run generate:coverage
-node scripts/generate-release-manifest.mjs --generated-at 2026-08-03T00:00:00Z --source-commit "$(git rev-parse HEAD)"
+node scripts/generate-release-manifest.mjs --generated-at 2026-08-08T00:00:00Z --source-commit "$(git rev-parse HEAD)"
 ```
 
 QGIS GeoJSON export is checked against RFC 7946’s WGS 84 longitude/latitude order, geometry structure, coordinate bounds, and prohibition on alternate `crs` declarations.

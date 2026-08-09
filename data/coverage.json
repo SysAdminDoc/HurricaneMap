@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-08-03T00:00:00Z",
-  "source_commit": "a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1",
+  "generated_at_utc": "2026-08-08T00:00:00Z",
+  "source_commit": "177e0f9c5411ed1499e1d69059882e357cce6e9d",
   "catalog": {
     "basins": [
       "AL",
@@ -337,13 +337,13 @@
         {
           "name": "NHC archived ATCF advisories",
           "url": "https://ftp.nhc.noaa.gov/atcf/archive/",
-          "revision_date": "2026-08-03",
+          "revision_date": "2026-08-08",
           "basin": "AL"
         },
         {
           "name": "NHC advisory discussions",
           "url": "https://www.nhc.noaa.gov/archive/",
-          "revision_date": "2026-08-03",
+          "revision_date": "2026-08-08",
           "basin": "AL"
         }
       ],

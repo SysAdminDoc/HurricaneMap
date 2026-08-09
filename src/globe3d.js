@@ -82,7 +82,10 @@ export async function openGlobe3D({ landfalls = [], focusStormId = null } = {}) 
   els.panel.dataset.ready = 'false';
   els.trigger?.setAttribute('aria-pressed', 'true');
   setStatus(t('globe.loading'));
-  releaseGlobeFocus = activateDialogFocus(els.panel, { initialFocus: '#close-globe3d' });
+  releaseGlobeFocus = activateDialogFocus(els.panel, {
+    initialFocus: '#close-globe3d',
+    returnFocus: els.trigger,
+  });
 
   await ensureStormsLoaded();
   if (generation !== openGeneration || els.panel.hidden) return;
