@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Tormentas activas
-        - text: "/No disponible NOAA NHC CurrentStorms Último éxito: No programado Próximo intento: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Origen: Red/"
+        - text: "/No disponible NOAA NHC CurrentStorms Último éxito: No programado Próximo intento: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Origen: Red/"
         - button "Reintentar"
       - listitem:
         - strong: Geometría oficial del pronóstico

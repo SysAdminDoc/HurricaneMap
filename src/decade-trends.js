@@ -9,6 +9,7 @@ import {
   getRawDamageText,
   getRawFatalityText,
 } from './impact-utils.js';
+import { t } from './i18n.js';
 
 let _cache = null;
 
@@ -156,7 +157,7 @@ export async function renderDecadeTrends(host) {
   `).join('');
 
   host.innerHTML = `
-    <div class="dt-table-wrap">
+    <div class="dt-table-wrap" role="region" tabindex="0" aria-label="${escapeHtml(t('stats.decadeTrends'))}">
       <table class="dt-table">
         <thead>
           <tr>

@@ -7301,7 +7301,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 .sp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
-.sp-header h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
+.sp-header h2 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
 
 .sp-controls { display: flex; gap: 6px; margin-bottom: 8px; }
 
@@ -7377,13 +7377,13 @@ body.side-panel-open .leaflet-top.leaflet-right {
   border-top: 1px solid var(--surface1);
 }
 
-.wind-context h4,
+.wind-context h3,
 .wind-context h5 {
   margin: 0 0 6px;
   color: var(--text);
 }
 
-.wind-context h4 { font-size: 14px; }
+.wind-context h3 { font-size: 14px; }
 
 .wind-context h5 { margin-top: 10px; font-size: 11px; color: var(--subtext); text-transform: uppercase; letter-spacing: .04em; }
 
@@ -8911,6 +8911,12 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .sob-agency {
   font-weight: 700;
+}
+
+.sob-meta > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .sob-issued {

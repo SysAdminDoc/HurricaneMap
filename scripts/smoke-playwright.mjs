@@ -1362,7 +1362,7 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
         { trigger: '#toggle-prep', panel: '#prep-panel', close: '#close-prep', entry: '#prep-panel-title' },
         { trigger: '#toggle-evac', panel: '#evac-panel', close: '#close-evac', entry: '#evac-panel-title' },
         { trigger: '#toggle-table-view', panel: '#table-view-panel', close: '#close-table-view', entry: '#table-view-title' },
-        { trigger: '#toggle-spatial-search', panel: '#spatial-results', close: '#spatial-results .close-btn', entry: '#spatial-results h3' },
+        { trigger: '#toggle-spatial-search', panel: '#spatial-results', close: '#spatial-results .close-btn', entry: '#spatial-results h2' },
       ];
       for (const scenario of scenarios) {
         const directTriggerVisible = await page.locator(scenario.trigger).isVisible();
@@ -1485,8 +1485,8 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       await assertNoAxeViolations(page, `${locale} track timeline (WCAG 2.2 AA)`, '#storm-panel');
 
       await clickHeaderAction(page, '#toggle-spatial-search');
-      await page.waitForSelector('#spatial-results:not([hidden]) h3', { timeout: 5_000 });
-      assert((await page.locator('#spatial-results h3').textContent()) === expected.spatialTitle, `${locale}: spatial prompt is not localized`);
+      await page.waitForSelector('#spatial-results:not([hidden]) h2', { timeout: 5_000 });
+      assert((await page.locator('#spatial-results h2').textContent()) === expected.spatialTitle, `${locale}: spatial prompt is not localized`);
       assert(await page.locator('#spatial-results .close-btn').getAttribute('aria-label') === expected.spatialClose, `${locale}: spatial close label is not localized`);
       await page.locator('#spatial-results .close-btn').focus();
       await page.keyboard.press('Enter');

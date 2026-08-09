@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Tanpèt aktif
-        - text: "/Pa disponib NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Orijin: Rezo/"
+        - text: "/Pa disponib NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Orijin: Rezo/"
         - button "Eseye ankò"
       - listitem:
         - strong: Jewometri previzyon ofisyèl

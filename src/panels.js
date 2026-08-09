@@ -54,10 +54,10 @@ function focusPanelEntry(el) {
 function restorePanelInvoker(el) {
   const invoker = panelInvokers.get(el.id);
   panelInvokers.delete(el.id);
-  if (!el.contains(document.activeElement)) return null;
+  if (!el.contains(document.activeElement)) return document.getElementById('map') || document.getElementById('main');
   return isVisibleFocusTarget(invoker)
     ? invoker
-    : document.getElementById('map');
+    : document.getElementById('map') || document.getElementById('main');
 }
 
 function focusPanelInvoker(target) {
@@ -167,11 +167,13 @@ function withTransition(fn, after = null) {
 /** Show one side panel and hide all others. */
 export function showPanel(id) {
   const invoker = normalizedInvoker(document.activeElement);
+  const existingPanel = getPanel(id);
+  const preserveInvoker = existingPanel && !existingPanel.hidden && panelInvokers.has(id);
   withTransition(() => {
     closePanelsExcept(id);
     const el = getPanel(id);
     if (el) {
-      panelInvokers.set(id, invoker);
+      if (!preserveInvoker) panelInvokers.set(id, invoker);
       ensurePanelChrome(el);
       ensurePanelCitation(el);
       el.classList.remove('minimized');

@@ -290,7 +290,7 @@ function renderComparePanel() {
     <h3 class="panel-section-h3">Side-by-side</h3>
     <div class="cp-table-wrap">
       <table class="cp-table">
-        <thead><tr><th></th>${headerCols}</tr></thead>
+        <thead><tr><th scope="col"><span class="visually-hidden">${escapeHtml(t('table.column.name'))}</span></th>${headerCols}</tr></thead>
         <tbody>${tableBody}</tbody>
       </table>
     </div>

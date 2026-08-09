@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Active storms
-        - text: "/Unavailable NOAA NHC CurrentStorms Last success: Not scheduled Next retry: 8\\/4\\/\\d+, 4:\\d+:\\d+ AM Origin: Network/"
+        - text: "/Unavailable NOAA NHC CurrentStorms Last success: Not scheduled Next retry: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Origin: Network/"
         - button "Retry"
       - listitem:
         - strong: Official forecast geometry

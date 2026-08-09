@@ -26,6 +26,7 @@ All notable changes to HurricaneMap.
 - Storm panels now show on-demand OpenFEMA disaster-declaration context grouped by declaration, state, and designated area, with incident-date/title matching, official record links, memory caching, and explicit no-match or unavailable states.
 - Build tooling now uses Playwright 1.62.1 and esbuild 0.28.2, and the optional Cesium globe is refreshed to 1.144 with verified SRI and a renewed review window.
 - Optional feeds now share localized loading, empty, stale-last-good, offline, rate-limit, malformed, timeout, and retry presenters with request cancellation guards across active, map-layer, panel, glossary, seasonal, radar, tide, wind, FEMA, and population surfaces.
+- Localized accessibility coverage now exercises desktop and mobile filters, search, statistics, comparison, tables, preparedness, evacuation, spatial search, on-this-date, storm/replay, globe fallback, action-rail focus, reduced motion, and forced colors with deterministic feed and clock fixtures.
 
 ### Fixed
 - The npm dependency graph now resolves the `fast-uri` high-severity advisory to patched release 3.1.5, with a regenerated lockfile-bound audit snapshot.

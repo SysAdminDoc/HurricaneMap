@@ -198,7 +198,7 @@ function renderPrompt() {
   showPanel('spatial-results');
   spBody.innerHTML = `
     <div class="sp-header">
-      <h3>${t('spatial.title')}</h3>
+      <h2>${t('spatial.title')}</h2>
       <button class="close-btn" aria-label="${escapeHtml(t('spatial.close'))}">×</button>
     </div>
     <p class="sp-hint">${t('spatial.hint')}</p>
@@ -227,7 +227,7 @@ function renderResults(results, lat, lon) {
   showPanel('spatial-results');
   spBody.innerHTML = `
     <div class="sp-header">
-      <h3>${escapeHtml(t('spatial.near', lat.toFixed(2), lon.toFixed(2)))}</h3>
+      <h2>${escapeHtml(t('spatial.near', lat.toFixed(2), lon.toFixed(2)))}</h2>
       <button class="close-btn" aria-label="${escapeHtml(t('spatial.close'))}">×</button>
     </div>
     <div class="sp-controls">${radiusBtns}<button class="text-btn sp-locate-btn" type="button">📍 ${t('spatial.useMyLocation')}</button></div>

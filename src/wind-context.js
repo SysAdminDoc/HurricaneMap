@@ -191,7 +191,7 @@ export function renderWindContext(host, result) {
   if (!host || result?.status === 'aborted') return;
   if (!result || result.status === 'loading') {
     host.innerHTML = `<section class="wind-context" aria-live="polite">
-      <h4>${escapeHtml(t('windContext.title'))}</h4>
+      <h3>${escapeHtml(t('windContext.title'))}</h3>
       <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
       <p class="wind-context-status">${escapeHtml(t('windContext.loading'))}</p>
     </section>`;
@@ -200,7 +200,7 @@ export function renderWindContext(host, result) {
 
   if (result.status !== 'current') {
     host.innerHTML = `<section class="wind-context" aria-live="polite">
-      <h4>${escapeHtml(t('windContext.title'))}</h4>
+      <h3>${escapeHtml(t('windContext.title'))}</h3>
       <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
       <p class="wind-context-status">${escapeHtml(t(`windContext.${result.reason === 'offline' ? 'offline' : 'unavailable'}`))}</p>
       <p class="wind-context-links">${sourceLinks()}</p>
@@ -227,7 +227,7 @@ export function renderWindContext(host, result) {
     : `<li class="wind-context-empty">${escapeHtml(t('windContext.noArrival'))}</li>`;
 
   host.innerHTML = `<section class="wind-context" aria-live="polite">
-    <h4>${escapeHtml(t('windContext.title'))}</h4>
+    <h3>${escapeHtml(t('windContext.title'))}</h3>
     <div class="optional-feed-status-host" data-feed-status="wind-context"></div>
     <p class="wind-context-issued">${escapeHtml(t('windContext.issued', issued))}</p>
     <h5>${escapeHtml(t('windContext.probability'))}</h5>
