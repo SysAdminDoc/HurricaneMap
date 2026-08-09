@@ -14,6 +14,12 @@ import {
   roundMetric,
 } from '../src/metric-presenters.js';
 import { buildQGISGeoJSON } from '../src/qgis.js';
+import {
+  buildComparisonCSVText,
+  escapeCSV,
+  formatComparisonValue,
+  getComparisonRows,
+} from '../src/compare-rows.js';
 
 for (const category of [-1, 0, 1, 2, 3, 4, 5]) {
   assert.equal(categoryLabel(category), presentCategory(category));
@@ -58,12 +64,61 @@ const qgis = buildQGISGeoJSON({
 assert.equal(qgis.features[0].properties.category, publicationCategoryLabel(1));
 assert.equal(qgis.features[0].properties.wind_speed_mph, ktToMph(64));
 
+const comparisonStorm = {
+  id: 'AL012026',
+  name: 'ALPHA',
+  year: 2026,
+  peak_wind_kt: 100,
+  min_pres_mb: 920,
+  landfall_max_category: 2,
+  us_landfall_count: 2,
+  us_landfalls: [{ state: 'FL' }, { state: 'TX' }, { state: 'FL' }],
+  track: [
+    { t: '2026-08-01T00:00:00Z', lat: 20, lon: -60, wind: 40, pres: 1000 },
+    { t: '2026-08-01T06:00:00Z', lat: 21, lon: -61, wind: 50, pres: 990 },
+    { t: '2026-08-01T12:00:00Z', lat: 22, lon: -62, wind: 60, pres: 980 },
+    { t: '2026-08-01T18:00:00Z', lat: 23, lon: -63, wind: 70, pres: 970 },
+    { t: '2026-08-02T00:00:00Z', lat: 24, lon: -64, wind: 80, pres: 960 },
+  ],
+};
+const comparisonPin = {
+  id: comparisonStorm.id,
+  name: comparisonStorm.name,
+  year: comparisonStorm.year,
+  storm: comparisonStorm,
+};
+const comparisonTranslate = key => key;
+for (const [windUnit, locale] of [['kt', 'en-US'], ['mph', 'es-ES'], ['kmh', 'ht']]) {
+  const rows = getComparisonRows({
+    allStorms: [comparisonStorm],
+    translate: comparisonTranslate,
+    windUnit,
+    locale,
+  });
+  const csv = buildComparisonCSVText({
+    storms: [comparisonPin],
+    allStorms: [comparisonStorm],
+    translate: comparisonTranslate,
+    windUnit,
+    locale,
+    generatedAt: '2026-08-08T00:00:00.000Z',
+  });
+  const csvLines = csv.split('\n');
+  for (const row of rows) {
+    const visible = formatComparisonValue(row, comparisonPin);
+    assert(
+      csvLines.includes(`${escapeCSV(row.label)},${escapeCSV(visible)}`),
+      `${windUnit}/${locale} comparison parity drifted for ${row.id}`,
+    );
+  }
+}
+
 for (const relative of [
   '../src/settings.js',
   '../src/metrics.js',
   '../src/panel.js',
   '../src/stats.js',
-  '../src/compare.js',
+  '../src/compare-rows.js',
   '../src/export.js',
   '../src/report.js',
   '../src/qgis.js',

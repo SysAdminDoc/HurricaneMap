@@ -1,6 +1,6 @@
 // HurricaneMap entry point.
 import {
-  loadInitial, getLandfalls, getStats, getMetadata, getCoverage, getAomlValidation, filterLandfalls,
+  loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
@@ -28,6 +28,7 @@ import { wireApplicationShell } from './shell-ui.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
 import { purgeLegacyUserPoint } from './user-point.js';
 import { initManifestLocale } from './manifest-locale.js';
+import { createAboutRenderer } from './about-ui.js';
 
 initGlobalErrorSurface();
 purgeLegacyUserPoint();
@@ -177,6 +178,12 @@ const els = {
   loading: document.getElementById('loading'),
 };
 
+const aboutRenderer = createAboutRenderer({
+  aomlValidation: els.aomlValidation,
+  dataProvenanceBody: els.dataProvenanceBody,
+  archiveCoverageBody: els.archiveCoverageBody,
+});
+
 const filterController = createFilterController({
   filters,
   elements: els,
@@ -219,199 +226,6 @@ function updateYearControlBounds() {
   }
 }
 
-function formatMetadataDate(value) {
-  if (!value) return 'Unavailable';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
-}
-
-function formatMetadataDateTime(value) {
-  if (!value) return 'Unavailable';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'UTC',
-  }) + ' UTC';
-}
-
-function formatNumber(value) {
-  return Number.isFinite(value) ? value.toLocaleString() : 'Unavailable';
-}
-
-function formatValidationPercent(value) {
-  return Number.isFinite(value) ? (value * 100).toFixed(1) : 'Unavailable';
-}
-
-function renderAomlValidation() {
-  if (!els.aomlValidation) return;
-  const validation = getAomlValidation();
-  if (!validation?.detected || !validation.ground_truth || !validation.scope) {
-    els.aomlValidation.innerHTML = t('about.aomlValidationUnavailable');
-    return;
-  }
-  const detected = validation.detected;
-  const truthCount = validation.ground_truth.record_count;
-  els.aomlValidation.innerHTML = t(
-    'about.aomlValidationHtml',
-    escapeHtml(detected.matched_count),
-    escapeHtml(truthCount),
-    escapeHtml(validation.scope.start_year),
-    escapeHtml(validation.scope.end_year),
-    escapeHtml(formatValidationPercent(detected.precision)),
-    escapeHtml(formatValidationPercent(detected.recall)),
-    escapeHtml(validation.inferred?.candidate_count ?? 0),
-  );
-}
-
-function renderDataProvenance() {
-  if (!els.dataProvenanceBody) return;
-  const metadata = getMetadata();
-  const stats = getStats();
-  if (!metadata) {
-    els.dataProvenanceBody.innerHTML = `
-      <p class="provenance-empty">Build metadata is unavailable in this data bundle. Counts still come from validated HURDAT2 statistics.</p>`;
-    return;
-  }
-
-  const coverage = metadata.coverage || {};
-  const yearRange = coverage.year_range || stats?.year_range || [];
-  const [yearMin, yearMax] = yearRange;
-  const sourceRows = Array.isArray(metadata.sources)
-    ? metadata.sources.map(source => {
-      const range = Array.isArray(source.storm_year_range)
-        ? `${escapeHtml(source.storm_year_range[0])}-${escapeHtml(source.storm_year_range[1])}`
-        : 'Unavailable';
-      return `
-        <li>
-          <strong>${escapeHtml(source.filename || source.id || 'Source file')}</strong>
-          <span>${escapeHtml(source.basin || 'Basin')} · ${formatNumber(source.storm_count)} storms · ${range}</span>
-          <span>Modified ${escapeHtml(formatMetadataDate(source.modified_utc))}</span>
-        </li>`;
-    }).join('')
-    : '';
-
-  els.dataProvenanceBody.innerHTML = `
-    <div class="provenance-grid">
-      <div>
-        <span class="provenance-label">Coverage</span>
-        <strong>${escapeHtml(yearMin)}-${escapeHtml(yearMax)}</strong>
-      </div>
-      <div>
-        <span class="provenance-label">Records</span>
-        <strong>${formatNumber(coverage.storm_count)} storms · ${formatNumber(coverage.landfall_event_count)} landfalls</strong>
-      </div>
-      <div>
-        <span class="provenance-label">Hurricane landfalls</span>
-        <strong>${formatNumber(coverage.hurricane_landfall_count)}</strong>
-      </div>
-      <div>
-        <span class="provenance-label">Generated</span>
-        <strong>${escapeHtml(formatMetadataDateTime(metadata.generated_at_utc))}</strong>
-      </div>
-    </div>
-    <div class="provenance-generator">
-      Generated by <code>${escapeHtml(metadata.generator?.name || 'preprocessor')}</code>
-      ${metadata.generator?.app_version ? `for HurricaneMap ${escapeHtml(metadata.generator.app_version)}` : ''}.
-    </div>
-    ${sourceRows ? `<ul class="provenance-sources">${sourceRows}</ul>` : ''}`;
-}
-
-function formatCoverageRange(range) {
-  if (!Array.isArray(range) || range.length !== 2 || !range.every(Number.isInteger)) return t('about.archiveUnavailable');
-  return `${range[0]}–${range[1]}`;
-}
-
-function coverageCount(value, key) {
-  return Number.isFinite(value) ? `${formatNumber(value)} ${t(key)}` : null;
-}
-
-function renderArchiveCoverage() {
-  if (!els.archiveCoverageBody) return;
-  const coverage = getCoverage();
-  if (!coverage?.catalog || !Array.isArray(coverage.datasets)) {
-    els.archiveCoverageBody.innerHTML = `<p class="provenance-empty">${escapeHtml(t('about.archiveCoverageUnavailable'))}</p>`;
-    return;
-  }
-
-  const catalog = coverage.catalog;
-  const summary = t(
-    'about.archiveCoverageSummary',
-    formatNumber(catalog.storm_count),
-    formatNumber(catalog.landfall_event_count),
-    formatCoverageRange(catalog.year_range),
-  );
-  const rows = coverage.datasets.map(dataset => {
-    const sources = (dataset.sources || []).map(source => {
-      const href = /^https:\/\//.test(source.url || '') ? source.url : null;
-      const sourceName = escapeHtml(source.name || t('about.archiveUnavailable'));
-      const sourceLink = href
-        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${sourceName}</a>`
-        : sourceName;
-      return `<span class="archive-coverage-source"><strong>${sourceLink}</strong><small>${escapeHtml(t('about.archiveRevision', formatMetadataDate(source.revision_date)))}</small></span>`;
-    }).join('');
-    const range = [
-      `<span>${escapeHtml(t('about.archiveRange', formatCoverageRange(dataset.year_range)))}</span>`,
-      dataset.basins?.length ? `<span>${escapeHtml(t('about.archiveBasins', dataset.basins.join(', ')))}</span>` : '',
-      dataset.end_date ? `<span>${escapeHtml(t('about.archiveEndDate', formatMetadataDate(dataset.end_date)))}</span>` : '',
-    ].filter(Boolean).join('');
-    const availability = [
-      coverageCount(dataset.availability?.records, 'about.archiveRecords'),
-      coverageCount(dataset.availability?.storms, 'about.archiveStorms'),
-      coverageCount(dataset.availability?.frames, 'about.archiveFrames'),
-      coverageCount(dataset.availability?.advisories, 'about.archiveAdvisories'),
-      coverageCount(dataset.availability?.marks, 'about.archiveMarks'),
-      dataset.availability?.runnable === false ? t('about.archiveNotRunnable') : t('about.archiveRunnable'),
-      dataset.distribution?.length ? t('about.archiveDistribution', dataset.distribution.join(', ')) : null,
-    ].filter(Boolean).map(value => `<span>${escapeHtml(value)}</span>`).join('');
-    const status = String(dataset.value_status || 'unavailable').replace(/[^a-z-]/g, '');
-    const statusLabel = t(`about.archiveCoverageStatus.${status}`);
-    const lifecycle = dataset.lifecycle_status && dataset.lifecycle_status !== dataset.value_status
-      ? `<small>${escapeHtml(t('about.archiveLifecycle', t(`about.archiveCoverageStatus.${dataset.lifecycle_status}`)))}</small>`
-      : '';
-    return `
-      <tr>
-        <th scope="row"><strong>${escapeHtml(dataset.label || dataset.id)}</strong><small>${escapeHtml(dataset.id || '')}</small></th>
-        <td>${sources || `<span>${escapeHtml(t('about.archiveUnavailable'))}</span>`}</td>
-        <td>${range}</td>
-        <td>${availability || `<span>${escapeHtml(t('about.archiveUnavailable'))}</span>`}</td>
-        <td><span class="archive-coverage-status archive-coverage-status--${status}">${escapeHtml(statusLabel)}</span>${lifecycle}</td>
-      </tr>`;
-  }).join('');
-
-  els.archiveCoverageBody.innerHTML = `
-    <p class="archive-coverage-summary">${escapeHtml(summary)}</p>
-    <div class="archive-coverage-table-wrap">
-      <table class="archive-coverage-table">
-        <caption class="sr-only">${escapeHtml(t('about.archiveCoverageTitle'))}</caption>
-        <thead><tr>
-          <th scope="col">${escapeHtml(t('about.archiveDataset'))}</th>
-          <th scope="col">${escapeHtml(t('about.archiveSource'))}</th>
-          <th scope="col">${escapeHtml(t('about.archiveRangeHeading'))}</th>
-          <th scope="col">${escapeHtml(t('about.archiveAvailability'))}</th>
-          <th scope="col">${escapeHtml(t('about.archiveStatus'))}</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-}
-
-document.addEventListener('hm-locale:change', () => {
-  renderAomlValidation();
-  renderDataProvenance();
-  renderArchiveCoverage();
-});
-
 async function boot() {
   // Initialize locale (before any rendering). Browser-language detection in
   // initLocale() only holds when the user hasn't explicitly picked a language
@@ -444,9 +258,9 @@ async function boot() {
     requestAnimationFrame(() => mainTarget?.focus({ preventScroll: true }));
   });
   await loadInitial();
-  renderAomlValidation();
+  aboutRenderer.renderAomlValidation();
   syncYearBoundsFromData();
-  populateStateFilter();
+  filterController.populateStateFilter(getStats()?.by_state);
   // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.
   const startupLauncherAction = launcherActionFromHash(location.hash);
   // Restore filters from URL hash BEFORE first render so the user's
@@ -530,8 +344,8 @@ async function boot() {
     getStats().total_storms.toLocaleString(),
     getStats().total_landfall_events.toLocaleString(),
   );
-  renderDataProvenance();
-  renderArchiveCoverage();
+  aboutRenderer.renderDataProvenance();
+  aboutRenderer.renderArchiveCoverage();
   
   // Initialize keyboard shortcuts and navigation.
   deferNonCritical(() => {
@@ -819,17 +633,6 @@ function wireSettingsControls() {
 // after restoring a permalink so the toggles match what was applied.
 function syncFilterUiFromState() {
   filterController.sync();
-}
-
-function populateStateFilter() {
-  const stats = getStats();
-  const states = Object.keys(stats.by_state).sort();
-  for (const s of states) {
-    const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = `${s} (${stats.by_state[s].total})`;
-    els.stateFilter.appendChild(opt);
-  }
 }
 
 // The bottom timeline scopes to the state filter (all years, one state) so

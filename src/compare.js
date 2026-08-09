@@ -1,14 +1,20 @@
 // Storm comparison mode — pin up to 4 storms, view their tracks color-coded
 // on the map and side-by-side intensity charts in a comparison panel.
 
-import { t } from './i18n.js';
-import { ensureStormsLoaded, getStorm, getAllStorms, categoryLabel, categoryClass, windToCategory } from './data.js';
+import { getLocale, t } from './i18n.js';
+import { ensureStormsLoaded, getStorm, getAllStorms, categoryClass } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
 import { hidePanel, showPanel } from './panels.js';
-import { computeACE, findRapidIntensification, computeTranslationStats, computeRIRiskScore, generateStormBiography } from './metrics.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
-import { presentNumber, presentPressure } from './metric-presenters.js';
+import { getSetting } from './settings.js';
+import {
+  buildComparisonCSVText,
+  formatComparisonValue,
+  getComparisonRows,
+} from './compare-rows.js';
+
+export { buildComparisonCSVText, getComparisonRows } from './compare-rows.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -17,17 +23,6 @@ const MAX_PINS = 4;
 
 // Distinct, high-contrast track colors. Each pin gets one in pin order.
 const PIN_COLORS = ['#cba6f7', '#74c7ec', '#fab387', '#a6e3a1'];
-
-function formatDate(value) {
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) return '—';
-  return date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
-}
 
 const tray = ensureTray();
 const comparePanel = document.getElementById('compare-panel');
@@ -199,13 +194,29 @@ function refreshComparePanelIfOpen() {
 }
 
 function renderComparePanel() {
+  const comparisonRows = getComparisonRows({
+    allStorms: getAllStorms(),
+    windUnit: getSetting('windUnit'),
+    locale: getLocale(),
+  });
+  const rowsById = new Map(comparisonRows.map(row => [row.id, row]));
+  const cardRows = {
+    peakWind: rowsById.get('peak-wind'),
+    peakCategory: rowsById.get('peak-category'),
+    minPressure: rowsById.get('minimum-pressure'),
+    landfallCategory: rowsById.get('landfall-category'),
+    landfalls: rowsById.get('us-landfalls'),
+    states: rowsById.get('states-hit'),
+  };
   const cards = pinned.map(p => {
     const s = p.storm;
-    const peakLabel = categoryLabel(windToCategory(s.peak_wind_kt));
-    const lfLabel = categoryLabel(s.landfall_max_category);
+    const peakLabel = formatComparisonValue(cardRows.peakCategory, p);
+    const peakWind = formatComparisonValue(cardRows.peakWind, p);
+    const lfLabel = formatComparisonValue(cardRows.landfallCategory, p);
     const lfClass = categoryClass(s.landfall_max_category);
-    const minPres = presentPressure(s.min_pres_mb);
-    const states = [...new Set((s.us_landfalls || []).map(lf => lf.state))].join(' · ');
+    const minPres = formatComparisonValue(cardRows.minPressure, p);
+    const landfalls = formatComparisonValue(cardRows.landfalls, p);
+    const states = formatComparisonValue(cardRows.states, p);
     return `
       <div class="cp-card" style="--pin-color:${p.color}">
         <div class="cp-card-head">
@@ -214,10 +225,10 @@ function renderComparePanel() {
           <button class="cp-remove" data-id="${s.id}" title="${t('compare.unpin')}">×</button>
         </div>
         <div class="cp-meta">
-          <span class="cat-pill ${lfClass}">${lfLabel} at landfall</span>
-          <span>Peak: <strong>${peakLabel} · ${s.peak_wind_kt} kt</strong></span>
-          <span>Min pres: <strong>${minPres}</strong></span>
-          <span>${s.us_landfall_count} landfall${s.us_landfall_count === 1 ? '' : 's'} · ${escapeHtml(states)}</span>
+          <span class="cat-pill ${lfClass}">${escapeHtml(lfLabel)} ${escapeHtml(t('compare.card.atLandfall'))}</span>
+          <span>${escapeHtml(cardRows.peakWind.label)}: <strong>${escapeHtml(peakLabel)} · ${escapeHtml(peakWind)}</strong></span>
+          <span>${escapeHtml(cardRows.minPressure.label)}: <strong>${escapeHtml(minPres)}</strong></span>
+          <span>${escapeHtml(cardRows.landfalls.label)}: <strong>${escapeHtml(landfalls)}</strong> · ${escapeHtml(states)}</span>
         </div>
         <div class="cp-chart" data-storm-id="${s.id}"></div>
       </div>
@@ -225,49 +236,30 @@ function renderComparePanel() {
   }).join('');
 
   // Side-by-side stat table with diff highlighting.
-  const rows = [
-    ['Peak wind', p => p.storm.peak_wind_kt, 'number', 'higher'],
-    ['Min pressure', p => p.storm.min_pres_mb, 'number', 'lower'],
-    ['Peak category', p => windToCategory(p.storm.peak_wind_kt), 'category'],
-    ['Landfall (max)', p => p.storm.landfall_max_category, 'category'],
-    ['# US landfalls', p => p.storm.us_landfall_count, 'number', 'higher'],
-    ['Track points', p => p.storm.track?.length || 0, 'number', 'higher'],
-    ['Genesis', p => p.storm.track && p.storm.track.length > 0 ? formatDate(p.storm.track[0].t) : '—', 'text'],
-    ['Final', p => p.storm.track && p.storm.track.length > 0 ? formatDate(p.storm.track[p.storm.track.length - 1].t) : '—', 'text'],
-    ['States hit', p => p.storm.us_landfalls && p.storm.us_landfalls.length > 0 ? [...new Set(p.storm.us_landfalls.map(lf => lf.state))].join(', ') : '—', 'text'],
-  ];
-
   // Compute min/max for diff highlighting.
   const extrema = {};
-  for (const [label, fn, type, direction = 'higher'] of rows) {
-    const values = pinned.map(fn).filter(v => v != null);
-    if (type === 'number' && values.length > 0) {
-      extrema[label] = {
+  for (const row of comparisonRows) {
+    const values = pinned.map(row.getValue).filter(Number.isFinite);
+    if (row.kind === 'number' && values.length > 0) {
+      extrema[row.id] = {
         max: Math.max(...values),
         min: Math.min(...values),
-        direction,
+        direction: row.direction || 'higher',
       };
     }
   }
 
   const headerCols = pinned.map(p => `<th style="color:${p.color}">${escapeHtml(formatStormName(p.name))} ${p.year}</th>`).join('');
-  const tableBody = rows.map(([label, fn, type]) => {
+  const tableBody = comparisonRows.map(row => {
     const cells = pinned.map(p => {
-      const val = fn(p);
-      let displayVal = val;
-      if (type === 'category') {
-        displayVal = val == null ? '—' : categoryLabel(val);
-      } else if (type === 'number') {
-        displayVal = val == null ? '—' : String(val);
-      } else {
-        displayVal = escapeHtml(String(val ?? '—'));
-      }
+      const val = row.getValue(p);
+      const displayVal = escapeHtml(formatComparisonValue(row, p));
       
       // Apply diff highlighting for numeric columns.
       let highlight = '';
-      if (type === 'number' && extrema[label] && val != null) {
-        const preferred = extrema[label].direction === 'lower' ? extrema[label].min : extrema[label].max;
-        const trailing = extrema[label].direction === 'lower' ? extrema[label].max : extrema[label].min;
+      if (row.kind === 'number' && extrema[row.id] && Number.isFinite(val)) {
+        const preferred = extrema[row.id].direction === 'lower' ? extrema[row.id].min : extrema[row.id].max;
+        const trailing = extrema[row.id].direction === 'lower' ? extrema[row.id].max : extrema[row.id].min;
         if (val === preferred) {
           highlight = ' class="cp-cell-max"';
         } else if (val === trailing) {
@@ -277,7 +269,7 @@ function renderComparePanel() {
       
       return `<td${highlight}>${displayVal}</td>`;
     }).join('');
-    return `<tr><th>${label}</th>${cells}</tr>`;
+    return `<tr><th>${escapeHtml(row.label)}</th>${cells}</tr>`;
   }).join('');
 
   compareBody.innerHTML = `
@@ -316,65 +308,13 @@ function renderComparePanel() {
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {
   if (!storms || storms.length === 0) return;
-  const allStorms = getAllStorms();
-
-  // Generate header
-  const header = ['Metric', ...storms.map(p => `${formatStormName(p.name)} (${p.year})`)].map(escapeCSV).join(',');
-
-  // Generate comparison table rows
-  const rows = [
-    ['Peak wind (kt)', p => p.storm.peak_wind_kt],
-    ['Min pressure (mb)', p => p.storm.min_pres_mb],
-    ['Peak category', p => categoryLabel(windToCategory(p.storm.peak_wind_kt))],
-    ['Landfall category', p => categoryLabel(p.storm.landfall_max_category ?? -1)],
-    ['US landfalls', p => p.storm.us_landfall_count ?? 0],
-    ['Track points', p => p.storm.track?.length ?? 0],
-    ['ACE (10⁴ kt²)', p => {
-      const ace = computeACE(p.storm.track || []);
-      return presentNumber(ace.value, 2);
-    }],
-    ['Forward speed (km/h)', p => {
-      const trans = computeTranslationStats(p.storm.track || []);
-      return presentNumber(trans?.mean_kmh, 1);
-    }],
-    ['RI detected', p => {
-      const ri = findRapidIntensification(p.storm.track || []);
-      return ri ? `+${ri.delta_kt} kt / ${Math.round(ri.hours)}h` : 'No';
-    }],
-    ['RI risk category', p => {
-      const risk = computeRIRiskScore(p.storm, allStorms);
-      return risk ? risk.category : '—';
-    }],
-  ];
-
-  const tableRows = rows.map(([label, fn]) => {
-    const cells = [escapeCSV(label)];
-    for (const p of storms) {
-      try {
-        const val = fn(p);
-        cells.push(escapeCSV(String(val ?? '—')));
-      } catch {
-        cells.push('—');
-      }
-    }
-    return cells.join(',');
+  const csvContent = buildComparisonCSVText({
+    storms,
+    allStorms: getAllStorms(),
+    translate: t,
+    windUnit: getSetting('windUnit'),
+    locale: getLocale(),
   });
-
-  // Generate narratives
-  const narrativeSection = ['', '', 'COMPARISON NARRATIVES', 'Narrative language,English', ...storms.map(p => {
-    const bio = generateStormBiography(p.storm, {});
-    return escapeCSV(`${formatStormName(p.name)} (${p.year}): ${bio}`);
-  })];
-
-  // Combine all rows
-  const csvContent = [
-    header,
-    ...tableRows,
-    ...narrativeSection,
-    '',
-    'Data source: NOAA HURDAT2 best-track database',
-    'Generated: ' + new Date().toISOString(),
-  ].join('\n');
 
   // Trigger download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -387,13 +327,4 @@ function exportComparisonCSV(storms) {
   link.click();
   link.remove();
   setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-}
-
-/** Escape a value for CSV (wrap in quotes if contains comma/quote/newline). */
-function escapeCSV(s) {
-  const str = String(s ?? '');
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
 }

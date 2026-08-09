@@ -49,6 +49,19 @@ export function createFilterController({
     elements.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
   };
 
+  const populateStateFilter = (byState = {}) => {
+    if (!elements.stateFilter) return;
+    const allStatesOption = elements.stateFilter.querySelector('option[value=""]');
+    elements.stateFilter.replaceChildren(...(allStatesOption ? [allStatesOption] : []));
+    for (const state of Object.keys(byState).sort()) {
+      const option = document.createElement('option');
+      option.value = state;
+      option.textContent = `${state} (${byState[state].total})`;
+      elements.stateFilter.appendChild(option);
+    }
+    elements.stateFilter.value = filters.state;
+  };
+
   const resetYears = () => {
     resetYearRange(filters, yearDefaults());
     sync();
@@ -126,5 +139,5 @@ export function createFilterController({
     });
   };
 
-  return { sync, updateResetState, wire };
+  return { sync, updateResetState, populateStateFilter, wire };
 }

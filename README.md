@@ -202,7 +202,10 @@ HurricaneMap/
 ├── manifest.ht.webmanifest # Haitian Creole PWA labels/shortcuts
 ├── src/
 │   ├── main.js             # app boot, canonical filters/hash, data/map orchestration
+│   ├── filter-controller.js # filter-control DOM wiring and state-option population
 │   ├── shell-ui.js         # injected top-level control and export wiring
+│   ├── about-ui.js         # provenance and archive-coverage About rendering
+│   ├── compare-rows.js     # typed comparison metrics shared by panel and CSV
 │   ├── data.js             # JSON loaders + index helpers
 │   ├── citation.js         # release citation and data-pin authority
 │   ├── citation-ui.js      # shared APA/BibTeX panel controls
@@ -245,7 +248,7 @@ HurricaneMap/
 
 ### Module ownership
 
-`main.js` is the only owner of canonical filters, shared-hash state, visible-landfall state, and map redraw orchestration. `shell-ui.js` owns top-level DOM actions through injected loaders and callbacks; it does not calculate filters or metrics. `panel.js` owns storm markup/data composition, while `panel-controls.js` owns listeners for controls created by that markup, including replay, playback, and panel exports. `citation.js` owns the release citation and permalink identity; `citation-ui.js` mounts its shared controls. `export.js`, `report.js`, `qgis.js`, and `svg-export.js` remain the format-specific serialization owners. New work should extend the existing owner or add a focused boundary rather than duplicating filter state or metric calculations.
+`main.js` is the only owner of canonical filters, shared-hash state, visible-landfall state, and map redraw orchestration. `filter-controller.js` owns filter-control DOM wiring and state-option population; `shell-ui.js` owns top-level DOM actions through injected loaders and callbacks; neither calculates metrics. `about-ui.js` owns provenance and archive-coverage rendering, while `compare-rows.js` owns the typed comparison metric contract consumed by both the panel and CSV serializer. `panel.js` owns storm markup/data composition, while `panel-controls.js` owns listeners for controls created by that markup, including replay, playback, and panel exports. `citation.js` owns the release citation and permalink identity; `citation-ui.js` mounts its shared controls. `export.js`, `report.js`, `qgis.js`, and `svg-export.js` remain the format-specific serialization owners. New work should extend the existing owner or add a focused boundary rather than duplicating filter state or metric calculations.
 
 ## How landfalls are detected
 
