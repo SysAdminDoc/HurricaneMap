@@ -49,9 +49,25 @@ export async function validateStac({ root = ROOT, profile = 'full' } = {}) {
     radarItems.push({ path: itemPath, item });
   }
   const radarManifest = await readJson(root, 'data/radar/manifest.json');
+  const coverage = await readJson(root, 'data/coverage.json');
+  const hurdatCoverage = coverage.datasets?.find(dataset => dataset.id === 'hurdat2');
+  const radarCoverage = coverage.datasets?.find(dataset => dataset.id === 'radar-archive');
   const releaseManifest = await readJson(root, 'data/release-manifest.json');
   if (catalog['hurricanemap:source_commit'] !== releaseManifest.source_commit || catalog['hurricanemap:generated_at_utc'] !== releaseManifest.generated_at_utc) {
     throw new Error('STAC catalog provenance does not match the release manifest');
+  }
+  if (!linksFor(catalog, 'describedby').some(link => resolveHref(CATALOG_PATH, link.href).relative === 'data/coverage.json')) {
+    throw new Error('STAC catalog is missing its archive coverage description link');
+  }
+  if (hurdat2Collection.summaries?.['hurricanemap:coverage_status'] !== hurdatCoverage?.value_status
+    || JSON.stringify(hurdat2Collection.summaries?.['hurricanemap:year_range']) !== JSON.stringify(hurdatCoverage?.year_range)
+    || hurdat2Collection.summaries?.['hurricanemap:inferred_landfall_count']?.[0] !== hurdat2Item.properties?.['hurricanemap:inferred_landfall_count']) {
+    throw new Error('HURDAT2 STAC coverage summaries are stale');
+  }
+  if (radarCollection.summaries?.['hurricanemap:coverage_status'] !== radarCoverage?.value_status
+    || JSON.stringify(radarCollection.summaries?.['hurricanemap:year_range']) !== JSON.stringify(radarCoverage?.year_range)
+    || radarCollection.summaries?.['hurricanemap:storm_count']?.[0] !== radarCoverage?.availability?.storms) {
+    throw new Error('radar STAC coverage summaries are stale');
   }
   const expectedSchemaVersion = `STAC-${STAC_VERSION}`;
   if (releaseManifest.artifacts.some(artifact => artifact.path.startsWith('data/stac/') && artifact.schema_version !== expectedSchemaVersion)) {

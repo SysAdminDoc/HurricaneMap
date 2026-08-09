@@ -79,11 +79,36 @@ const bundle = buildSanitizedSupportBundle({
     latitude: 25,
     address: '123 Private Street',
   }],
+  coverage: {
+    schema_version: 1,
+    generated_at_utc: '2026-08-03T00:00:00Z',
+    source_commit: 'a'.repeat(40),
+    catalog: {
+      basins: ['AL', 'EP'],
+      year_range: [1851, 2025],
+      storm_count: 595,
+      landfall_event_count: 759,
+      hurricane_landfall_count: 374,
+    },
+    datasets: [{
+      id: 'radar-archive',
+      label: 'Radar archive',
+      value_status: 'final',
+      lifecycle_status: 'active',
+      basins: ['AL'],
+      year_range: [1995, 2025],
+      distribution: ['core', 'full'],
+      availability: { runnable: true, storms: 139, frames: 1703 },
+    }],
+  },
 });
 const serialized = JSON.stringify(bundle);
 assert.equal(bundle.schema_version, 1);
 assert.equal(bundle.app.version, '1.9.2');
 assert.equal(bundle.storage.radar_pack_count, 1);
+assert.equal(bundle.coverage.available, true);
+assert.equal(bundle.coverage.catalog.storm_count, 595);
+assert.equal(bundle.coverage.datasets[0].availability.frames, 1703);
 assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.2');
 assert.deepEqual(bundle.offline_integrity, {
   state: 'unverified',

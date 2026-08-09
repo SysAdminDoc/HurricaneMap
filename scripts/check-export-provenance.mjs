@@ -10,9 +10,10 @@ import {
 } from '../src/export-provenance.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const [packageJson, metadata, releaseManifest, releaseManifestBytes] = await Promise.all([
+const [packageJson, metadata, coverage, releaseManifest, releaseManifestBytes] = await Promise.all([
   readJson('package.json'),
   readJson('data/metadata.json'),
+  readJson('data/coverage.json'),
   readJson('data/release-manifest.json'),
   readFile(path.join(root, 'data/release-manifest.json')),
 ]);
@@ -31,6 +32,9 @@ if (provenance.data_release.generated_at_utc !== releaseManifest.generated_at_ut
 if (provenance.data_release.source_commit !== releaseManifest.source_commit) fail('release source commit is stale');
 if (provenance.data_release.algorithm !== releaseManifest.algorithm) fail('release hash algorithm is stale');
 if (provenance.data_release.manifest_sha256 !== expectedManifestHash) fail('release manifest hash is stale');
+if (JSON.stringify(provenance.data_release.coverage) !== JSON.stringify(compactCoverage(coverage))) {
+  fail('archive coverage summary is stale');
+}
 
 const checkedArtifacts = getExportProvenanceArtifacts();
 const manifestArtifacts = new Map(releaseManifest.artifacts.map(artifact => [artifact.path, artifact]));
@@ -48,4 +52,29 @@ console.log(`export provenance ok (${Object.keys(checkedArtifacts).length} bound
 
 async function readJson(relativePath) {
   return JSON.parse(await readFile(path.join(root, relativePath), 'utf8'));
+}
+
+function compactCoverage(value) {
+  return {
+    schema_version: value.schema_version,
+    generated_at_utc: value.generated_at_utc,
+    source_commit: value.source_commit,
+    catalog: value.catalog,
+    datasets: value.datasets.map(dataset => ({
+      id: dataset.id,
+      value_status: dataset.value_status,
+      lifecycle_status: dataset.lifecycle_status,
+      basins: dataset.basins,
+      year_range: dataset.year_range,
+      end_date: dataset.end_date,
+      availability: {
+        runnable: dataset.availability?.runnable,
+        records: dataset.availability?.records ?? null,
+        storms: dataset.availability?.storms ?? null,
+        frames: dataset.availability?.frames ?? null,
+        advisories: dataset.availability?.advisories ?? null,
+        marks: dataset.availability?.marks ?? null,
+      },
+    })),
+  };
 }

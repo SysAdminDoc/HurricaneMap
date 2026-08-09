@@ -47,6 +47,8 @@
     "hurricanemap:region": "uscomp",
     "hurricanemap:product": "n0r",
     "hurricanemap:is_landfall_frame": false,
+    "hurricanemap:availability": "archived",
+    "hurricanemap:value_status": "final",
     "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
     "hurricanemap:source_date": "2005-08-25",
     "hurricanemap:distribution": [

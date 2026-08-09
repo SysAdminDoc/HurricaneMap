@@ -169,11 +169,20 @@
       "retirement_citation": null
     },
     {
+      "id": "hwm",
+      "label": "USGS observed high-water marks",
+      "paths": [
+        "data/surge-obs/index.json"
+      ],
+      "status": "active",
+      "end_date": null,
+      "retirement_citation": null
+    },
+    {
       "id": "tide-stations",
       "label": "NOAA CO-OPS tide-station index",
       "paths": [
-        "data/tide-stations.json",
-        "data/surge-obs/index.json"
+        "data/tide-stations.json"
       ],
       "status": "active",
       "end_date": null,

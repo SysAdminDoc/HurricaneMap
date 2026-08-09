@@ -1,6 +1,6 @@
 // HurricaneMap entry point.
 import {
-  loadInitial, getLandfalls, getStats, getMetadata, getAomlValidation, filterLandfalls,
+  loadInitial, getLandfalls, getStats, getMetadata, getCoverage, getAomlValidation, filterLandfalls,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
@@ -173,6 +173,7 @@ const els = {
   closeInfo: document.getElementById('close-info'),
   aomlValidation: document.getElementById('aoml-validation'),
   dataProvenanceBody: document.getElementById('data-provenance-body'),
+  archiveCoverageBody: document.getElementById('archive-coverage-body'),
   loading: document.getElementById('loading'),
 };
 
@@ -326,6 +327,91 @@ function renderDataProvenance() {
     ${sourceRows ? `<ul class="provenance-sources">${sourceRows}</ul>` : ''}`;
 }
 
+function formatCoverageRange(range) {
+  if (!Array.isArray(range) || range.length !== 2 || !range.every(Number.isInteger)) return t('about.archiveUnavailable');
+  return `${range[0]}–${range[1]}`;
+}
+
+function coverageCount(value, key) {
+  return Number.isFinite(value) ? `${formatNumber(value)} ${t(key)}` : null;
+}
+
+function renderArchiveCoverage() {
+  if (!els.archiveCoverageBody) return;
+  const coverage = getCoverage();
+  if (!coverage?.catalog || !Array.isArray(coverage.datasets)) {
+    els.archiveCoverageBody.innerHTML = `<p class="provenance-empty">${escapeHtml(t('about.archiveCoverageUnavailable'))}</p>`;
+    return;
+  }
+
+  const catalog = coverage.catalog;
+  const summary = t(
+    'about.archiveCoverageSummary',
+    formatNumber(catalog.storm_count),
+    formatNumber(catalog.landfall_event_count),
+    formatCoverageRange(catalog.year_range),
+  );
+  const rows = coverage.datasets.map(dataset => {
+    const sources = (dataset.sources || []).map(source => {
+      const href = /^https:\/\//.test(source.url || '') ? source.url : null;
+      const sourceName = escapeHtml(source.name || t('about.archiveUnavailable'));
+      const sourceLink = href
+        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${sourceName}</a>`
+        : sourceName;
+      return `<span class="archive-coverage-source"><strong>${sourceLink}</strong><small>${escapeHtml(t('about.archiveRevision', formatMetadataDate(source.revision_date)))}</small></span>`;
+    }).join('');
+    const range = [
+      `<span>${escapeHtml(t('about.archiveRange', formatCoverageRange(dataset.year_range)))}</span>`,
+      dataset.basins?.length ? `<span>${escapeHtml(t('about.archiveBasins', dataset.basins.join(', ')))}</span>` : '',
+      dataset.end_date ? `<span>${escapeHtml(t('about.archiveEndDate', formatMetadataDate(dataset.end_date)))}</span>` : '',
+    ].filter(Boolean).join('');
+    const availability = [
+      coverageCount(dataset.availability?.records, 'about.archiveRecords'),
+      coverageCount(dataset.availability?.storms, 'about.archiveStorms'),
+      coverageCount(dataset.availability?.frames, 'about.archiveFrames'),
+      coverageCount(dataset.availability?.advisories, 'about.archiveAdvisories'),
+      coverageCount(dataset.availability?.marks, 'about.archiveMarks'),
+      dataset.availability?.runnable === false ? t('about.archiveNotRunnable') : t('about.archiveRunnable'),
+      dataset.distribution?.length ? t('about.archiveDistribution', dataset.distribution.join(', ')) : null,
+    ].filter(Boolean).map(value => `<span>${escapeHtml(value)}</span>`).join('');
+    const status = String(dataset.value_status || 'unavailable').replace(/[^a-z-]/g, '');
+    const statusLabel = t(`about.archiveCoverageStatus.${status}`);
+    const lifecycle = dataset.lifecycle_status && dataset.lifecycle_status !== dataset.value_status
+      ? `<small>${escapeHtml(t('about.archiveLifecycle', t(`about.archiveCoverageStatus.${dataset.lifecycle_status}`)))}</small>`
+      : '';
+    return `
+      <tr>
+        <th scope="row"><strong>${escapeHtml(dataset.label || dataset.id)}</strong><small>${escapeHtml(dataset.id || '')}</small></th>
+        <td>${sources || `<span>${escapeHtml(t('about.archiveUnavailable'))}</span>`}</td>
+        <td>${range}</td>
+        <td>${availability || `<span>${escapeHtml(t('about.archiveUnavailable'))}</span>`}</td>
+        <td><span class="archive-coverage-status archive-coverage-status--${status}">${escapeHtml(statusLabel)}</span>${lifecycle}</td>
+      </tr>`;
+  }).join('');
+
+  els.archiveCoverageBody.innerHTML = `
+    <p class="archive-coverage-summary">${escapeHtml(summary)}</p>
+    <div class="archive-coverage-table-wrap">
+      <table class="archive-coverage-table">
+        <caption class="sr-only">${escapeHtml(t('about.archiveCoverageTitle'))}</caption>
+        <thead><tr>
+          <th scope="col">${escapeHtml(t('about.archiveDataset'))}</th>
+          <th scope="col">${escapeHtml(t('about.archiveSource'))}</th>
+          <th scope="col">${escapeHtml(t('about.archiveRangeHeading'))}</th>
+          <th scope="col">${escapeHtml(t('about.archiveAvailability'))}</th>
+          <th scope="col">${escapeHtml(t('about.archiveStatus'))}</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+document.addEventListener('hm-locale:change', () => {
+  renderAomlValidation();
+  renderDataProvenance();
+  renderArchiveCoverage();
+});
+
 async function boot() {
   // Initialize locale (before any rendering). Browser-language detection in
   // initLocale() only holds when the user hasn't explicitly picked a language
@@ -445,6 +531,7 @@ async function boot() {
     getStats().total_landfall_events.toLocaleString(),
   );
   renderDataProvenance();
+  renderArchiveCoverage();
   
   // Initialize keyboard shortcuts and navigation.
   deferNonCritical(() => {

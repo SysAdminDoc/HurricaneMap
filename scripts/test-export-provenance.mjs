@@ -46,6 +46,9 @@ function assertProvenance(provenance, label) {
   assert(provenance.data_release.source_commit.length === 40, `${label}: source commit`);
   assert(provenance.data_release.manifest_sha256.length === 64, `${label}: manifest hash`);
   assert(provenance.data_release.artifacts.length >= 5, `${label}: bound artifacts`);
+  assert.equal(provenance.data_release.coverage.catalog.storm_count, 595, `${label}: coverage storm count`);
+  assert.equal(provenance.data_release.coverage.datasets.find(dataset => dataset.id === 'radar-archive').availability.frames, 1703, `${label}: radar coverage`);
+  assert.equal(provenance.data_release.coverage.datasets.find(dataset => dataset.id === 'ncei-billions').availability.runnable, false, `${label}: closed coverage`);
   assert(provenance.methodology.length >= 2, `${label}: methodology`);
   const serialized = JSON.stringify(provenance);
   assert.doesNotMatch(serialized, /[A-Za-z]:\\|\/Users\/|saved.?views|preparedness|selected.?point|address/i, `${label}: private state leaked`);

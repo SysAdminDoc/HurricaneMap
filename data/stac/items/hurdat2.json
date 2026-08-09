@@ -45,6 +45,16 @@
     "end_datetime": "2025-07-07T18:00:00Z",
     "hurricanemap:storm_count": 595,
     "hurricanemap:landfall_event_count": 759,
+    "hurricanemap:year_range": [
+      1851,
+      2025
+    ],
+    "hurricanemap:basins": [
+      "AL",
+      "EP"
+    ],
+    "hurricanemap:coverage_status": "final",
+    "hurricanemap:inferred_landfall_count": 56,
     "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
     "hurricanemap:source_date": "2026-02-27",
     "hurricanemap:distribution": [
@@ -137,6 +147,23 @@
       "file:checksum": "sha256:dfeb522b8f39cac235daa8b893df022d563882c05e8d0c21f932f4a587d49f23",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "hurricanemap:source_date": "2026-02-27",
+      "hurricanemap:license": "public-domain",
+      "hurricanemap:distribution": [
+        "core",
+        "full"
+      ]
+    },
+    "coverage": {
+      "href": "../../coverage.json",
+      "title": "Dataset archive coverage",
+      "type": "application/json",
+      "roles": [
+        "data"
+      ],
+      "file:size": 16897,
+      "file:checksum": "sha256:91575e2a0f3b2269c234310023a894f841cb8edc8924455930d51fa00e77c175",
+      "hurricanemap:source_url": "https://github.com/SysAdminDoc/HurricaneMap",
+      "hurricanemap:source_date": "2026-08-03",
       "hurricanemap:license": "public-domain",
       "hurricanemap:distribution": [
         "core",

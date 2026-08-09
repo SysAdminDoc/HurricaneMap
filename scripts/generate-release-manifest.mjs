@@ -80,6 +80,7 @@ function sourceUrl(relative) {
   if (relative === 'data/outlook.json') return 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
   if (relative === 'data/distribution.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';
+  if (relative === 'data/coverage.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   return 'https://www.nhc.noaa.gov/data/hurdat/';
 }
 
@@ -93,7 +94,7 @@ function sourceDate(relative, buildMetadata, aomlData) {
   if (relative.startsWith('data/stac/')) return generatedAt.slice(0, 10);
   if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
   if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').source_date;
-  if (['data/landfalls.json', 'data/storms.json', 'data/storms.json.gz', 'data/stats.json', 'data/metadata.json'].includes(relative)) {
+  if (['data/landfalls.json', 'data/storms.json', 'data/storms.json.gz', 'data/stats.json', 'data/metadata.json', 'data/coverage.json'].includes(relative)) {
     return buildMetadata.generated_at_utc.slice(0, 10);
   }
   try {
@@ -109,6 +110,7 @@ function sourceDate(relative, buildMetadata, aomlData) {
 function schemaVersion(relative, bytes) {
   if (relative.startsWith('data/stac/')) return 'STAC-1.1.0';
   if (relative === 'data/metadata.json') return 1;
+  if (relative === 'data/coverage.json') return 1;
   if (relative === 'data/landfalls.json') return 1;
   if (relative === 'data/storms.json' || relative === 'data/storms.json.gz') return 1;
   if (relative === 'data/impacts.json') return 1;

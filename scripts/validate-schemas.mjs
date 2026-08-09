@@ -11,6 +11,7 @@ import { STAC_FILE_EXTENSION, STAC_SCHEMA_URLS, STAC_VERSION } from './generate-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const schemaFiles = [
   'metadata-v1.schema.json',
+  'coverage-v1.schema.json',
   'hurdat2-sources-v1.schema.json',
   'aoml-landfalls-v1.schema.json',
   'landfalls-v1.schema.json',
@@ -32,6 +33,7 @@ for (const filename of schemaFiles) {
 
 const fixtures = [
   ['metadata-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/metadata.json'), 'utf8'))],
+  ['coverage-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/coverage.json'), 'utf8'))],
   ['hurdat2-sources-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/hurdat2-sources.json'), 'utf8'))],
   ['aoml-landfalls-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/aoml-landfalls.json'), 'utf8'))],
   ['landfalls-v1.schema.json', JSON.parse(await readFile(path.join(root, 'data/landfalls.json'), 'utf8'))],

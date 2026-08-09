@@ -8,8 +8,8 @@ export const APP_VERSION = '1.9.2';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-03T00:00:00Z',
-  source_commit: 'a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1',
-  manifest_sha256: 'cd42cd0acc7b9515a4065190fde050c3afdf97abb0b10917fd79ae627fd30ffc',
+  source_commit: '7962084d4c7f7c065ff8ddacad29aa2d1a8e3692',
+  manifest_sha256: '73effc8e4a1907b68c746b05d7ad4f7fb76490d11ca5061380aea724b5f65d9e',
   algorithm: 'SHA-256',
 });
 
@@ -20,6 +20,14 @@ const ARTIFACTS = Object.freeze({
     sha256: 'b403a3941456b7a7a67b3ea402c81271e22f30f404cd7e310f9902d6eef86846',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-07-25',
+    schema_version: 1,
+  }),
+  'data/coverage.json': Object.freeze({
+    path: 'data/coverage.json',
+    bytes: 16897,
+    sha256: '91575e2a0f3b2269c234310023a894f841cb8edc8924455930d51fa00e77c175',
+    source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
+    source_date: '2026-08-03',
     schema_version: 1,
   }),
   'data/hurdat2-atlantic.txt': Object.freeze({
@@ -64,8 +72,8 @@ const ARTIFACTS = Object.freeze({
   }),
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
-    bytes: 7154,
-    sha256: '72dbdc35eb03f264492fe894bc8c15ddb43bffaefa0885452c28f58cd2d8e060',
+    bytes: 7344,
+    sha256: '83ad36c2d86cb3d5ba0821a97baf80bc93cfba97dad8bc67de8ae87ec80f9f6f',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-03',
     schema_version: 1,
@@ -86,6 +94,36 @@ const ARTIFACTS = Object.freeze({
     source_date: '2026-08-03',
     schema_version: 1,
   }),
+});
+
+const COVERAGE = Object.freeze({
+  schema_version: 1,
+  generated_at_utc: '2026-08-03T00:00:00Z',
+  source_commit: 'a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1',
+  catalog: Object.freeze({
+    basins: ['AL', 'EP'],
+    year_range: [1851, 2025],
+    storm_count: 595,
+    landfall_event_count: 759,
+    hurricane_landfall_count: 374,
+  }),
+  datasets: Object.freeze([
+    Object.freeze({ id: 'hurdat2', value_status: 'final', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [1851, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 759, storms: 595, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'aoml-landfalls', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [1851, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 386, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'storm-impacts', value_status: 'inferred', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [1950, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 244, storms: 244, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'ncei-billions', value_status: 'closed', lifecycle_status: 'closed', basins: ['AL', 'EP'], year_range: [1980, 2024], end_date: '2024-12-31', availability: Object.freeze({ runnable: false, records: 65, storms: 65, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'enso', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: [1950, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 76, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'seasonal-outlook', value_status: 'operational', lifecycle_status: 'active', basins: ['AL'], year_range: [2026, 2026], end_date: '2026-12-31', availability: Object.freeze({ runnable: true, records: 2, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'forecast-skill', value_status: 'final', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [2021, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 18, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'advisory-replay', value_status: 'operational', lifecycle_status: 'active', basins: ['AL'], year_range: [2015, 2024], end_date: '2024-12-31', availability: Object.freeze({ runnable: true, records: null, storms: 33, frames: null, advisories: 886, marks: null }) }),
+    Object.freeze({ id: 'storm-events', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [1953, 2024], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 157, storms: 157, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'rainfall', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [1950, 2020], end_date: '2024-12-31', availability: Object.freeze({ runnable: true, records: 211, storms: 211, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'radar-archive', value_status: 'final', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [1995, 2025], end_date: null, availability: Object.freeze({ runnable: true, records: null, storms: 139, frames: 1703, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'hwm', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [2003, 2024], end_date: null, availability: Object.freeze({ runnable: true, records: null, storms: 25, frames: null, advisories: null, marks: 10741 }) }),
+    Object.freeze({ id: 'tide-stations', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 301, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'storm-boundaries', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 52, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'glossary', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 20, storms: null, frames: null, advisories: null, marks: null }) }),
+  ]),
 });
 
 const ALL_ARTIFACT_PATHS = Object.freeze(Object.keys(ARTIFACTS));
@@ -139,6 +177,7 @@ export function buildExportProvenance({
     exported_at_utc: exportedAt || null,
     data_release: {
       ...RELEASE,
+      coverage: COVERAGE,
       artifacts,
     },
     methodology: [...methodology],

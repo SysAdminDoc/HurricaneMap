@@ -26,6 +26,44 @@ function ageMs(timestamp, now) {
   return Number.isFinite(timestamp) ? Math.max(0, now - timestamp) : null;
 }
 
+function summarizeCoverage(coverage) {
+  if (!coverage?.catalog || !Array.isArray(coverage.datasets)) {
+    return { available: false, catalog: null, datasets: [] };
+  }
+  const numeric = value => Number.isFinite(value) ? value : null;
+  return {
+    available: true,
+    schema_version: numeric(coverage.schema_version),
+    generated_at_utc: typeof coverage.generated_at_utc === 'string' ? coverage.generated_at_utc : null,
+    source_commit: /^[a-f0-9]{40}$/.test(coverage.source_commit || '') ? coverage.source_commit : null,
+    catalog: {
+      basins: Array.isArray(coverage.catalog.basins) ? coverage.catalog.basins.map(String).slice(0, 8) : [],
+      year_range: Array.isArray(coverage.catalog.year_range) ? coverage.catalog.year_range.map(numeric) : null,
+      storm_count: numeric(coverage.catalog.storm_count),
+      landfall_event_count: numeric(coverage.catalog.landfall_event_count),
+      hurricane_landfall_count: numeric(coverage.catalog.hurricane_landfall_count),
+    },
+    datasets: coverage.datasets.map(dataset => ({
+      id: sanitizeDiagnosticText(dataset.id),
+      label: sanitizeDiagnosticText(dataset.label),
+      value_status: sanitizeDiagnosticText(dataset.value_status),
+      lifecycle_status: sanitizeDiagnosticText(dataset.lifecycle_status),
+      basins: Array.isArray(dataset.basins) ? dataset.basins.map(String).slice(0, 8) : [],
+      year_range: Array.isArray(dataset.year_range) ? dataset.year_range.map(numeric) : null,
+      end_date: typeof dataset.end_date === 'string' ? dataset.end_date : null,
+      distribution: Array.isArray(dataset.distribution) ? dataset.distribution.map(String).slice(0, 4) : [],
+      availability: {
+        runnable: dataset.availability?.runnable !== false,
+        records: numeric(dataset.availability?.records),
+        storms: numeric(dataset.availability?.storms),
+        frames: numeric(dataset.availability?.frames),
+        advisories: numeric(dataset.availability?.advisories),
+        marks: numeric(dataset.availability?.marks),
+      },
+    })),
+  };
+}
+
 export function buildSanitizedSupportBundle({
   appVersion = 'unknown',
   dataSchemaVersion = null,
@@ -35,6 +73,7 @@ export function buildSanitizedSupportBundle({
   storage = {},
   release = storage.release || {},
   feeds = [],
+  coverage = null,
   now = Date.now(),
 } = {}) {
   const scopes = (Array.isArray(storage.scopes) ? storage.scopes : []).map(scope => ({
@@ -102,6 +141,7 @@ export function buildSanitizedSupportBundle({
       manifest_generated_at_utc: typeof release.manifestGeneratedAt === 'string' ? release.manifestGeneratedAt : null,
     },
     optional_feeds: optionalFeeds,
+    coverage: summarizeCoverage(coverage),
     errors: lastError ? [lastError] : [],
   };
 }
@@ -115,12 +155,22 @@ async function readMetadata(fetchImpl) {
   }
 }
 
+async function readCoverage(fetchImpl) {
+  try {
+    const response = await fetchImpl('data/coverage.json', { cache: 'no-cache' });
+    return response.ok ? await response.json() : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function collectOfflineDiagnostics({
   fetchImpl = globalThis.fetch,
   navigatorRef = globalThis.navigator,
 } = {}) {
-  const [metadata, storage] = await Promise.all([
+  const [metadata, coverage, storage] = await Promise.all([
     readMetadata(fetchImpl),
+    readCoverage(fetchImpl),
     inspectStorage(),
   ]);
   return buildSanitizedSupportBundle({
@@ -130,6 +180,7 @@ export async function collectOfflineDiagnostics({
     serviceWorker: getServiceWorkerDiagnostics(),
     storage,
     feeds: getOptionalFeedStates(),
+    coverage,
   });
 }
 
@@ -182,6 +233,13 @@ export async function renderOfflineDiagnostics(host) {
     <div class="diagnostics-feeds">
       <strong>${escapeHtml(t('diagnostics.feedAge'))}</strong>
       <span>${bundle.optional_feeds.map(feed => `${escapeHtml(feed.id)}: ${escapeHtml(formatDiagnosticAge(feed.last_success_age_ms))}`).join(' · ')}</span>
+    </div>
+    <div class="diagnostics-coverage">
+      <strong>${escapeHtml(t('diagnostics.coverage'))}</strong>
+      ${bundle.coverage.available
+        ? `<span>${escapeHtml(t('diagnostics.coverageSummary', bundle.coverage.datasets.length, bundle.coverage.catalog.year_range?.join('–') || '—', bundle.coverage.catalog.storm_count ?? '—'))}</span>
+           <div class="diagnostics-coverage-list" role="list" tabindex="0" aria-label="${escapeHtml(t('diagnostics.coverage'))}">${bundle.coverage.datasets.map(dataset => `<span role="listitem"><strong>${escapeHtml(dataset.label || dataset.id)}</strong><small>${escapeHtml(dataset.value_status)} · ${escapeHtml(dataset.year_range?.join('–') || t('diagnostics.coverageNoRange'))}${dataset.availability.runnable ? '' : ` · ${escapeHtml(t('diagnostics.coverageNotRunnable'))}`}</small></span>`).join('')}</div>`
+        : `<span>${escapeHtml(t('diagnostics.coverageUnavailable'))}</span>`}
     </div>
     ${bundle.errors.length ? `<p class="diagnostics-error" role="status">${escapeHtml(bundle.errors[0].name)}: ${escapeHtml(bundle.errors[0].message)}</p>` : ''}
     ${bundle.offline_integrity.error ? `<p class="diagnostics-error" role="status">${escapeHtml(t('diagnostics.integrityDetail'))}: ${escapeHtml(bundle.offline_integrity.error)}</p>` : ''}

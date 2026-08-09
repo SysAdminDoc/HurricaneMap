@@ -1,0 +1,644 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-08-03T00:00:00Z",
+  "source_commit": "a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1",
+  "catalog": {
+    "basins": [
+      "AL",
+      "EP"
+    ],
+    "year_range": [
+      1851,
+      2025
+    ],
+    "storm_count": 595,
+    "landfall_event_count": 759,
+    "hurricane_landfall_count": 374
+  },
+  "datasets": [
+    {
+      "id": "hurdat2",
+      "label": "NOAA/NHC HURDAT2 best-track and derived landfall data",
+      "paths": [
+        "data/hurdat2-atlantic.txt",
+        "data/hurdat2-nepac.txt",
+        "data/hurdat2-sources.json",
+        "data/landfalls.json",
+        "data/stats.json",
+        "data/storms.json",
+        "data/storms.json.gz"
+      ],
+      "sources": [
+        {
+          "name": "hurdat2-atlantic.txt (AL)",
+          "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-02272026.txt",
+          "revision_date": "2026-02-27",
+          "basin": "AL"
+        },
+        {
+          "name": "hurdat2-nepac.txt (EP)",
+          "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-02272026.txt",
+          "revision_date": "2026-02-27",
+          "basin": "EP"
+        }
+      ],
+      "basins": [
+        "AL",
+        "EP"
+      ],
+      "year_range": [
+        1851,
+        2025
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 759,
+        "storms": 595,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "595 final best-track storms; 759 landfall events, including 56 inferred events."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Best-track values are final HURDAT2 records; inferred landfalls remain explicitly tagged."
+      ]
+    },
+    {
+      "id": "aoml-landfalls",
+      "label": "AOML detailed U.S. hurricane landfall table",
+      "paths": [
+        "data/aoml-landfalls.json",
+        "data/aoml-us-landfalls.html"
+      ],
+      "sources": [
+        {
+          "name": "AOML detailed U.S. hurricane landfall table",
+          "url": "https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html",
+          "revision_date": "2026-03-01",
+          "basin": "AL"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        1851,
+        2025
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 386,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "386 normalized reference rows; 353 direct-landfall rows used for scoring."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Independent reference table; marker-qualified rows outside direct landfall remain visible but are excluded from the direct score."
+      ]
+    },
+    {
+      "id": "storm-impacts",
+      "label": "Community-sourced storm impacts",
+      "paths": [
+        "data/impacts.json"
+      ],
+      "sources": [
+        {
+          "name": "Wikipedia storm impact records",
+          "url": "https://en.wikipedia.org/",
+          "revision_date": "2026-07-25"
+        }
+      ],
+      "basins": [
+        "AL",
+        "EP"
+      ],
+      "year_range": [
+        1950,
+        2025
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "inferred",
+      "availability": {
+        "runnable": true,
+        "records": 244,
+        "storms": 244,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "244 storms have normalized community-source impact records; missing storms are unavailable, not zero."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Parsed community-source values carry field-level confidence; some legacy damage units are inferred."
+      ]
+    },
+    {
+      "id": "ncei-billions",
+      "label": "NOAA NCEI Billion-Dollar Weather and Climate Disasters",
+      "paths": [
+        "data/billions.json",
+        "data/ncei-billions-1980-2024.csv"
+      ],
+      "sources": [
+        {
+          "name": "NOAA NCEI Billion-Dollar Weather and Climate Disasters",
+          "url": "https://www.ncei.noaa.gov/access/billions/",
+          "revision_date": "2025-05-08"
+        }
+      ],
+      "basins": [
+        "AL",
+        "EP"
+      ],
+      "year_range": [
+        1980,
+        2024
+      ],
+      "end_date": "2024-12-31",
+      "lifecycle_status": "closed",
+      "value_status": "closed",
+      "availability": {
+        "runnable": false,
+        "records": 65,
+        "storms": 65,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "65 matched storm records; series closed after 2024-12-31."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "NOAA retired the product on 2025-05-08; no future rows are accepted."
+      ]
+    },
+    {
+      "id": "enso",
+      "label": "NOAA PSL Oceanic Niño Index snapshot",
+      "paths": [
+        "data/enso.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA CPC Oceanic Niño Index",
+          "url": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php",
+          "revision_date": "2026-06-19"
+        }
+      ],
+      "basins": [],
+      "year_range": [
+        1950,
+        2025
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 76,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "76 annual snapshot records; valid through 2026-08-31."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Snapshot values are not a live feed; validity is bounded by the published date."
+      ]
+    },
+    {
+      "id": "seasonal-outlook",
+      "label": "NOAA/CPC and CSU seasonal outlook snapshot",
+      "paths": [
+        "data/outlook.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA",
+          "url": "https://www.noaa.gov/news-release/noaa-predicts-below-normal-2026-atlantic-hurricane-season",
+          "revision_date": "2026-05-21",
+          "basin": "AL"
+        },
+        {
+          "name": "CSU (July update)",
+          "url": "https://tropical.colostate.edu/Forecast/2026-07.pdf",
+          "revision_date": "2026-07-08",
+          "basin": "AL"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        2026,
+        2026
+      ],
+      "end_date": "2026-12-31",
+      "lifecycle_status": "active",
+      "value_status": "operational",
+      "availability": {
+        "runnable": true,
+        "records": 2,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "2 seasonal outlook sources for 2026; valid through 2026-09-30."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "This is a dated forecast snapshot, not a historical best-track value."
+      ]
+    },
+    {
+      "id": "forecast-skill",
+      "label": "NOAA/NHC official forecast skill summary",
+      "paths": [
+        "data/forecast-skill.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA/NHC official forecast skill summary",
+          "url": "https://www.nhc.noaa.gov/verification/verify2.shtml",
+          "revision_date": "2026-07-08"
+        },
+        {
+          "name": "NHC five-year averages",
+          "url": "https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf",
+          "revision_date": "2026-07-08"
+        }
+      ],
+      "basins": [
+        "AL",
+        "EP"
+      ],
+      "year_range": [
+        2021,
+        2025
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 18,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "Post-season verification rows for 2021-2025; model OFCL."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Forecast skill is a verified summary and does not represent a forecast for a selected storm."
+      ]
+    },
+    {
+      "id": "advisory-replay",
+      "label": "NHC archived advisory replay",
+      "paths": [
+        "data/advisories.json",
+        "data/cone-radii.json"
+      ],
+      "sources": [
+        {
+          "name": "NHC archived ATCF advisories",
+          "url": "https://ftp.nhc.noaa.gov/atcf/archive/",
+          "revision_date": "2026-08-03",
+          "basin": "AL"
+        },
+        {
+          "name": "NHC advisory discussions",
+          "url": "https://www.nhc.noaa.gov/archive/",
+          "revision_date": "2026-08-03",
+          "basin": "AL"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        2015,
+        2024
+      ],
+      "end_date": "2024-12-31",
+      "lifecycle_status": "active",
+      "value_status": "operational",
+      "availability": {
+        "runnable": true,
+        "records": null,
+        "storms": 33,
+        "frames": null,
+        "advisories": 886,
+        "marks": null,
+        "detail": "886 preliminary operational advisories across 33 storms; exact-time HURDAT2 verification only."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Forecast positions and winds are operational values as issued; final best-track comparisons are separate."
+      ]
+    },
+    {
+      "id": "storm-events",
+      "label": "NOAA/NCEI Storm Events coincidence data",
+      "paths": [
+        "data/storm-events.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA/NCEI Storm Events Database",
+          "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/",
+          "revision_date": "2026-05-05"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        1953,
+        2024
+      ],
+      "end_date": "2025-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 157,
+        "storms": 157,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "157 storm coincidence records from the bundled NOAA/NCEI extract."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Coincidence records are not a complete damage or impact census."
+      ]
+    },
+    {
+      "id": "rainfall",
+      "label": "NOAA tropical cyclone rainfall reports",
+      "paths": [
+        "data/rainfall.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA tropical cyclone rainfall reports",
+          "url": "https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html",
+          "revision_date": "2026-06-20"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        1950,
+        2020
+      ],
+      "end_date": "2024-12-31",
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 211,
+        "storms": 211,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "211 storms have bundled tropical-cyclone rainfall summaries."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Missing storm records are unavailable, not zero rainfall."
+      ]
+    },
+    {
+      "id": "radar-archive",
+      "label": "Iowa State IEM archived NEXRAD composites",
+      "paths": [
+        "data/radar/manifest.json"
+      ],
+      "sources": [
+        {
+          "name": "Iowa State IEM NEXRAD mosaic archive",
+          "url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
+          "revision_date": "2026-05-03"
+        }
+      ],
+      "basins": [
+        "AL",
+        "EP"
+      ],
+      "year_range": [
+        1995,
+        2025
+      ],
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": null,
+        "storms": 139,
+        "frames": 1703,
+        "advisories": null,
+        "marks": null,
+        "detail": "1703 archived frames across 139 storms; core ships metadata and full ships PNG frames."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Only in-coverage frames are archived; missing local frames may use the online IEM fallback when available."
+      ]
+    },
+    {
+      "id": "hwm",
+      "label": "USGS observed high-water marks",
+      "paths": [
+        "data/surge-obs/index.json"
+      ],
+      "sources": [
+        {
+          "name": "USGS Short-Term Network observed high-water marks",
+          "url": "https://stn.wim.usgs.gov/STNServices/",
+          "revision_date": "2026-07-09"
+        }
+      ],
+      "basins": [
+        "AL"
+      ],
+      "year_range": [
+        2003,
+        2024
+      ],
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": null,
+        "storms": 25,
+        "frames": null,
+        "advisories": null,
+        "marks": 10741,
+        "detail": "10741 observed marks across 25 matched storm events; absent marks are unavailable."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Observed elevations are survey measurements used beside the modeled surge product."
+      ]
+    },
+    {
+      "id": "tide-stations",
+      "label": "NOAA CO-OPS tide-station index",
+      "paths": [
+        "data/tide-stations.json"
+      ],
+      "sources": [
+        {
+          "name": "NOAA CO-OPS tide station index",
+          "url": "https://tidesandcurrents.noaa.gov/",
+          "revision_date": "2026-07-09"
+        }
+      ],
+      "basins": [],
+      "year_range": null,
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 301,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "301 stations are indexed; water levels are fetched on demand from NOAA CO-OPS."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "The station index is bundled; observed and predicted water levels are operational requests, not a static archive."
+      ]
+    },
+    {
+      "id": "storm-boundaries",
+      "label": "U.S. Census state boundary polygons",
+      "paths": [
+        "data/us-states.geojson"
+      ],
+      "sources": [
+        {
+          "name": "U.S. Census state boundary polygons",
+          "url": "https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html",
+          "revision_date": "2026-05-03"
+        }
+      ],
+      "basins": [],
+      "year_range": null,
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 52,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "52 state and territory boundary features are bundled for spatial classification."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Boundaries support inferred-landfall and spatial-search geometry; they are not storm observations."
+      ]
+    },
+    {
+      "id": "glossary",
+      "label": "HurricaneMap glossary",
+      "paths": [
+        "data/glossary.json"
+      ],
+      "sources": [
+        {
+          "name": "HurricaneMap glossary",
+          "url": "https://github.com/SysAdminDoc/HurricaneMap",
+          "revision_date": "2026-07-25"
+        }
+      ],
+      "basins": [],
+      "year_range": null,
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 20,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "20 application glossary entries are bundled."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "Definitions are application-maintained explanatory text."
+      ]
+    }
+  ]
+}

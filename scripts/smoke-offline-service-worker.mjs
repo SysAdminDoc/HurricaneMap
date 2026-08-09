@@ -307,17 +307,21 @@ try {
     const panel = await import('/src/panel.js');
     await data.ensureStormsLoaded();
     const storms = data.getAllStorms();
+    const coverage = await (await fetch('/data/coverage.json')).json();
     const katrina = storms.find(storm => storm.id === 'AL122005');
     const landfall = data.getLandfalls().find(item => item.storm_id === 'AL122005');
     if (!katrina || !landfall) throw new Error('Katrina offline data unavailable');
     await panel.showStorm(landfall);
     return {
       storms: storms.length,
+      radarFrames: coverage.datasets.find(dataset => dataset.id === 'radar-archive')?.availability?.frames,
+      catalogStorms: coverage.catalog?.storm_count,
       panelText: document.querySelector('#storm-panel')?.textContent || '',
     };
   });
 
   assert(offlineResult.storms >= 500, `offline storms count too low: ${offlineResult.storms}`);
+  assert(offlineResult.catalogStorms === 595 && offlineResult.radarFrames === 1703, 'offline archive coverage facts are unavailable');
   assert(/Katrina/i.test(offlineResult.panelText), 'offline storm panel did not render Katrina');
   assert(/Est\. exposure/.test(offlineResult.panelText), 'offline exposure metric did not render from cached state density data');
 

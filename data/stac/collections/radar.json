@@ -40,7 +40,19 @@
     ],
     "hurricanemap:frame_count": [
       1703
-    ]
+    ],
+    "hurricanemap:year_range": [
+      1995,
+      2025
+    ],
+    "hurricanemap:basins": [
+      "AL",
+      "EP"
+    ],
+    "hurricanemap:storm_count": [
+      139
+    ],
+    "hurricanemap:coverage_status": "final"
   },
   "hurricanemap:frame_count": 1703,
   "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",

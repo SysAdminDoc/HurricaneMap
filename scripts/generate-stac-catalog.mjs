@@ -31,6 +31,10 @@ export async function buildStacFiles({ root = ROOT } = {}) {
   const radarManifest = JSON.parse(await readFile(path.join(dataRoot, 'radar/manifest.json'), 'utf8'));
   const storms = JSON.parse(await readFile(path.join(dataRoot, 'storms.json'), 'utf8'));
   const landfalls = JSON.parse(await readFile(path.join(dataRoot, 'landfalls.json'), 'utf8'));
+  const coverage = JSON.parse(await readFile(path.join(dataRoot, 'coverage.json'), 'utf8'));
+  const coverageById = new Map(coverage.datasets.map(dataset => [dataset.id, dataset]));
+  const hurdatCoverage = coverageById.get('hurdat2');
+  const radarCoverage = coverageById.get('radar-archive');
   const files = new Map();
   const sourceCommit = releaseManifest.source_commit;
   const generatedAt = releaseManifest.generated_at_utc;
@@ -107,6 +111,8 @@ export async function buildStacFiles({ root = ROOT } = {}) {
           'hurricanemap:region': storm.region,
           'hurricanemap:product': region.product,
           'hurricanemap:is_landfall_frame': Object.values(storm.landfalls || {}).includes(stamp),
+          'hurricanemap:availability': 'archived',
+          'hurricanemap:value_status': radarCoverage?.value_status || 'final',
           'hurricanemap:source_url': imageRecord.source_url,
           'hurricanemap:source_date': imageRecord.source_date,
           'hurricanemap:distribution': DISTRIBUTIONS,
@@ -138,6 +144,10 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       end_datetime: trackTimes.at(-1),
       'hurricanemap:storm_count': storms.length,
       'hurricanemap:landfall_event_count': landfalls.length,
+      'hurricanemap:year_range': hurdatCoverage?.year_range,
+      'hurricanemap:basins': hurdatCoverage?.basins,
+      'hurricanemap:coverage_status': hurdatCoverage?.value_status || 'final',
+      'hurricanemap:inferred_landfall_count': landfalls.filter(landfall => landfall.inferred).length,
       'hurricanemap:source_url': 'https://www.nhc.noaa.gov/data/hurdat/',
       'hurricanemap:source_date': latestSourceDate(releaseManifest, [
         'data/hurdat2-atlantic.txt',
@@ -156,6 +166,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       landfalls: asset('data/landfalls.json', HURDAT2_ITEM_PATH, { type: 'application/json', title: 'US landfall event index' }),
       boundaries: asset('data/us-states.geojson', HURDAT2_ITEM_PATH, { type: 'application/geo+json', title: 'US state boundaries' }),
       sources: asset('data/hurdat2-sources.json', HURDAT2_ITEM_PATH, { type: 'application/json', title: 'HURDAT2 source lock' }),
+      coverage: asset('data/coverage.json', HURDAT2_ITEM_PATH, { type: 'application/json', title: 'Dataset archive coverage' }),
     },
   };
   add(HURDAT2_ITEM_PATH, hurdat2Item);
@@ -181,6 +192,10 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       'hurricanemap:distribution': DISTRIBUTIONS,
       'hurricanemap:storm_count': [storms.length],
       'hurricanemap:landfall_event_count': [landfalls.length],
+      'hurricanemap:year_range': hurdatCoverage?.year_range,
+      'hurricanemap:basins': hurdatCoverage?.basins,
+      'hurricanemap:coverage_status': hurdatCoverage?.value_status || 'final',
+      'hurricanemap:inferred_landfall_count': [landfalls.filter(landfall => landfall.inferred).length],
     },
     'hurricanemap:source_url': 'https://www.nhc.noaa.gov/data/hurdat/',
     'hurricanemap:source_date': latestSourceDate(releaseManifest, [
@@ -208,6 +223,10 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       'hurricanemap:distribution': DISTRIBUTIONS,
       'hurricanemap:regions': Object.keys(RADAR_REGIONS).sort(),
       'hurricanemap:frame_count': [radarFrames.length],
+      'hurricanemap:year_range': radarCoverage?.year_range,
+      'hurricanemap:basins': radarCoverage?.basins,
+      'hurricanemap:storm_count': [radarCoverage?.availability?.storms],
+      'hurricanemap:coverage_status': radarCoverage?.value_status || 'final',
     },
     'hurricanemap:frame_count': radarFrames.length,
     'hurricanemap:source_url': 'https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/',
@@ -250,6 +269,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       { rel: 'child', href: relativeHref(CATALOG_PATH, HURDAT2_COLLECTION_PATH), type: 'application/json' },
       { rel: 'child', href: relativeHref(CATALOG_PATH, RADAR_COLLECTION_PATH), type: 'application/json' },
       { rel: 'describedby', href: relativeHref(CATALOG_PATH, 'data/release-manifest.json'), type: 'application/json', title: 'Release checksum manifest' },
+      { rel: 'describedby', href: relativeHref(CATALOG_PATH, 'data/coverage.json'), type: 'application/json', title: 'Dataset archive coverage' },
     ],
   });
 

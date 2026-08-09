@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## v1.9.2 — Acceptance hardening and release hygiene (2026-08-03)
 
 ### Added
+- The generated archive-coverage contract now reports source/revision, basin and year ranges, measured records/storms/frames/advisories/marks, distribution profiles, and final/inferred/operational/stale/closed/unavailable statuses for all 15 bundled datasets; About, offline diagnostics, STAC summaries, and research-export provenance consume the same facts.
 - Copy-ready APA and BibTeX release citations now appear on every analytical side panel and About surface, travel with research and storm exports, and are emitted by the starter notebook from the same HURDAT2 revision/hash contract; shared URLs now pin the full release-manifest SHA-256.
 - Bundled data metadata now carries a lifecycle status for each source; the retired NOAA NCEI Billion-Dollar Disasters series is explicitly closed at 2024, validates against that end date, and renders closed-series copy separately from an unavailable feed.
 - Hand-maintained seasonal outlook and ENSO snapshots now carry issue/validity windows, with a 45-day in-season freshness warning, hard expiry gate, and visible validity dates plus a current NOAA CPC link in the stats card.

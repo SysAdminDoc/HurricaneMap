@@ -39,6 +39,7 @@ const DATA = {
   stormsById: new Map(),
   stats: null,
   metadata: null,
+  coverage: null,       // per-dataset archive coverage and lifecycle facts
   impacts: null,       // storm_id -> raw + normalized Wikipedia impact fields
   billions: null,      // storm_id -> NCEI billion-dollar disaster event (frozen at 2024)
   billionsAvailable: false,
@@ -65,10 +66,11 @@ async function fetchJson(url, { optional = false, fallback = null, priority } = 
 }
 
 export async function loadInitial() {
-  const [lf, st, md, im, bn, enso, aoml] = await Promise.all([
+  const [lf, st, md, cv, im, bn, enso, aoml] = await Promise.all([
     fetchJson('data/landfalls.json', { priority: 'high' }),
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
+    fetchJson('data/coverage.json', { priority: 'high' }),
     fetchJson('data/impacts.json', { optional: true, fallback: {} }),
     fetchJson('data/billions.json', { optional: true, fallback: null }),
     fetchJson('data/enso.json', { optional: true, fallback: null }),
@@ -80,6 +82,7 @@ export async function loadInitial() {
   DATA.landfalls = lf || [];
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;
+  DATA.coverage = cv && typeof cv === 'object' ? cv : null;
   DATA.impacts = im || {};
   DATA.billions = bn && typeof bn === 'object' && !Array.isArray(bn) ? bn : {};
   DATA.billionsAvailable = Boolean(bn && typeof bn === 'object' && !Array.isArray(bn));
@@ -181,6 +184,10 @@ export function getStats() {
 
 export function getMetadata() {
   return DATA.metadata;
+}
+
+export function getCoverage() {
+  return DATA.coverage;
 }
 
 export function getAomlValidation() {

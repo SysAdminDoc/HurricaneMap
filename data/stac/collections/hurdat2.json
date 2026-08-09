@@ -38,6 +38,18 @@
     ],
     "hurricanemap:landfall_event_count": [
       759
+    ],
+    "hurricanemap:year_range": [
+      1851,
+      2025
+    ],
+    "hurricanemap:basins": [
+      "AL",
+      "EP"
+    ],
+    "hurricanemap:coverage_status": "final",
+    "hurricanemap:inferred_landfall_count": [
+      56
     ]
   },
   "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",

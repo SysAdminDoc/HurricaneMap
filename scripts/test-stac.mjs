@@ -15,6 +15,15 @@ assert(generated.has('data/stac/catalog.json'), 'STAC generator omitted the cata
 assert(generated.has('data/stac/items/hurdat2.json'), 'STAC generator omitted the HURDAT2 item');
 const catalogOnDisk = await readFile(path.join(root, 'data/stac/catalog.json'), 'utf8');
 assert.equal(catalogOnDisk, generated.get('data/stac/catalog.json'), 'checked-in catalog is not reproducible');
+const hurdat2Collection = JSON.parse(await readFile(path.join(root, 'data/stac/collections/hurdat2.json'), 'utf8'));
+const radarCollection = JSON.parse(await readFile(path.join(root, 'data/stac/collections/radar.json'), 'utf8'));
+const coverage = JSON.parse(await readFile(path.join(root, 'data/coverage.json'), 'utf8'));
+const hurdatCoverage = coverage.datasets.find(dataset => dataset.id === 'hurdat2');
+const radarCoverage = coverage.datasets.find(dataset => dataset.id === 'radar-archive');
+assert.deepEqual(hurdat2Collection.summaries['hurricanemap:year_range'], hurdatCoverage.year_range);
+assert.equal(hurdat2Collection.summaries['hurricanemap:inferred_landfall_count'][0], 56);
+assert.deepEqual(radarCollection.summaries['hurricanemap:year_range'], radarCoverage.year_range);
+assert.equal(radarCollection.summaries['hurricanemap:storm_count'][0], 139);
 
 const full = await validateStac({ root, profile: 'full' });
 assert.equal(full.collections, 2);

@@ -163,9 +163,17 @@ DATASET_STATUSES = [
         "retirement_citation": None,
     },
     {
+        "id": "hwm",
+        "label": "USGS observed high-water marks",
+        "paths": ["data/surge-obs/index.json"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+    {
         "id": "tide-stations",
         "label": "NOAA CO-OPS tide-station index",
-        "paths": ["data/tide-stations.json", "data/surge-obs/index.json"],
+        "paths": ["data/tide-stations.json"],
         "status": "active",
         "end_date": None,
         "retirement_citation": None,
