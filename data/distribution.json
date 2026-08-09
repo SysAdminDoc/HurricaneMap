@@ -1,9 +1,22 @@
 {
   "schema_version": 1,
   "profile": "full",
+  "source_commit": "14d36ee736947014a2a46912589c521c27694c32",
   "capabilities": {
     "historical_offline": true,
     "bundled_radar": true,
-    "remote_radar": true
+    "remote_radar": true,
+    "source_bundle": true
+  },
+  "payload": {
+    "file_count": 3606,
+    "bytes": 551462161,
+    "mandatory_bytes": 3227807,
+    "mandatory_file_count": 152,
+    "source_bundle_bytes": 12475089,
+    "source_bundle_file_count": 3,
+    "source_bundle_max_bytes": 13631488,
+    "radar_file_count": 1704,
+    "radar_bytes": 526918763
   }
 }

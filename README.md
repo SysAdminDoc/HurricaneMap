@@ -121,7 +121,7 @@ Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directo
 
 ### Distribution profiles
 
-Run `npm run dist:core` for the complete historical catalogue and offline application without bundled radar PNGs. Its deployable payload is still about 19 MB because the three-file source bundle remains available for an explicit download, but the mandatory service-worker install is about 7 MB; `data/distribution.json` reports both byte totals and the 13 MB source-pack cap. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write `data/distribution.json` with the source commit and capability flags. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
+Run `npm run dist:core` for the complete historical catalogue and offline application without bundled radar PNGs. Its deployable payload is still about 19 MB because the three-file source bundle remains available for an explicit download, but the mandatory service-worker install is about 7 MB; `data/distribution.json` reports payload and mandatory byte totals, the 13 MB source-pack cap, and radar counts. Run `npm run dist:full` for the approximately 521 MB deployment with all 1,700+ archived radar frames. Both commands require a clean tracked tree, stage deployable content under `dist/core` or `dist/full`, and write the same schema-versioned `data/distribution.json` contract, validated by `schemas/distribution-v1.schema.json`, with the profile-specific source commit and capability flags. Payload totals intentionally exclude the descriptor and release manifest themselves; those generated metadata files are still covered by `data/release-manifest.json`. The tracked source tree carries the full-profile descriptor; refresh it with `node scripts/build-distribution.mjs --write-source`, which also synchronizes its release-manifest hashes. The core build retains live IEM radar fallback when online and ships an empty local radar manifest so it never claims unavailable offline frames.
 
 The PWA manifests use the stable relative identity and scope `./`, so installs remain tied to the deployed app root on GitHub Pages, a subpath, or self-hosting. `manifest.webmanifest`, `manifest.es.webmanifest`, and `manifest.ht.webmanifest` localize installed names, screenshots, and shortcuts for the three supported interface locales; the app switches the manifest link when the locale changes. `npm run check:manifests` and the distribution/browser checks verify that every icon, screenshot, and shortcut target resolves in both profiles.
 
@@ -220,7 +220,7 @@ HurricaneMap/
 │   ├── storms.json             # full track + metadata for every US-landfalling storm
 │   ├── stats.json              # pre-computed stats: by state, decade, category, cold spots
 │   ├── metadata.json           # generated source provenance, coverage, and output metadata
-│   ├── distribution.json       # core/full build profile and capability contract
+│   ├── distribution.json       # canonical profile, payload, capability, and radar contract
 │   ├── stac/                    # static STAC catalog, collections, and per-frame items
 │   └── radar/                  # archived NEXRAD composites (~512 MB, 1700+ frames)
 │       ├── manifest.json           # storm_id → {landfalls, frames}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sysadmindoc.github.io/HurricaneMap/schemas/distribution-v1.schema.json",
+  "title": "HurricaneMap distribution descriptor v1",
+  "type": "object",
+  "required": ["schema_version", "profile", "source_commit", "capabilities", "payload"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "profile": { "enum": ["core", "full"] },
+    "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "capabilities": {
+      "type": "object",
+      "required": ["historical_offline", "bundled_radar", "remote_radar", "source_bundle"],
+      "properties": {
+        "historical_offline": { "type": "boolean" },
+        "bundled_radar": { "type": "boolean" },
+        "remote_radar": { "type": "boolean" },
+        "source_bundle": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "file_count",
+        "bytes",
+        "mandatory_bytes",
+        "mandatory_file_count",
+        "source_bundle_bytes",
+        "source_bundle_file_count",
+        "source_bundle_max_bytes",
+        "radar_file_count",
+        "radar_bytes"
+      ],
+      "properties": {
+        "file_count": { "type": "integer", "minimum": 1 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "mandatory_bytes": { "type": "integer", "minimum": 1 },
+        "mandatory_file_count": { "type": "integer", "minimum": 1 },
+        "source_bundle_bytes": { "type": "integer", "minimum": 1 },
+        "source_bundle_file_count": { "type": "integer", "const": 3 },
+        "source_bundle_max_bytes": { "type": "integer", "minimum": 1 },
+        "radar_file_count": { "type": "integer", "minimum": 0 },
+        "radar_bytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

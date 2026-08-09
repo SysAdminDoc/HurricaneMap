@@ -4,15 +4,25 @@ import { readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { describeDistribution, stageDistribution } from './build-distribution.mjs';
+import { describeDistribution, SOURCE_BUNDLE_FILES, stageDistribution } from './build-distribution.mjs';
 import { validateStac } from './check-stac.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.join(root, 'dist', '.test-core');
+const outputs = {
+  core: path.join(root, 'dist', '.test-core'),
+  full: path.join(root, 'dist', '.test-full'),
+};
 const [core, full] = await Promise.all([
   describeDistribution('core'),
   describeDistribution('full'),
 ]);
+
+const sourceDescriptor = JSON.parse(await readFile(path.join(root, 'data/distribution.json'), 'utf8'));
+const sourceManifest = JSON.parse(await readFile(path.join(root, 'data/release-manifest.json'), 'utf8'));
+assertDescriptor(sourceDescriptor, full, 'source descriptor');
+assert.equal(sourceDescriptor.profile, 'full', 'tracked source descriptor must describe the full repository payload');
+assert.equal(sourceDescriptor.source_commit, sourceManifest.source_commit, 'source descriptor and release manifest source commits must agree');
+await assertManifestAgreement(root, sourceDescriptor, sourceManifest, 'source descriptor');
 
 assert.equal(core.source_commit, full.source_commit, 'profiles must identify the same source commit');
 assert.equal(core.radar_file_count, 0, 'core distribution must omit radar PNGs');
@@ -52,34 +62,68 @@ for (const required of [
 }
 
 try {
-  await stageDistribution('core', output, { allowDirty: true });
-  const descriptor = JSON.parse(await readFile(path.join(output, 'data/distribution.json'), 'utf8'));
-  const releaseManifest = JSON.parse(await readFile(path.join(output, 'data/release-manifest.json'), 'utf8'));
-  const radarManifest = JSON.parse(await readFile(path.join(output, 'data/radar/manifest.json'), 'utf8'));
-  assert.equal(descriptor.profile, 'core');
-  assert.equal(releaseManifest.source_commit, descriptor.source_commit);
-  assert(!releaseManifest.artifacts.some(artifact => artifact.path.endsWith('.png')), 'core manifest must omit radar frame artifacts');
-  const distributionBytes = await readFile(path.join(output, 'data/distribution.json'));
-  const distributionArtifact = releaseManifest.artifacts.find(artifact => artifact.path === 'data/distribution.json');
-  assert.equal(distributionArtifact.bytes, distributionBytes.length);
-  assert.equal(distributionArtifact.sha256, createHash('sha256').update(distributionBytes).digest('hex'));
-  assert.equal(descriptor.capabilities.historical_offline, true);
-  assert.equal(descriptor.capabilities.bundled_radar, false);
-  assert.equal(descriptor.capabilities.remote_radar, true);
-  assert.equal(descriptor.capabilities.source_bundle, true);
-  assert.equal(descriptor.payload.mandatory_bytes, core.mandatory_bytes);
-  assert.equal(descriptor.payload.mandatory_file_count, core.mandatory_file_count);
-  assert.equal(descriptor.payload.source_bundle_bytes, core.source_bundle_bytes);
-  assert.equal(descriptor.payload.source_bundle_max_bytes, core.source_bundle_max_bytes);
-  assert.deepEqual(radarManifest, {}, 'core radar manifest must not claim bundled frames');
-  const stac = await validateStac({ root: output, profile: 'core' });
-  assert.equal(stac.collections, 2);
-  assert.equal(stac.radarAssets, full.radar_file_count);
+  for (const [profile, description] of [['core', core], ['full', full]]) {
+    const result = await stageDistribution(profile, outputs[profile], { allowDirty: true });
+    const descriptor = JSON.parse(await readFile(path.join(outputs[profile], 'data/distribution.json')));
+    const releaseManifest = JSON.parse(await readFile(path.join(outputs[profile], 'data/release-manifest.json')));
+    assertDescriptor(descriptor, description, `${profile} descriptor`);
+    assert.deepEqual(descriptor, result.descriptor, `${profile} stage result descriptor drifted from staged descriptor`);
+    await assertManifestAgreement(outputs[profile], descriptor, releaseManifest, `${profile} descriptor`);
+    const radarManifest = JSON.parse(await readFile(path.join(outputs[profile], 'data/radar/manifest.json')));
+    if (profile === 'core') {
+      assert(!releaseManifest.artifacts.some(artifact => artifact.path.endsWith('.png')), 'core manifest must omit radar frame artifacts');
+      assert.deepEqual(radarManifest, {}, 'core radar manifest must not claim bundled frames');
+    } else {
+      assert.equal(Object.keys(radarManifest).length > 0, true, 'full radar manifest must retain bundled frames');
+    }
+    const stac = await validateStac({ root: outputs[profile], profile });
+    assert.equal(stac.collections, 2);
+    assert.equal(stac.radarAssets, full.radar_file_count);
+  }
 } finally {
-  await rm(output, { recursive: true, force: true });
+  await Promise.all(Object.values(outputs).map(output => rm(output, { recursive: true, force: true })));
 }
 
 console.log(
   `distribution profiles ok (core ${(core.bytes / 1024 / 1024).toFixed(1)} MB, `
   + `full ${(full.bytes / 1024 / 1024).toFixed(1)} MB with ${full.radar_file_count} radar frames)`,
 );
+
+function assertDescriptor(descriptor, description, label) {
+  assert.equal(descriptor.schema_version, 1, `${label} schema version`);
+  assert.equal(descriptor.profile, description.profile, `${label} profile`);
+  assert.match(descriptor.source_commit, /^[a-f0-9]{40}$/, `${label} source commit`);
+  assert.equal(descriptor.capabilities.historical_offline, true, `${label} historical capability`);
+  assert.equal(descriptor.capabilities.bundled_radar, description.profile === 'full', `${label} radar capability`);
+  assert.equal(descriptor.capabilities.remote_radar, true, `${label} remote radar capability`);
+  assert.equal(descriptor.capabilities.source_bundle, true, `${label} source bundle capability`);
+  for (const key of [
+    'file_count',
+    'bytes',
+    'mandatory_bytes',
+    'mandatory_file_count',
+    'source_bundle_file_count',
+    'source_bundle_max_bytes',
+    'radar_file_count',
+    'radar_bytes',
+  ]) {
+    assert.equal(descriptor.payload[key], description[key], `${label} payload ${key}`);
+  }
+  assert(descriptor.payload.source_bundle_bytes <= descriptor.payload.source_bundle_max_bytes, `${label} source bundle exceeds cap`);
+}
+
+async function assertManifestAgreement(directory, descriptor, releaseManifest, label) {
+  assert.equal(releaseManifest.source_commit, descriptor.source_commit, `${label} source commit`);
+  const descriptorBytes = await readFile(path.join(directory, 'data/distribution.json'));
+  const descriptorArtifact = releaseManifest.artifacts.find(artifact => artifact.path === 'data/distribution.json');
+  assert.equal(descriptorArtifact.bytes, descriptorBytes.length, `${label} descriptor byte count`);
+  assert.equal(descriptorArtifact.sha256, createHash('sha256').update(descriptorBytes).digest('hex'), `${label} descriptor hash`);
+
+  const sourceArtifacts = releaseManifest.artifacts.filter(artifact => SOURCE_BUNDLE_FILES.has(artifact.path));
+  const releaseManifestBytes = (await readFile(path.join(directory, 'data/release-manifest.json'))).length;
+  assert.equal(sourceArtifacts.length + 1, descriptor.payload.source_bundle_file_count, `${label} source bundle file count`);
+  assert.equal(sourceArtifacts.reduce((sum, artifact) => sum + artifact.bytes, 0) + releaseManifestBytes, descriptor.payload.source_bundle_bytes, `${label} source bundle bytes`);
+  const radarArtifacts = releaseManifest.artifacts.filter(artifact => artifact.path.startsWith('data/radar/') && artifact.path.endsWith('.png'));
+  assert.equal(radarArtifacts.length, descriptor.payload.radar_file_count, `${label} radar file count`);
+  assert.equal(radarArtifacts.reduce((sum, artifact) => sum + artifact.bytes, 0), descriptor.payload.radar_bytes, `${label} radar bytes`);
+}

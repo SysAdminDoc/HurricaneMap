@@ -25,6 +25,8 @@ export const SOURCE_BUNDLE_FILES = new Set([
   'data/release-manifest.json',
 ]);
 export const SOURCE_BUNDLE_MAX_BYTES = 13 * 1024 * 1024;
+const GENERATED_METADATA_FILES = new Set(['data/distribution.json', 'data/release-manifest.json']);
+const EMPTY_RADAR_MANIFEST_BYTES = Buffer.byteLength('{}\n');
 const SERVICE_WORKER_SOURCE = await readFile(path.join(root, 'sw.js'), 'utf8');
 const APPLICATION_MODULES = git(['ls-files', '--', 'src'])
   .split(/\r?\n/)
@@ -61,10 +63,12 @@ export function trackedStaticFiles(profile) {
 
 export async function describeDistribution(profile) {
   const files = trackedStaticFiles(profile);
-  const measured = await Promise.all(files.map(async file => ({
+  const measured = (await Promise.all(files.map(async file => ({
     file,
     bytes: (await stat(path.join(root, file))).size,
-  })));
+  })))).map(item => profile === 'core' && item.file === 'data/radar/manifest.json'
+    ? { ...item, bytes: EMPTY_RADAR_MANIFEST_BYTES }
+    : item);
   const radarFiles = measured.filter(item => item.file.startsWith('data/radar/') && item.file.endsWith('.png'));
   const sourceBundleFiles = measured.filter(item => SOURCE_BUNDLE_FILES.has(item.file));
   const sourceBundleBytes = sourceBundleFiles.reduce((sum, item) => sum + item.bytes, 0);
@@ -73,12 +77,13 @@ export async function describeDistribution(profile) {
   }
   const mandatoryFiles = measured.filter(item => MANDATORY_INSTALL_FILES.has(item.file) && !SOURCE_BUNDLE_FILES.has(item.file));
   const mandatoryBytes = mandatoryFiles.reduce((sum, item) => sum + item.bytes, 0);
+  const payloadFiles = measured.filter(item => !GENERATED_METADATA_FILES.has(item.file));
   return {
     profile,
     source_commit: sourceCommit(),
     files: measured.map(item => item.file),
-    file_count: measured.length,
-    bytes: measured.reduce((sum, item) => sum + item.bytes, 0),
+    file_count: payloadFiles.length,
+    bytes: payloadFiles.reduce((sum, item) => sum + item.bytes, 0),
     mandatory_bytes: mandatoryBytes,
     mandatory_file_count: mandatoryFiles.length,
     source_bundle_bytes: sourceBundleBytes,
@@ -87,6 +92,47 @@ export async function describeDistribution(profile) {
     radar_file_count: radarFiles.length,
     radar_bytes: radarFiles.reduce((sum, item) => sum + item.bytes, 0),
   };
+}
+
+export function buildDistributionDescriptor(description, { sourceBundleBytes = description.source_bundle_bytes } = {}) {
+  return {
+    schema_version: 1,
+    profile: description.profile,
+    source_commit: description.source_commit,
+    capabilities: {
+      historical_offline: true,
+      bundled_radar: description.profile === 'full',
+      remote_radar: true,
+      source_bundle: true,
+    },
+    payload: {
+      file_count: description.file_count,
+      bytes: description.bytes,
+      mandatory_bytes: description.mandatory_bytes,
+      mandatory_file_count: description.mandatory_file_count,
+      source_bundle_bytes: sourceBundleBytes,
+      source_bundle_file_count: description.source_bundle_file_count,
+      source_bundle_max_bytes: description.source_bundle_max_bytes,
+      radar_file_count: description.radar_file_count,
+      radar_bytes: description.radar_bytes,
+    },
+  };
+}
+
+export async function writeSourceDescriptor() {
+  const description = await describeDistribution('full');
+  let descriptor = buildDistributionDescriptor(description);
+  await writeDistributionDescriptor(path.join(root, 'data/distribution.json'), descriptor);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await synchronizeReleaseManifest(root, description.source_commit);
+    const sourceBundleBytes = await measureSourceBundleBytes(root);
+    if (sourceBundleBytes === descriptor.payload.source_bundle_bytes) break;
+    descriptor = buildDistributionDescriptor(description, { sourceBundleBytes });
+    await writeDistributionDescriptor(path.join(root, 'data/distribution.json'), descriptor);
+    if (attempt === 2) throw new Error('source-bundle byte count did not stabilize');
+  }
+  await assertStagedDescriptor(root, descriptor);
+  return descriptor;
 }
 
 export async function stageDistribution(profile, outputDirectory, { allowDirty = false } = {}) {
@@ -110,32 +156,41 @@ export async function stageDistribution(profile, outputDirectory, { allowDirty =
   if (profile === 'core') {
     await writeFile(path.join(output, 'data/radar/manifest.json'), '{}\n', 'utf8');
   }
-  const descriptor = {
-    schema_version: 1,
-    profile,
-    source_commit: description.source_commit,
-    capabilities: {
-      historical_offline: true,
-      bundled_radar: profile === 'full',
-      remote_radar: true,
-      source_bundle: true,
-    },
-    payload: {
-      file_count: description.file_count,
-      bytes: description.bytes,
-      mandatory_bytes: description.mandatory_bytes,
-      mandatory_file_count: description.mandatory_file_count,
-      source_bundle_bytes: description.source_bundle_bytes,
-      source_bundle_file_count: description.source_bundle_file_count,
-      source_bundle_max_bytes: description.source_bundle_max_bytes,
-      radar_file_count: description.radar_file_count,
-      radar_bytes: description.radar_bytes,
-    },
-  };
+  let descriptor = buildDistributionDescriptor(description);
   await mkdir(path.join(output, 'data'), { recursive: true });
-  await writeFile(path.join(output, 'data/distribution.json'), `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
-  await synchronizeReleaseManifest(output, description.source_commit);
+  await writeDistributionDescriptor(path.join(output, 'data/distribution.json'), descriptor);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await synchronizeReleaseManifest(output, description.source_commit);
+    const sourceBundleBytes = await measureSourceBundleBytes(output);
+    if (sourceBundleBytes === descriptor.payload.source_bundle_bytes) break;
+    descriptor = buildDistributionDescriptor(description, { sourceBundleBytes });
+    await writeDistributionDescriptor(path.join(output, 'data/distribution.json'), descriptor);
+    if (attempt === 2) throw new Error('staged source-bundle byte count did not stabilize');
+  }
+  await assertStagedDescriptor(output, descriptor);
   return { ...description, output, descriptor };
+}
+
+async function writeDistributionDescriptor(file, descriptor) {
+  await writeFile(file, `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
+}
+
+async function measureSourceBundleBytes(directory) {
+  const sizes = await Promise.all([...SOURCE_BUNDLE_FILES].map(async file => (await stat(path.join(directory, file))).size));
+  return sizes.reduce((sum, size) => sum + size, 0);
+}
+
+async function assertStagedDescriptor(output, descriptor) {
+  const descriptorPath = path.join(output, 'data/distribution.json');
+  const descriptorBytes = await readFile(descriptorPath);
+  const manifest = JSON.parse(await readFile(path.join(output, 'data/release-manifest.json'), 'utf8'));
+  const artifact = manifest.artifacts?.find(candidate => candidate.path === 'data/distribution.json');
+  if (!artifact || artifact.bytes !== descriptorBytes.length || artifact.sha256 !== createHash('sha256').update(descriptorBytes).digest('hex')) {
+    throw new Error('staged release manifest does not describe data/distribution.json');
+  }
+  if (manifest.source_commit !== descriptor.source_commit) throw new Error('staged descriptor and release manifest source commits differ');
+  const sourceBundleBytes = await measureSourceBundleBytes(output);
+  if (descriptor.payload.source_bundle_bytes !== sourceBundleBytes) throw new Error('staged descriptor source-bundle bytes are stale');
 }
 
 async function synchronizeReleaseManifest(output, sourceCommitValue) {
@@ -177,6 +232,11 @@ async function walk(directory) {
 }
 
 async function main() {
+  if (process.argv.includes('--write-source')) {
+    const descriptor = await writeSourceDescriptor();
+    console.log(`source distribution descriptor written (${descriptor.profile} profile, ${descriptor.payload.file_count} payload files)`);
+    return;
+  }
   const profile = process.argv[2];
   const outputFlag = process.argv.indexOf('--out');
   const output = outputFlag >= 0

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-03T00:00:00Z",
-  "source_commit": "a77210eb5cbf93419997ad1b7f8ce73fb6b6abc1",
+  "source_commit": "14d36ee736947014a2a46912589c521c27694c32",
   "algorithm": "SHA-256",
   "artifacts": [
     {
@@ -51,8 +51,8 @@
     },
     {
       "path": "data/distribution.json",
-      "bytes": 156,
-      "sha256": "8cfdbcdaf0344c88233a0c07870dc16d21b51ccad6b986245c95694a4bfade5c",
+      "bytes": 551,
+      "sha256": "9c00f80c782704e73148573f14ce4ce434ce4d7c3f7dae9209762ce11ae52b19",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-07-29",
       "generated_at_utc": "2026-08-03T00:00:00Z",
