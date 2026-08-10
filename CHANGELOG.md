@@ -947,3 +947,24 @@ Initial release.
 - Statistics panel: state hotspot rankings, decade trends, category breakdown, cold-spot list (coastal states with no recorded hurricane-strength landfall).
 - Filters: year range (1851–2025), Saffir-Simpson category toggles, state filter, name/year search.
 - PWA manifest + viewport/theme-color meta tags.
+
+## Roadmap archive — 2026-08-10 — ROADMAP.md
+
+<details>
+<summary>Original roadmap snapshot</summary>
+
+```markdown
+# HurricaneMap Roadmap
+
+Incomplete work only. Blocked items requiring external decisions live in [`Roadmap_Blocked.md`](Roadmap_Blocked.md). Supporting evidence for everything below is in [`RESEARCH.md`](RESEARCH.md) (2026-08-08).
+
+## Research-Driven Additions
+
+### P1 — Now
+
+### P2 — Next
+
+### P3 — Later / under consideration
+```
+
+</details>
