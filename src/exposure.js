@@ -7,6 +7,12 @@
 // model.
 
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  registerOptionalFeedRetry,
+} from './optional-feeds.js';
 
 const NM2_TO_SQMI = 1.324293337;
 const DEFAULT_LANDFALL_WINDOW_HOURS = 18;
@@ -56,12 +62,37 @@ export function buildStateDensityIndex(usStatesGeojson) {
 }
 
 export async function ensureExposureDensitiesLoaded(url = './data/us-states.geojson') {
-  if (cachedStateDensities) return cachedStateDensities;
-  const res = await fetchWithTimeout(url, { cache: 'force-cache' }, REQUEST_TIMEOUT_MS.data);
-  if (!res.ok) throw new Error(`Population density index unavailable (${res.status})`);
-  cachedStateDensities = buildStateDensityIndex(await res.json());
-  return cachedStateDensities;
+  if (cachedStateDensities) {
+    completeOptionalFeed('exposure', { cacheOrigin: 'memory', itemCount: cachedStateDensities.size });
+    return cachedStateDensities;
+  }
+  const request = beginOptionalFeed('exposure', { cacheOrigin: 'bundled' });
+  try {
+    const res = await fetchWithTimeout(url, { cache: 'force-cache' }, REQUEST_TIMEOUT_MS.data);
+    if (!res.ok) {
+      const error = new Error(`Population density index unavailable (${res.status})`);
+      error.responseStatus = res.status;
+      throw error;
+    }
+    cachedStateDensities = buildStateDensityIndex(await res.json());
+    completeOptionalFeed('exposure', {
+      cacheOrigin: 'bundled',
+      itemCount: cachedStateDensities.size,
+      requestId: request.requestId,
+    });
+    return cachedStateDensities;
+  } catch (error) {
+    failOptionalFeed('exposure', {
+      error,
+      responseStatus: error.responseStatus || 0,
+      cacheOrigin: 'bundled',
+      requestId: request.requestId,
+    });
+    throw error;
+  }
 }
+
+registerOptionalFeedRetry('exposure', () => ensureExposureDensitiesLoaded());
 
 export function estimatePopulationExposure(storm, options = {}) {
   const track = Array.isArray(storm?.track) ? storm.track : [];

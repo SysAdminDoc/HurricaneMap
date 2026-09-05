@@ -5,6 +5,12 @@
 import { getMap } from './map.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  registerOptionalFeedRetry,
+} from './optional-feeds.js';
 
 let indexPromise = null;
 let layerGroup = null;
@@ -13,12 +19,42 @@ let renderGeneration = 0;
 
 function loadIndex() {
   if (!indexPromise) {
+    const request = beginOptionalFeed('hwm', { cacheOrigin: 'bundled' });
     indexPromise = fetchWithTimeout('data/surge-obs/index.json', {}, REQUEST_TIMEOUT_MS.data)
-      .then(res => (res.ok ? res.json() : null))
-      .catch(() => null);
+      .then(res => {
+        if (!res.ok) {
+          const error = new Error(`high-water mark index returned ${res.status}`);
+          error.responseStatus = res.status;
+          throw error;
+        }
+        return res.json();
+      })
+      .then(index => {
+        completeOptionalFeed('hwm', {
+          cacheOrigin: 'bundled',
+          itemCount: Object.keys(index || {}).length,
+          requestId: request.requestId,
+        });
+        return index;
+      })
+      .catch(error => {
+        failOptionalFeed('hwm', {
+          error,
+          responseStatus: error.responseStatus || 0,
+          cacheOrigin: 'bundled',
+          requestId: request.requestId,
+        });
+        indexPromise = null;
+        return null;
+      });
   }
   return indexPromise;
 }
+
+registerOptionalFeedRetry('hwm', () => {
+  indexPromise = null;
+  return loadIndex();
+});
 
 /** {event, count} when preprocessed marks exist for this storm, else null. */
 export async function hwmInfo(stormId) {

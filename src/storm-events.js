@@ -2,20 +2,53 @@
 
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  registerOptionalFeedRetry,
+} from './optional-feeds.js';
 
 let stormEventsPromise = null;
 
 export async function loadStormEvents() {
   if (!stormEventsPromise) {
+    const request = beginOptionalFeed('storm-events', { cacheOrigin: 'bundled' });
     stormEventsPromise = fetchWithTimeout('./data/storm-events.json', { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.data)
       .then(response => {
-        if (!response.ok) throw new Error(`Storm Events data returned ${response.status}`);
+        if (!response.ok) {
+          const error = new Error(`Storm Events data returned ${response.status}`);
+          error.responseStatus = response.status;
+          throw error;
+        }
         return response.json();
       })
-      .catch(() => { stormEventsPromise = null; return null; });
+      .then(data => {
+        completeOptionalFeed('storm-events', {
+          cacheOrigin: 'bundled',
+          itemCount: Object.keys(data?.storms || {}).length,
+          requestId: request.requestId,
+        });
+        return data;
+      })
+      .catch(error => {
+        failOptionalFeed('storm-events', {
+          error,
+          responseStatus: error.responseStatus || 0,
+          cacheOrigin: 'bundled',
+          requestId: request.requestId,
+        });
+        stormEventsPromise = null;
+        return null;
+      });
   }
   return stormEventsPromise;
 }
+
+registerOptionalFeedRetry('storm-events', () => {
+  stormEventsPromise = null;
+  return loadStormEvents();
+});
 
 export function getStormEventRecord(data, stormId) {
   return data?.storms?.[stormId] || null;

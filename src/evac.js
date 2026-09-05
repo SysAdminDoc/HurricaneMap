@@ -9,6 +9,13 @@ import { t } from './i18n.js';
 import { getMapOverlayColor } from './map-colors.js';
 import { hidePanel, showPanel } from './panels.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  cancelOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  registerOptionalFeedRetry,
+} from './optional-feeds.js';
 
 export const FLORIDA_ZONE_LAYER = 'https://services.arcgis.com/3wFbqsFPLeKqOlIK/arcgis/rest/services/KYZ_ZL_Vector_Enriched_Calculated_20230608/FeatureServer/46';
 export const ARCGIS_GEOCODER = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates';
@@ -275,17 +282,40 @@ export async function probeFloridaZoneLayer({ force = false, fetcher = fetchJson
   if (!force && floridaLayerProbe.result && now - floridaLayerProbe.checkedAt < FLORIDA_LAYER_PROBE_TTL_MS) {
     return floridaLayerProbe.result;
   }
+  const request = beginOptionalFeed('evac', { cacheOrigin: 'network' });
   try {
     const payload = await fetcher(buildFloridaLayerMetadataUrl());
     const result = classifyFloridaLayerAvailability(payload);
     floridaLayerProbe = { checkedAt: now, result };
+    if (result.available) {
+      completeOptionalFeed('evac', { cacheOrigin: 'network', itemCount: 1, requestId: request.requestId });
+    } else {
+      failOptionalFeed('evac', {
+        error: new Error(`Florida evacuation zone layer is ${result.reason || 'unavailable'}`),
+        responseStatus: 0,
+        cacheOrigin: 'network',
+        requestId: request.requestId,
+      });
+    }
     return result;
   } catch (error) {
-    const result = { available: false, reason: error?.name === 'AbortError' ? 'cancelled' : 'unreachable' };
+    const cancelled = error?.name === 'AbortError';
+    const result = { available: false, reason: cancelled ? 'cancelled' : 'unreachable' };
     floridaLayerProbe = { checkedAt: now, result };
+    if (cancelled) cancelOptionalFeed('evac', { requestId: request.requestId });
+    else {
+      failOptionalFeed('evac', {
+        error,
+        responseStatus: error?.responseStatus || 0,
+        cacheOrigin: 'network',
+        requestId: request.requestId,
+      });
+    }
     return result;
   }
 }
+
+registerOptionalFeedRetry('evac', () => probeFloridaZoneLayer({ force: true }));
 
 function layerFailureMessage(status) {
   return status?.reason === 'invalid-response'

@@ -16,6 +16,11 @@ export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   seasonal: { labelKey: 'feeds.seasonal', source: 'NOAA CPC bundled outlook snapshot' },
   population: { labelKey: 'feeds.population', source: 'SEDAC GPWv4 population-density tiles' },
   glossary: { labelKey: 'feeds.glossary', source: 'HurricaneMap bundled glossary' },
+  sst: { labelKey: 'feeds.sst', source: 'PacIOOS CoralTemp sea-surface temperature' },
+  hwm: { labelKey: 'feeds.hwm', source: 'USGS high-water marks' },
+  'storm-events': { labelKey: 'feeds.stormEvents', source: 'NOAA NCEI Storm Events' },
+  exposure: { labelKey: 'feeds.exposure', source: 'Bundled state population densities' },
+  evac: { labelKey: 'feeds.evac', source: 'Florida ArcGIS evacuation zones' },
 });
 
 export function getBundledDatasetStatus(metadata, datasetId) {

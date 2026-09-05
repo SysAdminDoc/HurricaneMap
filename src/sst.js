@@ -1,5 +1,11 @@
 import { getMap } from './map.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import {
+  beginOptionalFeed,
+  completeOptionalFeed,
+  failOptionalFeed,
+  registerOptionalFeedRetry,
+} from './optional-feeds.js';
 
 const L = window.L;
 
@@ -31,6 +37,7 @@ function fallbackTime() {
 
 function resolveLatestTime() {
   if (!latestTimePromise) {
+    const request = beginOptionalFeed('sst', { cacheOrigin: 'network' });
     latestTimePromise = (async () => {
       try {
         const response = await fetchWithTimeout(LATEST_TIME_PROBE, {}, REQUEST_TIMEOUT_MS.default);
@@ -38,10 +45,26 @@ function resolveLatestTime() {
           const data = await response.json();
           const iso = data?.table?.rows?.[0]?.[0];
           if (typeof iso === 'string' && !Number.isNaN(Date.parse(iso))) {
+            completeOptionalFeed('sst', { cacheOrigin: 'network', itemCount: 1, requestId: request.requestId });
             return { time: iso, fromProbe: true };
           }
         }
-      } catch { /* probe unreachable — fall back below */ }
+        // A reachable probe that cannot name a grid time still leaves the
+        // overlay drawing an older day, so this is stale, not success.
+        failOptionalFeed('sst', {
+          error: new Error(`CoralTemp time probe returned ${response.status}`),
+          responseStatus: response.status,
+          cacheOrigin: 'network',
+          requestId: request.requestId,
+        });
+      } catch (error) {
+        failOptionalFeed('sst', {
+          error,
+          responseStatus: error?.responseStatus || 0,
+          cacheOrigin: 'network',
+          requestId: request.requestId,
+        });
+      }
       return { time: fallbackTime(), fromProbe: false };
     })().finally(() => {
       // Coalesce only concurrent probes. A fallback is retried next enable,
@@ -51,6 +74,8 @@ function resolveLatestTime() {
   }
   return latestTimePromise;
 }
+
+registerOptionalFeedRetry('sst', () => resolveLatestTime());
 
 export function getSSTTime() {
   return resolvedTime;
