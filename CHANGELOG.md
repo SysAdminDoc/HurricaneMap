@@ -5,6 +5,7 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Changed
+- `npm run build` now runs every release gate through `scripts/run-gates.mjs` and reports all of them instead of stopping at the first failure. Each gate prints a pass/fail line with its duration, failures are repeated in full at the end, and the runner refuses to start if a gate-shaped script exists that nothing runs.
 - The 2026 Atlantic outlook now carries NOAA's August 6 update (75% chance of a below-normal season, 7–13 named storms, 2–6 hurricanes, 0–2 major) and CSU's August 5 forecast, replacing the May and July figures.
 
 ### Fixed

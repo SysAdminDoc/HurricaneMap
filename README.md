@@ -46,6 +46,8 @@ Fast non-browser verification:
 npm run build
 ```
 
+That runs all 84 release gates through `scripts/run-gates.mjs` and reports every one of them, so a single red gate can't hide the state of the rest. Each gate prints a pass or fail line with its duration, failures are repeated in full at the end, and the run exits non-zero if any failed. The runner also refuses to start if a `check:`, `validate:`, or `test:` script exists that neither the gate list nor the browser-lane exclusion list claims — a gate nothing runs is not a gate.
+
 ## Highlights
 
 - **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851–2025.
