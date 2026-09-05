@@ -118,6 +118,7 @@ try {
       'hm-data-v1',
       'hm-data-v2',
       'hm-tiles-v0',
+      'hm-tiles-v1',
       'hm-radar-v0',
     ]) {
       const cache = await caches.open(cacheName);

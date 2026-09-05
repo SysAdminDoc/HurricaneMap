@@ -8,7 +8,7 @@
 //     not preinstalled because the archive is intentionally large.
 //   - Source bundle (raw HURDAT2 + release manifest)  → cache-first only after
 //     an explicit user action; the bounded pack is never part of the core.
-//   - Map tiles (CartoDB, OSM)                       → stale-while-revalidate,
+//   - Map tiles (OpenStreetMap)                      → stale-while-revalidate,
 //     capped at TILE_CACHE_MAX_ENTRIES (oldest evicted first).
 //   - Everything else                                → network-first, fall back to cache.
 //

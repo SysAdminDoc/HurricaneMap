@@ -25,6 +25,10 @@ function addBasemap(targetMap) {
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
     maxZoom: 19,
+    // CORS-loaded so the tile a visitor actually sees can be read back from a
+    // canvas. A basemap that silently serves a placeholder still answers 200,
+    // so the smoke suite checks pixels rather than status codes.
+    crossOrigin: 'anonymous',
     className: 'basemap-tiles basemap-osm',
   }).addTo(targetMap);
 }

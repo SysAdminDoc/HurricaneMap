@@ -293,11 +293,12 @@ async function assertBasemapNotWatermarked(page) {
       return stats;
     }
 
-    async function measureUrl(url) {
-      const bitmap = await createImageBitmap(await (await fetch(url, { mode: 'cors' })).blob());
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    // Read the tile the visitor is looking at, not a second copy of it: the
+    // layer is CORS-loaded so the rendered <img> can go straight to a canvas.
+    function measureTile(image) {
+      const canvas = new OffscreenCanvas(image.naturalWidth, image.naturalHeight);
       const context = canvas.getContext('2d');
-      context.drawImage(bitmap, 0, 0);
+      context.drawImage(image, 0, 0);
       return measure(context.getImageData(0, 0, canvas.width, canvas.height));
     }
 
@@ -313,12 +314,10 @@ async function assertBasemapNotWatermarked(page) {
     for (let y = 0; y < 420; y += 48) controlContext.fillText('API KEY REQUIRED', -120, y);
     const controlStats = measure(controlContext.getImageData(0, 0, 256, 256));
 
-    const tiles = [...document.querySelectorAll('#map img.leaflet-tile')]
-      .map(img => img.src)
-      .filter(src => src.startsWith('https://'));
-    const hosts = [...new Set(tiles.map(src => new URL(src).host))];
-    const sampled = [];
-    for (const url of tiles.slice(0, 6)) sampled.push({ url, ...(await measureUrl(url)) });
+    const tiles = [...document.querySelectorAll('#map img.leaflet-tile.leaflet-tile-loaded')]
+      .filter(image => image.src.startsWith('https://') && image.naturalWidth > 0);
+    const hosts = [...new Set(tiles.map(image => new URL(image.src).host))];
+    const sampled = tiles.slice(0, 6).map(image => ({ url: image.src, ...measureTile(image) }));
     return { control: controlStats, hosts, tileCount: tiles.length, sampled };
   }, BASEMAP_TILE_HOST);
 
