@@ -88,6 +88,7 @@
     "test:notebook": "node scripts/python.mjs scripts/test-starter-notebook.py",
     "test:dependency-security": "node scripts/test-dependency-security.mjs",
     "test:layer-registry": "node scripts/test-layer-registry.mjs",
+    "test:shared-probe": "node scripts/test-shared-probe.mjs",
     "test:release-gates": "node scripts/test-release-gates.mjs",
     "test:goes-realtime": "node scripts/test-goes-realtime.mjs",
     "test:active-polling": "node scripts/test-active-polling.mjs",

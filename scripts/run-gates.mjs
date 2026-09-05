@@ -88,6 +88,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'test:notebook',
   'test:dependency-security',
   'test:layer-registry',
+  'test:shared-probe',
   'test:release-gates',
   'test:goes-realtime',
   'test:active-polling',

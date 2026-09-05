@@ -12,17 +12,19 @@
 // Registering under an id supersedes whatever held that id before, so the
 // common case, a user toggling a layer twice, cancels the first attempt instead
 // of racing it.
-import { idleOptionalFeed } from './optional-feeds.js';
+import { idleOptionalFeed, OPTIONAL_FEED_DEFINITIONS } from './optional-feeds.js';
 
 const entries = new Map();
 
 function detach(entry) {
-  if (!entry.layer || !entry.map) return;
+  if (!entry.layer) return;
   try {
     entry.map.removeLayer(entry.layer);
-  } catch {
-    // A layer already removed by its own module is not an error worth raising
-    // during teardown; the point is that it is gone.
+  } catch (error) {
+    // Keep tearing the rest down, but say so. Leaflet throws here when a layer
+    // belongs to a different map, and the symptom of swallowing that is an
+    // overlay stuck on screen: the exact bug this registry exists to prevent.
+    console.warn(`layer-registry: could not remove the "${entry.id}" layer`, error);
   }
 }
 
@@ -33,11 +35,24 @@ function detach(entry) {
  * @param {object} options
  * @param {object} options.map   Leaflet map (or anything with removeLayer).
  * @param {string} options.feedId optional-feed id reported idle on disposal.
+ *                                Opt in by naming one; most overlays are not
+ *                                feeds, and defaulting to the layer id made
+ *                                disposal throw on every id that was not.
  * @returns {{id: string, signal: AbortSignal, disposed: boolean,
  *            attach: (layer: any) => any, dispose: () => void}}
  */
-export function registerMapLayer(id, { map = null, feedId = id } = {}) {
+export function registerMapLayer(id, { map = null, feedId = null } = {}) {
   if (!id) throw new TypeError('a map layer registration needs an id');
+  // Without a map there is nothing to remove the layer from, so disposal would
+  // report success and leave the overlay on screen. Fail at the call site.
+  if (!map || typeof map.removeLayer !== 'function') {
+    throw new TypeError(`registering the "${id}" layer needs a map that can remove it`);
+  }
+  // A bad feed id would otherwise surface as a throw inside teardown, aborting
+  // whatever cleanup came after it in the caller's handler.
+  if (feedId && !OPTIONAL_FEED_DEFINITIONS[feedId]) {
+    throw new TypeError(`the "${id}" layer names an unknown optional feed: ${feedId}`);
+  }
   disposeMapLayer(id);
   const controller = new AbortController();
   const entry = { id, map, feedId, controller, layer: null, disposed: false };
@@ -51,7 +66,7 @@ export function registerMapLayer(id, { map = null, feedId = id } = {}) {
       // map. Returning null lets the caller bail without another guard.
       if (entry.disposed) return null;
       entry.layer = layer;
-      if (map && layer && typeof layer.addTo === 'function') layer.addTo(map);
+      if (layer && typeof layer.addTo === 'function') layer.addTo(map);
       return layer;
     },
     dispose() { disposeMapLayer(id); },

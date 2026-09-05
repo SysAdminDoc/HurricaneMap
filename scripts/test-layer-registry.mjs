@@ -5,6 +5,7 @@ import {
   isMapLayerActive,
   registerMapLayer,
 } from '../src/layer-registry.js';
+import { fetchWithTimeout } from '../src/network.js';
 import { beginOptionalFeed, getOptionalFeedState } from '../src/optional-feeds.js';
 
 function fakeMap() {
@@ -81,4 +82,60 @@ second.dispose();
 assert.equal(isMapLayerActive('radar'), false);
 assert.equal(disposeMapLayer('nothing-registered'), false, 'disposing an unknown id must be a no-op');
 
-console.log('layer registry ok (attach, dispose, feed idle, real abort, late-response refusal, supersede)');
+// Registering without a map used to be accepted: attach recorded the layer,
+// disposal removed nothing, and the caller was told it worked. An overlay left
+// on screen is the failure this registry exists to prevent, so it fails here
+// instead, at the call site that has the bug.
+assert.throws(() => registerMapLayer('no-map', {}), /needs a map that can remove it/);
+assert.throws(() => registerMapLayer('no-map', { map: {} }), /needs a map that can remove it/);
+assert.equal(isMapLayerActive('no-map'), false, 'a rejected registration must not claim the id');
+
+// A feed id has to be a real feed. Defaulting it to the layer id made disposal
+// throw `Unknown optional feed` for every overlay that is not one, inside a
+// teardown handler, aborting the cleanup that came after it.
+assert.throws(
+  () => registerMapLayer('hwm-marks', { map: fakeMap(), feedId: 'hwm-marks' }),
+  /unknown optional feed: hwm-marks/,
+);
+const notAFeed = registerMapLayer('hwm-marks', { map: fakeMap() });
+assert.doesNotThrow(() => notAFeed.dispose(), 'an overlay with no feed must tear down silently');
+
+// Removal can fail for real: Leaflet throws when a layer belongs to another
+// map. Teardown still has to finish, and the failure still has to be visible.
+const hostileMap = { removeLayer() { throw new Error('layer is not on this map'); } };
+const warnings = [];
+const realWarn = console.warn;
+console.warn = (...args) => warnings.push(args[0]);
+try {
+  const hostile = registerMapLayer('hostile', { map: hostileMap });
+  hostile.attach({ addTo() {} });
+  hostile.dispose();
+  assert.equal(hostile.signal.aborted, true, 'a failed removal must not stop the abort');
+  assert.equal(isMapLayerActive('hostile'), false, 'a failed removal must still release the id');
+} finally {
+  console.warn = realWarn;
+}
+assert.equal(warnings.length, 1, 'a failed removal must be reported, not swallowed');
+assert.match(warnings[0], /could not remove the "hostile" layer/);
+
+// End to end through the real network boundary: a request issued before a panel
+// close rejects, rather than being ignored once it arrives.
+const closing = registerMapLayer('sst', { map: fakeMap(), feedId: 'sst' });
+let fetchSignal = null;
+const pending = fetchWithTimeout('https://example.invalid/sst.json', { signal: closing.signal }, 12_000,
+  (input, init) => new Promise((resolve, reject) => {
+    fetchSignal = init.signal;
+    init.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), {
+      name: 'AbortError',
+      cause: init.signal.reason,
+    })), { once: true });
+  }));
+assert.equal(fetchSignal.aborted, false, 'the request must start live');
+closing.dispose();
+await assert.rejects(pending, /aborted/, 'closing the panel must abort the request it issued');
+assert.equal(getOptionalFeedState('sst').state, 'idle', 'and leave the feed idle rather than loading');
+
+console.log(
+  'layer registry ok (attach, dispose, feed idle, real abort through fetchWithTimeout, '
+  + 'late-response refusal, supersede, map and feed-id guards, visible removal failure)',
+);
