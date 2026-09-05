@@ -10,6 +10,7 @@ import {
   GATE_SCRIPTS,
   NON_GATE_SCRIPTS,
 } from './run-gates.mjs';
+import { INTERPRETER_CANDIDATES, missingInterpreterMessage, resolvePythonInterpreter } from './python.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { scripts } = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
@@ -54,4 +55,39 @@ assert.equal(describeSpawnFailure({ status: null, error: { code: 'ENOENT', messa
 assert.equal(describeSpawnFailure({ status: 1, signal: null }), '', 'an ordinary non-zero exit needs no extra explanation');
 assert.equal(describeSpawnFailure(undefined), '');
 
-console.log(`release gate runner ok (${GATE_SCRIPTS.length} gates claimed, ${NON_GATE_SCRIPTS.length} excluded, failure modes named)`);
+// The Python gates run through a resolver rather than a bare `python`, which
+// does not exist on systems shipping only `python3`.
+const pythonGates = Object.entries(scripts).filter(([, command]) => /\.py(\s|$)/.test(command));
+assert.ok(pythonGates.length >= 6, `expected at least six Python gates, found ${pythonGates.length}`);
+for (const [name, command] of pythonGates) {
+  assert.ok(
+    command.includes('scripts/python.mjs'),
+    `${name} invokes Python directly; route it through scripts/python.mjs so it resolves python3 too`,
+  );
+  assert.ok(!/(^|&&\s*)python\s/.test(command), `${name} still calls a bare python`);
+}
+
+assert.deepEqual(
+  INTERPRETER_CANDIDATES.map(candidate => [candidate.command, ...candidate.args].join(' ')),
+  ['python3', 'python', 'py -3'],
+  'python3 must be tried first: on POSIX it is the name guaranteed to be Python 3',
+);
+const probes = [];
+const found = resolvePythonInterpreter(INTERPRETER_CANDIDATES, (command, args) => {
+  probes.push(command);
+  return command === 'python' ? { status: 0, stdout: 'Python 3.12.0\n', stderr: '' } : { status: 1, stdout: '', stderr: '' };
+});
+assert.equal(found.command, 'python', 'the resolver must take the first candidate that answers');
+assert.equal(found.version, 'Python 3.12.0');
+assert.deepEqual(probes, ['python3', 'python'], 'the resolver must stop at the first working interpreter');
+assert.equal(
+  resolvePythonInterpreter(INTERPRETER_CANDIDATES, () => ({ status: 1, stdout: '', stderr: '' })),
+  null,
+  'no interpreter must resolve to null, not to a guess',
+);
+assert.match(missingInterpreterMessage(), /python3, python, py -3/, 'the failure must name what was tried');
+
+console.log(
+  `release gate runner ok (${GATE_SCRIPTS.length} gates claimed, ${NON_GATE_SCRIPTS.length} excluded, `
+  + `failure modes named, ${pythonGates.length} Python gates resolved portably)`,
+);

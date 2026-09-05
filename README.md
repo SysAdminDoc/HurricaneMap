@@ -131,6 +131,8 @@ python serve.py --port 8765
 # open http://127.0.0.1:8765/
 ```
 
+These manual commands say `python` because that is the name on Windows. Use `python3` wherever that is the Python 3 interpreter. The npm gates do not need the distinction: they run through `scripts/python.mjs`, which tries `python3`, then `python`, then the `py -3` launcher, and reports which names it tried if none of them answer.
+
 Use `node scripts/refresh-hurdat2.mjs --dry-run` to check NOAA's HURDAT2 directory locally. When source files change, rerun with `--apply`, rebuild derived JSON with an explicit timestamp such as `python scripts/preprocess_hurdat2.py --generated-at 2026-08-02T00:00:00Z`, then validate with `npm test`.
 
 ### Distribution profiles
