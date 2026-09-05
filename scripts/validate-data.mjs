@@ -12,6 +12,7 @@ import {
   utcDateOnly,
 } from '../src/snapshot-freshness.js';
 import { validateClosedSeriesRows, validateDatasetStatuses } from './dataset-status.mjs';
+import { validateOutlookSource } from './outlook-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
@@ -92,6 +93,9 @@ function validateHandMaintainedSnapshots(outlook, enso) {
     if (typeof source.url !== 'string' || !/^https:\/\//.test(source.url)) {
       fail(`${label}.url must be an HTTPS URL.`);
     }
+    // Only the newest source used to be checked at all, so a superseded
+    // forecast could carry any figures and any date with both gates green.
+    validateOutlookSource(source, index, outlook, fail);
   }
   if (issuedDates.length) {
     const latest = issuedDates.reduce((current, candidate) => candidate > current ? candidate : current);

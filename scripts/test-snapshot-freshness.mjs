@@ -11,6 +11,7 @@ import {
   parseSnapshotDate,
   SNAPSHOT_MAX_AGE_DAYS,
 } from '../src/snapshot-freshness.js';
+import { parseForecastRange, validateOutlookSource } from './outlook-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outlook = JSON.parse(await readFile(path.join(root, 'data/outlook.json'), 'utf8'));
@@ -127,6 +128,54 @@ assert.match(`${stale.stdout}\n${stale.stderr}`, />45 days/);
 const expired = validateAt(expiredDay);
 assert.notEqual(expired.status, 0);
 assert.match(`${expired.stdout}\n${expired.stderr}`, /past valid_until/);
+
+// The outlook source contract. Only the newest source was checked at all, so a
+// superseded forecast could carry any figures and any date with every gate
+// green. These pin the rules to the rules, not to whatever the live file says
+// today, because the live file is refreshed every few weeks.
+assert.deepEqual(parseForecastRange('7-13'), { min: 7, max: 13 }, 'a hyphen range');
+assert.deepEqual(parseForecastRange('7–13'), { min: 7, max: 13 }, 'NOAA publishes an en dash');
+assert.deepEqual(parseForecastRange('7—13'), { min: 7, max: 13 }, 'an em dash too');
+assert.deepEqual(parseForecastRange('7 to 13'), { min: 7, max: 13 });
+assert.deepEqual(parseForecastRange('9'), { min: 9, max: 9 }, 'CSU publishes a single figure');
+assert.deepEqual(parseForecastRange(' 9 '), { min: 9, max: 9 });
+assert.equal(parseForecastRange('13-7'), null, 'a range that runs backwards is not a range');
+assert.equal(parseForecastRange('several'), null);
+assert.equal(parseForecastRange('7-13-20'), null);
+assert.equal(parseForecastRange('7.5'), null, 'storm counts are whole numbers');
+assert.equal(parseForecastRange(''), null);
+assert.equal(parseForecastRange(null), null);
+assert.equal(parseForecastRange(undefined), null);
+
+const contractOutlook = { season: 2026, issued: '2026-08-06', valid_until: '2026-11-30' };
+const complain = source => {
+  const messages = [];
+  validateOutlookSource(source, 0, contractOutlook, message => messages.push(message));
+  return messages;
+};
+const sound = { issued: '2026-08-05', named: '9', hurricanes: '4', majors: '1' };
+assert.deepEqual(complain(sound), [], 'a sound source must raise nothing');
+assert.deepEqual(complain({ ...sound, named: '7–13', hurricanes: '2–6', majors: '0–2' }), [],
+  'the real NOAA ranges must pass, or the rules are just rejecting everything');
+assert.match(complain({ ...sound, majors: '9' })[0], /majors 9 exceeds hurricanes 4/);
+assert.match(complain({ ...sound, hurricanes: '20' })[0], /hurricanes 20 exceeds named 9/);
+assert.match(complain({ ...sound, named: '99', hurricanes: '88', majors: '77' })[0], /not a real seasonal figure/);
+assert.match(complain({ ...sound, named: 'lots' })[0], /must be a number or a range/);
+// The cycle for a season opens in December of the prior year, because that is
+// when the first looks are published, and closes when the outlook window does.
+assert.match(complain({ ...sound, issued: '2025-08-05' }).join(' '), /predates the 2026 forecast cycle/,
+  'a source a whole season behind the headline is not a superseded source, it is the wrong season');
+assert.match(complain({ ...sound, issued: '2025-11-30' }).join(' '), /predates the 2026 forecast cycle/);
+assert.deepEqual(complain({ ...sound, issued: '2025-12-05' }), [],
+  'CSU issues its first look in December of the prior year, which is inside the cycle');
+assert.deepEqual(complain({ ...sound, issued: '2026-01-02' }), [],
+  'and an early-season update is inside it too, so the date rule must not reject one');
+assert.match(complain({ ...sound, issued: '2026-12-15' }).join(' '), /after the 2026 outlook window closes/);
+assert.match(complain({ ...sound, issued: '2026-09-30' }).join(' '), /newer than the headline/);
+// A source that simply omits a count is not a violation: CSU publishes no
+// probability, and an agency may not forecast every category.
+assert.deepEqual(complain({ issued: '2026-08-05' }), []);
+assert.deepEqual(complain({ issued: '2026-08-05', named: '9' }), []);
 
 console.log(
   `snapshot freshness contracts ok (${windows.length} windows, earliest expiry ${iso(earliestExpiry)}, `
