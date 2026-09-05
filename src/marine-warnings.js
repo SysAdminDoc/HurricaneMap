@@ -1,6 +1,12 @@
-// NHC Graphical Marine Wind Warnings (0-24 hour outlook), proxied through the
-// fixed Cloudflare allowlist. The layer is opt-in because the polygons span
-// broad offshore forecast areas and can visually dominate historical tracks.
+// NHC Graphical Marine Wind Warnings (0-24 hour outlook). The layer is opt-in
+// because the polygons span broad offshore forecast areas and can visually
+// dominate historical tracks.
+//
+// Each feed is tried through the fixed Cloudflare allowlist first, then
+// straight from NHC. Unlike CurrentStorms.json and the outlook KMZs, the
+// /gis/ products answer with Access-Control-Allow-Origin, so a deployment with
+// no worker in front of it (GitHub Pages, for one) can read them directly
+// instead of losing the layer to a 404 on the proxy path.
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
@@ -13,7 +19,18 @@ import {
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
-const URLS = ['/nhc/marine/atlantic.kml', '/nhc/marine/pacific.kml'];
+export const MARINE_FEEDS = Object.freeze([
+  Object.freeze({
+    id: 'atlantic',
+    proxy: '/nhc/marine/atlantic.kml',
+    direct: 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml',
+  }),
+  Object.freeze({
+    id: 'pacific',
+    proxy: '/nhc/marine/pacific.kml',
+    direct: 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml',
+  }),
+]);
 const CACHE_MS = 6 * 60 * 60 * 1000;
 const STYLE = {
   low: { color: '#b45f9d', fillColor: '#dda0dd', fillOpacity: 0.20 },
@@ -51,17 +68,33 @@ export function parseMarineWarningKml(kml) {
   return features;
 }
 
+/**
+ * Read one marine feed, preferring the proxy and falling back to NHC directly.
+ * The last failure is rethrown so the optional-feed state still reports the
+ * real status code rather than a generic "unavailable".
+ */
+export async function fetchMarineFeed(feed, { fetchImpl } = {}) {
+  let lastError = null;
+  for (const url of [feed.proxy, feed.direct]) {
+    try {
+      const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active, fetchImpl);
+      if (!response.ok) {
+        const error = new Error(`${url} returned ${response.status}`);
+        error.responseStatus = response.status;
+        lastError = error;
+        continue;
+      }
+      return parseMarineWarningKml(await response.text());
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error(`${feed.id} marine warning feed unavailable`);
+}
+
 async function fetchWarnings(force) {
   if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) return cache.features;
-  const results = await Promise.allSettled(URLS.map(async url => {
-    const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
-    if (!response.ok) {
-      const error = new Error(`${url} returned ${response.status}`);
-      error.responseStatus = response.status;
-      throw error;
-    }
-    return parseMarineWarningKml(await response.text());
-  }));
+  const results = await Promise.allSettled(MARINE_FEEDS.map(feed => fetchMarineFeed(feed)));
   const features = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
   if (!features.length && results.every(result => result.status === 'rejected')) throw new Error('NHC marine warning feeds unavailable');
   cache = { fetchedAt: Date.now(), features };

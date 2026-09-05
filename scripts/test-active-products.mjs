@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { extractKmlFromKmz, parseOutlookKml } from '../src/outlook.js';
-import { parseMarineWarningKml } from '../src/marine-warnings.js';
+import { fetchMarineFeed, MARINE_FEEDS, parseMarineWarningKml } from '../src/marine-warnings.js';
 
 const outlookKml = `<?xml version="1.0"?><kml><Document>
   <Placemark><styleUrl>#zerox</styleUrl><ExtendedData>
@@ -69,5 +69,43 @@ function storedKmz(filename, contents) {
 }
 
 assert.equal(await extractKmlFromKmz(storedKmz('doc.kml', outlookKml)), outlookKml);
+
+// Marine warnings must survive a deployment with no worker in front of it.
+function recordingFetch(responder) {
+  const requested = [];
+  const fetchImpl = async url => {
+    requested.push(String(url));
+    return responder(String(url));
+  };
+  return { requested, fetchImpl };
+}
+const ok = body => ({ ok: true, status: 200, text: async () => body });
+const notFound = () => ({ ok: false, status: 404, text: async () => '' });
+
+const atlantic = MARINE_FEEDS[0];
+assert.equal(atlantic.proxy, '/nhc/marine/atlantic.kml');
+assert.match(atlantic.direct, /^https:\/\/www\.nhc\.noaa\.gov\/gis\/marine\/warnings\//);
+
+const proxied = recordingFetch(() => ok(marineKml));
+assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: proxied.fetchImpl })).length, 1);
+assert.deepEqual(proxied.requested, [atlantic.proxy], 'a working proxy must not reach out to NHC directly');
+
+const fallback = recordingFetch(url => url === atlantic.proxy ? notFound() : ok(marineKml));
+assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: fallback.fetchImpl })).length, 1);
+assert.deepEqual(fallback.requested, [atlantic.proxy, atlantic.direct], 'a 404 on the proxy must fall through to NHC');
+
+const throwing = recordingFetch(url => {
+  if (url === atlantic.proxy) throw new TypeError('Failed to fetch');
+  return ok(marineKml);
+});
+assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: throwing.fetchImpl })).length, 1, 'a network error on the proxy must fall through too');
+
+const dead = recordingFetch(() => notFound());
+await assert.rejects(
+  fetchMarineFeed(atlantic, { fetchImpl: dead.fetchImpl }),
+  error => error.responseStatus === 404,
+  'both sources failing must surface the real status, not a generic error',
+);
+assert.deepEqual(dead.requested, [atlantic.proxy, atlantic.direct]);
 
 console.log('active NHC products ok');

@@ -10,6 +10,7 @@ import {
   nhcProxyTargetFor,
   originUrlFor,
 } from '../cloudflare/worker.js';
+import { MARINE_FEEDS } from '../src/marine-warnings.js';
 
 const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const metaCsp = indexHtml.match(/Content-Security-Policy" content="([^"]+)"/)?.[1] || '';
@@ -73,6 +74,16 @@ assert.equal(nhcProxyTargetFor('/nhc/outlook/cpac.kmz'), 'https://www.nhc.noaa.g
 assert.equal(nhcProxyTargetFor('/nhc/marine/atlantic.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml');
 assert.equal(nhcProxyTargetFor('/nhc/marine/pacific.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml');
 assert.equal(nhcProxyTargetFor('/nhc/outlook/../../secrets'), null, 'proxy must reject every path outside the fixed allowlist');
+
+// src/marine-warnings.js falls back to NHC directly when the proxy path is
+// absent, so its direct URLs and the worker's allowlist must stay one product.
+for (const feed of MARINE_FEEDS) {
+  assert.equal(
+    nhcProxyTargetFor(feed.proxy),
+    feed.direct,
+    `${feed.id} marine fallback URL has drifted from the worker allowlist target`,
+  );
+}
 
 // Verify NHC proxy route is declared
 import workerModule from '../cloudflare/worker.js';

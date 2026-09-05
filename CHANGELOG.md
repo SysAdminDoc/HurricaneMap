@@ -10,6 +10,7 @@ All notable changes to HurricaneMap.
 
 ### Fixed
 - The release gate is unblocked: `fast-uri` moves to 3.1.7, clearing four high advisories (GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp) that affected every 3.x release through 3.1.5, and the checked-in npm audit snapshot is regenerated against the new lockfile.
+- The NHC marine wind warnings layer works again on deployments with no Cloudflare worker in front of them, including GitHub Pages. It tried only the proxied path, which 404s there, so the layer was silently dead; it now falls back to NHC's own `/gis/marine/warnings/` KML, which serves the CORS header the proxied products don't.
 - The hand-maintained ENSO and seasonal-outlook snapshots are back inside their validity windows, and the freshness test now derives its probe dates from the snapshots instead of asserting the very expiry date it exists to catch.
 - Offline distributions now inherit the source commit of the data release they package rather than whatever the working tree happened to be on, so `dist:core` and `dist:full` no longer desynchronize the staged release manifest from the STAC catalog beside it.
 
