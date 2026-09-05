@@ -249,8 +249,10 @@ async function boot() {
 
   // Start performance monitoring early
   initPerformanceMonitoring();
-  if (navigator.storage?.persist) navigator.storage.persist();
-  
+  // Persistence is requested when the user actually saves offline data, not
+  // here: at boot there is nothing to protect, Chromium decides on engagement
+  // it has not yet seen, and Firefox would prompt with no context.
+
   applyThemeToRoot();
   applyPaletteToBody();
   // Apply high-contrast mode if enabled

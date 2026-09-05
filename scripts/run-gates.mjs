@@ -130,6 +130,22 @@ export function findMissingGates(scripts) {
   return GATE_SCRIPTS.filter(name => !Object.hasOwn(scripts, name));
 }
 
+// The slowest gate is validate:schemas at roughly half a minute; ten minutes
+// is a hang, not a slow machine.
+const GATE_TIMEOUT_MS = 10 * 60 * 1000;
+const MAX_GATE_OUTPUT_BYTES = 32 * 1024 * 1024;
+
+export function describeSpawnFailure(result) {
+  if (result?.error?.code === 'ETIMEDOUT' || (result?.signal && result?.status === null && result?.error?.code !== 'ENOBUFS')) {
+    return `killed after ${GATE_TIMEOUT_MS / 1000}s (${result.signal || 'timeout'})`;
+  }
+  if (result?.error?.code === 'ENOBUFS') {
+    return `wrote more than ${MAX_GATE_OUTPUT_BYTES / 1024 / 1024} MB and was cut off; its real exit status is unknown`;
+  }
+  if (result?.error) return result.error.message;
+  return '';
+}
+
 function lastMeaningfulLine(output) {
   const lines = String(output || '')
     .split(/\r?\n/)
@@ -164,22 +180,27 @@ async function main() {
       cwd: root,
       encoding: 'utf8',
       shell: true,
-      maxBuffer: 32 * 1024 * 1024,
+      maxBuffer: MAX_GATE_OUTPUT_BYTES,
+      timeout: GATE_TIMEOUT_MS,
     });
     const seconds = ((Date.now() - gateStarted) / 1000).toFixed(1);
-    const output = `${result.stdout || ''}${result.stderr || ''}`;
     if (result.status === 0) {
       console.log(`${position} PASS ${name} (${seconds}s) — ${lastMeaningfulLine(result.stdout)}`);
     } else {
-      failures.push({ name, output });
-      console.log(`${position} FAIL ${name} (${seconds}s)`);
+      // A gate can die without ever setting an exit status — killed on the
+      // timeout, or cut off for writing more than the buffer holds. Say which,
+      // because the captured output alone reads like an unexplained failure.
+      const reason = describeSpawnFailure(result);
+      failures.push({ name, reason, output: `${result.stdout || ''}${result.stderr || ''}` });
+      console.log(`${position} FAIL ${name} (${seconds}s)${reason ? ` — ${reason}` : ''}`);
     }
   }
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
   if (failures.length) {
     for (const failure of failures) {
-      console.error(`\n----- ${failure.name} -----\n${failure.output.trimEnd()}`);
+      const heading = failure.reason ? `${failure.name} (${failure.reason})` : failure.name;
+      console.error(`\n----- ${heading} -----\n${failure.output.trimEnd()}`);
     }
     console.error(
       `\nrelease gates: ${GATE_SCRIPTS.length - failures.length}/${GATE_SCRIPTS.length} passed in ${elapsed}s; `

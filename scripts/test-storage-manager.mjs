@@ -9,7 +9,9 @@ import {
   cacheRadarPack,
   clearOptionalStorageScope,
   formatStorageBytes,
+  hasOptionalOfflineData,
   inspectStorage,
+  requestStoragePersistence,
   inspectRadarFrameCache,
   isQuotaExceededError,
   selectBoundedRadarFrames,
@@ -152,4 +154,76 @@ assert.equal((await successfulCaches.keys()).includes('hm-radar-v1'), false);
 await clearOptionalStorageScope('source', { cachesApi: sourceCaches });
 assert.equal((await sourceCaches.keys()).includes(SOURCE_BUNDLE_CACHE), false);
 
-console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs)');
+// Persistence is requested where there is finally something to protect.
+function persistenceApi({ already = false, grant = true, throws = false, supported = true } = {}) {
+  const calls = [];
+  const api = {
+    estimate: async () => ({ usage: 10, quota: 1_000_000 }),
+    persisted: async () => already,
+  };
+  if (supported) {
+    api.persist = async () => {
+      calls.push('persist');
+      if (throws) throw new Error('denied');
+      return grant;
+    };
+  }
+  return { api, calls };
+}
+
+const granted = persistenceApi({ grant: true });
+assert.deepEqual(await requestStoragePersistence(granted.api), { supported: true, persisted: true });
+assert.deepEqual(granted.calls, ['persist']);
+
+const denied = persistenceApi({ grant: false });
+assert.deepEqual(await requestStoragePersistence(denied.api), { supported: true, persisted: false });
+
+const alreadyPersisted = persistenceApi({ already: true });
+assert.deepEqual(await requestStoragePersistence(alreadyPersisted.api), { supported: true, persisted: true });
+assert.deepEqual(alreadyPersisted.calls, [], 'an origin that is already persistent must not be asked again');
+
+const throwing = persistenceApi({ throws: true });
+assert.deepEqual(await requestStoragePersistence(throwing.api), { supported: true, persisted: false }, 'a rejected persist must not escape');
+
+assert.deepEqual(await requestStoragePersistence(undefined), { supported: false, persisted: false });
+assert.deepEqual(await requestStoragePersistence(persistenceApi({ supported: false }).api), { supported: false, persisted: false });
+
+const radarPersistence = persistenceApi({ grant: true });
+const persistedPack = await cacheRadarPack('AL032026', manyFrames.slice(0, 2), {
+  cachesApi: new FakeCaches(),
+  fetchImpl: async () => new Response('frame'),
+  storageApi: radarPersistence.api,
+  packStorage: null,
+});
+assert.equal(persistedPack.persisted, true, 'saving a radar pack must request persistence');
+assert.deepEqual(radarPersistence.calls, ['persist']);
+
+const refusedPersistence = persistenceApi({ grant: false });
+const unprotectedPack = await cacheRadarPack('AL042026', manyFrames.slice(0, 2), {
+  cachesApi: new FakeCaches(),
+  fetchImpl: async () => new Response('frame'),
+  storageApi: refusedPersistence.api,
+  packStorage: null,
+});
+assert.equal(unprotectedPack.saved, 2, 'a refusal must not abort the save');
+assert.equal(unprotectedPack.persisted, false);
+
+const bundlePersistence = persistenceApi({ grant: true });
+const bundleCaches = new FakeCaches();
+const bundle = await cacheSourceBundle({
+  cachesApi: bundleCaches,
+  fetchImpl: async asset => new Response(asset.endsWith('release-manifest.json') ? sourceManifest : sourceBodies.get(asset)),
+  storageApi: bundlePersistence.api,
+});
+assert.equal(bundle.persisted, true, 'saving the source bundle must request persistence');
+assert.deepEqual(bundlePersistence.calls, ['persist']);
+
+// The eviction warning is driven by "there is evictable data", not by catching
+// the moment of refusal, so a reopened panel still shows it.
+assert.equal(hasOptionalOfflineData({ scopes: [{ id: 'shell', required: true, entries: 40 }], packs: {} }), false);
+assert.equal(hasOptionalOfflineData({ scopes: [{ id: 'radar', required: false, entries: 0 }], packs: {} }), false);
+assert.equal(hasOptionalOfflineData({ scopes: [{ id: 'radar', required: false, entries: 12 }], packs: {} }), true);
+assert.equal(hasOptionalOfflineData({ scopes: [], packs: { AL012026: { frames: 4 } } }), true);
+assert.equal(hasOptionalOfflineData(undefined), false);
+
+console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs, persistence on save)');

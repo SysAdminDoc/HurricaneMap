@@ -242,7 +242,7 @@
       "sources": [
         {
           "name": "NOAA (August update)",
-          "url": "https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml",
+          "url": "https://www.noaa.gov/news-release/noaa-maintains-prediction-for-below-normal-atlantic-hurricane-season",
           "revision_date": "2026-08-06",
           "basin": "AL"
         },

@@ -42,4 +42,12 @@ const panelLines = panel.split(/\r?\n/).length;
 assert(mainLines < 850, 'main.js shell orchestration regressed to ' + mainLines + ' lines');
 assert(panelLines < 800, 'panel.js renderer regressed to ' + panelLines + ' lines');
 
+// Storage persistence belongs to the save that needs it, not to boot: asking
+// before the user has engaged spends the one prompt Firefox gives and the
+// engagement heuristic Chromium has not seen yet, and the answer was discarded.
+assert(
+  !/navigator\.storage(\?\.)?\.?persist\b/.test(main),
+  'main.js must not request storage persistence at boot; storage-manager.js requests it when offline data is saved',
+);
+
 console.log('shell boundaries ok (' + mainLines + ' main.js lines, ' + panelLines + ' panel.js lines; injected shell/panel owners)');

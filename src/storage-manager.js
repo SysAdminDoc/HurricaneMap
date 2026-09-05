@@ -44,6 +44,34 @@ export function summarizeStorageEstimate(estimate = {}) {
   return { usage, quota, percent };
 }
 
+/**
+ * Ask the browser to protect this origin's storage, at the moment the user
+ * saves something worth protecting.
+ *
+ * Safari drops script-created storage after seven days without interaction
+ * unless persistence is granted, so an unprotected offline pack quietly stops
+ * being offline. Chromium answers from engagement heuristics and Firefox
+ * prompts, which is why this runs on an explicit save rather than at boot.
+ * A refusal is never fatal — the save still proceeds, and the storage panel
+ * says the data may be evicted.
+ */
+export async function requestStoragePersistence(storageApi = globalThis.navigator?.storage) {
+  if (typeof storageApi?.persist !== 'function') return { supported: false, persisted: false };
+  try {
+    if (await storageApi.persisted?.()) return { supported: true, persisted: true };
+    return { supported: true, persisted: Boolean(await storageApi.persist()) };
+  } catch {
+    return { supported: true, persisted: false };
+  }
+}
+
+/** True when the user has saved something the browser is free to evict. */
+export function hasOptionalOfflineData(snapshot) {
+  const scopes = snapshot?.scopes || [];
+  return scopes.some(scope => !scope.required && scope.entries > 0)
+    || Object.keys(snapshot?.packs || {}).length > 0;
+}
+
 export function isQuotaExceededError(error) {
   return error?.name === 'QuotaExceededError' ||
     error?.code === 22 ||
@@ -123,6 +151,7 @@ export async function cacheSourceBundle({
   if (!cachesApi || typeof fetchImpl !== 'function') {
     throw new Error('Source bundle storage is unavailable');
   }
+  const persistence = await requestStoragePersistence(storageApi);
   const cache = await cachesApi.open(SOURCE_BUNDLE_CACHE);
   const previous = new Map();
   for (const asset of [...SOURCE_BUNDLE_ASSETS, SOURCE_BUNDLE_MARKER_PATH]) {
@@ -210,6 +239,7 @@ export async function cacheSourceBundle({
     saved: SOURCE_BUNDLE_ASSETS.length,
     total: SOURCE_BUNDLE_ASSETS.length,
     bytes: totalBytes,
+    persisted: persistence.persisted,
   };
 }
 
@@ -387,8 +417,9 @@ export async function cacheRadarPack(stormId, frames, {
     throw new Error('Radar offline storage is unavailable');
   }
   const selected = selectBoundedRadarFrames(frames);
-  if (!selected.length) return { stormId, saved: 0, total: 0, bytes: 0 };
+  if (!selected.length) return { stormId, saved: 0, total: 0, bytes: 0, persisted: false };
 
+  const persistence = await requestStoragePersistence(storageApi);
   const cache = await cachesApi.open('hm-radar-v1');
   const storageEstimate = await readStorageEstimate(storageApi);
   const added = [];
@@ -438,7 +469,7 @@ export async function cacheRadarPack(stormId, frames, {
   };
   writePackIndex(index, packStorage);
   emitStorageChange();
-  return { stormId, saved, total: selected.length, bytes };
+  return { stormId, saved, total: selected.length, bytes, persisted: persistence.persisted };
 }
 
 function scopeLabel(scope) {
@@ -458,11 +489,17 @@ export async function renderStorageManager(host) {
       <p class="settings-help">${escapeHtml(t('storage.iosInstallHelp'))}</p>
       <button class="settings-action storage-ios-install" type="button" data-ios-install-guide aria-haspopup="dialog">${escapeHtml(t('storage.iosInstallAction'))}</button>
     </div>` : '';
+  // The browser refused to protect this origin and there is saved offline data
+  // for it to evict, so say so where the saved data is listed.
+  const evictionWarning = !snapshot.persisted && hasOptionalOfflineData(snapshot)
+    ? `<p class="settings-help storage-eviction-risk" role="status">${escapeHtml(t('storage.evictionRisk'))}</p>`
+    : '';
   host.innerHTML = `
     <div class="storage-summary">
       <strong>${escapeHtml(usage)}</strong>
       <span>${escapeHtml(snapshot.persisted ? t('storage.persisted') : t('storage.bestEffort'))}</span>
     </div>
+    ${evictionWarning}
     ${iosInstallGuide}
     <div class="storage-scopes" role="list">
       ${snapshot.scopes.map(scope => `

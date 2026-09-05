@@ -32,12 +32,25 @@ const windows = [
   ...outlook.sources.map((source, index) => ({ label: `data/outlook.json sources[${index}]`, snapshot: source })),
   { label: 'data/enso.json _meta', snapshot: enso._meta },
 ];
+// Anchored to the real clock, not to the data. Deriving every probe from the
+// snapshots proves the mechanism works but would pass just as happily on a
+// snapshot that expired a year ago, which is the failure this test exists for.
+const today = parseSnapshotDate(process.env.HURRICANEMAP_VALIDATION_DATE || '')
+  || new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z');
 for (const { label, snapshot } of windows) {
   const issued = parseSnapshotDate(snapshot.issued);
   const validUntil = parseSnapshotDate(snapshot.valid_until);
   assert.ok(issued, `${label}.issued must be an ISO date`);
   assert.ok(validUntil, `${label}.valid_until must be an ISO date`);
   assert.ok(validUntil > issued, `${label} must stay valid past its own issue date`);
+  assert.ok(
+    issued <= today,
+    `${label}.issued is ${snapshot.issued}, in the future as of ${iso(today)}`,
+  );
+  assert.ok(
+    validUntil >= today,
+    `${label} expired on ${snapshot.valid_until}; refresh it from ${snapshot.url || 'its published source'} rather than extending the window`,
+  );
 }
 
 const outlookIssued = parseSnapshotDate(outlook.issued);

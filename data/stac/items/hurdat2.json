@@ -160,8 +160,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 16887,
-      "file:checksum": "sha256:0f4790ba8ddf445c371cd6bfa7a1f25fcf4b15b42cb3dd496ab183d3f61f0cd4",
+      "file:size": 16926,
+      "file:checksum": "sha256:a1adb3dbe1c670acd7359e23173151acdfaebb171af9c2f6bf0a692177425f90",
       "hurricanemap:source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",

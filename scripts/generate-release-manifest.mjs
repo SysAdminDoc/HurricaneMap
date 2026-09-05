@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -84,6 +85,14 @@ function sourceUrl(relative) {
   return 'https://www.nhc.noaa.gov/data/hurdat/';
 }
 
+function handMaintainedIssued(relative, pick) {
+  const issued = pick(JSON.parse(readFileSync(path.join(root, relative), 'utf8')));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(issued || '')) {
+    throw new Error(`${relative} needs an ISO issued date to record as its source date`);
+  }
+  return issued;
+}
+
 function sourceDate(relative, buildMetadata, aomlData) {
   const radarStamp = relative.match(/t_(\d{4})(\d{2})(\d{2})\d{4}\.png$/);
   if (radarStamp) return `${radarStamp[1]}-${radarStamp[2]}-${radarStamp[3]}`;
@@ -92,6 +101,11 @@ function sourceDate(relative, buildMetadata, aomlData) {
   if (relative === 'data/aoml-landfalls.json' || relative === 'data/aoml-us-landfalls.html') return aomlData.source.source_date;
   if (relative === 'data/hurdat2-sources.json') return sourceLock.sources.map(source => source.source_date).sort().at(-1);
   if (relative.startsWith('data/stac/')) return generatedAt.slice(0, 10);
+  // Hand-maintained snapshots carry their own publication date. Falling through
+  // to the git log below dated them by their last commit, which lands before
+  // the product they hold once the file is refreshed in place.
+  if (relative === 'data/enso.json') return handMaintainedIssued(relative, record => record?._meta?.issued);
+  if (relative === 'data/outlook.json') return handMaintainedIssued(relative, record => record?.issued);
   if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
   if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').source_date;
   if (['data/landfalls.json', 'data/storms.json', 'data/storms.json.gz', 'data/stats.json', 'data/metadata.json', 'data/coverage.json'].includes(relative)) {
