@@ -25,6 +25,16 @@ assert.equal(sourceDescriptor.source_commit, sourceManifest.source_commit, 'sour
 await assertManifestAgreement(root, sourceDescriptor, sourceManifest, 'source descriptor');
 
 assert.equal(core.source_commit, full.source_commit, 'profiles must identify the same source commit');
+// A distribution names the data release it packages, not the checkout it was
+// built from. Stamping git HEAD here desynchronized the staged manifest from
+// the STAC catalog copied beside it, so every commit after a catalog
+// regeneration broke staging.
+const releaseMetadata = JSON.parse(await readFile(path.join(root, 'data/metadata.json'), 'utf8'));
+assert.equal(
+  full.source_commit,
+  releaseMetadata.generator.source_commit,
+  'distribution source commit must come from data/metadata.json, not the working tree HEAD',
+);
 assert.equal(core.radar_file_count, 0, 'core distribution must omit radar PNGs');
 assert(core.mandatory_bytes < 10 * 1024 * 1024, `core mandatory install is unexpectedly large: ${core.mandatory_bytes}`);
 assert(core.source_bundle_bytes > 11 * 1024 * 1024, `source bundle is unexpectedly small: ${core.source_bundle_bytes}`);

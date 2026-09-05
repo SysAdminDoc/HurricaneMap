@@ -51,8 +51,8 @@
     },
     {
       "path": "data/coverage.json",
-      "bytes": 16897,
-      "sha256": "8f538f561ec6bd16781602674978bf9a16c1e909f62d404fce5e5b523c8be320",
+      "bytes": 16887,
+      "sha256": "0f4790ba8ddf445c371cd6bfa7a1f25fcf4b15b42cb3dd496ab183d3f61f0cd4",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -61,7 +61,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "54f8fef727dcd3e5ae422e698d5db1dfb356d88fc7556cd5ee5405374d8ef78a",
+      "sha256": "73f79f0df050033d74bb0e84f2057beb5438ef31a5d159141d38b1fcd55ee822",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -70,7 +70,7 @@
     {
       "path": "data/enso.json",
       "bytes": 3783,
-      "sha256": "2f812f4f9727b54922d8ad891082d592ca656d9112b1ed87d3d16d7f20f6f6c4",
+      "sha256": "0bf9b1a9730547cd0811c25151b3e903425d913f6156cfd0134492f9ed938d02",
       "source_url": "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php",
       "source_date": "2026-08-04",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -159,8 +159,8 @@
     },
     {
       "path": "data/outlook.json",
-      "bytes": 808,
-      "sha256": "b27515fb10800abe0152ae3330ddc2c7f574e89c983ddc7560fdf0c4619603b6",
+      "bytes": 798,
+      "sha256": "d9f074fab6b0c21ea3767ee802125a2b63b86251812247bc6948c70b1eee996e",
       "source_url": "https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml",
       "source_date": "2026-08-04",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15550,7 +15550,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4480,
-      "sha256": "d54fed45c4855bd9e8c2c5c02508631c35bb78ac13172d550c08951deba87c81",
+      "sha256": "16356044780d002d7d99333e5468d321a6333c6a3552e18ed259817d1c602e94",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

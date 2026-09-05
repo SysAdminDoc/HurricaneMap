@@ -4,8 +4,13 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Changed
+- The 2026 Atlantic outlook now carries NOAA's August 6 update (75% chance of a below-normal season, 7–13 named storms, 2–6 hurricanes, 0–2 major) and CSU's August 5 forecast, replacing the May and July figures.
+
 ### Fixed
 - The release gate is unblocked: `fast-uri` moves to 3.1.7, clearing four high advisories (GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp) that affected every 3.x release through 3.1.5, and the checked-in npm audit snapshot is regenerated against the new lockfile.
+- The hand-maintained ENSO and seasonal-outlook snapshots are back inside their validity windows, and the freshness test now derives its probe dates from the snapshots instead of asserting the very expiry date it exists to catch.
+- Offline distributions now inherit the source commit of the data release they package rather than whatever the working tree happened to be on, so `dist:core` and `dist:full` no longer desynchronize the staged release manifest from the STAC catalog beside it.
 
 ## v1.9.3 — Metric parity and maintainability (2026-08-08)
 
