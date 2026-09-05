@@ -1,24 +1,178 @@
 {
   "model": "IUGG mean spherical Earth radius 6371.0088 km",
   "distance_vectors": [
-    { "name": "zero", "from": [0, 0], "to": [0, 0], "expected_km": 0 },
-    { "name": "equatorial degree", "from": [0, 0], "to": [0, 1], "expected_km": 111.1950802335329 },
-    { "name": "antimeridian", "from": [10, 179.9], "to": [10, -179.9], "expected_km": 21.90115508687676 },
-    { "name": "near pole", "from": [89.9, 0], "to": [89.9, 90], "expected_km": 15.72535506169153 },
-    { "name": "New York to London", "from": [40.7128, -74.006], "to": [51.5074, -0.1278], "expected_km": 5570.229873656523 }
+    {
+      "name": "zero",
+      "from": [
+        0,
+        0
+      ],
+      "to": [
+        0,
+        0
+      ],
+      "expected_km": 0
+    },
+    {
+      "name": "equatorial degree",
+      "from": [
+        0,
+        0
+      ],
+      "to": [
+        0,
+        1
+      ],
+      "expected_km": 111.1950802335329
+    },
+    {
+      "name": "antimeridian",
+      "from": [
+        10,
+        179.9
+      ],
+      "to": [
+        10,
+        -179.9
+      ],
+      "expected_km": 21.90115508687676
+    },
+    {
+      "name": "near pole",
+      "from": [
+        89.9,
+        0
+      ],
+      "to": [
+        89.9,
+        90
+      ],
+      "expected_km": 15.72535506169153
+    },
+    {
+      "name": "New York to London",
+      "from": [
+        40.7128,
+        -74.006
+      ],
+      "to": [
+        51.5074,
+        -0.1278
+      ],
+      "expected_km": 5570.229873656523
+    },
+    {
+      "name": "cape verde to miami",
+      "from": [
+        14.9,
+        -23.5
+      ],
+      "to": [
+        25.7617,
+        -80.1918
+      ],
+      "expected_km": 5989.512406482192,
+      "long_baseline": true
+    },
+    {
+      "name": "dakar to galveston",
+      "from": [
+        14.7167,
+        -17.4677
+      ],
+      "to": [
+        29.3013,
+        -94.7977
+      ],
+      "expected_km": 8003.976111550462,
+      "long_baseline": true
+    },
+    {
+      "name": "meridional quarter arc",
+      "from": [
+        0,
+        0
+      ],
+      "to": [
+        45,
+        0
+      ],
+      "expected_km": 5003.778610508981,
+      "long_baseline": true
+    }
   ],
   "segment_vectors": [
-    { "name": "equatorial cross track", "point": [1, 0.5], "start": [0, 0], "end": [0, 1], "expected_km": 111.19508023353288 },
-    { "name": "antimeridian cross track", "point": [10.1, 180], "start": [10, 179.5], "end": [10, -179.5], "expected_km": 11.078021415690563 },
-    { "name": "beyond endpoint", "point": [0, 2], "start": [0, 0], "end": [0, 1], "expected_km": 111.1950802335329 }
+    {
+      "name": "equatorial cross track",
+      "point": [
+        1,
+        0.5
+      ],
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1
+      ],
+      "expected_km": 111.19508023353288
+    },
+    {
+      "name": "antimeridian cross track",
+      "point": [
+        10.1,
+        180
+      ],
+      "start": [
+        10,
+        179.5
+      ],
+      "end": [
+        10,
+        -179.5
+      ],
+      "expected_km": 11.078021415690563
+    },
+    {
+      "name": "beyond endpoint",
+      "point": [
+        0,
+        2
+      ],
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1
+      ],
+      "expected_km": 111.1950802335329
+    }
   ],
   "closest_approach_vectors": [
     {
       "name": "interpolated equatorial midpoint",
-      "target": [1, 0.5],
+      "target": [
+        1,
+        0.5
+      ],
       "track": [
-        { "t": "2026-01-01T00:00:00Z", "lat": 0, "lon": 0, "wind": 40, "pres": 1000 },
-        { "t": "2026-01-01T12:00:00Z", "lat": 0, "lon": 1, "wind": 80, "pres": 980 }
+        {
+          "t": "2026-01-01T00:00:00Z",
+          "lat": 0,
+          "lon": 0,
+          "wind": 40,
+          "pres": 1000
+        },
+        {
+          "t": "2026-01-01T12:00:00Z",
+          "lat": 0,
+          "lon": 1,
+          "wind": 80,
+          "pres": 980
+        }
       ],
       "expected_km": 111.19508023353288,
       "expected_fraction": 0.5,
@@ -27,5 +181,7 @@
       "expected_wind": 60,
       "expected_time": "2026-01-01T06:00:00.000Z"
     }
-  ]
+  ],
+  "long_baseline_note": "Expected values for the >=4000 km vectors were computed independently of the implementations under test, by the spherical law of cosines and by Vincenty's formula for a sphere, on the same 6371.0088 km radius. The two agree to the last representable bit, and the meridional case matches the closed form R*pi/4 exactly. A haversine that runs short at long range, the error Tropycal disclosed at ~4.5% over 4000 km, fails these.",
+  "long_baseline_min_km": 4000
 }

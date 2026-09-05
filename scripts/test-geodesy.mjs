@@ -22,6 +22,24 @@ for (const vector of vectors.distance_vectors) {
   const actual = haversineKm(...vector.from, ...vector.to);
   assert(Math.abs(actual - vector.expected_km) <= toleranceKm, `${vector.name}: ${actual} km`);
 }
+
+// Long range is its own error class: an implementation can be exact across a
+// basin and still run short across an ocean, which is what Tropycal disclosed
+// at roughly 4.5% over 4000 km. These references were computed independently of
+// this code, so they catch that rather than recording it.
+const longBaselines = vectors.distance_vectors.filter(vector => vector.long_baseline);
+assert(longBaselines.length >= 2, 'the reference set must keep at least two long-baseline vectors');
+for (const vector of longBaselines) {
+  const actual = haversineKm(...vector.from, ...vector.to);
+  assert(
+    vector.expected_km >= vectors.long_baseline_min_km,
+    `${vector.name}: a long-baseline vector must span at least ${vectors.long_baseline_min_km} km, not ${vector.expected_km}`,
+  );
+  assert(
+    Math.abs(actual - vector.expected_km) <= toleranceKm,
+    `${vector.name}: ${actual} km against an independent ${vector.expected_km} km`,
+  );
+}
 for (const vector of vectors.segment_vectors) {
   const actual = pointToSegmentDistanceKm(
     ...vector.point,
