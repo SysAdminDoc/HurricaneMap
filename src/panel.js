@@ -653,10 +653,10 @@ function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
     sources.push(`<a href="https://www.ncei.noaa.gov/access/billions/" target="_blank" rel="noopener">${t('impacts.nceiSource')}</a>`);
   } else if (billionsState === 'closed' && Number.isInteger(billionsEndYear) && Number(storm.year) > billionsEndYear) {
     rows.push(`<div class="im-row im-row--closed"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${t('impacts.nceiClosed', billionsEndYear)}</span></div>`);
-    const retirementUrl = safeExternalUrl(billionsStatus.retirement_citation?.url);
-    if (retirementUrl) {
-      sources.push(`<a href="${retirementUrl}" target="_blank" rel="noopener">${t('impacts.nceiRetirementSource')}</a>`);
-    }
+    const cite = billionsStatus.retirement_citation;
+    const link = (url, key) => (url ? sources.push(`<a href="${url}" target="_blank" rel="noopener">${t(key)}</a>`) : null);
+    link(safeExternalUrl(cite?.url), 'impacts.nceiRetirementSource');
+    link(safeExternalUrl(cite?.successor?.url), 'impacts.nceiSuccessorSource');
   } else if (billionsState === 'unavailable') {
     rows.push(`<div class="im-row im-row--missing"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${t('impacts.nceiUnavailable')}</span></div>`);
   }

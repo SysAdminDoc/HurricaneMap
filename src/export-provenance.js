@@ -9,7 +9,7 @@ export const APP_VERSION = '1.9.3';
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
-  manifest_sha256: 'ded18422a67ad1d278393c5f14a187cec06c34ab4e9c5796a6228a74ceb13536',
+  manifest_sha256: '06e8d8a7ce7ab4cf798797234fa28df71bf8bf0ca9d7d0077f6d9d3adbb52cdc',
   algorithm: 'SHA-256',
 });
 
@@ -72,8 +72,8 @@ const ARTIFACTS = Object.freeze({
   }),
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
-    bytes: 7344,
-    sha256: '1bc885a96b28fb30eac1ecbe7607ca7e87a22cf5947f39f636be4142e8f5bcf9',
+    bytes: 7575,
+    sha256: 'c7c2ca066dff79f859d2b07ce6402bf515d556be7e3e6e374987060d504db165',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,

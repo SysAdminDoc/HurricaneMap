@@ -45,6 +45,19 @@ export function validateDatasetStatuses(datasets, knownPaths = new Set()) {
       if (typeof citation.title !== 'string' || !citation.title) errors.push(`${label}.retirement_citation.title is required.`);
       if (typeof citation.date !== 'string' || !ISO_DATE.test(citation.date)) errors.push(`${label}.retirement_citation.date must be an ISO date.`);
       if (typeof citation.url !== 'string' || !/^https:\/\//.test(citation.url)) errors.push(`${label}.retirement_citation.url must be HTTPS.`);
+      // Optional, but if a retired series names where the work continued, that
+      // pointer has to be as complete as the retirement notice itself.
+      const successor = citation.successor;
+      if (successor !== undefined && successor !== null) {
+        const successorLabel = `${label}.retirement_citation.successor`;
+        if (typeof successor !== 'object' || Array.isArray(successor)) {
+          errors.push(`${successorLabel} must be an object or null.`);
+        } else {
+          if (typeof successor.title !== 'string' || !successor.title) errors.push(`${successorLabel}.title is required.`);
+          if (typeof successor.date !== 'string' || !ISO_DATE.test(successor.date)) errors.push(`${successorLabel}.date must be an ISO date.`);
+          if (typeof successor.url !== 'string' || !/^https:\/\//.test(successor.url)) errors.push(`${successorLabel}.url must be HTTPS.`);
+        }
+      }
     }
     if ((dataset.status === 'closed' || dataset.status === 'deprecated') && (!dataset.end_date || !citation)) {
       errors.push(`${label} must include end_date and retirement_citation when status is ${dataset.status}.`);

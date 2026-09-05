@@ -39,7 +39,7 @@ export function setPopulation(enabled) {
     layer = L.tileLayer(TILE_URL, {
       maxZoom: 11,
       opacity: 0.55,
-      attribution: 'Population: <a href="https://sedac.ciesin.columbia.edu/data/collection/gpw-v4" target="_blank" rel="noopener">SEDAC GPWv4</a>',
+      attribution: 'Population: <a href="https://www.earthdata.nasa.gov/data/catalog?portal=sedac" target="_blank" rel="noopener">SEDAC GPWv4</a>',
     });
     layer.on('load', () => completeOptionalFeed('population', {
       itemCount: null,

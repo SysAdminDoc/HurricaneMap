@@ -318,7 +318,7 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 | **HURDAT2 Best-Track** | [NOAA National Hurricane Center](https://www.nhc.noaa.gov/data/) | Public Domain (U.S. Govt) | Landsea, C. W. & Franklin, 2013 |
 | **Detailed U.S. Landfalls** | [AOML Hurricane Research Division](https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html) | Public Domain (U.S. Govt) | AOML detailed impact/landfall table |
 | **NEXRAD Radar Archive** | [Iowa State IEM](https://mesonet.agron.iastate.edu/) | Public Domain | Acknowledgment required |
-| **Population Density (GPWv4)** | [SEDAC, Columbia University](https://sedac.ciesin.columbia.edu/) | CC BY 4.0 | [See attribution](LICENSE.md#population-density) |
+| **Population Density (GPWv4)** | [SEDAC via NASA Earthdata](https://www.earthdata.nasa.gov/data/catalog?portal=sedac) | CC BY 4.0 | [See attribution](LICENSE.md#population-density) |
 | **State Boundaries** | [U.S. Census Bureau TIGER](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) | Public Domain | Acknowledgment required |
 | **Storm Impacts** | [Wikipedia](https://en.wikipedia.org/) | CC BY-SA 3.0 | [See details](LICENSE.md#storm-impacts-data) |
 | **Map Tiles** | [OpenStreetMap](https://www.openstreetmap.org/) | ODbL | © OSM contributors |

@@ -755,6 +755,7 @@ export const STRINGS = {
     'impacts.nceiClosed': 'No data — series ended {0}',
     'impacts.nceiUnavailable': 'NOAA NCEI data unavailable',
     'impacts.nceiRetirementSource': 'Why the series ended (NOAA NESDIS)',
+    'impacts.nceiSuccessorSource': 'Continued by Climate Central',
     'impacts.deaths': 'deaths',
 
     // USGS high-water marks
@@ -1678,6 +1679,7 @@ export const STRINGS = {
     'impacts.nceiClosed': 'Sin datos — la serie terminó en {0}',
     'impacts.nceiUnavailable': 'Datos de NOAA NCEI no disponibles',
     'impacts.nceiRetirementSource': 'Por qué terminó la serie (NOAA NESDIS)',
+    'impacts.nceiSuccessorSource': 'Continuado por Climate Central',
     'impacts.deaths': 'muertes',
 
     // USGS high-water marks
@@ -2579,6 +2581,7 @@ export const STRINGS = {
     'impacts.nceiClosed': 'Pa gen done — seri a fini an {0}',
     'impacts.nceiUnavailable': 'Done NOAA NCEI yo pa disponib',
     'impacts.nceiRetirementSource': 'Poukisa seri a fini (NOAA NESDIS)',
+    'impacts.nceiSuccessorSource': 'Climate Central kontinye li',
     'impacts.deaths': 'moun ki mouri',
 
     // USGS high-water marks

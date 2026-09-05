@@ -4,54 +4,182 @@
   "title": "HurricaneMap build metadata v1",
   "$defs": {
     "retirementCitation": {
-      "type": ["object", "null"],
-      "required": ["title", "date", "url"],
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "title",
+        "date",
+        "url"
+      ],
       "properties": {
-        "title": { "type": "string", "minLength": 1 },
-        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "url": { "type": "string", "pattern": "^https://" }
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "successor": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "title",
+            "date",
+            "url"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "url": {
+              "type": "string",
+              "pattern": "^https://"
+            }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
     "dataset": {
       "type": "object",
-      "required": ["id", "label", "paths", "status", "end_date", "retirement_citation"],
+      "required": [
+        "id",
+        "label",
+        "paths",
+        "status",
+        "end_date",
+        "retirement_citation"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "paths": { "type": "array", "items": { "type": "string", "pattern": "^data/" }, "minItems": 1 },
-        "status": { "enum": ["active", "closed", "deprecated"] },
-        "end_date": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "retirement_citation": { "$ref": "#/$defs/retirementCitation" }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^data/"
+          },
+          "minItems": 1
+        },
+        "status": {
+          "enum": [
+            "active",
+            "closed",
+            "deprecated"
+          ]
+        },
+        "end_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "retirement_citation": {
+          "$ref": "#/$defs/retirementCitation"
+        }
       },
       "additionalProperties": false
     },
     "output": {
       "type": "object",
-      "required": ["path", "size_bytes", "modified_utc", "sha256"],
+      "required": [
+        "path",
+        "size_bytes",
+        "modified_utc",
+        "sha256"
+      ],
       "properties": {
-        "path": { "type": "string", "pattern": "^data/" },
-        "size_bytes": { "type": "integer", "minimum": 1 },
-        "modified_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
-        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        "path": {
+          "type": "string",
+          "pattern": "^data/"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modified_utc": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
       },
       "additionalProperties": false
     }
   },
   "type": "object",
-  "required": ["schema_version", "generated_at_utc", "generator", "sources", "datasets", "coverage", "outputs", "methodology"],
+  "required": [
+    "schema_version",
+    "generated_at_utc",
+    "generator",
+    "sources",
+    "datasets",
+    "coverage",
+    "outputs",
+    "methodology"
+  ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "generated_at_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
     "generator": {
       "type": "object",
-      "required": ["name", "app_version", "source_commit", "source_manifest", "runtime"],
+      "required": [
+        "name",
+        "app_version",
+        "source_commit",
+        "source_manifest",
+        "runtime"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "app_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-        "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
-        "source_manifest": { "type": "string", "pattern": "^data/" },
-        "runtime": { "type": "string", "minLength": 1 }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "app_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "source_manifest": {
+          "type": "string",
+          "pattern": "^data/"
+        },
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
@@ -60,22 +188,77 @@
       "minItems": 2,
       "items": {
         "type": "object",
-        "required": ["id", "basin", "filename", "path", "size_bytes", "modified_utc", "source_date", "source_file", "source_url", "sha256", "storm_count", "storm_year_range"],
+        "required": [
+          "id",
+          "basin",
+          "filename",
+          "path",
+          "size_bytes",
+          "modified_utc",
+          "source_date",
+          "source_file",
+          "source_url",
+          "sha256",
+          "storm_count",
+          "storm_year_range"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "basin": { "enum": ["AL", "EP"] },
-          "filename": { "type": "string", "minLength": 1 },
-          "path": { "type": "string", "pattern": "^data/" },
-          "size_bytes": { "type": "integer", "minimum": 1 },
-          "modified_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
-          "source_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-          "source_file": { "type": "string", "pattern": "^hurdat2-.+\\.txt$" },
-          "source_url": { "type": "string", "pattern": "^https://www\\.nhc\\.noaa\\.gov/data/hurdat/hurdat2-.+\\.txt$" },
-          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-          "storm_count": { "type": "integer", "minimum": 1 },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "basin": {
+            "enum": [
+              "AL",
+              "EP"
+            ]
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^data/"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "modified_utc": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+          },
+          "source_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "source_file": {
+            "type": "string",
+            "pattern": "^hurdat2-.+\\.txt$"
+          },
+          "source_url": {
+            "type": "string",
+            "pattern": "^https://www\\.nhc\\.noaa\\.gov/data/hurdat/hurdat2-.+\\.txt$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "storm_count": {
+            "type": "integer",
+            "minimum": 1
+          },
           "storm_year_range": {
             "type": "array",
-            "prefixItems": [{ "type": "integer" }, { "type": "integer" }],
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
             "minItems": 2,
             "maxItems": 2
           }
@@ -86,44 +269,108 @@
     "datasets": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/dataset" }
+      "items": {
+        "$ref": "#/$defs/dataset"
+      }
     },
     "coverage": {
       "type": "object",
-      "required": ["year_range", "storm_count", "landfall_event_count", "hurricane_landfall_count", "impact_row_count", "basins"],
+      "required": [
+        "year_range",
+        "storm_count",
+        "landfall_event_count",
+        "hurricane_landfall_count",
+        "impact_row_count",
+        "basins"
+      ],
       "properties": {
         "year_range": {
           "type": "array",
-          "prefixItems": [{ "type": "integer" }, { "type": "integer" }],
+          "prefixItems": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "integer"
+            }
+          ],
           "minItems": 2,
           "maxItems": 2
         },
-        "storm_count": { "type": "integer", "minimum": 1 },
-        "landfall_event_count": { "type": "integer", "minimum": 1 },
-        "hurricane_landfall_count": { "type": "integer", "minimum": 0 },
-        "impact_row_count": { "type": "integer", "minimum": 0 },
-        "basins": { "type": "array", "items": { "enum": ["AL", "EP"] }, "minItems": 2, "uniqueItems": true }
+        "storm_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "landfall_event_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hurricane_landfall_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "impact_row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "basins": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "AL",
+              "EP"
+            ]
+          },
+          "minItems": 2,
+          "uniqueItems": true
+        }
       },
       "additionalProperties": false
     },
     "outputs": {
       "type": "object",
-      "required": ["landfalls", "storms", "storms_gzip", "stats"],
+      "required": [
+        "landfalls",
+        "storms",
+        "storms_gzip",
+        "stats"
+      ],
       "properties": {
-        "landfalls": { "$ref": "#/$defs/output" },
-        "storms": { "$ref": "#/$defs/output" },
-        "storms_gzip": { "$ref": "#/$defs/output" },
-        "stats": { "$ref": "#/$defs/output" }
+        "landfalls": {
+          "$ref": "#/$defs/output"
+        },
+        "storms": {
+          "$ref": "#/$defs/output"
+        },
+        "storms_gzip": {
+          "$ref": "#/$defs/output"
+        },
+        "stats": {
+          "$ref": "#/$defs/output"
+        }
       },
       "additionalProperties": false
     },
     "methodology": {
       "type": "object",
-      "required": ["explicit_landfall_marker", "inferred_landfall_rule", "category_rule"],
+      "required": [
+        "explicit_landfall_marker",
+        "inferred_landfall_rule",
+        "category_rule"
+      ],
       "properties": {
-        "explicit_landfall_marker": { "type": "string", "minLength": 1 },
-        "inferred_landfall_rule": { "type": "string", "minLength": 1 },
-        "category_rule": { "type": "string", "minLength": 1 }
+        "explicit_landfall_marker": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inferred_landfall_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category_rule": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     }

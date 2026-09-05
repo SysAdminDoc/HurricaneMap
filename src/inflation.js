@@ -59,6 +59,12 @@ export const BILLIONS_DATASET_STATUS = Object.freeze({
     title: 'Billion Dollar Weather and Climate Disasters',
     date: '2025-05-08',
     url: 'https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters',
+    // A retired series should say where the work continued, not just that it stopped.
+    successor: Object.freeze({
+      title: 'Billion-dollar disasters, continued by Climate Central',
+      date: '2025-07-28',
+      url: 'https://www.climatecentral.org/climate-services/billion-dollar-disasters',
+    }),
   }),
 });
 

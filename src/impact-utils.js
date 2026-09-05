@@ -60,7 +60,7 @@ export function tornadoSearchUrl(storm) {
     endDate_yyyy: String(end.getUTCFullYear()),
     statefips: stateFilters.join(','),
   });
-  return `https://www.ncei.noaa.gov/stormevents/listevents.jsp?${params}`;
+  return `https://www.ncei.noaa.gov/access/storm-events-database/?${params}`;
 }
 
 function parseLegacyDeaths(value) {

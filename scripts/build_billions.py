@@ -30,6 +30,12 @@ RETIREMENT_CITATION = {
     "title": "Billion Dollar Weather and Climate Disasters",
     "date": "2025-05-08",
     "url": "https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters",
+    # NOAA retired the product; Climate Central took it over on 2025-07-28.
+    "successor": {
+        "title": "Billion-dollar disasters, continued by Climate Central",
+        "date": "2025-07-28",
+        "url": "https://www.climatecentral.org/climate-services/billion-dollar-disasters",
+    },
 }
 
 
