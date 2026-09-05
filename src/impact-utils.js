@@ -32,35 +32,45 @@ export function formatFatalityCount(value) {
   return value.toLocaleString();
 }
 
-const STORM_EVENT_STATE_FIPS = Object.freeze({
-  Alabama: '01', Alaska: '02', California: '06', Connecticut: '09', Delaware: '10',
-  'District of Columbia': '11', Florida: '12', Georgia: '13', Hawaii: '15', Louisiana: '22',
-  Maine: '23', Maryland: '24', Massachusetts: '25', Mississippi: '28', 'New Hampshire': '33',
-  'New Jersey': '34', 'New York': '36', 'North Carolina': '37', Pennsylvania: '42',
-  'Rhode Island': '44', 'South Carolina': '45', Texas: '48', Virginia: '51', 'Puerto Rico': '72',
-});
+// Storm Events covers the states and territories a U.S. landfall can occur in.
+// This decides whether the link is worth offering at all, not what it queries.
+const STORM_EVENT_STATES = Object.freeze(new Set([
+  'Alabama', 'Alaska', 'California', 'Connecticut', 'Delaware', 'District of Columbia',
+  'Florida', 'Georgia', 'Hawaii', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
+  'Mississippi', 'New Hampshire', 'New Jersey', 'New York', 'North Carolina',
+  'Pennsylvania', 'Rhode Island', 'South Carolina', 'Texas', 'Virginia', 'Puerto Rico',
+]));
 
-export function tornadoSearchUrl(storm) {
+// NCEI replaced the Storm Events jsp with a client-rendered app. Verified on
+// 2026-09-05: the legacy `listevents.jsp` query, the current `?eventType=...`
+// query and the bare address all return the same 1166-byte shell, and loading
+// the search route with every parameter spelling leaves the form untouched.
+// The old link therefore promised a filtered result and delivered a landing
+// page, so the query string is gone and the terms go to the reader instead.
+const STORM_EVENTS_SEARCH = 'https://www.ncei.noaa.gov/access/storm-events-database/search';
+
+function stormEventsWindow(storm) {
   if (!storm?.year || storm.year < 1950 || !storm.track?.length) return null;
   const start = new Date(storm.track[0].t);
   const end = new Date(storm.track[storm.track.length - 1].t);
   if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime())) return null;
-  const stateFilters = [...new Set((storm.us_landfalls || [])
+  const states = [...new Set((storm.us_landfalls || [])
     .map(landfall => landfall?.state)
-    .filter(state => STORM_EVENT_STATE_FIPS[state]))]
-    .map(state => `${STORM_EVENT_STATE_FIPS[state]},${state.toUpperCase()}`);
-  if (!stateFilters.length) return null;
-  const params = new URLSearchParams({
-    eventType: '(C) Tornado',
-    beginDate_mm: String(start.getUTCMonth() + 1).padStart(2, '0'),
-    beginDate_dd: String(start.getUTCDate()).padStart(2, '0'),
-    beginDate_yyyy: String(start.getUTCFullYear()),
-    endDate_mm: String(end.getUTCMonth() + 1).padStart(2, '0'),
-    endDate_dd: String(end.getUTCDate()).padStart(2, '0'),
-    endDate_yyyy: String(end.getUTCFullYear()),
-    statefips: stateFilters.join(','),
-  });
-  return `https://www.ncei.noaa.gov/access/storm-events-database/?${params}`;
+    .filter(state => STORM_EVENT_STATES.has(state)))];
+  if (!states.length) return null;
+  return { start, end, states };
+}
+
+export function tornadoSearchUrl(storm) {
+  return stormEventsWindow(storm) ? STORM_EVENTS_SEARCH : null;
+}
+
+/** What to enter once the search page opens, since it cannot be pre-filled. */
+export function tornadoSearchHint(storm) {
+  const window = stormEventsWindow(storm);
+  if (!window) return null;
+  const day = date => date.toISOString().slice(0, 10);
+  return `${window.states.join(', ')} · ${day(window.start)} to ${day(window.end)}`;
 }
 
 function parseLegacyDeaths(value) {

@@ -26,7 +26,7 @@ import {
   formatExposurePeople,
   formatExposureTooltip,
 } from './exposure.js';
-import { tornadoSearchUrl } from './impact-utils.js';
+import { tornadoSearchHint, tornadoSearchUrl } from './impact-utils.js';
 import {
   nhcWalletUrlFor,
   noaaTcrUrl,
@@ -186,6 +186,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   const nhcWalletUrl = nhcWalletUrlFor(storm);
   const sliderUrl = sliderSatelliteUrl(storm);
   const tornadoUrl = tornadoSearchUrl(storm);
+  const tornadoHint = tornadoSearchHint(storm);
   const reconUrl = reconArchiveUrl(storm);
 
   const radarApi = getRadar();
@@ -333,7 +334,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
           ${noaaReportUrl ? `<a class="action-btn" href="${escapeHtml(noaaReportUrl)}" target="_blank" rel="noopener">NOAA report</a>` : ''}
           ${nhcWalletUrl ? `<a class="action-btn" href="${escapeHtml(nhcWalletUrl)}" target="_blank" rel="noopener">NHC archive</a>` : ''}
           ${sliderUrl ? `<a class="action-btn" href="${escapeHtml(sliderUrl)}" target="_blank" rel="noopener">GOES satellite</a>` : ''}
-          ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" target="_blank" rel="noopener">Tornadoes (NOAA)</a>` : ''}
+          ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" title="${escapeHtml(t('links.tornadoHint', tornadoHint))}" target="_blank" rel="noopener">Storm Events (NOAA)</a>` : ''}
           ${reconUrl ? `<a class="action-btn" href="${escapeHtml(reconUrl)}" target="_blank" rel="noopener">Recon archive</a>` : ''}
         </div>
 

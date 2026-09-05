@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { getDamageMillions, getFatalityCount } from '../src/impact-utils.js';
-import { tornadoSearchUrl } from '../src/impact-utils.js';
+import { getDamageMillions, getFatalityCount, tornadoSearchHint, tornadoSearchUrl } from '../src/impact-utils.js';
 import { getCoverageYearRange } from '../src/data.js';
 import { buildPublicationCSV, csvEscape, publicationCategoryLabel } from '../src/export.js';
 import { inflateUSD } from '../src/inflation.js';
@@ -57,12 +56,32 @@ assert.match(report.markdown, /## Release Provenance/);
 const futureDamage = inflateUSD(125, 2025);
 assert.deepEqual(futureDamage, { real: 125, factor: 1, baseYear: 2025, currentDollars: true });
 
-const tornadoUrl = tornadoSearchUrl({
+// This used to assert statefips === '22,LOUISIANA,28,MISSISSIPPI,12,FLORIDA'.
+// That assertion was wrong: it pinned the shape of a parameter the destination
+// ignores. NCEI's Storm Events is now a client-rendered app that reads no
+// filters from the URL, so the old link opened an unfiltered landing page while
+// the test reported the filter as correct. The contract is now the gating (who
+// gets a link at all) and the search terms handed to the reader.
+const katrina = {
   year: 2005,
   track: [{ t: '2005-08-23T18:00:00Z' }, { t: '2005-08-31T18:00:00Z' }],
   us_landfalls: [{ state: 'Louisiana' }, { state: 'Mississippi' }, { state: 'Florida' }, { state: 'Oregon' }],
-});
-assert(!tornadoUrl.includes('%252C'), 'state filter separators must be encoded only once');
-assert.equal(new URL(tornadoUrl).searchParams.get('statefips'), '22,LOUISIANA,28,MISSISSIPPI,12,FLORIDA');
+};
+const tornadoUrl = tornadoSearchUrl(katrina);
+assert.equal(tornadoUrl, 'https://www.ncei.noaa.gov/access/storm-events-database/search');
+assert.equal(new URL(tornadoUrl).search, '', 'no query string: every parameter form is ignored by the destination');
+assert.equal(
+  tornadoSearchHint(katrina),
+  'Louisiana, Mississippi, Florida · 2005-08-23 to 2005-08-31',
+  'the reader gets the terms the link cannot carry, and Oregon is dropped as uncovered',
+);
+// Storm Events begins in 1950, and a storm with no covered landfall state has
+// nothing to look up, so neither gets a link at all.
+assert.equal(tornadoSearchUrl({ ...katrina, year: 1949 }), null);
+assert.equal(tornadoSearchHint({ ...katrina, year: 1949 }), null);
+assert.equal(tornadoSearchUrl({ ...katrina, us_landfalls: [{ state: 'Oregon' }] }), null);
+assert.equal(tornadoSearchUrl({ ...katrina, us_landfalls: [] }), null);
+assert.equal(tornadoSearchUrl({ ...katrina, track: [{ t: 'not a date' }] }), null);
+assert.equal(tornadoSearchUrl({ ...katrina, track: [] }), null);
 
 console.log('report export ok');
