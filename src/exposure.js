@@ -77,9 +77,11 @@ export async function ensureExposureDensitiesLoaded(url = './data/us-states.geoj
       throw error;
     }
     cachedStateDensities = buildStateDensityIndex(await res.json());
+    const stateCount = Object.keys(cachedStateDensities).length;
     completeOptionalFeed('exposure', {
+      empty: stateCount === 0,
       cacheOrigin: 'bundled',
-      itemCount: Object.keys(cachedStateDensities).length,
+      itemCount: stateCount,
       requestId: request.requestId,
     });
     return cachedStateDensities;

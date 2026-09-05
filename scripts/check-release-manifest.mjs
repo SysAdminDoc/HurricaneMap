@@ -44,32 +44,45 @@ const PREPROCESSOR_OUTPUTS = [
   'data/storms.json',
   'data/storms.json.gz',
 ];
-const drifted = [];
-for (const relative of PREPROCESSOR_OUTPUTS) {
-  let committed;
+// A published distribution ships without .git, and a shallow clone may not hold
+// the release commit at all. Neither is drift, so say so rather than accusing
+// the data. The byte and SHA-256 checks above still ran either way.
+function gitAvailable() {
   try {
-    committed = execFileSync('git', ['cat-file', '-p', `${manifest.source_commit}:${relative}`], {
-      cwd: root,
-      maxBuffer: 64 * 1024 * 1024,
-    });
+    execFileSync('git', ['rev-parse', '--git-dir'], { cwd: root, stdio: 'ignore' });
+    return execFileSync('git', ['cat-file', '-e', `${manifest.source_commit}^{commit}`], { cwd: root, stdio: 'ignore' }) || true;
   } catch {
-    throw new Error(`release manifest names ${manifest.source_commit}, which has no ${relative}`);
+    return false;
   }
-  const digest = createHash('sha256').update(committed).digest('hex');
-  const artifact = manifest.artifacts.find(candidate => candidate.path === relative);
-  if (artifact.sha256 !== digest) drifted.push(relative);
-}
-if (drifted.length) {
-  throw new Error(
-    `${drifted.join(', ')} no longer match ${manifest.source_commit.slice(0, 12)}; `
-    + 'rerun preprocess_hurdat2.py and stamp the new commit rather than editing derived data by hand',
-  );
 }
 
-console.log(
-  `release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified; `
-  + `${PREPROCESSOR_OUTPUTS.length} derived files match ${manifest.source_commit.slice(0, 12)})`,
-);
+let derivedNote = 'derived-file check skipped: this tree has no git history for the release commit';
+if (gitAvailable()) {
+  const drifted = [];
+  for (const relative of PREPROCESSOR_OUTPUTS) {
+    const artifact = manifest.artifacts.find(candidate => candidate.path === relative);
+    if (!artifact) throw new Error(`release manifest no longer describes ${relative}`);
+    let committed;
+    try {
+      committed = execFileSync('git', ['cat-file', '-p', `${manifest.source_commit}:${relative}`], {
+        cwd: root,
+        maxBuffer: 64 * 1024 * 1024,
+      });
+    } catch {
+      throw new Error(`${manifest.source_commit.slice(0, 12)} does not contain ${relative}; the release identity and the data disagree`);
+    }
+    if (artifact.sha256 !== createHash('sha256').update(committed).digest('hex')) drifted.push(relative);
+  }
+  if (drifted.length) {
+    throw new Error(
+      `${drifted.join(', ')} no longer match ${manifest.source_commit.slice(0, 12)}; `
+      + 'rerun preprocess_hurdat2.py rather than editing derived data by hand',
+    );
+  }
+  derivedNote = `${PREPROCESSOR_OUTPUTS.length} derived files match ${manifest.source_commit.slice(0, 12)}`;
+}
+
+console.log(`release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified; ${derivedNote})`);
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

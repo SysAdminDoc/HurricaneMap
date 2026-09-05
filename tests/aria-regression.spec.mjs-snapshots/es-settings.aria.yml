@@ -108,6 +108,26 @@
         - strong: Glosario
         - text: "No solicitado HurricaneMap bundled glossary Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
         - button "Reintentar"
+      - listitem:
+        - strong: Temperatura de la superficie del mar
+        - text: "No solicitado PacIOOS CoralTemp sea-surface temperature Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+        - button "Reintentar"
+      - listitem:
+        - strong: Marcas de nivel máximo
+        - text: "/Actual · \\d+ registros USGS high-water marks Último éxito: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Próximo intento: No programado Origen: Datos sin conexión incluidos/"
+        - button "Reintentar"
+      - listitem:
+        - strong: Informes de eventos de tormenta
+        - text: "/Actual · \\d+ registros NOAA NCEI Storm Events Último éxito: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Próximo intento: No programado Origen: Datos sin conexión incluidos/"
+        - button "Reintentar"
+      - listitem:
+        - strong: Exposición de población
+        - text: "/Actual · \\d+ registros Bundled state population densities Último éxito: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Próximo intento: No programado Origen: Datos sin conexión incluidos/"
+        - button "Reintentar"
+      - listitem:
+        - strong: Zonas de evacuación
+        - text: "No solicitado Florida ArcGIS evacuation zones Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+        - button "Reintentar"
   - region "Almacenamiento sin conexión":
     - heading "Almacenamiento sin conexión" [level=3]
     - paragraph: Los datos históricos principales están protegidos. Los archivos de origen forman un paquete opcional guardado por el usuario; los mosaicos y paquetes de radar se pueden borrar por separado.
@@ -165,7 +185,55 @@
         - strong: Paquete de origen
         - text: no instalado · 0 · 0 B
     - strong: Antigüedad de fuentes opcionales
-    - text: "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito · population: nunca tuvo éxito · glossary: nunca tuvo éxito"
+    - text: "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito · population: nunca tuvo éxito · glossary: nunca tuvo éxito · sst: nunca tuvo éxito · hwm: hace 0 min · storm-events: hace 0 min · exposure: hace 0 min · evac: nunca tuvo éxito"
+    - strong: Cobertura del archivo
+    - text: /\d+ conjuntos · \d+–\d+ · \d+ tormentas/
+    - list "Cobertura del archivo":
+      - listitem:
+        - strong: NOAA/NHC HURDAT2 best-track and derived landfall data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: AOML detailed U.S. hurricane landfall table
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Community-sourced storm impacts
+        - text: /inferred · \d+–\d+/
+      - listitem:
+        - strong: NOAA NCEI Billion-Dollar Weather and Climate Disasters
+        - text: /closed · \d+–\d+ · no ejecutable/
+      - listitem:
+        - strong: NOAA PSL Oceanic Niño Index snapshot
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA/CPC and CSU seasonal outlook snapshot
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NHC official forecast skill summary
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NHC archived advisory replay
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NCEI Storm Events coincidence data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA tropical cyclone rainfall reports
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Iowa State IEM archived NEXRAD composites
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: USGS observed high-water marks
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA CO-OPS tide-station index
+        - text: final · sin rango
+      - listitem:
+        - strong: U.S. Census state boundary polygons
+        - text: final · sin rango
+      - listitem:
+        - strong: HurricaneMap glossary
+        - text: final · sin rango
     - button "Reparar ahora"
     - button "Reintentar service worker"
     - button "Actualizar diagnóstico"

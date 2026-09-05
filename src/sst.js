@@ -114,6 +114,15 @@ export async function setSSTVisible(visible) {
       colorBarMaximum: 32,
       attribution: `SST: NOAA Coral Reef Watch CoralTemp via PacIOOS ERDDAP (${day})`,
     });
+    // The time probe succeeding says nothing about whether the field draws.
+    // A throttled or dead WMS endpoint would otherwise leave the feed green
+    // over an empty map.
+    sstLayer.on('load', () => completeOptionalFeed('sst', { cacheOrigin: 'network', itemCount: 1 }));
+    sstLayer.on('tileerror', () => failOptionalFeed('sst', {
+      error: new Error('CoralTemp WMS tiles failed to load'),
+      responseStatus: 0,
+      cacheOrigin: 'network',
+    }));
   } else {
     sstLayer.setParams({ time: resolvedTime });
     sstLayer.options.attribution = `SST: NOAA Coral Reef Watch CoralTemp via PacIOOS ERDDAP (${resolvedTime.slice(0, 10)})`;

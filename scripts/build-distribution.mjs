@@ -14,6 +14,8 @@ const STATIC_ROOT_FILES = new Set([
   'example.png',
   'globe.html',
   'index.html',
+  'robots.txt',
+  'sitemap.xml',
   'manifest.webmanifest',
   'manifest.es.webmanifest',
   'manifest.ht.webmanifest',

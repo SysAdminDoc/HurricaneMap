@@ -8,9 +8,12 @@
 //
 //   node scripts/stamp-release.mjs
 //
-// Pass --source-commit/--generated-at to move the release identity; by default
-// it keeps the identity data/metadata.json already names, because that field
-// describes the preprocessor run, not the commit carrying these bytes.
+// It takes no identity flags on purpose. data/metadata.json is the single owner
+// of generated_at_utc and source_commit, and only preprocess_hurdat2.py writes
+// it, so the only way to move the release identity is to re-run the
+// preprocessor. An earlier version accepted --source-commit and appeared to
+// honour it, but build-distribution.mjs re-derives the commit from metadata and
+// overwrote it, so the flag silently did nothing.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -21,11 +24,6 @@ import { releaseGeneratedAt, releaseSourceCommit } from './release-identity.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROVENANCE_PATH = 'src/export-provenance.js';
-
-function flag(name) {
-  const index = process.argv.indexOf(`--${name}`);
-  return index >= 0 ? process.argv[index + 1] : null;
-}
 
 function run(command, args) {
   execFileSync(command, args, { cwd: root, stdio: 'inherit' });
@@ -49,8 +47,15 @@ function patchArtifactField(source, artifactPath, key, value) {
 }
 
 async function main() {
-  const sourceCommit = flag('source-commit') || await releaseSourceCommit(root);
-  const generatedAt = flag('generated-at') || await releaseGeneratedAt(root);
+  const rejected = process.argv.slice(2).filter(argument => /^--(source-commit|generated-at)$/.test(argument));
+  if (rejected.length) {
+    throw new Error(
+      `${rejected.join(' and ')} cannot be set here: data/metadata.json owns the release identity, `
+      + 'and only scripts/preprocess_hurdat2.py writes it. Re-run the preprocessor to move the release.',
+    );
+  }
+  const sourceCommit = await releaseSourceCommit(root);
+  const generatedAt = await releaseGeneratedAt(root);
   const identity = ['--generated-at', generatedAt, '--source-commit', sourceCommit];
 
   // Coverage first: it reads data/enso.json and data/outlook.json, so a manifest

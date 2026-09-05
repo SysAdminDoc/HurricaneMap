@@ -29,6 +29,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'check:export-provenance',
   'check:popup-sinks',
   'validate:data',
+  'test:discovery',
   'test:dataset-status',
   'test:snapshot-freshness',
   'test:coverage',

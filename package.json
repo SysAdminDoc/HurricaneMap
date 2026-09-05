@@ -26,6 +26,7 @@
     "dist:full": "node scripts/build-distribution.mjs full",
     "check:popup-sinks": "node scripts/check-popup-sinks.mjs",
     "validate:data": "node scripts/validate-data.mjs",
+    "test:discovery": "node scripts/test-discovery.mjs",
     "test:dataset-status": "node scripts/test-dataset-status.mjs",
     "test:snapshot-freshness": "node scripts/test-snapshot-freshness.mjs",
     "generate:coverage": "node scripts/build-coverage.mjs",

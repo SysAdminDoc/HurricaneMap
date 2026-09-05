@@ -30,9 +30,11 @@ function loadIndex() {
         return res.json();
       })
       .then(index => {
+        const stormCount = Object.keys(index || {}).length;
         completeOptionalFeed('hwm', {
+          empty: stormCount === 0,
           cacheOrigin: 'bundled',
-          itemCount: Object.keys(index || {}).length,
+          itemCount: stormCount,
           requestId: request.requestId,
         });
         return index;

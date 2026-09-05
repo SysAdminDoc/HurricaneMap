@@ -108,6 +108,26 @@
         - strong: Glosè
         - text: "Poko mande HurricaneMap bundled glossary Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
         - button "Eseye ankò"
+      - listitem:
+        - strong: Tanperati sifas lanmè a
+        - text: "Poko mande PacIOOS CoralTemp sea-surface temperature Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Mak pi wo dlo a rive
+        - text: "/Aktyèl · \\d+ anrejistreman USGS high-water marks Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Rapò evènman tanpèt
+        - text: "/Aktyèl · \\d+ anrejistreman NOAA NCEI Storm Events Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Ekspozisyon popilasyon
+        - text: "/Aktyèl · \\d+ anrejistreman Bundled state population densities Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - button "Eseye ankò"
+      - listitem:
+        - strong: Zòn evakyasyon
+        - text: "Poko mande Florida ArcGIS evacuation zones Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
+        - button "Eseye ankò"
   - region "Depo san entènèt":
     - heading "Depo san entènèt" [level=3]
     - paragraph: Done istorik prensipal yo pwoteje. Fichye sous yo se yon pake opsyonèl itilizatè a sove; mozayik kat ak pake rada yo ka efase apa.
@@ -165,7 +185,55 @@
         - strong: Pake sous
         - text: pa enstale · 0 · 0 B
     - strong: Laj sous opsyonèl yo
-    - text: "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi"
+    - text: "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi · sst: poko janm reyisi · hwm: sa gen 0 min · storm-events: sa gen 0 min · exposure: sa gen 0 min · evac: poko janm reyisi"
+    - strong: Kouvèti achiv la
+    - text: /\d+ done · \d+–\d+ · \d+ tanpèt/
+    - list "Kouvèti achiv la":
+      - listitem:
+        - strong: NOAA/NHC HURDAT2 best-track and derived landfall data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: AOML detailed U.S. hurricane landfall table
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Community-sourced storm impacts
+        - text: /inferred · \d+–\d+/
+      - listitem:
+        - strong: NOAA NCEI Billion-Dollar Weather and Climate Disasters
+        - text: /closed · \d+–\d+ · pa ka kouri/
+      - listitem:
+        - strong: NOAA PSL Oceanic Niño Index snapshot
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA/CPC and CSU seasonal outlook snapshot
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NHC official forecast skill summary
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NHC archived advisory replay
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NCEI Storm Events coincidence data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA tropical cyclone rainfall reports
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Iowa State IEM archived NEXRAD composites
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: USGS observed high-water marks
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA CO-OPS tide-station index
+        - text: final · pa gen peryòd
+      - listitem:
+        - strong: U.S. Census state boundary polygons
+        - text: final · pa gen peryòd
+      - listitem:
+        - strong: HurricaneMap glossary
+        - text: final · pa gen peryòd
     - button "Repare kounye a"
     - button "Eseye service worker ankò"
     - button "Rafrechi dyagnostik"

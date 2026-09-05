@@ -258,6 +258,17 @@ function markLocation(lat, lon) {
   }).addTo(map);
 }
 
+// The layer probe must not share the cancel-the-previous-request controller:
+// a user typing an address while the probe is open aborted it, which reported
+// the feed idle and took its retry button away after a routine interaction.
+async function fetchJsonIsolated(url) {
+  const response = await fetchWithTimeout(url, {
+    headers: { Accept: 'application/json' },
+  }, REQUEST_TIMEOUT_MS.evacuation);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
 async function fetchJson(url) {
   requestController?.abort();
   requestController = new AbortController();
@@ -277,7 +288,7 @@ async function fetchJson(url) {
 let floridaLayerProbe = { checkedAt: 0, result: null };
 const FLORIDA_LAYER_PROBE_TTL_MS = 5 * 60 * 1000;
 
-export async function probeFloridaZoneLayer({ force = false, fetcher = fetchJson } = {}) {
+export async function probeFloridaZoneLayer({ force = false, fetcher = fetchJsonIsolated } = {}) {
   const now = Date.now();
   if (!force && floridaLayerProbe.result && now - floridaLayerProbe.checkedAt < FLORIDA_LAYER_PROBE_TTL_MS) {
     return floridaLayerProbe.result;

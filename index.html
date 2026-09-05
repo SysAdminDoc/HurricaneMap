@@ -16,8 +16,38 @@
   <meta name="twitter:description" content="Interactive map of every recorded U.S. hurricane landfall (1851-2025) from NOAA HURDAT2." />
   <meta name="twitter:image" content="https://sysadmindoc.github.io/HurricaneMap/example.png" />
   <title>HurricaneMap — 174 Years of U.S. Hurricane Landfalls</title>
+  <link rel="canonical" href="https://sysadmindoc.github.io/HurricaneMap/" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="alternate" type="application/json" title="HurricaneMap STAC catalog" href="data/stac/catalog.json" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Dataset",
+    "name": "HurricaneMap: U.S. tropical cyclone landfalls, 1851-2025",
+    "alternateName": "HurricaneMap",
+    "description": "Every recorded U.S. hurricane and tropical-storm landfall derived from NOAA HURDAT2 Atlantic and Eastern North Pacific best-track data. 595 landfalling storms, 759 landfall events, 374 at hurricane strength, with per-storm tracks, intensity, archived NEXRAD radar, and publication-ready exports.",
+    "url": "https://sysadmindoc.github.io/HurricaneMap/",
+    "sameAs": "https://github.com/SysAdminDoc/HurricaneMap",
+    "license": "https://opensource.org/licenses/MIT",
+    "keywords": ["hurricane", "tropical cyclone", "landfall", "HURDAT2", "NOAA", "United States", "storm track"],
+    "temporalCoverage": "1851/2025",
+    "spatialCoverage": { "@type": "Place", "name": "United States, including Puerto Rico, the U.S. Virgin Islands and Hawaii" },
+    "creator": { "@type": "Organization", "name": "SysAdminDoc", "url": "https://github.com/SysAdminDoc" },
+    "isBasedOn": {
+      "@type": "Dataset",
+      "name": "NOAA HURDAT2 Atlantic hurricane database",
+      "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-02272026.txt",
+      "datePublished": "2026-02-27",
+      "creator": { "@type": "Organization", "name": "NOAA National Hurricane Center" }
+    },
+    "citation": "Landsea, C. W., and J. L. Franklin, 2013: Atlantic Hurricane Database Uncertainty and Presentation of a New Database Format. Mon. Wea. Rev., 141, 3576-3592.",
+    "distribution": [
+      { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://sysadmindoc.github.io/HurricaneMap/data/landfalls.json", "name": "Landfall events" },
+      { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://sysadmindoc.github.io/HurricaneMap/data/storms.json", "name": "Storm tracks" },
+      { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://sysadmindoc.github.io/HurricaneMap/data/stac/catalog.json", "name": "STAC 1.1.0 catalog" }
+    ]
+  }
+  </script>
   <link rel="icon" type="image/png" sizes="192x192" href="branding/logo-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="branding/apple-touch-icon.png" />
   <link rel="stylesheet" href="vendor/leaflet.css" />
@@ -58,6 +88,29 @@
   <link rel="modulepreload" href="src/manifest-locale.js" />
 </head>
 <body>
+  <noscript>
+    <div class="noscript-notice">
+      <h1>HurricaneMap</h1>
+      <p>
+        An interactive atlas of every recorded U.S. hurricane and tropical-storm landfall from 1851 to 2025,
+        built from NOAA's HURDAT2 best-track database (revision of 27 February 2026). It covers 595 landfalling
+        storms and 759 landfall events, 374 of them at hurricane strength.
+      </p>
+      <p>The map itself needs JavaScript, but the underlying data does not. You can read it directly:</p>
+      <ul>
+        <li><a href="data/landfalls.json">landfalls.json</a> — one record per landfall event</li>
+        <li><a href="data/storms.json">storms.json</a> — full six-hourly tracks per storm</li>
+        <li><a href="data/stats.json">stats.json</a> — totals by state, decade and category</li>
+        <li><a href="data/metadata.json">metadata.json</a> — source files, revision dates and checksums</li>
+        <li><a href="data/stac/catalog.json">STAC 1.1.0 catalog</a> — machine-readable dataset discovery</li>
+        <li><a href="https://github.com/SysAdminDoc/HurricaneMap">Source code and documentation on GitHub</a></li>
+      </ul>
+      <p>
+        Cite the underlying database as Landsea, C. W., and J. L. Franklin, 2013: Atlantic Hurricane Database
+        Uncertainty and Presentation of a New Database Format. <em>Mon. Wea. Rev.</em>, 141, 3576-3592.
+      </p>
+    </div>
+  </noscript>
   <a href="#main" class="skip-to-content" data-i18n="app.skipToMap">Skip to map</a>
   <main id="main" tabindex="-1">
   <div id="map" aria-label="Hurricane landfall map" data-i18n-aria-label="app.mapLabel" tabindex="-1"></div>

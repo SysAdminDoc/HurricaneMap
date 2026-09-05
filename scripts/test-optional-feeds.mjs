@@ -149,6 +149,25 @@ await withFetch(
 );
 assert.equal(getOptionalFeedState('storm-events').state, 'success', 'loadStormEvents must report success');
 assert.equal(getOptionalFeedState('storm-events').itemCount, 2, 'loadStormEvents must count the storms it loaded');
+// An index that loads but holds nothing is `empty`, not a success with zero
+// items: those read identically in diagnostics but mean different things.
+idleOptionalFeed('storm-events');
+await withFetch(async () => ({ ok: true, status: 200, json: async () => ({ storms: {} }) }), async () => {
+  const { loadStormEvents: reload } = await import(`../src/storm-events.js?empty=${Date.now()}`);
+  return reload();
+});
+assert.equal(getOptionalFeedState('storm-events').state, 'empty', 'an index with no storms must report empty');
+
+idleOptionalFeed('storm-events');
+await withFetch(
+  async () => ({ ok: true, status: 200, json: async () => ({ storms: { AL122005: {}, AL092022: {} } }) }),
+  async () => {
+    const { loadStormEvents: reload } = await import(`../src/storm-events.js?refill=${Date.now()}`);
+    return reload();
+  },
+);
+assert.equal(getOptionalFeedState('storm-events').state, 'success');
+
 const stormEventsRetry = await withFetch(
   async () => ({ ok: false, status: 503, json: async () => ({}) }),
   () => retryOptionalFeed('storm-events'),

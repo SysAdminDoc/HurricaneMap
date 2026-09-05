@@ -108,6 +108,26 @@
         - strong: Glossary
         - text: "Not requested HurricaneMap bundled glossary Last success: Not scheduled Next retry: Not scheduled Origin: None"
         - button "Retry"
+      - listitem:
+        - strong: Sea-surface temperature
+        - text: "Not requested PacIOOS CoralTemp sea-surface temperature Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
+      - listitem:
+        - strong: High-water marks
+        - text: "/Current · \\d+ records USGS high-water marks Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - button "Retry"
+      - listitem:
+        - strong: Storm event reports
+        - text: "/Current · \\d+ records NOAA NCEI Storm Events Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - button "Retry"
+      - listitem:
+        - strong: Population exposure
+        - text: "/Current · \\d+ records Bundled state population densities Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - button "Retry"
+      - listitem:
+        - strong: Evacuation zones
+        - text: "Not requested Florida ArcGIS evacuation zones Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - button "Retry"
   - region "Offline storage":
     - heading "Offline storage" [level=3]
     - paragraph: Core historical data is protected. Source files are an optional, user-saved bundle; map tiles and radar packs can be cleared independently.
@@ -165,7 +185,55 @@
         - strong: Source bundle
         - text: not installed · 0 · 0 B
     - strong: Optional-feed age
-    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful"
+    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful · sst: never successful · hwm: 0 min ago · storm-events: 0 min ago · exposure: 0 min ago · evac: never successful"
+    - strong: Archive coverage
+    - text: /\d+ datasets · \d+–\d+ · \d+ storms/
+    - list "Archive coverage":
+      - listitem:
+        - strong: NOAA/NHC HURDAT2 best-track and derived landfall data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: AOML detailed U.S. hurricane landfall table
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Community-sourced storm impacts
+        - text: /inferred · \d+–\d+/
+      - listitem:
+        - strong: NOAA NCEI Billion-Dollar Weather and Climate Disasters
+        - text: /closed · \d+–\d+ · not runnable/
+      - listitem:
+        - strong: NOAA PSL Oceanic Niño Index snapshot
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA/CPC and CSU seasonal outlook snapshot
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NHC official forecast skill summary
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NHC archived advisory replay
+        - text: /operational · \d+–\d+/
+      - listitem:
+        - strong: NOAA/NCEI Storm Events coincidence data
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA tropical cyclone rainfall reports
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: Iowa State IEM archived NEXRAD composites
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: USGS observed high-water marks
+        - text: /final · \d+–\d+/
+      - listitem:
+        - strong: NOAA CO-OPS tide-station index
+        - text: final · no range
+      - listitem:
+        - strong: U.S. Census state boundary polygons
+        - text: final · no range
+      - listitem:
+        - strong: HurricaneMap glossary
+        - text: final · no range
     - button "Repair now"
     - button "Retry service worker"
     - button "Refresh diagnostics"

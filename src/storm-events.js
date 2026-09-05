@@ -24,9 +24,11 @@ export async function loadStormEvents() {
         return response.json();
       })
       .then(data => {
+        const stormCount = Object.keys(data?.storms || {}).length;
         completeOptionalFeed('storm-events', {
+          empty: stormCount === 0,
           cacheOrigin: 'bundled',
-          itemCount: Object.keys(data?.storms || {}).length,
+          itemCount: stormCount,
           requestId: request.requestId,
         });
         return data;

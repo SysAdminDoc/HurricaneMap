@@ -4,15 +4,20 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Added
+- The atlas can now be found and cited. The site publishes `robots.txt`, `sitemap.xml`, a canonical URL, and a schema.org `Dataset` block naming HURDAT2, its 27 February 2026 revision, the licence and the Landsea and Franklin citation. A `<noscript>` fallback tells a reader with scripting off what the page is and links the underlying JSON, the STAC catalog and the citation, so the data stays reachable even when the map is not. A gate checks the structured data against `data/metadata.json` and `data/coverage.json`, so it cannot drift into advertising a source or a coverage range this build does not use.
+
 ### Changed
 - `npm run stamp:release` regenerates every derived release artifact in one step: archive coverage, the release manifest, the STAC catalog, the distribution descriptor, and the provenance mirror. Doing it by hand meant remembering that coverage reads the hand-maintained snapshots and that the manifest has to be written twice around the catalog.
-- `npm run check:release-manifest` now proves the four preprocessor outputs are still byte-identical to the commit the manifest names, so derived data cannot be hand-edited and stamped over. Hand-maintained snapshots are excluded on purpose and stay covered by `npm run validate:data`.
+- `npm run check:release-manifest` now proves the four preprocessor outputs are still byte-identical to the commit the manifest names, so hand-editing derived data and then re-stamping is caught rather than laundered. Hand-maintained snapshots are excluded on purpose and stay covered by `npm run validate:data`.
 - The Node.js floor moves from 20 to 22. Node 20 reached end of life on 2026-04-30, so `engines.node` no longer advertises an unsupported line.
 - `npm run build` now runs every release gate through `scripts/run-gates.mjs` and reports all of them instead of stopping at the first failure. Each gate prints a pass/fail line with its duration, failures are repeated in full at the end, and the runner refuses to start if a gate-shaped script exists that nothing runs.
 - The 2026 Atlantic outlook now carries NOAA's August 6 update (75% chance of a below-normal season, 7–13 named storms, 2–6 hurricanes, 0–2 major) and CSU's August 5 forecast, replacing the May and July figures.
 
 ### Fixed
 - The release gate is unblocked: `fast-uri` moves to 3.1.7, clearing four high advisories fixed in 3.1.6. GHSA-f65p-4m7j-42xc and GHSA-jqff-g426-hqxp reach back to 3.0.0, GHSA-fph4-wmhf-6fwf to 3.1.2, and GHSA-5jgf-p345-68v8 to 3.1.3. The checked-in npm audit snapshot is regenerated against the new lockfile.
+- The ENSO badge on the seasonal outlook card failed WCAG AA contrast at 3.96:1 against the raised panel surface, where 10.5px bold text needs 4.5:1. It now uses the body text colour over the same tint, clearing 4.5:1 on every surface the banner sits on.
+- Typing an address in the evacuation panel no longer cancels an in-flight zone-layer probe. The probe shared the lookup's cancel-the-previous-request controller, so a routine interaction reported the feed as never attempted and hid its retry button.
 - The GOES satellite quicklink was requesting `goes-16`, which SLIDER has returned 404 for since GOES-19 took over as GOES-East on 2025-04-07, so every non-Hawaii storm opened a dead feed. It now requests `goes-19` and points straight at `slider.cira.colostate.edu` instead of the retired `rammb-slider` host.
 - Persistent storage is now requested when you save offline data rather than during boot, and it is awaited instead of discarded. Asking at startup spent Firefox's one prompt and Chromium's engagement check before there was anything to protect. When the browser declines and offline data is already saved, the storage panel says so, because Safari clears script-created storage after seven days without a visit.
 - Sea-surface temperature, high-water marks, storm event reports, population exposure, and evacuation zones are now tracked like every other optional layer. All five reach the network, and none of them reported a state, so a layer that failed looked identical to one with nothing to show and offered no retry. Optional data diagnostics now covers 19 feeds instead of 14.
