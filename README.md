@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
 
-> **174 years of U.S. hurricane landfalls**, every dot drawn directly from NOAA's HURDAT2 best-track database (1851–2025).
+> **174 years of U.S. hurricane landfalls**, every dot drawn directly from NOAA's HURDAT2 best-track database (1851-2025).
 >
 > **Live demo:** https://sysadmindoc.github.io/HurricaneMap/
 
@@ -17,7 +17,7 @@
 
 ## What this is
 
-A static, interactive web map that plots **every recorded hurricane and tropical-storm landfall on U.S. soil**, drawn straight from the National Hurricane Center's HURDAT2 best-track database — the same source the NHC uses for its post-season analyses.
+A static, interactive web map that plots **every recorded hurricane and tropical-storm landfall on U.S. soil**, drawn straight from the National Hurricane Center's HURDAT2 best-track database, the same source the NHC uses for its post-season analyses.
 
 Click any dot and you get the storm's full track, its peak intensity, every U.S. landfall it made (chronological), and one-click jumps to the Wikipedia article, YouTube footage search, NOAA Tropical Cyclone Report, and the NHC storm wallet.
 
@@ -56,42 +56,42 @@ That regenerates archive coverage, the release manifest, the STAC catalog, the d
 
 `source_commit` names the preprocessor run that produced the derived data, not the commit carrying the bytes. `npm run check:release-manifest` enforces that: `data/landfalls.json`, `data/stats.json`, `data/storms.json`, and `data/storms.json.gz` must still be byte-identical to that commit, so hand-editing derived data and then re-stamping does not launder it: the stamp keeps the old commit id and the drift check trips. Hand-maintained snapshots such as `data/enso.json` and `data/outlook.json` are refreshed between preprocessor runs by design and are policed by `npm run validate:data` instead.
 
-That runs all 85 release gates through `scripts/run-gates.mjs` and reports every one of them, so a single red gate can't hide the state of the rest. Each gate prints a pass or fail line with its duration, failures are repeated in full at the end, and the run exits non-zero if any failed. The runner also refuses to start if a `check:`, `validate:`, or `test:` script exists that neither the gate list nor the browser-lane exclusion list claims. A gate nothing runs is not a gate.
+That runs all 89 release gates through `scripts/run-gates.mjs` and reports every one of them, so a single red gate can't hide the state of the rest. Each gate prints a pass or fail line with its duration, failures are repeated in full at the end, and the run exits non-zero if any failed. The runner also refuses to start if a `check:`, `validate:`, or `test:` script exists that neither the gate list nor the browser-lane exclusion list claims. A gate nothing runs is not a gate.
 
 ## Highlights
 
-- **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851–2025.
+- **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851-2025.
 - Both **Atlantic** and **Eastern North Pacific** HURDAT2 basins ingested (so storms like Iniki '92 on Kauai are included).
-- **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times — fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
+- **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times, which fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).
 - **Multi-state tracking** for storms like Andrew (FL → FL → LA), Charley (FL → FL → SC → SC), Hugo (PR → PR → SC), Katrina (FL → LA → LA).
-- Per-segment **intensity-coloured tracks** — you can see exactly where a storm intensified, peaked, and weakened.
-- **Track animation** — opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Starting playback collapses the storm panel to a restore tab and promotes radar sync, speed, restart, close, and scrubber controls into a compact map dock.
-- **📡 Archived NEXRAD radar — full-storm timeline, offline-capable** — every storm from August 1995 onward ships with **every in-coverage 6-hourly track frame** baked into the repo. Click 📡 next to any landfall and the loop animates the entire U.S. passage of that storm from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days; Helene '24 shows the eyewall crossing the Big Bend. **No internet required after `git clone`.** Frames not in the local archive transparently fall back to live IEM URLs.
-- **Live GOES satellite background** — when active storms exist, an opt-in setting overlays current NOAA/NESDIS/STAR GOES GeoColor sectors behind the official advisory track/cone. Atlantic, Eastern Pacific, and Central Pacific active storms automatically choose the closest live sector; see [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md).
-- **📈 Intensity time-series chart** — inline SVG in every storm panel showing wind (kt) + pressure (mb) over the storm's life, with category-colored dots, dashed pressure line (inverted so deeper storms read higher), Cat 1-5 reference bands, vertical landfall markers, and a hover crosshair tooltip.
-- **🌀 Compare mode** — pin up to 4 storms, see their tracks color-coded on the map, side-by-side stat tables, mini intensity charts. Andrew '92 vs Katrina '05 vs Michael '18 in one view.
-- **🔥 Density heatmap** — toggle a Catppuccin-tinted heat layer weighted by Saffir-Simpson category to show landfall hotspots vs cold spots.
-- **🗺️ State deep-dive** — click any state polygon (or pick from the filter), get a panel with that state's full landfall history: by-category histogram, by-decade trend, top-5 worst on record, every storm sortable.
-- **🌊 SLOSH MOM storm surge zones** — overlay NHC's Cat 1-5 maximum-of-maximums inundation maps along the U.S. Gulf and East Coast, plus the dedicated Hawaii (Cat 1-4) and Puerto Rico/USVI regional grids. Powered by NOAA's pre-rendered ArcGIS tiles — picking a category snaps the worst-case envelope into view.
-- **🌬️ Wind-field swaths** — for storms 2004+, a checkbox in the storm panel renders the actual HURDAT2 wind-radii analysis (34/50/64 kt asymmetric quadrants per track point) as overlapping polygons along the path.
-- **🛰️ ✈️ 🍝 🌪️ Quicklinks** — every storm panel links out to GOES satellite imagery (RAMMB SLIDER, 2018+), NOAA Storm Events tornado search filtered to the storm's dates + states, Hurricane Hunters recon archive (Tropical Atlantic mirror), Wikipedia, YouTube footage search, NOAA Tropical Cyclone Reports, and the NHC storm wallet.
-- **⚠️ Impacts data** — raw Wikipedia infobox deaths/damage text plus normalized numeric fields, source title/URL, parse time, units, qualifiers, and confidence reasoning (244 storms covered so far; missing means unavailable, not zero; rerun `scripts/scrape_impacts.py` to fill in more).
-- **📏 Observed high-water marks** — 25 modern storms (Katrina, Harvey, Sandy, Ian, Helene…) carry a toggleable layer of surveyed USGS peak-water elevations (10,700+ marks, elevation-colored, coastal vs riverine) — the ground truth to compare against the modeled SLOSH surge zones. Preprocessed from the USGS Short-Term Network (`scripts/build_hwm.py`), works offline.
-- **🌊 Tide-gauge water levels ("what the water did")** — for 1990+ storms, load NOAA CO-OPS observed hourly water levels vs the predicted astronomical tide at the 2-3 gauges nearest the strongest landfall, with the peak surge residual called out (Katrina: Grand Isle +3.8 ft, S.W. Pass +4.9 ft at the Aug 29 landfall hour). Fetched live on demand — never automatically.
-- **💰 Billion-dollar disasters** — 65 landfalling storms joined to NOAA NCEI's U.S. Billion-Dollar Weather and Climate Disasters record (1980–2024, CPI-adjusted to 2024 USD, official death tolls). The NCEI product was retired in May 2025, so the dataset is frozen and ships with the repo (`scripts/build_billions.py`).
-- **📊 Seasonal outlook freshness** — the bundled NOAA/CSU outlook and NOAA CPC ENSO snapshot carry explicit issue and validity dates; `npm run validate:data` warns when an in-season outlook exceeds 45 days and fails a release after either snapshot's `valid_until` date. The stats card shows each issue/validity date and links to the current NOAA CPC product.
-- **🚨 Active storm tracking** — when NHC reports active storms, a pulsing badge appears with the official cone/track, Potential Tropical Cyclone support, advisory/discussion/name-pronunciation/rip-current links, an optional GOES backdrop, hourly feed checks, and retry/backoff status.
-- **📍 Point-specific NHC wind guidance** — right-click/long-press the map or use device location to see current official 34/50/64 kt cumulative probability bands and the nearest 34 kt earliest-reasonable/most-likely arrival contours. Device coordinates stay in the tab session by default; an explicit option can remember only latitude/longitude for up to 24 hours, with a clear control. Issue time, contour distance, source links, and an explicit impact-forecast caveat are always shown; stale or offline products fall back to links without displaying old values.
-- **❎ NHC tropical outlook + marine warnings** — official formation disturbances render with the NHC's 2026 gray-X treatment for near-0% systems; an opt-in layer adds the 0–24 hour offshore wind-warning zones.
-- **📐 Measured forecast-skill retrospective** — each historical storm shows its basin's official NHC 2021–2025 OFCL track and intensity errors by lead time, sample sizes, definitions, and source files. A separate control retains the clearly labeled illustrative 2015/2025/2026 cone-radius reconstruction.
-- **〰️ Animated risk trajectories** — an opt-in education mode replaces the cone boundary with 20 deterministic plausible center paths, scaled to the selected error era and automatically rendered without motion when reduced motion is preferred.
-- **🎒 Offline preparedness planner** — a device-local EN/ES/Kreyòl checklist and household calculator sizes water and food for a three-day evacuation kit or two-week stay-at-home kit, with progress available after a fully offline reload.
-- **📍 Official evacuation-zone lookup** — enter a Florida address or choose a map point to query the state-published evacuation-zone layer, with a clear Esri address-transmission disclosure, a coordinate-only path, labelled outage fallback, and official sources for Florida, North Carolina, South Carolina, Georgia, Texas, Virginia, Maryland, and Massachusetts.
-- **🖼️ Filtered track gallery** — render the current historical filter set as a stylized 1800×1200 all-tracks density poster, then export a PNG with NOAA/NHC HURDAT2 attribution embedded in the artwork.
-- **Progressive anchored controls** — header hints use `popover="hint"` and CSS anchor positioning in current browsers without closing the settings flyout, with equivalent fixed-position behavior retained for older engines.
-- **⚠️ 2026 cone standard: coastal + inland watches/warnings** — matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
-- **👥 Population density** — toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
+- Per-segment **intensity-coloured tracks**, so you can see exactly where a storm intensified, peaked, and weakened.
+- **Track animation**: opt-in playback of a spinning hurricane glyph and translucent wind-field disk that travels the full path, both sized in real-time by Saffir-Simpson category at each track point. Starting playback collapses the storm panel to a restore tab and promotes radar sync, speed, restart, close, and scrubber controls into a compact map dock.
+- **📡 Archived NEXRAD radar, full-storm timeline, offline-capable**: every storm from August 1995 onward ships with **every in-coverage 6-hourly track frame** baked into the repo. Click 📡 next to any landfall and the loop animates the entire U.S. passage of that storm from genesis-in-coverage to dissipation, with the map auto-panning to follow the eye. Katrina '05 plays back 22 frames over five days; Helene '24 shows the eyewall crossing the Big Bend. **No internet required after `git clone`.** Frames not in the local archive transparently fall back to live IEM URLs.
+- **Live GOES satellite background**: when active storms exist, an opt-in setting overlays current NOAA/NESDIS/STAR GOES GeoColor sectors behind the official advisory track/cone. Atlantic, Eastern Pacific, and Central Pacific active storms automatically choose the closest live sector; see [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md).
+- **📈 Intensity time-series chart**: inline SVG in every storm panel showing wind (kt) + pressure (mb) over the storm's life, with category-colored dots, dashed pressure line (inverted so deeper storms read higher), Cat 1-5 reference bands, vertical landfall markers, and a hover crosshair tooltip.
+- **🌀 Compare mode**: pin up to 4 storms, see their tracks color-coded on the map, side-by-side stat tables, mini intensity charts. Andrew '92 vs Katrina '05 vs Michael '18 in one view.
+- **🔥 Density heatmap**: toggle a Catppuccin-tinted heat layer weighted by Saffir-Simpson category to show landfall hotspots vs cold spots.
+- **🗺️ State deep-dive**: click any state polygon (or pick from the filter), get a panel with that state's full landfall history: by-category histogram, by-decade trend, top-5 worst on record, every storm sortable.
+- **🌊 SLOSH MOM storm surge zones**: overlay NHC's Cat 1-5 maximum-of-maximums inundation maps along the U.S. Gulf and East Coast, plus the dedicated Hawaii (Cat 1-4) and Puerto Rico/USVI regional grids. Powered by NOAA's pre-rendered ArcGIS tiles. Picking a category snaps the worst-case envelope into view.
+- **🌬️ Wind-field swaths**: for storms 2004+, a checkbox in the storm panel renders the actual HURDAT2 wind-radii analysis (34/50/64 kt asymmetric quadrants per track point) as overlapping polygons along the path.
+- **🛰️ ✈️ 🍝 🌪️ Quicklinks**: every storm panel links out to GOES satellite imagery (RAMMB SLIDER, 2018+), NOAA Storm Events tornado search filtered to the storm's dates + states, Hurricane Hunters recon archive (Tropical Atlantic mirror), Wikipedia, YouTube footage search, NOAA Tropical Cyclone Reports, and the NHC storm wallet.
+- **⚠️ Impacts data**: raw Wikipedia infobox deaths/damage text plus normalized numeric fields, source title/URL, parse time, units, qualifiers, and confidence reasoning (244 storms covered so far; missing means unavailable, not zero; rerun `scripts/scrape_impacts.py` to fill in more).
+- **📏 Observed high-water marks**: 25 modern storms (Katrina, Harvey, Sandy, Ian, Helene…) carry a toggleable layer of surveyed USGS peak-water elevations (10,700+ marks, elevation-colored, coastal vs riverine), the ground truth to compare against the modeled SLOSH surge zones. Preprocessed from the USGS Short-Term Network (`scripts/build_hwm.py`), works offline.
+- **🌊 Tide-gauge water levels ("what the water did")**: for 1990+ storms, load NOAA CO-OPS observed hourly water levels vs the predicted astronomical tide at the 2-3 gauges nearest the strongest landfall, with the peak surge residual called out (Katrina: Grand Isle +3.8 ft, S.W. Pass +4.9 ft at the Aug 29 landfall hour). Fetched live on demand, never automatically.
+- **💰 Billion-dollar disasters**: 65 landfalling storms joined to NOAA NCEI's U.S. Billion-Dollar Weather and Climate Disasters record (1980-2024, CPI-adjusted to 2024 USD, official death tolls). The NCEI product was retired in May 2025, so the dataset is frozen and ships with the repo (`scripts/build_billions.py`).
+- **📊 Seasonal outlook freshness**: the bundled NOAA/CSU outlook and NOAA CPC ENSO snapshot carry explicit issue and validity dates; `npm run validate:data` warns when an in-season outlook exceeds 45 days and fails a release after either snapshot's `valid_until` date. The stats card shows each issue/validity date and links to the current NOAA CPC product.
+- **🚨 Active storm tracking**: when NHC reports active storms, a pulsing badge appears with the official cone/track, Potential Tropical Cyclone support, advisory/discussion/name-pronunciation/rip-current links, an optional GOES backdrop, hourly feed checks, and retry/backoff status.
+- **📍 Point-specific NHC wind guidance**: right-click/long-press the map or use device location to see current official 34/50/64 kt cumulative probability bands and the nearest 34 kt earliest-reasonable/most-likely arrival contours. Device coordinates stay in the tab session by default; an explicit option can remember only latitude/longitude for up to 24 hours, with a clear control. Issue time, contour distance, source links, and an explicit impact-forecast caveat are always shown; stale or offline products fall back to links without displaying old values.
+- **❎ NHC tropical outlook + marine warnings**: official formation disturbances render with the NHC's 2026 gray-X treatment for near-0% systems; an opt-in layer adds the 0-24 hour offshore wind-warning zones.
+- **📐 Measured forecast-skill retrospective**: each historical storm shows its basin's official NHC 2021-2025 OFCL track and intensity errors by lead time, sample sizes, definitions, and source files. A separate control retains the clearly labeled illustrative 2015/2025/2026 cone-radius reconstruction.
+- **〰️ Animated risk trajectories**: an opt-in education mode replaces the cone boundary with 20 deterministic plausible center paths, scaled to the selected error era and automatically rendered without motion when reduced motion is preferred.
+- **🎒 Offline preparedness planner**: a device-local EN/ES/Kreyòl checklist and household calculator sizes water and food for a three-day evacuation kit or two-week stay-at-home kit, with progress available after a fully offline reload.
+- **📍 Official evacuation-zone lookup**: enter a Florida address or choose a map point to query the state-published evacuation-zone layer, with a clear Esri address-transmission disclosure, a coordinate-only path, labelled outage fallback, and official sources for Florida, North Carolina, South Carolina, Georgia, Texas, Virginia, Maryland, and Massachusetts.
+- **🖼️ Filtered track gallery**: render the current historical filter set as a stylized 1800×1200 all-tracks density poster, then export a PNG with NOAA/NHC HURDAT2 attribution embedded in the artwork.
+- **Progressive anchored controls**: header hints use `popover="hint"` and CSS anchor positioning in current browsers without closing the settings flyout, with equivalent fixed-position behavior retained for older engines.
+- **⚠️ 2026 cone standard: coastal + inland watches/warnings**: matching the NHC's 2026 operational cone graphic, active storms overlay tropical-storm/hurricane watch and warning zones (including inland zones, CONUS/HI/PR/USVI) from `api.weather.gov`, with the official pink/blue diagonal hatch where a Hurricane Watch overlaps a Tropical Storm Warning, and an on-map legend.
+- **👥 Population density**: toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
 ## What's new in v1.9.3 - Metric parity and maintainability (2026-08-08)
@@ -105,7 +105,7 @@ Earlier release history is maintained in the [CHANGELOG](CHANGELOG.md).
 
 ## Quick start
 
-The map is **already published** on GitHub Pages — open https://sysadmindoc.github.io/HurricaneMap/ and you're done.
+The map is **already published** on GitHub Pages. Open https://sysadmindoc.github.io/HurricaneMap/ and you're done.
 
 To run locally (e.g. after refreshing the HURDAT2 data):
 
@@ -155,7 +155,7 @@ Live satellite backdrop: [`docs/GOES_REALTIME.md`](docs/GOES_REALTIME.md) docume
 
 Runtime mapping code is deliberately pinned: Leaflet 1.9.4 is vendored locally for offline use, while Cesium 1.144 is loaded only for the optional globe with exact script and stylesheet integrity hashes. The disputed Leaflet advisory record (with its `check:popup-sinks` compensating control) and Cesium release/SRI decision are recorded in [`security/dependency-security-policy.json`](security/dependency-security-policy.json). Updating either requires checking its upstream license/release, changing the complete pinned asset pair, updating that decision record, and passing the desktop/mobile map and globe smokes.
 
-Cesium also runs under least privilege. Because its bundled Knockout needs `unsafe-eval`, the globe is confined to a separate `globe.html` document embedded as `sandbox="allow-scripts"` — an opaque origin with no access to the application's DOM, storage, cookies, or service worker. The two documents exchange only a versioned `hm-globe-v1` message envelope, with both sides validating source, origin, message type, and payload shape. The application document itself runs `script-src 'self'` and grants no third-party script host at all; `npm run test:globe-protocol` fails the build if that boundary regresses.
+Cesium also runs under least privilege. Because its bundled Knockout needs `unsafe-eval`, the globe is confined to a separate `globe.html` document embedded as `sandbox="allow-scripts"`, an opaque origin with no access to the application's DOM, storage, cookies, or service worker. The two documents exchange only a versioned `hm-globe-v1` message envelope, with both sides validating source, origin, message type, and payload shape. The application document itself runs `script-src 'self'` and grants no third-party script host at all; `npm run test:globe-protocol` fails the build if that boundary regresses.
 
 Build and test dependencies use maintained npm release lines: esbuild 0.28.2 (MIT), Playwright and Playwright Test 1.63.0 (Apache-2.0), and axe-core Playwright 4.13.0 (MPL-2.0). `npm run check:security` runs the live `npm audit --json --audit-level=high` gate and falls back to the lockfile-bound, time-bounded snapshot in `security/npm-audit-snapshot.json` when the advisory service is unavailable; `npm run check:security:offline` exercises the deterministic snapshot path directly. Both commands also verify the reviewed Leaflet/Cesium versions, hashes, SRI values, licenses, and decision expiry. Before merging an update, run `npm outdated`, `npm run check:security`, and `npm test`; the latter includes a lockfile/vendor security and license audit, bundle budget, browser accessibility/layout checks including locale-aware ARIA snapshots, the deterministic desktop/mobile visual matrix for shell, storm, statistics, comparison, settings, advisory replay, playback, light, dark, and high-contrast states, the local Chromium/Firefox/WebKit contract matrix, offline service-worker check, and Cesium globe smoke. `npm run test:browser-matrix` reports each engine's shell/manifest/search/panel and offline-cache result separately, explicitly naming unsupported capabilities. The visual fixture aborts external requests, stubs the map renderer, masks live chrome, and uses a 0.1% maximum pixel-diff ratio. Checked-in lossless WebP baselines are intentionally Windows/Chromium-specific; `npm run test:visual` and `npm run test:visual:update` run on Windows and emit a clear successful skip on Linux/macOS to avoid false cross-platform pixel failures. `package.json` requires Node.js 22 or newer. Playwright only needs Node 20, but that line reached end of life on 2026-04-30, so the floor tracks a supported release instead. Vendored library and font notices, versions, sources, and font hashes are recorded in [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt).
 
@@ -271,35 +271,35 @@ HurricaneMap/
 
 HURDAT2 marks a `L` record-identifier on track points where the cyclone center crosses a coastline. We use this **as the primary signal** for every landfall.
 
-For storms without an `L` marker — most commonly EPac/CPac storms hitting Hawaii (the marker convention is "continental U.S. only") and a handful of 1971–1990 storms (a documented HURDAT2 marking gap) — we fall back to **inferred landfall detection**:
+For storms without an `L` marker, most commonly EPac/CPac storms hitting Hawaii (the marker convention is "continental U.S. only") and a handful of 1971-1990 storms (a documented HURDAT2 marking gap), we fall back to **inferred landfall detection**:
 
 1. For each consecutive pair of 6-hourly track points, classify each as *inside-a-state* via point-in-polygon against the U.S. Census Bureau state boundaries.
 2. Whenever the track transitions from offshore → onshore while at TS+ intensity, that's a landfall.
 3. If both endpoints are offshore but the great-circle segment crosses land (which happens with small islands like Kauai), sample 10 mid-segment positions and place the inferred landfall at the first one inside a state polygon. Wind/pressure interpolated linearly.
-4. EPac-basin inferred landfalls are restricted to coastal Pacific states (HI, CA, OR, WA, AK) — otherwise EPac storms tracking up through Mexico produce spurious "landfalls" in landlocked Arizona / New Mexico.
+4. EPac-basin inferred landfalls are restricted to coastal Pacific states (HI, CA, OR, WA, AK). Otherwise EPac storms tracking up through Mexico produce spurious "landfalls" in landlocked Arizona / New Mexico.
 5. HURDAT2 `C` records mean closest approach without a subsequent landfall; the record and its adjacent track segments are excluded from inferred promotion.
 
 Inferred landfalls are flagged with an `inferred` tag in the storm panel so you can tell them apart from official `L`-marker landfalls.
 
-The build also ingests the [AOML detailed continental U.S. landfall table](https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html) as an independent ground-truth artifact. For the comparable 1983–1990 continental, hurricane-strength scope, the current release matches 16 of 16 reference rows (100.0% precision and 100.0% recall). The same report identifies three inferred tropical-storm candidates in that window separately because the AOML reference rows are hurricane-only.
+The build also ingests the [AOML detailed continental U.S. landfall table](https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html) as an independent ground-truth artifact. For the comparable 1983-1990 continental, hurricane-strength scope, the current release matches 16 of 16 reference rows (100.0% precision and 100.0% recall). The same report identifies three inferred tropical-storm candidates in that window separately because the AOML reference rows are hurricane-only.
 
 ## Saffir-Simpson at landfall
 
 | Category | Sustained wind | Color |
 | -------- | -------------- | ----- |
-| TS / sub-hurricane | 34–63 kt | sapphire |
-| Cat 1 | 64–82 kt | green |
-| Cat 2 | 83–95 kt | yellow |
-| Cat 3 (major) | 96–112 kt | peach |
-| Cat 4 | 113–136 kt | pink |
+| TS / sub-hurricane | 34-63 kt | sapphire |
+| Cat 1 | 64-82 kt | green |
+| Cat 2 | 83-95 kt | yellow |
+| Cat 3 (major) | 96-112 kt | peach |
+| Cat 4 | 113-136 kt | pink |
 | Cat 5 | 137+ kt | mauve |
 
-A storm's **headline landfall category** is the highest category recorded at *any* of its U.S. landfalls — so a storm that peaks offshore and lands as a TS shows up as TS, not as its peak intensity.
+A storm's **headline landfall category** is the highest category recorded at *any* of its U.S. landfalls, so a storm that peaks offshore and lands as a TS shows up as TS, not as its peak intensity.
 
 ## Known data quirks
 
-- **1971–1990 has known gaps in HURDAT2's continental-U.S. landfall marking.** Some real landfalls are missing or under-categorized; the inferred-landfall pass picks up most of them but a few are absent because the 6-hour track doesn't cross a polygon.
-- **Pre-1944** (no aircraft reconnaissance) and **pre-late-1960s** (no satellite) systematically under-sample storm count and bias intensities low — see Landsea & Franklin 2013.
+- **1971-1990 has known gaps in HURDAT2's continental-U.S. landfall marking.** Some real landfalls are missing or under-categorized; the inferred-landfall pass picks up most of them but a few are absent because the 6-hour track doesn't cross a polygon.
+- **Pre-1944** (no aircraft reconnaissance) and **pre-late-1960s** (no satellite) systematically under-sample storm count and bias intensities low, see Landsea & Franklin 2013.
 - **Wind radii** (34/50/64 kt) only present from 2004 onward in HURDAT2; modern storms use them for 2D swaths, 3D wind cones, and the screening exposure metric. **Radius of maximum wind** only begins in 2021 and remains too sparse for historical comparison.
 - **Hawaii 1959 Hurricane Dot, 1992 Iniki** etc. are inferred landfalls because HURDAT2's `L` marker convention doesn't apply outside continental U.S. The category is interpolated from the nearest 6-hour position.
 
@@ -309,7 +309,7 @@ A storm's **headline landfall category** is the highest category recorded at *an
 
 Every preprocessing run writes `data/metadata.json` alongside the generated landfall, storm, and stats files. It records the exact HURDAT2 source filenames, URLs, revision dates, SHA-256 values, source storm-year ranges, output hashes, generator/runtime, source commit, coverage counts, and lifecycle status for every bundled dataset. A status entry is `active`, `closed`, or `deprecated`, and closed/deprecated entries carry an end date plus a retirement citation. `npm run generate:coverage` turns that source metadata plus each bundled archive manifest into the canonical per-dataset coverage view, including measured availability and final/inferred/operational/stale/closed/unavailable value status. The About dialog and offline diagnostics surface these facts alongside the measured AOML check so users can confirm exactly which data bundle they are viewing. `data/hurdat2-sources.json` is the checked-in source lock and remains in the mandatory runtime; the two raw best-track files are available from Settings as a bounded, user-initiated source bundle.
 
-The NOAA NCEI Billion-Dollar Weather and Climate Disasters product is a closed series: NOAA retired it on 2025-05-08 with no updates beyond calendar year 2024. For a 2025-or-later storm, the impacts panel therefore says **“No data — series ended 2024”** and links to the retirement notice; if the bundled file itself cannot load, it says the data is unavailable instead. `npm run validate:data` rejects any future NCEI row beyond the recorded end date.
+The NOAA NCEI Billion-Dollar Weather and Climate Disasters product is a closed series: NOAA retired it on 2025-05-08 with no updates beyond calendar year 2024. For a 2025-or-later storm, the impacts panel therefore says **“No data, series ended 2024”** and links to the retirement notice; if the bundled file itself cannot load, it says the data is unavailable instead. `npm run validate:data` rejects any future NCEI row beyond the recorded end date.
 
 Hand-maintained seasonal snapshots are time-bounded rather than silently treated as current. `data/outlook.json` records issue/validity windows for each NOAA and CSU entry plus the latest snapshot window; `data/enso.json` stores the same contract in `_meta`. Refresh both files when NOAA CPC or CSU publishes a new product, then run `npm run validate:data` before release. The validator accepts a snapshot through its inclusive `valid_until` date and emits an in-season warning after 45 days without treating that warning as a data value.
 
@@ -345,8 +345,8 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 ### Data Accuracy Notes
 
 - **Pre-1944** (no aircraft) and **pre-1960s** (no satellite): lower completeness and accuracy
-- **1971–1990**: documented gaps in continental U.S. landfall marking in HURDAT2
-- **Historical uncertainty:** Pre-1900 tracks have ±100+ km uncertainty; modern (post-1960) ±10–20 km
+- **1971-1990**: documented gaps in continental U.S. landfall marking in HURDAT2
+- **Historical uncertainty:** Pre-1900 tracks have ±100+ km uncertainty; modern (post-1960) ±10-20 km
 - **More details:** [Data Accuracy & Disclaimers in LICENSE.md](LICENSE.md#data-accuracy--disclaimers)
 
 ---
@@ -357,10 +357,10 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 | ---- | ----- |
 | Atlantic best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
-| Official forecast skill (2021–2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml) — regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
-| Archived NHC advisories (2015–2024 U.S.-landfalling Atlantic storms) | [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/) — regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
-| Format spec | [Landsea, C. W. — *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
-| Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/) — fetched live (CORS-enabled), no preprocessing |
+| Official forecast skill (2021-2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml). Regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
+| Archived NHC advisories (2015-2024 U.S.-landfalling Atlantic storms) | [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/). Regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
+| Format spec | [Landsea, C. W., *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
+| Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/), fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |
 | Map tiles | [CartoDB Dark Matter](https://carto.com/) over OpenStreetMap |
 | Map library | [Leaflet 1.9](https://leafletjs.com/) |
@@ -369,7 +369,7 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 
 Radar PNGs in `data/radar/` come from the [Iowa State IEM NEXRAD archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/). They're committed to the repo so the tool works offline, but you can re-scrape them at any time.
 
-> **Size budget:** GitHub Pages hard-caps published sites at **1 GB** and the tracked tree is already ~520 MB (radar ~500 MB). `npm run build` fails above a 900 MB guard (`scripts/check-pages-size.mjs`) — if you densify the radar archive past that, serve the frames from the Cloudflare worker CDN ([docs/CLOUDFLARE_CDN.md](docs/CLOUDFLARE_CDN.md)) instead of committing them.
+> **Size budget:** GitHub Pages hard-caps published sites at **1 GB** and the tracked tree is already ~520 MB (radar ~500 MB). `npm run build` fails above a 900 MB guard (`scripts/check-pages-size.mjs`), if you densify the radar archive past that, serve the frames from the Cloudflare worker CDN ([docs/CLOUDFLARE_CDN.md](docs/CLOUDFLARE_CDN.md)) instead of committing them.
 
 ```bash
 # Default — every covered landfall + every in-coverage TS+ track point
@@ -430,15 +430,15 @@ The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stat
 
 ## License & Attribution
 
-- **Software:** MIT — see [LICENSE](LICENSE)
+- **Software:** MIT, see [LICENSE](LICENSE)
 - **Data Sources:** See [LICENSE.md](LICENSE.md) for detailed attribution
 - **Vendored code and fonts:** See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt)
 
 This project aggregates data from multiple sources:
-- **HURDAT2 Best-Track Database** — NOAA National Hurricane Center (public domain)
-- **SLOSH Storm Surge Zones** — NOAA NHC (public domain)
-- **NEXRAD Archived Radar** — NOAA / Iowa Environmental Mesonet (public domain)
-- **Population Density** — SEDAC GPWv4, Columbia University (CC BY 4.0)
-- **Storm Impacts** — Wikipedia (CC BY-SA 3.0)
+- **HURDAT2 Best-Track Database**: NOAA National Hurricane Center (public domain)
+- **SLOSH Storm Surge Zones**: NOAA NHC (public domain)
+- **NEXRAD Archived Radar**: NOAA / Iowa Environmental Mesonet (public domain)
+- **Population Density**: SEDAC GPWv4, Columbia University (CC BY 4.0)
+- **Storm Impacts**: Wikipedia (CC BY-SA 3.0)
 
 **When using HurricaneMap in research or publications:** Cite NOAA/NHC as the original data source. See [LICENSE.md](LICENSE.md) for full citation formats and per-dataset attribution requirements.

@@ -46,12 +46,16 @@ const definitions = glossary.map(entry => entry.definition).join('\n');
 assert.doesNotMatch(definitions, /\b157\s*kt\b/i, 'glossary must not publish the obsolete 157 kt Category 5 threshold');
 assert.doesNotMatch(definitions, /\b111\s*kt\b/i, 'glossary must not confuse the 111 mph major-hurricane threshold with knots');
 
+// Hyphens, not en dashes: these expectations used to spell the README rows with
+// en dashes while the glossary rows above spell the very same ranges with
+// hyphens, so the README table was the odd one out and the repo's writing rule
+// bans en dashes in prose. The numbers are unchanged.
 for (const row of [
-  '| TS / sub-hurricane | 34–63 kt |',
-  '| Cat 1 | 64–82 kt |',
-  '| Cat 2 | 83–95 kt |',
-  '| Cat 3 (major) | 96–112 kt |',
-  '| Cat 4 | 113–136 kt |',
+  '| TS / sub-hurricane | 34-63 kt |',
+  '| Cat 1 | 64-82 kt |',
+  '| Cat 2 | 83-95 kt |',
+  '| Cat 3 (major) | 96-112 kt |',
+  '| Cat 4 | 113-136 kt |',
   '| Cat 5 | 137+ kt |',
 ]) {
   assert.ok(readme.includes(row), `README category table must include ${row}`);
