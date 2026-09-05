@@ -708,8 +708,8 @@ function sliderSatelliteUrl(storm) {
   const isHawaii = lfs.length && lfs[0].state === 'Hawaii';
   const sat = isHawaii ? 'goes-18' : 'goes-16';
   const sec = isHawaii ? 'full_disk' : 'conus';
-  // Default to the GeoColor product — most legible, day-and-night.
-  return `https://rammb-slider.cira.colostate.edu/?sat=${sat}&sec=${sec}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
+  // GeoColor is most legible day-and-night. Canonical host, not rammb-slider.
+  return `https://slider.cira.colostate.edu/?sat=${sat}&sec=${sec}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
 }
 
 // Days-at-intensity stacked horizontal bar. Visualizes how many hours of

@@ -42,6 +42,15 @@ const panelLines = panel.split(/\r?\n/).length;
 assert(mainLines < 850, 'main.js shell orchestration regressed to ' + mainLines + ' lines');
 assert(panelLines < 800, 'panel.js renderer regressed to ' + panelLines + ' lines');
 
+// CIRA's SLIDER moved hosts. The old address still redirects with the query
+// intact, so this is about not depending on that redirect outliving the link.
+const sliderLink = panel.match(/return `(https:\/\/slider\.cira\.colostate\.edu\/\?[^`]*)`/)?.[1];
+assert(sliderLink, 'the satellite quicklink must be built on the canonical SLIDER host');
+assert(!/return `https:\/\/rammb-slider\./.test(panel), 'panel.js must not rebuild links on the retired SLIDER host');
+for (const parameter of ['sat=', 'sec=', 'start_unix=']) {
+  assert(sliderLink.includes(parameter), `the SLIDER quicklink must carry ${parameter}`);
+}
+
 // Storage persistence belongs to the save that needs it, not to boot: asking
 // before the user has engaged spends the one prompt Firefox gives and the
 // engagement heuristic Chromium has not seen yet, and the answer was discarded.
