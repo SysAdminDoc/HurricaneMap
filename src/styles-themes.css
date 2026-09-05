@@ -183,3 +183,39 @@ html.light-theme .atlas-context-rail {
   --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
   background: rgba(7, 21, 39, 0.9);
 }
+
+/* The desktop storm panel (>=1121px) is skinned with the same --atlas-* tokens
+   as the header and the context rail, but it was never added to their light
+   overrides. It kept the dark navy surfaces while --text flipped to the light
+   ink, which put the title at 1.01:1 on the white sticky header and the body
+   at 1.96:1 on navy. High contrast made it worse, not better. */
+html.light-theme .storm-panel {
+  --atlas-panel: rgba(255, 255, 255, 0.97);
+  --atlas-panel-strong: rgba(248, 250, 255, 0.985);
+  --atlas-edge: rgba(53, 95, 126, 0.2);
+  --atlas-cyan: #0a6070;
+  --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
+  --atlas-shadow: 0 18px 48px rgba(76, 79, 105, 0.18);
+  --atlas-ink: var(--foreground);
+}
+
+/* The biography and the other muted panel text sit on a faint lavender tint,
+   where the default light --subtext lands at 4.27:1. One step darker clears AA
+   on the tint and on the plain panel alike. High contrast is excluded: its own
+   palette is stronger still, and this would undercut it. */
+html.light-theme:not(.high-contrast) .storm-panel {
+  --subtext: #5c5f77;
+}
+
+@media (min-width: 1121px) {
+  html.light-theme .storm-panel .panel-sticky-header {
+    background: linear-gradient(135deg, var(--atlas-panel-strong), var(--atlas-panel));
+  }
+
+  html.light-theme .storm-panel .meta-row > span:not(.cat-pill),
+  html.light-theme .storm-panel .stat-grid .stat,
+  html.light-theme .storm-panel .landfall-list li {
+    border-color: var(--border-subtle);
+    background: var(--surface-control);
+  }
+}

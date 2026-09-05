@@ -331,6 +331,111 @@ async function assertBasemapNotWatermarked(page) {
   );
 }
 
+// The desktop storm panel (>=1121px) is skinned with the --atlas-* tokens, and
+// the light theme's overrides for those tokens named only the header, the
+// mobile menu and the context rail. The panel kept its dark navy surfaces while
+// the ink flipped light, so the title measured 1.01:1 on the white sticky
+// header and the biography 1.96:1 on navy. Below 1121px the panel uses
+// --surface-panel and reads fine, which is why the mobile baselines stayed
+// green and nothing caught it.
+async function assertStormPanelContrast(browser, baseUrl) {
+  const targets = [
+    ['title', '#storm-panel .storm-panel-header h2'],
+    ['biography', '#storm-panel .biography-text'],
+    ['stat label', '#storm-panel .stat-grid .label'],
+    ['stat value', '#storm-panel .stat-grid .value'],
+    ['meta pill', '#storm-panel .meta-row > span:not(.cat-pill)'],
+    ['landfall row', '#storm-panel .landfall-list li'],
+    ['section heading', '#storm-panel .panel-section-h3'],
+  ];
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, { onboarded: true, theme: 'light', highContrast: false, reducedMotion: true, locale: 'en' });
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await openKatrinaPanel(page);
+    await page.waitForSelector('#storm-panel:not([hidden]) .storm-panel-layout');
+
+    for (const profile of [
+      { theme: 'light', highContrast: false, minimum: 4.5 },
+      { theme: 'light', highContrast: true, minimum: 7 },
+      { theme: 'dark', highContrast: false, minimum: 4.5 },
+    ]) {
+      await page.evaluate(async ({ theme, highContrast }) => {
+        const settings = await import('/src/settings.js');
+        settings.setSetting('theme', theme);
+        settings.setSetting('highContrast', highContrast);
+      }, profile);
+      await page.waitForFunction(
+        ({ theme, highContrast }) => document.documentElement.dataset.theme === theme &&
+          document.documentElement.classList.contains('high-contrast') === highContrast,
+        profile,
+      );
+      await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
+
+      const measured = await page.evaluate(selectors => {
+        const parse = value => {
+          const numbers = String(value).match(/[\d.]+/g);
+          if (!numbers) throw new Error(`Unsupported computed color: ${value}`);
+          const [r, g, b, a] = numbers.map(Number);
+          return { r, g, b, a: a === undefined ? 1 : a };
+        };
+        const over = (front, back) => ({
+          r: front.r * front.a + back.r * (1 - front.a),
+          g: front.g * front.a + back.g * (1 - front.a),
+          b: front.b * front.a + back.b * (1 - front.a),
+          a: 1,
+        });
+        const channel = value => {
+          const normalized = value / 255;
+          return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+        };
+        const luminance = color => 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
+        const ratio = (a, b) => {
+          const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+          return (high + 0.05) / (low + 0.05);
+        };
+        // Walk up compositing every translucent background until an opaque one
+        // is reached: the panel's ink sits on a tint on a tint.
+        const backgroundOf = element => {
+          const stack = [];
+          for (let node = element; node; node = node.parentElement) {
+            const background = parse(getComputedStyle(node).backgroundColor);
+            if (background.a > 0) stack.push(background);
+            if (background.a === 1) break;
+          }
+          let base = { r: 255, g: 255, b: 255, a: 1 };
+          for (let index = stack.length - 1; index >= 0; index--) base = over(stack[index], base);
+          return base;
+        };
+        return selectors.map(([name, selector]) => {
+          const element = document.querySelector(selector);
+          if (!element) return { name, selector, missing: true };
+          const background = backgroundOf(element);
+          const foreground = over(parse(getComputedStyle(element).color), background);
+          return { name, selector, ratio: Number(ratio(foreground, background).toFixed(2)) };
+        });
+      }, targets);
+
+      const label = `${profile.theme}${profile.highContrast ? ' + high contrast' : ''} storm panel at 1440px`;
+      const missing = measured.filter(row => row.missing);
+      assert(!missing.length, `${label}: could not measure ${missing.map(row => row.selector).join(', ')}`);
+      const failed = measured.filter(row => row.ratio < profile.minimum);
+      assert(
+        !failed.length,
+        `${label}: below ${profile.minimum}:1 — ${failed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
+      );
+    }
+  } finally {
+    await context.close();
+  }
+  if (pageErrors.length) throw new Error(`storm panel contrast page errors: ${pageErrors.join(' | ')}`);
+  console.log('  storm panel contrast ok (light, light + high contrast, dark at 1440px)');
+}
+
 async function assertComparisonExportParity(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   const page = await context.newPage();
@@ -3314,6 +3419,7 @@ try {
   await assertSourceLanguageDisclosures(browser, baseUrl);
   await assertForcedColorsContract(browser, baseUrl);
   await assertComparisonExportParity(browser, baseUrl);
+  await assertStormPanelContrast(browser, baseUrl);
 
   await browser.close();
 

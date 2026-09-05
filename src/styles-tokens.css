@@ -223,6 +223,7 @@
   --atlas-panel-strong: rgba(7, 18, 34, 0.985);
   --atlas-edge: rgba(129, 188, 220, 0.22);
   --atlas-cyan: #54d7e8;
+  --atlas-ink: #f2f8fb;
   --atlas-cyan-soft: rgba(84, 215, 232, 0.14);
   --atlas-shadow: 0 18px 48px rgba(1, 8, 18, 0.46);
 }

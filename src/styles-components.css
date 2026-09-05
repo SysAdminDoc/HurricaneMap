@@ -10067,7 +10067,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 
   .storm-panel .storm-panel-header h2 {
     margin-bottom: 7px;
-    color: #f2f8fb;
+    color: var(--atlas-ink);
     font-size: 25px;
     letter-spacing: -0.035em;
   }
@@ -10122,7 +10122,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
   }
 
   .storm-panel .stat-grid .value {
-    color: #eef8fa;
+    color: var(--atlas-ink);
   }
 
   .storm-panel .panel-section-h3 {
