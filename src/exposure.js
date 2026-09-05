@@ -63,7 +63,9 @@ export function buildStateDensityIndex(usStatesGeojson) {
 
 export async function ensureExposureDensitiesLoaded(url = './data/us-states.geojson') {
   if (cachedStateDensities) {
-    completeOptionalFeed('exposure', { cacheOrigin: 'memory', itemCount: cachedStateDensities.size });
+    // buildStateDensityIndex returns a plain object, not a Map: counting it
+    // with .size silently reported no items at all.
+    completeOptionalFeed('exposure', { cacheOrigin: 'memory', itemCount: Object.keys(cachedStateDensities).length });
     return cachedStateDensities;
   }
   const request = beginOptionalFeed('exposure', { cacheOrigin: 'bundled' });
@@ -77,7 +79,7 @@ export async function ensureExposureDensitiesLoaded(url = './data/us-states.geoj
     cachedStateDensities = buildStateDensityIndex(await res.json());
     completeOptionalFeed('exposure', {
       cacheOrigin: 'bundled',
-      itemCount: cachedStateDensities.size,
+      itemCount: Object.keys(cachedStateDensities).length,
       requestId: request.requestId,
     });
     return cachedStateDensities;

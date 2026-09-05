@@ -131,4 +131,67 @@ for (const id of definitions) {
   assert.equal(getOptionalFeedState(id).detail, 'error', `${id} must still say why it went stale`);
 }
 
-console.log(`optional feed state contract ok (${definitions.length} feeds; success, 404, 429, timeout, malformed, offline, stale-last-good, retry, cancellation)`);
+// The loop above exercises the shared state machine, which would pass even if
+// no module ever called into it. These drive the real exported functions so a
+// module that stops reporting is caught. src/sst.js and src/hwm.js import
+// src/map.js and need a DOM; their wiring is covered by the browser suite.
+const realFetch = globalThis.fetch;
+async function withFetch(impl, run) {
+  globalThis.fetch = impl;
+  try { return await run(); } finally { globalThis.fetch = realFetch; }
+}
+
+const { loadStormEvents } = await import('../src/storm-events.js');
+idleOptionalFeed('storm-events');
+await withFetch(
+  async () => ({ ok: true, status: 200, json: async () => ({ storms: { AL122005: {}, AL092022: {} } }) }),
+  loadStormEvents,
+);
+assert.equal(getOptionalFeedState('storm-events').state, 'success', 'loadStormEvents must report success');
+assert.equal(getOptionalFeedState('storm-events').itemCount, 2, 'loadStormEvents must count the storms it loaded');
+const stormEventsRetry = await withFetch(
+  async () => ({ ok: false, status: 503, json: async () => ({}) }),
+  () => retryOptionalFeed('storm-events'),
+);
+assert.equal(stormEventsRetry.ok, true, 'storm-events must register a retry handler');
+assert.equal(getOptionalFeedState('storm-events').state, 'stale', 'a failed retry must keep the last-good report');
+assert.equal(getOptionalFeedState('storm-events').detail, 'error');
+
+const { ensureExposureDensitiesLoaded } = await import('../src/exposure.js');
+idleOptionalFeed('exposure');
+const densityGeojson = { features: [{ properties: { name: 'Florida', density: 400 } }, { properties: { name: 'Texas', density: 110 } }] };
+// Hold the response open so the in-flight state is observable: without a
+// beginOptionalFeed call the layer would jump straight from idle to success
+// and show no loading indicator or stale-response guard.
+let releaseDensity;
+const densityInFlight = new Promise(resolve => { releaseDensity = resolve; });
+const exposureLoad = withFetch(
+  async () => { await densityInFlight; return { ok: true, status: 200, json: async () => densityGeojson }; },
+  ensureExposureDensitiesLoaded,
+);
+assert.equal(getOptionalFeedState('exposure').state, 'loading', 'exposure must report loading while its fetch is open');
+releaseDensity();
+await exposureLoad;
+assert.equal(getOptionalFeedState('exposure').state, 'success');
+assert.equal(getOptionalFeedState('exposure').itemCount, 2, 'exposure must count states, not report null from a Map-shaped read');
+
+const { probeFloridaZoneLayer } = await import('../src/evac.js');
+idleOptionalFeed('evac');
+await probeFloridaZoneLayer({
+  force: true,
+  fetcher: async () => ({ type: 'Feature Layer', name: 'Evacuation Zones', geometryType: 'esriGeometryPolygon', fields: [{ name: 'EZone' }] }),
+});
+assert.equal(getOptionalFeedState('evac').state, 'success', 'a reachable zone layer must report success');
+await probeFloridaZoneLayer({ force: true, fetcher: async () => ({ error: { code: 500 } }) });
+assert.equal(getOptionalFeedState('evac').state, 'stale', 'a service error after a success must keep last-good');
+assert.equal(getOptionalFeedState('evac').detail, 'error');
+await probeFloridaZoneLayer({
+  force: true,
+  fetcher: async () => { throw Object.assign(new Error('aborted'), { name: 'AbortError' }); },
+});
+assert.equal(getOptionalFeedState('evac').state, 'stale', 'a cancelled probe must not be reported as a failure');
+
+console.log(
+  `optional feed state contract ok (${definitions.length} feeds; success, 404, 429, timeout, malformed, offline, `
+  + 'stale-last-good, retry, cancellation; storm-events, exposure and evac driven end to end)',
+);
