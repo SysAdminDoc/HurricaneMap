@@ -1,0 +1,355 @@
+- region "On this date in history":
+  - button "Minimize on this date in history"
+  - button "Close this-date panel": ×
+  - heading "On this date in history" [level=2]
+  - paragraph: /Recorded U\.S\. landfalls within seven calendar days of \d+-\d+\./
+  - list:
+    - listitem:
+      - text: /\d+/
+      - button "DEBBY at South Carolina":
+        - strong: DEBBY
+        - text: ""
+      - text: /TS \d+ kt Aug 8, \d+, \d+:\d+ AM UTC today/
+    - listitem:
+      - text: /\d+/
+      - button "DEBBY at Florida":
+        - strong: DEBBY
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 5, \d+, \d+:\d+ AM UTC 3d ago/
+    - listitem:
+      - text: /\d+/
+      - button "ISAIAS at North Carolina":
+        - strong: ISAIAS
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 4, \d+, \d+:\d+ AM UTC 4d ago/
+    - listitem:
+      - text: /\d+/
+      - button "ISELLE at Hawaii":
+        - strong: ISELLE
+        - text: ""
+      - text: /TS \d+ kt Aug 8, \d+, \d+:\d+ PM UTC today/
+    - listitem:
+      - text: /\d+/
+      - button "EDOUARD at Texas":
+        - strong: EDOUARD
+        - text: ""
+      - text: /TS \d+ kt Aug 5, \d+, \d+:\d+ PM UTC 3d ago/
+    - listitem:
+      - text: /\d+/
+      - button "CHARLEY at South Carolina":
+        - strong: CHARLEY
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button "CHARLEY at South Carolina":
+        - strong: CHARLEY
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button "CHARLEY at Florida":
+        - strong: CHARLEY
+        - text: ""
+      - text: /Cat 4 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 5d/
+    - listitem:
+      - text: /\d+/
+      - button "CHARLEY at Florida":
+        - strong: CHARLEY
+        - text: ""
+      - text: /Cat 4 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 5d/
+    - listitem:
+      - text: /\d+/
+      - button "BONNIE at Florida":
+        - strong: BONNIE
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 4d/
+    - listitem:
+      - text: /\d+/
+      - button "BERTHA at Texas":
+        - strong: BERTHA
+        - text: ""
+      - text: /TD \d+ kt Aug 9, \d+, \d+:\d+ AM UTC in 1d/
+    - listitem:
+      - text: /\d+/
+      - button "BERTHA at Louisiana":
+        - strong: BERTHA
+        - text: ""
+      - text: /TS \d+ kt Aug 5, \d+, \d+:\d+ AM UTC 3d ago/
+    - listitem:
+      - text: /\d+/
+      - button "BARRY at Florida":
+        - strong: BARRY
+        - text: ""
+      - text: /TS \d+ kt Aug 6, \d+, \d+:\d+ AM UTC 2d ago/
+    - listitem:
+      - text: /\d+/
+      - button "ERIN at Florida":
+        - strong: ERIN
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 3, \d+, \d+:\d+ PM UTC 5d ago/
+    - listitem:
+      - text: /\d+/
+      - button "ERIN at Florida":
+        - strong: ERIN
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 2, \d+, \d+:\d+ AM UTC 6d ago/
+    - listitem:
+      - text: /\d+/
+      - button "CHANTAL at Texas":
+        - strong: CHANTAL
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 1, \d+, \d+:\d+ PM UTC 7d ago/
+    - listitem:
+      - text: /\d+/
+      - button "BERYL at Louisiana":
+        - strong: BERYL
+        - text: ""
+      - text: /TS \d+ kt Aug 9, \d+, \d+:\d+ PM UTC in 1d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Texas/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button "DANNY at Louisiana":
+        - strong: DANNY
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 7d/
+    - listitem:
+      - text: /\d+/
+      - button "ALLEN at Texas":
+        - strong: ALLEN
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button "BELLE at Massachusetts":
+        - strong: BELLE
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button "BELLE at New York":
+        - strong: BELLE
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button "CELIA at Texas":
+        - strong: CELIA
+        - text: ""
+      - text: /Cat 4 \d+ kt Aug 3, \d+, \d+:\d+ PM UTC 5d ago/
+    - listitem:
+      - text: /\d+/
+      - button "ABBY at Texas":
+        - strong: ABBY
+        - text: ""
+      - text: /TS \d+ kt Aug 7, \d+, \d+:\d+ PM UTC 1d ago/
+    - listitem:
+      - text: /\d+/
+      - button "DOT at Hawaii":
+        - strong: DOT
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 7, \d+, \d+:\d+ PM UTC 1d ago/
+    - listitem:
+      - text: /\d+/
+      - button "BERTHA at Texas":
+        - strong: BERTHA
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button "BETSY at Puerto Rico":
+        - strong: BETSY
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 4d/
+    - listitem:
+      - text: /\d+/
+      - button "CONNIE at North Carolina":
+        - strong: CONNIE
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 4d/
+    - listitem:
+      - text: /\d+/
+      - button "BRENDA at Louisiana":
+        - strong: BRENDA
+        - text: ""
+      - text: /TS \d+ kt Aug 1, \d+, \d+:\d+ PM UTC 7d ago/
+    - listitem:
+      - text: /\d+/
+      - button "BARBARA at North Carolina":
+        - strong: BARBARA
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button "BARBARA at North Carolina":
+        - strong: BARBARA
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button "BARBARA at North Carolina":
+        - strong: BARBARA
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at North Carolina/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 1, \d+, \d+:\d+ PM UTC 7d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at South Carolina/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 3d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Texas/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug 7, \d+, \d+:\d+ PM UTC 1d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 5d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 3d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 7d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Texas/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 4 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug 8, \d+, \d+:\d+ AM UTC today/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 3 \d+ kt Aug 6, \d+, \d+:\d+ PM UTC 2d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 1, \d+, \d+:\d+ PM UTC 7d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Alabama/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 3d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Mississippi/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 7d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 6d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 2d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 2 \d+ kt Aug 1, \d+, \d+:\d+ PM UTC 7d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 1 \d+ kt Aug 2, \d+, \d+:\d+ PM UTC 6d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Florida/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug 2, \d+, \d+:\d+ AM UTC 6d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 7d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Alabama/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug 7, \d+, \d+:\d+ PM UTC 1d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Texas/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 5d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Alabama/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /TS \d+ kt Aug 3, \d+, \d+:\d+ PM UTC 5d ago/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Texas/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 3 \d+ kt Aug \d+, \d+, \d+:\d+ AM UTC in 5d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 3 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 3d/
+    - listitem:
+      - text: /\d+/
+      - button /\d+ unnamed at Louisiana/:
+        - strong: /\d+ unnamed/
+        - text: ""
+      - text: /Cat 4 \d+ kt Aug \d+, \d+, \d+:\d+ PM UTC in 2d/
+  - group: Cite this release

@@ -1,0 +1,126 @@
+- region "Siklòn tou pre yon pwen":
+  - button "Minimize siklòn tou pre yon pwen"
+  - heading /Siklòn tou pre \d+\.\d+, -\d+\.\d+/ [level=2]
+  - button "Fèmen rechèch siklòn ki tou pre": ×
+  - button /\d+ mi/
+  - button /\d+ mi/
+  - button /\d+ mi/
+  - button "📍 Itilize pozisyon mwen"
+  - paragraph: Kowòdone ou yo santre rechèch sa a epi ajoute distans pou siklòn aktif yo. Yo rete sèlman pandan sesyon onglet sa a sof si ou chwazi sonje yo anba a.
+  - checkbox /Sonje sou aparèy sa a pandan \d+ èdtan Li sere sèlman latitid ak lonjitid\. Vizyalizasyon ki anrejistre pa janm gen yo\./
+  - strong: /Sonje sou aparèy sa a pandan \d+ èdtan/
+  - text: Li sere sèlman latitid ak lonjitid. Vizyalizasyon ki anrejistre pa janm gen yo.
+  - button "Efase pozisyon ki anrejistre" [disabled]
+  - status
+  - text: /\d+ siklòn nan yon distans \d+ mi/
+  - list:
+    - listitem: /Unnamed \d+ Cat 1 · 1 mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · 1 mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · 2 mi NW · \d+\.\d+ kt/
+    - listitem: /King \d+ Cat 4 · 2 mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · 4 mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · 5 mi NE · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · 6 mi E · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · 6 mi N · \d+ kt/
+    - listitem: /Cleo \d+ Cat 2 · 6 mi E · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · 8 mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Sally \d+ Cat 2 · \d+ mi S · \d+ kt/
+    - listitem: /Katrina \d+ Cat 3 · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+ kt/
+    - listitem: /Ivan \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi S · \d+ kt/
+    - listitem: /Andrew \d+ Cat 5 · \d+ mi S · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi S · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Bonnie \d+ TS · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi SE · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi E · \d+ kt/
+    - listitem: /Irene \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Dottie \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Floyd \d+ Cat 1 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Gerda \d+ Cat 1 · \d+ mi N · \d+ kt/
+    - listitem: /Harvey \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi N · \d+ kt/
+    - listitem: /Jerry \d+ TS · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /Ernesto \d+ TS · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Inez \d+ Cat 2 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /David \d+ Cat 2 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Isidore \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Isbell \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Betsy \d+ Cat 4 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NE · \d+ kt/
+    - listitem: /Felice \d+ TS · \d+ mi S · \d+ kt/
+    - listitem: /Gordon \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi S · \d+ kt/
+    - listitem: /Wilma \d+ Cat 3 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Isaias \d+ Cat 1 · \d+ mi E · \d+ kt/
+    - listitem: /Dennis \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Chris \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Eta \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NE · \d+ kt/
+    - listitem: /Bob \d+ Cat 1 · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 5 · \d+ mi SW · \d+ kt/
+    - listitem: /Donna \d+ Cat 4 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Mitch \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Fay \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Judith \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi N · \d+ kt/
+    - listitem: /Ana \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Irma \d+ Cat 3 · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Frances \d+ Cat 2 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Matthew \d+ Cat 1 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Jeanne \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi E · \d+ kt/
+  - heading "Gid van ofisyèl NHC" [level=3]
+  - status:
+    - strong: Gid van NHC
+    - text: Pa disponib NOAA NHC tropical weather summary GIS Kantite anrejistreman enkoni Poko gen chaj ki reyisi
+    - button "Eseye ankò"
+  - paragraph: Pa gen pwodwi ofisyèl aktyèl ki kouvri pwen sa a. Nou pa montre ansyen valè.
+  - paragraph:
+    - link "Gid pwodwi NHC":
+      - /url: https://www.nhc.noaa.gov/aboutnhcgraphics.shtml
+    - text: ·
+    - link "Sous GIS NHC":
+      - /url: https://www.nhc.noaa.gov/gis/
+  - paragraph: Gid ofisyèl sou pwobabilite kimilatif; li pa yon trajektwa, yon mare tanpèt, ni yon garanti enpak.
+  - group: Site vèsyon sa a

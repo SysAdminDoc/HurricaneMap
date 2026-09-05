@@ -1,0 +1,5329 @@
+- region "Tabla de toques de tierra":
+  - button "Minimizar tabla de toques de tierra"
+  - heading "Tabla de toques de tierra" [level=2]
+  - button "Cerrar tabla": ×
+  - table "Toques de tierra filtrados":
+    - rowgroup:
+      - row "Año ↓ Nombre Categoría Estado Viento Presión":
+        - columnheader "Año ↓"
+        - columnheader "Nombre"
+        - columnheader "Categoría"
+        - columnheader "Estado"
+        - columnheader "Viento"
+        - columnheader "Presión"
+    - rowgroup:
+      - row /\d+ Chantal Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chantal"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Francine Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Francine"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Helene Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Helene"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Milton Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Milton"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harold Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harold"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Idalia Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Idalia"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ophelia Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ophelia"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Colin Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Colin"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fiona Categoría 1 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fiona"
+        - cell "Categoría 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tormenta tropical Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tormenta tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fred Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fred"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tormenta tropical Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tormenta tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tormenta tropical Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tormenta tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ida Categoría 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ida"
+        - cell "Categoría 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Mindy Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Mindy"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicholas Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicholas"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cristobal Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cristobal"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tormenta tropical New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tormenta tropical"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaias Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaias"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Laura Categoría 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Laura"
+        - cell "Categoría 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sally Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sally"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sally Categoría 2 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sally"
+        - cell "Categoría 2"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beta Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beta"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Delta Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Delta"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Zeta Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Zeta"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eta Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eta"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eta Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eta"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dorian Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dorian"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Imelda Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Imelda"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Karen Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Karen"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Karen Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Karen"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Florence Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tormenta tropical Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Michael Categoría 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Michael"
+        - cell "Categoría 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Emily Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Emily"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irma Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irma"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Maria Categoría 4 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Maria"
+        - cell "Categoría 4"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nate Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nate"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nate Categoría 1 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nate"
+        - cell "Categoría 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Depresión tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Depresión tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Colin Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Colin"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Julia Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Julia"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Matthew Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Matthew"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Darby Tormenta tropical Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Darby"
+        - cell "Tormenta tropical"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ana Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ana"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bill Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bill"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Iselle Tormenta tropical Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Iselle"
+        - cell "Tormenta tropical"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrea Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrea"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaac Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaac"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaac Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaac"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sandy Categoría 1 New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sandy"
+        - cell "Categoría 1"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Don Depresión tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Don"
+        - cell "Depresión tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tormenta tropical New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tormenta tropical"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Lee Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Lee"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Two Depresión tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Two"
+        - cell "Depresión tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dolly Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dolly"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dolly Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dolly"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edouard Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edouard"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gustav Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gustav"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ike Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ike"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Depresión tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Depresión tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gabrielle Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gabrielle"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Humberto Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Humberto"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ten Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ten"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Olga Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Olga"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tormenta tropical Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tormenta tropical Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tormenta tropical Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Rita Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Rita"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Tammy Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Tammy"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Wilma Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Wilma"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gaston Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gaston"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tormenta tropical Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ivan Categoría 3 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ivan"
+        - cell "Categoría 3"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ivan Depresión tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ivan"
+        - cell "Depresión tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jeanne Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jeanne"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jeanne Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jeanne"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Matthew Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Matthew"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bill Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bill"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresión tropical Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresión tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Grace Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Grace"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isabel Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isabel"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Depresión tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Depresión tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edouard Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edouard"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tormenta tropical Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isidore Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isidore"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kyle Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kyle"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kyle Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kyle"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Lili Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Lili"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Depresión tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Depresión tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gabrielle Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gabrielle"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresión tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresión tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Helene Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Helene"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bret Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bret"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Floyd Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Floyd"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Earl Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Earl"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Georges Categoría 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Georges"
+        - cell "Categoría 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Georges Categoría 2 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Georges"
+        - cell "Categoría 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Mitch Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Mitch"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Categoría 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Categoría 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fran Categoría 3 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fran"
+        - cell "Categoría 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hortense Categoría 1 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hortense"
+        - cell "Categoría 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Josephine Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Josephine"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dean Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dean"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jerry Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jerry"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Opal Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Opal"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresión tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresión tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Categoría 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Categoría 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Categoría 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Categoría 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danielle Tormenta tropical Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danielle"
+        - cell "Tormenta tropical"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Iniki Categoría 3 Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Iniki"
+        - cell "Categoría 3"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Categoría 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Categoría 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Categoría 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Categoría 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Tormenta tropical Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Tormenta tropical"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chantal Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chantal"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Categoría 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Categoría 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Categoría 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Categoría 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Categoría 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Categoría 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jerry Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jerry"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chris Tormenta tropical Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chris"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Florence Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Keith Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Keith"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Floyd Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Floyd"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elena Categoría 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elena"
+        - cell "Categoría 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gloria Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gloria"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gloria Categoría 1 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gloria"
+        - cell "Categoría 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Depresión tropical Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Depresión tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isabel Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isabel"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Juan Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Juan"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kate Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kate"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Diana Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Diana"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isidore Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isidore"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alicia Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alicia"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Depresión tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Depresión tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dean Tormenta tropical Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dean"
+        - cell "Tormenta tropical"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chris Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chris"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gert Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gert"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allen Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allen"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danielle Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danielle"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Tormenta tropical Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Categoría 1 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Categoría 1"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frederic Tormenta tropical Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frederic"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frederic Categoría 2 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frederic"
+        - cell "Categoría 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Amelia Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Amelia"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Babe Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Babe"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Belle Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Belle"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Belle Tormenta tropical Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Belle"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dottie Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dottie"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dottie Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dottie"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eloise Tormenta tropical Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eloise"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carmen Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Carmen"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Delia Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Delia"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Delia Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Delia"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Agnes Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Agnes"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Agnes Tormenta tropical New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Agnes"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Doria Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Doria"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fern Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fern"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edith Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Edith"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ginger Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ginger"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Becky Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Becky"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Celia Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Celia"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Felice Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Felice"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Camille Categoría 5 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Camille"
+        - cell "Categoría 5"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gerda Categoría 1 Maine \d+ kt —/:
+        - cell /\d+/
+        - cell "Gerda"
+        - cell "Categoría 1"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jenny Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jenny"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Candy Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Candy"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gladys Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gladys"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Beulah Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beulah"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Doria Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Doria"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Alma Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alma"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Inez Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Inez"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Inez Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Inez"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Betsy Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Betsy Categoría 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Categoría 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debbie Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debbie"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Cleo Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cleo"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cleo Tormenta tropical Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cleo"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dora Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dora"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hilda Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hilda"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isbell Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isbell"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isbell Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isbell"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carla Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carla"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Esther Tormenta tropical Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tormenta tropical Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tormenta tropical Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tormenta tropical"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Virginia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Categoría 2 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Categoría 2"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Categoría 1 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Categoría 1"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ethel Categoría 1 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ethel"
+        - cell "Categoría 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tormenta tropical Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debra Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debra"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gracie Categoría 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gracie"
+        - cell "Categoría 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tormenta tropical Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Judith Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Judith"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dot Categoría 1 Hawaii \d+ kt —/:
+        - cell /\d+/
+        - cell "Dot"
+        - cell "Categoría 1"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ella Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ella"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Audrey Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Audrey"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debbie Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Debbie"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Betsy Categoría 2 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Categoría 2"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Flossy Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Flossy"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Flossy Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Flossy"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Connie Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Connie"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Diane Tormenta tropical North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Diane"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ione Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ione"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alice Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Alice"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carol Categoría 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carol"
+        - cell "Categoría 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carol Categoría 3 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carol"
+        - cell "Categoría 3"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Categoría 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Categoría 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Categoría 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Categoría 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Categoría 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Categoría 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hazel Categoría 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Categoría 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alice Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Alice"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Florence Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Hazel Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Hazel Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Able Categoría 2 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Able"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ How Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "How"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Baker Categoría 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Baker"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Baker Categoría 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Baker"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Easy Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Easy"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Easy Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Easy"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ King Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "King"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Love Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Love"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Maryland \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Maryland"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 3 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Maine \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Categoría 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tormenta tropical Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Categoría 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Categoría 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tormenta tropical Rhode Island \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tormenta tropical"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell "—"
+  - paragraph: /\d+ toques de tierra/
+  - group: Citar esta versión

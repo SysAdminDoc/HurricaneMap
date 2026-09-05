@@ -1,0 +1,87 @@
+- region "Comparar huracanes":
+  - button "Minimizar comparar huracanes"
+  - button "Cerrar comparación": ×
+  - heading "Comparar huracanes" [level=2]
+  - paragraph: Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.
+  - button "📥 CSV"
+  - heading /Katrina \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 3 en tierra Viento máximo:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Presión mínima:"
+  - strong: /\d+ mb/
+  - text: "Toques de tierra en EE. UU.:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading /Andrew \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 5 en tierra Viento máximo:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Presión mínima:"
+  - strong: /\d+ mb/
+  - text: "Toques de tierra en EE. UU.:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading "Side-by-side" [level=3]
+  - table:
+    - rowgroup:
+      - row /Nombre Katrina \d+ Andrew \d+/:
+        - columnheader "Nombre"
+        - columnheader /Katrina \d+/
+        - columnheader /Andrew \d+/
+    - rowgroup:
+      - row /Viento máximo \d+ kt \d+ kt/:
+        - rowheader "Viento máximo"
+        - cell /\d+ kt/
+        - cell /\d+ kt/
+      - row /Presión mínima \d+ mb \d+ mb/:
+        - rowheader "Presión mínima"
+        - cell /\d+ mb/
+        - cell /\d+ mb/
+      - row "Categoría máxima Cat 5 Cat 5":
+        - rowheader "Categoría máxima"
+        - cell "Cat 5"
+        - cell "Cat 5"
+      - row "Categoría en tierra Cat 3 Cat 5":
+        - rowheader "Categoría en tierra"
+        - cell "Cat 3"
+        - cell "Cat 5"
+      - row "Toques de tierra en EE. UU. 3 3":
+        - rowheader "Toques de tierra en EE. UU."
+        - cell "3"
+        - cell "3"
+      - row /Puntos de trayectoria \d+ \d+/:
+        - rowheader "Puntos de trayectoria"
+        - cell /\d+/
+        - cell /\d+/
+      - row /Génesis \d+ ago \d+ \d+ ago \d+/:
+        - rowheader "Génesis"
+        - cell /\d+ ago \d+/
+        - cell /\d+ ago \d+/
+      - row /Final \d+ ago \d+ \d+ ago \d+/:
+        - rowheader "Final"
+        - cell /\d+ ago \d+/
+        - cell /\d+ ago \d+/
+      - row "Estados afectados Florida, Louisiana Florida, Louisiana":
+        - rowheader "Estados afectados"
+        - cell "Florida, Louisiana"
+        - cell "Florida, Louisiana"
+      - row /ACE \(\d+⁴ kt²\) \d+\.\d+ \d+\.\d+/:
+        - rowheader /ACE \(\d+⁴ kt²\)/
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /Velocidad de avance \(km\/h\) \d+\.\d+ \d+\.\d+/:
+        - rowheader "Velocidad de avance (km/h)"
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /RI detectada \+\d+ kt \/ \d+ h \+\d+ kt \/ \d+ h/:
+        - rowheader "RI detectada"
+        - cell /\+\d+ kt \/ \d+ h/
+        - cell /\+\d+ kt \/ \d+ h/
+      - row "Categoría de riesgo RI high high":
+        - rowheader "Categoría de riesgo RI"
+        - cell "high"
+        - cell "high"
+  - group: Citar esta versión

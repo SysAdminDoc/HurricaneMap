@@ -1,0 +1,40 @@
+- region "Evacuation zone lookup":
+  - button "Minimize evacuation zone lookup"
+  - button "Close evacuation zone lookup": ×
+  - heading "Evacuation zone lookup" [level=2]
+  - paragraph: "Privacy: typed addresses are sent to Esri’s World Geocoding Service. The map-point option sends latitude/longitude only to Florida’s ArcGIS zone layer; HurricaneMap stores neither."
+  - paragraph: Check a Florida address or map point against the state-published evacuation-zone layer. Typed addresses go to Esri; map points send only coordinates. Use the official state sources below for other states.
+  - text: Florida address
+  - searchbox "Florida address"
+  - button "Find zone"
+  - text: Typed addresses are sent to Esri’s World Geocoding Service. Map-point checks send only latitude/longitude to Florida’s ArcGIS zone layer. HurricaneMap stores neither.
+  - button "Choose a point on the map"
+  - status:
+    - paragraph: Enter a Florida address or choose a map point. A map point avoids address geocoding.
+  - paragraph: Evacuation zones are based on storm-surge risk and are not the same as FEMA flood zones.
+  - heading "Official state sources" [level=3]
+  - link "Florida — Florida Division of Emergency Management":
+    - /url: https://www.floridadisaster.org/knowyourzone/
+    - text: ""
+  - link "North Carolina — North Carolina Department of Public Safety / Emergency Management":
+    - /url: https://www.ncdps.gov/our-organization/emergency-management/emergency-preparedness/know-your-zone
+    - text: ""
+  - link "South Carolina — South Carolina Emergency Management Division":
+    - /url: https://scemd.org/prepare/know-your-zone/
+    - text: ""
+  - link "Georgia — Georgia Emergency Management and Homeland Security Agency":
+    - /url: https://gema.georgia.gov/hurricanes
+    - text: ""
+  - link "Texas — Texas Division of Emergency Management / Texas Hurricane Center":
+    - /url: https://gov.texas.gov/hurricane
+    - text: ""
+  - link "Virginia — Virginia Department of Emergency Management":
+    - /url: https://vdem.virginia.gov/know-your-zone/
+    - text: ""
+  - link "Maryland — Maryland Emergency Management Agency":
+    - /url: https://mdem.maryland.gov/action/Pages/know-your-zone-md.aspx
+    - text: ""
+  - link "Massachusetts — Massachusetts Emergency Management Agency":
+    - /url: https://www.mass.gov/info-details/hurricane-evacuation-zones
+    - text: ""
+  - group: Cite this release

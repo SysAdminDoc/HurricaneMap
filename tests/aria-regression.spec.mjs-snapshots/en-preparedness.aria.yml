@@ -1,0 +1,72 @@
+- region "Hurricane preparedness":
+  - button "Minimize hurricane preparedness"
+  - button "Close hurricane preparedness": ×
+  - heading "Hurricane preparedness" [level=2]
+  - paragraph: Build a three-day evacuation kit or a two-week stay-at-home kit. Your progress stays on this device and works offline.
+  - link "Ready.gov":
+    - /url: https://www.ready.gov/kit
+  - link "American Red Cross":
+    - /url: https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html
+  - region "Household supply calculator":
+    - heading "Household supply calculator" [level=3]
+    - text: People in household
+    - spinbutton "People in household": "1"
+    - text: Supply plan
+    - combobox "Supply plan":
+      - option "Go-kit · 3 days" [selected]
+      - option "Stay home · 2 weeks"
+    - status:
+      - strong: "3"
+      - text: /gallons of water \d+ L/
+      - strong: "3"
+      - text: person-days of food for 3 days
+    - paragraph: "Baseline: one gallon per person per day for drinking and sanitation. Add water for pets and medical needs."
+  - region "Supply checklist":
+    - heading "Supply checklist" [level=3]
+    - strong: /0\/\d+/
+    - progressbar "Preparedness checklist progress"
+    - group "Essential supplies":
+      - text: ""
+      - checkbox "Stored drinking and sanitation water"
+      - text: Stored drinking and sanitation water
+      - checkbox "Nonperishable, easy-to-prepare food"
+      - text: Nonperishable, easy-to-prepare food
+      - checkbox "Battery or hand-crank weather radio"
+      - text: Battery or hand-crank weather radio
+      - checkbox "Flashlights"
+      - text: Flashlights
+      - checkbox "Extra batteries"
+      - text: Extra batteries
+      - checkbox "Manual can opener and multipurpose tool"
+      - text: Manual can opener and multipurpose tool
+    - group "Health and power":
+      - text: ""
+      - checkbox "First-aid kit"
+      - text: First-aid kit
+      - checkbox "Prescription medications and medication list"
+      - text: Prescription medications and medication list
+      - checkbox "Medical-device supplies and backup power"
+      - text: Medical-device supplies and backup power
+      - checkbox "Phone chargers and power banks"
+      - text: Phone chargers and power banks
+    - group "Household needs":
+      - text: ""
+      - checkbox "Sanitation and personal-hygiene items"
+      - text: Sanitation and personal-hygiene items
+      - checkbox "Cash in small bills"
+      - text: Cash in small bills
+    - group "Plans and documents":
+      - text: ""
+      - checkbox "Waterproof copies of IDs, insurance, and medical records"
+      - text: Waterproof copies of IDs, insurance, and medical records
+      - checkbox "Written family contacts and meeting plan"
+      - text: Written family contacts and meeting plan
+    - group "Pets and children":
+      - text: ""
+      - checkbox "Pet food, water, leash, carrier, and medicines"
+      - text: Pet food, water, leash, carrier, and medicines
+      - checkbox "Infant formula, diapers, wipes, and comfort items"
+      - text: Infant formula, diapers, wipes, and comfort items
+    - button "Clear completed items"
+  - paragraph: Customize for disabilities, medications, pets, infants, climate, and local evacuation instructions. Follow emergency officials when a storm threatens.
+  - group: Cite this release

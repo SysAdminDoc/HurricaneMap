@@ -1,0 +1,87 @@
+- region "Konpare siklòn":
+  - button "Minimize konpare siklòn"
+  - button "Fèmen konparezon": ×
+  - heading "Konpare siklòn" [level=2]
+  - paragraph: Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.
+  - button "📥 CSV"
+  - heading /Katrina \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 3 nan tonbe sou tè Van maksimòm:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Presyon minimòm:"
+  - strong: /\d+ mb/
+  - text: "Tonbe sou tè Ozetazini:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading /Andrew \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 5 nan tonbe sou tè Van maksimòm:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Presyon minimòm:"
+  - strong: /\d+ mb/
+  - text: "Tonbe sou tè Ozetazini:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading "Side-by-side" [level=3]
+  - table:
+    - rowgroup:
+      - row /Non Katrina \d+ Andrew \d+/:
+        - columnheader "Non"
+        - columnheader /Katrina \d+/
+        - columnheader /Andrew \d+/
+    - rowgroup:
+      - row /Van maksimòm \d+ kt \d+ kt/:
+        - rowheader "Van maksimòm"
+        - cell /\d+ kt/
+        - cell /\d+ kt/
+      - row /Presyon minimòm \d+ mb \d+ mb/:
+        - rowheader "Presyon minimòm"
+        - cell /\d+ mb/
+        - cell /\d+ mb/
+      - row "Kategori maksimòm Cat 5 Cat 5":
+        - rowheader "Kategori maksimòm"
+        - cell "Cat 5"
+        - cell "Cat 5"
+      - row "Kategori nan tonbe sou tè Cat 3 Cat 5":
+        - rowheader "Kategori nan tonbe sou tè"
+        - cell "Cat 3"
+        - cell "Cat 5"
+      - row "Tonbe sou tè Ozetazini 3 3":
+        - rowheader "Tonbe sou tè Ozetazini"
+        - cell "3"
+        - cell "3"
+      - row /Pwen chemen \d+ \d+/:
+        - rowheader "Pwen chemen"
+        - cell /\d+/
+        - cell /\d+/
+      - row /Kreyasyon Aug \d+, \d+ Aug \d+, \d+/:
+        - rowheader "Kreyasyon"
+        - cell /Aug \d+, \d+/
+        - cell /Aug \d+, \d+/
+      - row /Final Aug \d+, \d+ Aug \d+, \d+/:
+        - rowheader "Final"
+        - cell /Aug \d+, \d+/
+        - cell /Aug \d+, \d+/
+      - row "Eta ki touche Florida, Louisiana Florida, Louisiana":
+        - rowheader "Eta ki touche"
+        - cell "Florida, Louisiana"
+        - cell "Florida, Louisiana"
+      - row /ACE \(\d+⁴ kt²\) \d+\.\d+ \d+\.\d+/:
+        - rowheader /ACE \(\d+⁴ kt²\)/
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /Vitès avans \(km\/h\) \d+\.\d+ \d+\.\d+/:
+        - rowheader "Vitès avans (km/h)"
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /RI detekte \+\d+ kt \/ \d+ èdtan \+\d+ kt \/ \d+ èdtan/:
+        - rowheader "RI detekte"
+        - cell /\+\d+ kt \/ \d+ èdtan/
+        - cell /\+\d+ kt \/ \d+ èdtan/
+      - row "Kategori risk RI high high":
+        - rowheader "Kategori risk RI"
+        - cell "high"
+        - cell "high"
+  - group: Site vèsyon sa a

@@ -1,0 +1,126 @@
+- region "Storms near a point":
+  - button "Minimize storms near a point"
+  - heading /Storms near \d+\.\d+, -\d+\.\d+/ [level=2]
+  - button "Close nearby-storm search": ×
+  - button /\d+ mi/
+  - button /\d+ mi/
+  - button /\d+ mi/
+  - button "📍 Use my location"
+  - paragraph: Your coordinates center this search and add distance to active storms. They stay in this tab session unless you opt in below.
+  - checkbox /Remember on this device for \d+ hours Stores only latitude and longitude\. Saved views never include them\./
+  - strong: /Remember on this device for \d+ hours/
+  - text: Stores only latitude and longitude. Saved views never include them.
+  - button "Clear saved location" [disabled]
+  - status
+  - text: /\d+ storms within \d+ mi/
+  - list:
+    - listitem: /Unnamed \d+ Cat 1 · 1 mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · 1 mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · 2 mi NW · \d+\.\d+ kt/
+    - listitem: /King \d+ Cat 4 · 2 mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · 4 mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · 5 mi NE · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · 6 mi E · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · 6 mi N · \d+ kt/
+    - listitem: /Cleo \d+ Cat 2 · 6 mi E · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · 8 mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Sally \d+ Cat 2 · \d+ mi S · \d+ kt/
+    - listitem: /Katrina \d+ Cat 3 · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+ kt/
+    - listitem: /Ivan \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi S · \d+ kt/
+    - listitem: /Andrew \d+ Cat 5 · \d+ mi S · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi S · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Bonnie \d+ TS · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi SE · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi E · \d+ kt/
+    - listitem: /Irene \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Dottie \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Floyd \d+ Cat 1 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Gerda \d+ Cat 1 · \d+ mi N · \d+ kt/
+    - listitem: /Harvey \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi N · \d+ kt/
+    - listitem: /Jerry \d+ TS · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /Ernesto \d+ TS · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Inez \d+ Cat 2 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi E · \d+\.\d+ kt/
+    - listitem: /David \d+ Cat 2 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Isidore \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Isbell \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Betsy \d+ Cat 4 · \d+ mi S · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NE · \d+ kt/
+    - listitem: /Felice \d+ TS · \d+ mi S · \d+ kt/
+    - listitem: /Gordon \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi S · \d+ kt/
+    - listitem: /Wilma \d+ Cat 3 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi W · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 4 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Isaias \d+ Cat 1 · \d+ mi E · \d+ kt/
+    - listitem: /Dennis \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Chris \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Eta \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NE · \d+ kt/
+    - listitem: /Bob \d+ Cat 1 · \d+ mi NW · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 5 · \d+ mi SW · \d+ kt/
+    - listitem: /Donna \d+ Cat 4 · \d+ mi SW · \d+\.\d+ kt/
+    - listitem: /Mitch \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NE · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Fay \d+ TS · \d+ mi W · \d+ kt/
+    - listitem: /Judith \d+ TS · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ Cat 2 · \d+ mi N · \d+ kt/
+    - listitem: /Ana \d+ TS · \d+ mi NE · \d+ kt/
+    - listitem: /Irma \d+ Cat 3 · \d+ mi W · \d+ kt/
+    - listitem: /Unnamed \d+ Cat 1 · \d+ mi NW · \d+\.\d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi SW · \d+ kt/
+    - listitem: /Frances \d+ Cat 2 · \d+ mi N · \d+\.\d+ kt/
+    - listitem: /Matthew \d+ Cat 1 · \d+ mi NE · \d+\.\d+ kt/
+    - listitem: /Jeanne \d+ Cat 3 · \d+ mi N · \d+ kt/
+    - listitem: /Unnamed \d+ TS · \d+ mi E · \d+ kt/
+  - heading "Official NHC wind guidance" [level=3]
+  - status:
+    - strong: NHC wind guidance
+    - text: Unavailable NOAA NHC tropical weather summary GIS Record count unknown No successful load yet
+    - button "Retry"
+  - paragraph: No current official product covers this point. Older values are not shown.
+  - paragraph:
+    - link "NHC product guide":
+      - /url: https://www.nhc.noaa.gov/aboutnhcgraphics.shtml
+    - text: ·
+    - link "NHC GIS source":
+      - /url: https://www.nhc.noaa.gov/gis/
+  - paragraph: Official cumulative probability guidance; not a track, surge, or guaranteed impact forecast.
+  - group: Cite this release

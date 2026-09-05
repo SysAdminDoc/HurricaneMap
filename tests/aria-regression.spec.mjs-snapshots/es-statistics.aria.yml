@@ -1,0 +1,190 @@
+- region "Estadísticas":
+  - button "Minimizar estadísticas"
+  - button "Cerrar estadísticas": ×
+  - heading "Estadísticas" [level=2]
+  - paragraph: "/\\d+ U\\.S\\.-landfalling storms · \\d+ landfall events · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
+  - text: 📊 PERSPECTIVA ESTACIONAL NOAA CPC
+  - status:
+    - strong: Perspectiva estacional
+    - text: "/Actual NOAA CPC bundled outlook snapshot 2 registros Último resultado válido: 8 ago \\d+, \\d+:\\d+/"
+    - button "Reintentar"
+  - strong: "/\\d+ Atlántico: Se espera una temporada por debajo de lo normal/"
+  - text: El Niño (fuerte)
+  - link "NOAA (August update)":
+    - /url: https://www.noaa.gov/news-release/noaa-maintains-prediction-for-below-normal-atlantic-hurricane-season
+  - text: /7–\d+ con nombre · 2–6 huracanes · 0–2 intensos \d+% chance below-normal · emitido el \d+-\d+-\d+ · válido hasta \d+-\d+-\d+/
+  - link "CSU (August update)":
+    - /url: https://tropical.colostate.edu/Forecast/2026-08.pdf
+  - text: /9 con nombre · 4 huracanes · 1 intensos emitido el \d+-\d+-\d+ · válido hasta \d+-\d+-\d+/
+  - link "Ver la perspectiva estacional actual de huracanes de NOAA CPC →":
+    - /url: https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml
+  - group: Precisión histórica del pronóstico
+  - heading "Landfalls by state" [level=3]
+  - text: /Florida \d+ Texas \d+ Louisiana \d+ North Carolina \d+ South Carolina \d+ Mississippi \d+ Alabama \d+ New York \d+ Puerto Rico \d+ Georgia \d+ Massachusetts \d+ Rhode Island \d+ Connecticut 9 Maine 5 Hawaii 4 New Jersey 4 Virginia 4 Maryland 1/
+  - heading "Landfalls by category" [level=3]
+  - text: /TS \/ sub-hurricane \d+ Category 1 \d+ Category 2 \d+ Category 3 \d+ Category 4 \d+ Category 5 5/
+  - heading "Coastal states with no recorded hurricane landfall" [level=3]
+  - text: Delaware District of Columbia Maryland New Hampshire Pennsylvania Virginia
+  - paragraph: /Tropical storms have hit these states; only Cat 1\+ direct landfalls are excluded here\. HURDAT2's \d+-\d+ continental-U\.S\. landfall markings have known gaps\./
+  - heading "Cobertura de datos de impactos" [level=3]
+  - paragraph: /\d+ de \d+ huracanes del catálogo tienen registros de impactos \(\d+%\)\./
+  - paragraph: Los registros faltantes indican datos comunitarios no disponibles, no cero muertes o daños.
+  - group: Mostrar cobertura por año
+  - heading "Landfalls by decade" [level=3]
+  - text: /\d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+/
+  - heading "Climatología anual — ACE, named storms, US landfalls" [level=3]
+  - 'img /Annual climatology: ACE, named storms, US landfalls, \d+ to \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
+  - text: /ACE \(Accumulated Cyclone Energy\) — peak \d+ Named storms \(≥\d+ kt\) — peak \d+ US landfalls — peak \d+/
+  - paragraph:
+    - text: "Top 3 landfall-storm ACE years annotated at top:"
+    - strong: /\d+/
+    - text: /\(\d+\),/
+    - strong: /\d+/
+    - text: /\(\d+\),/
+    - strong: /\d+/
+    - text: /\(\d+\)\. ACE is subtotaled only for storms in this U\.S\.-landfall catalog; the named-storm threshold is the post-\d+ naming convention applied retroactively\./
+  - heading /Tendencias climáticas — \d+-year rolling averages/ [level=3]
+  - img: High Low Landfalls ACE Forward speed
+  - paragraph:
+    - strong: /Trend direction \(\d+-year rolling avg\):/
+    - text: "Landfalls: ↑ increasing · ACE: ↑ increasing · Speed: ↓ decreasing"
+  - heading "Tendencias por década" [level=3]
+  - region "Tendencias por década":
+    - table:
+      - rowgroup:
+        - row "Decade Named Major ACE Deadliest Costliest":
+          - columnheader "Decade"
+          - columnheader "Named"
+          - columnheader "Major"
+          - columnheader "ACE"
+          - columnheader "Deadliest"
+          - columnheader "Costliest"
+      - rowgroup:
+        - row /\d+[hmsp]+ \d+ 6 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /6 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 3 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /3 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 9 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /9 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 7 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /7 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 6 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /6 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 9 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /9 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 7 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /7 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ 8 \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /8 \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ — —/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell "—"
+          - cell "—"
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Brenda \(\d+\) Brenda \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Brenda \(\d+\)/
+          - cell /Brenda \(\d+\)/
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Candy \(\d+\) Debbie \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Candy \(\d+\)/
+          - cell /Debbie \(\d+\)/
+        - row /\d+[hmsp]+ \d+ 7 \(\d+%\) \d+ David \(\d+\) Agnes \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /7 \(\d+%\)/
+          - cell /\d+/
+          - cell /David \(\d+\)/
+          - cell /Agnes \(\d+\)/
+        - row /\d+[hmsp]+ \d+ 7 \(\d+%\) \d+ Allen \(\d+\) Hugo \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /7 \(\d+%\)/
+          - cell /\d+/
+          - cell /Allen \(\d+\)/
+          - cell /Hugo \(\d+\)/
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Mitch \(\d+\) Andrew \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Mitch \(\d+\)/
+          - cell /Andrew \(\d+\)/
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Hermine \(\d+\) Katrina \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Hermine \(\d+\)/
+          - cell /Katrina \(\d+\)/
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Maria \(\d+\) Harvey \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Maria \(\d+\)/
+          - cell /Harvey \(\d+\)/
+        - row /\d+[hmsp]+ \d+ \d+ \(\d+%\) \d+ Colin \(\d+\) Ian \(\d+\)/:
+          - rowheader /\d+[hmsp]+/
+          - cell /\d+/
+          - cell /\d+ \(\d+%\)/
+          - cell /\d+/
+          - cell /Colin \(\d+\)/
+          - cell /Ian \(\d+\)/
+  - paragraph: /Major hurricane % reflects Category 3\+ at peak intensity \(≥\d+ kt\)\. Deadliest\/costliest use normalized impact fields from Wikipedia infoboxes\. Hover over storm names to see details\./
+  - group: Citar esta versión

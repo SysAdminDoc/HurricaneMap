@@ -1,0 +1,72 @@
+- region "Preparación para huracanes":
+  - button "Minimizar preparación para huracanes"
+  - button "Cerrar preparación para huracanes": ×
+  - heading "Preparación para huracanes" [level=2]
+  - paragraph: Prepare un kit de evacuación para tres días o uno para permanecer en casa durante dos semanas. Su progreso queda en este dispositivo y funciona sin conexión.
+  - link "Ready.gov":
+    - /url: https://www.ready.gov/kit
+  - link "American Red Cross":
+    - /url: https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html
+  - region "Calculadora de suministros del hogar":
+    - heading "Calculadora de suministros del hogar" [level=3]
+    - text: Personas en el hogar
+    - spinbutton "Personas en el hogar": "1"
+    - text: Plan de suministros
+    - combobox "Plan de suministros":
+      - option "Kit de salida · 3 días" [selected]
+      - option "En casa · 2 semanas"
+    - status:
+      - strong: "3"
+      - text: /galones de agua \d+ L/
+      - strong: "3"
+      - text: días-persona de alimentos para 3 días
+    - paragraph: "Base: un galón por persona al día para beber y saneamiento. Añada agua para mascotas y necesidades médicas."
+  - region "Lista de suministros":
+    - heading "Lista de suministros" [level=3]
+    - strong: /0\/\d+/
+    - progressbar "Progreso de la lista de preparación"
+    - group "Suministros esenciales":
+      - text: ""
+      - checkbox "Agua almacenada para beber y saneamiento"
+      - text: Agua almacenada para beber y saneamiento
+      - checkbox "Alimentos no perecederos y fáciles de preparar"
+      - text: Alimentos no perecederos y fáciles de preparar
+      - checkbox "Radio meteorológica de batería o manivela"
+      - text: Radio meteorológica de batería o manivela
+      - checkbox "Linternas"
+      - text: Linternas
+      - checkbox "Baterías adicionales"
+      - text: Baterías adicionales
+      - checkbox "Abrelatas manual y herramienta multiuso"
+      - text: Abrelatas manual y herramienta multiuso
+    - group "Salud y energía":
+      - text: ""
+      - checkbox "Botiquín de primeros auxilios"
+      - text: Botiquín de primeros auxilios
+      - checkbox "Medicamentos recetados y lista de medicamentos"
+      - text: Medicamentos recetados y lista de medicamentos
+      - checkbox "Suministros médicos y energía de respaldo"
+      - text: Suministros médicos y energía de respaldo
+      - checkbox "Cargadores de teléfono y baterías portátiles"
+      - text: Cargadores de teléfono y baterías portátiles
+    - group "Necesidades del hogar":
+      - text: ""
+      - checkbox "Artículos de saneamiento e higiene personal"
+      - text: Artículos de saneamiento e higiene personal
+      - checkbox "Efectivo en billetes pequeños"
+      - text: Efectivo en billetes pequeños
+    - group "Planes y documentos":
+      - text: ""
+      - checkbox "Copias impermeables de identificación, seguro e historial médico"
+      - text: Copias impermeables de identificación, seguro e historial médico
+      - checkbox "Contactos familiares escritos y plan de reunión"
+      - text: Contactos familiares escritos y plan de reunión
+    - group "Mascotas y niños":
+      - text: ""
+      - checkbox "Comida, agua, correa, transportadora y medicinas para mascotas"
+      - text: Comida, agua, correa, transportadora y medicinas para mascotas
+      - checkbox "Fórmula, pañales, toallitas y objetos de consuelo para bebés"
+      - text: Fórmula, pañales, toallitas y objetos de consuelo para bebés
+    - button "Borrar artículos completados"
+  - paragraph: Adapte el kit para discapacidades, medicamentos, mascotas, bebés, clima e instrucciones locales de evacuación. Siga a las autoridades cuando amenace una tormenta.
+  - group: Citar esta versión

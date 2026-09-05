@@ -1,0 +1,72 @@
+- region "Preparasyon pou siklòn":
+  - button "Minimize preparasyon pou siklòn"
+  - button "Fèmen preparasyon pou siklòn": ×
+  - heading "Preparasyon pou siklòn" [level=2]
+  - paragraph: Prepare yon kit evakyasyon pou twa jou oswa yon kit pou rete lakay pandan de semèn. Pwogrè ou rete sou aparèy sa a epi li mache san entènèt.
+  - link "Ready.gov":
+    - /url: https://www.ready.gov/kit
+  - link "American Red Cross":
+    - /url: https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html
+  - region "Kalkilatris pwovizyon kay la":
+    - heading "Kalkilatris pwovizyon kay la" [level=3]
+    - text: Moun nan kay la
+    - spinbutton "Moun nan kay la": "1"
+    - text: Plan pwovizyon
+    - combobox "Plan pwovizyon":
+      - option "Kit pou pati · 3 jou" [selected]
+      - option "Rete lakay · 2 semèn"
+    - status:
+      - strong: "3"
+      - text: /galon dlo \d+ L/
+      - strong: "3"
+      - text: jou-moun manje pou 3 jou
+    - paragraph: "Baz: yon galon pou chak moun chak jou pou bwè ak ijyèn. Ajoute dlo pou bèt ak bezwen medikal."
+  - region "Lis pwovizyon":
+    - heading "Lis pwovizyon" [level=3]
+    - strong: /0\/\d+/
+    - progressbar "Pwogrè lis preparasyon an"
+    - group "Pwovizyon esansyèl":
+      - text: ""
+      - checkbox "Dlo sere pou bwè ak ijyèn"
+      - text: Dlo sere pou bwè ak ijyèn
+      - checkbox "Manje ki pa gate epi ki fasil pou prepare"
+      - text: Manje ki pa gate epi ki fasil pou prepare
+      - checkbox "Radyo meteyo ak pil oswa manivèl"
+      - text: Radyo meteyo ak pil oswa manivèl
+      - checkbox "Flach"
+      - text: Flach
+      - checkbox "Pil anplis"
+      - text: Pil anplis
+      - checkbox "Ouvè-bwat manyèl ak zouti milti-itilizasyon"
+      - text: Ouvè-bwat manyèl ak zouti milti-itilizasyon
+    - group "Sante ak kouran":
+      - text: ""
+      - checkbox "Kit premye swen"
+      - text: Kit premye swen
+      - checkbox "Medikaman preskripsyon ak lis medikaman"
+      - text: Medikaman preskripsyon ak lis medikaman
+      - checkbox "Pwovizyon aparèy medikal ak kouran sekou"
+      - text: Pwovizyon aparèy medikal ak kouran sekou
+      - checkbox "Chajè telefòn ak batri pòtab"
+      - text: Chajè telefòn ak batri pòtab
+    - group "Bezwen kay la":
+      - text: ""
+      - checkbox "Atik sanitasyon ak ijyèn pèsonèl"
+      - text: Atik sanitasyon ak ijyèn pèsonèl
+      - checkbox "Lajan kach an ti biyè"
+      - text: Lajan kach an ti biyè
+    - group "Plan ak dokiman":
+      - text: ""
+      - checkbox "Kopi enpèmeyab idantite, asirans, ak dosye medikal"
+      - text: Kopi enpèmeyab idantite, asirans, ak dosye medikal
+      - checkbox "Kontak fanmi ekri ak plan rankont"
+      - text: Kontak fanmi ekri ak plan rankont
+    - group "Bèt ak timoun":
+      - text: ""
+      - checkbox "Manje, dlo, kòd, kaj, ak medikaman pou bèt"
+      - text: Manje, dlo, kòd, kaj, ak medikaman pou bèt
+      - checkbox "Lèt tibebe, kouchèt, sèvyèt, ak bagay rekonfò"
+      - text: Lèt tibebe, kouchèt, sèvyèt, ak bagay rekonfò
+    - button "Efase atik ki fini yo"
+  - paragraph: Adapte kit la pou andikap, medikaman, bèt, tibebe, klima, ak enstriksyon evakyasyon lokal. Swiv responsab ijans yo lè yon tanpèt menase.
+  - group: Site vèsyon sa a

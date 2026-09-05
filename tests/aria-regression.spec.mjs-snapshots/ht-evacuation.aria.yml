@@ -1,0 +1,40 @@
+- region "Chèche zòn evakyasyon":
+  - button "Minimize chèche zòn evakyasyon"
+  - button "Fèmen rechèch zòn evakyasyon": ×
+  - heading "Chèche zòn evakyasyon" [level=2]
+  - paragraph: "Konfidansyalite: adrès ou tape yo ale bay World Geocoding Service Esri. Opsyon pwen sou kat la voye sèlman latitid/longitid bay kouch ArcGIS Florid la; HurricaneMap pa konsève okenn nan yo."
+  - paragraph: Tcheke yon adrès oswa yon pwen sou kat Florid la nan kouch zòn evakyasyon eta a pibliye. Adrès yo ale bay Esri; pwen yo voye sèlman kowòdone. Pou lòt eta yo, sèvi ak sous ofisyèl ki anba a.
+  - text: Adrès nan Florid
+  - searchbox "Adrès nan Florid"
+  - button "Jwenn zòn"
+  - text: Yo voye adrès ou bay World Geocoding Service Esri. Pwen sou kat la voye sèlman latitid/longitid bay kouch ArcGIS Florid la. HurricaneMap pa konsève okenn nan yo.
+  - button "Chwazi yon pwen sou kat la"
+  - status:
+    - paragraph: Antre yon adrès Florid oswa chwazi yon pwen sou kat la. Yon pwen evite jeokodaj adrès la.
+  - paragraph: Zòn evakyasyon baze sou risk vag tanpèt epi yo pa menm ak zòn inondasyon FEMA.
+  - heading "Sous ofisyèl eta yo" [level=3]
+  - link "Florid — Florida Division of Emergency Management":
+    - /url: https://www.floridadisaster.org/knowyourzone/
+    - text: ""
+  - link "Kawolin di Nò — North Carolina Department of Public Safety / Emergency Management":
+    - /url: https://www.ncdps.gov/our-organization/emergency-management/emergency-preparedness/know-your-zone
+    - text: ""
+  - link "Kawolin di Sid — South Carolina Emergency Management Division":
+    - /url: https://scemd.org/prepare/know-your-zone/
+    - text: ""
+  - link "Jòji — Georgia Emergency Management and Homeland Security Agency":
+    - /url: https://gema.georgia.gov/hurricanes
+    - text: ""
+  - link "Tekzas — Texas Division of Emergency Management / Texas Hurricane Center":
+    - /url: https://gov.texas.gov/hurricane
+    - text: ""
+  - link "Vijini — Virginia Department of Emergency Management":
+    - /url: https://vdem.virginia.gov/know-your-zone/
+    - text: ""
+  - link "Maryland — Maryland Emergency Management Agency":
+    - /url: https://mdem.maryland.gov/action/Pages/know-your-zone-md.aspx
+    - text: ""
+  - link "Massachusetts — Massachusetts Emergency Management Agency":
+    - /url: https://www.mass.gov/info-details/hurricane-evacuation-zones
+    - text: ""
+  - group: Site vèsyon sa a

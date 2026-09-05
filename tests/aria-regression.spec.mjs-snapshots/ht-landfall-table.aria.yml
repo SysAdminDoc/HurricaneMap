@@ -1,0 +1,5329 @@
+- region "Tablo kote siklòn touche tè":
+  - button "Minimize tablo kote siklòn touche tè"
+  - heading "Tablo kote siklòn touche tè" [level=2]
+  - button "Fèmen tablo a": ×
+  - table "Touche tè siklòn ki filtre":
+    - rowgroup:
+      - row "Ane ↓ Non Kategori Eta Van Presyon":
+        - columnheader "Ane ↓"
+        - columnheader "Non"
+        - columnheader "Kategori"
+        - columnheader "Eta"
+        - columnheader "Van"
+        - columnheader "Presyon"
+    - rowgroup:
+      - row /\d+ Chantal Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chantal"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Francine Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Francine"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Helene Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Helene"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Milton Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Milton"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harold Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harold"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Idalia Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Idalia"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ophelia Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ophelia"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Colin Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Colin"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fiona Kategori 1 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fiona"
+        - cell "Kategori 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ian Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ian"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicole Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicole"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elsa Tanpèt twopikal Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elsa"
+        - cell "Tanpèt twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fred Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fred"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tanpèt twopikal Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tanpèt twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tanpèt twopikal Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tanpèt twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ida Kategori 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ida"
+        - cell "Kategori 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Mindy Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Mindy"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nicholas Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nicholas"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cristobal Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cristobal"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tanpèt twopikal New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tanpèt twopikal"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaias Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaias"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Laura Kategori 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Laura"
+        - cell "Kategori 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sally Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sally"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sally Kategori 2 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sally"
+        - cell "Kategori 2"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beta Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beta"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Delta Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Delta"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Zeta Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Zeta"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eta Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eta"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eta Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eta"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dorian Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dorian"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Imelda Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Imelda"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Karen Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Karen"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Karen Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Karen"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Florence Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tanpèt twopikal Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Michael Kategori 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Michael"
+        - cell "Kategori 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Emily Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Emily"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irma Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irma"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Maria Kategori 4 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Maria"
+        - cell "Kategori 4"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nate Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nate"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Nate Kategori 1 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Nate"
+        - cell "Kategori 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Depresyon twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Depresyon twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Colin Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Colin"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Julia Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Julia"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Matthew Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Matthew"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Darby Tanpèt twopikal Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Darby"
+        - cell "Tanpèt twopikal"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ana Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ana"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bill Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bill"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Iselle Tanpèt twopikal Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Iselle"
+        - cell "Tanpèt twopikal"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrea Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrea"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debby Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debby"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaac Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaac"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isaac Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isaac"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Sandy Kategori 1 New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Sandy"
+        - cell "Kategori 1"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Don Depresyon twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Don"
+        - cell "Depresyon twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tanpèt twopikal New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tanpèt twopikal"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Lee Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Lee"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Two Depresyon twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Two"
+        - cell "Depresyon twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dolly Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dolly"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dolly Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dolly"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edouard Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edouard"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gustav Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gustav"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ike Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ike"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Depresyon twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Depresyon twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gabrielle Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gabrielle"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Humberto Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Humberto"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ten Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ten"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Olga Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Olga"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tanpèt twopikal Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ernesto Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ernesto"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tanpèt twopikal Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tanpèt twopikal Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Katrina Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Katrina"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Rita Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Rita"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Tammy Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Tammy"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Wilma Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Wilma"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gaston Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gaston"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tanpèt twopikal Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ivan Kategori 3 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ivan"
+        - cell "Kategori 3"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ivan Depresyon twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ivan"
+        - cell "Depresyon twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jeanne Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jeanne"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jeanne Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jeanne"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Matthew Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Matthew"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bill Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bill"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresyon twopikal Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresyon twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Grace Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Grace"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isabel Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isabel"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Depresyon twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Depresyon twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edouard Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edouard"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fay Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fay"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hanna Tanpèt twopikal Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hanna"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isidore Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isidore"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kyle Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kyle"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kyle Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kyle"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Lili Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Lili"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Depresyon twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Depresyon twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gabrielle Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gabrielle"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresyon twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresyon twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Helene Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Helene"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bret Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bret"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Floyd Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Floyd"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Harvey Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Harvey"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Earl Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Earl"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frances Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frances"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Georges Kategori 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Georges"
+        - cell "Kategori 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Georges Kategori 2 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Georges"
+        - cell "Kategori 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hermine Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hermine"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Mitch Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Mitch"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Kategori 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Kategori 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arthur Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arthur"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fran Kategori 3 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fran"
+        - cell "Kategori 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hortense Kategori 1 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hortense"
+        - cell "Kategori 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Josephine Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Josephine"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dean Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dean"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Erin Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Erin"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jerry Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jerry"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Opal Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Opal"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alberto Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alberto"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Depresyon twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Depresyon twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gordon Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gordon"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Kategori 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Kategori 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Kategori 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Kategori 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Andrew Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Andrew"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danielle Tanpèt twopikal Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danielle"
+        - cell "Tanpèt twopikal"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Iniki Kategori 3 Hawaii \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Iniki"
+        - cell "Kategori 3"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Kategori 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Kategori 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Kategori 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Kategori 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Tanpèt twopikal Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Tanpèt twopikal"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allison Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allison"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chantal Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chantal"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Kategori 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Kategori 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Kategori 3 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Kategori 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hugo Kategori 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hugo"
+        - cell "Kategori 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jerry Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jerry"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Beryl Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beryl"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chris Tanpèt twopikal Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chris"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Florence Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Keith Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Keith"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Floyd Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Floyd"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bonnie Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bonnie"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Charley Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Charley"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danny Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danny"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Elena Kategori 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Elena"
+        - cell "Kategori 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gloria Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gloria"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gloria Kategori 1 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gloria"
+        - cell "Kategori 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Henri Depresyon twopikal Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Henri"
+        - cell "Depresyon twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isabel Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isabel"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Juan Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Juan"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Kate Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Kate"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Diana Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Diana"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isidore Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isidore"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alicia Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alicia"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Barry Depresyon twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barry"
+        - cell "Depresyon twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dean Tanpèt twopikal Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dean"
+        - cell "Tanpèt twopikal"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Chris Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Chris"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dennis Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dennis"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gert Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gert"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Allen Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Allen"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Danielle Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Danielle"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bob Tanpèt twopikal Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bob"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Claudette Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Claudette"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ David Kategori 1 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "David"
+        - cell "Kategori 1"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frederic Tanpèt twopikal Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frederic"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Frederic Kategori 2 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Frederic"
+        - cell "Kategori 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Amelia Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Amelia"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Babe Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Babe"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Belle Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Belle"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Belle Tanpèt twopikal Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Belle"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dottie Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dottie"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dottie Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dottie"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Eloise Tanpèt twopikal Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Eloise"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carmen Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Carmen"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Delia Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Delia"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Delia Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Delia"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Agnes Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Agnes"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Agnes Tanpèt twopikal New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Agnes"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Doria Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Doria"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Fern Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Fern"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edith Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Edith"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ginger Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ginger"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Becky Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Becky"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Celia Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Celia"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Felice Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Felice"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Camille Kategori 5 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Camille"
+        - cell "Kategori 5"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gerda Kategori 1 Maine \d+ kt —/:
+        - cell /\d+/
+        - cell "Gerda"
+        - cell "Kategori 1"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Jenny Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Jenny"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Candy Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Candy"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gladys Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gladys"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Beulah Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Beulah"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Doria Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Doria"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Alma Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Alma"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Inez Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Inez"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Inez Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Inez"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Betsy Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Betsy Kategori 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Kategori 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debbie Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debbie"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Abby Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Abby"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Cleo Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cleo"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cleo Tanpèt twopikal Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cleo"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dora Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Dora"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hilda Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hilda"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isbell Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isbell"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Isbell Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Isbell"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carla Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carla"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Esther Tanpèt twopikal Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tanpèt twopikal Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tanpèt twopikal Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tanpèt twopikal"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Virginia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Kategori 2 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Kategori 2"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Donna Kategori 1 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Donna"
+        - cell "Kategori 1"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Ethel Kategori 1 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ethel"
+        - cell "Kategori 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Arlene Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Arlene"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Cindy Tanpèt twopikal Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Cindy"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debra Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Debra"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Gracie Kategori 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Gracie"
+        - cell "Kategori 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Irene Tanpèt twopikal Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Irene"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Judith Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Judith"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Dot Kategori 1 Hawaii \d+ kt —/:
+        - cell /\d+/
+        - cell "Dot"
+        - cell "Kategori 1"
+        - cell "Hawaii"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ella Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ella"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Audrey Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Audrey"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Bertha Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Bertha"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Debbie Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Debbie"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Esther Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Esther"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Betsy Kategori 2 Puerto Rico \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Betsy"
+        - cell "Kategori 2"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Flossy Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Flossy"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Flossy Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Flossy"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Brenda Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Brenda"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Connie Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Connie"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Diane Tanpèt twopikal North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Diane"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Ione Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Ione"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alice Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Alice"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carol Kategori 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carol"
+        - cell "Kategori 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Carol Kategori 3 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Carol"
+        - cell "Kategori 3"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Kategori 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Kategori 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Kategori 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Kategori 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Edna Kategori 2 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Edna"
+        - cell "Kategori 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Hazel Kategori 4 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Kategori 4"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Alice Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Alice"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Barbara Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Barbara"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Florence Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Florence"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Hazel Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Hazel Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Hazel"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Able Kategori 2 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Able"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ How Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "How"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Baker Kategori 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Baker"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Baker Kategori 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Baker"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Easy Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Easy"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Easy Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Easy"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ King Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "King"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Love Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Love"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Virginia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Virginia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 5 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 5"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Alabama \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 New Jersey \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "New Jersey"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Maryland \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Maryland"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Maine \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Massachusetts \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Mississippi \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Georgia \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 New York \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 3 Rhode Island \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Massachusetts \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Massachusetts"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Maine \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Maine"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 South Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "South Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Connecticut \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Alabama \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Alabama"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 New York \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "New York"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Connecticut \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Connecticut"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 4 Louisiana \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 4"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal North Carolina \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "North Carolina"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Louisiana \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Louisiana"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Georgia \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Georgia"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Kategori 2 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Mississippi \d+ kt \d+ mb/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Mississippi"
+        - cell /\d+ kt/
+        - cell /\d+ mb/
+      - row /\d+ Unnamed Tanpèt twopikal Puerto Rico \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Puerto Rico"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 2 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 2"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 1 Texas \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 1"
+        - cell "Texas"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Kategori 3 Florida \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Kategori 3"
+        - cell "Florida"
+        - cell /\d+ kt/
+        - cell "—"
+      - row /\d+ Unnamed Tanpèt twopikal Rhode Island \d+ kt —/:
+        - cell /\d+/
+        - cell "Unnamed"
+        - cell "Tanpèt twopikal"
+        - cell "Rhode Island"
+        - cell /\d+ kt/
+        - cell "—"
+  - paragraph: /\d+ touche tè/
+  - group: Site vèsyon sa a

@@ -1,0 +1,87 @@
+- region "Compare Storms":
+  - button "Minimize compare storms"
+  - button "Close comparison": ×
+  - heading "Compare Storms" [level=2]
+  - paragraph: Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.
+  - button "📥 CSV"
+  - heading /Katrina \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 3 at landfall Peak wind:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Min pressure:"
+  - strong: /\d+ mb/
+  - text: "US landfalls:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading /Andrew \(\d+\)/ [level=3]
+  - button "×"
+  - text: "Cat 5 at landfall Peak wind:"
+  - strong: /Cat 5 · \d+ kt/
+  - text: "Min pressure:"
+  - strong: /\d+ mb/
+  - text: "US landfalls:"
+  - strong: "3"
+  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - heading "Side-by-side" [level=3]
+  - table:
+    - rowgroup:
+      - row /Name Katrina \d+ Andrew \d+/:
+        - columnheader "Name"
+        - columnheader /Katrina \d+/
+        - columnheader /Andrew \d+/
+    - rowgroup:
+      - row /Peak wind \d+ kt \d+ kt/:
+        - rowheader "Peak wind"
+        - cell /\d+ kt/
+        - cell /\d+ kt/
+      - row /Min pressure \d+ mb \d+ mb/:
+        - rowheader "Min pressure"
+        - cell /\d+ mb/
+        - cell /\d+ mb/
+      - row "Peak category Cat 5 Cat 5":
+        - rowheader "Peak category"
+        - cell "Cat 5"
+        - cell "Cat 5"
+      - row "Landfall category Cat 3 Cat 5":
+        - rowheader "Landfall category"
+        - cell "Cat 3"
+        - cell "Cat 5"
+      - row "US landfalls 3 3":
+        - rowheader "US landfalls"
+        - cell "3"
+        - cell "3"
+      - row /Track points \d+ \d+/:
+        - rowheader "Track points"
+        - cell /\d+/
+        - cell /\d+/
+      - row /Genesis Aug \d+, \d+ Aug \d+, \d+/:
+        - rowheader "Genesis"
+        - cell /Aug \d+, \d+/
+        - cell /Aug \d+, \d+/
+      - row /Final Aug \d+, \d+ Aug \d+, \d+/:
+        - rowheader "Final"
+        - cell /Aug \d+, \d+/
+        - cell /Aug \d+, \d+/
+      - row "States hit Florida, Louisiana Florida, Louisiana":
+        - rowheader "States hit"
+        - cell "Florida, Louisiana"
+        - cell "Florida, Louisiana"
+      - row /ACE \(\d+⁴ kt²\) \d+\.\d+ \d+\.\d+/:
+        - rowheader /ACE \(\d+⁴ kt²\)/
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /Forward speed \(km\/h\) \d+\.\d+ \d+\.\d+/:
+        - rowheader "Forward speed (km/h)"
+        - cell /\d+\.\d+/
+        - cell /\d+\.\d+/
+      - row /RI detected \+\d+ kt \/ \d+[hmsp]+ \+\d+ kt \/ \d+[hmsp]+/:
+        - rowheader "RI detected"
+        - cell /\+\d+ kt \/ \d+[hmsp]+/
+        - cell /\+\d+ kt \/ \d+[hmsp]+/
+      - row "RI risk category high high":
+        - rowheader "RI risk category"
+        - cell "high"
+        - cell "high"
+  - group: Cite this release

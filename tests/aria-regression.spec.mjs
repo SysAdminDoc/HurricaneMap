@@ -175,7 +175,8 @@ for (const locale of locales) {
 
 for (const locale of locales) {
   test(`localized accessibility journeys preserve focus for ${locale}`, async ({ page }) => {
-    test.setTimeout(60_000);
+    // Seven extra ARIA snapshots per locale on top of the axe sweep.
+    test.setTimeout(150_000);
     await prepareLocalizedPage(page, locale);
     await assertNoAxeViolations(page, `${locale} filters`, '#filters');
 
@@ -219,6 +220,7 @@ for (const locale of locales) {
     await page.waitForSelector('#stats-panel:not([hidden]) #stats-panel-title', { timeout: 10_000 });
     await page.waitForFunction(() => document.activeElement?.id === 'stats-panel-title');
     await assertNoAxeViolations(page, `${locale} statistics`, '#stats-panel');
+    await expect(page.locator('#stats-panel')).toMatchAriaSnapshot({ name: `${locale}-statistics.aria.yml` });
     await domClick(page, '#close-stats');
     await page.waitForFunction(() => document.querySelector('#stats-panel')?.hidden && document.activeElement?.id === 'toggle-stats');
 
@@ -233,12 +235,14 @@ for (const locale of locales) {
     await page.waitForSelector('#compare-panel:not([hidden]) .cp-card', { timeout: 10_000 });
     await page.waitForFunction(() => document.activeElement?.id === 'compare-panel-title');
     await assertNoAxeViolations(page, `${locale} compare`, '#compare-panel');
+    await expect(page.locator('#compare-panel')).toMatchAriaSnapshot({ name: `${locale}-compare.aria.yml` });
     await domClick(page, '#close-compare');
     await page.waitForFunction(() => document.querySelector('#compare-panel')?.hidden && document.activeElement?.id === 'toggle-compare');
 
     await activateHeaderAction(page, '#toggle-table-view');
     await page.waitForSelector('#table-view-panel:not([hidden]) tbody tr', { timeout: 10_000 });
     await assertNoAxeViolations(page, `${locale} landfall table`, '#table-view-panel');
+    await expect(page.locator('#table-view-panel')).toMatchAriaSnapshot({ name: `${locale}-landfall-table.aria.yml` });
     await domFocus(page, '#table-view-panel th[data-col="year"]');
     const sortBefore = await page.getAttribute('#table-view-panel th[data-col="year"]', 'aria-sort');
     await dispatchDomKey(page, '#table-view-panel th[data-col="year"]', 'Enter');
@@ -250,12 +254,14 @@ for (const locale of locales) {
     await domClick(page, '#toggle-on-this-date');
     await page.waitForSelector('#on-this-date-panel:not([hidden]) .otd-content, #on-this-date-panel:not([hidden]) .empty-state', { timeout: 10_000 });
     await assertNoAxeViolations(page, `${locale} on-this-date`, '#on-this-date-panel');
+    await expect(page.locator('#on-this-date-panel')).toMatchAriaSnapshot({ name: `${locale}-on-this-date.aria.yml` });
     await domClick(page, '#close-on-this-date');
     await page.waitForFunction(() => document.querySelector('#on-this-date-panel')?.hidden && document.activeElement?.id === 'toggle-on-this-date');
 
     await activateHeaderAction(page, '#toggle-prep');
     await page.waitForSelector('#prep-panel:not([hidden]) #prep-household', { timeout: 10_000 });
     await assertNoAxeViolations(page, `${locale} preparedness`, '#prep-panel');
+    await expect(page.locator('#prep-panel')).toMatchAriaSnapshot({ name: `${locale}-preparedness.aria.yml` });
     await setDomValue(page, '#prep-household', 2, 'change');
     await setDomValue(page, '#prep-mode', 'home', 'change');
     await domClick(page, '[data-prep-item="water"]');
@@ -267,6 +273,7 @@ for (const locale of locales) {
     await page.waitForSelector('#evac-panel:not([hidden]) #evac-address-input', { timeout: 10_000 });
     await expect(page.locator('#evac-disclosure')).toContainText('Esri');
     await assertNoAxeViolations(page, `${locale} evacuation`, '#evac-panel');
+    await expect(page.locator('#evac-panel')).toMatchAriaSnapshot({ name: `${locale}-evacuation.aria.yml` });
     const evacReady = await page.evaluate(async () => (await import('/src/i18n.js')).t('evac.ready'));
     await setDomValue(page, '#evac-address-input', '100 Main Street', 'input');
     await page.evaluate(() => document.querySelector('#evac-address-form')?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
@@ -285,6 +292,7 @@ for (const locale of locales) {
     });
     await page.waitForSelector('#spatial-results:not([hidden]) .sp-count', { timeout: 15_000 });
     await assertNoAxeViolations(page, `${locale} spatial search`, '#spatial-results');
+    await expect(page.locator('#spatial-results')).toMatchAriaSnapshot({ name: `${locale}-spatial-search.aria.yml` });
     await domClick(page, '#spatial-results .close-btn');
     await page.waitForFunction(() => document.querySelector('#spatial-results')?.hidden && document.activeElement?.id === 'toggle-mobile-actions');
 
