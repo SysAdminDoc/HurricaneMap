@@ -14,8 +14,6 @@ import {
 } from './optional-feeds.js';
 
 let indexPromise = null;
-let layerGroup = null;
-let shownStormId = null;
 
 function loadIndex() {
   if (!indexPromise) {
@@ -64,6 +62,11 @@ export async function hwmInfo(stormId) {
   return index?.[stormId] || null;
 }
 
+function nothingToShow(handle) {
+  handle.dispose();
+  return 0;
+}
+
 function elevationColor(ft) {
   if (ft >= 20) return '#f38ba8';
   if (ft >= 12) return '#fab387';
@@ -83,10 +86,12 @@ export async function showHwm(stormId) {
     REQUEST_TIMEOUT_MS.data,
   ).catch(() => null);
   if (handle.disposed) return 0;
-  if (!response?.ok) return 0;
+  // A storm with no marks, or a fetch that failed, must not leave the id
+  // claimed: the registration would outlive the attempt with no layer under it.
+  if (!response?.ok) return nothingToShow(handle);
   const points = await response.json();
   if (handle.disposed) return 0;
-  if (!Array.isArray(points) || !points.length) return 0;
+  if (!Array.isArray(points) || !points.length) return nothingToShow(handle);
   const L = window.L;
   const nextLayerGroup = L.layerGroup();
   for (const [lat, lon, elevFt, env] of points) {
@@ -103,17 +108,9 @@ export async function showHwm(stormId) {
     ).addTo(nextLayerGroup);
   }
   if (!handle.attach(nextLayerGroup)) return 0;
-  layerGroup = nextLayerGroup;
-  shownStormId = stormId;
   return points.length;
 }
 
 export function hideHwm() {
   disposeMapLayer('hwm-marks');
-  layerGroup = null;
-  shownStormId = null;
-}
-
-export function hwmShownFor() {
-  return shownStormId;
 }

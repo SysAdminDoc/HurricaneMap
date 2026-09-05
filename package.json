@@ -89,6 +89,7 @@
     "test:dependency-security": "node scripts/test-dependency-security.mjs",
     "test:layer-registry": "node scripts/test-layer-registry.mjs",
     "test:shared-probe": "node scripts/test-shared-probe.mjs",
+    "test:panel-impacts": "node scripts/test-panel-impacts.mjs",
     "test:release-gates": "node scripts/test-release-gates.mjs",
     "test:goes-realtime": "node scripts/test-goes-realtime.mjs",
     "test:active-polling": "node scripts/test-active-polling.mjs",
