@@ -1542,6 +1542,13 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     if (width <= 720) await assertMobileTargetSizes(page, `${name} storm detail`);
     await captureVisualSnapshot(page, `${name}-storm-detail`);
 
+    // Playwright's click fails when another element intercepts the pointer.
+    // The panel's sticky header used to swallow the close button at every
+    // width, and a dispatched click could not see it.
+    await page.click('#close-panel', { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 5000 });
+    await openKatrinaPanel(page);
+
     await page.evaluate(async () => {
       const panels = await import('/src/panels.js');
       panels.closeAllPanels();

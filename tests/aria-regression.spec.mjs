@@ -200,7 +200,7 @@ for (const locale of locales) {
     await assertNoAxeViolations(page, `${locale} storm panel`, '#storm-panel');
     const stormBeforeCloseFocus = await page.evaluate(() => document.activeElement?.closest('#storm-panel') !== null);
     expect(stormBeforeCloseFocus).toBe(true);
-    await domClick(page, '#close-panel');
+    await page.click('#close-panel');
     await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden);
     await page.waitForFunction(() => ['map', 'toggle-filters', 'search-input'].includes(document.activeElement?.id));
 

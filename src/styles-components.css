@@ -8089,6 +8089,14 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-meta 
   z-index: 4;
 }
 
+/* The sticky header is a later sibling with its own stacking context, so
+   without a z-index of its own the close button is painted over and its
+   pointer events are swallowed. The minimise button above already carries
+   one, which is why it kept working. */
+.storm-panel > .close-btn {
+  z-index: 5;
+}
+
 @media (max-width: 720px) {
   .storm-panel .panel-sticky-header {
     padding-right: 86px;
