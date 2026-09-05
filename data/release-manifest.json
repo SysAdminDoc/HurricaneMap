@@ -67,7 +67,7 @@
     {
       "path": "data/coverage.json",
       "bytes": 16926,
-      "sha256": "a1adb3dbe1c670acd7359e23173151acdfaebb171af9c2f6bf0a692177425f90",
+      "sha256": "a89126a8010326789118045686a23bd3c2e5322bee7b8d07a4eae290f07f1caa",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "67a30172c7eb5f8a08f80f84d8a5076b01f1143c7f63cea6c2861beed34765cc",
+      "sha256": "9119ce38ac249d1824f5c87d86042f9b9d744115032e3a166f9a176a68e6a43f",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-05",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -105,7 +105,7 @@
       "bytes": 5718,
       "sha256": "3e2bfe3b09a5db14c6d7587406dda51683980dc85c42a3463d5c293e70d03213",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-07-25",
+      "source_date": "2026-09-05",
       "generated_at_utc": "2026-08-08T00:00:00Z",
       "schema_version": 1
     },
@@ -15565,7 +15565,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4480,
-      "sha256": "1369f90e9ec3911dc0526eeb7d7506b8cdbac7d8e8ed70d8092660f5d4fe3b93",
+      "sha256": "f512fb14cf685c28b0a3776c71cd27cd25eb10af8e3fd7084dbe07e5a0d9e255",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

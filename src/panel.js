@@ -334,7 +334,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
           ${noaaReportUrl ? `<a class="action-btn" href="${escapeHtml(noaaReportUrl)}" target="_blank" rel="noopener">NOAA report</a>` : ''}
           ${nhcWalletUrl ? `<a class="action-btn" href="${escapeHtml(nhcWalletUrl)}" target="_blank" rel="noopener">NHC archive</a>` : ''}
           ${sliderUrl ? `<a class="action-btn" href="${escapeHtml(sliderUrl)}" target="_blank" rel="noopener">GOES satellite</a>` : ''}
-          ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" title="${escapeHtml(t('links.tornadoHint', tornadoHint))}" target="_blank" rel="noopener">Storm Events (NOAA)</a>` : ''}
+          ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" title="${escapeHtml(t('links.tornadoHint', tornadoHint?.states, tornadoHint?.from, tornadoHint?.to))}" target="_blank" rel="noopener">Storm Events (NOAA)</a>` : ''}
           ${reconUrl ? `<a class="action-btn" href="${escapeHtml(reconUrl)}" target="_blank" rel="noopener">Recon archive</a>` : ''}
         </div>
 

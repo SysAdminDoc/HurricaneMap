@@ -58,12 +58,26 @@ async function main() {
   const generatedAt = await releaseGeneratedAt(root);
   const identity = ['--generated-at', generatedAt, '--source-commit', sourceCommit];
 
-  // Coverage first: it reads data/enso.json and data/outlook.json, so a manifest
-  // built before it hashes a coverage file that is about to change.
-  run(process.execPath, ['scripts/build-coverage.mjs']);
-  run(process.execPath, ['scripts/generate-release-manifest.mjs', ...identity]);
+  // Coverage and the manifest each read the other: coverage takes its revision
+  // dates from the manifest's source_date, and the manifest hashes coverage.
+  // One pass of each is not enough, and it fails quietly rather than loudly:
+  // commit a data file and coverage keeps the previous revision date, which
+  // test:coverage then reports as a mismatch nobody caused this run.
+  //
+  // So run the pair until coverage stops moving, and say so if it never does.
+  let coverageDigest = null;
+  for (let pass = 1; ; pass += 1) {
+    run(process.execPath, ['scripts/build-coverage.mjs']);
+    run(process.execPath, ['scripts/generate-release-manifest.mjs', ...identity]);
+    const digest = (await sha256Of('data/coverage.json')).sha256;
+    if (digest === coverageDigest) break;
+    coverageDigest = digest;
+    if (pass >= 5) {
+      throw new Error('coverage and the release manifest did not settle in five passes; one of them is not deterministic');
+    }
+  }
   run(process.execPath, ['scripts/generate-stac-catalog.mjs', '--write']);
-  // Second pass so the manifest records the catalog it just caused to change.
+  // Once more so the manifest records the catalog it just caused to change.
   run(process.execPath, ['scripts/generate-release-manifest.mjs', ...identity]);
   run(process.execPath, ['scripts/build-distribution.mjs', '--write-source']);
 

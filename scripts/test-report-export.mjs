@@ -70,9 +70,13 @@ const katrina = {
 const tornadoUrl = tornadoSearchUrl(katrina);
 assert.equal(tornadoUrl, 'https://www.ncei.noaa.gov/access/storm-events-database/search');
 assert.equal(new URL(tornadoUrl).search, '', 'no query string: every parameter form is ignored by the destination');
-assert.equal(
+// The parts stay separate so the sentence around them can be translated: the
+// connective used to be a hardcoded English "to" inside the Spanish and Haitian
+// Creole strings. State names are deliberately not translated, because they are
+// typed into an English form.
+assert.deepEqual(
   tornadoSearchHint(katrina),
-  'Louisiana, Mississippi, Florida · 2005-08-23 to 2005-08-31',
+  { states: 'Louisiana, Mississippi, Florida', from: '2005-08-23', to: '2005-08-31' },
   'the reader gets the terms the link cannot carry, and Oregon is dropped as uncovered',
 );
 // Storm Events begins in 1950, and a storm with no covered landfall state has

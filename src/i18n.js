@@ -634,7 +634,7 @@ export const STRINGS = {
     // Storm events
     'stormevents.title': 'Storm Events near landfall',
     'stormevents.unavailable': 'NOAA Storm Events records begin in 1950, so tornado and hail coincidence data is unavailable for this storm.',
-    'links.tornadoHint': 'Opens the NOAA Storm Events search. It cannot be filtered from a link, so search for: {0}',
+    'links.tornadoHint': 'Opens the NOAA Storm Events search. It cannot be filtered from a link, so search for: {0}, {1} to {2}',
 
     // About / info modal
     'about.title': 'About HurricaneMap',
@@ -1560,7 +1560,7 @@ export const STRINGS = {
     // Storm events
     'stormevents.title': 'Eventos meteorológicos cerca del toque de tierra',
     'stormevents.unavailable': 'Los registros de eventos comienzan en 1950; datos de tornado y granizo no están disponibles para este huracán.',
-    'links.tornadoHint': 'Abre la búsqueda de NOAA Storm Events. No se puede filtrar desde un enlace, así que busque: {0}',
+    'links.tornadoHint': 'Abre la búsqueda de NOAA Storm Events. No se puede filtrar desde un enlace, así que busque: {0}, del {1} al {2}',
 
     // About / info modal
     'about.title': 'Acerca de HurricaneMap',
@@ -2423,7 +2423,7 @@ export const STRINGS = {
     'seasonal.definition.below': 'Sezon an gen <7 tanpèt ki gen non oswa yon ACE ba.',
     'stormevents.title': 'Evènman tanpèt bò kote siklòn touche tè',
     'stormevents.unavailable': 'Dosye NOAA kòmanse nan 1950; done tònad pa disponib pou siklòn sa a.',
-    'links.tornadoHint': 'Li ouvri rechèch NOAA Storm Events la. Yon lyen pa ka filtre l, kidonk chèche: {0}',
+    'links.tornadoHint': 'Li ouvri rechèch NOAA Storm Events la. Yon lyen pa ka filtre l, kidonk chèche: {0}, {1} rive {2}',
     'about.title': 'Konsènan HurricaneMap',
     'about.archiveCoverageTitle': 'Kouvèti achiv la',
     'about.archiveCoverageIntro': 'Sous ki nan pake a gen diferan peryòd, sik mizajou, ak disponiblite.',

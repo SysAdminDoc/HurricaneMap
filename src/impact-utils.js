@@ -65,12 +65,17 @@ export function tornadoSearchUrl(storm) {
   return stormEventsWindow(storm) ? STORM_EVENTS_SEARCH : null;
 }
 
-/** What to enter once the search page opens, since it cannot be pre-filled. */
+/**
+ * What to enter once the search page opens, since it cannot be pre-filled.
+ *
+ * The parts stay separate so the sentence around them can be translated. The
+ * state names do not translate: they are typed into an English form.
+ */
 export function tornadoSearchHint(storm) {
   const window = stormEventsWindow(storm);
   if (!window) return null;
   const day = date => date.toISOString().slice(0, 10);
-  return `${window.states.join(', ')} · ${day(window.start)} to ${day(window.end)}`;
+  return { states: window.states.join(', '), from: day(window.start), to: day(window.end) };
 }
 
 function parseLegacyDeaths(value) {
