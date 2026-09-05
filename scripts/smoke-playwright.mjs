@@ -227,7 +227,10 @@ const BASEMAP_TILE_HOST = 'tile.openstreetmap.org';
 // a mislaid one is announced to screen readers and shown to nobody. Measure
 // its box rather than waiting for the feed to reach a state that reveals it.
 async function assertActiveBadgeInViewport(page, label) {
-  await page.waitForSelector('#active-storm-badge', { timeout: 20000 });
+  // Attached, not visible: on a deployment without the NHC relay the feed is
+  // unsupported and the badge legitimately stays hidden. Its box is still
+  // measurable, and its box is what this checks.
+  await page.waitForSelector('#active-storm-badge', { state: 'attached', timeout: 20000 });
   const box = await page.evaluate(() => {
     const badge = document.getElementById('active-storm-badge');
     const wasHidden = badge.hidden;
@@ -1023,6 +1026,29 @@ async function assertReducedMotionContract(page, label) {
   assert(!state.offenders.length, `${label}: visible motion remains: ${JSON.stringify(state.offenders)}`);
 }
 
+// A feed status card is fixed-position over the map, and on a phone the map is
+// also where the storm panel and the timeline live. Both cards used to sit on
+// top of an open panel: the outlook card covered the panel's lower half and the
+// timeline, the active card covered its header.
+async function assertNoOverlayCoversOpenPanel(page, label) {
+  const collisions = await page.evaluate(() => {
+    const panel = document.querySelector('#storm-panel');
+    if (!panel || panel.hidden) return 'no open storm panel';
+    const panelRect = panel.getBoundingClientRect();
+    const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+    return [...document.querySelectorAll('.optional-feed-status-overlay')]
+      .filter(element => {
+        const style = getComputedStyle(element);
+        return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden';
+      })
+      .map(element => ({ id: element.id, rect: element.getBoundingClientRect() }))
+      .filter(entry => overlaps(entry.rect, panelRect))
+      .map(entry => entry.id);
+  });
+  assert(collisions !== 'no open storm panel', `${label}: the storm panel was not open, so the overlay check proved nothing`);
+  assert(!collisions.length, `${label}: feed status overlays sit on top of the open storm panel: ${collisions.join(', ')}`);
+}
+
 async function assertMobileTargetSizes(page, label) {
   const undersized = await page.evaluate(() => [...document.querySelectorAll(
     '.app-header button, #filters button, #filters input, #filters select, .side-panel:not([hidden]) button, .anim-controls button, .anim-controls input'
@@ -1675,6 +1701,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, `${name} storm detail`);
     if (width <= 720) await assertMobileTargetSizes(page, `${name} storm detail`);
+    if (width <= 720) await assertNoOverlayCoversOpenPanel(page, `${name} storm detail`);
     await captureVisualSnapshot(page, `${name}-storm-detail`);
 
     // Playwright's click fails when another element intercepts the pointer.
@@ -2623,6 +2650,12 @@ try {
       return zip;
     };
     const kmz = storedZip('doc.kml', kml);
+    // Stubbing the relay's responses is simulating a deployment that has the
+    // relay, so say so: the feeds now skip the /nhc/ routes outright when the
+    // active poll has already found them missing.
+    const proxy = await import('/src/nhc-proxy.js');
+    proxy.resetNhcProxyAvailability();
+    proxy.reportNhcProxyAvailability(true);
     const realFetch = window.fetch;
     window.fetch = async url => String(url).includes('/nhc/outlook/')
       ? new Response(kmz, { status: 200 })

@@ -37,6 +37,9 @@ export function getBundledDatasetState(status, available) {
 
 const VALID_STATES = new Set([
   'idle', 'loading', 'success', 'empty', 'stale', 'offline', 'rate-limited', 'malformed', 'timeout', 'error',
+  // Not a failure: the deployment has no route to this source at all, so there
+  // is nothing to retry and nothing to poll for.
+  'unsupported',
 ]);
 const VALID_ORIGINS = new Set(['none', 'network', 'memory', 'bundled', 'service-worker']);
 const retryHandlers = new Map();
@@ -200,6 +203,21 @@ export function failOptionalFeed(id, {
   });
 }
 
+// A feed whose source this deployment cannot reach. Distinct from 'error',
+// which invites a retry, and from 'idle', which reads as "not requested yet".
+export function unsupportedOptionalFeed(id) {
+  requireFeed(id);
+  return publish(id, {
+    state: 'unsupported',
+    detail: null,
+    responseStatus: 0,
+    nextRetryAt: null,
+    itemCount: null,
+    requestId: nextRequestId(),
+    cacheOrigin: 'none',
+  }, { allowRequestChange: true });
+}
+
 export function idleOptionalFeed(id) {
   const previous = requireFeed(id);
   return publish(id, {
@@ -292,7 +310,7 @@ export function renderOptionalFeedDiagnostics(host) {
           <span>${escapeHtml(t('feeds.cache'))}: ${escapeHtml(t(`feeds.cache.${feed.cacheOrigin}`))}</span>
         </div>
         <div class="feed-diagnostic-actions">
-          <button class="text-btn feed-retry" type="button" data-feed-retry="${escapeHtml(feed.id)}" ${feed.state === 'loading' ? 'disabled' : ''}>${escapeHtml(t('feeds.retry'))}</button>
+          ${feed.state === 'unsupported' ? '' : `<button class="text-btn feed-retry" type="button" data-feed-retry="${escapeHtml(feed.id)}" ${feed.state === 'loading' ? 'disabled' : ''}>${escapeHtml(t('feeds.retry'))}</button>`}
         </div>
       </div>`;
   }).join('');

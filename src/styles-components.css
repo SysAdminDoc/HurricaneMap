@@ -6111,6 +6111,14 @@ body.side-panel-open .leaflet-top.leaflet-right {
     display: none;
   }
 
+  /* A phone has no room for both. The outlook card sat over the storm panel's
+     lower half and the timeline, and the active card over the panel header. */
+  body.filters-open .optional-feed-status-overlay,
+  body.side-panel-open .optional-feed-status-overlay,
+  body.track-playback-active .optional-feed-status-overlay {
+    display: none;
+  }
+
   .settings-pill,
   .settings-action,
   .settings-menu .toggle-row,

@@ -54,16 +54,14 @@
     - list:
       - listitem:
         - strong: Tanpèt aktif
-        - text: "/Pa disponib NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Orijin: Rezo/"
-        - button "Eseye ankò"
+        - text: "Pa disponib nan enstalasyon sa a NOAA NHC CurrentStorms Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
       - listitem:
         - strong: Jewometri previzyon ofisyèl
         - text: "Poko mande NOAA NHC official forecast GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
         - button "Eseye ankò"
       - listitem:
         - strong: Pèspektiv twopikal
-        - text: "Pa disponib NOAA NHC Tropical Weather Outlook Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo"
-        - button "Eseye ankò"
+        - text: "Pa disponib nan enstalasyon sa a NOAA NHC Tropical Weather Outlook Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"
       - listitem:
         - strong: Avètisman sou lanmè
         - text: "Poko mande NOAA NHC Marine Wind Warnings Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn"

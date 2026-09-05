@@ -36,14 +36,17 @@ import {
   idleOptionalFeed,
   isOptionalFeedRequestCurrent,
   reportOptionalFeedResult,
+  unsupportedOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+import { isMissingProxyRoute, nhcProxyUrl, reportNhcProxyAvailability } from './nhc-proxy.js';
 
 const L = window.L;
 
-const NHC_DIRECT = 'https://www.nhc.noaa.gov/CurrentStorms.json';
-const NHC_CF_PROXY = '/nhc/CurrentStorms.json';
-const NHC_FALLBACK = 'https://corsproxy.io/?url=' + encodeURIComponent(NHC_DIRECT);
+// www.nhc.noaa.gov sends no CORS header on CurrentStorms.json, so the worker
+// relay is the only way a browser can read it. corsproxy.io used to stand in
+// and now answers 401 to everyone, which turned the fallback into a second
+// error rather than a rescue.
 
 let layerGroup = null;
 let badgeEl = null;
@@ -90,8 +93,18 @@ export async function startActiveStormPolling() {
     renderOperationalLayers();
   });
 
+  // Before the operational layers: the active poll is what discovers whether
+  // this deployment has the /nhc/ relay, and the layers wait on that answer
+  // rather than each rediscovering it with its own 404.
+  try {
+    await fetchAndRender();
+  } finally {
+    // Backstop. The layers await that answer, so anything that stops the poll
+    // before it reports would otherwise leave them waiting for ever. The first
+    // report wins, so this only fires when nothing else got there.
+    reportNhcProxyAvailability(true);
+  }
   await renderOperationalLayers();
-  await fetchAndRender();
 }
 
 async function fetchAndRender() {
@@ -101,6 +114,18 @@ async function fetchAndRender() {
   const storms = result.storms || [];
   const countForStatus = result.ok ? storms.length : (lastStorms?.length || 0);
   const state = result.ok ? 'ok' : (result.status === 429 ? 'rate-limit' : 'error');
+
+  // No relay route on this deployment: there is nothing to retry and nothing
+  // to poll for, so stop rather than leaving a permanent error card over the
+  // map with a Retry button that can never succeed.
+  if (!result.ok && isMissingProxyRoute(result.status)) {
+    if (pollTimer) clearTimeout(pollTimer);
+    pollTimer = null;
+    nextPollAt = null;
+    unsupportedOptionalFeed('active');
+    ensureBadge(0, { state: 'ok' });
+    return;
+  }
 
   if (!result.ok) {
     consecutiveFailures += 1;
@@ -182,16 +207,6 @@ async function renderOperationalLayers() {
   return { outlookResult, marineResult };
 }
 
-function resolveProxyUrl() {
-  try {
-    const origin = new URL(location.origin);
-    if (origin.hostname === 'localhost' || origin.hostname === '127.0.0.1') {
-      return NHC_FALLBACK;
-    }
-  } catch { /* fall through */ }
-  return NHC_CF_PROXY;
-}
-
 async function tryFetch(url) {
   const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
   if (response.status === 429) return { ok: false, status: 429, storms: [] };
@@ -201,20 +216,15 @@ async function tryFetch(url) {
 }
 
 async function fetchCurrentStorms() {
-  const primaryUrl = resolveProxyUrl();
-  const fallbackUrl = primaryUrl === NHC_CF_PROXY ? NHC_FALLBACK : NHC_CF_PROXY;
-  let primary = null;
   try {
-    primary = await tryFetch(primaryUrl);
-    // Honor rate-limit backoff without hammering the fallback.
-    if (primary.ok || primary.status === 429) return primary;
-  } catch { /* primary threw — fall through to fallback */ }
-  // Hosts without the Cloudflare /nhc/ route (e.g. GitHub Pages) return 404
-  // here rather than throwing, so non-ok results must also trigger fallback.
-  try {
-    return await tryFetch(fallbackUrl);
+    const result = await tryFetch(nhcProxyUrl('/nhc/CurrentStorms.json'));
+    // First one through the door tells the other feeds what it found. A
+    // network error is not proof the route is missing, so only a 404 counts.
+    reportNhcProxyAvailability(!isMissingProxyRoute(result.status));
+    return result;
   } catch (error) {
-    return primary || { ok: false, status: 0, storms: [], error };
+    reportNhcProxyAvailability(true);
+    return { ok: false, status: 0, storms: [], error };
   }
 }
 

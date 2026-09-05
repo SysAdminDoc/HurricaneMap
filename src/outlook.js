@@ -11,8 +11,10 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
   idleOptionalFeed,
+  unsupportedOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+import { isMissingProxyRoute, nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
 
 const BASINS = ['atl', 'pac', 'cpac'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -122,7 +124,7 @@ async function fetchBasin(basin, force) {
   const cached = cache.get(basin);
   if (!force && cached && Date.now() - cached.fetchedAt < CACHE_MS) return cached.points;
   const response = await fetchWithTimeout(
-    `/nhc/outlook/${basin}.kmz`,
+    nhcProxyUrl(`/nhc/outlook/${basin}.kmz`),
     { cache: 'no-cache' },
     REQUEST_TIMEOUT_MS.active,
   );
@@ -179,6 +181,13 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     idleOptionalFeed('outlook');
     return { status: 'idle', pointCount: 0 };
   }
+  // The active poll has already found out whether the relay exists. Asking
+  // again would 404 once per basin and log three console errors to learn it.
+  if (!await nhcProxyAvailable()) {
+    clearTropicalOutlook();
+    unsupportedOptionalFeed('outlook');
+    return { status: 'unsupported', pointCount: 0 };
+  }
   const generation = ++renderGeneration;
   const request = beginOptionalFeed('outlook', { cacheOrigin: 'network' });
   ensureLayer(map);
@@ -193,11 +202,20 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
   const failures = results.filter(result => result.status === 'rejected');
   if (!points.length && failures.length === results.length) {
     const error = failures[0]?.reason;
+    const responseStatus = error?.responseStatus || 0;
+    // Every basin 404ed on our own relay route, so this deployment has no
+    // worker in front of it. NHC's own KMZ sends no CORS header, so there is
+    // no direct substitute and nothing a retry could reach.
+    if (failures.every(failure => isMissingProxyRoute(failure.reason?.responseStatus))) {
+      clearTropicalOutlook();
+      unsupportedOptionalFeed('outlook');
+      return { status: 'unsupported', pointCount: 0, responseStatus };
+    }
     const result = {
       status: 'error',
       pointCount: 0,
       error,
-      responseStatus: error?.responseStatus || 0,
+      responseStatus,
     };
     failOptionalFeed('outlook', { ...result, requestId: request.requestId });
     return result;

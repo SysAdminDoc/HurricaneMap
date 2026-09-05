@@ -13,7 +13,7 @@ CONTENT_SECURITY_POLICY = (
     "https://pae-paha.pacioos.hawaii.edu https://tile.openstreetmap.org https://*.tile.openstreetmap.org "
     "https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com "
     "https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu "
-    "https://www.nhc.noaa.gov https://www.fema.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; "
+    "https://www.nhc.noaa.gov https://www.fema.gov; font-src 'self'; worker-src 'self' blob:; "
     "frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self';"
 )
 CACHE_CONTROL = 'no-cache'

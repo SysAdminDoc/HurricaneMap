@@ -26,7 +26,7 @@ export function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}
   if (!host) return '';
   const feed = getOptionalFeedState(feedId);
   const definition = getOptionalFeedDefinition(feedId);
-  const showRetry = feed.state !== 'loading' && feed.state !== 'idle';
+  const showRetry = feed.state !== 'loading' && feed.state !== 'idle' && feed.state !== 'unsupported';
   const itemText = Number.isFinite(feed.itemCount) ? t('feeds.items', feed.itemCount) : t('feeds.itemsUnknown');
   const lastGood = Number.isFinite(feed.lastSuccessAt)
     ? t('feeds.lastGoodAt', formatTimestamp(feed.lastSuccessAt))
@@ -51,7 +51,9 @@ export function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}
     </div>
     ${feed.state === 'stale' ? `<p class="optional-feed-last-good">${escapeHtml(t('feeds.showingLastGood'))}</p>` : ''}
     ${showRetry ? `<button class="text-btn optional-feed-retry" type="button" data-optional-feed-retry="${escapeHtml(feedId)}">${escapeHtml(t('feeds.retry'))}</button>` : ''}`;
-  host.hidden = feed.state === 'idle';
+  // An unsupported feed is reported in the diagnostics panel, not as a card
+  // over the map: there is no action a reader could take about it.
+  host.hidden = feed.state === 'idle' || feed.state === 'unsupported';
   return host.innerHTML;
 }
 

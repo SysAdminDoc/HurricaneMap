@@ -18,6 +18,7 @@ import {
   idleOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+import { nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
 
 export const MARINE_FEEDS = Object.freeze([
   Object.freeze({
@@ -78,13 +79,19 @@ export function looksLikeKml(body) {
   return /<\s*kml[\s>]/i.test(String(body || ''));
 }
 
-export async function fetchMarineFeed(feed, { fetchImpl, signal } = {}) {
+export async function fetchMarineFeed(feed, { fetchImpl, signal, useProxy = true } = {}) {
   let lastError = null;
   // One deadline for the whole feed, not one per attempt: two sequential
   // 12-second budgets would let a dead proxy hold the layer for 24.
   const deadline = AbortSignal.timeout(REQUEST_TIMEOUT_MS.active);
   const budget = signal ? AbortSignal.any([signal, deadline]) : deadline;
-  for (const url of [feed.proxy, feed.direct]) {
+  // The relay route is resolved against the document base so a worker mounted
+  // under a project path is found rather than missed. Unlike the other two
+  // feeds this one has a real fallback: NHC's /gis/ paths do send CORS headers,
+  // so a deployment without the relay still gets its warnings, and skipping
+  // straight to NHC saves it two 404s it already knows the answer to.
+  const sources = useProxy ? [nhcProxyUrl(feed.proxy), feed.direct] : [feed.direct];
+  for (const url of sources) {
     try {
       const response = await fetchWithTimeout(url, { cache: 'no-cache', signal: budget }, REQUEST_TIMEOUT_MS.active, fetchImpl);
       if (!response.ok) {
@@ -112,7 +119,8 @@ export async function fetchMarineFeed(feed, { fetchImpl, signal } = {}) {
 
 async function fetchWarnings(force) {
   if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) return cache.features;
-  const results = await Promise.allSettled(MARINE_FEEDS.map(feed => fetchMarineFeed(feed)));
+  const useProxy = await nhcProxyAvailable();
+  const results = await Promise.allSettled(MARINE_FEEDS.map(feed => fetchMarineFeed(feed, { useProxy })));
   const features = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
   if (!features.length && results.every(result => result.status === 'rejected')) throw new Error('NHC marine warning feeds unavailable');
   cache = { fetchedAt: Date.now(), features };
