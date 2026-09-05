@@ -31,6 +31,7 @@
     "generate:coverage": "node scripts/build-coverage.mjs",
     "test:coverage": "node scripts/test-coverage.mjs",
     "validate:schemas": "node scripts/validate-schemas.mjs",
+    "stamp:release": "node scripts/stamp-release.mjs",
     "generate:stac": "node scripts/generate-stac-catalog.mjs --write",
     "test:stac": "node scripts/test-stac.mjs",
     "test:category-contract": "node scripts/test-category-contract.mjs",

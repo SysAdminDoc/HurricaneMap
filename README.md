@@ -46,6 +46,16 @@ Fast non-browser verification:
 npm run build
 ```
 
+After changing anything under `data/`, re-stamp the derived artifacts:
+
+```bash
+npm run stamp:release
+```
+
+That regenerates archive coverage, the release manifest, the STAC catalog, the distribution descriptor, and the provenance mirror in `src/export-provenance.js`, in the one order that works: coverage reads the hand-maintained snapshots, the catalog reads its provenance from the manifest, and the manifest hashes the catalog back, so the manifest is written twice. It is idempotent, and it keeps the identity `data/metadata.json` already names unless you pass `--source-commit` and `--generated-at`.
+
+`source_commit` names the preprocessor run that produced the derived data, not the commit carrying the bytes. `npm run check:release-manifest` enforces that: `data/landfalls.json`, `data/stats.json`, `data/storms.json`, and `data/storms.json.gz` must still be byte-identical to that commit, so hand-editing derived data and re-stamping does not launder it. Hand-maintained snapshots such as `data/enso.json` and `data/outlook.json` are refreshed between preprocessor runs by design and are policed by `npm run validate:data` instead.
+
 That runs all 85 release gates through `scripts/run-gates.mjs` and reports every one of them, so a single red gate can't hide the state of the rest. Each gate prints a pass or fail line with its duration, failures are repeated in full at the end, and the run exits non-zero if any failed. The runner also refuses to start if a `check:`, `validate:`, or `test:` script exists that neither the gate list nor the browser-lane exclusion list claims. A gate nothing runs is not a gate.
 
 ## Highlights

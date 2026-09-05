@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,7 +29,47 @@ for (const artifact of manifest.artifacts) {
   if (artifact.schema_version == null || artifact.schema_version === '') throw new Error(`${artifact.path} has no schema version`);
 }
 
-console.log(`release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified)`);
+// source_commit names the preprocessor run that produced the derived data, so
+// those files must still be byte-identical to that commit. Hand-maintained
+// snapshots (enso, outlook) are refreshed between preprocessor runs by design
+// and are deliberately not checked here: their currency is validate:data's job.
+//
+// data/metadata.json is excluded because it cannot satisfy this: it records the
+// identity stamped from HEAD at generation time, so at the commit it names it
+// still holds the previous commit's id and version. The four files below carry
+// no self-reference, so drift in them means derived data was edited by hand.
+const PREPROCESSOR_OUTPUTS = [
+  'data/landfalls.json',
+  'data/stats.json',
+  'data/storms.json',
+  'data/storms.json.gz',
+];
+const drifted = [];
+for (const relative of PREPROCESSOR_OUTPUTS) {
+  let committed;
+  try {
+    committed = execFileSync('git', ['cat-file', '-p', `${manifest.source_commit}:${relative}`], {
+      cwd: root,
+      maxBuffer: 64 * 1024 * 1024,
+    });
+  } catch {
+    throw new Error(`release manifest names ${manifest.source_commit}, which has no ${relative}`);
+  }
+  const digest = createHash('sha256').update(committed).digest('hex');
+  const artifact = manifest.artifacts.find(candidate => candidate.path === relative);
+  if (artifact.sha256 !== digest) drifted.push(relative);
+}
+if (drifted.length) {
+  throw new Error(
+    `${drifted.join(', ')} no longer match ${manifest.source_commit.slice(0, 12)}; `
+    + 'rerun preprocess_hurdat2.py and stamp the new commit rather than editing derived data by hand',
+  );
+}
+
+console.log(
+  `release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified; `
+  + `${PREPROCESSOR_OUTPUTS.length} derived files match ${manifest.source_commit.slice(0, 12)})`,
+);
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

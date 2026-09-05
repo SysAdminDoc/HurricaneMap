@@ -5,6 +5,8 @@ All notable changes to HurricaneMap.
 ## Unreleased
 
 ### Changed
+- `npm run stamp:release` regenerates every derived release artifact in one step: archive coverage, the release manifest, the STAC catalog, the distribution descriptor, and the provenance mirror. Doing it by hand meant remembering that coverage reads the hand-maintained snapshots and that the manifest has to be written twice around the catalog.
+- `npm run check:release-manifest` now proves the four preprocessor outputs are still byte-identical to the commit the manifest names, so derived data cannot be hand-edited and stamped over. Hand-maintained snapshots are excluded on purpose and stay covered by `npm run validate:data`.
 - The Node.js floor moves from 20 to 22. Node 20 reached end of life on 2026-04-30, so `engines.node` no longer advertises an unsupported line.
 - `npm run build` now runs every release gate through `scripts/run-gates.mjs` and reports all of them instead of stopping at the first failure. Each gate prints a pass/fail line with its duration, failures are repeated in full at the end, and the runner refuses to start if a gate-shaped script exists that nothing runs.
 - The 2026 Atlantic outlook now carries NOAA's August 6 update (75% chance of a below-normal season, 7–13 named storms, 2–6 hurricanes, 0–2 major) and CSU's August 5 forecast, replacing the May and July figures.
