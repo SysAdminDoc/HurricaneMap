@@ -19,6 +19,7 @@ import {
   pythonMajorVersion,
   resolvePythonInterpreter,
   searchCandidates,
+  shellCommand,
   selectInterpreter,
 } from './python.mjs';
 
@@ -131,6 +132,18 @@ const fakeTree = new Set([
   'D:\\Apps\\Programs\\Python\\Python313\\python.exe',
   'C:\\Windows\\py.exe',
 ]);
+// python.org names the 32-bit and ARM64 builds Python3xx-32 and Python3xx-arm64.
+// Matching only the plain name meant the Program Files (x86) root, which holds
+// nothing else, could never produce a hit.
+const oddBuildTree = new Set([
+  'C:\\Program Files (x86)\\Python312-32',
+  'C:\\Program Files (x86)\\Python312-32\\python.exe',
+  'D:\\Apps\\Programs\\Python\\Python313-arm64',
+  'D:\\Apps\\Programs\\Python\\Python313-arm64\\python.exe',
+  'D:\\Apps\\Programs\\Python\\Python313',
+  'D:\\Apps\\Programs\\Python\\Python313\\python.exe',
+  'D:\\Apps\\Programs\\Python\\Launcher\\py.exe',
+]);
 const fakeFs = {
   existsSync: target => fakeTree.has(target),
   readdirSync: dir => {
@@ -163,6 +176,28 @@ assert.deepEqual(
   [],
   'a machine with no install on disk must discover nothing rather than guess',
 );
+const oddFs = {
+  existsSync: target => oddBuildTree.has(target),
+  readdirSync: dir => {
+    const prefix = dir.endsWith('\\') ? dir : `${dir}\\`;
+    const names = [...oddBuildTree]
+      .filter(entry => entry.startsWith(prefix) && !entry.slice(prefix.length).includes('\\'))
+      .map(entry => entry.slice(prefix.length));
+    if (!names.length) throw new Error(`ENOENT: ${dir}`);
+    return names;
+  },
+};
+assert.deepEqual(
+  installedCandidates({ LOCALAPPDATA: 'D:\\Apps' }, oddFs).map(c => c.command),
+  [
+    'D:\\Apps\\Programs\\Python\\Python313\\python.exe',
+    'D:\\Apps\\Programs\\Python\\Python313-arm64\\python.exe',
+    'C:\\Program Files (x86)\\Python312-32\\python.exe',
+    'D:\\Apps\\Programs\\Python\\Launcher\\py.exe',
+  ],
+  '32-bit, ARM64 and the per-user launcher must all be found, with the plain build preferred',
+);
+
 assert.equal(pinnedCandidate({}), null);
 assert.deepEqual(pinnedCandidate({ HURRICANEMAP_PYTHON: '  C:\\py\\python.exe  ' }), {
   command: 'C:\\py\\python.exe',
@@ -203,6 +238,52 @@ assert.match(
   /No Python 3 interpreter found/,
 );
 assert.match(missingInterpreterMessage(), /set HURRICANEMAP_PYTHON/, 'the failure must name the way out');
+
+// pyenv-win, mise, scoop and Chocolatey all put Python on PATH as a .cmd shim,
+// which Node refuses to spawn directly. Without a shell retry, a machine where
+// `python3 --version` answers in the terminal reported no interpreter at all.
+const shimProbes = [];
+const shimmed = resolvePythonInterpreter(INTERPRETER_CANDIDATES, (command, argsOrOptions, maybeOptions) => {
+  const shell = Boolean((maybeOptions || argsOrOptions)?.shell);
+  shimProbes.push({ command, shell });
+  // The shim answers only through cmd.exe; a direct spawn gets ENOENT.
+  return shell && command.startsWith('python3')
+    ? { status: 0, stdout: 'Python 3.13.15\n', stderr: '' }
+    : { status: null, error: { code: 'ENOENT', message: 'spawn ENOENT' } };
+}, 'win32');
+assert.equal(shimmed?.command, 'python3', 'a shimmed interpreter must be found');
+assert.equal(shimmed.shell, true, 'and remembered as needing a shell to run');
+assert.deepEqual(
+  shimProbes.slice(0, 2),
+  // The shell retry passes one command line rather than an args array, because
+  // Node concatenates args under shell: true without escaping them (DEP0190).
+  [{ command: 'python3', shell: false }, { command: 'python3 --version', shell: true }],
+  'the direct spawn is tried first: the shell retry is a fallback, not the default',
+);
+assert.equal(
+  resolvePythonInterpreter(INTERPRETER_CANDIDATES, () => ({ status: null, error: { code: 'ENOENT' } }), 'linux'),
+  null,
+  'the shell retry is Windows-only; POSIX has no batch shims to rescue',
+);
+const posixProbes = [];
+resolvePythonInterpreter(INTERPRETER_CANDIDATES, command => {
+  posixProbes.push(command);
+  return { status: null, error: { code: 'ENOENT' } };
+}, 'linux');
+assert.equal(posixProbes.length, 3, 'POSIX must probe each name once, not twice');
+
+// With shell: true Node concatenates arguments without escaping them, so the
+// command line has to carry its own quotes or a path with a space splits.
+assert.equal(shellCommand('python3', ['scripts/test.py']), 'python3 scripts/test.py');
+assert.equal(
+  shellCommand('C:\\Program Files\\Python\\python.exe', ['C:\\my repo\\a.py', '--flag']),
+  '"C:\\Program Files\\Python\\python.exe" "C:\\my repo\\a.py" --flag',
+);
+assert.equal(shellCommand('py', ['-3', 'a.py']), 'py -3 a.py', 'ordinary arguments stay unquoted');
+assert.equal(shellCommand('python', ['say "hi"']), 'python "say ""hi"""', 'embedded quotes are doubled');
+for (const nasty of ['a&b', 'a|b', 'a>b', 'a<b', 'a^b', 'a(b']) {
+  assert.match(shellCommand('python', [nasty]), /^python "/, `${nasty} must not reach cmd.exe unquoted`);
+}
 
 // Probing an interpreter and running it are two separate spawns. The second one
 // can fail on its own, and exiting 1 with no output makes every cause look the

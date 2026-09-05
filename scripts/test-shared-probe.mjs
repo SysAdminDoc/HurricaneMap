@@ -9,6 +9,10 @@ function deferred() {
   return { promise, resolve, reject };
 }
 
+// The probe defers the run by one microtask so it can install itself first,
+// so let the loop turn before inspecting what the run received.
+const tick = () => new Promise(resolve => { setTimeout(resolve, 0); });
+
 function abortableRun(record) {
   return signal => {
     const gate = deferred();
@@ -26,6 +30,7 @@ function abortableRun(record) {
   const probe = createSharedProbe(abortableRun(runs));
   const first = probe();
   const second = probe();
+  await tick();
   assert.equal(runs.length, 1, 'concurrent callers must share one run');
   runs[0].gate.resolve('2026-09-04T12:00:00Z');
   assert.deepEqual(await Promise.all([first, second]), ['2026-09-04T12:00:00Z', '2026-09-04T12:00:00Z']);
@@ -43,6 +48,7 @@ function abortableRun(record) {
   const firstEnable = probe(closing.signal);
   const rejected = firstEnable.catch(error => error);
   const reopened = probe();
+  await tick();
   assert.equal(runs.length, 1, 'the second enable must join the probe already running');
   closing.abort();
   assert.equal((await rejected).name, 'AbortError', 'the caller that left must see an abort');
@@ -62,6 +68,7 @@ function abortableRun(record) {
   const probe = createSharedProbe(abortableRun(runs));
   const closing = new AbortController();
   const only = probe(closing.signal).catch(error => error);
+  await tick();
   closing.abort();
   assert.equal((await only).name, 'AbortError');
   assert.equal(runs[0].signal.aborted, true, 'with nobody waiting, the request must be aborted');
@@ -75,6 +82,7 @@ function abortableRun(record) {
   const b = new AbortController();
   const first = probe(a.signal).catch(error => error);
   const second = probe(b.signal).catch(error => error);
+  await tick();
   a.abort();
   await first;
   assert.equal(runs[0].signal.aborted, false, 'one of two callers leaving must not cancel the request');
@@ -88,9 +96,63 @@ function abortableRun(record) {
   const runs = [];
   const probe = createSharedProbe(abortableRun(runs));
   const settled = probe();
+  await tick();
   runs[0].gate.resolve('ok');
   assert.equal(await settled, 'ok');
   assert.equal(runs[0].signal.aborted, false, 'a completed run must not be aborted afterwards');
+}
+
+// THE SECOND BUG, and the reason the first fix was not enough: an aborted run
+// does not settle until its request actually rejects, which is at least a task
+// later. Leaving it installed for that window meant the next caller joined the
+// dead run and took its fallback, exactly as before. A real fetch rejects
+// asynchronously, so this run does too.
+{
+  const runs = [];
+  const probe = createSharedProbe(signal => {
+    const gate = deferred();
+    runs.push({ signal, gate });
+    // One task later, not synchronously: this is what a real abort looks like.
+    signal.addEventListener('abort', () => setTimeout(() => gate.resolve('STALE FALLBACK'), 0), { once: true });
+    return gate.promise;
+  });
+  const closing = new AbortController();
+  const first = probe(closing.signal).catch(error => error);
+  await tick();
+  closing.abort();
+  assert.equal((await first).name, 'AbortError');
+  // The aborted run has not settled yet: its gate resolves on a later task.
+  const reopened = probe();
+  await tick();
+  assert.equal(runs.length, 2, 'a caller arriving before the cancelled run settles must start a fresh one');
+  assert.equal(runs[1].signal.aborted, false);
+  // And when the cancelled run finally does settle, its teardown must not
+  // uninstall the run that replaced it: a third caller has to join run 2, not
+  // start a redundant run 3 alongside it.
+  runs[0].gate.resolve('STALE FALLBACK');
+  await tick();
+  const third = probe();
+  await tick();
+  assert.equal(runs.length, 2, 'the stale run\'s teardown must not uninstall its replacement');
+  runs[1].gate.resolve('the real answer');
+  assert.equal(await reopened, 'the real answer', 'it must not inherit the cancelled run\'s fallback');
+  assert.equal(await third, 'the real answer', 'the third caller must share the live run');
+}
+
+// Calling probe() from inside the run joins it rather than starting a second.
+// The previous implementation installed the entry after invoking the run, so a
+// re-entrant call saw nothing in flight and clobbered the controller.
+{
+  const signals = [];
+  let inner = null;
+  const probe = createSharedProbe(async signal => {
+    signals.push(signal);
+    if (signals.length === 1) inner = probe();
+    return 'once';
+  });
+  assert.equal(await probe(), 'once');
+  assert.equal(await inner, 'once', 'the re-entrant caller must get the same answer');
+  assert.equal(signals.length, 1, 'a re-entrant call must join the run, not start another');
 }
 
 // A caller arriving after the previous run settled starts a fresh one, and the
@@ -99,9 +161,11 @@ function abortableRun(record) {
   const runs = [];
   const probe = createSharedProbe(abortableRun(runs));
   const firstCall = probe();
+  await tick();
   runs[0].gate.resolve('first');
   assert.equal(await firstCall, 'first');
   const secondCall = probe();
+  await tick();
   assert.equal(runs.length, 2, 'a probe after the previous one settled must run again');
   assert.equal(runs[1].signal.aborted, false, 'the new run must not inherit the old run\'s cancellation');
   runs[1].gate.resolve('second');
@@ -123,9 +187,11 @@ function abortableRun(record) {
   const runs = [];
   const probe = createSharedProbe(abortableRun(runs));
   const failing = probe().catch(error => error.message);
+  await tick();
   runs[0].gate.reject(new Error('ERDDAP is down'));
   assert.equal(await failing, 'ERDDAP is down');
   const retry = probe();
+  await tick();
   assert.equal(runs.length, 2, 'a failed run must not be cached as in-flight');
   runs[1].gate.resolve('recovered');
   assert.equal(await retry, 'recovered');

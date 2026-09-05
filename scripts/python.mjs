@@ -73,21 +73,31 @@ export function installedCandidates(env = process.env, fs = defaultFs) {
   const windows = [];
   for (const dir of roots) {
     for (const entry of directoryEntries(fs, dir)) {
-      const minor = /^Python3(\d+)$/.exec(entry)?.[1];
-      if (minor === undefined) continue;
+      // python.org writes Python313 for the 64-bit build, Python313-32 for the
+      // 32-bit one and Python313-arm64 for ARM64. Matching only the first made
+      // the "Program Files (x86)" root, which only ever holds -32, dead code.
+      const build = /^Python3(\d+)(-32|-arm64)?$/.exec(entry);
+      if (!build) continue;
       const exe = path.join(dir, entry, 'python.exe');
-      if (fs.existsSync(exe)) windows.push({ command: exe, args: [], minor: Number(minor) });
+      if (!fs.existsSync(exe)) continue;
+      // Any of these runs the gates. The order is about being deterministic:
+      // the plain build is the one a machine carrying several is most likely
+      // to have installed on purpose.
+      const variant = { undefined: 0, '-arm64': 1, '-32': 2 }[build[2]];
+      windows.push({ command: exe, args: [], minor: Number(build[1]), variant });
     }
   }
-  // Newest first, then by path so two installs of the same minor stay in a
-  // stable order rather than whatever the directory listing happened to give.
-  windows.sort((a, b) => b.minor - a.minor || a.command.localeCompare(b.command));
+  // Newest first, then plain before -arm64 before -32, then by path so two
+  // installs that tie stay in a stable order rather than whatever the directory
+  // listing happened to give.
+  windows.sort((a, b) => b.minor - a.minor || a.variant - b.variant || a.command.localeCompare(b.command));
 
-  const launcher = 'C:\\Windows\\py.exe';
-  const extras = fs.existsSync(launcher) ? [{ command: launcher, args: ['-3'] }] : [];
+  const launchers = ['C:\\Windows\\py.exe'];
+  if (env.LOCALAPPDATA) launchers.push(path.join(env.LOCALAPPDATA, 'Programs', 'Python', 'Launcher', 'py.exe'));
+  const extras = launchers.filter(exe => fs.existsSync(exe)).map(exe => ({ command: exe, args: ['-3'] }));
   const posix = POSIX_INTERPRETERS.filter(exe => fs.existsSync(exe)).map(exe => ({ command: exe, args: [] }));
 
-  return [...windows.map(({ minor, ...candidate }) => candidate), ...extras, ...posix];
+  return [...windows.map(({ minor, variant, ...candidate }) => candidate), ...extras, ...posix];
 }
 
 /** Everything worth probing when nothing is pinned, in probe order. */
@@ -95,20 +105,49 @@ export function searchCandidates(env = process.env, fs = defaultFs) {
   return [...INTERPRETER_CANDIDATES, ...installedCandidates(env, fs)];
 }
 
+function probeVersion(run, candidate, shell) {
+  // With shell: true Node concatenates an args array without escaping it, which
+  // it deprecates in DEP0190. Passing one already-quoted string instead is both
+  // the documented way and the safe one.
+  const parts = [...candidate.args, '--version'];
+  const probe = shell
+    ? run(shellCommand(candidate.command, parts), { cwd: root, encoding: 'utf8', windowsHide: true, shell: true })
+    : run(candidate.command, parts, { cwd: root, encoding: 'utf8', windowsHide: true });
+  if (probe.status !== 0) return { version: null, launched: probe.status !== null && !probe.error };
+  const version = `${probe.stdout || ''}${probe.stderr || ''}`.trim();
+  return { version: pythonMajorVersion(version) === 3 ? version : null, launched: true };
+}
+
 /** The first candidate that reports itself as Python 3, or null when none do. */
-export function resolvePythonInterpreter(candidates = INTERPRETER_CANDIDATES, run = spawnSync) {
+export function resolvePythonInterpreter(candidates = INTERPRETER_CANDIDATES, run = spawnSync, platform = process.platform) {
   for (const candidate of candidates) {
-    const probe = run(candidate.command, [...candidate.args, '--version'], {
-      cwd: root,
-      encoding: 'utf8',
-      windowsHide: true,
-    });
-    if (probe.status !== 0) continue;
-    const version = `${probe.stdout || ''}${probe.stderr || ''}`.trim();
-    if (pythonMajorVersion(version) !== 3) continue;
-    return { ...candidate, version };
+    const direct = probeVersion(run, candidate, false);
+    if (direct.version) return { ...candidate, version: direct.version };
+    // pyenv-win, mise, scoop and Chocolatey all put Python on PATH as a .cmd
+    // shim, which Node refuses to spawn directly. Without this, a machine where
+    // `python3 --version` works in the terminal reports no interpreter at all.
+    //
+    // Only when the spawn itself failed: an interpreter that launched and said
+    // something unusable has answered, and asking again through cmd.exe would
+    // just double every probe on every Windows run.
+    if (direct.launched || platform !== 'win32' || path.isAbsolute(candidate.command)) continue;
+    const shelled = probeVersion(run, candidate, true);
+    if (shelled.version) return { ...candidate, version: shelled.version, shell: true };
   }
   return null;
+}
+
+/**
+ * One command line for cmd.exe. Anything carrying a space or a shell
+ * metacharacter is quoted, so a script path under "Program Files" or a
+ * repository in a user folder with a space still runs.
+ */
+export function shellCommand(command, parts = []) {
+  const quote = part => {
+    const text = String(part);
+    return /[\s&|<>^"()]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  return [quote(command), ...parts.map(quote)].join(' ');
 }
 
 export function missingInterpreterMessage(candidates = INTERPRETER_CANDIDATES) {
@@ -165,11 +204,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.error(error);
     process.exit(127);
   }
-  const result = spawnSync(interpreter.command, [...interpreter.args, script, ...process.argv.slice(3)], {
-    cwd: root,
-    stdio: 'inherit',
-    windowsHide: true,
-  });
+  const parts = [...interpreter.args, script, ...process.argv.slice(3)];
+  const result = interpreter.shell
+    ? spawnSync(shellCommand(interpreter.command, parts), { cwd: root, stdio: 'inherit', windowsHide: true, shell: true })
+    : spawnSync(interpreter.command, parts, { cwd: root, stdio: 'inherit', windowsHide: true });
   const failure = describeRunFailure(result, interpreter);
   if (failure) console.error(failure);
   process.exit(result.status ?? 1);

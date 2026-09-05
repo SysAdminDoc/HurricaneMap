@@ -69,7 +69,10 @@ export function registerMapLayer(id, { map = null, feedId = null } = {}) {
       if (layer && typeof layer.addTo === 'function') layer.addTo(map);
       return layer;
     },
-    dispose() { disposeMapLayer(id); },
+    // Only while this handle still holds the id. Disposing by id alone let a
+    // superseded holder tear down the registration that replaced it, which is
+    // the same stale-writer bug the registry exists to prevent, one level up.
+    dispose() { return entries.get(id) === entry ? disposeMapLayer(id) : false; },
   };
 }
 

@@ -30,34 +30,44 @@ function rejectWhenAborted(signal, stop, message) {
  *          AbortError for a caller whose own signal aborts first.
  */
 export function createSharedProbe(run, { abortMessage = 'the shared probe was cancelled' } = {}) {
-  let inFlight = null;
-  let controller = null;
+  let current = null;
   let waiting = 0;
 
+  const retire = entry => { if (current === entry) current = null; };
+
   return async function probe(signal = null) {
-    if (!inFlight) {
-      controller = new AbortController();
-      const own = controller;
-      // A new run can only start once inFlight is null, and these are cleared
-      // together, so there is no window where a later run could be clobbered.
-      inFlight = (async () => run(own.signal))().finally(() => {
-        controller = null;
-        inFlight = null;
-      });
+    if (!current) {
+      const controller = new AbortController();
+      const entry = { controller, promise: null };
+      // `run` is deferred by one microtask so `current` is installed, and its
+      // promise assigned, before it can be called. A run that calls back into
+      // probe() then joins this entry rather than starting a second one and
+      // leaving the two disagreeing about which controller is live.
+      entry.promise = Promise.resolve()
+        .then(() => run(controller.signal))
+        .finally(() => retire(entry));
+      current = entry;
     }
-    const current = inFlight;
-    const owner = controller;
+    const entry = current;
     waiting += 1;
     const stop = new AbortController();
     try {
-      if (!signal) return await current;
-      return await Promise.race([current, rejectWhenAborted(signal, stop.signal, abortMessage)]);
+      if (!signal) return await entry.promise;
+      return await Promise.race([entry.promise, rejectWhenAborted(signal, stop.signal, abortMessage)]);
     } finally {
       stop.abort();
       waiting -= 1;
       // The last caller to leave cancels the request. While anyone is still
       // waiting, one caller walking away must not take the answer with it.
-      if (waiting <= 0 && controller === owner) owner?.abort();
+      //
+      // Retiring at the moment of cancellation matters as much as the abort:
+      // an aborted run does not settle until its request actually rejects, and
+      // leaving it installed for those few tasks means the next caller joins a
+      // dead probe and silently takes whatever fallback it resolves with.
+      if (waiting <= 0 && current === entry) {
+        retire(entry);
+        entry.controller.abort();
+      }
     }
   };
 }

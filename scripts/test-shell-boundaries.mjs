@@ -47,6 +47,14 @@ for (const owned of ['wikipediaUrl', 'youtubeUrl', 'noaaTcrUrl', 'reconArchiveUr
   assert.doesNotMatch(panel, new RegExp(String.raw`function ${owned}\(`), `${owned} must not be redefined in panel.js`);
 }
 assert.doesNotMatch(panel, /function renderImpactsBlock|im-row|impacts-block/, 'panel.js must not render impacts itself');
+// The billion-dollar source link only renders once that dataset has loaded,
+// which a Node test cannot do, so the address is pinned here instead. It is the
+// attribution for every NCEI cost figure the panel prints.
+assert.match(
+  panelImpacts,
+  /href="https:\/\/www\.ncei\.noaa\.gov\/access\/billions\/"/,
+  'the NCEI cost figures must credit the billion-dollar disasters product itself',
+);
 assert.match(panel, /from '\.\/panel-impacts\.js'/, 'panel.js must consume the extracted module');
 
 const mainLines = main.split(/\r?\n/).length;

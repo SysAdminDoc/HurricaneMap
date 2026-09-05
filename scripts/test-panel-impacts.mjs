@@ -4,6 +4,7 @@ import {
   nhcWalletUrlFor,
   noaaTcrUrl,
   reconArchiveUrl,
+  renderImpactsBlock,
   sliderSatelliteUrl,
   wikipediaUrl,
   youtubeUrl,
@@ -119,4 +120,61 @@ function assertHttpsUrl(value, label) {
   );
 }
 
-console.log('panel impacts ok (7 source links: encoding, archive floors, basin limits, GOES-East/West sectors)');
+// The impacts block itself. Without these, it could be reduced to `return ''`
+// and every gate in the repo stayed green: nothing else asserts what it renders.
+{
+  const row = {
+    deaths: '1,392',
+    damages: '125000000000',
+    wiki_url: 'https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29',
+    deaths_total: 1392,
+    damage_millions_usd: 125_000,
+    impact_confidence: 'high',
+    impact_confidence_reason: 'Parsed directly from the source.',
+  };
+  const html = renderImpactsBlock({ id: 'AL122005', year: 2005 }, row);
+
+  const rows = [...html.matchAll(/<div class="im-row[^"]*">(.*?)<\/div>\s*(?=<div|$)/gs)].map(m => m[1]);
+  const labelled = label => rows.find(text => text.includes(`>${label}<`));
+  assert.ok(html.includes('impacts-block'), 'the block must render its container');
+
+  // Each figure has to land against its own label. A row that reports deaths
+  // under "Damage" is worse than no row at all.
+  const fatalities = labelled('Fatalities');
+  assert.ok(fatalities, 'a storm with a death toll must show a fatalities row');
+  assert.ok(fatalities.includes('1,392'), `the fatalities row must carry the toll: ${fatalities}`);
+  assert.ok(!fatalities.includes('125'), 'the fatalities row must not carry the damage figure');
+
+  const damage = labelled('Damage');
+  assert.ok(damage, 'a storm with a damage figure must show a damage row');
+  assert.ok(damage.includes('125.0B') || damage.includes('$125'), `the damage row must carry the nominal figure: ${damage}`);
+  assert.ok(!damage.includes('1,392'), 'the damage row must not carry the death toll');
+
+  // The source line is the provenance. Dropping it leaves figures with no
+  // attribution and no confidence, which is exactly what must not ship.
+  assert.match(html, /<div class="im-source">.+<\/div>/s, 'the source line must be rendered');
+  assert.ok(html.includes(row.wiki_url), 'the source must link where the figures came from');
+  assert.match(html, /rel="noopener"/, 'outbound source links must carry rel="noopener"');
+  assert.match(html, /Confidence: high/, 'the confidence the row records must be shown');
+
+  // A storm with no impacts record says so rather than rendering nothing.
+  const missing = renderImpactsBlock({ id: 'AL011850', year: 1850 }, null);
+  assert.ok(missing.includes('impacts-block'), 'a storm with no record still gets the block');
+  assert.match(missing, /im-row--missing/, 'and is told the record is missing');
+  assert.ok(!missing.includes('Fatalities'), 'with no figures invented for it');
+
+  // An unknown confidence value must not be echoed into the page.
+  const spoofed = renderImpactsBlock({ id: 'AL122005', year: 2005 }, { ...row, impact_confidence: '<script>x</script>' });
+  assert.ok(!spoofed.includes('<script>'), 'an unrecognised confidence must not reach the DOM');
+  assert.match(spoofed, /Confidence: unknown/, 'it falls back to unknown');
+
+  // A source URL that is not a safe external link must not become an anchor.
+  const hostile = renderImpactsBlock({ id: 'AL122005', year: 2005 }, { ...row, wiki_url: 'javascript:alert(1)' });
+  assert.ok(!hostile.includes('javascript:'), 'a javascript: source must never be linked');
+  assert.match(hostile, /Source: Wikipedia/, 'the source is still named, just not linked');
+}
+
+console.log(
+  'panel impacts ok (6 source links: encoding, archive floors, basin limits, GOES sectors; '
+  + 'impacts block: row/label pairing, provenance line, missing record, unsafe input)',
+);

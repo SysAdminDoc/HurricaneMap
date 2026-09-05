@@ -7,6 +7,7 @@ import {
   cancelOptionalFeed,
   completeOptionalFeed,
   failOptionalFeed,
+  idleOptionalFeed,
   registerOptionalFeedRetry,
 } from './optional-feeds.js';
 
@@ -95,8 +96,16 @@ function applyResolvedTime(resolved) {
 // Retrying has to move the overlay to the date it just resolved. It used to
 // resolve and throw the answer away, so the button reported success over a
 // layer still drawing the old day.
+//
+// With the layer off there is nothing to retry: probing anyway walked the feed
+// from idle to loading to success while no layer was on the map, which is the
+// feed claiming to describe something that is not there.
 registerOptionalFeedRetry('sst', async () => {
-  const resolved = await resolveLatestTime();
+  if (!activeHandle || activeHandle.disposed) {
+    idleOptionalFeed('sst');
+    return { time: resolvedTime, fromProbe: resolvedTimeFromProbe, skipped: 'layer-off' };
+  }
+  const resolved = await resolveLatestTime(activeHandle.signal);
   applyResolvedTime(resolved);
   if (sstLayer && activeHandle && !activeHandle.disposed) {
     sstLayer.setParams({ time: resolvedTime });

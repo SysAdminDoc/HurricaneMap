@@ -82,6 +82,20 @@ second.dispose();
 assert.equal(isMapLayerActive('radar'), false);
 assert.equal(disposeMapLayer('nothing-registered'), false, 'disposing an unknown id must be a no-op');
 
+// A superseded handle must not tear down the registration that replaced it.
+// hwm.js disposes its handle on every path that draws nothing, and an await
+// slipped in ahead of that would otherwise take out the next storm's marks.
+const staleMap = fakeMap();
+const superseded = registerMapLayer('hwm-marks', { map: staleMap });
+const successor = registerMapLayer('hwm-marks', { map: staleMap });
+const successorLayer = successor.attach(fakeLayer('successor marks'));
+assert.equal(superseded.dispose(), false, 'a superseded handle must not dispose the live registration');
+assert.equal(successor.disposed, false, 'the live handle must survive a stale dispose');
+assert.equal(isMapLayerActive('hwm-marks'), true);
+assert.ok(!staleMap.removed.includes(successorLayer), 'the successor layer must stay on the map');
+assert.equal(successor.dispose(), true, 'the holder can still dispose it');
+assert.equal(isMapLayerActive('hwm-marks'), false);
+
 // Registering without a map used to be accepted: attach recorded the layer,
 // disposal removed nothing, and the caller was told it worked. An overlay left
 // on screen is the failure this registry exists to prevent, so it fails here
