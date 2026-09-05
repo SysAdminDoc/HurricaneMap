@@ -64,8 +64,8 @@ for (const font of fontContracts) {
 if ((notices.match(/License: SIL Open Font License 1\.1/g) || []).length !== fontContracts.length) {
   errors.push('each vendored font must declare SIL Open Font License 1.1');
 }
-if (packageJson.engines?.node !== '>=20') errors.push('package.json must declare engines.node >=20');
-if (lockfile.packages?.['']?.engines?.node !== '>=20') errors.push('package-lock.json must preserve engines.node >=20');
+if (packageJson.engines?.node !== '>=22') errors.push('package.json must declare engines.node >=22');
+if (lockfile.packages?.['']?.engines?.node !== '>=22') errors.push('package-lock.json must preserve engines.node >=22');
 for (const requirement of ['numpy==2.5.1', 'pandas==3.0.5', 'matplotlib==3.11.1', 'pillow==12.3.0', 'notebook==7.6.1', 'nbclient==0.10.2', 'nbformat==5.10.4']) {
   if (!requirements.split(/\r?\n/).includes(requirement)) errors.push(`missing pinned notebook dependency ${requirement}`);
 }

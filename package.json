@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Static NOAA HURDAT2 hurricane landfall map.",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "check:syntax": "node scripts/check-syntax.mjs",
