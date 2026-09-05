@@ -38,6 +38,45 @@ for (const artifact of manifest.artifacts) {
 // identity stamped from HEAD at generation time, so at the commit it names it
 // still holds the previous commit's id and version. The four files below carry
 // no self-reference, so drift in them means derived data was edited by hand.
+// The manifest separates two dates that used to be conflated: source_commit is
+// the preprocessor identity, and hand_maintained.refreshed_utc is when the
+// snapshots that are edited in place were last republished. A snapshot ships
+// under a source_commit that predates it by design, so the second date is what
+// says whether it is current.
+const handMaintained = manifest.hand_maintained;
+if (!handMaintained || !Array.isArray(handMaintained.snapshots) || !handMaintained.snapshots.length) {
+  throw new Error('release manifest must record hand_maintained.snapshots');
+}
+const HAND_MAINTAINED_ISSUED = {
+  'data/enso.json': record => record?._meta?.issued,
+  'data/outlook.json': record => record?.issued,
+};
+for (const snapshot of handMaintained.snapshots) {
+  const pick = HAND_MAINTAINED_ISSUED[snapshot.path];
+  if (!pick) throw new Error(`release manifest records an unknown hand-maintained snapshot: ${snapshot.path}`);
+  const bytes = await readFile(path.join(root, snapshot.path));
+  const digest = createHash('sha256').update(bytes).digest('hex');
+  if (snapshot.sha256 !== digest) {
+    throw new Error(`${snapshot.path} has changed since the manifest recorded its refresh; regenerate the manifest`);
+  }
+  const issued = pick(JSON.parse(bytes.toString('utf8')));
+  if (snapshot.issued !== issued) {
+    throw new Error(`${snapshot.path} says it was issued ${issued}, the manifest says ${snapshot.issued}`);
+  }
+}
+for (const path_ of Object.keys(HAND_MAINTAINED_ISSUED)) {
+  if (!handMaintained.snapshots.some(snapshot => snapshot.path === path_)) {
+    throw new Error(`release manifest omits the hand-maintained snapshot ${path_}`);
+  }
+}
+const latestRefresh = handMaintained.snapshots.map(snapshot => snapshot.issued).sort().at(-1);
+if (handMaintained.refreshed_utc !== latestRefresh) {
+  throw new Error(
+    `release manifest hand_maintained.refreshed_utc is ${handMaintained.refreshed_utc}, `
+    + `but the newest snapshot was issued ${latestRefresh}`,
+  );
+}
+
 const PREPROCESSOR_OUTPUTS = [
   'data/landfalls.json',
   'data/stats.json',

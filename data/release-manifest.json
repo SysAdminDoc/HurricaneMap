@@ -3,6 +3,21 @@
   "generated_at_utc": "2026-08-08T00:00:00Z",
   "source_commit": "177e0f9c5411ed1499e1d69059882e357cce6e9d",
   "algorithm": "SHA-256",
+  "hand_maintained": {
+    "refreshed_utc": "2026-09-03",
+    "snapshots": [
+      {
+        "path": "data/enso.json",
+        "issued": "2026-09-03",
+        "sha256": "0bf9b1a9730547cd0811c25151b3e903425d913f6156cfd0134492f9ed938d02"
+      },
+      {
+        "path": "data/outlook.json",
+        "issued": "2026-08-06",
+        "sha256": "414c98f0f907a17e48cebf9da3e99d459a50a4a28c9e455a48800f0b1f5add06"
+      }
+    ]
+  },
   "artifacts": [
     {
       "path": "data/advisories.json",
@@ -61,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "ad97371adf12d17391d00de5233faf6ac2d6c94d382e3dcc4a1ca0e6a9156c38",
+      "sha256": "7146b64b089b952b80cab2d63d2ca2eec3511b8a9b74ecad08f874d3d2c78f93",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-05",
       "generated_at_utc": "2026-08-08T00:00:00Z",

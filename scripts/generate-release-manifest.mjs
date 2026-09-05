@@ -9,6 +9,14 @@ import { commitExists, releaseSourceCommit } from './release-identity.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dataRoot = path.join(root, 'data');
+
+// The two snapshots nobody's preprocessor writes: they are edited in place when
+// NOAA publishes a new product, and each carries that product's own date.
+const HAND_MAINTAINED = [
+  { path: 'data/enso.json', pick: record => record?._meta?.issued },
+  { path: 'data/outlook.json', pick: record => record?.issued },
+];
+
 const generatedAtFlag = process.argv.indexOf('--generated-at');
 const generatedAt = generatedAtFlag >= 0 ? process.argv[generatedAtFlag + 1] : null;
 if (!generatedAt || !/^\d{4}-\d{2}-\d{2}T/.test(generatedAt) || Number.isNaN(Date.parse(generatedAt))) {
@@ -49,11 +57,38 @@ for (const relative of files) {
     schema_version: schemaVersion(relative, bytes),
   });
 }
+// source_commit is the preprocessor identity: the commit whose run produced the
+// derived data. The hand-maintained snapshots are refreshed in place between
+// those runs, so they ship under an identity that predates them, and until now
+// only prose said that was intended. This block states when they were last
+// refreshed, so the two dates can be told apart by a reader and by a gate.
+const byPath = new Map(artifacts.map(artifact => [artifact.path, artifact]));
+const snapshots = HAND_MAINTAINED.map(({ path: relative, pick }) => ({
+  path: relative,
+  issued: handMaintainedIssued(relative, pick),
+  sha256: byPath.get(relative).sha256,
+}));
+const previous = await readPreviousManifest();
+for (const snapshot of snapshots) {
+  const before = previous?.hand_maintained?.snapshots?.find(entry => entry.path === snapshot.path);
+  if (!before || before.sha256 === snapshot.sha256) continue;
+  if (before.issued === snapshot.issued) {
+    throw new Error(
+      `${snapshot.path} has changed but still says it was issued ${snapshot.issued}. `
+      + 'A refreshed snapshot carries the publication date of the product it holds; '
+      + 'update its issued date, or revert the edit.',
+    );
+  }
+}
 const manifest = {
   schema_version: 1,
   generated_at_utc: generatedAt,
   source_commit: sourceCommit,
   algorithm: 'SHA-256',
+  hand_maintained: {
+    refreshed_utc: snapshots.map(snapshot => snapshot.issued).sort().at(-1),
+    snapshots,
+  },
   artifacts,
 };
 await writeFile(
@@ -91,6 +126,14 @@ function sourceUrl(relative) {
   if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';
   if (relative === 'data/coverage.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   return 'https://www.nhc.noaa.gov/data/hurdat/';
+}
+
+async function readPreviousManifest() {
+  try {
+    return JSON.parse(await readFile(path.join(dataRoot, 'release-manifest.json'), 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 function handMaintainedIssued(relative, pick) {

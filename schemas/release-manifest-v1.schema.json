@@ -3,26 +3,122 @@
   "$id": "https://sysadmindoc.github.io/HurricaneMap/schemas/release-manifest-v1.schema.json",
   "title": "HurricaneMap data release manifest v1",
   "type": "object",
-  "required": ["schema_version", "generated_at_utc", "source_commit", "algorithm", "artifacts"],
+  "required": [
+    "schema_version",
+    "generated_at_utc",
+    "source_commit",
+    "algorithm",
+    "artifacts",
+    "hand_maintained"
+  ],
   "properties": {
-    "schema_version": { "const": 1 },
-    "generated_at_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
-    "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
-    "algorithm": { "const": "SHA-256" },
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "algorithm": {
+      "const": "SHA-256"
+    },
+    "hand_maintained": {
+      "description": "When the snapshots that are edited in place were last republished. source_commit is the preprocessor identity, the commit whose run produced the derived data; these snapshots are refreshed between those runs and so ship under an identity that predates them.",
+      "type": "object",
+      "required": [
+        "refreshed_utc",
+        "snapshots"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "refreshed_utc": {
+          "description": "The newest issued date among the snapshots below.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "snapshots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "issued",
+              "sha256"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "issued": {
+                "description": "The publication date of the product the snapshot holds, not the date it was committed.",
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
     "artifacts": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["path", "bytes", "sha256", "source_url", "source_date", "generated_at_utc", "schema_version"],
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "source_url",
+          "source_date",
+          "generated_at_utc",
+          "schema_version"
+        ],
         "properties": {
-          "path": { "type": "string", "pattern": "^data/" },
-          "bytes": { "type": "integer", "minimum": 1 },
-          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-          "source_url": { "type": "string", "pattern": "^https://" },
-          "source_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-          "generated_at_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
-          "schema_version": { "anyOf": [{ "type": "integer" }, { "type": "string", "minLength": 1 }] }
+          "path": {
+            "type": "string",
+            "pattern": "^data/"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "source_url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "source_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "generated_at_utc": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+          },
+          "schema_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string",
+                "minLength": 1
+              }
+            ]
+          }
         },
         "additionalProperties": false
       }
