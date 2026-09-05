@@ -1,5 +1,17 @@
-// Tide-gauge helpers: station picking, datagetter URL contract, residual math.
-import { buildDataUrl, fetchWithRetry, nearestStations, peakResidual } from '../src/tides.js';
+// Tide-gauge helpers: station picking, datagetter URL contract, residual math,
+// and the lifetime of a load whose storm panel is replaced under it.
+//
+// i18n and the optional-feed UI both read the document, so the shim goes up
+// before src/tides.js is imported.
+globalThis.document = {
+  documentElement: { lang: 'en' },
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent() {},
+};
+
+const { buildDataUrl, fetchWithRetry, nearestStations, peakResidual, renderTidesBlock } = await import('../src/tides.js');
+const { getOptionalFeedState } = await import('../src/optional-feeds.js');
 import { haversineKm } from '../src/geodesy.js';
 
 function assert(condition, message) {
@@ -71,4 +83,127 @@ const retried = await fetchWithRetry('https://example.test/tides', {
 });
 assert(retried?.ok && attempts === 2, 'timed-out tide requests should retry once');
 
-console.log('tides ok (station picking, datagetter contract, residual math)');
+// A storm switch mid-request used to leave the feed stuck on 'loading'. Both
+// early returns bailed out without settling it, and renderOptionalFeedStatus
+// hides the retry button while a feed is loading, so the next storm's tides
+// block offered no way out at all.
+
+// Enough of an element for renderTidesBlock and mountOptionalFeedStatus: the
+// two of them set innerHTML, look up three children, and wire one click.
+function fakeElement(tag = 'div') {
+  const element = {
+    tag,
+    isConnected: true,
+    hidden: false,
+    dataset: {},
+    attributes: {},
+    classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    getAttribute(name) { return this.attributes[name] ?? null; },
+    removeAttribute(name) { delete this.attributes[name]; },
+    listeners: new Map(),
+    children: [],
+    set innerHTML(markup) {
+      this._html = markup;
+      // Re-created markup means re-created children, which is exactly what
+      // strands a listener bound to the previous generation.
+      this.children = [];
+      const add = (parent, selector) => {
+        const node = fakeElement();
+        parent.children.push({ selector, node });
+        return node;
+      };
+      const block = markup.includes('tides-block') ? add(this, '.tides-block') : null;
+      if (markup.includes('tides-feed-status')) add(this, '#tides-feed-status');
+      // The load button always lives inside the block, so replacing the
+      // block's markup replaces the button, as it does in the real panel.
+      if (markup.includes('tide-load-btn')) add(block || this, '.tide-load-btn');
+    },
+    get innerHTML() { return this._html || ''; },
+    querySelector(selector) {
+      const direct = this.children.find(child => child.selector === selector);
+      if (direct) return direct.node;
+      for (const child of this.children) {
+        const nested = child.node.querySelector(selector);
+        if (nested) return nested;
+      }
+      return null;
+    },
+    addEventListener(type, handler) {
+      if (!this.listeners.has(type)) this.listeners.set(type, []);
+      this.listeners.get(type).push(handler);
+    },
+    removeEventListener() {},
+    dispatchEvent() {},
+  };
+  return element;
+}
+
+const KATRINA = {
+  year: 2005,
+  us_landfalls: [{ t: '2005-08-29T11:10:00Z', lat: 29.27, lon: -89.6, category: 3 }],
+};
+
+const settle = () => new Promise(resolve => setTimeout(resolve, 0));
+const feedState = () => getOptionalFeedState('tides').state;
+
+async function clickLoad(host) {
+  const button = host.querySelector('.tide-load-btn');
+  assert(button, 'the tides block must offer a load button');
+  const handlers = button.listeners.get('click') || [];
+  assert(handlers.length === 1, `expected one click handler, found ${handlers.length}`);
+  void handlers[0]({ target: button });
+  await settle();
+}
+
+let started = 0;
+let aborted = 0;
+// A request that never answers, so the load is still in flight when the panel
+// is replaced. Cancellation is the only thing that can end it.
+globalThis.fetch = (url, init) => {
+  // The station index is a local file and always answers; only the CO-OPS
+  // datagetter calls are left hanging.
+  if (String(url).includes('tide-stations.json')) {
+    return Promise.resolve({ ok: true, status: 200, json: async () => stations });
+  }
+  started++;
+  return new Promise((resolve, reject) => {
+    if (init?.signal?.aborted) {
+      aborted++;
+      reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+      return;
+    }
+    init?.signal?.addEventListener('abort', () => {
+      aborted++;
+      reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+    }, { once: true });
+  });
+};
+
+const hostA = fakeElement();
+await renderTidesBlock(hostA, KATRINA);
+await clickLoad(hostA);
+assert(feedState() === 'loading', `the feed should be loading once the request starts: ${feedState()}`);
+assert(started > 0, 'the load must have reached the network');
+
+// The panel re-renders for another storm: the old host is detached and a new
+// block is mounted while the first load is still in flight.
+hostA.isConnected = false;
+const hostB = fakeElement();
+await renderTidesBlock(hostB, KATRINA);
+await settle();
+assert(feedState() === 'idle', `a superseded load must leave the feed idle, not ${feedState()}`);
+assert(aborted > 0, 'a superseded load must abort its requests instead of finishing into a detached node');
+
+// The new host's own load still works, and is settled the same way when it in
+// turn is replaced.
+const beforeSecond = started;
+await clickLoad(hostB);
+assert(feedState() === 'loading', `the new host's own load should start: ${feedState()}`);
+assert(started > beforeSecond, 'the second load must issue its own requests');
+hostB.isConnected = false;
+await renderTidesBlock(fakeElement(), KATRINA);
+await settle();
+assert(feedState() === 'idle', `the second superseded load must settle too: ${feedState()}`);
+
+console.log('tides ok (station picking, datagetter contract, residual math, superseded loads settle idle)');

@@ -11,6 +11,7 @@ import { categoryStrength } from './data.js';
 import { haversineKm } from './geodesy.js';
 import {
   beginOptionalFeed,
+  cancelOptionalFeed,
   completeOptionalFeed,
   failOptionalFeed,
 } from './optional-feeds.js';
@@ -18,6 +19,11 @@ import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const API = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
+// The storm panel rebuilds its host on every render, so a load started for one
+// storm can still be in flight when the next storm's block is mounted. Its
+// results would be written into a detached node, and the feed it began would
+// never settle.
+let loadInFlight = null;
 const MAX_STATIONS = 3;
 const MAX_KM = 150;
 const WINDOW_HOURS = 48;
@@ -102,15 +108,19 @@ export async function fetchWithRetry(url, {
   attempts = REQUEST_ATTEMPTS,
   timeoutMs = REQUEST_TIMEOUT_MS.tides,
   fetchImpl = globalThis.fetch,
+  signal = null,
 } = {}) {
   let lastResponse = null;
   for (let attempt = 0; attempt < attempts; attempt++) {
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
     try {
-      const response = await fetchWithTimeout(url, { cache: 'no-cache' }, timeoutMs, fetchImpl);
+      const response = await fetchWithTimeout(url, { cache: 'no-cache', signal }, timeoutMs, fetchImpl);
       lastResponse = response;
       if (response.ok || (response.status < 500 && response.status !== 429)) return response;
-    } catch {
-      // Retry timeouts and transient network failures.
+    } catch (error) {
+      // Retry timeouts and transient network failures, but a cancelled load is
+      // not transient: nothing is waiting for the answer any more.
+      if (signal?.aborted || error?.name === 'AbortError') throw new DOMException('Aborted', 'AbortError');
     }
   }
   return lastResponse;
@@ -121,11 +131,11 @@ function exactWindow(series, centerTime) {
   return series.filter(point => Math.abs(point.time - centerTime) <= windowMs);
 }
 
-async function fetchStationSeries(station, landfallIso) {
+async function fetchStationSeries(station, landfallIso, signal = null) {
   const centerTime = Date.parse(landfallIso);
   const [obsRes, predRes] = await Promise.all([
-    fetchWithRetry(buildDataUrl(station.id, 'hourly_height', landfallIso)),
-    fetchWithRetry(buildDataUrl(station.id, 'predictions', landfallIso)),
+    fetchWithRetry(buildDataUrl(station.id, 'hourly_height', landfallIso), { signal }),
+    fetchWithRetry(buildDataUrl(station.id, 'predictions', landfallIso), { signal }),
   ]);
   if (!obsRes?.ok || !predRes?.ok) {
     const response = !obsRes?.ok ? obsRes : predRes;
@@ -178,6 +188,15 @@ function stationCard(result, landfallMs) {
 
 export async function renderTidesBlock(host, storm) {
   if (!host) return;
+  if (loadInFlight) {
+    // Settle the superseded feed here rather than in the load's own
+    // continuation: the load can be parked anywhere, and until the feed leaves
+    // 'loading' the status host hides its retry button.
+    const superseded = loadInFlight;
+    loadInFlight = null;
+    superseded.controller.abort();
+    cancelOptionalFeed('tides', { requestId: superseded.requestId });
+  }
   // Hourly verified water levels are reliable from the 1990s on; older
   // storms rarely have retrievable gauge records via the API.
   if (!storm?.year || storm.year < 1990) return;
@@ -208,12 +227,22 @@ export async function renderTidesBlock(host, storm) {
       event.target.textContent = t('tides.loading');
     }
     const request = beginOptionalFeed('tides');
+    const controller = new AbortController();
+    loadInFlight = { controller, requestId: request.requestId };
     try {
       const stations = await loadStations();
+      if (controller.signal.aborted) return;
       const nearby = nearestStations(stations, landfall.lat, landfall.lon);
-      const settled = await Promise.allSettled(nearby.map(station => fetchStationSeries(station, landfall.t)));
+      const settled = await Promise.allSettled(
+        nearby.map(station => fetchStationSeries(station, landfall.t, controller.signal)),
+      );
       const results = settled.filter(item => item.status === 'fulfilled').map(item => item.value).filter(Boolean);
-      if (!host.isConnected) return;
+      // Settle the feed before leaving. Returning while it is still 'loading'
+      // hides the retry button, so the next storm's block offers no way out.
+      if (!host.isConnected || controller.signal.aborted) {
+        cancelOptionalFeed('tides', { requestId: request.requestId });
+        return;
+      }
       if (!results.length) {
         const failure = settled.find(item => item.status === 'rejected')?.reason;
         if (failure) throw failure;
@@ -233,13 +262,17 @@ export async function renderTidesBlock(host, storm) {
         ${results.map(result => stationCard(result, landfallMs)).join('')}
         <div class="im-source"><a href="https://tidesandcurrents.noaa.gov/" target="_blank" rel="noopener">${t('tides.source')}</a></div>`;
     } catch (error) {
-      if (!host.isConnected) return;
+      if (!host.isConnected || controller.signal.aborted || error?.name === 'AbortError') {
+        cancelOptionalFeed('tides', { requestId: request.requestId });
+        return;
+      }
       failOptionalFeed('tides', { error, responseStatus: error.responseStatus || 0, requestId: request.requestId });
       block.innerHTML = `<div class="tide-empty">${t('tides.empty')}</div><button class="text-btn tide-load-btn" type="button">${t('tides.retry')}</button>`;
       wireLoadButton();
     }
     finally {
       loading = false;
+      if (loadInFlight?.controller === controller) loadInFlight = null;
     }
   };
   const wireLoadButton = () => host.querySelector('.tide-load-btn')?.addEventListener('click', load, { once: true });
