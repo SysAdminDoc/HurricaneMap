@@ -7645,10 +7645,10 @@ body.side-panel-open .leaflet-top.leaflet-right {
   color: var(--on-accent);
 }
 
-/* The OSM fallback basemap swap promised a darkening filter that never
-   existed: without it a CARTO outage floods the dark UI with full-brightness
-   tiles and washes out the screen-blended radar overlay. */
-.basemap-fallback {
+/* OpenStreetMap ships light tiles; without this the dark UI is flooded with
+   full-brightness imagery that washes out the screen-blended radar overlay.
+   The themes layer switches it off for the light theme. */
+.basemap-osm {
   filter: invert(1) hue-rotate(180deg) brightness(0.75) contrast(0.9) saturate(0.65);
 }
 

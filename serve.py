@@ -6,11 +6,11 @@ from urllib.parse import urlsplit
 
 CONTENT_SECURITY_POLICY = (
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-    "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org "
+    "img-src 'self' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.org "
     "https://tiles.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu "
     "https://pae-paha.pacioos.hawaii.edu; connect-src 'self' https://api.weather.gov "
     "https://api.tidesandcurrents.noaa.gov https://mapservices.weather.noaa.gov "
-    "https://pae-paha.pacioos.hawaii.edu https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org "
+    "https://pae-paha.pacioos.hawaii.edu https://tile.openstreetmap.org https://*.tile.openstreetmap.org "
     "https://tiles.arcgis.com https://services9.arcgis.com https://services.arcgis.com "
     "https://geocode.arcgis.com https://cdn.star.nesdis.noaa.gov https://mesonet.agron.iastate.edu "
     "https://www.nhc.noaa.gov https://www.fema.gov https://corsproxy.io; font-src 'self'; worker-src 'self' blob:; "

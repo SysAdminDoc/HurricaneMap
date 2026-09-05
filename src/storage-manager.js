@@ -6,7 +6,7 @@ import { isIosSafari, showIosInstallCoachmark } from './onboarding.js';
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
   { id: 'data', prefix: 'hm-data-', required: true },
-  { id: 'tiles', cacheName: 'hm-tiles-v1', required: false },
+  { id: 'tiles', cacheName: 'hm-tiles-v2', required: false },
   { id: 'radar', cacheName: 'hm-radar-v1', required: false },
   { id: 'source', prefix: 'hm-source-', required: false },
 ]);

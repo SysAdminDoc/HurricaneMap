@@ -159,7 +159,7 @@ html.light-theme {
   --accent-grad: linear-gradient(135deg, #7c3aed, #0969da);
 }
 
-html.light-theme .basemap-fallback {
+html.light-theme .basemap-osm {
   filter: none;
 }
 

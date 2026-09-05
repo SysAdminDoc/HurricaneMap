@@ -16,38 +16,17 @@ let landfallTooltip = null;
 const markersByEventKey = new Map();
 
 function addBasemap(targetMap) {
-  // CartoDB Dark Matter — the design's intended basemap.
-  const primaryLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a> | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-    className: 'basemap-tiles',
-  });
-  // Fallback: OSM standard, darkened via CSS filter so the dark theme survives.
-  const fallbackLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // OpenStreetMap standard tiles, darkened for the dark theme by the
+  // .basemap-osm CSS filter. CARTO's keyless dark_all service now composites an
+  // "API KEY REQUIRED" watermark into every tile at its CDN edge and still
+  // answers HTTP 200, so no tileerror fallback can ever detect it. OSM's tile
+  // usage policy applies: this is a low-volume static atlas and the
+  // attribution below is required.
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Hurricane data: <a href="https://www.nhc.noaa.gov/data/">NOAA HURDAT2</a>',
     maxZoom: 19,
-    className: 'basemap-tiles basemap-fallback',
-  });
-
-  // Don't swap on the first transient error — Carto occasionally drops tiles
-  // and a single 5xx shouldn't nuke the whole basemap. Swap only if we hit a
-  // sustained-failure threshold within a rolling window.
-  let fallbackActive = false;
-  let errCount = 0;
-  let firstErrAt = 0;
-  primaryLayer.on('tileerror', () => {
-    if (fallbackActive) return;
-    const now = Date.now();
-    if (now - firstErrAt > 8000) { errCount = 0; firstErrAt = now; }
-    if (++errCount >= 6) {
-      fallbackActive = true;
-      if (targetMap.hasLayer(primaryLayer)) targetMap.removeLayer(primaryLayer);
-      fallbackLayer.addTo(targetMap);
-    }
-  });
-
-  primaryLayer.addTo(targetMap);
+    className: 'basemap-tiles basemap-osm',
+  }).addTo(targetMap);
 }
 
 export function initMap() {

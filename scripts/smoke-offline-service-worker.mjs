@@ -210,7 +210,7 @@ try {
     }
   }, releaseTuple.data_db);
   const offlineKeys = migrationState.offlineKeys;
-  for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-data-v2', 'hm-tiles-v0', 'hm-radar-v0']) {
+  for (const legacyCache of ['hm-shell-hm-v0.9.0', 'hm-data-v1', 'hm-data-v2', 'hm-tiles-v0', 'hm-tiles-v1', 'hm-radar-v0']) {
     assert(!migrationState.cacheKeys.includes(legacyCache), `legacy cache survived activation: ${legacyCache}`);
   }
   assert(!migrationState.cacheKeys.includes('hm-source-bundle-v1'), 'source bundle was installed without a user action');
@@ -290,7 +290,7 @@ try {
   // data store used by the offline app shell.
   await page.evaluate(async () => {
     await caches.delete('hm-radar-v1');
-    await caches.delete('hm-tiles-v1');
+    await caches.delete('hm-tiles-v2');
     await caches.delete('hm-source-bundle-v1');
   });
 

@@ -18,7 +18,7 @@ const SW_VERSION = 'hm-v1.9.3';
 const SHELL_CACHE = `hm-shell-${SW_VERSION}`;
 const DATA_CACHE_PREFIX = 'hm-data-';
 const DATA_CACHE = `${DATA_CACHE_PREFIX}${SW_VERSION}`;
-const TILE_CACHE = 'hm-tiles-v1';
+const TILE_CACHE = 'hm-tiles-v2';
 const RADAR_CACHE = 'hm-radar-v1';
 const SOURCE_BUNDLE_CACHE = 'hm-source-bundle-v1';
 const SOURCE_BUNDLE_MARKER_PATH = './__hurricanemap-source-bundle.json';
@@ -206,7 +206,7 @@ function isSourceBundleAsset(url) {
 }
 
 function isTile(url) {
-  return /tile\.openstreetmap|cartocdn|mesonet\.agron\.iastate\.edu/.test(url.host);
+  return /tile\.openstreetmap|mesonet\.agron\.iastate\.edu/.test(url.host);
 }
 
 self.addEventListener('fetch', (event) => {

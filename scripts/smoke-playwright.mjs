@@ -217,6 +217,91 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
 // numbers. They are built from one row definition today, but nothing proved
 // it, and a divergence here is the one defect class this product cannot
 // afford: a reader cites the CSV and quotes the screen.
+// The basemap provider can start watermarking keyless tiles without ever
+// failing a request: CARTO's dark_all service composites "API KEY REQUIRED"
+// into every tile at its CDN edge and still answers HTTP 200, so Leaflet's
+// tileerror fallback never fires. Check the pixels, not the status code.
+const BASEMAP_TILE_HOST = 'tile.openstreetmap.org';
+
+async function assertBasemapNotWatermarked(page) {
+  const report = await page.evaluate(async (host) => {
+    const luminance = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+    // A watermark is sparse near-neutral ink on an otherwise featureless
+    // field. Real map tiles fill their whole 256-colour palette; a watermarked
+    // CARTO tile quantizes to 15-19 colours yet still carries contrasting grey
+    // text, so "nearly flat but lettered" separates the two with room to spare.
+    function measure(imageData) {
+      const { data } = imageData;
+      const total = data.length / 4;
+      const counts = new Map();
+      for (let i = 0; i < data.length; i += 4) {
+        const key = (data[i] << 16) | (data[i + 1] << 8) | data[i + 2];
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+      let modal = 0;
+      let modalCount = 0;
+      for (const [key, n] of counts) {
+        if (n > modalCount) { modalCount = n; modal = key; }
+      }
+      const modalLum = luminance((modal >> 16) & 255, (modal >> 8) & 255, modal & 255);
+      let ink = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        if (Math.abs(r - g) > 8 || Math.abs(g - b) > 8 || Math.abs(r - b) > 8) continue;
+        if (Math.abs(luminance(r, g, b) - modalLum) < 40) continue;
+        ink++;
+      }
+      const stats = {
+        distinctColors: counts.size,
+        modalShare: modalCount / total,
+        inkShare: ink / total,
+      };
+      stats.watermarked = stats.modalShare >= 0.5 && stats.distinctColors <= 128 && stats.inkShare > 0.005;
+      return stats;
+    }
+
+    async function measureUrl(url) {
+      const bitmap = await createImageBitmap(await (await fetch(url, { mode: 'cors' })).blob());
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const context = canvas.getContext('2d');
+      context.drawImage(bitmap, 0, 0);
+      return measure(context.getImageData(0, 0, canvas.width, canvas.height));
+    }
+
+    // Positive control: the detector must flag a synthetic watermark tile, so
+    // a green run means the pixels were read, not that the check went blind.
+    const control = new OffscreenCanvas(256, 256);
+    const controlContext = control.getContext('2d');
+    controlContext.fillStyle = '#262626';
+    controlContext.fillRect(0, 0, 256, 256);
+    controlContext.fillStyle = '#9a9a9a';
+    controlContext.font = 'bold 22px sans-serif';
+    controlContext.rotate(-0.5);
+    for (let y = 0; y < 420; y += 48) controlContext.fillText('API KEY REQUIRED', -120, y);
+    const controlStats = measure(controlContext.getImageData(0, 0, 256, 256));
+
+    const tiles = [...document.querySelectorAll('#map img.leaflet-tile')]
+      .map(img => img.src)
+      .filter(src => src.startsWith('https://'));
+    const hosts = [...new Set(tiles.map(src => new URL(src).host))];
+    const sampled = [];
+    for (const url of tiles.slice(0, 6)) sampled.push({ url, ...(await measureUrl(url)) });
+    return { control: controlStats, hosts, tileCount: tiles.length, sampled };
+  }, BASEMAP_TILE_HOST);
+
+  assert(report.control.watermarked, `basemap watermark detector failed its own positive control: ${JSON.stringify(report.control)}`);
+  assert(report.tileCount > 0, 'no basemap tiles loaded, so the watermark check could not run');
+  const flagged = report.sampled.filter(tile => tile.watermarked);
+  assert(flagged.length === 0, `basemap tiles carry a watermark: ${JSON.stringify(flagged)}`);
+  assert(
+    report.hosts.length === 1 && report.hosts[0] === BASEMAP_TILE_HOST,
+    `basemap tiles came from an unexpected host: ${report.hosts.join(', ')}`,
+  );
+}
+
 async function assertComparisonExportParity(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   const page = await context.newPage();
@@ -1292,7 +1377,7 @@ async function assertSupportBundleExport(page) {
   assert(!/PRIVATE VIEW|PRIVATE SEARCH|PRIVATE ANSWER|25\.7617|-80\.1918|saved.?views|search.?history|preparedness|\"lat\"|\"lon\"/i.test(body), 'support bundle leaked private local state');
   const activeDataCache = 'hm-data-hm-v1.9.3';
   await page.evaluate(async (dataCacheName) => {
-    await (await caches.open('hm-tiles-v1')).put('/recoverable-tile', new Response('tile'));
+    await (await caches.open('hm-tiles-v2')).put('/recoverable-tile', new Response('tile'));
     await (await caches.open(dataCacheName)).put('/protected-history', new Response('history'));
   }, activeDataCache);
   await page.click('[data-clear-storage="tiles"]');
@@ -1301,13 +1386,13 @@ async function assertSupportBundleExport(page) {
   await page.click('#confirm-local-action .confirm-action-cancel');
   await page.waitForFunction(() => document.activeElement?.matches('[data-clear-storage="tiles"]'));
   assert(await page.evaluate(async () => (
-    Boolean(await (await caches.open('hm-tiles-v1')).match('/recoverable-tile')) &&
+    Boolean(await (await caches.open('hm-tiles-v2')).match('/recoverable-tile')) &&
     document.activeElement?.matches('[data-clear-storage="tiles"]')
   )), 'cancelling cache clearing removed data or lost invoker focus');
   await page.click('[data-clear-storage="tiles"]');
   await page.click('#confirm-local-action .confirm-action-submit');
   await page.waitForFunction(async (dataCacheName) => (
-    !(await caches.keys()).includes('hm-tiles-v1') &&
+    !(await caches.keys()).includes('hm-tiles-v2') &&
     (await caches.keys()).includes(dataCacheName) &&
     document.activeElement?.matches('[data-clear-storage="tiles"]') &&
     /Map tiles.*cleared/i.test(document.querySelector('#map-announce')?.textContent || '')
@@ -2438,6 +2523,7 @@ try {
   }, { timeout: 5000 });
   await page.waitForFunction(() => !document.querySelector('.hm-toast--warn'), { timeout: 10000 });
 
+  await assertBasemapNotWatermarked(page);
   await assertNoAxeViolations(page, 'main view (WCAG 2.2 AA)');
 
   await openKatrinaPanel(page);

@@ -11,7 +11,7 @@ export const SAVED_VIEWS_SCHEMA_VERSION = 1;
 
 export const CACHE_CONTRACT = Object.freeze({
   data: 'hm-data-v2',
-  tiles: 'hm-tiles-v1',
+  tiles: 'hm-tiles-v2',
   radar: 'hm-radar-v1',
   offlineDb: 'hm-offline-data-v2',
   offlineDbVersion: 1,

@@ -364,8 +364,10 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 | Format spec | [Landsea, C. W., *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
 | Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/), fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |
-| Map tiles | [CartoDB Dark Matter](https://carto.com/) over OpenStreetMap |
+| Map tiles | [OpenStreetMap standard tiles](https://www.openstreetmap.org/), darkened by CSS in the dark theme |
 | Map library | [Leaflet 1.9](https://leafletjs.com/) |
+
+Tiles come straight from openstreetmap.org, so the project runs under the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/). That policy is written for exactly this kind of traffic: a single low-volume site, no bulk downloading, no tile scraping, attribution kept visible in the map corner. If this atlas ever draws enough traffic to matter, the tiles move to a paid host or to a self-served extract rather than staying on the volunteer infrastructure. The basemap used to be CARTO's keyless Dark Matter service, which now stamps "API KEY REQUIRED" across every tile it serves while still answering HTTP 200.
 
 ## Refreshing the radar archive
 
