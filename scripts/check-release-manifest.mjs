@@ -39,10 +39,12 @@ for (const artifact of manifest.artifacts) {
 // still holds the previous commit's id and version. The four files below carry
 // no self-reference, so drift in them means derived data was edited by hand.
 // The manifest separates two dates that used to be conflated: source_commit is
-// the preprocessor identity, and hand_maintained.refreshed_utc is when the
-// snapshots that are edited in place were last republished. A snapshot ships
-// under a source_commit that predates it by design, so the second date is what
-// says whether it is current.
+// the preprocessor identity, and hand_maintained.refreshed_utc is the newest
+// publication date among the snapshots that are edited in place. It is the date
+// of the product, not of the commit, and with two snapshots at different dates
+// it describes only the newer one, which is why each snapshot records its own.
+// A snapshot ships under a source_commit that predates it by design, so these
+// dates are what say whether it is current.
 const handMaintained = manifest.hand_maintained;
 if (!handMaintained || !Array.isArray(handMaintained.snapshots) || !handMaintained.snapshots.length) {
   throw new Error('release manifest must record hand_maintained.snapshots');
@@ -75,6 +77,47 @@ if (handMaintained.refreshed_utc !== latestRefresh) {
     `release manifest hand_maintained.refreshed_utc is ${handMaintained.refreshed_utc}, `
     + `but the newest snapshot was issued ${latestRefresh}`,
   );
+}
+
+// The generator refuses to write a changed snapshot under an unchanged issue
+// date, but that guard reads the previous manifest, so deleting the manifest
+// first skipped it and the edit shipped under the old date with every gate
+// green. Git holds the previous state whether or not the manifest does, so the
+// invariant belongs here, in a gate, and is checked against the commit.
+function committedFile(relative) {
+  try {
+    return execFileSync('git', ['show', `HEAD:${relative}`], { cwd: root, maxBuffer: 64 * 1024 * 1024 });
+  } catch {
+    return null;
+  }
+}
+
+let snapshotHistory = 'snapshot history check skipped: this tree has no git history';
+if (gitAvailable()) {
+  const notes = [];
+  for (const snapshot of handMaintained.snapshots) {
+    const previousBytes = committedFile(snapshot.path);
+    if (!previousBytes) continue;
+    const previousDigest = createHash('sha256').update(previousBytes).digest('hex');
+    if (previousDigest === snapshot.sha256) continue;
+    const previousIssued = HAND_MAINTAINED_ISSUED[snapshot.path](JSON.parse(previousBytes.toString('utf8')));
+    if (previousIssued === snapshot.issued) {
+      throw new Error(
+        `${snapshot.path} has changed since the last commit but still says it was issued ${snapshot.issued}. `
+        + 'A refreshed snapshot carries the publication date of the product it holds.',
+      );
+    }
+    // Forward only. A refresh that lands an older product than the one it
+    // replaces is a mistake, and it drags refreshed_utc backward with it.
+    if (previousIssued && snapshot.issued < previousIssued) {
+      throw new Error(
+        `${snapshot.path} moved back from ${previousIssued} to ${snapshot.issued}. `
+        + 'A refresh publishes a newer product, not an older one.',
+      );
+    }
+    notes.push(`${snapshot.path} ${previousIssued} to ${snapshot.issued}`);
+  }
+  snapshotHistory = notes.length ? `refreshed: ${notes.join(', ')}` : 'snapshots unchanged since the last commit';
 }
 
 const PREPROCESSOR_OUTPUTS = [
@@ -121,7 +164,7 @@ if (gitAvailable()) {
   derivedNote = `${PREPROCESSOR_OUTPUTS.length} derived files match ${manifest.source_commit.slice(0, 12)}`;
 }
 
-console.log(`release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified; ${derivedNote})`);
+console.log(`release manifest ok (${manifest.artifacts.length} artifacts, byte counts and SHA-256 verified; ${derivedNote}; ${snapshotHistory})`);
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

@@ -18,7 +18,11 @@ const DASHES = /[–—]/;
 // least as many of the same character. A naive toggle gets this wrong in both
 // directions: a ``` inside a ```` block closes it, and a ~~~ inside a ```
 // block closes that too.
-const FENCE = /^(\s{0,3})(`{3,}|~{3,})(.*)$/;
+// Indentation is allowed up to a list item's content column, because a fenced
+// block inside a numbered step is indented four spaces and was being read as
+// prose. A fence closes at any indent, so an opener at column 0 and a closer at
+// column 4 still pair up.
+const FENCE = /^(\s{0,8})(`{3,}|~{3,})(.*)$/;
 
 function stripInlineCode(line) {
   return line
@@ -46,12 +50,23 @@ export function findProseDashes(text) {
       return;
     }
     if (fence) return;
-    if (/^\s*<pre\b/i.test(line)) htmlBlock = true;
+    // A <pre> can open mid-line and close mid-line, and the text after the
+    // close is prose. Blank the block out rather than skipping whole lines:
+    // skipping missed the prose beside it and flagged the code inside it.
+    let subject = line;
     if (htmlBlock) {
-      if (/<\/pre>/i.test(line)) htmlBlock = false;
-      return;
+      const close = subject.search(/<\/pre>/i);
+      if (close === -1) return;
+      htmlBlock = false;
+      subject = subject.slice(close + 6);
     }
-    if (DASHES.test(stripInlineCode(line))) hits.push({ line: index + 1, text: line.trim() });
+    subject = subject.replace(/<pre\b[\s\S]*?<\/pre>/gi, '');
+    const open = subject.search(/<pre\b/i);
+    if (open !== -1) {
+      htmlBlock = true;
+      subject = subject.slice(0, open);
+    }
+    if (DASHES.test(stripInlineCode(subject))) hits.push({ line: index + 1, text: line.trim() });
   });
   // A file whose fences do not balance is a problem in its own right: the tail
   // of it was exempted by an accident of punctuation.
@@ -90,6 +105,19 @@ assert.equal(findProseDashes('The placeholder is `—` for a missing figure.').l
 assert.equal(findProseDashes('The placeholder is `—` and — this is prose.').length, 1, 'but only the span is exempt');
 assert.equal(findProseDashes('<!-- a — b -->').length, 0, 'an HTML comment is not prose');
 assert.equal(findProseDashes('<pre>\na — b\n</pre>').length, 0, 'an HTML pre block is code');
+assert.equal(findProseDashes('<div><pre>\ncmd --x — y\n</pre></div>').length, 0, 'even opened mid-line');
+assert.equal(findProseDashes('<pre>x</pre> and prose — here').length, 1, 'and the prose beside it is still prose');
+assert.equal(findProseDashes('<pre>\nc\n</pre> and prose — here').length, 1, 'including on the closing line');
+assert.equal(
+  findProseDashes('1. Run this:\n\n    ```\n    cmd --a — b\n    ```\n').length,
+  0,
+  'a fence indented into a list item is still a fence',
+);
+assert.equal(
+  findProseDashes('```\ncode — here\n    ```\nprose — after the block\n').length,
+  1,
+  'a fence closed at a deeper indent still closes, so the prose after it is checked',
+);
 assert.equal(findProseDashes('[text](https://example.com/a–b)').length, 0, 'a link target is an address');
 assert.equal(findProseDashes('a - b, a-b, 1851-2025').length, 0, 'hyphens are fine');
 
@@ -98,7 +126,19 @@ assert.equal(findProseDashes('a - b, a-b, 1851-2025').length, 0, 'hyphens are fi
 // translated string are read by more people than the README is. A lone em dash
 // is a placeholder glyph for "no value" there and has to survive, so these
 // surfaces are checked for the connector form only.
-const APP_SURFACES = ['index.html', 'manifest.webmanifest', 'data/glossary.json', 'src/i18n.js'];
+const APP_SURFACES = [
+  'index.html',
+  'manifest.webmanifest',
+  // The localised install names are the same surface as the English one, and
+  // were left carrying the punctuation the English one had removed.
+  'manifest.es.webmanifest',
+  'manifest.ht.webmanifest',
+  'data/glossary.json',
+  'src/i18n.js',
+  // The About panel builds its own year ranges rather than taking them from a
+  // translated string, so it needed checking too.
+  'src/about-ui.js',
+];
 const CONNECTOR = /\S\s*[–—]\s+\S|\S\s+[–—]\s*\S/;
 
 export function findConnectorDashes(text, { code = false } = {}) {
@@ -114,12 +154,21 @@ export function findConnectorDashes(text, { code = false } = {}) {
         blockComment = false;
         subject = line.slice(line.indexOf('*/') + 2);
       }
+      // Blank out string literals first. A `//` or `/*` inside one is content,
+      // not a comment: treating it as a comment truncated the line and, for
+      // `/*`, silenced every line after it until some later `*/`.
+      const strings = [];
+      subject = subject.replace(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g, match => {
+        strings.push(match);
+        return ` ${strings.length - 1} `;
+      });
       subject = subject.replace(/\/\*[\s\S]*?\*\//g, '');
       if (/\/\*/.test(subject)) {
         blockComment = true;
         subject = subject.slice(0, subject.indexOf('/*'));
       }
-      subject = subject.replace(/(^|[^:'"`\\])\/\/.*$/, '$1');
+      subject = subject.replace(/\/\/.*$/, '');
+      subject = subject.replace(/ (\d+) /g, (_, index) => strings[Number(index)]);
     }
     if (CONNECTOR.test(subject)) hits.push({ line: index + 1, text: line.trim() });
   });
@@ -148,8 +197,21 @@ assert.equal(
   0,
   'the // inside a URL must not be mistaken for a comment',
 );
+// A `//` or a `/*` inside a string is content. Reading either as a comment
+// truncated the line, and `/*` silenced every line after it as well.
+assert.equal(
+  findConnectorDashes("const p = 'a//b'; const t = 'Wind — gust';", { code: true }).length,
+  1,
+  'a // inside a string must not hide the rest of the line',
+);
+assert.equal(
+  findConnectorDashes("const s = '/*';\nconst t = 'Evicted — repair needed';\nconst u = 'Storm — surge';", { code: true }).length,
+  2,
+  'a /* inside a string must not silence the rest of the file',
+);
+assert.equal(findConnectorDashes('const t = `a — b`;', { code: true }).length, 1, 'a template literal is still copy');
 
-const files = ['README.md', 'CHANGELOG.md', ...(await markdownFiles(path.join(root, 'docs'), 'docs'))];
+const files = ['README.md', 'CHANGELOG.md', 'LICENSE.md', ...(await markdownFiles(path.join(root, 'docs'), 'docs'))];
 assert.ok(files.length >= 8, `the scan must cover the docs tree, found only ${files.length} files`);
 
 const failures = [];

@@ -2135,7 +2135,7 @@ try {
     /Layer depth is shallower than the best track/.test(coverageText),
     `About did not distinguish layer depth from best-track depth: ${coverageText.slice(0, 200)}`,
   );
-  for (const [label, range] of [['Archived NEXRAD radar', '1995–2025'], ['Advisory replay', '2015–2024']]) {
+  for (const [label, range] of [['Archived NEXRAD radar', '1995-2025'], ['Advisory replay', '2015-2024']]) {
     assert(
       coverageText.includes(range),
       `About did not state ${label} as covering ${range}: ${coverageText.slice(0, 400)}`,

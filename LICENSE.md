@@ -20,8 +20,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 **Source:** National Hurricane Center (NHC), National Oceanic and Atmospheric Administration (NOAA)
 **URL:** https://www.nhc.noaa.gov/data/hurdat/
 **License:** Public Domain (U.S. Government Work)
-**Citation:** Landsea, C. W., and J. L. Franklin, 2013: The Atlantic Hurricane Database Re-analysis Project: Documentation for the 1851–2012 Alterations and Addition to the HURDAT2 Database. National Hurricane Center, 73 pp.
-**Data Coverage:** Atlantic basin (1851–2025), Eastern Pacific basin (1949–2025)
+**Citation:** Landsea, C. W., and J. L. Franklin, 2013: The Atlantic Hurricane Database Re-analysis Project: Documentation for the 1851-2012 Alterations and Addition to the HURDAT2 Database. National Hurricane Center, 73 pp.
+**Data Coverage:** Atlantic basin (1851-2025), Eastern Pacific basin (1949-2025)
 **Last Update:** February 2026 (covers 2025 season)
 
 HurricaneMap plots every recorded U.S. hurricane and tropical-storm landfall from the HURDAT2 database. This is the authoritative best-track archive maintained by the National Hurricane Center and is used by NOAA for all official post-season analyses.
@@ -46,7 +46,7 @@ The SLOSH (Sea, Lake, and Overland Surges from Hurricanes) model is NOAA's opera
 **URL:** https://mesonet.agron.iastate.edu/
 **License:** Public Domain
 **Data:** Level 2 / 3 composite radar reflectivity
-**Availability:** Fallback data source for storms 1995–present when full-archive NEXRAD is unavailable
+**Availability:** Fallback data source for storms from 1995 to the present when full-archive NEXRAD is unavailable
 
 IEM mirrors and archives NEXRAD reflectivity mosaics from the NWS Radar Data Center. HurricaneMap's offline NEXRAD archive is precomputed from IEM's historical tiles.
 
@@ -78,13 +78,13 @@ HurricaneMap uses crowd-sourced impacts data from Wikipedia hurricane articles. 
 
 The following external services are linked (not embedded) in HurricaneMap for reference:
 
-- **GOES Satellite (RAMMB SLIDER):** https://rammb-slider.cira.colostate.edu/ — NOAA real-time satellite imagery
-- **NOAA Tropical Cyclone Reports:** https://www.nhc.noaa.gov/data/tcr/ — Post-season official analyses
-- **NHC Storm Wallets:** https://www.nhc.noaa.gov/archive/ — Historical advisory archives
-- **Wikipedia:** https://en.wikipedia.org/ — Encyclopedia articles (CC BY-SA 3.0)
-- **YouTube:** https://www.youtube.com/ — Storm footage (user-generated and news)
-- **Tropical Tidbits:** https://www.tropicaltidbits.com/ — Spaghetti-model ensemble visualizations
-- **Track The Tropics:** https://trackthetropics.com/ — Community-maintained tracking
+- **GOES Satellite (CIRA SLIDER):** https://slider.cira.colostate.edu/: NOAA real-time satellite imagery
+- **NOAA Tropical Cyclone Reports:** https://www.nhc.noaa.gov/data/tcr/: Post-season official analyses
+- **NHC Storm Wallets:** https://www.nhc.noaa.gov/archive/: Historical advisory archives
+- **Wikipedia:** https://en.wikipedia.org/: Encyclopedia articles (CC BY-SA 3.0)
+- **YouTube:** https://www.youtube.com/: Storm footage (user-generated and news)
+- **Tropical Tidbits:** https://www.tropicaltidbits.com/: Spaghetti-model ensemble visualizations
+- **Track The Tropics:** https://trackthetropics.com/: Community-maintained tracking
 
 ---
 
@@ -112,7 +112,7 @@ HurricaneMap's software dependencies are listed in `package.json` and resolved i
 - **HURDAT2 Completeness:** HURDAT2 coverage is complete only from ~1900 onward. Pre-1851 storms exist but are sparse; pre-1900 data is incomplete.
 - **Landfall Detection:** Landfalls are marked in HURDAT2 with an `L` flag when the center crossed the coastline. HurricaneMap also infers landfalls for storms whose 6-hourly track grazes U.S. land between synoptic observation times.
 - **Pre-Satellite Era:** Observations before ~1945 (pre-aircraft) and before ~1960 (pre-satellite) are based on ship reports, coastal weather stations, and historical accounts; accuracy is lower.
-- **Track Uncertainty:** Historical track positions, especially pre-1900, carry substantial uncertainty (±100+ km). Modern satellite-era tracks (post-1960) are generally accurate to ±10–20 km.
+- **Track Uncertainty:** Historical track positions, especially pre-1900, carry substantial uncertainty (±100+ km). Modern satellite-era tracks (post-1960) are generally accurate to ±10-20 km.
 - **Wind Speeds:** Saffir-Simpson categories are computed from maximum sustained wind speeds. Category assignments may differ slightly depending on methodology (e.g., 1-minute vs. 10-minute average winds).
 
 ---

@@ -44,7 +44,7 @@ function formatCoverageRange(range) {
   if (!Array.isArray(range) || range.length !== 2 || !range.every(Number.isInteger)) {
     return t('about.archiveUnavailable');
   }
-  return `${range[0]}–${range[1]}`;
+  return `${range[0]}-${range[1]}`;
 }
 
 function coverageCount(value, key) {

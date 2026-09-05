@@ -1,5 +1,5 @@
 {
-  "name": "HurricaneMap — Llegadas de huracanes en EE. UU. 1851-presente",
+  "name": "HurricaneMap: Llegadas de huracanes en EE. UU. 1851-presente",
   "short_name": "HurricaneMap",
   "description": "Mapa interactivo de cada llegada de huracán a EE. UU. registrada, basado en la base de datos HURDAT2 de NOAA.",
   "id": "./",

@@ -79,6 +79,12 @@ for (const snapshot of snapshots) {
       + 'update its issued date, or revert the edit.',
     );
   }
+  if (snapshot.issued < before.issued) {
+    throw new Error(
+      `${snapshot.path} moved back from ${before.issued} to ${snapshot.issued}. `
+      + 'A refresh publishes a newer product, not an older one.',
+    );
+  }
 }
 const manifest = {
   schema_version: 1,

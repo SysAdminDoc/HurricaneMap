@@ -146,6 +146,22 @@ assert.equal(parseForecastRange('7.5'), null, 'storm counts are whole numbers');
 assert.equal(parseForecastRange(''), null);
 assert.equal(parseForecastRange(null), null);
 assert.equal(parseForecastRange(undefined), null);
+// Splitting on the dash and dropping empty parts accepted a great deal of
+// nonsense: a leading minus read as the separator, so a negative count parsed
+// as its absolute value and rendered on the card as written.
+assert.equal(parseForecastRange('-9'), null, 'a storm count has no sign');
+assert.equal(parseForecastRange(-9), null);
+assert.equal(parseForecastRange('9to13'), null, 'a range needs space around its "to"');
+assert.equal(parseForecastRange('004'), null, 'no leading zeros');
+assert.equal(parseForecastRange('5-'), null, 'a range needs both ends');
+assert.equal(parseForecastRange('to 9'), null);
+assert.equal(parseForecastRange('9 to'), null);
+assert.equal(parseForecastRange('9–'), null);
+assert.equal(parseForecastRange('1e1'), null);
+assert.equal(parseForecastRange('+9'), null);
+assert.equal(parseForecastRange('٩'), null, 'and only ASCII digits');
+assert.equal(parseForecastRange('９'), null);
+assert.deepEqual(parseForecastRange('0-2'), { min: 0, max: 2 }, 'zero is a real end of a majors range');
 
 const contractOutlook = { season: 2026, issued: '2026-08-06', valid_until: '2026-11-30' };
 const complain = source => {
@@ -176,6 +192,33 @@ assert.match(complain({ ...sound, issued: '2026-09-30' }).join(' '), /newer than
 // probability, and an agency may not forecast every category.
 assert.deepEqual(complain({ issued: '2026-08-05' }), []);
 assert.deepEqual(complain({ issued: '2026-08-05', named: '9' }), []);
+// A partial source is still bounded on its own, by the ceiling rather than by
+// the ordering rule, which has nothing to compare an absent count against.
+assert.match(complain({ issued: '2026-08-05', hurricanes: '99' })[0], /not a real seasonal figure/);
+assert.match(complain({ issued: '2026-08-05', majors: '99' })[0], /not a real seasonal figure/);
+assert.deepEqual(complain({ issued: '2026-08-05', hurricanes: '4' }), [], 'a plausible partial count is fine');
+// The gap that remains, stated rather than papered over: with no named range
+// present, "40 hurricanes" is under the ceiling and has nothing to sit inside.
+assert.deepEqual(complain({ issued: '2026-08-05', hurricanes: '40' }), []);
+
+// A whole season with no named storms at all is a placeholder, not a forecast:
+// the quietest Atlantic season on record had one.
+assert.match(complain({ ...sound, named: '0', hurricanes: '0', majors: '0' })[0], /not a real figure/);
+assert.match(complain({ ...sound, named: '0-0', hurricanes: '0', majors: '0' })[0], /not a real figure/);
+assert.deepEqual(complain({ ...sound, named: '9', hurricanes: '0', majors: '0' }), [],
+  'but a forecast of no hurricanes is ordinary');
+
+// A shape the rules cannot read has to be reported, not skipped.
+assert.match(complain({ ...sound, issued: '2026-02-30' })[0], /not a date the forecast-cycle rules can read/);
+assert.match(complain({ ...sound, issued: undefined })[0], /not a date the forecast-cycle rules can read/);
+assert.match(complain(null)[0], /must be an object/);
+assert.match(complain('a string')[0], /must be an object/);
+assert.match(complain([])[0], /must be an object/);
+{
+  const messages = [];
+  validateOutlookSource(sound, 0, { season: '2026', issued: '2026-08-06' }, message => messages.push(message));
+  assert.match(messages[0], /season must be an integer/, 'a season that is not an integer disabled every date rule');
+}
 
 console.log(
   `snapshot freshness contracts ok (${windows.length} windows, earliest expiry ${iso(earliestExpiry)}, `
