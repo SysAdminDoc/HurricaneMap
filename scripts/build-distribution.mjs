@@ -4,6 +4,8 @@ import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { releaseSourceCommit } from './release-identity.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STATIC_ROOT_FILES = new Set([
   '.dockerignore',
@@ -49,17 +51,9 @@ function git(args) {
 // A distribution repackages a published data release, so it inherits that
 // release's identity instead of stamping whatever HEAD happens to be. Reading
 // git here desynchronized the staged release manifest from the STAC catalog
-// copied beside it — the catalog carries the commit baked in at its last
+// copied beside it: the catalog carries the commit baked in at its last
 // `generate:stac --write`, so any later commit, docs included, broke staging.
-// data/metadata.json is the authority the notebook contract already enforces.
-export async function releaseSourceCommit() {
-  const metadata = JSON.parse(await readFile(path.join(root, 'data/metadata.json'), 'utf8'));
-  const commit = metadata?.generator?.source_commit;
-  if (!/^[a-f0-9]{40}$/.test(commit || '')) {
-    throw new Error('data/metadata.json is missing a 40-character generator.source_commit');
-  }
-  return commit;
-}
+// scripts/release-identity.mjs is the single owner of that value.
 
 export function trackedStaticFiles(profile) {
   if (!['core', 'full'].includes(profile)) throw new Error(`Unknown distribution profile: ${profile}`);
@@ -91,7 +85,7 @@ export async function describeDistribution(profile) {
   const payloadFiles = measured.filter(item => !GENERATED_METADATA_FILES.has(item.file));
   return {
     profile,
-    source_commit: await releaseSourceCommit(),
+    source_commit: await releaseSourceCommit(root),
     files: measured.map(item => item.file),
     file_count: payloadFiles.length,
     bytes: payloadFiles.reduce((sum, item) => sum + item.bytes, 0),

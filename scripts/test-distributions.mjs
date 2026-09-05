@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describeDistribution, SOURCE_BUNDLE_FILES, stageDistribution } from './build-distribution.mjs';
 import { validateStac } from './check-stac.mjs';
+import { commitExists, releaseSourceCommit } from './release-identity.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outputs = {
@@ -34,6 +35,16 @@ assert.equal(
   full.source_commit,
   releaseMetadata.generator.source_commit,
   'distribution source commit must come from data/metadata.json, not the working tree HEAD',
+);
+// One owner, so regenerating the manifest and then staging cannot disagree.
+assert.equal(await releaseSourceCommit(root), releaseMetadata.generator.source_commit);
+assert.equal(sourceManifest.source_commit, await releaseSourceCommit(root), 'the manifest generator and the stager must resolve the same commit');
+assert.equal(commitExists(releaseMetadata.generator.source_commit, root), true, 'the released commit must exist in this checkout');
+assert.equal(commitExists('0'.repeat(40), root), false, 'an unresolvable object must be rejected');
+await assert.rejects(
+  releaseSourceCommit(path.join(root, 'scripts')),
+  /generator\.source_commit|ENOENT/,
+  'a missing data/metadata.json must throw rather than fall back to git',
 );
 assert.equal(core.radar_file_count, 0, 'core distribution must omit radar PNGs');
 assert(core.mandatory_bytes < 10 * 1024 * 1024, `core mandatory install is unexpectedly large: ${core.mandatory_bytes}`);

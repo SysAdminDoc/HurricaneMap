@@ -5,6 +5,8 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { commitExists, releaseSourceCommit } from './release-identity.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dataRoot = path.join(root, 'data');
 const generatedAtFlag = process.argv.indexOf('--generated-at');
@@ -12,12 +14,18 @@ const generatedAt = generatedAtFlag >= 0 ? process.argv[generatedAtFlag + 1] : n
 if (!generatedAt || !/^\d{4}-\d{2}-\d{2}T/.test(generatedAt) || Number.isNaN(Date.parse(generatedAt))) {
   throw new Error('Pass a deterministic ISO timestamp with --generated-at');
 }
+// Default to the release data/metadata.json already names, so regenerating the
+// manifest and then staging a distribution cannot disagree about the commit.
+// Pass --source-commit explicitly to move the release identity forward.
 const sourceCommitFlag = process.argv.indexOf('--source-commit');
 const sourceCommit = sourceCommitFlag >= 0
   ? process.argv[sourceCommitFlag + 1]
-  : execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  : await releaseSourceCommit(root);
 if (!/^[a-f0-9]{40}$/.test(sourceCommit)) {
-  throw new Error('Pass a 40-character git revision with --source-commit or run inside a git checkout');
+  throw new Error('Pass a 40-character git revision with --source-commit');
+}
+if (!commitExists(sourceCommit, root)) {
+  throw new Error(`${sourceCommit} is not a commit in this checkout`);
 }
 
 const metadata = JSON.parse(await readFile(path.join(dataRoot, 'metadata.json'), 'utf8'));
