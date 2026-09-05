@@ -70,6 +70,26 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
     }
   }
 
+  // Header controls animate their colour over 120ms on a theme change. Sampling
+  // after a fixed sleep read a value part-way through that animation whenever
+  // the machine was busy, and reported the intermediate colour as a contrast
+  // failure: on 2026-09-05 all nine controls failed at rgb(114, 117, 138),
+  // which is neither theme's token, and an immediate re-run passed. Contrast is
+  // a property of the settled colours, so measure with no animation at all.
+  //
+  // Scoped to this measurement and removed afterwards: left in place it also
+  // collapses the animations that give the mobile filter checkboxes their
+  // 44px touch targets, and the next assertion on the same page fails.
+  const stillness = await page.addStyleTag({
+    content: `*, *::before, *::after {
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+    }`,
+  });
+  try {
+
   for (const combination of combinations) {
     await page.evaluate(async ({ theme, palette, highContrast }) => {
       const settings = await import('/src/settings.js');
@@ -84,7 +104,8 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
         document.documentElement.classList.contains('high-contrast') === highContrast,
       combination,
     );
-    await page.waitForTimeout(200);
+    // Belt and braces: nothing may still be running when the colours are read.
+    await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
 
     const audit = await page.evaluate(() => {
       const parseColor = value => {
@@ -187,6 +208,9 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
     settings.setSetting('palette', 'default');
     settings.setSetting('highContrast', false);
   });
+  } finally {
+    await stillness.evaluate(node => node.remove());
+  }
 }
 
 const mime = new Map([
