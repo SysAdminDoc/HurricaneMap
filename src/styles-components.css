@@ -1274,7 +1274,12 @@ label > input[type="checkbox"] {
 
 /* Active storm badge (top-right, only shown during hurricane season when
    NHC is tracking storms). */
-.active-badge {
+/* .glass is declared later at equal specificity and sets position: relative,
+   which laid the badge out in normal flow after a full-viewport <main>, i.e.
+   entirely below the fold. The badge carries role="status", so it was
+   announced to screen readers and visible to nobody. */
+.active-badge,
+.active-badge.glass {
   position: absolute;
   /* Below the header row — at top:16px the badge overlapped and intercepted
      clicks on the right-side header buttons whenever it was visible. */

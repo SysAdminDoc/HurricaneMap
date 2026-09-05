@@ -223,6 +223,36 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
 // tileerror fallback never fires. Check the pixels, not the status code.
 const BASEMAP_TILE_HOST = 'tile.openstreetmap.org';
 
+// The badge is created by the active-storm poll and carries role="status", so
+// a mislaid one is announced to screen readers and shown to nobody. Measure
+// its box rather than waiting for the feed to reach a state that reveals it.
+async function assertActiveBadgeInViewport(page, label) {
+  await page.waitForSelector('#active-storm-badge', { timeout: 20000 });
+  const box = await page.evaluate(() => {
+    const badge = document.getElementById('active-storm-badge');
+    const wasHidden = badge.hidden;
+    badge.hidden = false;
+    const rect = badge.getBoundingClientRect();
+    badge.hidden = wasHidden;
+    return {
+      position: getComputedStyle(badge).position,
+      top: Math.round(rect.top),
+      left: Math.round(rect.left),
+      bottom: Math.round(rect.bottom),
+      right: Math.round(rect.right),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+    };
+  });
+  assert(box.width > 0 && box.height > 0, `${label}: active-storm badge has no box: ${JSON.stringify(box)}`);
+  assert(box.position === 'absolute', `${label}: active-storm badge is positioned ${box.position}, not absolute`);
+  assert(
+    box.top >= 0 && box.left >= 0 && box.bottom <= box.viewport.height && box.right <= box.viewport.width,
+    `${label}: active-storm badge lies outside the viewport: ${JSON.stringify(box)}`,
+  );
+}
+
 async function assertBasemapNotWatermarked(page) {
   const report = await page.evaluate(async (host) => {
     const luminance = (r, g, b) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -1493,6 +1523,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
+    await assertActiveBadgeInViewport(page, `${name} active badge`);
     if (width <= 720) await assertMobileHeaderReachability(page, `${name} header`, { requireOverflow: width <= 430 });
     await assertThemeContrastMatrix(page);
     await captureVisualSnapshot(page, `${name}-dark`);
