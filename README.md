@@ -426,7 +426,7 @@ curl -sSL -o data/hurdat2-nepac.txt \
 python scripts/preprocess_hurdat2.py --generated-at 2026-08-02T00:00:00Z
 ```
 
-The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. Impact rows can be refreshed with `python scripts/scrape_impacts.py`; use `python scripts/scrape_impacts.py --normalize-existing` after source-format fixes that should be applied to the existing `data/impacts.json` without a network scrape. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.
+The preprocessor refreshes `data/landfalls.json`, `data/storms.json`, `data/stats.json`, and `data/metadata.json`. `data/enso.json` is derived, not typed: `python scripts/build_enso.py` takes each year's ONI anomaly for its ASO season, August through October, from the checked-in CPC table at `data/oni.ascii.txt`, and names the phase by NOAA's thresholds of +0.5 and -0.5. To refresh it, replace that table from `cpc.ncep.noaa.gov/data/indices/oni.ascii.txt` and re-run the script with `--issued` set to the retrieval date. `npm run check:enso` fails if the two ever disagree. Impact rows can be refreshed with `python scripts/scrape_impacts.py`; use `python scripts/scrape_impacts.py --normalize-existing` after source-format fixes that should be applied to the existing `data/impacts.json` without a network scrape. Then run `npm test`, bump the version, update `CHANGELOG.md`, commit, and create a release.
 
 ## License & Attribution
 

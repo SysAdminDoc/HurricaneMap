@@ -15,6 +15,7 @@
     "check:readme-links": "node scripts/check-readme-links.mjs",
     "check:release-truth": "node scripts/check-release-truth.mjs",
     "check:prose-dashes": "node scripts/check-prose-dashes.mjs",
+    "check:enso": "node scripts/python.mjs scripts/build_enso.py --check",
     "check:licenses": "node scripts/check-licenses.mjs",
     "check:security": "node scripts/check-dependency-security.mjs",
     "check:security:offline": "node scripts/check-dependency-security.mjs --offline",

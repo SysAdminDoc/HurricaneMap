@@ -121,6 +121,7 @@ function sourceUrl(relative) {
   if (relative === 'data/storm-events.json') return 'https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/';
   if (relative === 'data/rainfall.json') return 'https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html';
   if (relative === 'data/enso.json') return 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php';
+  if (relative === 'data/oni.ascii.txt') return 'https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt';
   if (relative === 'data/outlook.json') return 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
   if (relative === 'data/distribution.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';
@@ -156,6 +157,8 @@ function sourceDate(relative, buildMetadata, aomlData) {
   // to the git log below dated them by their last commit, which lands before
   // the product they hold once the file is refreshed in place.
   if (relative === 'data/enso.json') return handMaintainedIssued(relative, record => record?._meta?.issued);
+  // The CPC table and the file derived from it are refreshed in the same pass.
+  if (relative === 'data/oni.ascii.txt') return handMaintainedIssued('data/enso.json', record => record?._meta?.issued);
   if (relative === 'data/outlook.json') return handMaintainedIssued(relative, record => record?.issued);
   if (relative.includes('hurdat2-atlantic')) return buildMetadata.sources.find(source => source.basin === 'AL').source_date;
   if (relative.includes('hurdat2-nepac')) return buildMetadata.sources.find(source => source.basin === 'EP').source_date;

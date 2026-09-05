@@ -9,7 +9,7 @@ export const APP_VERSION = '1.9.3';
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
-  manifest_sha256: '859a0012d0b02bb35db010d3019ab7aba42e99ca34f284ffaec823f3799fde6d',
+  manifest_sha256: 'f6f4e09eeee67fb4c8de0da63ffaabcfb82dc61548ca97a15195c1b19a8d48d3',
   algorithm: 'SHA-256',
 });
 
@@ -25,7 +25,7 @@ const ARTIFACTS = Object.freeze({
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
     bytes: 16926,
-    sha256: 'a89126a8010326789118045686a23bd3c2e5322bee7b8d07a4eae290f07f1caa',
+    sha256: '4374211cfa62e4bc8cfcfa3e1fbc09be3bbddea591fe1534f0600e7200bbafaf',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
     source_date: '2026-08-08',
     schema_version: 1,
