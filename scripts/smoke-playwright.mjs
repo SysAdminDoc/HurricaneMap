@@ -213,6 +213,126 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
   }
 }
 
+// What the comparison panel shows and what it exports have to be the same
+// numbers. They are built from one row definition today, but nothing proved
+// it, and a divergence here is the one defect class this product cannot
+// afford: a reader cites the CSV and quotes the screen.
+async function assertComparisonExportParity(browser, baseUrl) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+
+    const parity = await page.evaluate(async () => {
+      const data = await import('/src/data.js');
+      const compare = await import('/src/compare.js');
+      const settings = await import('/src/settings.js');
+      const i18n = await import('/src/i18n.js');
+      await data.ensureStormsLoaded();
+      // Three storms, deliberately unlike each other: Katrina, Iniki in the
+      // Pacific, and an 1851 storm with no impact record, so missing values
+      // and multi-state rows are compared too, not just the easy ones.
+      const ids = ['AL122005', 'EP181992', 'AL011851'];
+      const chosen = ids.map(id => data.getAllStorms().find(item => item.id === id)).filter(Boolean);
+      for (const storm of chosen) {
+        if (!compare.isPinned(storm.id)) await compare.togglePin(storm);
+      }
+      compare.openComparePanel();
+
+      const csv = compare.buildComparisonCSVText({
+        storms: compare.getPins(),
+        allStorms: data.getAllStorms(),
+        translate: i18n.t,
+        windUnit: settings.getSetting('windUnit'),
+        locale: i18n.getLocale(),
+        generatedAt: '2026-01-01T00:00:00.000Z',
+      });
+
+      // Parse the CSV table section the same way a spreadsheet would.
+      const parseCsvRow = line => {
+        const fields = [];
+        let field = '';
+        let quoted = false;
+        for (let index = 0; index < line.length; index += 1) {
+          const character = line[index];
+          if (quoted) {
+            if (character === '"' && line[index + 1] === '"') { field += '"'; index += 1; }
+            else if (character === '"') quoted = false;
+            else field += character;
+          } else if (character === '"') quoted = true;
+          else if (character === ',') { fields.push(field); field = ''; }
+          else field += character;
+        }
+        fields.push(field);
+        return fields;
+      };
+      const csvLines = csv.split('\n');
+      const blank = csvLines.indexOf('');
+      const csvRows = csvLines.slice(1, blank === -1 ? undefined : blank).map(parseCsvRow);
+
+      const table = document.querySelector('#compare-panel table');
+      const domRows = [...(table?.querySelectorAll('tbody tr') || table?.querySelectorAll('tr') || [])]
+        .map(row => [...row.querySelectorAll('th, td')].map(cell => cell.textContent.trim()))
+        .filter(cells => cells.length > 1);
+
+      const cards = [...document.querySelectorAll('#compare-panel .cp-card')].map(card => ({
+        title: card.querySelector('h3')?.textContent.trim() || '',
+        meta: card.querySelector('.cp-meta')?.textContent.replace(/\s+/g, ' ').trim() || '',
+      }));
+
+      return { csvHeader: parseCsvRow(csvLines[0]), csvRows, domRows, cards, pins: compare.getPins().length };
+    });
+
+    assert(parity.pins >= 2, `comparison parity needs at least two pinned storms, got ${parity.pins}`);
+    assert(parity.domRows.length > 0, 'the comparison table rendered no rows');
+    assert(
+      parity.csvRows.length === parity.domRows.length,
+      `the export has ${parity.csvRows.length} metric rows and the table shows ${parity.domRows.length}`,
+    );
+
+    for (const [index, csvRow] of parity.csvRows.entries()) {
+      const domRow = parity.domRows[index];
+      assert(
+        csvRow.length === domRow.length,
+        `row ${index} has ${csvRow.length} exported fields and ${domRow.length} rendered cells`,
+      );
+      for (const [column, exported] of csvRow.entries()) {
+        assert(
+          exported === domRow[column],
+          `comparison row "${csvRow[0]}" column ${column}: the panel shows `
+          + `${JSON.stringify(domRow[column])} and the export says ${JSON.stringify(exported)}`,
+        );
+      }
+    }
+
+    // The cards restate a handful of the same metrics in a different shape, so
+    // every figure on them has to appear in that storm's exported column.
+    for (const card of parity.cards) {
+      const column = parity.csvHeader.findIndex(name => name.replace(/\s+/g, ' ') === card.title);
+      assert(column > 0, `the export has no column for the pinned card "${card.title}"`);
+      const exported = new Set(parity.csvRows.map(row => row[column]));
+      const figures = card.meta.match(/-?\d[\d,]*(?:\.\d+)?(?:\s*(?:kt|mph|km\/h|mb))?/g) || [];
+      assert(figures.length > 0, `the card for ${card.title} showed no figures at all`);
+      for (const figure of figures) {
+        assert(
+          [...exported].some(value => value.includes(figure)),
+          `the card for ${card.title} shows ${JSON.stringify(figure)}, which appears in no exported field`,
+        );
+      }
+    }
+
+    assert(!pageErrors.length, `comparison parity produced page errors: ${pageErrors.join(' | ')}`);
+    console.log(
+      `  comparison parity ok (${parity.csvRows.length} metrics x ${parity.pins} storms, cards cross-checked)`,
+    );
+  } finally {
+    await context.close();
+  }
+}
+
 const mime = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
@@ -3070,6 +3190,7 @@ try {
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
   await assertForcedColorsContract(browser, baseUrl);
+  await assertComparisonExportParity(browser, baseUrl);
 
   await browser.close();
 
