@@ -8,9 +8,9 @@ import {
   beginOptionalFeed,
   completeOptionalFeed,
   failOptionalFeed,
-  idleOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+import { disposeMapLayer, registerMapLayer } from './layer-registry.js';
 
 const TILE_URL = 'https://tiles.arcgis.com/tiles/nzS0F0zdNLvs7nc8/arcgis/rest/services/GPW_PopulationDensity2015_1km/MapServer/tile/{z}/{y}/{x}';
 
@@ -24,15 +24,14 @@ function ensureStatus() {
 }
 
 export function setPopulation(enabled) {
-  const map = getMap();
   if (!enabled) {
-    if (layer) {
-      map.removeLayer(layer);
-      layer = null;
-    }
-    idleOptionalFeed('population');
+    // The registry removes the layer and reports the feed idle; the tile layer
+    // object survives so a re-enable reuses its warm tile cache.
+    disposeMapLayer('population');
     return;
   }
+  const map = getMap();
+  const handle = registerMapLayer('population', { map, feedId: 'population' });
   const request = beginOptionalFeed('population', { cacheOrigin: layer ? 'memory' : 'network' });
   requestId = request.requestId;
   ensureStatus();
@@ -53,6 +52,6 @@ export function setPopulation(enabled) {
       requestId,
     }));
   }
-  layer.addTo(map);
+  handle.attach(layer);
   if (layer._loaded) completeOptionalFeed('population', { cacheOrigin: 'memory', requestId });
 }

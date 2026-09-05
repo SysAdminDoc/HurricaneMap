@@ -5,6 +5,7 @@
 import { getMap } from './map.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { disposeMapLayer, registerMapLayer } from './layer-registry.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -15,7 +16,6 @@ import {
 let indexPromise = null;
 let layerGroup = null;
 let shownStormId = null;
-let renderGeneration = 0;
 
 function loadIndex() {
   if (!indexPromise) {
@@ -72,13 +72,20 @@ function elevationColor(ft) {
 }
 
 export async function showHwm(stormId) {
-  const generation = ++renderGeneration;
-  removeLayerGroup();
-  const response = await fetchWithTimeout(`data/surge-obs/${stormId}.json`, {}, REQUEST_TIMEOUT_MS.data).catch(() => null);
-  if (generation !== renderGeneration) return 0;
+  // Registering supersedes any previous storm's marks: it removes that layer
+  // and aborts its fetch, where the old generation counter let the superseded
+  // request run to completion and then discarded the bytes. The marks carry no
+  // feedId because that belongs to the index load, not to one storm's overlay.
+  const handle = registerMapLayer('hwm-marks', { map: getMap(), feedId: null });
+  const response = await fetchWithTimeout(
+    `data/surge-obs/${stormId}.json`,
+    { signal: handle.signal },
+    REQUEST_TIMEOUT_MS.data,
+  ).catch(() => null);
+  if (handle.disposed) return 0;
   if (!response?.ok) return 0;
   const points = await response.json();
-  if (generation !== renderGeneration) return 0;
+  if (handle.disposed) return 0;
   if (!Array.isArray(points) || !points.length) return 0;
   const L = window.L;
   const nextLayerGroup = L.layerGroup();
@@ -95,24 +102,16 @@ export async function showHwm(stormId) {
       { direction: 'top' },
     ).addTo(nextLayerGroup);
   }
-  if (generation !== renderGeneration) return 0;
+  if (!handle.attach(nextLayerGroup)) return 0;
   layerGroup = nextLayerGroup;
-  layerGroup.addTo(getMap());
   shownStormId = stormId;
   return points.length;
 }
 
 export function hideHwm() {
-  renderGeneration++;
-  removeLayerGroup();
+  disposeMapLayer('hwm-marks');
+  layerGroup = null;
   shownStormId = null;
-}
-
-function removeLayerGroup() {
-  if (layerGroup) {
-    getMap().removeLayer(layerGroup);
-    layerGroup = null;
-  }
 }
 
 export function hwmShownFor() {
