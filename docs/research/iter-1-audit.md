@@ -1,6 +1,6 @@
-# Iter 1 — Self-Audit (Phase 5)
+# Iter 1: Self-Audit (Phase 5)
 
-> Adversarial review of harvest + scored output. Single-session mode: the auditor is the same agent — known degradation, but the seven-dimension checklist still surfaces drift.
+> Adversarial review of harvest + scored output. Single-session mode: the auditor is the same agent, known degradation, but the seven-dimension checklist still surfaces drift.
 
 ## 1. Source traceability
 - ✅ Harvest items derive from prior turn's published Tier-1/2/3/4 list + repo gap analysis.
@@ -21,15 +21,15 @@
 ## 4. Internal consistency
 - ✅ Implementation order in scored.md matches NOW list.
 - ✅ Estimated effort sums to a realistic single-iteration scope.
-- ⚠ N4 (permalinks) listed at Effort 2 but interacts with N3 (city selector — must persist), N5 (export menu — no URL impact). Cross-feature integration accounted for in implementation order step 4 (URL state added LAST).
+- ⚠ N4 (permalinks) listed at Effort 2 but interacts with N3 (city selector, must persist), N5 (export menu, no URL impact). Cross-feature integration accounted for in implementation order step 4 (URL state added LAST).
 
 ## 5. Adversarial review
 - **Could ACE confuse non-experts?** Yes. Mitigation: tooltip explanation on the stat tile.
-- **Could RI flag false-positive on data-thin pre-1944 storms?** Possible — older storms have 12h+ obs gaps. Mitigation: only flag when 24h delta has actual obs at both endpoints (no interpolation).
+- **Could RI flag false-positive on data-thin pre-1944 storms?** Possible, older storms have 12h+ obs gaps. Mitigation: only flag when 24h delta has actual obs at both endpoints (no interpolation).
 - **Could closest-approach be misleading on extratropical or multi-pass storms?** Edge case. Mitigation: use minimum over entire track, label includes the date so users see context.
-- **Could permalinks expose state we don't want to share?** No — only filter values + storm ID + state name. All public.
+- **Could permalinks expose state we don't want to share?** No, only filter values + storm ID + state name. All public.
 - **Could KML/GeoJSON export break for storms with null wind/pres?** Yes if not handled. Mitigation: filter nulls in export builder; document in code comments.
-- **Could the export menu conflict with the existing action-row?** Layout-wise no — separate row. UX-wise no — clearly labeled separate menu.
+- **Could the export menu conflict with the existing action-row?** Layout-wise no, separate row. UX-wise no, clearly labeled separate menu.
 
 ## 6. Charter alignment
 - ✅ All NOW items stay client-side.

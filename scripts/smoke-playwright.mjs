@@ -2897,12 +2897,12 @@ try {
   );
 
   await openStormPanel(page, 'AL032025');
-  await page.waitForFunction(() => /No data\s*—\s*series ended 2024/.test(
+  await page.waitForFunction(() => /No data,\s*series ended 2024/.test(
     document.querySelector('#storm-panel .impacts-block')?.textContent || '',
   ), { timeout: 10000 });
   const closedSeriesText = await page.textContent('#storm-panel .impacts-block');
   assert(
-    /No data\s*—\s*series ended 2024/.test(closedSeriesText),
+    /No data,\s*series ended 2024/.test(closedSeriesText),
     `closed NCEI series was not distinguished from unavailable data: ${closedSeriesText}`,
   );
 

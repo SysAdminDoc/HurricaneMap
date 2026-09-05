@@ -1,8 +1,8 @@
-# Iter 1 — Scored & Tiered (Phase 3)
+# Iter 1: Scored & Tiered (Phase 3)
 
 Each item scored on Fit (charter) / Impact / Effort / Risk / Dependencies / Novelty (1-5, higher = better except Effort/Risk/Dependencies where lower = better).
 
-## NOW (P0/P1 — ship this iteration)
+## NOW (P0/P1: ship this iteration)
 
 ### N1. ACE per storm + per season (h1 metric)
 - Fit 5 / Impact 5 / Effort 1 / Risk 1 / Dep 1 / Novelty 4
@@ -31,9 +31,9 @@ Each item scored on Fit (charter) / Impact / Effort / Risk / Dependencies / Nove
 - Generate Blob client-side; `URL.createObjectURL` + `<a download>` synthetic click.
 - Include track + landfall points + storm metadata.
 
-## NEXT (P1 — next iteration)
+## NEXT (P1: next iteration)
 
-- N6. Pressure-fall rate metric (mb / 24h) — overlay on chart.
+- N6. Pressure-fall rate metric (mb / 24h), overlay on chart.
 - N7. Translation speed at landfall (kt/mph).
 - N8. Days at hurricane / major intensity.
 - N9. Onboarding tour (first-visit, dismissible, localStorage-flag).
@@ -71,14 +71,14 @@ Each item scored on Fit (charter) / Impact / Effort / Risk / Dependencies / Nove
 
 ## REJECTED (with reasoning)
 
-- R1. **Web Share API only** — clipboard fallback is mandatory for desktop browsers; can't ship as Share-API-only. (Resolved: include both.)
-- R2. **Audio description toggle** — out of charter scope; visual product.
-- R3. **Saharan Air Layer overlay** — interesting but requires GOES-derived SAL imagery that has no clean public API; defer indefinitely.
-- R4. **MJO phase indicator** — relies on ENSEMBLE NOAA CPC index; rejected on data-pipeline complexity vs. payoff.
-- R5. **Vector tiles for state polygons** — current GeoJSON is 89KB, fast enough; vector tiling adds toolchain for no perceptible win.
-- R6. **Code-split per panel** — no measured perf problem; premature optimization for a static site at this size.
-- R7. **Backend / API endpoint** — violates "stay client-side" charter constraint.
-- R8. **Animated favicon** — distracting in tab bar; users dislike.
+- R1. **Web Share API only**, clipboard fallback is mandatory for desktop browsers; can't ship as Share-API-only. (Resolved: include both.)
+- R2. **Audio description toggle**, out of charter scope; visual product.
+- R3. **Saharan Air Layer overlay**, interesting but requires GOES-derived SAL imagery that has no clean public API; defer indefinitely.
+- R4. **MJO phase indicator**, relies on ENSEMBLE NOAA CPC index; rejected on data-pipeline complexity vs. payoff.
+- R5. **Vector tiles for state polygons**, current GeoJSON is 89KB, fast enough; vector tiling adds toolchain for no perceptible win.
+- R6. **Code-split per panel**, no measured perf problem; premature optimization for a static site at this size.
+- R7. **Backend / API endpoint**, violates "stay client-side" charter constraint.
+- R8. **Animated favicon**, distracting in tab bar; users dislike.
 
 ## Six-dimension category coverage check
 
@@ -96,14 +96,14 @@ Each item scored on Fit (charter) / Impact / Effort / Risk / Dependencies / Nove
 | Offline | PWA in NEXT (#12). |
 | Multi-user | N/A. |
 | Migration | Storm data schema versioning in LATER. |
-| Upgrade | Already done — versioned releases. |
+| Upgrade | Already done, versioned releases. |
 
 ## Implementation order this iteration
 
-1. New file `src/metrics.js` — `computeACE`, `findRapidIntensification`, `closestApproach`, `formatNumber`, city list.
-2. `src/panel.js` — extend stat-grid with ACE + RI badge + closest-pass selector + Export menu.
-3. `src/chart.js` — add RI window red-tinted polyline segment.
-4. `src/main.js` — URL hash encode/decode + restore + write hooks.
-5. `index.html` — meta-row Export menu markup, Closest-pass selector markup.
-6. `src/styles.css` — RI badge, ACE chip, closest-pass selector styling, export menu styling.
+1. New file `src/metrics.js`, `computeACE`, `findRapidIntensification`, `closestApproach`, `formatNumber`, city list.
+2. `src/panel.js`, extend stat-grid with ACE + RI badge + closest-pass selector + Export menu.
+3. `src/chart.js`, add RI window red-tinted polyline segment.
+4. `src/main.js`. URL hash encode/decode + restore + write hooks.
+5. `index.html`, meta-row Export menu markup, Closest-pass selector markup.
+6. `src/styles.css`. RI badge, ACE chip, closest-pass selector styling, export menu styling.
 7. CHANGELOG entry, README badge bump, ROADMAP refresh.

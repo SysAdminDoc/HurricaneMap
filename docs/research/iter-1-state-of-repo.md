@@ -1,4 +1,4 @@
-# Iter 1 — State of Repo (Phase 0 recon)
+# Iter 1: State of Repo (Phase 0 recon)
 
 **Run date:** 2026-05-03
 **Prior version:** v0.3.1
@@ -39,16 +39,16 @@
 
 ## ROADMAP status entering this run
 
-ROADMAP.md (Phase 1-3) is **100% checked** — every item shipped. There is no current actionable roadmap.
+ROADMAP.md (Phase 1-3) is **100% checked**, every item shipped. There is no current actionable roadmap.
 
 ## Not yet present (gaps surfaced by audit)
 
 1. **Per-storm derived intensity metrics**: ACE (Accumulated Cyclone Energy), rapid-intensification (RI) flag.
-2. **Closest-approach tool**: "did a hurricane pass within N mi of [city]?" — not currently answerable.
+2. **Closest-approach tool**: "did a hurricane pass within N mi of [city]?", not currently answerable.
 3. **Permalink / URL state**: filter combinations, opened storm, opened state are NOT shareable. Reload loses everything.
 4. **Storm export**: no way to export a track as KML/GeoJSON/CSV for use in QGIS / Google Earth / spreadsheets.
 5. **Pressure on chart**: ✅ already present (verified).
-6. **Search by name/year**: ✅ already present (verified — `searchStorms` in `data.js`).
+6. **Search by name/year**: ✅ already present (verified, `searchStorms` in `data.js`).
 7. **ROADMAP.md is stale**: every Phase 1-3 item is checked. Needs Phase 4 replenish from research.
 
 ## Charter alignment
@@ -59,4 +59,4 @@ Per repo `CLAUDE.md`-style framing: HurricaneMap is a public-facing, single-page
 - Be educational + research-friendly (export/share/compare friendly).
 - Respect dark-mode default + the established Catppuccin Mocha tonal palette.
 
-ACE / RI / closest-approach / permalinks / export all align cleanly with the charter — no scope expansion needed.
+ACE / RI / closest-approach / permalinks / export all align cleanly with the charter, no scope expansion needed.

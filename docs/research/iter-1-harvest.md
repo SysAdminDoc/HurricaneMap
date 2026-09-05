@@ -1,4 +1,4 @@
-# Iter 1 — Harvest (Phase 2)
+# Iter 1: Harvest (Phase 2)
 
 > Quantity-first list of candidate features sourced from prior turn's tiered survey and repo gap analysis. Filtered + scored in `iter-1-scored.md`. Sources are the 9-class extension of the dimensions: direct OSS competitors (Tropycal, IBTrACS visualizers, NHC tools), commercial (Zoom Earth, Windy, MyRadar, Stormpulse-era), adjacent OSS (Leaflet plugins, MapLibre, Cesium), awesome-lists (awesome-meteorology, awesome-leaflet, awesome-gis), community signal (r/hurricane, r/TropicalWeather, HN tropical-cyclone discussions, NWS Twitter), standards (HURDAT2, ATCF, IBTrACS spec, OGC tile standards), academic (NHC TCRs, AOML/HRD publications, climate trend papers), dependency changelogs (Leaflet, leaflet.heat, leaflet-velocity), security advisories (none acutely relevant for this static site).
 
@@ -27,7 +27,7 @@
 18. Closest approach with wind threshold ("storms within 100mi at TS-force or stronger").
 19. Top-N nearest hurricanes ranked by distance × wind.
 20. Per-city return-period estimates (Cat-1, Cat-3, Cat-5).
-21. "On this day in history" — storms passing nearest in current calendar week.
+21. "On this day in history", storms passing nearest in current calendar week.
 22. Threat heatmap from city POV (radial bands).
 
 ### Shareability / state

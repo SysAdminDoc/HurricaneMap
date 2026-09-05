@@ -2,7 +2,7 @@
   {
     "term": "ACE",
     "language": "en",
-    "definition": "Accumulated Cyclone Energy — a measure of the total wind-energy output of a tropical cyclone. Calculated as the sum of (wind speed²/10⁴) over all 6-hourly observations where wind ≥ 34 kt. Typical Atlantic season produces ~100 ACE units; a single major hurricane alone generates ~10-30 units."
+    "definition": "Accumulated Cyclone Energy, a measure of the total wind-energy output of a tropical cyclone. Calculated as the sum of (wind speed²/10⁴) over all 6-hourly observations where wind ≥ 34 kt. Typical Atlantic season produces ~100 ACE units; a single major hurricane alone generates ~10-30 units."
   },
   {
     "term": "Rapid Intensification (RI)",
@@ -27,7 +27,7 @@
   {
     "term": "Pressure Fall",
     "language": "en",
-    "definition": "Explosive Deepening — when central pressure drops rapidly, typically ≥20 mb in 24 hours. Indicates very rapid intensification and often precedes the strongest winds."
+    "definition": "Explosive Deepening, when central pressure drops rapidly, typically ≥20 mb in 24 hours. Indicates very rapid intensification and often precedes the strongest winds."
   },
   {
     "term": "HURDAT2",

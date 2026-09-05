@@ -51,6 +51,27 @@ assert.deepEqual(
   'a newly added gate that nothing runs must be reported',
 );
 
+// README claims about the gates have to survive the gates changing. The stated
+// count sat at 85 for five gates, was corrected to 89 by a commit that added
+// the ninetieth, and nothing compared it to the code either time.
+const readme = await readFile(path.join(root, 'README.md'), 'utf8');
+const statedCount = /all (\d+) release gates/.exec(readme);
+assert.ok(
+  !statedCount || Number(statedCount[1]) === GATE_SCRIPTS.length,
+  `README says "all ${statedCount?.[1]} release gates" but the runner has ${GATE_SCRIPTS.length}. `
+  + 'Either correct it or drop the number, which is what this check exists to stop rotting.',
+);
+
+// NCEI's Storm Events is a client-rendered app that reads no filters from a
+// URL, so a link cannot arrive pre-filtered. The app stopped claiming it could;
+// the README kept saying so for two more commits.
+assert.doesNotMatch(
+  readme,
+  /Storm Events[^.]*?\bfiltered\b/i,
+  'README must not describe the Storm Events quicklink as filtered: the destination ignores every parameter',
+);
+assert.doesNotMatch(readme, /rammb-slider|RAMMB SLIDER/, 'README must not name the retired SLIDER host');
+
 // A gate can die without an exit status. Reporting those as a bare FAIL left an
 // operator staring at truncated output with no stated cause.
 assert.match(
