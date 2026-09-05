@@ -238,7 +238,7 @@
     - button "Retry service worker"
     - button "Refresh diagnostics"
     - button "Export support JSON"
-    - paragraph: The export includes versions and technical errors only—never locations, addresses, searches, saved views, or preparedness answers.
+    - paragraph: The export includes versions and technical errors only, never locations, addresses, searches, saved views, or preparedness answers.
   - region "Saved views":
     - heading "Saved views" [level=3]
     - paragraph: /Saved views never include addresses or selected locations\. Device location stays session-only unless you explicitly remember it for \d+ hours\./

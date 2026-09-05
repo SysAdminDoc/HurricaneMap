@@ -87,6 +87,10 @@
       - link "Sous FEMA":
         - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
       - status:
+        - strong: Deklarasyon federal pou katastwòf
+        - text: Pa disponib FEMA Disaster Declarations Summaries Kantite anrejistreman enkoni Poko gen chaj ki reyisi
+        - button "Eseye ankò"
+      - status:
         - paragraph: Deklarasyon FEMA yo pa disponib kounye a.
         - paragraph:
           - text: Nou pa ka konfime yon deklarasyon jouk sous la reponn.
@@ -100,8 +104,8 @@
       - /url: https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl
     - link "NHC archive":
       - /url: https://www.nhc.noaa.gov/archive/2005/AL122005.shtml
-    - link "Tornadoes (NOAA)":
-      - /url: https://www.ncei.noaa.gov/stormevents/listevents.jsp?eventType=%28C%29+Tornado&beginDate_mm=08&beginDate_dd=23&beginDate_yyyy=2005&endDate_mm=08&endDate_dd=31&endDate_yyyy=2005&statefips=12%2CFLORIDA%2C22%2CLOUISIANA
+    - link "Storm Events (NOAA)":
+      - /url: https://www.ncei.noaa.gov/access/storm-events-database/search
     - link "Recon archive":
       - /url: https://tropicalatlantic.com/recon/?archive=2005&storm=Katrina
     - text: "Ekspòte chemen:"

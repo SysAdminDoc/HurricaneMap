@@ -238,7 +238,7 @@
     - button "Eseye service worker ankò"
     - button "Rafrechi dyagnostik"
     - button "Ekspòte JSON sipò"
-    - paragraph: Ekspòtasyon an gen sèlman vèsyon ak erè teknik—li pa janm gen pozisyon, adrès, rechèch, vizyalizasyon anrejistre, oswa repons preparasyon.
+    - paragraph: Ekspòtasyon an gen sèlman vèsyon ak erè teknik, li pa janm gen pozisyon, adrès, rechèch, vizyalizasyon anrejistre, oswa repons preparasyon.
   - region "Vizyalizasyon anrejistre":
     - heading "Vizyalizasyon anrejistre" [level=3]
     - paragraph: /Vizyalizasyon anrejistre pa janm gen adrès oswa pozisyon ou chwazi\. Pozisyon aparèy la rete sèlman pandan sesyon an sof si ou chwazi sonje li pandan \d+ èdtan\./

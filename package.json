@@ -28,6 +28,7 @@
     "dist:core": "node scripts/build-distribution.mjs core",
     "dist:full": "node scripts/build-distribution.mjs full",
     "check:popup-sinks": "node scripts/check-popup-sinks.mjs",
+    "check:aria-quicklinks": "node scripts/check-aria-quicklinks.mjs",
     "validate:data": "node scripts/validate-data.mjs",
     "test:discovery": "node scripts/test-discovery.mjs",
     "test:dataset-status": "node scripts/test-dataset-status.mjs",
