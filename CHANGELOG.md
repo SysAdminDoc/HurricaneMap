@@ -2,6 +2,11 @@
 
 All notable changes to HurricaneMap.
 
+## Unreleased
+
+### Fixed
+- The release gate is unblocked: `fast-uri` moves to 3.1.7, clearing four high advisories (GHSA-5jgf-p345-68v8, GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp) that affected every 3.x release through 3.1.5, and the checked-in npm audit snapshot is regenerated against the new lockfile.
+
 ## v1.9.3 — Metric parity and maintainability (2026-08-08)
 
 ### Added
