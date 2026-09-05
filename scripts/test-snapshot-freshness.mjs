@@ -35,8 +35,11 @@ const windows = [
 // Anchored to the real clock, not to the data. Deriving every probe from the
 // snapshots proves the mechanism works but would pass just as happily on a
 // snapshot that expired a year ago, which is the failure this test exists for.
-const today = parseSnapshotDate(process.env.HURRICANEMAP_VALIDATION_DATE || '')
-  || new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z');
+// Deliberately the real clock, never HURRICANEMAP_VALIDATION_DATE: that
+// variable steers the validator subprocesses below, and honouring it here would
+// let `HURRICANEMAP_VALIDATION_DATE=2020-01-01 npm run build` switch off the one
+// assertion that notices the snapshots have gone stale.
+const today = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`);
 for (const { label, snapshot } of windows) {
   const issued = parseSnapshotDate(snapshot.issued);
   const validUntil = parseSnapshotDate(snapshot.valid_until);

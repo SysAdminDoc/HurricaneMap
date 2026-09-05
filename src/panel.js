@@ -704,11 +704,11 @@ function sliderSatelliteUrl(storm) {
   // SLIDER takes Unix seconds and a sector. CONUS sector is the right scale
   // for U.S. landfalls; tropical-atlantic for storms still over open ocean.
   const unix = Math.floor(ts.getTime() / 1000);
-  // GOES-16 (East) cannot see Hawaii — Pacific landfalls need GOES-18 full disk.
+  // GOES-19 replaced goes-16 as East on 2025-04-07; Hawaii needs GOES-18.
   const isHawaii = lfs.length && lfs[0].state === 'Hawaii';
-  const sat = isHawaii ? 'goes-18' : 'goes-16';
+  const sat = isHawaii ? 'goes-18' : 'goes-19';
   const sec = isHawaii ? 'full_disk' : 'conus';
-  // GeoColor is most legible day-and-night. Canonical host, not rammb-slider.
+  // GeoColor is most legible day-and-night. Canonical CIRA host only.
   return `https://slider.cira.colostate.edu/?sat=${sat}&sec=${sec}&start_unix=${unix}&time_step=10&motion=loop&im=12`;
 }
 

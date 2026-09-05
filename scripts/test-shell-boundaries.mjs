@@ -46,9 +46,18 @@ assert(panelLines < 800, 'panel.js renderer regressed to ' + panelLines + ' line
 // intact, so this is about not depending on that redirect outliving the link.
 const sliderLink = panel.match(/return `(https:\/\/slider\.cira\.colostate\.edu\/\?[^`]*)`/)?.[1];
 assert(sliderLink, 'the satellite quicklink must be built on the canonical SLIDER host');
-assert(!/return `https:\/\/rammb-slider\./.test(panel), 'panel.js must not rebuild links on the retired SLIDER host');
+// Matched anywhere in the file, not just in the return, so an interpolated
+// host cannot slip the retired name past a literal-prefix check.
+assert(!/rammb-slider/.test(panel), 'panel.js must not name the retired SLIDER host at all');
 for (const parameter of ['sat=', 'sec=', 'start_unix=']) {
   assert(sliderLink.includes(parameter), `the SLIDER quicklink must carry ${parameter}`);
+}
+// SLIDER 404s goes-16 since GOES-19 took over as GOES-East on 2025-04-07.
+assert(!/'goes-16'|"goes-16"|=goes-16/.test(panel), 'panel.js must not request the decommissioned goes-16 feed');
+const satellites = [...panel.matchAll(/'(goes-\d+)'/g)].map(match => match[1]);
+assert(satellites.length > 0, 'the quicklink must name its satellites explicitly');
+for (const satellite of satellites) {
+  assert(['goes-18', 'goes-19'].includes(satellite), `${satellite} is not a SLIDER feed this app should link to`);
 }
 
 // Storage persistence belongs to the save that needs it, not to boot: asking

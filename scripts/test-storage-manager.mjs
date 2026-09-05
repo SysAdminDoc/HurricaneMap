@@ -11,6 +11,7 @@ import {
   formatStorageBytes,
   hasOptionalOfflineData,
   inspectStorage,
+  renderStorageManager,
   requestStoragePersistence,
   inspectRadarFrameCache,
   isQuotaExceededError,
@@ -172,11 +173,11 @@ function persistenceApi({ already = false, grant = true, throws = false, support
 }
 
 const granted = persistenceApi({ grant: true });
-assert.deepEqual(await requestStoragePersistence(granted.api), { supported: true, persisted: true });
+assert.deepEqual(await requestStoragePersistence(granted.api), { supported: true, persisted: true, timedOut: false });
 assert.deepEqual(granted.calls, ['persist']);
 
 const denied = persistenceApi({ grant: false });
-assert.deepEqual(await requestStoragePersistence(denied.api), { supported: true, persisted: false });
+assert.deepEqual(await requestStoragePersistence(denied.api), { supported: true, persisted: false, timedOut: false });
 
 const alreadyPersisted = persistenceApi({ already: true });
 assert.deepEqual(await requestStoragePersistence(alreadyPersisted.api), { supported: true, persisted: true });
@@ -184,6 +185,16 @@ assert.deepEqual(alreadyPersisted.calls, [], 'an origin that is already persiste
 
 const throwing = persistenceApi({ throws: true });
 assert.deepEqual(await requestStoragePersistence(throwing.api), { supported: true, persisted: false }, 'a rejected persist must not escape');
+
+// Firefox answers persist() from a doorhanger the user may never touch.
+const neverAnswers = { estimate: async () => ({}), persisted: async () => false, persist: () => new Promise(() => {}) };
+const pendingStart = Date.now();
+assert.deepEqual(
+  await requestStoragePersistence(neverAnswers, { timeoutMs: 40 }),
+  { supported: true, persisted: false, timedOut: true },
+  'an unanswered prompt must resolve as a refusal, not hang the save',
+);
+assert.ok(Date.now() - pendingStart < 2000, 'the persistence prompt must not block the save');
 
 assert.deepEqual(await requestStoragePersistence(undefined), { supported: false, persisted: false });
 assert.deepEqual(await requestStoragePersistence(persistenceApi({ supported: false }).api), { supported: false, persisted: false });
@@ -225,5 +236,33 @@ assert.equal(hasOptionalOfflineData({ scopes: [{ id: 'radar', required: false, e
 assert.equal(hasOptionalOfflineData({ scopes: [{ id: 'radar', required: false, entries: 12 }], packs: {} }), true);
 assert.equal(hasOptionalOfflineData({ scopes: [], packs: { AL012026: { frames: 4 } } }), true);
 assert.equal(hasOptionalOfflineData(undefined), false);
+
+// The warning has to actually render, not merely be computable.
+function renderWith(snapshot) {
+  const host = { innerHTML: '' };
+  return renderStorageManager(host, { inspect: async () => snapshot }).then(() => host.innerHTML);
+}
+const baseSnapshot = {
+  usage: 1024,
+  quota: 1_000_000,
+  percent: 1,
+  scopes: [
+    { id: 'shell', required: true, entries: 40, sizeBytes: 100, cacheName: 'hm-shell-x' },
+    { id: 'radar', required: false, entries: 0, sizeBytes: 0, cacheName: 'hm-radar-v1' },
+  ],
+  release: { state: 'intact' },
+  packs: {},
+};
+const savedRadar = {
+  ...baseSnapshot,
+  scopes: baseSnapshot.scopes.map(scope => scope.id === 'radar' ? { ...scope, entries: 12, sizeBytes: 4096 } : scope),
+};
+const evictionText = 'storage-eviction-risk';
+assert.equal((await renderWith({ ...baseSnapshot, persisted: false })).includes(evictionText), false, 'no saved optional data, no warning');
+assert.equal((await renderWith({ ...savedRadar, persisted: true })).includes(evictionText), false, 'persistence granted, no warning');
+const warned = await renderWith({ ...savedRadar, persisted: false });
+assert.equal(warned.includes(evictionText), true, 'saved data plus a refusal must warn');
+assert.equal(warned.includes('role="status"'), true, 'the warning must be announced');
+assert.equal((await renderWith({ ...savedRadar, persisted: false, packs: { AL012026: {} } })).includes(evictionText), true);
 
 console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs, persistence on save)');

@@ -30,5 +30,10 @@ const cesium = policy.vendors.find(vendor => vendor.id === 'cesium');
 assert.equal(cesium.decision, 'pinned-sri-isolation', 'Cesium must remain isolated behind the reviewed SRI policy');
 assert.match(cesium.assets.javascript.integrity, /^sha384-[A-Za-z0-9+/]+=*$/);
 assert.match(cesium.assets.stylesheet.integrity, /^sha384-[A-Za-z0-9+/]+=*$/);
-assert.ok(Date.parse(cesium.review_expires_at_utc) >= Date.parse('2026-09-30T00:00:00Z'), 'Cesium review must extend through the roadmap review window');
+// Anchored to the clock, not to a literal date that quietly becomes a date in
+// the past: the point is that the review has not lapsed, not that it once ran.
+const cesiumExpiry = Date.parse(cesium.review_expires_at_utc);
+assert.ok(Number.isFinite(cesiumExpiry), 'Cesium review must carry a parsable expiry');
+assert.ok(cesiumExpiry > Date.now(), `Cesium review lapsed on ${cesium.review_expires_at_utc}; re-review the pinned release and SRI pair`);
+assert.ok(Date.parse(cesium.reviewed_at_utc) <= Date.now(), 'Cesium review cannot be dated in the future');
 console.log('dependency security helpers ok (JSON parsing, severity gate, lock binding)');

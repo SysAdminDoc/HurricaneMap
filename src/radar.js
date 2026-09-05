@@ -426,7 +426,8 @@ export class RadarOverlay {
       const result = await cacheRadarPack(this.stormId, this.localFrames, {
         onProgress: ({ saved, total }) => this.setStatus(`Saving radar pack ${saved}/${total}…`),
       });
-      this.setStatus(`Saved ${result.saved} radar frames for offline use.`);
+      const evictionNote = result.persisted ? '' : ` ${t('storage.evictionRisk')}`;
+      this.setStatus(`Saved ${result.saved} radar frames for offline use.${evictionNote}`);
       button.textContent = 'Saved';
     } catch (error) {
       this.setStatus(isQuotaExceededError(error)

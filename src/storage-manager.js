@@ -55,11 +55,22 @@ export function summarizeStorageEstimate(estimate = {}) {
  * A refusal is never fatal — the save still proceeds, and the storage panel
  * says the data may be evicted.
  */
-export async function requestStoragePersistence(storageApi = globalThis.navigator?.storage) {
+export const PERSISTENCE_PROMPT_TIMEOUT_MS = 15_000;
+
+export async function requestStoragePersistence(storageApi = globalThis.navigator?.storage, {
+  timeoutMs = PERSISTENCE_PROMPT_TIMEOUT_MS,
+} = {}) {
   if (typeof storageApi?.persist !== 'function') return { supported: false, persisted: false };
   try {
     if (await storageApi.persisted?.()) return { supported: true, persisted: true };
-    return { supported: true, persisted: Boolean(await storageApi.persist()) };
+    // Firefox answers persist() from a doorhanger the user may never touch, and
+    // the caller has already disabled its save button. Treat silence as a
+    // refusal after a bounded wait rather than hanging the save forever.
+    const answered = await Promise.race([
+      storageApi.persist().then(granted => ({ granted: Boolean(granted) })),
+      new Promise(resolve => setTimeout(() => resolve({ granted: false, timedOut: true }), timeoutMs)),
+    ]);
+    return { supported: true, persisted: answered.granted, timedOut: Boolean(answered.timedOut) };
   } catch {
     return { supported: true, persisted: false };
   }
@@ -476,10 +487,10 @@ function scopeLabel(scope) {
   return t(`storage.scope.${scope.id}`);
 }
 
-export async function renderStorageManager(host) {
+export async function renderStorageManager(host, { inspect = inspectStorage } = {}) {
   if (!host) return;
   host.innerHTML = `<p class="settings-help">${escapeHtml(t('storage.loading'))}</p>`;
-  const snapshot = await inspectStorage();
+  const snapshot = await inspect();
   const usage = snapshot.usage == null
     ? t('storage.unavailable')
     : `${formatStorageBytes(snapshot.usage)} / ${formatStorageBytes(snapshot.quota)}${snapshot.percent == null ? '' : ` (${snapshot.percent}%)`}`;
@@ -539,7 +550,9 @@ export function initStorageManager(host = document.getElementById('storage-manag
       const status = host.querySelector('.storage-action-status');
       const message = result.error
         ? t('storage.sourceFailed', label)
-        : t('storage.sourceComplete', formatStorageBytes(result.bytes));
+        // Say it where the save happened, not only in the panel summary: the
+        // browser just declined to protect what the user asked it to keep.
+        : `${t('storage.sourceComplete', formatStorageBytes(result.bytes))}${result.persisted ? '' : ` ${t('storage.evictionRisk')}`}`;
       if (status) status.textContent = message;
       announceLocalAction(message);
       host.querySelector('[data-cache-source-bundle]')?.focus({ preventScroll: true });

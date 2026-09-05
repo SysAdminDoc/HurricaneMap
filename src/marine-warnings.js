@@ -73,20 +73,38 @@ export function parseMarineWarningKml(kml) {
  * The last failure is rethrown so the optional-feed state still reports the
  * real status code rather than a generic "unavailable".
  */
-export async function fetchMarineFeed(feed, { fetchImpl } = {}) {
+/** A KML document, as opposed to a host's 200-response SPA shell or error page. */
+export function looksLikeKml(body) {
+  return /<\s*kml[\s>]/i.test(String(body || ''));
+}
+
+export async function fetchMarineFeed(feed, { fetchImpl, signal } = {}) {
   let lastError = null;
+  // One deadline for the whole feed, not one per attempt: two sequential
+  // 12-second budgets would let a dead proxy hold the layer for 24.
+  const deadline = AbortSignal.timeout(REQUEST_TIMEOUT_MS.active);
+  const budget = signal ? AbortSignal.any([signal, deadline]) : deadline;
   for (const url of [feed.proxy, feed.direct]) {
     try {
-      const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active, fetchImpl);
+      const response = await fetchWithTimeout(url, { cache: 'no-cache', signal: budget }, REQUEST_TIMEOUT_MS.active, fetchImpl);
       if (!response.ok) {
         const error = new Error(`${url} returned ${response.status}`);
         error.responseStatus = response.status;
         lastError = error;
         continue;
       }
-      return parseMarineWarningKml(await response.text());
+      // A host that answers 200 with its own app shell (static-site fallbacks
+      // do this for unknown paths) would otherwise parse to zero polygons and
+      // be cached for six hours as a quiet ocean.
+      const body = await response.text();
+      if (!looksLikeKml(body)) {
+        lastError = new Error(`${url} returned ${body.length} bytes that are not KML`);
+        continue;
+      }
+      return parseMarineWarningKml(body);
     } catch (error) {
       lastError = error;
+      if (budget.aborted) break;
     }
   }
   throw lastError || new Error(`${feed.id} marine warning feed unavailable`);

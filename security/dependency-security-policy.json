@@ -32,25 +32,25 @@
       "id": "cesium",
       "kind": "remote-sri",
       "name": "CesiumJS",
-      "version": "1.144",
+      "version": "1.145",
       "assets": {
         "javascript": {
-          "url": "https://cesium.com/downloads/cesiumjs/releases/1.144/Build/Cesium/Cesium.js",
-          "integrity": "sha384-H7H47ZzeAn6uxYsb2NwFWi9i4aBOLgIaY1F3FHTId02di0GMUqNHFZUFX/wFyZbl"
+          "url": "https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js",
+          "integrity": "sha384-1G42k2yKVnUMrgZBHAlf+pQXOrpQdoo/lqzpebarn4Wamb2UgdZSZWtWEYfVP3sO"
         },
         "stylesheet": {
-          "url": "https://cesium.com/downloads/cesiumjs/releases/1.144/Build/Cesium/Widgets/widgets.css",
+          "url": "https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css",
           "integrity": "sha384-ghEeMdcWWzRv/BPeUcX835vcKDGrxvROXisl/Btpv3GeekBUXTSPVcFJpI1Tcrgp"
         }
       },
       "license": "Apache-2.0",
-      "source_url": "https://github.com/CesiumGS/cesium/releases/tag/1.144",
+      "source_url": "https://github.com/CesiumGS/cesium/releases/tag/1.145",
       "decision": "pinned-sri-isolation",
-      "reviewed_at_utc": "2026-08-08T00:00:00Z",
-      "review_expires_at_utc": "2026-10-31T00:00:00Z",
+      "reviewed_at_utc": "2026-09-05T00:00:00Z",
+      "review_expires_at_utc": "2026-12-31T00:00:00Z",
       "advisories": [],
       "rationale": "Cesium is optional, loaded only in the opaque sandboxed globe document, and both remote assets use exact SRI hashes.",
-      "next_action": "Review the pinned Cesium release and SRI pair before 2026-10-31 or before changing the isolated globe boundary."
+      "next_action": "Review the pinned Cesium release and SRI pair before 2026-12-31 or before changing the isolated globe boundary."
     }
   ]
 }

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { extractKmlFromKmz, parseOutlookKml } from '../src/outlook.js';
-import { fetchMarineFeed, MARINE_FEEDS, parseMarineWarningKml } from '../src/marine-warnings.js';
+import { fetchMarineFeed, looksLikeKml, MARINE_FEEDS, parseMarineWarningKml } from '../src/marine-warnings.js';
 
 const outlookKml = `<?xml version="1.0"?><kml><Document>
   <Placemark><styleUrl>#zerox</styleUrl><ExtendedData>
@@ -99,6 +99,21 @@ const throwing = recordingFetch(url => {
   return ok(marineKml);
 });
 assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: throwing.fetchImpl })).length, 1, 'a network error on the proxy must fall through too');
+
+// A 200 carrying something that is not KML must fall through, not be accepted
+// as an empty ocean and cached for six hours.
+assert.equal(looksLikeKml(marineKml), true);
+assert.equal(looksLikeKml('<!doctype html><html><body>app shell</body></html>'), false);
+assert.equal(looksLikeKml(''), false);
+const shellFallback = recordingFetch(url => url === atlantic.proxy
+  ? ok('<!doctype html><html><body>app shell</body></html>')
+  : ok(marineKml));
+assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: shellFallback.fetchImpl })).length, 1);
+assert.deepEqual(
+  shellFallback.requested,
+  [atlantic.proxy, atlantic.direct],
+  'a 200 that is not KML must fall through to NHC',
+);
 
 const dead = recordingFetch(() => notFound());
 await assert.rejects(
