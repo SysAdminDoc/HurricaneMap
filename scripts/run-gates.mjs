@@ -22,6 +22,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'check:release-truth',
   'check:prose-dashes',
   'check:enso',
+  'test:coverage-claims',
   'check:licenses',
   'check:security',
   'check:pages-size',

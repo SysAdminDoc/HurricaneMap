@@ -2008,6 +2008,23 @@ try {
     expectedGeneratorVersion && provenanceText.includes(`HurricaneMap ${expectedGeneratorVersion}`),
     'About provenance did not render the generator app version.',
   );
+  // Two tiers: the best track reaches 1851, the layers built on top of it do
+  // not, and one range for all of them overstated the shallow ones.
+  const coverageText = await page.textContent('#archive-coverage-body');
+  assert(
+    /Layer depth is shallower than the best track/.test(coverageText),
+    `About did not distinguish layer depth from best-track depth: ${coverageText.slice(0, 200)}`,
+  );
+  for (const [label, range] of [['Archived NEXRAD radar', '1995–2025'], ['Advisory replay', '2015–2024']]) {
+    assert(
+      coverageText.includes(range),
+      `About did not state ${label} as covering ${range}: ${coverageText.slice(0, 400)}`,
+    );
+  }
+  assert(
+    /next revision is expected in 2027/.test(coverageText),
+    `About did not name when the next HURDAT2 revision is due: ${coverageText.slice(0, 300)}`,
+  );
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
 

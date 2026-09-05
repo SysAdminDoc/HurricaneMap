@@ -4,6 +4,7 @@
 import { getAomlValidation, getCoverage, getMetadata, getStats } from './data.js';
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
+import { layerDepths, nextRevisionExpectation } from './coverage-claims.js';
 
 function formatMetadataDate(value) {
   if (!value) return 'Unavailable';
@@ -182,8 +183,30 @@ export function createAboutRenderer({
         </tr>`;
     }).join('');
 
+    // Two tiers, because one range for everything overstates the shallow
+    // layers: the best track reaches 1851, the radar loop starts in 1995.
+    const layers = layerDepths(coverage)
+      .map(layer => t(
+        'about.archiveLayerDepth',
+        layer.label,
+        formatCoverageRange([layer.from, layer.to]),
+        layer.storms == null ? '' : t('about.archiveLayerStorms', formatNumber(layer.storms)),
+      ))
+      .join(t('about.archiveLayerSeparator'));
+    const depth = layers ? `<p class="archive-coverage-summary">${escapeHtml(t('about.archiveLayerIntro', layers))}</p>` : '';
+    const revision = nextRevisionExpectation(getMetadata());
+    const refresh = revision
+      ? `<p class="archive-coverage-summary">${escapeHtml(t(
+        'about.archiveNextRevision',
+        formatMetadataDate(revision.revised),
+        String(revision.expectedYear),
+      ))}</p>`
+      : '';
+
     archiveCoverageBody.innerHTML = `
       <p class="archive-coverage-summary">${escapeHtml(summary)}</p>
+      ${depth}
+      ${refresh}
       <div class="archive-coverage-table-wrap">
         <table class="archive-coverage-table">
           <caption class="sr-only">${escapeHtml(t('about.archiveCoverageTitle'))}</caption>

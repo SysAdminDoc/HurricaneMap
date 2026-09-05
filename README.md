@@ -61,6 +61,8 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 ## Highlights
 
 - **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851-2025.
+- **Layer depth is not the same as best-track depth.** The best track reaches back to 1851. The archived radar loop covers 1995-2025 (139 storms), advisory replay 2015-2024 (33 storms), and surveyed high-water marks 2003-2024 (25 storms). The About dialog states both tiers from `data/coverage.json`, and `npm run test:coverage-claims` fails if this paragraph and that file disagree.
+- HURDAT2 was last revised 2026-02-27. NHC reissues it once a year in the spring, so the next revision is expected in 2027.
 - Both **Atlantic** and **Eastern North Pacific** HURDAT2 basins ingested (so storms like Iniki '92 on Kauai are included).
 - **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times, which fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
 - **Hotspot / cold-spot analysis**: ranks every coastal state, lists ones that have never recorded a hurricane-strength landfall (Delaware, Maryland, Virginia, New Hampshire, Pennsylvania, DC).
