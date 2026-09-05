@@ -753,6 +753,49 @@ async function assertVideoExport(page) {
   await download.delete();
 }
 
+// The storm panel owns the radar overlay, the track animator, the wind-field
+// swath and the high-water marks, and every control for them lives inside the
+// panel. When another managed panel hid the storm panel, only the cone, the
+// risk trajectories and the advisory replay were torn down: the radar kept
+// running under the newly opened panel with no way to switch it off, still
+// captioned with the previous storm.
+async function assertStormOverlaysStopWithThePanel(page) {
+  await openKatrinaPanel(page);
+  await page.locator('#storm-panel button:has-text("Radar")').first().click();
+  await page.waitForFunction(
+    () => Boolean(document.querySelector('.radar-controls')) &&
+      document.querySelectorAll('#map .leaflet-image-layer').length > 0,
+    { timeout: 20000 },
+  );
+
+  await page.click('#toggle-stats');
+  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 10000 });
+
+  const leftovers = await page.evaluate(() => {
+    const controls = document.querySelector('.radar-controls');
+    const visible = element => {
+      if (!element || element.hidden) return false;
+      const style = getComputedStyle(element);
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    };
+    return {
+      radarControlsVisible: visible(controls),
+      radarImageLayers: document.querySelectorAll('#map .leaflet-image-layer').length,
+      windFieldPaths: document.querySelectorAll('path.wind-field-swath, .wind-field-legend').length,
+      highWaterMarks: document.querySelectorAll('.hwm-marker, #hwm-legend:not([hidden])').length,
+    };
+  });
+  assert(!leftovers.radarControlsVisible, 'radar controls survived the storm panel being hidden by another panel');
+  assert(leftovers.radarImageLayers === 0, `radar imagery survived the storm panel being hidden: ${leftovers.radarImageLayers} layers`);
+  assert(!leftovers.windFieldPaths, 'wind-field overlay survived the storm panel being hidden');
+  assert(!leftovers.highWaterMarks, 'high-water marks survived the storm panel being hidden');
+
+  await page.evaluate(async () => {
+    const panels = await import('/src/panels.js');
+    panels.closeAllPanels();
+  });
+}
+
 async function assertRadarRenderModes(page) {
   await page.evaluate(async () => {
     const { getMap } = await import('/src/map.js');
@@ -2724,6 +2767,7 @@ try {
   await openKatrinaPanel(page);
   await assertVideoExport(page);
   await assertRadarRenderModes(page);
+  await assertStormOverlaysStopWithThePanel(page);
   // Live permalink navigation: assigning a new hash in an open tab must
   // apply it without a reload (hashchange listener).
   await page.evaluate(() => { location.hash = '#storm=AL092022'; });

@@ -100,10 +100,12 @@ async function refreshRadarCacheStatus(stormId) {
     }
   }
 }
-closeBtn.addEventListener('click', () => {
-  hidePanel('storm-panel');
-  cancelFemaRequest();
-  clearTracks();
+// Everything the storm panel owns on the map. Its controls live inside the
+// panel, so anything still running once the panel is gone cannot be turned off:
+// the radar overlay kept its floating controls and the old storm's title, the
+// track animator kept its rAF loop, and the wind-field swath and high-water
+// marks stayed drawn over whichever panel had just opened.
+function stopStormOverlays() {
   if (animator) animator.stop();
   if (radar) radar.close();
   hideWindField();
@@ -111,6 +113,13 @@ closeBtn.addEventListener('click', () => {
   clearRetrospectiveCone();
   clearRiskTrajectories();
   clearAdvisoryReplay();
+}
+
+closeBtn.addEventListener('click', () => {
+  hidePanel('storm-panel');
+  cancelFemaRequest();
+  clearTracks();
+  stopStormOverlays();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 // Other managed panels hide the storm panel through panels.js. Keep map-owned
@@ -118,9 +127,7 @@ closeBtn.addEventListener('click', () => {
 // legends over the newly opened surface.
 document.addEventListener('hm-panel:hidden', event => {
   if (event.detail?.id !== 'storm-panel') return;
-  clearRetrospectiveCone();
-  clearRiskTrajectories();
-  clearAdvisoryReplay();
+  stopStormOverlays();
 });
 let showStormSeq = 0;
 export async function showStorm(landfall, { advisoryReplay = null } = {}) {
@@ -136,13 +143,9 @@ export async function showStorm(landfall, { advisoryReplay = null } = {}) {
     </div>
   `;
   // Stop any running animation and drop the previous storm's overlays when
-  // switching storms — the wind-field swath otherwise outlives its checkbox.
-  if (animator) animator.stop();
-  hideWindField();
-  hideHwm();
-  clearRetrospectiveCone();
-  clearRiskTrajectories();
-  clearAdvisoryReplay();
+  // switching storms — the wind-field swath otherwise outlives its checkbox,
+  // and the radar controls kept the previous storm's title.
+  stopStormOverlays();
   await ensureStormsLoaded();
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
