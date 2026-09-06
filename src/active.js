@@ -118,7 +118,7 @@ async function fetchAndRender() {
   // No relay route on this deployment: there is nothing to retry and nothing
   // to poll for, so stop rather than leaving a permanent error card over the
   // map with a Retry button that can never succeed.
-  if (!result.ok && isMissingProxyRoute(result.status)) {
+  if (!result.ok && result.missingRoute) {
     if (pollTimer) clearTimeout(pollTimer);
     pollTimer = null;
     nextPollAt = null;
@@ -209,18 +209,21 @@ async function renderOperationalLayers() {
 
 async function tryFetch(url) {
   const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
-  if (response.status === 429) return { ok: false, status: 429, storms: [] };
-  if (!response.ok) return { ok: false, status: response.status || 0, storms: [] };
+  if (response.status === 429) return { ok: false, status: 429, storms: [], missingRoute: false };
+  if (!response.ok) {
+    return { ok: false, status: response.status || 0, storms: [], missingRoute: isMissingProxyRoute(response) };
+  }
   const data = await response.json();
-  return { ok: true, status: response.status, storms: (data && data.activeStorms) || [] };
+  return { ok: true, status: response.status, storms: (data && data.activeStorms) || [], missingRoute: false };
 }
 
 async function fetchCurrentStorms() {
   try {
     const result = await tryFetch(nhcProxyUrl('/nhc/CurrentStorms.json'));
     // First one through the door tells the other feeds what it found. A
-    // network error is not proof the route is missing, so only a 404 counts.
-    reportNhcProxyAvailability(!isMissingProxyRoute(result.status));
+    // network error is not proof of anything, and neither is a 404 the relay
+    // itself served: only an untagged 404 means the route is absent.
+    reportNhcProxyAvailability(!result.missingRoute);
     return result;
   } catch (error) {
     reportNhcProxyAvailability(true);

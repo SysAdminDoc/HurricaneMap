@@ -199,6 +199,13 @@ html.light-theme .storm-panel {
   --atlas-ink: var(--foreground);
 }
 
+/* Section headings are the panel's one accent-coloured text. The light accent
+   clears AA comfortably but lands at 6.89:1 against the panel's lightest
+   gradient stop, just under the 7:1 that high contrast promises. */
+html.light-theme.high-contrast .storm-panel {
+  --atlas-cyan: #00434f;
+}
+
 /* The biography and the other muted panel text sit on a faint lavender tint,
    where the default light --subtext lands at 4.27:1. One step darker clears AA
    on the tint and on the plain panel alike. High contrast is excluded: its own

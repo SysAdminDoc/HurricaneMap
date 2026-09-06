@@ -19,11 +19,17 @@ export function nhcProxyUrl(route) {
   return new URL(path.replace(/^\/+/, ''), base).href;
 }
 
-// A 404 from our own relay route means the route is not deployed. That is a
-// property of the deployment, not a transient failure, so it is reported as
-// unsupported rather than retried forever.
-export function isMissingProxyRoute(status) {
-  return status === 404;
+// The relay passes NHC's status through verbatim, so a 404 can mean either
+// "no worker here" or "the worker asked NHC and NHC said no". Treating both as
+// a missing route would kill active-storm tracking for the rest of the page
+// load on a real worker deployment the first time an upstream file moved.
+// Every response the worker serves is tagged, so the tag tells them apart.
+export const PROXY_RESPONSE_TAG = 'X-HurricaneMap-CDN';
+
+export function isMissingProxyRoute(response) {
+  if (!response || response.status !== 404) return false;
+  const tag = typeof response.headers?.get === 'function' ? response.headers.get(PROXY_RESPONSE_TAG) : null;
+  return !tag;
 }
 
 // Whether this deployment has the relay, answered once per page load. The
@@ -45,5 +51,8 @@ export function reportNhcProxyAvailability(available) {
 // Test seam: the discovery is a page-load-scoped fact, and a suite that drives
 // several deployments in one process needs to forget the previous answer.
 export function resetNhcProxyAvailability() {
+  // Settle the outgoing promise first: anything already awaiting it would
+  // otherwise wait on a promise nobody can resolve any more.
+  settle(true);
   availability = new Promise(resolve => { settle = resolve; });
 }

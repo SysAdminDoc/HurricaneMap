@@ -13,6 +13,7 @@ import {
   registerOptionalFeedRetry,
   reportOptionalFeedResult,
   retryOptionalFeed,
+  unsupportedOptionalFeed,
 } from '../src/optional-feeds.js';
 import { t } from '../src/i18n.js';
 
@@ -210,7 +211,27 @@ await probeFloridaZoneLayer({
 });
 assert.equal(getOptionalFeedState('evac').state, 'stale', 'a cancelled probe must not be reported as a failure');
 
+// A feed whose source this deployment cannot reach at all. It must not read as
+// a failure: 'error' mounts a permanent card with a Retry that cannot succeed,
+// which is the whole reason this state exists.
+unsupportedOptionalFeed('outlook');
+assert.equal(getOptionalFeedState('outlook').state, 'unsupported');
+assert.equal(getOptionalFeedState('outlook').nextRetryAt, null, 'an unsupported feed must not schedule a retry');
+assert.equal(getOptionalFeedState('outlook').detail, null);
+assert.equal(getOptionalFeedState('outlook').responseStatus, 0);
+
+// The same result routed through the generic reporter, which is how a caller
+// that returns { status } from a render function reaches the state machine.
+beginOptionalFeed('outlook');
+assert.equal(getOptionalFeedState('outlook').state, 'loading');
+reportOptionalFeedResult('outlook', { status: 'unsupported' });
+assert.equal(
+  getOptionalFeedState('outlook').state,
+  'unsupported',
+  'reportOptionalFeedResult must not turn an unsupported result into an error',
+);
+
 console.log(
   `optional feed state contract ok (${definitions.length} feeds; success, 404, 429, timeout, malformed, offline, `
-  + 'stale-last-good, retry, cancellation; storm-events, exposure and evac driven end to end)',
+  + 'stale-last-good, retry, cancellation, unsupported; storm-events, exposure and evac driven end to end)',
 );

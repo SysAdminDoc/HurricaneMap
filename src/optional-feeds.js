@@ -244,6 +244,10 @@ export function cancelOptionalFeed(id, { requestId } = {}) {
 export function reportOptionalFeedResult(id, result, options = {}) {
   const status = result?.status;
   if (status === 'idle' || status === 'unavailable') return idleOptionalFeed(id);
+  // Without this an unsupported result falls all the way through to the
+  // failure branch below and becomes 'error', which is the permanent retry
+  // card this state exists to avoid.
+  if (status === 'unsupported') return unsupportedOptionalFeed(id);
   if (status === 'rendered' || status === 'success') {
     return completeOptionalFeed(id, {
       ...options,

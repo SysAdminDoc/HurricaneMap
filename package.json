@@ -99,6 +99,7 @@
     "test:active-polling": "node scripts/test-active-polling.mjs",
     "test:active-products": "node scripts/test-active-products.mjs",
     "test:optional-feeds": "node scripts/test-optional-feeds.mjs",
+    "test:optional-feed-ui": "node scripts/test-optional-feed-ui.mjs",
     "test:wind-context": "node scripts/test-wind-context.mjs",
     "test:user-point": "node scripts/test-user-point.mjs",
     "test:storage-manager": "node scripts/test-storage-manager.mjs",

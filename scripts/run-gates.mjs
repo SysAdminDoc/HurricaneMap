@@ -99,6 +99,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'test:active-polling',
   'test:active-products',
   'test:optional-feeds',
+  'test:optional-feed-ui',
   'test:wind-context',
   'test:user-point',
   'test:storage-manager',

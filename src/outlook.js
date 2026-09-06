@@ -131,6 +131,7 @@ async function fetchBasin(basin, force) {
   if (!response.ok) {
     const error = new Error(`NHC ${basin} outlook returned ${response.status}`);
     error.responseStatus = response.status;
+    error.missingProxyRoute = isMissingProxyRoute(response);
     throw error;
   }
   const kml = await extractKmlFromKmz(await response.arrayBuffer());
@@ -206,7 +207,7 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     // Every basin 404ed on our own relay route, so this deployment has no
     // worker in front of it. NHC's own KMZ sends no CORS header, so there is
     // no direct substitute and nothing a retry could reach.
-    if (failures.every(failure => isMissingProxyRoute(failure.reason?.responseStatus))) {
+    if (failures.every(failure => failure.reason?.missingProxyRoute)) {
       clearTropicalOutlook();
       unsupportedOptionalFeed('outlook');
       return { status: 'unsupported', pointCount: 0, responseStatus };

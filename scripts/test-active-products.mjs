@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 import { extractKmlFromKmz, parseOutlookKml } from '../src/outlook.js';
 import { fetchMarineFeed, looksLikeKml, MARINE_FEEDS, parseMarineWarningKml } from '../src/marine-warnings.js';
+import { isMissingProxyRoute, nhcProxyUrl } from '../src/nhc-proxy.js';
 
 const outlookKml = `<?xml version="1.0"?><kml><Document>
   <Placemark><styleUrl>#zerox</styleUrl><ExtendedData>
@@ -122,5 +123,41 @@ await assert.rejects(
   'both sources failing must surface the real status, not a generic error',
 );
 assert.deepEqual(dead.requested, [atlantic.proxy, atlantic.direct]);
+
+
+// A 404 from /nhc/* is ambiguous: the relay passes NHC's status through, so it
+// means "no worker here" or "the worker asked and NHC said no". Reading both as
+// a missing route killed active-storm tracking for the rest of the page load on
+// a real worker deployment the first time an upstream file moved. Every
+// response the worker serves carries its tag.
+const headers = entries => ({ get: name => entries[name] ?? null });
+assert.equal(
+  isMissingProxyRoute({ status: 404, headers: headers({}) }),
+  true,
+  'an untagged 404 means the relay route is not deployed',
+);
+assert.equal(
+  isMissingProxyRoute({ status: 404, headers: headers({ 'X-HurricaneMap-CDN': 'MISS' }) }),
+  false,
+  'a 404 the relay itself served is an upstream miss, not a missing route',
+);
+assert.equal(
+  isMissingProxyRoute({ status: 404, headers: headers({ 'X-HurricaneMap-CDN': 'HIT' }) }),
+  false,
+  'a cached relay 404 is still an upstream miss',
+);
+for (const status of [200, 429, 500, 503]) {
+  assert.equal(
+    isMissingProxyRoute({ status, headers: headers({}) }),
+    false,
+    `${status} is not a missing route`,
+  );
+}
+assert.equal(isMissingProxyRoute(null), false, 'no response is not proof of a missing route');
+assert.equal(isMissingProxyRoute({ status: 404 }), true, 'a 404 with no readable headers is treated as missing');
+
+// Outside a browser there is no base to resolve against, so the canonical
+// worker route is returned unchanged and the worker tests still read it.
+assert.equal(nhcProxyUrl('/nhc/CurrentStorms.json'), '/nhc/CurrentStorms.json');
 
 console.log('active NHC products ok');

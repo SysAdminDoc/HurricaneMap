@@ -7,7 +7,13 @@ import {
   retryOptionalFeed,
 } from './optional-feeds.js';
 
-const mounts = new WeakMap();
+// Keyed by feed, not by host element. Several callers rebuild their host with
+// innerHTML immediately before mounting, so a registry keyed by element never
+// found the previous mount: every re-render added another pair of document
+// listeners, each still rendering into a node that had already been discarded.
+// Opening a series of storms, retrying radar or running several spatial
+// searches accumulated them for the life of the tab.
+const mounts = new Map();
 
 function formatTimestamp(value) {
   if (!Number.isFinite(value)) return t('feeds.never');
@@ -59,7 +65,7 @@ export function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}
 
 export function mountOptionalFeedStatus(host, feedId, { onRetry = null, now = Date.now } = {}) {
   if (!host) return () => {};
-  mounts.get(host)?.();
+  mounts.get(feedId)?.();
   const unregister = onRetry ? registerOptionalFeedRetry(feedId, onRetry) : null;
   const render = () => renderOptionalFeedStatus(host, feedId, { now: now() });
   const onChange = event => {
@@ -81,9 +87,11 @@ export function mountOptionalFeedStatus(host, feedId, { onRetry = null, now = Da
     document.removeEventListener('hm-locale:change', onLocale);
     host.removeEventListener('click', onClick);
     unregister?.();
-    mounts.delete(host);
+    // Only clear the slot if it is still ours: a later mount for the same feed
+    // has already replaced it, and its cleanup must not be dropped.
+    if (mounts.get(feedId) === cleanup) mounts.delete(feedId);
   };
-  mounts.set(host, cleanup);
+  mounts.set(feedId, cleanup);
   render();
   return cleanup;
 }

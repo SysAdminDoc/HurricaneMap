@@ -48,6 +48,22 @@ function collectPageErrors(target, sink) {
   });
 }
 
+// Failing requests the app makes for itself. A 404 is logged by the browser
+// whatever the code does with the rejection, so the only way to keep the
+// console clean is not to ask. One probe per page load is the floor: a
+// deployment cannot be identified without a single request, and every feed
+// reads that one answer.
+const EXPECTED_FAILED_REQUESTS = 1;
+
+function collectFailedRequests(target, sink) {
+  target.on('response', response => {
+    if (response.status() < 400) return;
+    const url = new URL(response.url());
+    if (url.origin !== new URL(target.url() || 'http://127.0.0.1').origin) return;
+    sink.push(`${response.status()} ${url.pathname}`);
+  });
+}
+
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice'];
 // Known-accepted axe rule ids (e.g. unavoidable map-canvas noise). Currently
 // empty — new violations should be fixed, not allowlisted, unless they come
@@ -381,7 +397,20 @@ async function assertStormPanelContrast(browser, baseUrl) {
 
       const measured = await page.evaluate(selectors => {
         const parse = value => {
-          const numbers = String(value).match(/[\d.]+/g);
+          const text = String(value).trim();
+          const hex = text.match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+          if (hex) {
+            const expanded = hex[1].length === 3
+              ? [...hex[1]].map(character => character.repeat(2)).join('')
+              : hex[1];
+            return {
+              r: Number.parseInt(expanded.slice(0, 2), 16),
+              g: Number.parseInt(expanded.slice(2, 4), 16),
+              b: Number.parseInt(expanded.slice(4, 6), 16),
+              a: 1,
+            };
+          }
+          const numbers = text.match(/[\d.]+/g);
           if (!numbers) throw new Error(`Unsupported computed color: ${value}`);
           const [r, g, b, a] = numbers.map(Number);
           return { r, g, b, a: a === undefined ? 1 : a };
@@ -401,12 +430,32 @@ async function assertStormPanelContrast(browser, baseUrl) {
           const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
           return (high + 0.05) / (low + 0.05);
         };
+        // The panel and its sticky header paint through the `background`
+        // shorthand with a linear-gradient, which resets background-color to
+        // transparent. Reading only background-color composited the panel's ink
+        // straight onto the page behind it, so a gradient that went dark under
+        // light ink would still have measured clean: the exact defect this
+        // assertion exists to catch.
+        const gradientStops = value => {
+          const image = String(value || '');
+          if (!image.includes('gradient')) return [];
+          return (image.match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/gi) || []).map(parse);
+        };
+        const surfaceOf = node => {
+          const style = getComputedStyle(node);
+          const stops = gradientStops(style.backgroundImage);
+          // The darkest stop is the one the text has to survive.
+          if (stops.length) {
+            return stops.reduce((worst, stop) => (luminance(stop) < luminance(worst) ? stop : worst));
+          }
+          return parse(style.backgroundColor);
+        };
         // Walk up compositing every translucent background until an opaque one
         // is reached: the panel's ink sits on a tint on a tint.
         const backgroundOf = element => {
           const stack = [];
           for (let node = element; node; node = node.parentElement) {
-            const background = parse(getComputedStyle(node).backgroundColor);
+            const background = surfaceOf(node);
             if (background.a > 0) stack.push(background);
             if (background.a === 1) break;
           }
@@ -1074,6 +1123,18 @@ async function assertReducedMotionContract(page, label) {
 // top of an open panel: the outlook card covered the panel's lower half and the
 // timeline, the active card covered its header.
 async function assertNoOverlayCoversOpenPanel(page, label) {
+  // Force both cards into a state that would render them. On a server with no
+  // /nhc/ relay the feeds are unsupported and their hosts are hidden anyway, so
+  // without this the check passes whether or not the rule that hides them
+  // behind an open panel still exists.
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    for (const id of ['active', 'outlook']) feeds.failOptionalFeed(id, { responseStatus: 503 });
+  });
+  await page.waitForFunction(
+    () => [...document.querySelectorAll('.optional-feed-status-overlay')].some(element => !element.hidden),
+    { timeout: 5000 },
+  );
   const collisions = await page.evaluate(() => {
     const panel = document.querySelector('#storm-panel');
     if (!panel || panel.hidden) return 'no open storm panel';
@@ -1090,6 +1151,28 @@ async function assertNoOverlayCoversOpenPanel(page, label) {
   });
   assert(collisions !== 'no open storm panel', `${label}: the storm panel was not open, so the overlay check proved nothing`);
   assert(!collisions.length, `${label}: feed status overlays sit on top of the open storm panel: ${collisions.join(', ')}`);
+
+  // Positive control: with the panel closed the same cards must be on screen,
+  // so a green result means they were hidden by the panel and not by something
+  // that had already removed them.
+  await page.evaluate(async () => {
+    const panels = await import('/src/panels.js');
+    panels.closeAllPanels();
+  });
+  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 5000 });
+  const visibleWithoutPanel = await page.evaluate(() => [...document.querySelectorAll('.optional-feed-status-overlay')]
+    .filter(element => !element.hidden && getComputedStyle(element).display !== 'none')
+    .map(element => element.id));
+  assert(
+    visibleWithoutPanel.length > 0,
+    `${label}: the feed cards were not visible even with no panel open, so the collision check proved nothing`,
+  );
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    for (const id of ['active', 'outlook']) feeds.unsupportedOptionalFeed(id);
+  });
+  // Hand the panel back open: the caller snapshots it next.
+  await openKatrinaPanel(page);
 }
 
 async function assertMobileTargetSizes(page, label) {
@@ -3440,9 +3523,24 @@ try {
   const mobilePage = await mobileContext.newPage();
   const mobileErrors = [];
   collectPageErrors(mobilePage, mobileErrors);
+  const mobileFailedRequests = [];
+  collectFailedRequests(mobilePage, mobileFailedRequests);
 
   await mobilePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(mobilePage);
+  // Let the deferred active-storm poll run: it is the request this counts.
+  await mobilePage.waitForFunction(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    return feeds.getOptionalFeedState('active').state !== 'idle';
+  }, { timeout: 20000 });
+  assert(
+    mobileFailedRequests.length <= EXPECTED_FAILED_REQUESTS,
+    `a fresh load made ${mobileFailedRequests.length} failing same-origin requests, expected at most ${EXPECTED_FAILED_REQUESTS}: ${mobileFailedRequests.join(', ')}`,
+  );
+  assert(
+    mobileFailedRequests.every(entry => entry.includes('/nhc/')),
+    `a fresh load failed on something other than the NHC relay probe: ${mobileFailedRequests.join(', ')}`,
+  );
 
   const mobileState = await mobilePage.evaluate(() => ({
     visible: document.querySelector('#visible-count')?.textContent || '',
