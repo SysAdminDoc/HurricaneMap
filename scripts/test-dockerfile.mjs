@@ -15,12 +15,26 @@ assert.match(dockerfile, /serve\.py/, 'Dockerfile should ship the security-heade
 assert.match(dockerfile, /HEALTHCHECK/, 'Dockerfile should include a healthcheck');
 assert.match(dockerfile, /data\/metadata\.json/, 'healthcheck should verify a real app data asset');
 
+// The image copies the whole working tree and serve.py hands out anything in
+// it, so the working notes and the development surface have to stay out.
 for (const required of [
   'node_modules',
   '.git',
   '.tmp-bundle',
   '.tmp-pw',
   'test-results',
+  'CLAUDE.md',
+  'AGENTS.md',
+  'ROADMAP.md',
+  'RESEARCH.md',
+  'Roadmap_Blocked.md',
+  'LOGO_PROMPTS.md',
+  '.claude',
+  'tests',
+  'scripts',
+  'notebooks',
+  'security',
+  'tmp',
 ]) {
   assert.match(dockerignore, new RegExp(`(^|\\n)${required.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(\\n|$)`), `.dockerignore should exclude ${required}`);
 }

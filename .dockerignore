@@ -13,3 +13,24 @@ npm-debug.log*
 .tmp-pid.txt
 __pycache__
 *.pyc
+
+# Working notes and agent state. These are gitignored, so a clone does not have
+# them, but a build from a working tree copies them and serve.py hands them out:
+# http://host:8080/CLAUDE.md was public on any Docker deployment.
+CLAUDE.md
+AGENTS.md
+CODEX_CHANGELOG.md
+ROADMAP.md
+RESEARCH.md
+Roadmap_Blocked.md
+LOGO_PROMPTS.md
+.claude
+.codex
+
+# Development surface the served site never reads.
+tests
+scripts
+notebooks
+security
+tmp
+requirements-notebooks.txt

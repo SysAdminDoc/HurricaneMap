@@ -50,9 +50,18 @@ try:
     assert data.status == 200
     assert data.getheader('Content-Security-Policy') is None
     assert data.getheader('Cache-Control') == 'no-cache'
+
+    # SimpleHTTPRequestHandler indexes any directory that has no index.html,
+    # so a Docker deployment served a browsable listing of the whole tree.
+    for directory in ('/src/', '/data/', '/schemas/'):
+        listing = fetch(directory)
+        assert listing.status == 404, f'{directory} returned {listing.status}, expected 404'
+
+    # A directory that does have an index.html still serves it.
+    assert fetch('/').status == 200
 finally:
     server.shutdown()
     server.server_close()
     thread.join(timeout=5)
 
-print('static server security headers ok (primary CSP, non-primary isolation, hardening headers)')
+print('static server security headers ok (primary CSP, non-primary isolation, hardening headers, no directory listings)')

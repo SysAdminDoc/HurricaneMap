@@ -20,6 +20,16 @@ CACHE_CONTROL = 'no-cache'
 
 
 class HurricaneMapHandler(SimpleHTTPRequestHandler):
+    def list_directory(self, path):
+        """Refuse directory listings.
+
+        SimpleHTTPRequestHandler indexes any directory without an index.html,
+        so a request for /scripts/ or /security/ enumerated the tree. The
+        static site never needs a listing.
+        """
+        self.send_error(404, 'No permission to list directory')
+        return None
+
     def end_headers(self):
         path = urlsplit(self.path).path
         if path == '/' or path.endswith('/index.html'):
