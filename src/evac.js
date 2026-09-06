@@ -376,7 +376,12 @@ async function lookupAddress(address) {
     }
     await lookupFloridaPoint(candidate.lat, candidate.lon, { locationLabel: candidate.address });
   } catch (error) {
-    if (error?.name !== 'AbortError') console.warn('Florida address lookup failed:', error);
+    // fetchJson aborts the previous request as soon as a new one starts, so
+    // submitting a second address replaced "Locating…" with a generic error
+    // while the second lookup was still running. lookupFloridaPoint above
+    // already returns on an abort; this path did not.
+    if (error?.name === 'AbortError') return;
+    console.warn('Florida address lookup failed:', error);
     renderFailure(t('evac.error'));
   }
 }

@@ -48,6 +48,12 @@ let goesLayerGroup = null;
 let goesLayerMap = null;
 let statusEl = null;
 let activeOverlays = [];
+// Overlays added by the render currently in flight. They go on the layer group
+// before their images load, and a superseded render's own load/error handlers
+// bail on the generation check, so nothing else would ever take them off:
+// toggling the layer twice, or a poll landing during a settings change, stacked
+// 0.44-opacity JPEGs on the map until clearGoesLayers() ran.
+let pendingOverlays = [];
 // Bumped whenever layers are cleared so late image load/error events from a
 // removed overlay can't resurrect the status badge.
 let goesRenderGeneration = 0;
@@ -68,6 +74,8 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
   }
 
   ensureGoesLayer(map);
+  for (const stale of pendingOverlays) goesLayerGroup.removeLayer(stale);
+  pendingOverlays = [];
   const generation = ++goesRenderGeneration;
   const previousOverlays = activeOverlays.slice();
   const loadedOverlays = [];
@@ -82,6 +90,7 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
     if (loadedOverlays.length) {
       for (const oldOverlay of previousOverlays) goesLayerGroup.removeLayer(oldOverlay);
       activeOverlays = loadedOverlays;
+      pendingOverlays = [];
       updateGoesStatus('ready', sectorIds, now);
       completeOptionalFeed('goes', {
         itemCount: loadedOverlays.length,
@@ -121,6 +130,7 @@ export async function renderGoesRealtimeContext(activeStorms, options = {}) {
       }
     });
     overlay.addTo(goesLayerGroup);
+    pendingOverlays.push(overlay);
   }
 
   return { status: 'rendered', sectorIds, imageCount: sectorIds.length };
@@ -135,6 +145,7 @@ export function clearGoesLayers() {
   goesRenderGeneration++;
   if (goesLayerGroup) goesLayerGroup.clearLayers();
   activeOverlays = [];
+  pendingOverlays = [];
 }
 
 export function selectGoesSectors(activeStorms) {

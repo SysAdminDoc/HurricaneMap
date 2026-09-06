@@ -20,7 +20,17 @@ let glossaryData = null;
 let glossaryCache = {};
 let releaseGlossaryFocus = null;
 
-/** Fetch and cache the glossary. */
+let glossaryLoad = null;
+
+/**
+ * Fetch and cache the glossary.
+ *
+ * Concurrent callers share one load. Two rapid opens used to start two: the
+ * second superseded the first, the first returned an empty array, and whichever
+ * built the modal first built it with no terms while the other found the modal
+ * already there and returned without rendering. The reader saw "No matching
+ * terms" until they typed something.
+ */
 export async function loadGlossary() {
   if (glossaryData) {
     completeOptionalFeed('glossary', {
@@ -29,6 +39,14 @@ export async function loadGlossary() {
     });
     return glossaryData;
   }
+  if (!glossaryLoad) {
+    // Cleared when it settles, so a failed load can be retried.
+    glossaryLoad = loadGlossaryOnce().finally(() => { glossaryLoad = null; });
+  }
+  return glossaryLoad;
+}
+
+async function loadGlossaryOnce() {
   const request = beginOptionalFeed('glossary', { cacheOrigin: 'bundled' });
   try {
     const resp = await fetchWithTimeout('./data/glossary.json', {}, REQUEST_TIMEOUT_MS.data);

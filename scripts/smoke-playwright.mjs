@@ -3272,8 +3272,10 @@ try {
 
   let evacServiceDown = false;
   let evacGeocodeCalls = 0;
-  await page.route('https://geocode.arcgis.com/**', route => {
+  let evacGeocodeDelayMs = 0;
+  await page.route('https://geocode.arcgis.com/**', async route => {
     evacGeocodeCalls += 1;
+    if (evacGeocodeDelayMs) await new Promise(resolve => setTimeout(resolve, evacGeocodeDelayMs));
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -3318,6 +3320,41 @@ try {
   const evacAddressResult = await page.textContent('#evac-result');
   assert(/MIAMI-DADE/.test(evacAddressResult) && /not an evacuation order/i.test(evacAddressResult), `address zone result is incomplete: ${evacAddressResult}`);
   assert(await page.getAttribute('#evac-result a', 'href') === 'https://www.floridadisaster.org/knowyourzone/', 'zone result did not link to official Florida verification');
+
+  // A second address submitted while the first geocode is still running aborts
+  // the first, and the abort used to be rendered as a generic failure over the
+  // lookup that was still in progress.
+  // Both lookups are slow, so the second is still running when the first is
+  // aborted. That window is the whole defect: the abort used to render a
+  // generic failure over a lookup that had not finished, and the second
+  // result then overwrote it, so it is invisible to anything that only checks
+  // the settled state.
+  evacGeocodeDelayMs = 2500;
+  await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
+  await page.click('#evac-address-form button[type="submit"]');
+  await page.waitForFunction(() => /Finding that Florida location/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
+  await page.click('#evac-address-form button[type="submit"]');
+  const duringSecondLookup = await page.evaluate(async () => {
+    const seen = [];
+    for (let sample = 0; sample < 12; sample++) {
+      seen.push(document.querySelector('#evac-result')?.textContent || '');
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return seen;
+  });
+  const flashedFailure = duringSecondLookup.filter(text => /couldn't|could not|unavailable|failed/i.test(text));
+  assert(
+    !flashedFailure.length,
+    `a superseded address lookup painted an error while its replacement was still running: ${JSON.stringify(flashedFailure[0])}`,
+  );
+  evacGeocodeDelayMs = 0;
+  await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', { timeout: 10000 });
+  const supersededLookup = await page.textContent('#evac-result');
+  assert(
+    /MIAMI-DADE/.test(supersededLookup),
+    `the second address lookup did not survive the first being aborted: ${supersededLookup}`,
+  );
 
   const geocodeCallsBeforeMap = evacGeocodeCalls;
   await page.click('#evac-map-pick');

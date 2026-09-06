@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import {
   buildGoesLatestImageUrl,
+  clearGoesLayers,
   goesCacheStamp,
   goesSourcePageUrl,
   inferStormBasin,
   latestStormPoint,
   selectGoesSectorForStorm,
+  renderGoesRealtimeContext,
   selectGoesSectors,
 } from '../src/goes-realtime.js';
 
@@ -67,5 +69,102 @@ assert.equal(
   'https://www.goes.noaa.gov/sector.php?sat=G19&sector=taw',
   'source page should point to the official NOAA sector page',
 );
+
+// A render whose images are still loading when the next render starts used to
+// leave its overlays on the layer group for ever: its own load/error handlers
+// return early on the generation check, and the next render only removes the
+// overlays it had already committed. Toggling the layer twice, or a poll
+// landing during a settings change, stacked translucent JPEGs on the map.
+// The status badge is appended to document.body; the module builds it lazily,
+// so a minimal stand-in keeps the render path reachable without a DOM library.
+const makeElement = () => ({
+  id: '',
+  className: '',
+  hidden: false,
+  innerHTML: '',
+  style: {},
+  dataset: {},
+  attributes: {},
+  classList: { add() {}, remove() {}, contains: () => false },
+  setAttribute(name, value) { this.attributes[name] = String(value); },
+  getAttribute(name) { return this.attributes[name] ?? null; },
+  appendChild(child) { return child; },
+  querySelector: () => null,
+  addEventListener() {},
+  removeEventListener() {},
+});
+globalThis.document = {
+  documentElement: { lang: 'en' },
+  body: Object.assign(makeElement(), { contains: () => true }),
+  createElement: makeElement,
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent() { return true; },
+};
+
+const layerGroupContents = new Set();
+const fakeLayerGroup = {
+  addTo() { return fakeLayerGroup; },
+  addLayer(layer) { layerGroupContents.add(layer); },
+  removeLayer(layer) { layerGroupContents.delete(layer); },
+  clearLayers() { layerGroupContents.clear(); },
+};
+const createdOverlays = [];
+globalThis.window = {
+  L: {
+    layerGroup: () => fakeLayerGroup,
+    imageOverlay(url) {
+      const handlers = new Map();
+      const overlay = {
+        url,
+        once(event, handler) { handlers.set(event, handler); return overlay; },
+        fire(event) { handlers.get(event)?.(); },
+        addTo(group) { group.addLayer(overlay); return overlay; },
+      };
+      createdOverlays.push(overlay);
+      return overlay;
+    },
+  },
+};
+const fakePane = () => ({ style: {}, classList: { add() {}, remove() {}, contains: () => false } });
+const fakeMap = {
+  createPane: fakePane,
+  getPane: fakePane,
+  hasLayer: () => true,
+  addLayer(layer) { return layer; },
+  removeLayer() {},
+};
+
+const storms = [{ id: 'AL012026' }];
+// First render: its image never loads, so nothing settles.
+await renderGoesRealtimeContext(storms, { map: fakeMap, enabled: true });
+const firstGeneration = [...layerGroupContents];
+assert.equal(firstGeneration.length, 1, 'the first render should put its overlay on the layer group');
+
+// Second render arrives while the first is still loading.
+await renderGoesRealtimeContext(storms, { map: fakeMap, enabled: true });
+const secondGeneration = [...layerGroupContents];
+assert.equal(
+  secondGeneration.length,
+  1,
+  `a superseded render must not leave its overlay behind: ${secondGeneration.length} overlays on the layer group`,
+);
+assert.notEqual(secondGeneration[0], firstGeneration[0], 'the surviving overlay must be the newest generation');
+
+// The superseded overlay's image finally arrives. It must not resurrect itself.
+firstGeneration[0].fire('load');
+assert.equal(layerGroupContents.size, 1, 'a late load from a superseded render must not add anything back');
+assert.equal([...layerGroupContents][0], secondGeneration[0]);
+
+// A committed generation is still replaced normally.
+secondGeneration[0].fire('load');
+await renderGoesRealtimeContext(storms, { map: fakeMap, enabled: true });
+const thirdGeneration = [...layerGroupContents];
+assert.equal(thirdGeneration.length, 2, 'a committed overlay stays until the replacement loads');
+thirdGeneration[1].fire('load');
+assert.equal(layerGroupContents.size, 1, 'once the replacement loads, the committed overlay is removed');
+
+clearGoesLayers();
+assert.equal(layerGroupContents.size, 0, 'clearGoesLayers empties the group');
 
 console.log('goes realtime utilities ok');
