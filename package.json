@@ -50,6 +50,7 @@
     "test:filter-state": "node scripts/test-filter-state.mjs",
     "test:settings": "node scripts/test-settings.mjs",
     "test:fuzzy": "node scripts/test-fuzzy.mjs",
+    "test:glossary": "node scripts/test-glossary.mjs",
     "test:climatology": "node scripts/test-climatology.mjs",
     "test:decade-trends": "node scripts/test-decade-trends.mjs",
     "test:radar": "node scripts/test-radar.mjs",

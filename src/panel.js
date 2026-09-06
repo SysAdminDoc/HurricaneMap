@@ -116,10 +116,11 @@ function stopStormOverlays() {
 }
 
 closeBtn.addEventListener('click', () => {
+  // hidePanel dispatches hm-panel:hidden, and the handler below runs the
+  // overlay teardown, so only the parts unique to a real close belong here.
   hidePanel('storm-panel');
   cancelFemaRequest();
   clearTracks();
-  stopStormOverlays();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 // Other managed panels hide the storm panel through panels.js. Keep map-owned

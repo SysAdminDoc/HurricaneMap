@@ -488,6 +488,68 @@ async function assertStormPanelContrast(browser, baseUrl) {
   console.log('  storm panel contrast ok (light, light + high contrast, dark at 1440px)');
 }
 
+// The status host for an optional feed registers two document listeners, and
+// four callers rebuild their host with innerHTML immediately before mounting.
+// A registry keyed by element never matched, so every re-render added another
+// pair still rendering into a node that had been thrown away. The unit test
+// pins the registry; this pins the thing a reader actually does.
+async function assertFeedListenersDoNotAccumulate(browser, baseUrl) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, { onboarded: true, theme: 'dark', highContrast: false, reducedMotion: true, locale: 'en' });
+  // Count before any application script runs, so nothing is missed.
+  await context.addInitScript(() => {
+    if (window.top !== window) return;
+    window.__hmFeedListenerCounts = { 'hm-optional-feed:change': 0, 'hm-locale:change': 0 };
+    const add = document.addEventListener.bind(document);
+    const remove = document.removeEventListener.bind(document);
+    document.addEventListener = (type, ...rest) => {
+      if (type in window.__hmFeedListenerCounts) window.__hmFeedListenerCounts[type] += 1;
+      return add(type, ...rest);
+    };
+    document.removeEventListener = (type, ...rest) => {
+      if (type in window.__hmFeedListenerCounts) window.__hmFeedListenerCounts[type] -= 1;
+      return remove(type, ...rest);
+    };
+  });
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+
+    const storms = ['AL122005', 'AL092022', 'AL112017', 'AL041992', 'AL092017'];
+    await openStormPanel(page, storms[0]);
+    await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), { timeout: 15000 });
+    const baseline = await page.evaluate(() => ({ ...window.__hmFeedListenerCounts }));
+
+    for (let round = 0; round < 2; round++) {
+      for (const storm of storms) {
+        await openStormPanel(page, storm);
+        await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), { timeout: 15000 });
+      }
+    }
+
+    const after = await page.evaluate(() => ({ ...window.__hmFeedListenerCounts }));
+    for (const [type, count] of Object.entries(after)) {
+      assert(
+        count <= baseline[type],
+        `opening ten storms grew the ${type} listener count from ${baseline[type]} to ${count}`,
+      );
+    }
+    // Positive control: the instrumentation has to have seen the listeners at
+    // all, or a constant zero would pass.
+    assert(
+      baseline['hm-optional-feed:change'] > 0,
+      'the listener counter never observed a feed status mount, so it proved nothing',
+    );
+  } finally {
+    await context.close();
+  }
+  if (pageErrors.length) throw new Error(`feed listener page errors: ${pageErrors.join(' | ')}`);
+  console.log('  feed status listeners stay constant across ten storm opens');
+}
+
 async function assertComparisonExportParity(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   const page = await context.newPage();
@@ -3330,20 +3392,36 @@ try {
   // result then overwrote it, so it is invisible to anything that only checks
   // the settled state.
   evacGeocodeDelayMs = 2500;
+  const geocodeCallsBeforeRace = evacGeocodeCalls;
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
   await page.waitForFunction(() => /Finding that Florida location/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
+  // Sample the class rather than the copy: renderFailure is the only thing
+  // that sets the warning tone, and matching English text would false-green in
+  // any other locale.
   const duringSecondLookup = await page.evaluate(async () => {
     const seen = [];
     for (let sample = 0; sample < 12; sample++) {
-      seen.push(document.querySelector('#evac-result')?.textContent || '');
+      const result = document.querySelector('#evac-result');
+      seen.push({ tone: result?.className || '', text: (result?.textContent || '').slice(0, 90) });
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     return seen;
   });
-  const flashedFailure = duringSecondLookup.filter(text => /couldn't|could not|unavailable|failed/i.test(text));
+  // Positive control: the samples have to have landed while the replacement
+  // was still in flight, or the check proves nothing. Two geocode calls and a
+  // pending state during the window are what "still in flight" means.
+  assert(
+    evacGeocodeCalls === geocodeCallsBeforeRace + 2,
+    `the superseded-lookup check did not issue two geocode requests: ${evacGeocodeCalls - geocodeCallsBeforeRace}`,
+  );
+  assert(
+    duringSecondLookup.some(sample => /Finding that Florida location/i.test(sample.text)),
+    'the superseded-lookup check never saw the pending state, so it sampled the wrong window',
+  );
+  const flashedFailure = duringSecondLookup.filter(sample => /evac-result--warning/.test(sample.tone));
   assert(
     !flashedFailure.length,
     `a superseded address lookup painted an error while its replacement was still running: ${JSON.stringify(flashedFailure[0])}`,
@@ -3632,6 +3710,7 @@ try {
   await assertForcedColorsContract(browser, baseUrl);
   await assertComparisonExportParity(browser, baseUrl);
   await assertStormPanelContrast(browser, baseUrl);
+  await assertFeedListenersDoNotAccumulate(browser, baseUrl);
 
   await browser.close();
 
