@@ -265,7 +265,7 @@ html.high-contrast {
   --focus-ring-soft: 0 0 0 4px rgba(255, 255, 255, 0.34);
   --intensity-wind-line: var(--text);
   --intensity-pressure-line: var(--sapphire);
-  --intensity-grid-line: var(--surface2);
+  --intensity-grid-line: var(--border-strong);
   --intensity-axis-line: var(--text);
   --disabled-opacity: 0.72;
 }
