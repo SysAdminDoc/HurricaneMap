@@ -3,6 +3,7 @@ import { t } from './i18n.js';
 import { getOptionalFeedStates } from './optional-feeds.js';
 import { announceLocalAction } from './confirm-action.js';
 import { formatStorageBytes, inspectStorage } from './storage-manager.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import {
   getServiceWorkerDiagnostics,
   requestOfflineIntegrityCheck,
@@ -148,7 +149,7 @@ export function buildSanitizedSupportBundle({
 
 async function readMetadata(fetchImpl) {
   try {
-    const response = await fetchImpl('data/metadata.json', { cache: 'no-cache' });
+    const response = await fetchImpl('data/metadata.json', { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.data);
     return response.ok ? await response.json() : {};
   } catch {
     return {};
@@ -157,15 +158,17 @@ async function readMetadata(fetchImpl) {
 
 async function readCoverage(fetchImpl) {
   try {
-    const response = await fetchImpl('data/coverage.json', { cache: 'no-cache' });
+    const response = await fetchImpl('data/coverage.json', { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.data);
     return response.ok ? await response.json() : null;
   } catch {
     return null;
   }
 }
 
+// Promise.all over both reads: one stalled response used to leave the
+// diagnostics panel spinning with nothing to say and no way to stop it.
 export async function collectOfflineDiagnostics({
-  fetchImpl = globalThis.fetch,
+  fetchImpl = fetchWithTimeout,
   navigatorRef = globalThis.navigator,
 } = {}) {
   const [metadata, coverage, storage] = await Promise.all([

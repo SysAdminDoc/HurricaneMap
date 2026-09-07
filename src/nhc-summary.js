@@ -16,6 +16,8 @@
 // links whose URL is missing, so the card degrades to the storm's fixed NHC
 // links rather than breaking.
 
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+
 export const SUMMARY_SERVICE_ROOT =
   'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer';
 
@@ -210,11 +212,11 @@ export function parseSummaryOutlookPoints(payload) {
   return points;
 }
 
-async function fetchSummaryLayer(layer, { fetchImpl = fetch, signal } = {}) {
+async function fetchSummaryLayer(layer, { fetchImpl = fetchWithTimeout, signal } = {}) {
   const response = await fetchImpl(buildSummaryQueryUrl(layer), {
     signal,
     headers: { Accept: 'application/geo+json, application/json' },
-  });
+  }, REQUEST_TIMEOUT_MS.active);
   if (!response.ok) {
     const error = new Error(`NHC summary layer ${layer} returned ${response.status}`);
     error.responseStatus = response.status;
@@ -223,12 +225,12 @@ async function fetchSummaryLayer(layer, { fetchImpl = fetch, signal } = {}) {
   return response.json();
 }
 
-export async function fetchSummaryActiveStorms({ fetchImpl = fetch, signal, now = Date.now() } = {}) {
+export async function fetchSummaryActiveStorms({ fetchImpl = fetchWithTimeout, signal, now = Date.now() } = {}) {
   const payload = await fetchSummaryLayer(SUMMARY_LAYERS.forecastPoints, { fetchImpl, signal });
   return parseSummaryActiveStorms(payload, { now });
 }
 
-export async function fetchSummaryOutlookPoints({ fetchImpl = fetch, signal } = {}) {
+export async function fetchSummaryOutlookPoints({ fetchImpl = fetchWithTimeout, signal } = {}) {
   const payload = await fetchSummaryLayer(SUMMARY_LAYERS.outlook, { fetchImpl, signal });
   return parseSummaryOutlookPoints(payload);
 }

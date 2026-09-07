@@ -225,9 +225,7 @@ async function tryFetch(url) {
 // and the storm card drops the links it has no URL for.
 async function fetchSummaryStorms() {
   try {
-    const storms = await fetchSummaryActiveStorms({
-      fetchImpl: (url, init) => fetchWithTimeout(url, init, REQUEST_TIMEOUT_MS.active),
-    });
+    const storms = await fetchSummaryActiveStorms();
     return { ok: true, status: 200, storms, missingRoute: false, source: SUMMARY_SOURCE };
   } catch (error) {
     // A failure here is a failing source, not an absent one: there is

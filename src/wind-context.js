@@ -9,6 +9,7 @@ import {
   isOptionalFeedRequestCurrent,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const SERVICE_ROOT = 'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer';
 const PRODUCT_URL = 'https://www.nhc.noaa.gov/aboutnhcgraphics.shtml';
@@ -129,7 +130,7 @@ async function fetchJson(fetchImpl, url, signal) {
   const response = await fetchImpl(url, {
     signal,
     headers: { Accept: 'application/json, application/geo+json' },
-  });
+  }, REQUEST_TIMEOUT_MS.cone);
   if (!response.ok) {
     const error = new Error(`NHC GIS request failed (${response.status})`);
     error.responseStatus = response.status;
@@ -138,23 +139,40 @@ async function fetchJson(fetchImpl, url, signal) {
   return response.json();
 }
 
+// A retry starts a fresh request with no caller signal on it, because the
+// signal that came with the first one may already be aborted. Nothing could
+// then cancel the retry, so five NHC GIS queries outlived the panel that asked
+// for them. The load owns a controller instead: the next load aborts the one
+// before it, whether or not the caller brought a signal of its own.
+let inFlight = null;
+
 export async function loadWindContext(lat, lon, {
-  fetchImpl = fetch,
+  fetchImpl = fetchWithTimeout,
   now = Date.now(),
   signal,
 } = {}) {
+  inFlight?.abort();
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  inFlight = controller;
+  if (controller && signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
+  const loadSignal = controller?.signal || signal;
+
   const request = beginOptionalFeed('wind-context');
   const requests = [
     ...WIND_LAYERS.map(definition =>
-      fetchJson(fetchImpl, buildWindProbabilityUrl(definition.layer, lat, lon), signal)
+      fetchJson(fetchImpl, buildWindProbabilityUrl(definition.layer, lat, lon), loadSignal)
         .then(payload => parseWindProbability(payload, definition, now))),
     ...ARRIVAL_LAYERS.map(definition =>
-      fetchJson(fetchImpl, buildArrivalUrl(definition.layer, lat, lon), signal)
+      fetchJson(fetchImpl, buildArrivalUrl(definition.layer, lat, lon), loadSignal)
         .then(payload => parseNearestArrival(payload, definition, lat, lon, now))),
   ];
 
   const settled = await Promise.allSettled(requests);
-  if (signal?.aborted) {
+  if (inFlight === controller) inFlight = null;
+  if (loadSignal?.aborted) {
     cancelOptionalFeed('wind-context', { requestId: request.requestId });
     return { status: 'aborted', requestId: request.requestId };
   }

@@ -124,4 +124,39 @@ renderWindContext(failedHost, failed);
 assert.match(failedHost.innerHTML, /NHC product guide/);
 assert.doesNotMatch(failedHost.innerHTML, /40-50%/);
 
-console.log('NHC wind context ok (34/50/64 kt, nearest contours, freshness, link-only fallback)');
+// A retry runs with no caller signal, because the one the first request came
+// with may already be aborted. Nothing could cancel it, so five NHC GIS queries
+// per click outlived the panel that asked for them. A new load now aborts the
+// one it supersedes.
+const pending = [];
+const hangingFetch = (_url, init) => new Promise((_resolve, reject) => {
+  pending.push(init.signal);
+  init.signal.addEventListener('abort', () => reject(init.signal.reason ?? new Error('aborted')), { once: true });
+});
+const abandoned = loadWindContext(point.lat, point.lon, { fetchImpl: hangingFetch, now });
+assert.equal(pending.length, 5, 'the first load must be in flight before the second starts');
+assert(pending.every(signal => !signal.aborted), 'the first load must not abort itself');
+
+const superseding = loadWindContext(point.lat, point.lon, { fetchImpl: async () => response({ features: [] }), now });
+assert(
+  pending.slice(0, 5).every(signal => signal.aborted),
+  'a second load must abort the requests the first one left in flight',
+);
+assert.equal((await superseding).status, 'link-only', 'the superseding load still reports its own result');
+assert.equal((await abandoned).status, 'aborted', 'the superseded load reports itself aborted, not failed');
+
+// A caller that cancels still cancels: the load's own controller follows the
+// signal it was handed rather than replacing it.
+const callerControl = new AbortController();
+const callerCancelled = loadWindContext(point.lat, point.lon, {
+  fetchImpl: hangingFetch,
+  now,
+  signal: callerControl.signal,
+});
+const callerSignals = pending.slice(-5);
+assert.equal(callerSignals.length, 5);
+callerControl.abort();
+assert(callerSignals.every(signal => signal.aborted), 'a caller abort must reach the requests in flight');
+assert.equal((await callerCancelled).status, 'aborted');
+
+console.log('NHC wind context ok (34/50/64 kt, nearest contours, freshness, link-only fallback, supersede and caller cancellation)');

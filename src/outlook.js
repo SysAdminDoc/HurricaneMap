@@ -156,9 +156,7 @@ function isCacheFresh(key, force) {
 
 async function fetchSummaryBasins(force) {
   if (isCacheFresh(SUMMARY_CACHE_KEY, force)) return cache.get(SUMMARY_CACHE_KEY).points;
-  const points = await fetchSummaryOutlookPoints({
-    fetchImpl: (url, init) => fetchWithTimeout(url, init, REQUEST_TIMEOUT_MS.active),
-  });
+  const points = await fetchSummaryOutlookPoints();
   cache.set(SUMMARY_CACHE_KEY, { fetchedAt: Date.now(), points });
   return points;
 }

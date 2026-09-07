@@ -2,6 +2,7 @@ import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 import { isIosSafari, showIosInstallCoachmark } from './onboarding.js';
+import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
@@ -155,7 +156,7 @@ function parseSourceManifest(text) {
 
 export async function cacheSourceBundle({
   cachesApi = globalThis.caches,
-  fetchImpl = globalThis.fetch,
+  fetchImpl = fetchWithTimeout,
   storageApi = globalThis.navigator?.storage,
   onProgress = () => {},
 } = {}) {
@@ -177,7 +178,7 @@ export async function cacheSourceBundle({
       const response = await fetchImpl(asset, {
         cache: 'no-cache',
         headers: { 'x-hurricanemap-source-bundle': 'refresh' },
-      });
+      }, REQUEST_TIMEOUT_MS.data);
       if (!response?.ok) throw new Error(`Source bundle asset returned ${response?.status || 0}: ${asset}`);
       const body = await responseBytes(response);
       totalBytes += body.byteLength;
@@ -419,7 +420,7 @@ export async function clearOptionalStorageScope(scopeId, {
 
 export async function cacheRadarPack(stormId, frames, {
   cachesApi = globalThis.caches,
-  fetchImpl = globalThis.fetch,
+  fetchImpl = fetchWithTimeout,
   storageApi = globalThis.navigator?.storage,
   packStorage = globalThis.localStorage,
   onProgress = () => {},
@@ -440,7 +441,12 @@ export async function cacheRadarPack(stormId, frames, {
     for (const [index, frame] of selected.entries()) {
       const existing = await cache.match(frame.url);
       if (!existing) {
-        const response = await fetchImpl(frame.url, { cache: 'no-cache' });
+        // The deadline is per frame, not per pack. Without it one stalled
+        // response left "Saving radar pack N/M" on screen for ever with the
+        // button disabled and no way back. A frame that fails still fails the
+        // pack, as a 404 always has: a pack the index calls saved has to be
+        // complete.
+        const response = await fetchImpl(frame.url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.radar);
         if (!response?.ok) throw new Error(`Radar frame returned ${response?.status || 0}`);
         const contentLength = Number(response.headers?.get?.('content-length'));
         const frameBytes = Number.isFinite(contentLength) && contentLength >= 0
