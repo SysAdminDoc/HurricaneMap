@@ -4,7 +4,7 @@ import { getMap } from './map.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { showPanel, hidePanel } from './panels.js';
 import { t } from './i18n.js';
-import { renderWindContextForPoint } from './wind-context.js';
+import { cancelWindContext, renderWindContextForPoint } from './wind-context.js';
 import { clearUserPoint, loadUserPoint, saveUserPoint } from './user-point.js';
 
 export function getSavedUserPoint() {
@@ -55,6 +55,10 @@ export function clearSearch() {
   searchGeneration++;
   windContextController?.abort();
   windContextController = null;
+  // A retry runs with no caller signal, so aborting the controller above does
+  // not reach it. Closing the panel has to stop it too, or five NHC GIS
+  // requests keep running against a host nobody can see.
+  cancelWindContext();
   if (circle) { getMap().removeLayer(circle); circle = null; }
   if (panelEl && !panelEl.hidden) hidePanel('spatial-results');
 }

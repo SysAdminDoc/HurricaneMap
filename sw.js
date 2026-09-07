@@ -149,10 +149,24 @@ async function discoverModuleGraph() {
 
 self.addEventListener('install', (event) => {
   event.waitUntil(withReleaseLock(async () => {
-    const cache = await caches.open(SHELL_CACHE);
-    await precacheShell(cache);
-    await precacheOfflineData();
-    await validateReleaseBundle();
+    // An install that fails after opening its caches leaves versioned caches
+    // for a version that never activates, and only that version's activate
+    // would remove them. Clean up what this install created, and only that: a
+    // repair install of the version already serving shares these caches, so
+    // deleting them unconditionally would take a working offline shell down
+    // with the failed install.
+    const preexisting = new Set(await caches.keys().catch(() => []));
+    try {
+      const cache = await caches.open(SHELL_CACHE);
+      await precacheShell(cache);
+      await precacheOfflineData();
+      await validateReleaseBundle();
+    } catch (error) {
+      for (const name of [SHELL_CACHE, DATA_CACHE]) {
+        if (!preexisting.has(name)) await caches.delete(name).catch(() => {});
+      }
+      throw error;
+    }
   }));
 });
 
@@ -462,22 +476,27 @@ async function validateReleaseBundle({ cacheName = DATA_CACHE, dbName = DATA_DB,
 
 async function classifyOfflineIntegrity() {
   const checkedAt = new Date().toISOString();
+  // The active worker is the only authority on which versioned caches are
+  // being served. A client that guesses "highest version present" reports on
+  // the leftovers of an install that failed and never activated.
+  const active = { sw_version: SW_VERSION, shell_cache: SHELL_CACHE, data_cache: DATA_CACHE };
   const cacheNames = await caches.keys().catch(() => []);
   if (!cacheNames.includes(SHELL_CACHE) || !cacheNames.includes(DATA_CACHE)) {
-    return { state: 'evicted', checked_at_utc: checkedAt, error: 'Offline shell or data cache is missing' };
+    return { ...active, state: 'evicted', checked_at_utc: checkedAt, error: 'Offline shell or data cache is missing' };
   }
   try {
     const dataCache = await caches.open(DATA_CACHE);
     if (!await dataCache.match(RELEASE_MARKER_PATH)) {
-      return { state: 'evicted', checked_at_utc: checkedAt, error: 'Offline release marker is missing' };
+      return { ...active, state: 'evicted', checked_at_utc: checkedAt, error: 'Offline release marker is missing' };
     }
     try {
       await validateReleaseBundle();
-      return { state: 'intact', checked_at_utc: checkedAt, error: null };
+      return { ...active, state: 'intact', checked_at_utc: checkedAt, error: null };
     } catch (strictError) {
       try {
         await validateReleaseBundle({ strictTuple: false });
         return {
+          ...active,
           state: 'stale-but-valid',
           checked_at_utc: checkedAt,
           error: String(strictError?.message || strictError).slice(0, 240),
@@ -494,6 +513,7 @@ async function classifyOfflineIntegrity() {
   } catch (error) {
     const message = String(error?.message || error).slice(0, 240);
     return {
+      ...active,
       state: /missing|unavailable/i.test(message) ? 'evicted' : 'invalid',
       checked_at_utc: checkedAt,
       error: message,
@@ -507,6 +527,9 @@ async function reportOfflineIntegrity(event) {
     result = await classifyOfflineIntegrity();
   } catch (error) {
     result = {
+      sw_version: SW_VERSION,
+      shell_cache: SHELL_CACHE,
+      data_cache: DATA_CACHE,
       state: 'invalid',
       checked_at_utc: new Date().toISOString(),
       error: String(error?.message || error).slice(0, 240),

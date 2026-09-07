@@ -8,6 +8,7 @@ import {
   parseNearestArrival,
   parseWindProbability,
   renderWindContext,
+  cancelWindContext,
 } from '../src/wind-context.js';
 
 const now = Date.UTC(2026, 6, 25, 18);
@@ -159,4 +160,25 @@ callerControl.abort();
 assert(callerSignals.every(signal => signal.aborted), 'a caller abort must reach the requests in flight');
 assert.equal((await callerCancelled).status, 'aborted');
 
-console.log('NHC wind context ok (34/50/64 kt, nearest contours, freshness, link-only fallback, supersede and caller cancellation)');
+// Closing the panel has to stop a retry too. A retry runs with no caller
+// signal, because the one the first request came with may already be aborted,
+// so nothing outside this module could reach it: five NHC GIS requests kept
+// running against a host that had just been hidden.
+const retryPending = [];
+const retryFetch = (_url, init) => new Promise((_resolve, reject) => {
+  retryPending.push(init.signal);
+  init.signal.addEventListener('abort', () => reject(init.signal.reason ?? new Error('aborted')), { once: true });
+});
+const retry = loadWindContext(point.lat, point.lon, { fetchImpl: retryFetch, now });
+assert.equal(retryPending.length, 5, 'the retry must be in flight before it is cancelled');
+assert(retryPending.every(signal => !signal.aborted));
+assert.equal(cancelWindContext(), true, 'cancelWindContext reports that it stopped something');
+// Immediately, before the load settles and clears the slot itself: a cancel
+// that aborts without releasing the controller would report a second stop for
+// a request it had already stopped.
+assert.equal(cancelWindContext(), false, 'a cancelled load must release the slot rather than be cancelled twice');
+assert(retryPending.every(signal => signal.aborted), 'closing the panel must abort a retry that carries no caller signal');
+assert.equal((await retry).status, 'aborted');
+assert.equal(cancelWindContext(), false, 'with nothing in flight there is nothing to cancel');
+
+console.log('NHC wind context ok (34/50/64 kt, nearest contours, freshness, link-only fallback, supersede, caller and panel cancellation)');

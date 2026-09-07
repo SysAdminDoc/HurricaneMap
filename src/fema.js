@@ -208,7 +208,7 @@ export function clearFemaCache() {
 
 export async function fetchFemaDeclarations(
   storm,
-  { fetchImpl = globalThis.fetch, signal } = {},
+  { fetchImpl, signal } = {},
 ) {
   const query = buildFemaQuery(storm);
   const cacheKey = query || `no-query:${stormName(storm) || 'unnamed'}`;

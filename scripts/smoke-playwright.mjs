@@ -573,6 +573,183 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
+// The header's stacking and its blur used to be declared !important in the
+// shell layer, which is also what stopped the light theme reaching it. Removing
+// that took two other things with it, and nothing here was looking: a more
+// specific selector in the same layer put the header back under the filters and
+// the storm panel at z-index 1000, and the themes layer's generic .glass rules
+// took the blur over, keying it to the operating system's colour preference
+// rather than to the app's own theme.
+async function assertHeaderStackingAndBlur(browser, baseUrl) {
+  const readHeader = async scheme => {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, colorScheme: scheme });
+    await seedSettings(context, { onboarded: true, theme: 'dark', locale: 'en', reducedMotion: true });
+    await stubQuietTropics(context);
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      return await page.evaluate(() => {
+        const layer = selector => {
+          const element = document.querySelector(selector);
+          if (!element) return null;
+          const value = Number.parseInt(getComputedStyle(element).zIndex, 10);
+          return Number.isFinite(value) ? value : null;
+        };
+        const header = document.querySelector('.app-header');
+        return {
+          headerZ: layer('.app-header'),
+          backdrop: getComputedStyle(header).backdropFilter,
+          below: Object.fromEntries(
+            ['#filters', '.storm-panel', '.optional-feed-status-overlay', '.atlas-context-rail', '.season-summary', '.radar-controls']
+              .map(selector => [selector, layer(selector)])
+              .filter(([, value]) => value !== null),
+          ),
+        };
+      });
+    } finally {
+      await context.close();
+    }
+  };
+
+  const dark = await readHeader('dark');
+  const light = await readHeader('light');
+  assert(Number.isFinite(dark.headerZ), `header has no numeric z-index: ${dark.headerZ}`);
+  const covered = Object.entries(dark.below).filter(([, value]) => value >= dark.headerZ);
+  assert(
+    Object.keys(dark.below).length >= 3,
+    `only ${Object.keys(dark.below).length} stacked surfaces were measured, so the header stacking check proves nothing`,
+  );
+  assert(
+    !covered.length,
+    `the header sits at z-index ${dark.headerZ}, at or below ${covered.map(([name, value]) => `${name} (${value})`).join(', ')}`,
+  );
+  assert(
+    dark.backdrop === light.backdrop,
+    `the header's blur follows the operating system rather than the app: dark-preference "${dark.backdrop}" vs light-preference "${light.backdrop}"`,
+  );
+  assert(
+    /blur\(18px\)/.test(dark.backdrop),
+    `the header lost its own blur to the generic .glass rules: ${dark.backdrop}`,
+  );
+}
+
+// The other half of the same change: where the relay IS deployed it still wins,
+// because only CurrentStorms.json carries the advisory and discussion URLs. If
+// isMissingProxyRoute ever misread a real worker 404 the app would silently
+// switch to the MapServer and lose those links with nothing to notice.
+async function assertRelayStillWinsForActiveStorms(browser, baseUrl) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, {
+    onboarded: true, theme: 'dark', reducedMotion: true, locale: 'en',
+    nhcOutlook: false, nhcForecastCone: false, goesRealtime: false, marineWarnings: false,
+  });
+  let summaryReads = 0;
+  await context.route(
+    'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/**',
+    route => {
+      summaryReads += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/geo+json',
+        body: JSON.stringify({ type: 'FeatureCollection', features: [] }),
+      });
+    },
+  );
+  // What the Cloudflare worker serves, tag and all.
+  await context.route('**/nhc/CurrentStorms.json', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    headers: { 'X-HurricaneMap-CDN': 'MISS' },
+    body: JSON.stringify({ activeStorms: [{
+      id: 'al092026',
+      binNumber: 'AT1',
+      name: 'Relay',
+      classification: 'HU',
+      intensity: '90',
+      pressure: '960',
+      latitude: '25.0N',
+      longitude: '80.0W',
+      lastUpdate: '2026-09-07T15:00:00Z',
+      publicAdvisory: { url: 'https://www.nhc.noaa.gov/text/refresh/MIATCPAT1+shtml/071500.shtml' },
+      forecastDiscussion: { url: 'https://www.nhc.noaa.gov/text/refresh/MIATCDAT1+shtml/071500.shtml' },
+    }] }),
+  }));
+
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForFunction(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      return !['idle', 'loading'].includes(feeds.getOptionalFeedState('active').state);
+    }, { timeout: 25000 });
+
+    const state = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      const active = feeds.getOptionalFeedState('active');
+      const badge = document.getElementById('active-storm-badge');
+      return {
+        state: active.state,
+        itemCount: active.itemCount,
+        source: active.source,
+        badgeLabel: badge?.getAttribute('aria-label') || '',
+      };
+    });
+    assert(
+      state.state === 'success' && state.itemCount === 1,
+      `with a relay: the relay feed did not answer: ${JSON.stringify(state)}`,
+    );
+    assert(
+      /CurrentStorms/.test(state.source),
+      `with a relay: the feed credits the wrong source: ${state.source}`,
+    );
+    assert(summaryReads === 0, `with a relay: the MapServer was queried ${summaryReads} times when the relay answered`);
+    assert(/1 active storm/i.test(state.badgeLabel), `with a relay: badge did not announce the storm: ${state.badgeLabel}`);
+
+    // The links only CurrentStorms.json carries are what the relay is for.
+    const links = await page.evaluate(async () => {
+      const active = await import('/src/active.js');
+      const card = active.activeStormCardElement({
+        name: 'Relay',
+        id: 'al092026',
+        classification: 'HU',
+        intensity: '90',
+        publicAdvisory: { url: 'https://www.nhc.noaa.gov/text/refresh/MIATCPAT1+shtml/071500.shtml' },
+        forecastDiscussion: { url: 'https://www.nhc.noaa.gov/text/refresh/MIATCDAT1+shtml/071500.shtml' },
+      }, [25, -80]);
+      return {
+        hrefs: [...card.querySelectorAll('a')].map(anchor => anchor.getAttribute('href')),
+        summary: card.querySelector('p')?.textContent || '',
+      };
+    });
+    assert(
+      links.hrefs.some(href => /MIATCPAT1/.test(href)) && links.hrefs.some(href => /MIATCDAT1/.test(href)),
+      `with a relay: the advisory and discussion links are missing: ${links.hrefs.join(', ')}`,
+    );
+    assert(/90 kt/.test(links.summary), `with a relay: the card lost the intensity: ${links.summary}`);
+
+    // A storm with no reported intensity must not read as a calm one. The
+    // MapServer writes 9999 where it has no value, which the parser turns into
+    // null, and Number(null) is 0.
+    const missingIntensity = await page.evaluate(async () => {
+      const active = await import('/src/active.js');
+      const card = active.activeStormCardElement({ name: 'Lowell', id: 'ep122026', classification: 'MH', intensity: null }, [18, -162]);
+      return card.querySelector('p')?.textContent || '';
+    });
+    assert(
+      !/0 kt/.test(missingIntensity),
+      `an unreported intensity rendered as calm: "${missingIntensity}"`,
+    );
+
+    assert(!pageErrors.length, `with a relay: page errors: ${pageErrors.join(' | ')}`);
+  } finally {
+    await context.close();
+  }
+}
+
 // A deployment with no /nhc/ relay used to report the active-storm feed and
 // the tropical outlook "not available on this deployment" and stop. NHC's
 // tropical weather summary MapServer answers the same questions with a CORS
@@ -586,7 +763,7 @@ async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await seedSettings(context, {
     onboarded: true, theme: 'dark', highContrast: false, reducedMotion: true, locale: 'en',
-    nhcOutlook: true, nhcForecastCone: false, goesRealtime: false, marineWarnings: false,
+    nhcOutlook: true, nhcForecastCone: true, goesRealtime: false, marineWarnings: false,
   });
 
   const summaryLayersRead = [];
@@ -603,6 +780,35 @@ async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
       });
     },
   );
+
+  const coneLayersRead = [];
+  await context.route('https://services9.arcgis.com/**', route => {
+    const url = new URL(route.request().url());
+    const layer = url.pathname.match(/FeatureServer\/(\d+)\/query$/)?.[1];
+    coneLayersRead.push(layer);
+    // Layer 4 is the forecast error cone; a matching polygon around Lowell's
+    // fixture position is enough to prove the cone reaches the map from a
+    // MapServer-sourced storm.
+    const cone = {
+      type: 'FeatureCollection',
+      features: layer === '4' ? [{
+        type: 'Feature',
+        properties: { STORMNAME: 'Hurricane Lowell', BASIN: 'EP', STORMNUM: 12, ADVISNUM: '46A', STORMID: 'ep122026' },
+        geometry: { type: 'Polygon', coordinates: [[[-164, 16], [-160, 16], [-160, 20], [-164, 20], [-164, 16]]] },
+      }] : [],
+    };
+    return route.fulfill({ status: 200, contentType: 'application/geo+json', body: JSON.stringify(cone) });
+  });
+  // Everything else the active-storm render reaches for is a separate feed with
+  // its own coverage; answer them emptily so this assertion is about the
+  // MapServer fallback and not about NOAA's uptime.
+  for (const host of ['https://api.weather.gov/**', 'https://cdn.star.nesdis.noaa.gov/**']) {
+    await context.route(host, route => route.fulfill({
+      status: 200,
+      contentType: 'application/geo+json',
+      body: JSON.stringify({ type: 'FeatureCollection', features: [] }),
+    }));
+  }
 
   const page = await context.newPage();
   const pageErrors = [];
@@ -658,15 +864,32 @@ async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
         badgeHidden: badge?.hidden ?? null,
         badgeLabel: badge?.getAttribute('aria-label') || '',
         outlookMarkers: document.querySelectorAll('.nhc-outlook-marker').length,
-        unsupported: [...document.querySelectorAll('.optional-feed-status-overlay')]
-          .map(element => element.textContent || '')
-          .filter(text => /not available on this deployment/i.test(text)).length,
+        stormPopups: [...document.querySelectorAll('.leaflet-marker-icon, .leaflet-interactive')].length,
       };
     });
     assert(rendered.badgeHidden === false, 'no relay: the active-storm badge stayed hidden with two storms up');
     assert(/2 active storms/i.test(rendered.badgeLabel), `no relay: badge does not announce both storms: ${rendered.badgeLabel}`);
     assert(rendered.outlookMarkers === 1, `no relay: expected one outlook marker, saw ${rendered.outlookMarkers}`);
-    assert(rendered.unsupported === 0, 'no relay: a feed still reports itself unavailable on this deployment');
+
+    // The cone travels with a MapServer-sourced storm, or the fallback delivers
+    // a badge and nothing a reader can act on.
+    await page.waitForFunction(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      return !['idle', 'loading'].includes(feeds.getOptionalFeedState('forecast').state);
+    }, { timeout: 25000 });
+    const forecast = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      const state = feeds.getOptionalFeedState('forecast');
+      return { state: state.state, cones: document.querySelectorAll('path.nhc-cone, .nhc-forecast-cone').length };
+    });
+    assert(
+      coneLayersRead.includes('4'),
+      `no relay: the forecast cone service was never queried for a MapServer-sourced storm: ${coneLayersRead.join(', ')}`,
+    );
+    assert(
+      forecast.state === 'success',
+      `no relay: the forecast cone did not render for a MapServer-sourced storm: ${JSON.stringify(forecast)}`,
+    );
 
     // The storms are the ones in the fixture, not a coincidence of live data.
     const stormNames = await page.evaluate(async () => {
@@ -745,6 +968,10 @@ async function assertFeedListenersDoNotAccumulate(browser, baseUrl) {
 
 async function assertComparisonExportParity(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  // serve.py has no relay, so without this the active feed reaches the live
+  // summary MapServer and puts a third-party dependency inside a test that had
+  // none. This context seeds no settings, so the stub has to be asked for here.
+  await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
   collectPageErrors(page, pageErrors);
@@ -3915,6 +4142,8 @@ try {
   await assertStormPanelContrast(browser, baseUrl);
   await assertFeedListenersDoNotAccumulate(browser, baseUrl);
   await assertSummaryServiceServesActiveStorms(browser, baseUrl);
+  await assertRelayStillWinsForActiveStorms(browser, baseUrl);
+  await assertHeaderStackingAndBlur(browser, baseUrl);
 
   await browser.close();
 

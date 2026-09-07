@@ -65,17 +65,27 @@ function summaryFeatures(payload, layer) {
   return Array.isArray(payload?.features) ? payload.features : [];
 }
 
-// An empty layer is the off-season answer, not a broken contract, so the field
-// check only runs when there is a row to check it against.
+// An empty layer is the off-season answer, not a broken contract, so the check
+// only runs when there is a row to run it against. Every row is checked, not
+// just the first: a rename that reaches part of a payload, or a leading feature
+// carrying no properties at all, would otherwise pass the whole thing and let
+// the rest render as nameless storms at unknown positions.
 function assertSummaryFields(features, required, layer) {
-  const properties = features[0]?.properties;
-  if (!properties) return;
-  const missing = required.filter(field => !(field in properties));
-  if (!missing.length) return;
-  const error = new Error(
-    `NHC summary layer ${layer} no longer publishes ${missing.join(', ')}`,
-  );
-  error.missingFields = missing;
+  const missing = new Set();
+  for (const feature of features) {
+    const properties = feature?.properties;
+    if (!properties) {
+      missing.add('properties');
+      continue;
+    }
+    for (const field of required) {
+      if (!(field in properties)) missing.add(field);
+    }
+  }
+  if (!missing.size) return;
+  const names = [...missing].join(', ');
+  const error = new Error(`NHC summary layer ${layer} no longer publishes ${names}`);
+  error.missingFields = [...missing];
   throw error;
 }
 
@@ -85,16 +95,23 @@ function finiteNumber(value) {
   return numeric;
 }
 
+// 9999 is the sentinel here as well, and a marker at 9999N is worse than no
+// marker. Anything outside the sphere is refused rather than drawn.
+function onEarth(lat, lon) {
+  return Number.isFinite(lat) && Number.isFinite(lon) &&
+    Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+}
+
 function featurePosition(feature) {
   const coordinates = feature?.geometry?.coordinates;
   if (Array.isArray(coordinates) && coordinates.length >= 2) {
     const lon = Number(coordinates[0]);
     const lat = Number(coordinates[1]);
-    if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
+    if (onEarth(lat, lon)) return { lat, lon };
   }
   const lat = Number(feature?.properties?.lat);
   const lon = Number(feature?.properties?.lon);
-  if (Number.isFinite(lat) && Number.isFinite(lon)) return { lat, lon };
+  if (onEarth(lat, lon)) return { lat, lon };
   return null;
 }
 
@@ -112,18 +129,33 @@ export function summaryStormName(value) {
 export function summaryStormId(properties, now = Date.now()) {
   const basin = String(properties?.basin || '').trim().toUpperCase().replace(/[^A-Z]/g, '');
   const number = Number(properties?.stormnum);
-  if (basin.length !== 2 || !Number.isFinite(number) || number <= 0) return '';
-  return `${basin}${String(Math.trunc(number)).padStart(2, '0')}${summaryYear(properties, now)}`;
+  if (basin.length !== 2 || !Number.isFinite(number) || number <= 0 || number > 99) return '';
+  const year = summaryYear(properties, now);
+  if (!year) return '';
+  return `${basin}${String(Math.trunc(number)).padStart(2, '0')}${year}`;
+}
+
+// This service publishes only live products, so a year outside the current
+// season is a misread rather than history. idp_filedate is epoch milliseconds;
+// taken as seconds it lands in 1970, and every id then silently stops matching
+// the cone service's STORMID. One year either side covers an advisory issued
+// on 31 December and read on 1 January.
+function plausibleYear(value, now) {
+  const year = Number(value);
+  if (!Number.isFinite(year)) return null;
+  const current = new Date(now).getUTCFullYear();
+  return year >= current - 1 && year <= current + 1 ? year : null;
 }
 
 function summaryYear(properties, now) {
   const filed = Number(properties?.idp_filedate);
   if (Number.isFinite(filed) && filed > 0) {
-    const filedDate = new Date(filed);
-    if (Number.isFinite(filedDate.getTime())) return filedDate.getUTCFullYear();
+    const fromFile = plausibleYear(new Date(filed).getUTCFullYear(), now);
+    if (fromFile) return fromFile;
   }
   const advisoryYear = String(properties?.advdate || '').match(/\b(?:19|20)\d{2}\b/);
-  if (advisoryYear) return Number(advisoryYear[0]);
+  const fromAdvisory = advisoryYear ? plausibleYear(Number(advisoryYear[0]), now) : null;
+  if (fromAdvisory) return fromAdvisory;
   return new Date(now).getUTCFullYear();
 }
 
@@ -133,16 +165,30 @@ export function parseSummaryActiveStorms(payload, { now = Date.now() } = {}) {
 
   // One row per forecast hour, so the storm is whichever row sits earliest on
   // its own timeline. tau 0 is the current fix in every advisory seen so far,
-  // but taking the minimum survives an advisory that omits it.
+  // but taking the minimum survives an advisory that omits it. An unreadable
+  // tau sorts last on both sides of the comparison, so a bad value on the row
+  // already held cannot let a five-day forecast point take its place.
+  const forecastHour = properties => {
+    const tau = Number(properties?.tau);
+    return Number.isFinite(tau) ? tau : Infinity;
+  };
+  // Keyed on basin and storm number, which is the identity every consumer
+  // matches on, not on binnumber. The bin is a display slot: Lowell was EP12
+  // in CP4 after crossing into the central Pacific, so two storms can share a
+  // bin and collapse into one, and one storm can change bin mid-advisory and
+  // split into two.
   const earliest = new Map();
   for (const feature of features) {
     const properties = feature?.properties;
     if (!properties) continue;
-    const key = String(properties.binnumber || '').trim().toUpperCase()
-      || `${properties.basin}:${properties.stormnum}`;
-    const tau = Number(properties.tau);
+    const basin = String(properties.basin || '').trim().toUpperCase();
+    const number = Number(properties.stormnum);
+    const key = basin && Number.isFinite(number)
+      ? `${basin}:${number}`
+      : String(properties.binnumber || '').trim().toUpperCase();
+    if (!key) continue;
     const previous = earliest.get(key);
-    if (previous && Number(previous.properties.tau) <= (Number.isFinite(tau) ? tau : Infinity)) continue;
+    if (previous && forecastHour(previous.properties) <= forecastHour(properties)) continue;
     earliest.set(key, feature);
   }
 
@@ -173,19 +219,24 @@ export function parseSummaryActiveStorms(payload, { now = Date.now() } = {}) {
 }
 
 function outlookRisk(properties) {
-  const category = `${properties?.risk7day ?? ''} ${properties?.prob7day ?? ''}`
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-  if (category.includes('nearzero') || category.includes('near0')) return 'near-zero';
-  if (category.includes('high')) return 'high';
-  if (category.includes('medium')) return 'medium';
-  return 'low';
+  const normalize = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const category = normalize(properties?.risk7day);
+  if (category === 'nearzero' || category === 'near0') return 'near-zero';
+  if (category === 'high') return 'high';
+  if (category === 'medium') return 'medium';
+  if (category === 'low') return 'low';
+  // No category to read. The percentage is the only other statement of risk
+  // NHC makes, and "Near 0%" is the one value that changes the symbol.
+  const percentage = normalize(properties?.prob7day);
+  return percentage === 'near0' || percentage === 'near0percent' ? 'near-zero' : 'low';
 }
 
-// The KMZ numbers its disturbances 1..N in the order NHC lists them, and the
-// MapServer returns the same set in objectid order. The position in that order
-// is the same ordinal, so a marker still reads "Disturbance 2" rather than a
-// bare word. The discussion paragraph exists only in the KMZ.
+// The KMZ numbers its disturbances 1..N within a basin, because NHC issues one
+// outlook per basin and the app fetches one KMZ per basin. This layer carries
+// every basin at once in objectid order, so the ordinal has to be counted per
+// basin or a marker's number stops matching NHC's own text product: two
+// Atlantic systems and one Pacific one read 1, 2 and 1, never 1, 2, 3. The
+// discussion paragraph exists only in the KMZ.
 export function parseSummaryOutlookPoints(payload) {
   const features = summaryFeatures(payload, SUMMARY_LAYERS.outlook);
   assertSummaryFields(features, SUMMARY_OUTLOOK_FIELDS, SUMMARY_LAYERS.outlook);
@@ -194,13 +245,17 @@ export function parseSummaryOutlookPoints(payload) {
     (a, b) => Number(a?.properties?.objectid ?? 0) - Number(b?.properties?.objectid ?? 0),
   );
   const points = [];
+  const perBasin = new Map();
   for (const feature of ordered) {
     const position = featurePosition(feature);
     if (!position) continue;
     const properties = feature.properties || {};
+    const basin = String(properties.basin || '').trim().toLowerCase();
+    const ordinal = (perBasin.get(basin) || 0) + 1;
+    perBasin.set(basin, ordinal);
     points.push({
-      basin: String(properties.basin || '').trim().toLowerCase(),
-      disturbance: String(points.length + 1),
+      basin,
+      disturbance: String(ordinal),
       lat: position.lat,
       lon: position.lon,
       risk: outlookRisk(properties),

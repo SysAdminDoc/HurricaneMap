@@ -3,6 +3,7 @@ import { t } from './i18n.js';
 import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 import { isIosSafari, showIosInstallCoachmark } from './onboarding.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { getServiceWorkerDiagnostics } from './sw-updates.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
@@ -332,16 +333,45 @@ function emitStorageChange() {
   }
 }
 
-function selectCacheName(cacheNames, definition) {
+// Cache names carry a version, and a plain string sort puts hm-shell-hm-v1.9.3
+// above hm-shell-hm-v1.10.0 because "9" sorts after "1". Compare the numbers.
+export function compareCacheNames(a, b) {
+  const left = String(a).match(/v(\d+(?:\.\d+)*)$/);
+  const right = String(b).match(/v(\d+(?:\.\d+)*)$/);
+  if (!left || !right) return String(a).localeCompare(String(b));
+  const leftParts = left[1].split('.').map(Number);
+  const rightParts = right[1].split('.').map(Number);
+  for (let index = 0; index < Math.max(leftParts.length, rightParts.length); index += 1) {
+    const difference = (leftParts[index] || 0) - (rightParts[index] || 0);
+    if (difference) return difference;
+  }
+  return String(a).localeCompare(String(b));
+}
+
+// Which caches the running worker is actually serving from. An install that
+// fails after opening its caches leaves a versioned pair for a version that
+// never activated, and only that version's activate would remove them, so
+// "the highest version present" describes a tuple nothing is serving while the
+// old worker keeps working perfectly.
+export function activeCacheNames(diagnostics = getServiceWorkerDiagnostics()) {
+  return {
+    shell: diagnostics?.activeShellCache || null,
+    data: diagnostics?.activeDataCache || null,
+  };
+}
+
+export function selectCacheName(cacheNames, definition, active = {}) {
   const candidates = cacheNames.filter(name => definition.prefix
     ? name.startsWith(definition.prefix)
     : name === definition.cacheName);
   if (!candidates.length) return null;
+  const claimed = active[definition.id];
+  if (claimed && candidates.includes(claimed)) return claimed;
   if (definition.id === 'data') {
     const versioned = candidates.filter(name => name.startsWith('hm-data-hm-'));
-    return [...(versioned.length ? versioned : candidates)].sort().at(-1) || null;
+    return [...(versioned.length ? versioned : candidates)].sort(compareCacheNames).at(-1) || null;
   }
-  return [...candidates].sort().at(-1) || null;
+  return [...candidates].sort(compareCacheNames).at(-1) || null;
 }
 
 export async function inspectReleaseTuple({
@@ -384,6 +414,7 @@ export async function inspectStorage({
   storageApi = globalThis.navigator?.storage,
   cachesApi = globalThis.caches,
   packStorage = globalThis.localStorage,
+  active = activeCacheNames(),
 } = {}) {
   const estimate = await readStorageEstimate(storageApi);
   let persisted = false;
@@ -393,7 +424,7 @@ export async function inspectStorage({
   const cacheNames = cachesApi ? await cachesApi.keys().catch(() => []) : [];
   const scopes = [];
   for (const definition of STORAGE_SCOPES) {
-    const cacheName = selectCacheName(cacheNames, definition);
+    const cacheName = selectCacheName(cacheNames, definition, active);
     let cacheSnapshot = { entries: 0, sizeBytes: 0 };
     if (cacheName && cacheNames.includes(cacheName)) {
       cacheSnapshot = await inspectCache(cachesApi, cacheName);
@@ -426,13 +457,14 @@ export async function clearOptionalStorageScope(scopeId, {
   cachesApi = globalThis.caches,
   packStorage = globalThis.localStorage,
   notify = true,
+  active = activeCacheNames(),
 } = {}) {
   const scope = STORAGE_SCOPES.find(candidate => candidate.id === scopeId);
   if (!scope) throw new Error(`Unknown storage scope: ${scopeId}`);
   if (scope.required) throw new Error(`Required storage scope cannot be cleared: ${scopeId}`);
   if (!cachesApi) return false;
   const cacheNames = await cachesApi.keys().catch(() => []);
-  const cacheName = scope.cacheName || selectCacheName(cacheNames, scope);
+  const cacheName = scope.cacheName || selectCacheName(cacheNames, scope, active);
   const companions = (scope.companions || []).filter(name => cacheNames.includes(name));
   if (!cacheName && !companions.length) return false;
   const results = await Promise.all([

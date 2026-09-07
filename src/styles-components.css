@@ -6753,6 +6753,17 @@ body.side-panel-open .leaflet-top.leaflet-right {
     text-overflow: ellipsis;
   }
 
+  /* The cell clips, but the link inside it did not: its own box kept its full
+     text width and ran under the disclosure in the next column, so two controls
+     physically overlapped. Haitian Creole, the longest of the three locales, is
+     where it shows. */
+  .stats-panel .sob-meta > a {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .stats-panel .sob-details {
     grid-area: details;
     justify-self: end;
@@ -9093,6 +9104,16 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .sob-status--warning {
   color: var(--yellow, #f9e2af);
+}
+
+/* The outlook history disclosure is a real control and had no size of its own:
+   at 9.5px in the statistics panel its box was around 12px tall, half the 24px
+   WCAG 2.2 target-size minimum. Padding rather than a flex row, because
+   `display: flex` on a summary drops the disclosure triangle in WebKit. */
+.sob-details > summary {
+  min-height: 24px;
+  padding: 5px 2px;
+  cursor: pointer;
 }
 
 /* Tide-gauge panel section */

@@ -176,6 +176,16 @@ html.light-theme #map .leaflet-tile-pane {
   box-shadow: var(--atlas-shadow);
 }
 
+/* The header's own blur, not the generic .glass one. Two rules earlier in this
+   layer set .glass backdrop-filter from prefers-color-scheme, so with the
+   shell layer's !important gone the header took its blur from the operating
+   system's colour preference rather than from the app's own theme: the dark
+   theme rendered with the light blur on a light-preference machine. Matching
+   .app-header.glass outranks .glass whatever the source order. */
+.app-header.glass {
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
 html.light-theme .app-header,
 html.light-theme .mobile-actions-menu {
   --atlas-panel-strong: rgba(248, 250, 255, 0.98);

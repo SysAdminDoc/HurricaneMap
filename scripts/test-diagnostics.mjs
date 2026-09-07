@@ -4,6 +4,7 @@ import {
   buildSanitizedSupportBundle,
   sanitizeDiagnosticText,
 } from '../src/diagnostics.js';
+import { activeCacheNames } from '../src/storage-manager.js';
 import {
   getServiceWorkerDiagnostics,
   requestOfflineIntegrityCheck,
@@ -157,6 +158,9 @@ const integrityNavigator = {
             state: 'stale-but-valid',
             error: 'old release tuple',
             checked_at_utc: '2026-08-03T00:00:00.000Z',
+            sw_version: 'hm-v1.9.3',
+            shell_cache: 'hm-shell-hm-v1.9.3',
+            data_cache: 'hm-data-hm-v1.9.3',
           },
         })));
       },
@@ -170,10 +174,45 @@ const integrityNavigator = {
   },
 };
 const integrityResult = await requestOfflineIntegrityCheck({ navigatorRef: integrityNavigator, documentRef: null });
+// The worker names the caches it is serving from. A client that instead picks
+// the highest version present reports on the leftovers of an install that
+// failed and never activated, while the old worker keeps serving correctly.
 assert.deepEqual(integrityResult, {
   state: 'stale-but-valid',
   error: 'old release tuple',
   checkedAt: '2026-08-03T00:00:00.000Z',
+  swVersion: 'hm-v1.9.3',
+  shellCache: 'hm-shell-hm-v1.9.3',
+  dataCache: 'hm-data-hm-v1.9.3',
 });
+const publishedNames = getServiceWorkerDiagnostics();
+assert.equal(publishedNames.activeShellCache, 'hm-shell-hm-v1.9.3');
+assert.equal(publishedNames.activeDataCache, 'hm-data-hm-v1.9.3');
+assert.equal(publishedNames.activeSwVersion, 'hm-v1.9.3');
+assert.deepEqual(
+  activeCacheNames(publishedNames),
+  { shell: 'hm-shell-hm-v1.9.3', data: 'hm-data-hm-v1.9.3' },
+);
 
-console.log('offline diagnostics ok (registration retry, cache/version bundle, privacy redaction)');
+// A later probe that times out must not erase what a working one reported: the
+// caches did not change because the worker stopped answering.
+const silentNavigator = {
+  serviceWorker: {
+    controller: { postMessage() {} },
+    addEventListener() {},
+    removeEventListener() {},
+  },
+};
+const timedOut = await requestOfflineIntegrityCheck({
+  navigatorRef: silentNavigator,
+  documentRef: null,
+  timeoutMs: 10,
+});
+assert.equal(timedOut.state, 'unverified');
+assert.equal(
+  getServiceWorkerDiagnostics().activeShellCache,
+  'hm-shell-hm-v1.9.3',
+  'a timed-out probe must leave the last known cache names in place',
+);
+
+console.log('offline diagnostics ok (registration retry, cache/version bundle, privacy redaction, active cache names)');

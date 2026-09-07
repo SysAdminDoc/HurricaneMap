@@ -146,6 +146,15 @@ async function fetchJson(fetchImpl, url, signal) {
 // before it, whether or not the caller brought a signal of its own.
 let inFlight = null;
 
+// Stops whatever load is in flight, including a retry that was started with no
+// caller signal of its own. spatial-search calls this when the panel closes.
+export function cancelWindContext() {
+  const controller = inFlight;
+  inFlight = null;
+  controller?.abort();
+  return Boolean(controller);
+}
+
 export async function loadWindContext(lat, lon, {
   fetchImpl = fetchWithTimeout,
   now = Date.now(),

@@ -4,6 +4,9 @@ import { createHash, webcrypto } from 'node:crypto';
 import {
   MAX_RADAR_PACK_FRAMES,
   RADAR_PACK_CACHE,
+  activeCacheNames,
+  compareCacheNames,
+  selectCacheName,
   SOURCE_BUNDLE_ASSETS,
   SOURCE_BUNDLE_CACHE,
   cacheSourceBundle,
@@ -329,4 +332,77 @@ assert.equal(warned.includes(evictionText), true, 'saved data plus a refusal mus
 assert.equal(warned.includes('role="status"'), true, 'the warning must be announced');
 assert.equal((await renderWith({ ...savedRadar, persisted: false, packs: { AL012026: {} } })).includes(evictionText), true);
 
-console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs, persistence on save)');
+// Cache names carry a version, and a plain string sort ranks 1.9.3 above
+// 1.10.0 because "9" sorts after "1". The panel would have reported on the
+// wrong release for every version from 1.10.0 onwards.
+assert.deepEqual(
+  ['hm-shell-hm-v1.9.3', 'hm-shell-hm-v1.10.0', 'hm-shell-hm-v1.2.0'].sort(compareCacheNames),
+  ['hm-shell-hm-v1.2.0', 'hm-shell-hm-v1.9.3', 'hm-shell-hm-v1.10.0'],
+);
+assert.deepEqual(
+  ['hm-data-hm-v2.0.0', 'hm-data-hm-v10.0.0'].sort(compareCacheNames),
+  ['hm-data-hm-v2.0.0', 'hm-data-hm-v10.0.0'],
+);
+assert.deepEqual(['hm-tiles-v2', 'hm-tiles-v10'].sort(compareCacheNames), ['hm-tiles-v2', 'hm-tiles-v10']);
+assert.deepEqual(['b-cache', 'a-cache'].sort(compareCacheNames), ['a-cache', 'b-cache'], 'unversioned names still order stably');
+
+const shellScope = { id: 'shell', prefix: 'hm-shell-' };
+const shellCaches = ['hm-shell-hm-v1.9.3', 'hm-shell-hm-v1.10.0'];
+assert.equal(selectCacheName(shellCaches, shellScope, {}), 'hm-shell-hm-v1.10.0');
+
+// An install that fails after opening its caches leaves a versioned pair for a
+// version that never activates, and only that version's activate would clean
+// them up. The old worker keeps serving correctly while the panel inspects the
+// broken tuple and calls the release unverified.
+assert.equal(
+  selectCacheName(shellCaches, shellScope, { shell: 'hm-shell-hm-v1.9.3' }),
+  'hm-shell-hm-v1.9.3',
+  'the cache the running worker named must win over the highest version present',
+);
+assert.equal(
+  selectCacheName(shellCaches, shellScope, { shell: 'hm-shell-hm-v1.4.0' }),
+  'hm-shell-hm-v1.10.0',
+  'a claim for a cache that is not there falls back to the newest one that is',
+);
+assert.equal(selectCacheName([], shellScope, { shell: 'hm-shell-hm-v1.9.3' }), null);
+
+assert.deepEqual(activeCacheNames({}), { shell: null, data: null });
+assert.deepEqual(
+  activeCacheNames({ activeShellCache: 'hm-shell-hm-v1.9.3', activeDataCache: 'hm-data-hm-v1.9.3' }),
+  { shell: 'hm-shell-hm-v1.9.3', data: 'hm-data-hm-v1.9.3' },
+);
+
+// End to end: the panel inspects the tuple the worker is serving, not the
+// leftovers of the install that failed.
+const versionedCaches = new FakeCaches();
+for (const name of ['hm-shell-hm-v1.9.3', 'hm-shell-hm-v1.10.0', 'hm-data-hm-v1.9.3', 'hm-data-hm-v1.10.0']) {
+  await versionedCaches.open(name);
+}
+const servingCache = await versionedCaches.open('hm-data-hm-v1.9.3');
+servingCache.values.set('./__hurricanemap-release.json', new Response(JSON.stringify({
+  shell_cache: 'hm-shell-hm-v1.9.3',
+  data_cache: 'hm-data-hm-v1.9.3',
+  sw_version: 'hm-v1.9.3',
+})));
+const servedSnapshot = await inspectStorage({
+  cachesApi: versionedCaches,
+  storageApi: null,
+  packStorage: null,
+  active: { shell: 'hm-shell-hm-v1.9.3', data: 'hm-data-hm-v1.9.3' },
+});
+assert.equal(servedSnapshot.release.state, 'coherent', 'the running release must read as coherent');
+assert.equal(servedSnapshot.scopes.find(scope => scope.id === 'shell').cacheName, 'hm-shell-hm-v1.9.3');
+
+const guessedSnapshot = await inspectStorage({
+  cachesApi: versionedCaches,
+  storageApi: null,
+  packStorage: null,
+  active: { shell: null, data: null },
+});
+assert.equal(
+  guessedSnapshot.release.state,
+  'unverified',
+  'guessing the newest caches must be what reports the half-installed tuple, or the fix above proves nothing',
+);
+
+console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs, persistence on save, active release tuple over the newest one present)');

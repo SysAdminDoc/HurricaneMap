@@ -64,6 +64,8 @@ let pollTimer = null;
 let pollingStarted = false;
 let consecutiveFailures = 0;
 let activeStatusEl = null;
+// Settled once per page load by the first probe that gets an untagged 404.
+let relayAbsent = false;
 
 function ensureActiveFeedStatus() {
   if (!activeStatusEl || !document.body.contains(activeStatusEl)) {
@@ -205,9 +207,17 @@ async function renderOperationalLayers() {
 
 async function tryFetch(url) {
   const response = await fetchWithTimeout(url, { cache: 'no-cache' }, REQUEST_TIMEOUT_MS.active);
-  if (response.status === 429) return { ok: false, status: 429, storms: [], missingRoute: false };
+  if (response.status === 429) {
+    return { ok: false, status: 429, storms: [], missingRoute: false, source: CURRENT_STORMS_SOURCE };
+  }
   if (!response.ok) {
-    return { ok: false, status: response.status || 0, storms: [], missingRoute: isMissingProxyRoute(response) };
+    return {
+      ok: false,
+      status: response.status || 0,
+      storms: [],
+      missingRoute: isMissingProxyRoute(response),
+      source: CURRENT_STORMS_SOURCE,
+    };
   }
   const data = await response.json();
   return {
@@ -242,6 +252,10 @@ async function fetchSummaryStorms() {
 }
 
 async function fetchCurrentStorms() {
+  // The relay's absence is a property of the deployment, not of this poll. The
+  // first probe settles it; asking again every hour would reproduce the same
+  // console 404 for the life of the tab.
+  if (relayAbsent) return fetchSummaryStorms();
   try {
     const result = await tryFetch(nhcProxyUrl('/nhc/CurrentStorms.json'));
     // First one through the door tells the other feeds what it found. A
@@ -249,6 +263,7 @@ async function fetchCurrentStorms() {
     // itself served: only an untagged 404 means the route is absent.
     reportNhcProxyAvailability(!result.missingRoute);
     if (!result.missingRoute) return result;
+    relayAbsent = true;
   } catch (error) {
     reportNhcProxyAvailability(true);
     return { ok: false, status: 0, storms: [], error, source: CURRENT_STORMS_SOURCE };
@@ -360,7 +375,7 @@ export function activeStormCardElement(storm, currentPoint, doc = globalThis.doc
   const classification = isPotentialTropicalCyclone(storm)
     ? t('active.ptc')
     : String(storm.classification || '').trim();
-  const intensity = Number(storm.intensity);
+  const intensity = storm.intensity == null ? NaN : Number(storm.intensity);
   const links = [
     [safeExternalHref(storm.publicAdvisory?.url, { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.advisory')],
     [safeExternalHref(storm.forecastDiscussion?.url, { protocols: ['https:'], hosts: NHC_LINK_HOSTS }), t('active.discussion')],

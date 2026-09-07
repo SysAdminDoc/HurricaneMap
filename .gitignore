@@ -42,6 +42,10 @@ test-results/
 .tmp-pid.txt
 audit-*.png
 .tmp-stormevents/
+# One-off browser probes written next to the code they measure. One of these
+# was committed on 2026-09-07 and had to be deleted in the next commit.
+.probe-*.mjs
+*.bak
 
 # Markdown files local-only (except README)
 *.md

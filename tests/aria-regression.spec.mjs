@@ -26,6 +26,11 @@ test.use({
   viewport: { width: 1440, height: 960 },
   serviceWorkers: 'block',
   reducedMotion: 'reduce',
+  // The clock below is frozen in UTC, but the timestamps these snapshots
+  // contain are rendered with toLocaleString, which reads the browser's
+  // timezone. Without pinning it, a baseline recorded in New York fails in
+  // Denver on the hour, and in Tokyo on the date and the meridiem.
+  timezoneId: 'UTC',
 });
 
 test.beforeAll(async () => {

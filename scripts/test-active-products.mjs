@@ -11,6 +11,7 @@ import {
   fetchSummaryOutlookPoints,
   parseSummaryActiveStorms,
   parseSummaryOutlookPoints,
+  summaryStormId,
 } from '../src/nhc-summary.js';
 
 const outlookKml = `<?xml version="1.0"?><kml><Document>
@@ -230,24 +231,39 @@ assert.equal(withoutCurrentFix[0].movementSpeed, null);
 
 // The advisory the row was cut from is the only place the year appears;
 // validtime carries a day and a clock and nothing else.
+const advisoryYearOnly = {
+  type: 'FeatureCollection',
+  features: [{
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [-70, 25] },
+    properties: {
+      ...forecastFixture.features[0].properties,
+      idp_filedate: null,
+      advdate: '500 PM AST Thu Sep 03 2025',
+      basin: 'AL',
+      stormnum: 9,
+      binnumber: 'AT1',
+    },
+  }],
+};
+const pinnedNow = Date.UTC(2026, 0, 2);
+assert.equal(
+  parseSummaryActiveStorms(advisoryYearOnly, { now: pinnedNow })[0].id,
+  'AL092025',
+  'with no file date the advisory text supplies the year, including across a new year',
+);
+// This service publishes only live products, so a year from another decade is
+// a misread of the field rather than history worth trusting.
 assert.equal(
   parseSummaryActiveStorms({
     type: 'FeatureCollection',
     features: [{
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [-70, 25] },
-      properties: {
-        ...forecastFixture.features[0].properties,
-        idp_filedate: null,
-        advdate: '500 PM AST Thu Sep 03 2020',
-        basin: 'AL',
-        stormnum: 9,
-        binnumber: 'AT1',
-      },
+      ...advisoryYearOnly.features[0],
+      properties: { ...advisoryYearOnly.features[0].properties, advdate: '500 PM AST Thu Sep 03 2011' },
     }],
-  })[0].id,
-  'AL092020',
-  'with no file date the advisory text supplies the year',
+  }, { now: pinnedNow })[0].id,
+  'AL092026',
+  'an implausible advisory year falls back to the current season rather than minting a decade-old id',
 );
 
 // A rename upstream would leave every storm nameless at an unknown position.
@@ -268,6 +284,111 @@ for (const field of ['stormname', 'advisnum', 'basin', 'binnumber']) {
     `renaming ${field} upstream must fail the gate, not render blanks`,
   );
 }
+
+// The contract has to hold for every row, not only the first one read. A rename
+// that reaches part of a payload, or a leading feature with no properties at
+// all, used to pass the whole thing and let the rest render as nameless storms
+// at unknown positions.
+const renamedSecondRow = {
+  type: 'FeatureCollection',
+  features: forecastFixture.features.map((feature, index) => {
+    if (index === 0) return feature;
+    const properties = { ...feature.properties };
+    properties.stormName = properties.stormname;
+    delete properties.stormname;
+    return { ...feature, properties };
+  }),
+};
+assert.throws(
+  () => parseSummaryActiveStorms(renamedSecondRow),
+  error => error.missingFields?.includes('stormname'),
+  'a rename that reaches only some rows must fail the gate too',
+);
+assert.throws(
+  () => parseSummaryActiveStorms({
+    type: 'FeatureCollection',
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [-70, 25] } },
+      ...forecastFixture.features.map(feature => {
+        const properties = { ...feature.properties };
+        delete properties.binnumber;
+        return { ...feature, properties };
+      }),
+    ],
+  }),
+  error => error.missingFields?.includes('binnumber'),
+  'a first feature with no properties must not disable the check for the rest',
+);
+
+// binnumber is a display slot, not an identity. Lowell was EP12 in bin CP4
+// after crossing into the central Pacific, so keying on the bin let two storms
+// collapse into one and let one storm split into two.
+const sharedBin = {
+  type: 'FeatureCollection',
+  features: forecastFixture.features.map(feature => ({
+    ...feature,
+    properties: { ...feature.properties, binnumber: 'CP4' },
+  })),
+};
+assert.deepEqual(
+  parseSummaryActiveStorms(sharedBin).map(storm => storm.id),
+  ['EP122026', 'EP132026'],
+  'two storms sharing a bin must stay two storms',
+);
+const splitBin = {
+  type: 'FeatureCollection',
+  features: forecastFixture.features
+    .filter(feature => feature.properties.binnumber === 'CP4')
+    .map((feature, index) => ({
+      ...feature,
+      properties: { ...feature.properties, binnumber: index ? 'EP4' : 'CP4' },
+    })),
+};
+assert.deepEqual(
+  parseSummaryActiveStorms(splitBin).map(storm => storm.id),
+  ['EP122026'],
+  'one storm whose bin changes mid-advisory must stay one storm',
+);
+
+// An unreadable tau on the row already held used to let a five-day forecast
+// point replace the current fix, because NaN <= anything is false.
+const unreadableTau = {
+  type: 'FeatureCollection',
+  features: forecastFixture.features
+    .filter(feature => feature.properties.binnumber === 'CP4')
+    .map(feature => ({ ...feature, properties: { ...feature.properties, tau: 'n/a' } })),
+};
+const [heldRow] = parseSummaryActiveStorms(unreadableTau);
+assert.equal(heldRow.lat, 18.000000000100044, 'a bad tau must not promote a later forecast point to the current fix');
+assert.equal(heldRow.intensity, 100);
+
+// 9999 is the sentinel in lat and lon as well, and a marker at 9999N is worse
+// than no marker at all.
+assert.deepEqual(
+  parseSummaryActiveStorms({
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [9999, 9999] },
+      properties: { ...forecastFixture.features[0].properties, lat: 9999, lon: 9999 },
+    }],
+  }),
+  [],
+  'a storm at the sentinel position must be dropped, not drawn',
+);
+
+// idp_filedate is epoch milliseconds. Read as seconds it lands in 1970 and the
+// id stops matching the cone service, with nothing to show for it.
+assert.equal(
+  summaryStormId(
+    { basin: 'EP', stormnum: 12, idp_filedate: 1788801759, advdate: '800 AM HST Mon Sep 07 2026' },
+    Date.UTC(2026, 8, 7),
+  ),
+  'EP122026',
+  'a file date read as seconds lands in 1970; the advisory text must win instead',
+);
+assert.equal(summaryStormId({ basin: 'AL', stormnum: 100, advdate: 'Sep 07 2026' }, Date.UTC(2026, 8, 7)), '', 'ATCF numbers are two digits');
+assert.equal(summaryStormId({ basin: 'AL', stormnum: 0, advdate: 'Sep 07 2026' }, Date.UTC(2026, 8, 7)), '');
 
 // Out of season the layer is empty. That is an answer, not a broken contract.
 assert.deepEqual(parseSummaryActiveStorms({ type: 'FeatureCollection', features: [] }), []);
@@ -303,6 +424,32 @@ const outlookRisks = parseSummaryOutlookPoints({
 });
 assert.deepEqual(outlookRisks.map(point => point.risk), ['high', 'low', 'near-zero']);
 assert.deepEqual(outlookRisks.map(point => point.disturbance), ['1', '2', '3']);
+const twoBasins = parseSummaryOutlookPoints({
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-60, 15] }, properties: { objectid: 1, basin: 'Atlantic', prob2day: '80%', risk2day: 'High', prob7day: '90%', risk7day: 'High' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-120, 12] }, properties: { objectid: 2, basin: 'Pacific', prob2day: '10%', risk2day: 'Low', prob7day: '30%', risk7day: 'Low' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-50, 14] }, properties: { objectid: 3, basin: 'Atlantic', prob2day: '20%', risk2day: 'Low', prob7day: '30%', risk7day: 'Low' } },
+  ],
+});
+// NHC issues one outlook per basin and numbers the disturbances within it, so
+// a marker reading "Disturbance 3" would not match any product it publishes.
+assert.deepEqual(
+  twoBasins.map(point => `${point.basin}:${point.disturbance}`),
+  ['atlantic:1', 'pacific:1', 'atlantic:2'],
+);
+
+// The category is a category. Folding the percentage into it let any prob7day
+// text containing "high" set the symbol, and lost the near-zero X when the
+// category was blank.
+const blankCategory = parseSummaryOutlookPoints({
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-40, 12] }, properties: { objectid: 1, basin: 'Atlantic', prob2day: 'Near 0%', risk2day: 'Near 0%', risk7day: '', prob7day: 'Near 0%' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-41, 12] }, properties: { objectid: 2, basin: 'Atlantic', prob2day: '10%', risk2day: 'Low', risk7day: 'Low', prob7day: 'high confidence 20%' } },
+  ],
+});
+assert.deepEqual(blankCategory.map(point => point.risk), ['near-zero', 'low']);
 assert.deepEqual(outlookRisks.map(point => point.lon), [-60, -50, -40], 'the ordinal must follow objectid, not payload order');
 
 // A deployment with no relay makes exactly one request per feed, to the

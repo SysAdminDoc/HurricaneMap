@@ -148,6 +148,19 @@ if (!/import\.meta\.url/.test(source) ||
     !/discoverModuleGraph\(\)/.test(source)) {
   errors.push('module service worker must derive its application shell from MODULE_ENTRYPOINTS and import.meta.url.');
 }
+// A client cannot tell which versioned caches are being served by looking at
+// the cache list: an install that fails after opening its caches leaves a pair
+// for a version that never activates, and only that version's activate would
+// remove them. The worker says which pair it is using, and cleans up after
+// itself when its own install fails, but only the caches that install created.
+if (!source.includes('sw_version: SW_VERSION, shell_cache: SHELL_CACHE, data_cache: DATA_CACHE')) {
+  errors.push('sw.js must report its own SW_VERSION, SHELL_CACHE and DATA_CACHE with every offline integrity result.');
+}
+if (!source.includes('const preexisting = new Set(await caches.keys()') ||
+    !source.includes('if (!preexisting.has(name)) await caches.delete(name)')) {
+  errors.push('sw.js install must delete the versioned caches it created when it fails, and only those.');
+}
+
 if (!/RELEASE_LOCK_NAME/.test(source) ||
     !/navigator(?:\?\.)?locks/.test(source) ||
     !/withReleaseLock/.test(source)) {

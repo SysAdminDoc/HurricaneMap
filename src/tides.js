@@ -107,7 +107,7 @@ export function peakResidual(observed, predicted, { centerTime = null, windowHou
 export async function fetchWithRetry(url, {
   attempts = REQUEST_ATTEMPTS,
   timeoutMs = REQUEST_TIMEOUT_MS.tides,
-  fetchImpl = globalThis.fetch,
+  fetchImpl,
   signal = null,
 } = {}) {
   let lastResponse = null;

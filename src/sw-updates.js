@@ -12,6 +12,11 @@ let serviceWorkerDiagnostics = Object.freeze({
   offlineIntegrity: 'unverified',
   offlineIntegrityError: null,
   offlineIntegrityCheckedAt: null,
+  // Reported by the active worker, which is the only thing that knows which
+  // versioned caches are actually being served.
+  activeSwVersion: null,
+  activeShellCache: null,
+  activeDataCache: null,
   lastError: null,
 });
 
@@ -134,6 +139,9 @@ export async function requestOfflineIntegrityCheck({
           : 'invalid',
         error: event.data.error ? String(event.data.error).slice(0, 240) : null,
         checkedAt: typeof event.data.checked_at_utc === 'string' ? event.data.checked_at_utc : null,
+        swVersion: typeof event.data.sw_version === 'string' ? event.data.sw_version : null,
+        shellCache: typeof event.data.shell_cache === 'string' ? event.data.shell_cache : null,
+        dataCache: typeof event.data.data_cache === 'string' ? event.data.data_cache : null,
       });
     };
     const timer = setTimeout(() => finish({ state: 'unverified', error: 'offline-integrity-timeout' }), timeoutMs);
@@ -146,13 +154,32 @@ export async function requestOfflineIntegrityCheck({
   });
 }
 
-function publishIntegrity({ state = 'unverified', error = null, checkedAt = null } = {}, documentRef) {
+function publishIntegrity({
+  state = 'unverified',
+  error = null,
+  checkedAt = null,
+  swVersion = null,
+  shellCache = null,
+  dataCache = null,
+} = {}, documentRef) {
   publishDiagnostics({
     offlineIntegrity: state,
     offlineIntegrityError: error ? String(error).slice(0, 240) : null,
     offlineIntegrityCheckedAt: checkedAt,
+    // Only overwrite what the worker actually reported: a timeout or an
+    // unregistered worker must not erase the names a previous answer gave.
+    ...(swVersion ? { activeSwVersion: swVersion } : {}),
+    ...(shellCache ? { activeShellCache: shellCache } : {}),
+    ...(dataCache ? { activeDataCache: dataCache } : {}),
   }, documentRef);
-  return { state, error: error ? String(error).slice(0, 240) : null, checkedAt };
+  return {
+    state,
+    error: error ? String(error).slice(0, 240) : null,
+    checkedAt,
+    swVersion,
+    shellCache,
+    dataCache,
+  };
 }
 
 async function resolveActiveWorker(serviceWorker, timeoutMs) {

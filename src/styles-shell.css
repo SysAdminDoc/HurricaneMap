@@ -13,7 +13,12 @@ header.app-header.glass {
   position: absolute;
   top: 16px;
   left: 12px;
-  z-index: 1000;
+  /* Above every panel and overlay: the header owns the top-left corner and its
+     controls have to stay clickable while a panel is open. This used to be
+     declared as 3000 further down the file and won only because it was
+     !important; without that the selector above, being more specific, put the
+     header back under the filters, the storm panel and the feed cards. */
+  z-index: 3000;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -49,12 +54,10 @@ header.app-header.glass {
   border-radius: 12px !important;
 }
 
-/* The header's surface is skinned in the themes layer, not here. It used to be
-   declared !important in this layer, and !important reverses layer precedence,
-   so the shell layer beat the themes layer: the light override never applied
-   and the header stayed a navy slab above a light UI while its own buttons
-   switched to light chips. What is left here is what no other layer sets. */
-.app-header {
-  z-index: 3000;
-  backdrop-filter: blur(18px) saturate(135%);
-}
+/* The header's surface and its blur are skinned in the themes layer, not here.
+   They used to be declared !important in this layer, and !important reverses
+   layer precedence, so the shell layer beat the themes layer: the light
+   override never applied and the header stayed a navy slab above a light UI
+   while its own buttons switched to light chips. Nothing about the header's
+   painting is left in this layer, because the themes layer beats it whatever
+   the specificity. */
