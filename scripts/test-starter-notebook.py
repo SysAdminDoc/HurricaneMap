@@ -18,7 +18,13 @@ EXPECTED_COUNTS = {
     "landfall_event_count": 759,
     "hurricane_landfall_count": 374,
 }
-NOTEBOOK_PACKAGES = ("nbclient", "nbformat", "numpy", "pandas", "matplotlib")
+# ipykernel is here because nbclient needs a registered python3 kernelspec to
+# execute anything; without it the run dies with "No such kernel named python3"
+# rather than reporting a missing package.
+NOTEBOOK_PACKAGES = ("nbclient", "nbformat", "numpy", "pandas", "matplotlib", "ipykernel")
+
+# run-gates.mjs reads this as SKIPPED rather than PASS.
+SKIPPED_EXIT_CODE = 3
 PROVENANCE_FILES = ("data/landfalls.json", "data/metadata.json", "data/storms.json")
 OFFLINE_GUARD = """
 import socket
@@ -156,12 +162,27 @@ def _execute_notebook(output_dir: Path) -> str:
 def execute_release_check(data_report: dict[str, Any]) -> int:
     missing = _missing_notebook_packages()
     if missing:
+        # This used to return 0. The one gate that proves the published notebook
+        # still reproduces the 595/759/374 contract therefore passed on every
+        # machine that could not run it, which was every machine without the
+        # notebook packages installed. Not running is not the same as passing.
+        if os.environ.get("HURRICANEMAP_NOTEBOOK") == "skip":
+            # run-gates.mjs reports the last meaningful line, so the sentence a
+            # reader needs goes after the machine-readable report, not before it.
+            print(json.dumps(data_report, sort_keys=True))
+            print(
+                "starter notebook did NOT run: HURRICANEMAP_NOTEBOOK=skip is set and "
+                f"{', '.join(missing)} {'is' if len(missing) == 1 else 'are'} missing. "
+                "The data contract and provenance passed; the notebook itself was not executed."
+            )
+            return SKIPPED_EXIT_CODE
         print(
-            "starter notebook execution skipped: optional notebook packages missing "
-            f"({', '.join(missing)}); data contract and provenance passed"
+            "starter notebook cannot run: install "
+            f"{' '.join(missing)} (pip install {' '.join(NOTEBOOK_PACKAGES)}), or set "
+            "HURRICANEMAP_NOTEBOOK=skip to record the gate as skipped rather than passed",
+            file=sys.stderr,
         )
-        print(json.dumps(data_report, sort_keys=True))
-        return 0
+        return 1
 
     try:
         with tempfile.TemporaryDirectory(prefix="hurricanemap-notebook-") as first_temp, tempfile.TemporaryDirectory(

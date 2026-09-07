@@ -32,7 +32,7 @@ The release gate runs the same notebook offline in two disposable output directo
 npm run test:notebook
 ```
 
-The command validates 595 storms, 759 landfall events, 374 hurricane-strength landfalls, and the release-manifest hashes before executing. If the optional notebook runtime is not installed, it reports the missing packages separately and still reports data-contract failures distinctly.
+The command validates 595 storms, 759 landfall events, 374 hurricane-strength landfalls, and the release-manifest hashes before executing. If the notebook runtime is not installed the gate fails and names the missing packages: a check that did not run is not a check that passed. Set `HURRICANEMAP_NOTEBOOK=skip` to record a deliberate skip, which still verifies the data contract and shows up as SKIPPED in `npm run build` rather than as a pass. The pinned environment needs Python 3.12 or newer.
 
 **What you'll learn:**
 - How to structure landfall data for analysis

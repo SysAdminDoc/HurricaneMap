@@ -197,7 +197,7 @@ Every research export (publication CSV, statistical Markdown report, QGIS GeoJSO
 
 ### Notebook analysis
 
-The starter notebook uses Python 3.11+ with a pinned pandas, NumPy, Matplotlib, Pillow, and Jupyter Notebook environment. From the repository root, install everything with one command:
+The starter notebook uses Python 3.12 or newer with a pinned pandas, NumPy, Matplotlib, Pillow, and Jupyter Notebook environment. NumPy 2.5.1 refuses to install below 3.12, so 3.11 cannot satisfy the pins. From the repository root, install everything with one command:
 
 ```bash
 python -m pip install -r requirements-notebooks.txt
@@ -209,7 +209,9 @@ Then run `python -m notebook notebooks/analysis-starter.ipynb`. The setup cell e
 npm run test:notebook
 ```
 
-Pillow is included because the repository's radar-transparency, placeholder-branding, and radar preprocessing tools import `PIL`; keeping it in the same pinned environment avoids a separate undocumented setup path. If notebook execution packages are absent, the command reports them separately from a data-contract failure.
+Pillow is included because the repository's radar-transparency, placeholder-branding, and radar preprocessing tools import `PIL`; keeping it in the same pinned environment avoids a separate undocumented setup path. ipykernel is included because nbclient needs a registered `python3` kernelspec to execute anything.
+
+If those packages are absent the gate fails and names them, because a check that did not run is not a check that passed. To record a deliberate skip instead, set `HURRICANEMAP_NOTEBOOK=skip`: the gate then says the notebook did not run, still verifies the data contract and provenance, and `npm run build` reports it as SKIPPED rather than counting it among the passes.
 
 ## Project layout
 

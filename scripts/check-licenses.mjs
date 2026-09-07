@@ -66,7 +66,7 @@ if ((notices.match(/License: SIL Open Font License 1\.1/g) || []).length !== fon
 }
 if (packageJson.engines?.node !== '>=22') errors.push('package.json must declare engines.node >=22');
 if (lockfile.packages?.['']?.engines?.node !== '>=22') errors.push('package-lock.json must preserve engines.node >=22');
-for (const requirement of ['numpy==2.5.1', 'pandas==3.0.5', 'matplotlib==3.11.1', 'pillow==12.3.0', 'notebook==7.6.1', 'nbclient==0.10.2', 'nbformat==5.10.4']) {
+for (const requirement of ['numpy==2.5.1', 'pandas==3.0.5', 'matplotlib==3.11.1', 'pillow==12.3.0', 'notebook==7.6.1', 'nbclient==0.10.2', 'nbformat==5.10.4', 'ipykernel==7.3.0']) {
   if (!requirements.split(/\r?\n/).includes(requirement)) errors.push(`missing pinned notebook dependency ${requirement}`);
 }
 if (!readme.includes('python -m pip install -r requirements-notebooks.txt')) {

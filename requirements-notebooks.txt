@@ -5,3 +5,4 @@ pillow==12.3.0
 notebook==7.6.1
 nbclient==0.10.2
 nbformat==5.10.4
+ipykernel==7.3.0

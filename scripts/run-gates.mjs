@@ -144,8 +144,24 @@ export function findMissingGates(scripts) {
 
 // The slowest gate is validate:schemas at roughly half a minute; ten minutes
 // is a hang, not a slow machine.
+// A gate can report that it could not run at all, which is not the same as
+// passing. test:notebook is the case that forced this: it returned 0 whenever
+// the notebook packages were absent, so the one check that proves the published
+// notebook still reproduces the release contract was green on every machine
+// that could not run it. Exit code 3 means SKIPPED. A skipped gate is counted
+// and named separately, so a run where something never executed cannot read as
+// a clean full-set pass.
+export const GATE_SKIPPED_EXIT_CODE = 3;
 const GATE_TIMEOUT_MS = 10 * 60 * 1000;
 const MAX_GATE_OUTPUT_BYTES = 32 * 1024 * 1024;
+
+// Three outcomes, not two. Kept separate from the reporting loop so the
+// SKIPPED path is testable without running all 96 gates.
+export function classifyGateResult(result) {
+  if (result?.status === 0) return 'passed';
+  if (result?.status === GATE_SKIPPED_EXIT_CODE) return 'skipped';
+  return 'failed';
+}
 
 export function describeSpawnFailure(result) {
   if (result?.error?.code === 'ETIMEDOUT' || (result?.signal && result?.status === null && result?.error?.code !== 'ENOBUFS')) {
@@ -184,6 +200,7 @@ async function main() {
   }
 
   const failures = [];
+  const skipped = [];
   const started = Date.now();
   for (const [index, name] of GATE_SCRIPTS.entries()) {
     const position = `${String(index + 1).padStart(2, ' ')}/${GATE_SCRIPTS.length}`;
@@ -196,8 +213,12 @@ async function main() {
       timeout: GATE_TIMEOUT_MS,
     });
     const seconds = ((Date.now() - gateStarted) / 1000).toFixed(1);
-    if (result.status === 0) {
+    const outcome = classifyGateResult(result);
+    if (outcome === 'passed') {
       console.log(`${position} PASS ${name} (${seconds}s) — ${lastMeaningfulLine(result.stdout)}`);
+    } else if (outcome === 'skipped') {
+      skipped.push(name);
+      console.log(`${position} SKIP ${name} (${seconds}s) — ${lastMeaningfulLine(result.stdout)}`);
     } else {
       // A gate can die without ever setting an exit status — killed on the
       // timeout, or cut off for writing more than the buffer holds. Say which,
@@ -209,18 +230,23 @@ async function main() {
   }
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(1);
+  // A skipped gate is not a pass, so it is subtracted from the count and named.
+  // A summary reading 96/96 while one gate never ran is the exact thing this
+  // whole distinction exists to stop.
+  const passed = GATE_SCRIPTS.length - failures.length - skipped.length;
+  const skipNote = skipped.length ? `; ${skipped.length} SKIPPED: ${skipped.join(', ')}` : '';
   if (failures.length) {
     for (const failure of failures) {
       const heading = failure.reason ? `${failure.name} (${failure.reason})` : failure.name;
       console.error(`\n----- ${heading} -----\n${failure.output.trimEnd()}`);
     }
     console.error(
-      `\nrelease gates: ${GATE_SCRIPTS.length - failures.length}/${GATE_SCRIPTS.length} passed in ${elapsed}s; `
-      + `failed: ${failures.map(failure => failure.name).join(', ')}`,
+      `\nrelease gates: ${passed}/${GATE_SCRIPTS.length} passed in ${elapsed}s; `
+      + `failed: ${failures.map(failure => failure.name).join(', ')}${skipNote}`,
     );
     process.exit(1);
   }
-  console.log(`\nrelease gates ok (${GATE_SCRIPTS.length}/${GATE_SCRIPTS.length} passed in ${elapsed}s)`);
+  console.log(`\nrelease gates ok (${passed}/${GATE_SCRIPTS.length} passed in ${elapsed}s${skipNote})`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

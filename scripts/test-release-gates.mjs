@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  classifyGateResult,
   describeSpawnFailure,
   findMissingGates,
   findUnclaimedGates,
   GATE_SCRIPTS,
+  GATE_SKIPPED_EXIT_CODE,
   NON_GATE_SCRIPTS,
 } from './run-gates.mjs';
 import {
@@ -325,7 +329,66 @@ assert.equal(describeRunFailure({ status: 0 }, py313), '', 'a clean run explains
 assert.equal(describeRunFailure({ status: 1 }, py313), '', 'a Python test that simply failed is already legible');
 assert.equal(describeRunFailure(undefined, py313), '');
 
+// A gate that could not run is not a gate that passed. test:notebook returned 0
+// whenever the notebook packages were absent, so the only check that proves the
+// published notebook still reproduces the 595/759/374 release contract was green
+// on every machine that could not execute it.
+assert.equal(GATE_SKIPPED_EXIT_CODE, 3);
+assert.equal(classifyGateResult({ status: 0 }), 'passed');
+assert.equal(classifyGateResult({ status: GATE_SKIPPED_EXIT_CODE }), 'skipped');
+assert.equal(classifyGateResult({ status: 1 }), 'failed');
+assert.equal(classifyGateResult({ status: null, signal: 'SIGKILL' }), 'failed', 'a killed gate is a failure, not a skip');
+assert.equal(classifyGateResult(undefined), 'failed');
+
+// Drive the notebook gate with a planted ImportError so the missing-package
+// paths are exercised on a machine that has the packages installed.
+const shimDir = await mkdtemp(path.join(tmpdir(), 'hurricanemap-notebook-shim-'));
+try {
+  await writeFile(
+    path.join(shimDir, 'nbclient.py'),
+    'raise ImportError("planted by test-release-gates: nbclient is unavailable")\n',
+    'utf8',
+  );
+  const runNotebookGate = env => spawnSync(process.execPath, [path.join(root, 'scripts', 'python.mjs'), path.join(root, 'scripts', 'test-starter-notebook.py')], {
+    cwd: root,
+    encoding: 'utf8',
+    env: { ...process.env, PYTHONPATH: shimDir, ...env },
+  });
+
+  const refused = runNotebookGate({ HURRICANEMAP_NOTEBOOK: '' });
+  assert.equal(refused.status, 1, `a gate that cannot run must fail, got ${refused.status}: ${refused.stdout}${refused.stderr}`);
+  assert.match(refused.stderr, /nbclient/, 'the failure must name the package that is missing');
+  assert.match(refused.stderr, /HURRICANEMAP_NOTEBOOK=skip/, 'and must name the way to record a deliberate skip');
+
+  const skippedRun = runNotebookGate({ HURRICANEMAP_NOTEBOOK: 'skip' });
+  assert.equal(
+    skippedRun.status,
+    GATE_SKIPPED_EXIT_CODE,
+    `an explicit skip must exit ${GATE_SKIPPED_EXIT_CODE}, got ${skippedRun.status}: ${skippedRun.stdout}${skippedRun.stderr}`,
+  );
+  assert.match(skippedRun.stdout, /did NOT run/, 'a skip must say so in words, not only in an exit code');
+  assert.equal(classifyGateResult(skippedRun), 'skipped');
+
+  // Positive control: without the planted failure the same command runs the
+  // notebook, so the two results above came from the missing package and not
+  // from something that was broken all along.
+  const real = spawnSync(process.execPath, [path.join(root, 'scripts', 'python.mjs'), path.join(root, 'scripts', 'test-starter-notebook.py')], {
+    cwd: root,
+    encoding: 'utf8',
+    env: { ...process.env, PYTHONPATH: '', HURRICANEMAP_NOTEBOOK: 'skip' },
+  });
+  assert.equal(
+    real.status,
+    0,
+    'with the packages present the gate must execute the notebook and pass, even with the skip flag set',
+  );
+  assert.match(real.stdout, /starter notebook verification ok/);
+} finally {
+  await rm(shimDir, { recursive: true, force: true });
+}
+
 console.log(
   `release gate runner ok (${GATE_SCRIPTS.length} gates claimed, ${NON_GATE_SCRIPTS.length} excluded, `
-  + `failure modes named, ${pythonGates.length} Python gates resolved portably)`,
+  + `failure modes named, ${pythonGates.length} Python gates resolved portably, `
+  + 'a gate that cannot run reports SKIPPED rather than PASS)',
 );
