@@ -4678,6 +4678,27 @@ kbd {
   text-overflow: ellipsis;
 }
 
+/* text-overflow has no effect on a flex container, and .subtitle is one, so
+   the header read "...Atlas · 595 st" cut through a word at 1024px and again
+   at 1378px. The ellipsis has to sit on the children that actually hold the
+   text, and they have to be allowed to shrink to reach it. */
+.title-block .subtitle > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The storm and landfall totals used to sit here beside the atlas name. The
+   subtitle box is 264px wide at 1440px and the name alone wants 215px, so the
+   two shared it by cutting each other off, and at 1600px they still did. They
+   moved to the context rail, which is the surface built for dataset facts and
+   has the room. */
+.atlas-context-count {
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+}
+
 .icon-btn {
   background: rgba(17, 17, 27, 0.34);
   border-color: rgba(205, 214, 244, 0.12);
@@ -10069,14 +10090,17 @@ html:not(.light-theme) #map .leaflet-tile-pane {
   background: var(--legend-color);
 }
 
+/* The histogram's backing was a hardcoded navy while the ribbon around it went
+   light, so the light theme drew pale bars on a purplish slab. Both themes
+   already define a sunken surface for exactly this. */
 .timeline-axis {
-  border-color: rgba(129, 188, 220, 0.16);
-  background: rgba(3, 13, 27, 0.58);
+  border-color: var(--border-subtle);
+  background: var(--surface-sunken);
 }
 
 .timeline-axis:hover,
 .timeline-axis.dragging {
-  background: rgba(5, 20, 37, 0.78);
+  background: var(--surface-control-hover);
 }
 
 @media (min-width: 1121px) {

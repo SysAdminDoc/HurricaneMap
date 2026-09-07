@@ -634,6 +634,69 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
+// The subtitle is a flex container, and text-overflow does nothing on one, so
+// at 1024px and again at 1378px the header read "...Atlas · 595 st", cut
+// through a word. Either the text fits or it ends in an ellipsis; a clipped
+// word with neither is the defect.
+async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
+  const widths = [1024, 1280, 1378, 1440];
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, { onboarded: true, theme: 'dark', locale, reducedMotion: true });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    for (const width of widths) {
+      await page.setViewportSize({ width, height: 960 });
+      await page.waitForFunction(target => window.innerWidth === target, width);
+      const cut = await page.evaluate(() => [...document.querySelectorAll('.app-header .subtitle, .app-header .subtitle > span, .app-header h1')]
+        .filter(element => {
+          const style = getComputedStyle(element);
+          if (style.display === 'none' || style.visibility === 'hidden') return false;
+          // A one-pixel rounding difference is not a clipped word, and
+          // overflowing is not the defect on its own: an element that shows an
+          // ellipsis overflows by definition. The defect is overflowing with no
+          // ellipsis to show for it, which is how the header read
+          // "...Atlas · 595 st".
+          //
+          // text-overflow does nothing on a flex or grid container, though, and
+          // .subtitle is one. Excusing an element because it DECLARES an
+          // ellipsis it cannot honour is the exact hole this is meant to close,
+          // so a flex container gets no excuse: it either fits or its children
+          // shrink until it does.
+          const honoursEllipsis = style.textOverflow === 'ellipsis' &&
+            !['flex', 'inline-flex', 'grid', 'inline-grid'].includes(style.display);
+          return element.scrollWidth > element.clientWidth + 1 && !honoursEllipsis;
+        })
+        .map(element => ({
+          text: (element.textContent || '').trim().slice(0, 40),
+          scrollWidth: element.scrollWidth,
+          clientWidth: element.clientWidth,
+          textOverflow: getComputedStyle(element).textOverflow,
+        })));
+      assert(!cut.length, `[${locale}] header text is cut with no ellipsis at ${width}px: ${JSON.stringify(cut)}`);
+    }
+    // Positive control: the subtitle has to have text on screen, or the loop
+    // above passed on an empty header. And the totals it used to carry have to
+    // still be somewhere a reader can see them, which is now the context rail.
+    const survivors = await page.evaluate(() => ({
+      subtitle: (document.querySelector('.app-header .subtitle')?.textContent || '').trim(),
+      counts: (document.querySelector('.atlas-context-rail #storm-count')?.textContent || '').trim(),
+    }));
+    assert(
+      survivors.subtitle.length > 20,
+      `[${locale}] the subtitle has no text to clip, so the check proves nothing: "${survivors.subtitle}"`,
+    );
+    assert(
+      /\d[\d,]*\D+\d[\d,]*/.test(survivors.counts),
+      `[${locale}] the totals did not survive the move out of the header: "${survivors.counts}"`,
+    );
+  } finally {
+    await context.close();
+  }
+}
+
 // The header's stacking and its blur used to be declared !important in the
 // shell layer, which is also what stopped the light theme reaching it. Removing
 // that took two other things with it, and nothing here was looking: a more
@@ -4293,6 +4356,9 @@ try {
   await assertSummaryServiceServesActiveStorms(browser, baseUrl);
   await assertRelayStillWinsForActiveStorms(browser, baseUrl);
   await assertHeaderStackingAndBlur(browser, baseUrl);
+  // Spanish is the longest of the three subtitles, and it is where the flex
+  // children have to shrink rather than be cut through a word.
+  for (const locale of ['en', 'es']) await assertHeaderTextIsNotCut(browser, baseUrl, locale);
 
   await browser.close();
 
