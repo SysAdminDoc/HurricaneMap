@@ -184,6 +184,16 @@ try {
     localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
   });
   const page = await context.newPage();
+  // Opening the globe logged six CSP violations: Cesium's widgets set inline
+  // styles, and its credit logo and moon texture are images from its own host.
+  // Real errors hide behind noise like that, so the count has to be zero.
+  const cspViolations = [];
+  page.on('console', message => {
+    const text = message.text();
+    if (/Content Security Policy|violates the following Content Security Policy/i.test(text)) {
+      cspViolations.push(text.slice(0, 200));
+    }
+  });
   const pageErrors = [];
   page.on('pageerror', error => {
     // Playwright's own serviceWorkers:'block' shim is injected into the sandboxed
@@ -327,8 +337,14 @@ try {
   await context.close();
   await browser.close();
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
+  if (cspViolations.length) {
+    throw new Error(`${cspViolations.length} CSP violations opening the globe: ${cspViolations.join(' | ')}`);
+  }
 
-  console.log(`globe3d smoke ok (${Math.round(desktop.width)}x${Math.round(desktop.height)}, ${desktop.entities} entities, ${desktop.windCones} cone layers, ${desktopPixels.variedPixels} varied pixels)`);
+  console.log(
+    `globe3d smoke ok (${Math.round(desktop.width)}x${Math.round(desktop.height)}, ${desktop.entities} entities, `
+    + `${desktop.windCones} cone layers, ${desktopPixels.variedPixels} varied pixels, no CSP violations)`,
+  );
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
