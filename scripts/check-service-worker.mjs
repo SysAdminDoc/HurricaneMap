@@ -114,6 +114,24 @@ if (!/const\s+DATA_CACHE_PREFIX\s*=\s*['"]hm-data-['"]/.test(source) ||
 if (!/RADAR_CACHE_MAX_ENTRIES/.test(source) || !/trimCache\(RADAR_CACHE,\s*RADAR_CACHE_MAX_ENTRIES\)/.test(source)) {
   errors.push('sw.js must cap the on-demand radar cache.');
 }
+// The cap is why saved packs cannot live in that cache. A 120-frame pack plus
+// ordinary browsing crossed the 240-entry limit, so saving a third pack deleted
+// the first one's frames while the pack index still called it saved. The pack
+// cache has to exist, survive activation, be read before the LRU, and never be
+// handed to trimCache.
+if (!/const\s+RADAR_PACK_CACHE\s*=\s*['"]hm-radar-saved-v1['"]/.test(source)) {
+  errors.push('sw.js must name a radar pack cache that the LRU never trims.');
+}
+if (new RegExp('trimCache\\(\\s*RADAR_PACK_CACHE').test(source)) {
+  errors.push('sw.js must never trim the radar pack cache: those frames were saved deliberately.');
+}
+if (!/k !== RADAR_PACK_CACHE/.test(source)) {
+  errors.push('sw.js activate path must keep the radar pack cache instead of deleting it as unknown.');
+}
+if (!/caches\.open\(RADAR_PACK_CACHE\)/.test(source) ||
+    !new RegExp('function radarFrame\\(').test(source)) {
+  errors.push('sw.js must serve a saved radar frame from the pack cache before falling through to the LRU.');
+}
 if (/stamen|opentopomap/.test(source) || !source.includes('mesonet\\.agron\\.iastate\\.edu')) {
   errors.push('sw.js tile caching must cover the app\'s IEM radar tiles without dead host matchers.');
 }
@@ -140,6 +158,15 @@ const radarBranch = source.indexOf('if (isRadarAsset(url))');
 const shellBranch = source.indexOf('if (isShell(url))');
 if (radarBranch < 0 || shellBranch < 0 || radarBranch > shellBranch) {
   errors.push('fetch handler must route radar PNGs before generic shell/image caching.');
+}
+// The branch has to dispatch to the reader that checks the pack cache first.
+// Asserting only that radarFrame() is defined somewhere let the fetch handler
+// go straight back to the LRU with the function sitting there unused.
+if (radarBranch >= 0) {
+  const branchBody = source.slice(radarBranch, source.indexOf('} else if', radarBranch));
+  if (!branchBody.includes('radarFrame(req')) {
+    errors.push('fetch handler must answer a radar PNG through radarFrame(), which reads the saved-pack cache before the LRU.');
+  }
 }
 
 for (const [label, collection] of assets) {

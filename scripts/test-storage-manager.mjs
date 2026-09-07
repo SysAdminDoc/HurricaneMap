@@ -3,6 +3,7 @@ import { createHash, webcrypto } from 'node:crypto';
 
 import {
   MAX_RADAR_PACK_FRAMES,
+  RADAR_PACK_CACHE,
   SOURCE_BUNDLE_ASSETS,
   SOURCE_BUNDLE_CACHE,
   cacheSourceBundle,
@@ -90,7 +91,16 @@ const saved = await cacheRadarPack('AL012026', manyFrames.slice(0, 3), {
   packStorage: null,
 });
 assert.equal(saved.saved, 3);
-assert.equal((await successfulCaches.open('hm-radar-v1')).values.size, 3);
+// Was hm-radar-v1. That is the service worker's 240-entry LRU, and a pack holds
+// up to 120 frames, so a third pack evicted the first one's while the index
+// still listed it as saved. The assertion moved because the behaviour it names
+// is the defect.
+assert.equal((await successfulCaches.open(RADAR_PACK_CACHE)).values.size, 3);
+assert.equal(
+  (await successfulCaches.open('hm-radar-v1')).values.size,
+  0,
+  'a deliberately saved pack must not be written into the cache the worker trims',
+);
 const radarCacheState = await inspectRadarFrameCache(
   [...manyFrames.slice(0, 3), { url: 'data/radar/Test/not-cached.png' }],
   { cachesApi: successfulCaches },
@@ -101,6 +111,60 @@ assert.deepEqual(
 );
 const emptyRadarCacheState = await inspectRadarFrameCache(manyFrames.slice(0, 1), { cachesApi: new FakeCaches() });
 assert.equal(emptyRadarCacheState.state, 'empty');
+
+// Three full packs, then enough browsing to empty the LRU entirely. Every pack
+// still reads complete, because none of its frames were in the LRU to lose.
+const packCaches = new FakeCaches();
+const packOf = id => Array.from({ length: MAX_RADAR_PACK_FRAMES }, (_, index) => ({
+  url: `data/radar/${id}/t_${String(index).padStart(4, '0')}.png`,
+}));
+const packIds = ['AL012026', 'AL022026', 'AL032026'];
+for (const id of packIds) {
+  const result = await cacheRadarPack(id, packOf(id), {
+    cachesApi: packCaches,
+    fetchImpl: async () => new Response('frame'),
+    storageApi: { estimate: async () => ({ usage: 10, quota: 1_000_000_000 }) },
+    packStorage: null,
+  });
+  assert.equal(result.saved, MAX_RADAR_PACK_FRAMES, `${id} did not save every frame`);
+}
+const browsingLru = await packCaches.open('hm-radar-v1');
+for (const frame of [...packOf('AL042026'), ...packOf('AL052026')]) {
+  await browsingLru.put(frame.url, new Response('frame'));
+}
+// What the service worker's trim does, taken to its limit.
+browsingLru.values.clear();
+for (const id of packIds) {
+  const state = await inspectRadarFrameCache(packOf(id), { cachesApi: packCaches });
+  assert.deepEqual(
+    { id, state: state.state, cached: state.cached },
+    { id, state: 'complete', cached: MAX_RADAR_PACK_FRAMES },
+    `${id} lost frames to radar browsing`,
+  );
+}
+
+// A frame the reader only browsed past is still reported as held: the two
+// caches are read together, so moving the packs did not narrow what counts.
+const browsedOnly = new FakeCaches();
+const browsedCache = await browsedOnly.open('hm-radar-v1');
+await browsedCache.put(manyFrames[0].url, new Response('frame'));
+assert.equal(
+  (await inspectRadarFrameCache([manyFrames[0]], { cachesApi: browsedOnly })).state,
+  'complete',
+  'a frame in the browsing cache must still count as cached',
+);
+
+// Clearing the radar scope clears both caches, or "Clear" would leave behind
+// the larger half of what the panel had just counted.
+assert.equal(
+  await clearOptionalStorageScope('radar', { cachesApi: packCaches, packStorage: null, notify: false }),
+  true,
+);
+assert.deepEqual(
+  (await packCaches.keys()).filter(name => name.startsWith('hm-radar')),
+  [],
+  'clearing radar must remove the saved packs as well as the browsing cache',
+);
 
 const sourceBodies = new Map([
   [SOURCE_BUNDLE_ASSETS[0], 'atlantic source'],
@@ -131,7 +195,7 @@ assert.equal(sourceResult.bytes, Buffer.byteLength(sourceBodies.get(SOURCE_BUNDL
 assert.equal((await sourceCaches.open(SOURCE_BUNDLE_CACHE)).values.size, 4, 'source pack must include its integrity marker');
 
 const quotaCaches = new FakeCaches();
-quotaCaches.caches.set('hm-radar-v1', new FakeCache({ failAt: 2 }));
+quotaCaches.caches.set(RADAR_PACK_CACHE, new FakeCache({ failAt: 2 }));
 const core = await quotaCaches.open('hm-data-v2');
 core.values.set('data/storms.json.gz', new Response('required'));
 await assert.rejects(
@@ -143,7 +207,7 @@ await assert.rejects(
   }),
   error => error.name === 'QuotaExceededError',
 );
-assert.equal((await quotaCaches.open('hm-radar-v1')).values.size, 0, 'failed pack must roll back only its new radar frames');
+assert.equal((await quotaCaches.open(RADAR_PACK_CACHE)).values.size, 0, 'failed pack must roll back only its new radar frames');
 assert.ok(core.values.has('data/storms.json.gz'), 'quota rollback must preserve required historical data');
 
 await assert.rejects(

@@ -8,7 +8,11 @@ export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
   { id: 'data', prefix: 'hm-data-', required: true },
   { id: 'tiles', cacheName: 'hm-tiles-v2', required: false },
-  { id: 'radar', cacheName: 'hm-radar-v1', required: false },
+  // Two caches, one row. hm-radar-v1 is the service worker's LRU for frames
+  // the reader merely browsed past; hm-radar-saved-v1 holds the packs they
+  // asked to keep and is never trimmed. Reporting only the first understated
+  // usage and left "Clear" deleting half of what the reader could see.
+  { id: 'radar', cacheName: 'hm-radar-v1', companions: ['hm-radar-saved-v1'], required: false },
   { id: 'source', prefix: 'hm-source-', required: false },
 ]);
 export const MAX_RADAR_PACK_FRAMES = 120;
@@ -21,6 +25,7 @@ export const SOURCE_BUNDLE_ASSETS = Object.freeze([
 export const SOURCE_BUNDLE_CACHE = 'hm-source-bundle-v1';
 const SOURCE_BUNDLE_MARKER_PATH = './__hurricanemap-source-bundle.json';
 const RADAR_PACKS_KEY = 'hm-radar-packs-v1';
+export const RADAR_PACK_CACHE = 'hm-radar-saved-v1';
 const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
 const QUOTA_HEADROOM = 0.95;
 
@@ -271,6 +276,7 @@ export function selectBoundedRadarFrames(frames, limit = MAX_RADAR_PACK_FRAMES) 
 export async function inspectRadarFrameCache(frames, {
   cachesApi = globalThis.caches,
   cacheName = 'hm-radar-v1',
+  packCacheName = RADAR_PACK_CACHE,
 } = {}) {
   const urls = [...new Set(
     (Array.isArray(frames) ? frames : [])
@@ -280,10 +286,18 @@ export async function inspectRadarFrameCache(frames, {
   const base = { state: 'unavailable', cached: 0, total: urls.length, urls };
   if (!urls.length || !cachesApi) return base;
   const cacheNames = await cachesApi.keys().catch(() => []);
-  if (!cacheNames.includes(cacheName)) return { ...base, state: 'empty' };
+  // A frame counts as held whichever cache holds it: a saved pack lives in one,
+  // an incidentally browsed frame in the other.
+  const present = [packCacheName, cacheName].filter(name => cacheNames.includes(name));
+  if (!present.length) return { ...base, state: 'empty' };
   try {
-    const cache = await cachesApi.open(cacheName);
-    const cached = await Promise.all(urls.map(url => cache.match(url).then(Boolean).catch(() => false)));
+    const caches_ = await Promise.all(present.map(name => cachesApi.open(name)));
+    const cached = await Promise.all(urls.map(async url => {
+      for (const cache of caches_) {
+        if (await cache.match(url).then(Boolean).catch(() => false)) return true;
+      }
+      return false;
+    }));
     const cachedCount = cached.filter(Boolean).length;
     return {
       ...base,
@@ -384,6 +398,14 @@ export async function inspectStorage({
     if (cacheName && cacheNames.includes(cacheName)) {
       cacheSnapshot = await inspectCache(cachesApi, cacheName);
     }
+    for (const companion of definition.companions || []) {
+      if (!cacheNames.includes(companion)) continue;
+      const extra = await inspectCache(cachesApi, companion);
+      cacheSnapshot = {
+        entries: cacheSnapshot.entries + extra.entries,
+        sizeBytes: cacheSnapshot.sizeBytes + extra.sizeBytes,
+      };
+    }
     scopes.push({ ...definition, cacheName, ...cacheSnapshot });
   }
   const release = await inspectReleaseTuple({
@@ -411,8 +433,13 @@ export async function clearOptionalStorageScope(scopeId, {
   if (!cachesApi) return false;
   const cacheNames = await cachesApi.keys().catch(() => []);
   const cacheName = scope.cacheName || selectCacheName(cacheNames, scope);
-  if (!cacheName) return false;
-  const removed = await cachesApi.delete(cacheName);
+  const companions = (scope.companions || []).filter(name => cacheNames.includes(name));
+  if (!cacheName && !companions.length) return false;
+  const results = await Promise.all([
+    cacheName ? cachesApi.delete(cacheName) : Promise.resolve(false),
+    ...companions.map(name => cachesApi.delete(name)),
+  ]);
+  const removed = results.some(Boolean);
   if (scopeId === 'radar') writePackIndex({}, packStorage);
   if (notify) emitStorageChange();
   return removed;
@@ -432,7 +459,10 @@ export async function cacheRadarPack(stormId, frames, {
   if (!selected.length) return { stormId, saved: 0, total: 0, bytes: 0, persisted: false };
 
   const persistence = await requestStoragePersistence(storageApi);
-  const cache = await cachesApi.open('hm-radar-v1');
+  // Not hm-radar-v1: that is the service worker's 240-entry LRU, and a pack
+  // holds up to 120 frames, so a third pack evicted the first one's frames
+  // while the index still called it saved.
+  const cache = await cachesApi.open(RADAR_PACK_CACHE);
   const storageEstimate = await readStorageEstimate(storageApi);
   const added = [];
   let saved = 0;

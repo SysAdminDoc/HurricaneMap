@@ -20,6 +20,12 @@ const DATA_CACHE_PREFIX = 'hm-data-';
 const DATA_CACHE = `${DATA_CACHE_PREFIX}${SW_VERSION}`;
 const TILE_CACHE = 'hm-tiles-v2';
 const RADAR_CACHE = 'hm-radar-v1';
+// Frames the user explicitly saved live apart from the ones they merely
+// browsed past. RADAR_CACHE is an LRU: a 120-frame pack plus ordinary browsing
+// crossed its 240-entry cap, so saving a third pack silently deleted the first
+// one's frames while the pack index still listed it as saved. Nothing trims
+// this cache, and trimCache is never pointed at it.
+const RADAR_PACK_CACHE = 'hm-radar-saved-v1';
 const SOURCE_BUNDLE_CACHE = 'hm-source-bundle-v1';
 const SOURCE_BUNDLE_MARKER_PATH = './__hurricanemap-source-bundle.json';
 const DATA_DB_PREFIX = 'hm-offline-data-';
@@ -169,7 +175,7 @@ self.addEventListener('activate', (event) => {
     await validateReleaseBundle();
     const keys = await caches.keys();
     await Promise.all(keys.map((k) => {
-      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
+      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== RADAR_PACK_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
     }));
     if (self.registration.navigationPreload) {
       await self.registration.navigationPreload.enable();
@@ -217,7 +223,7 @@ self.addEventListener('fetch', (event) => {
   if (!url.protocol.startsWith('http')) return;
 
   if (isRadarAsset(url)) {
-    event.respondWith(cacheFirst(req, RADAR_CACHE, event));
+    event.respondWith(radarFrame(req, event));
   } else if (isSourceBundleAsset(url)) {
     event.respondWith(sourceBundleWhileRevalidate(req, event));
   } else if (isShell(url)) {
@@ -241,6 +247,19 @@ async function trimCache(cacheName, maxEntries) {
     if (keys.length <= maxEntries) return;
     await Promise.all(keys.slice(0, keys.length - maxEntries).map(key => cache.delete(key)));
   } catch { /* best-effort */ }
+}
+
+// A saved pack answers before the browsing cache, and a miss there falls
+// through to the LRU exactly as before. Without this a pack would be written
+// somewhere the fetch handler never looked, which is worse than the eviction
+// it was written to survive.
+async function radarFrame(req, event) {
+  try {
+    const packs = await caches.open(RADAR_PACK_CACHE);
+    const saved = await packs.match(req);
+    if (saved) return saved;
+  } catch { /* the pack cache is optional; fall through to the LRU */ }
+  return cacheFirst(req, RADAR_CACHE, event);
 }
 
 async function cacheFirst(req, cacheName, event) {
