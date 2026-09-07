@@ -73,11 +73,12 @@ function summaryFeatures(payload, layer) {
 function assertSummaryFields(features, required, layer) {
   const missing = new Set();
   for (const feature of features) {
+    // RFC 7946 permits "properties": null, and such a row carries no storm to
+    // check. Skipping it is not the hole the first version of this had: that
+    // one stopped at features[0], so a rename reaching every row but the first
+    // passed the whole payload.
     const properties = feature?.properties;
-    if (!properties) {
-      missing.add('properties');
-      continue;
-    }
+    if (!properties) continue;
     for (const field of required) {
       if (!(field in properties)) missing.add(field);
     }
@@ -130,9 +131,7 @@ export function summaryStormId(properties, now = Date.now()) {
   const basin = String(properties?.basin || '').trim().toUpperCase().replace(/[^A-Z]/g, '');
   const number = Number(properties?.stormnum);
   if (basin.length !== 2 || !Number.isFinite(number) || number <= 0 || number > 99) return '';
-  const year = summaryYear(properties, now);
-  if (!year) return '';
-  return `${basin}${String(Math.trunc(number)).padStart(2, '0')}${year}`;
+  return `${basin}${String(Math.trunc(number)).padStart(2, '0')}${summaryYear(properties, now)}`;
 }
 
 // This service publishes only live products, so a year outside the current
@@ -153,9 +152,12 @@ function summaryYear(properties, now) {
     const fromFile = plausibleYear(new Date(filed).getUTCFullYear(), now);
     if (fromFile) return fromFile;
   }
+  // The advisory text states its year outright, so it is taken as written. Only
+  // the file date is sanity-checked, because a unit mix-up there is silent,
+  // whereas rejecting a year the advisory actually names would replace a
+  // correct old date with a guess at today's.
   const advisoryYear = String(properties?.advdate || '').match(/\b(?:19|20)\d{2}\b/);
-  const fromAdvisory = advisoryYear ? plausibleYear(Number(advisoryYear[0]), now) : null;
-  if (fromAdvisory) return fromAdvisory;
+  if (advisoryYear) return Number(advisoryYear[0]);
   return new Date(now).getUTCFullYear();
 }
 
@@ -168,8 +170,14 @@ export function parseSummaryActiveStorms(payload, { now = Date.now() } = {}) {
   // but taking the minimum survives an advisory that omits it. An unreadable
   // tau sorts last on both sides of the comparison, so a bad value on the row
   // already held cannot let a five-day forecast point take its place.
+  // Number('') and Number(null) are both 0, which is finite and is tau zero,
+  // the current fix. A row with no readable forecast hour has to sort last on
+  // both sides of the comparison, or a five-day forecast point takes the
+  // current position's place.
   const forecastHour = properties => {
-    const tau = Number(properties?.tau);
+    const raw = properties?.tau;
+    if (raw === null || raw === undefined || String(raw).trim() === '') return Infinity;
+    const tau = Number(raw);
     return Number.isFinite(tau) ? tau : Infinity;
   };
   // Keyed on basin and storm number, which is the identity every consumer
@@ -182,8 +190,11 @@ export function parseSummaryActiveStorms(payload, { now = Date.now() } = {}) {
     const properties = feature?.properties;
     if (!properties) continue;
     const basin = String(properties.basin || '').trim().toUpperCase();
+    // Number('') and Number(null) are both 0, which is finite. Without the
+    // positive test a blank storm number gave every such row the key "AL:0" and
+    // collapsed two live storms into one.
     const number = Number(properties.stormnum);
-    const key = basin && Number.isFinite(number)
+    const key = basin && Number.isFinite(number) && number > 0
       ? `${basin}:${number}`
       : String(properties.binnumber || '').trim().toUpperCase();
     if (!key) continue;
@@ -218,17 +229,29 @@ export function parseSummaryActiveStorms(payload, { now = Date.now() } = {}) {
   return storms.sort((a, b) => a.id.localeCompare(b.id) || a.binNumber.localeCompare(b.binNumber));
 }
 
+// The category is what sets the symbol, and it has to be read loosely: NHC
+// decorates it ("High (>60%)"), and exact matching turned an 80% disturbance
+// into the low-risk marker. The percentage is consulted only when there is no
+// category at all, and only for the one value that changes the symbol, because
+// folding it into the category let "high confidence 20%" read as high.
 function outlookRisk(properties) {
   const normalize = value => String(value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const category = normalize(properties?.risk7day);
-  if (category === 'nearzero' || category === 'near0') return 'near-zero';
-  if (category === 'high') return 'high';
-  if (category === 'medium') return 'medium';
-  if (category === 'low') return 'low';
-  // No category to read. The percentage is the only other statement of risk
-  // NHC makes, and "Near 0%" is the one value that changes the symbol.
+  if (category) {
+    if (category.includes('nearzero') || category.includes('near0')) return 'near-zero';
+    if (category.includes('high')) return 'high';
+    if (category.includes('medium')) return 'medium';
+    return 'low';
+  }
   const percentage = normalize(properties?.prob7day);
-  return percentage === 'near0' || percentage === 'near0percent' ? 'near-zero' : 'low';
+  if (percentage.includes('near0')) return 'near-zero';
+  // A bare percentage with no category. NHC's own thresholds: 60% and above is
+  // high, 40% is medium, and anything under that is low.
+  const chance = Number(String(properties?.prob7day ?? '').match(/\d+/)?.[0]);
+  if (!Number.isFinite(chance)) return 'low';
+  if (chance >= 60) return 'high';
+  if (chance >= 40) return 'medium';
+  return 'low';
 }
 
 // The KMZ numbers its disturbances 1..N within a basin, because NHC issues one
@@ -247,12 +270,16 @@ export function parseSummaryOutlookPoints(payload) {
   const points = [];
   const perBasin = new Map();
   for (const feature of ordered) {
-    const position = featurePosition(feature);
-    if (!position) continue;
     const properties = feature.properties || {};
     const basin = String(properties.basin || '').trim().toLowerCase();
+    // Counted before the position check, because NHC numbers the disturbances
+    // it issues, not the ones this parser can place. Skipping the count for a
+    // dropped row renumbered the survivors and stopped them matching the text
+    // product.
     const ordinal = (perBasin.get(basin) || 0) + 1;
     perBasin.set(basin, ordinal);
+    const position = featurePosition(feature);
+    if (!position) continue;
     points.push({
       basin,
       disturbance: String(ordinal),

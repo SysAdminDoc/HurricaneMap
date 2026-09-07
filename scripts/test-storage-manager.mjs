@@ -19,6 +19,7 @@ import {
   requestStoragePersistence,
   inspectRadarFrameCache,
   isQuotaExceededError,
+  migrateSavedRadarPacks,
   selectBoundedRadarFrames,
   summarizeStorageEstimate,
 } from '../src/storage-manager.js';
@@ -155,6 +156,45 @@ assert.equal(
   (await inspectRadarFrameCache([manyFrames[0]], { cachesApi: browsedOnly })).state,
   'complete',
   'a frame in the browsing cache must still count as cached',
+);
+
+// A pack saved before the split still sits in the LRU, where the worker's trim
+// deletes it exactly as before. Reading both caches makes it report complete;
+// only moving it makes that report true.
+const legacyCaches = new FakeCaches();
+const legacyLru = await legacyCaches.open('hm-radar-v1');
+const legacyFrames = packOf('AL011999').slice(0, 4);
+for (const frame of legacyFrames) await legacyLru.put(frame.url, new Response('frame'));
+const legacyIndex = {
+  'hm-radar-packs-v1': JSON.stringify({ AL011999: { savedAt: '2026-01-01T00:00:00Z', frameCount: 4, urls: legacyFrames.map(frame => frame.url) } }),
+};
+const legacyStorage = {
+  getItem: key => legacyIndex[key] ?? null,
+  setItem: (key, value) => { legacyIndex[key] = value; },
+  removeItem: key => { delete legacyIndex[key]; },
+};
+assert.deepEqual(
+  await migrateSavedRadarPacks({ cachesApi: legacyCaches, packStorage: legacyStorage }),
+  { moved: 4, packs: 1 },
+  'every frame the index lists must be moved out of the trimmed cache',
+);
+// Idempotent, checked while the frames are still in the LRU: after it is
+// emptied there would be nothing to move on a second pass either way, and the
+// assertion would pass whether or not the guard existed.
+assert.deepEqual(
+  await migrateSavedRadarPacks({ cachesApi: legacyCaches, packStorage: legacyStorage }),
+  { moved: 0, packs: 1 },
+  'a second run must move nothing, because the frames are already saved',
+);
+legacyLru.values.clear();
+assert.equal(
+  (await inspectRadarFrameCache(legacyFrames, { cachesApi: legacyCaches })).state,
+  'complete',
+  'a migrated pack must survive the LRU being emptied',
+);
+assert.deepEqual(
+  await migrateSavedRadarPacks({ cachesApi: new FakeCaches(), packStorage: { getItem: () => null } }),
+  { moved: 0, packs: 0 },
 );
 
 // Clearing the radar scope clears both caches, or "Clear" would leave behind

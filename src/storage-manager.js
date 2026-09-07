@@ -477,6 +477,38 @@ export async function clearOptionalStorageScope(scopeId, {
   return removed;
 }
 
+// Packs saved before the split still sit in the service worker's LRU, which
+// trims to 240 entries oldest-first. Reading both caches makes them report as
+// complete, right up until browsing radar deletes them exactly as before, so
+// they have to be moved rather than merely found. Runs once, on the frames the
+// index says were saved, and leaves the LRU copy alone: the worker's own trim
+// will reclaim it, and deleting it here would lose the frame if the copy failed.
+export async function migrateSavedRadarPacks({
+  cachesApi = globalThis.caches,
+  packStorage = globalThis.localStorage,
+} = {}) {
+  const index = readPackIndex(packStorage);
+  const urls = [...new Set(Object.values(index).flatMap(pack => (Array.isArray(pack?.urls) ? pack.urls : [])))];
+  if (!urls.length || !cachesApi) return { moved: 0, packs: Object.keys(index).length };
+  const names = await cachesApi.keys().catch(() => []);
+  if (!names.includes('hm-radar-v1')) return { moved: 0, packs: Object.keys(index).length };
+  const [lru, saved] = await Promise.all([cachesApi.open('hm-radar-v1'), cachesApi.open(RADAR_PACK_CACHE)]);
+  let moved = 0;
+  for (const url of urls) {
+    try {
+      if (await saved.match(url)) continue;
+      const response = await lru.match(url);
+      if (!response) continue;
+      await saved.put(url, response.clone ? response.clone() : response);
+      moved += 1;
+    } catch {
+      // One unreadable frame is not a reason to abandon the rest of the pack.
+    }
+  }
+  if (moved) emitStorageChange();
+  return { moved, packs: Object.keys(index).length };
+}
+
 export async function cacheRadarPack(stormId, frames, {
   cachesApi = globalThis.caches,
   fetchImpl = fetchWithTimeout,

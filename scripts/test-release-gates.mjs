@@ -333,7 +333,9 @@ assert.equal(describeRunFailure(undefined, py313), '');
 // whenever the notebook packages were absent, so the only check that proves the
 // published notebook still reproduces the 595/759/374 release contract was green
 // on every machine that could not execute it.
-assert.equal(GATE_SKIPPED_EXIT_CODE, 3);
+// Not compared to its own literal, which would prove nothing: 0 and 1 are the
+// two codes every gate already uses, so the skip code has to be neither.
+assert.ok(Number.isInteger(GATE_SKIPPED_EXIT_CODE) && GATE_SKIPPED_EXIT_CODE > 1, `the skip code must not collide with pass or fail, got ${GATE_SKIPPED_EXIT_CODE}`);
 assert.equal(classifyGateResult({ status: 0 }), 'passed');
 assert.equal(classifyGateResult({ status: GATE_SKIPPED_EXIT_CODE }), 'skipped');
 assert.equal(classifyGateResult({ status: 1 }), 'failed');

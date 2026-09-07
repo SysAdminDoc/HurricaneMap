@@ -161,15 +161,23 @@ self.addEventListener('install', (event) => {
     // repair install of the version already serving shares these caches, so
     // deleting them unconditionally would take a working offline shell down
     // with the failed install.
-    const preexisting = new Set(await caches.keys().catch(() => []));
+    //
+    // null, not an empty set, when the list cannot be read. caches.keys()
+    // rejects under the same conditions that make an install fail (blocked site
+    // data, storage corruption), and an empty set would have said "this install
+    // created everything", which on a same-version reinstall means deleting the
+    // running worker's shell. Not knowing means deleting nothing.
+    const preexisting = await caches.keys().then(names => new Set(names)).catch(() => null);
     try {
       const cache = await caches.open(SHELL_CACHE);
       await precacheShell(cache);
       await precacheOfflineData();
       await validateReleaseBundle();
     } catch (error) {
-      for (const name of [SHELL_CACHE, DATA_CACHE]) {
-        if (!preexisting.has(name)) await caches.delete(name).catch(() => {});
+      if (preexisting) {
+        for (const name of [SHELL_CACHE, DATA_CACHE]) {
+          if (!preexisting.has(name)) await caches.delete(name).catch(() => {});
+        }
       }
       throw error;
     }
@@ -510,6 +518,11 @@ async function classifyOfflineIntegrity() {
       } catch (relaxedError) {
         const message = String(relaxedError?.message || relaxedError).slice(0, 240);
         return {
+          // This branch is the broken-offline answer, which is exactly when the
+          // panel most needs to be told which caches are being served. It was
+          // the one return that did not carry them, so the client fell back to
+          // guessing the highest version present.
+          ...active,
           state: /missing|unavailable/i.test(message) ? 'evicted' : 'invalid',
           checked_at_utc: checkedAt,
           error: message,

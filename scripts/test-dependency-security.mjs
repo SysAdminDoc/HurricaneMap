@@ -61,7 +61,26 @@ assert.ok(Date.parse(cesium.reviewed_at_utc) <= Date.now(), 'Cesium review canno
 // depended on, consumed within minutes. An advisory scan cannot see it, because
 // nobody has reported it yet.
 assert.deepEqual(findUnsignedPackages({ invalid: [], missing: [] }), [], 'a clean tree reports nothing');
-assert.deepEqual(findUnsignedPackages(null), []);
+
+// npm writes its own failures as a JSON error envelope on stdout, not to
+// stderr, so a parsed object is not the same as a completed audit. Reading one
+// as an empty result printed "0 unsigned or invalid tarballs" for a check that
+// had verified nothing: a registry 5xx, a key fetch failure, or a private
+// registry with no signing keys all arrive this way.
+const envelope = findUnsignedPackages({ error: { summary: 'found no installed dependencies to audit', detail: '' } });
+assert.equal(envelope.length, 1, 'an npm error envelope must fail the gate, not read as a clean tree');
+assert.equal(envelope[0].kind, 'unverified');
+assert.match(envelope[0].reason, /no installed dependencies/);
+assert.equal(
+  findUnsignedPackages(null).length,
+  1,
+  'no report at all is unverified, not clean',
+);
+assert.equal(
+  findUnsignedPackages({ invalid: [] }).length,
+  1,
+  'a half-shaped report is unverified: npm reports both arrays or neither',
+);
 assert.deepEqual(
   findUnsignedPackages({
     invalid: [{ name: 'ansi-regex', version: '6.2.4', reason: 'signature mismatch' }],
@@ -114,4 +133,32 @@ assert.deepEqual(
   'a commented line must not be read as a setting, and a real one after it must be',
 );
 
-console.log('dependency security helpers ok (JSON parsing, severity gate, lock binding, registry signatures, install policy)');
+// npm's docs: a package matching min-release-age-exclude "can always resolve to
+// its newest version, even when a release-age window is set". A glob of * turns
+// the window off while leaving the setting above in place for anyone reading
+// the file, which is worse than not having it.
+for (const glob of ['*', '**']) {
+  const errors = validateNpmPolicyText([
+    'min-release-age=3',
+    `min-release-age-exclude[]=${glob}`,
+    'ignore-scripts=true',
+    'allow-git=none',
+  ].join('\n'));
+  assert.equal(errors.length, 1, `an exclude of ${glob} must be reported: ${errors.join(', ')}`);
+  assert.match(errors[0], /exempts every package/);
+}
+assert.deepEqual(
+  validateNpmPolicyText([
+    'min-release-age=3',
+    'min-release-age-exclude[]=@hurricanemap/internal',
+    'ignore-scripts=true',
+    'allow-git=none',
+  ].join('\n')),
+  [],
+  'a named exemption is a decision, not a hole',
+);
+
+console.log(
+  'dependency security helpers ok (JSON parsing, severity gate, lock binding, registry signatures that fail closed, '
+  + 'install policy including its exemptions)',
+);

@@ -46,8 +46,27 @@ export function findHighRiskFindings(report) {
 // 2025-2026 campaigns produced within minutes of publishing.
 export function findUnsignedPackages(report) {
   const problems = [];
-  for (const [kind, entries] of [['invalid', report?.invalid], ['missing', report?.missing]]) {
-    for (const entry of Array.isArray(entries) ? entries : []) {
+  // npm writes its failures as a JSON error envelope on stdout, not to stderr,
+  // so a parsed object is not the same as a completed audit. "found no
+  // installed dependencies to audit", a registry 5xx, a key fetch failure and a
+  // private registry with no signing keys all arrive this way, and reading them
+  // as an empty result printed "0 unsigned or invalid tarballs" for a check
+  // that had verified nothing. The gate has to fail closed.
+  if (report?.error) {
+    const summary = report.error.summary || report.error.detail || 'npm reported an error';
+    problems.push({ kind: 'unverified', name: 'the installed tree', reason: String(summary).slice(0, 200) });
+    return problems;
+  }
+  if (!Array.isArray(report?.invalid) || !Array.isArray(report?.missing)) {
+    problems.push({
+      kind: 'unverified',
+      name: 'the installed tree',
+      reason: 'npm audit signatures did not report { invalid, missing }',
+    });
+    return problems;
+  }
+  for (const [kind, entries] of [['invalid', report.invalid], ['missing', report.missing]]) {
+    for (const entry of entries) {
       const name = entry?.name || entry?.package || 'unknown package';
       const version = entry?.version ? `@${entry.version}` : '';
       problems.push({ kind, name: `${name}${version}`, reason: entry?.reason || entry?.integrity || '' });
@@ -100,9 +119,15 @@ async function main() {
   if (signatures?.report) {
     const unsigned = findUnsignedPackages(signatures.report);
     for (const problem of unsigned) {
-      errors.push(`${problem.kind} registry signature for ${problem.name}${problem.reason ? ` (${problem.reason})` : ''}`);
+      errors.push(
+        problem.kind === 'unverified'
+          ? `npm audit signatures verified nothing: ${problem.reason}`
+          : `${problem.kind} registry signature for ${problem.name}${problem.reason ? ` (${problem.reason})` : ''}`,
+      );
     }
-    signatureNote = `${unsigned.length} unsigned or invalid tarballs`;
+    signatureNote = unsigned.some(problem => problem.kind === 'unverified')
+      ? 'signatures unverified'
+      : `signatures verified, ${unsigned.length} unsigned or invalid`;
   } else if (signatures?.error) {
     console.warn(`dependency security: npm audit signatures unavailable; ${signatures.error}`);
   }
@@ -138,6 +163,17 @@ export function validateNpmPolicyText(text) {
   const days = Number(settings.get('min-release-age'));
   if (!Number.isFinite(days) || days < 2) {
     errors.push(`.npmrc must set min-release-age to at least 2 days, found ${settings.get('min-release-age') ?? 'nothing'}`);
+  }
+  // npm's own docs: a package matching min-release-age-exclude "can always
+  // resolve to its newest version, even when a release-age window is set". A
+  // glob of * therefore turns the window off entirely while leaving the setting
+  // above in place for anyone reading the file.
+  const exclusions = [...settings.keys()].filter(key => key.startsWith('min-release-age-exclude'));
+  for (const key of exclusions) {
+    const value = settings.get(key);
+    if (value === '*' || value === '**') {
+      errors.push(`.npmrc sets ${key}=${value}, which exempts every package from the release window`);
+    }
   }
   if (settings.get('ignore-scripts') !== 'true') {
     errors.push('.npmrc must set ignore-scripts=true; the README documents the explicit npx playwright install');

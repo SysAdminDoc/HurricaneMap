@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Active storms
-        - text: "/Unavailable NOAA NHC tropical weather summary GIS Last success: Not scheduled Next retry: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Origin: Network/"
+        - text: "/Unavailable NOAA NHC tropical weather summary GIS Last success: Not scheduled Next retry: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Origin: Network/"
         - button "Retry"
       - listitem:
         - strong: Official forecast geometry
@@ -114,15 +114,15 @@
         - button "Retry"
       - listitem:
         - strong: High-water marks
-        - text: "/Current · \\d+ records USGS high-water marks Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - text: "/Current · \\d+ records USGS high-water marks Last success: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
         - button "Retry"
       - listitem:
         - strong: Storm event reports
-        - text: "/Current · \\d+ records NOAA NCEI Storm Events Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - text: "/Current · \\d+ records NOAA NCEI Storm Events Last success: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
         - button "Retry"
       - listitem:
         - strong: Population exposure
-        - text: "/Current · \\d+ records Bundled state population densities Last success: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
+        - text: "/Current · \\d+ records Bundled state population densities Last success: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Next retry: Not scheduled Origin: Bundled offline data/"
         - button "Retry"
       - listitem:
         - strong: Evacuation zones
@@ -159,7 +159,7 @@
     - heading "Offline diagnostics" [level=3]
     - paragraph: Service worker, cache, storage, and source readiness for troubleshooting offline use.
     - strong: Registration
-    - text: Registered
+    - text: Registered (module worker)
     - strong: Page control
     - text: Not controlled
     - strong: Storage

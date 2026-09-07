@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Tanpèt aktif
-        - text: "/Pa disponib NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Orijin: Rezo/"
+        - text: "/Pa disponib NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Orijin: Rezo/"
         - button "Eseye ankò"
       - listitem:
         - strong: Jewometri previzyon ofisyèl
@@ -114,15 +114,15 @@
         - button "Eseye ankò"
       - listitem:
         - strong: Mak pi wo dlo a rive
-        - text: "/Aktyèl · \\d+ anrejistreman USGS high-water marks Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman USGS high-water marks Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Rapò evènman tanpèt
-        - text: "/Aktyèl · \\d+ anrejistreman NOAA NCEI Storm Events Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman NOAA NCEI Storm Events Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Ekspozisyon popilasyon
-        - text: "/Aktyèl · \\d+ anrejistreman Bundled state population densities Dènye siksè: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman Bundled state population densities Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Zòn evakyasyon
@@ -159,7 +159,7 @@
     - heading "Dyagnostik san entènèt" [level=3]
     - paragraph: Eta service worker, kach, depo, ak sous pou rezoud pwoblèm san entènèt.
     - strong: Anrejistreman
-    - text: Anrejistre
+    - text: Anrejistre (worker modil)
     - strong: Kontwòl paj la
     - text: Pa sou kontwòl
     - strong: Depo

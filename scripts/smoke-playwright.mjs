@@ -2750,46 +2750,82 @@ async function assertForcedColorsContract(browser, baseUrl) {
       const panels = await import('/src/panels.js');
       panels.closeAllPanels();
     });
+    // All eight, not the two that happen to be on screen. The other six had no
+    // test at all, so the only evidence they were fixed was that the CSS had
+    // been written. Each is built here with the class the app gives it, because
+    // the rule is keyed on the class and several of them only exist while a
+    // panel that is not open would be.
     const dataSwatches = await page.evaluate(() => {
-      const seen = [];
-      for (const selector of ['.tl-bar', '.timeline-legend-item i']) {
-        const element = document.querySelector(selector);
-        if (!element) { seen.push({ selector, missing: true }); continue; }
+      const selectors = [
+        ['.tl-bar', 'div'],
+        ['.timeline-legend-item i', 'i'],
+        ['.ct-dot', 'span'],
+        ['.cp-swatch', 'span'],
+        ['.dai-seg', 'span'],
+        ['.tal-swatch', 'span'],
+        ['.ss-tier-dot', 'span'],
+        ['.radar-swatch', 'span'],
+      ];
+      const host = document.createElement('div');
+      host.style.position = 'fixed';
+      host.style.left = '0';
+      host.style.top = '0';
+      document.body.appendChild(host);
+      const measured = [];
+      for (const [selector, tag] of selectors) {
+        const live = document.querySelector(selector);
+        let element = live;
+        if (!element) {
+          element = document.createElement(tag);
+          // The last simple class in the selector is the one the rule keys on.
+          element.className = selector.split(' ').pop().replace(/^[.#]/, '');
+          element.style.display = 'inline-block';
+          element.style.width = '12px';
+          element.style.height = '12px';
+          // A fill of the app's own palette, which is what the rule protects.
+          element.style.backgroundColor = 'rgb(250, 179, 135)';
+          host.appendChild(element);
+        }
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
-        seen.push({
+        measured.push({
           selector,
+          synthesized: !live,
           width: Math.round(rect.width * 100) / 100,
           height: Math.round(rect.height * 100) / 100,
           background: style.backgroundColor,
           border: style.borderTopWidth,
+          borderColor: style.borderTopColor,
           forcedColorAdjust: style.forcedColorAdjust,
         });
       }
-      return seen;
+      host.remove();
+      return measured;
     });
-    const missingSwatches = dataSwatches.filter(entry => entry.missing);
-    assert(!missingSwatches.length, `forced-colors: no swatch to measure: ${JSON.stringify(missingSwatches)}`);
+    assert(dataSwatches.length === 8, `forced-colors: expected eight data swatches, measured ${dataSwatches.length}`);
     for (const swatch of dataSwatches) {
       assert(
         swatch.forcedColorAdjust === 'none',
         `forced-colors: ${swatch.selector} lets the user agent repaint the datum: ${JSON.stringify(swatch)}`,
       );
+      // Colour alone is not a safe encoding where the palette can be replaced,
+      // and Chromium reports a repainted background as the opaque Canvas colour
+      // rather than as transparent, so a "did it lose its fill" check cannot
+      // see the regression. The outline is what can be measured, and it is also
+      // what keeps a swatch findable when its fixed fill lands near the
+      // reader's chosen background.
       assert(
-        swatch.width > 0 && swatch.height > 0,
-        `forced-colors: ${swatch.selector} has no box: ${JSON.stringify(swatch)}`,
-      );
-      assert(
-        !/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(swatch.background),
-        `forced-colors: ${swatch.selector} lost its fill: ${JSON.stringify(swatch)}`,
+        Number.parseFloat(swatch.border) > 0 && !/transparent|rgba(0,s*0,s*0,s*0)/i.test(swatch.borderColor),
+        `forced-colors: ${swatch.selector} has no system-coloured outline to fall back on: ${JSON.stringify(swatch)}`,
       );
     }
-    // Colour alone is not safe where the palette can be replaced, so the bars
-    // keep an outline that survives a display which drops the fill.
-    const bar = dataSwatches.find(entry => entry.selector === '.tl-bar');
+    // Positive control: the histogram bar is real, on screen and painted, so a
+    // green result above is not an artefact of measuring elements this probe
+    // built for itself.
+    const liveBar = dataSwatches.find(entry => entry.selector === '.tl-bar');
     assert(
-      Number.parseFloat(bar.border) > 0,
-      `forced-colors: histogram bars have no outline to fall back on: ${JSON.stringify(bar)}`,
+      liveBar && !liveBar.synthesized && liveBar.width > 0 && liveBar.height > 0,
+      `forced-colors: the timeline bar was not measured live, so the swatch checks prove less than they claim: ${JSON.stringify(liveBar)}`,
     );
 
   } finally {

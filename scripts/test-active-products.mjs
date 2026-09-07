@@ -252,8 +252,9 @@ assert.equal(
   'AL092025',
   'with no file date the advisory text supplies the year, including across a new year',
 );
-// This service publishes only live products, so a year from another decade is
-// a misread of the field rather than history worth trusting.
+// The advisory names its year outright, so it is taken as written even when it
+// is old. Rejecting it would replace a date the product states with a guess at
+// today's, which is a worse answer than the one it corrects.
 assert.equal(
   parseSummaryActiveStorms({
     type: 'FeatureCollection',
@@ -262,8 +263,8 @@ assert.equal(
       properties: { ...advisoryYearOnly.features[0].properties, advdate: '500 PM AST Thu Sep 03 2011' },
     }],
   }, { now: pinnedNow })[0].id,
-  'AL092026',
-  'an implausible advisory year falls back to the current season rather than minting a decade-old id',
+  'AL092011',
+  'a year the advisory states is the year, not a guess to be overruled',
 );
 
 // A rename upstream would leave every storm nameless at an unknown position.
@@ -389,6 +390,116 @@ assert.equal(
 );
 assert.equal(summaryStormId({ basin: 'AL', stormnum: 100, advdate: 'Sep 07 2026' }, Date.UTC(2026, 8, 7)), '', 'ATCF numbers are two digits');
 assert.equal(summaryStormId({ basin: 'AL', stormnum: 0, advdate: 'Sep 07 2026' }, Date.UTC(2026, 8, 7)), '');
+
+// Number('') and Number(null) are both 0, which is finite. A blank storm
+// number gave every such row the key "AL:0" and collapsed two live storms into
+// one, with an empty id and no second marker on the map.
+const blankStormNumbers = {
+  type: 'FeatureCollection',
+  features: ['AT1', 'AT2'].map((bin, index) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [-70 - index, 25 + index] },
+    properties: {
+      ...forecastFixture.features[0].properties,
+      basin: 'AL', stormnum: '', binnumber: bin, stormname: index ? 'Tropical Storm Bill' : 'Hurricane Ana',
+    },
+  })),
+};
+assert.deepEqual(
+  parseSummaryActiveStorms(blankStormNumbers).map(storm => storm.binNumber).sort(),
+  ['AT1', 'AT2'],
+  'a blank storm number must fall back to the bin rather than merging two storms',
+);
+assert.equal(
+  parseSummaryActiveStorms({
+    type: 'FeatureCollection',
+    features: blankStormNumbers.features.map(feature => ({
+      ...feature,
+      properties: { ...feature.properties, stormnum: null },
+    })),
+  }).length,
+  2,
+  'a null storm number must not merge two storms either',
+);
+
+// Same arithmetic, the other field: a null or empty tau read as tau zero, the
+// current fix, so a five-day forecast point took the storm's position.
+for (const emptyTau of [null, '', '   ']) {
+  const [storm] = parseSummaryActiveStorms({
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [-170, 30] },
+        properties: { ...forecastFixture.features[0].properties, tau: emptyTau, maxwind: 35 },
+      },
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [-162, 18] },
+        properties: { ...forecastFixture.features[0].properties, tau: 0, maxwind: 110 },
+      },
+    ],
+  });
+  assert.deepEqual(
+    { lat: storm.lat, intensity: storm.intensity },
+    { lat: 18, intensity: 110 },
+    `a tau of ${JSON.stringify(emptyTau)} must not outrank the current fix`,
+  );
+}
+
+// RFC 7946 permits "properties": null. Such a row carries no storm, and used to
+// abort the whole layer over a field name it never had.
+const nullProperties = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-70, 25] }, properties: null },
+    ...forecastFixture.features,
+  ],
+};
+assert.equal(
+  parseSummaryActiveStorms(nullProperties).length,
+  2,
+  'a row with no properties must be skipped, not turned into an error for every other storm',
+);
+
+// The category is decorated in the wild, and exact matching turned an 80%
+// disturbance into the low-risk marker.
+const decoratedRisk = parseSummaryOutlookPoints({
+  type: 'FeatureCollection',
+  features: [
+    ['High (>60%)', '80 percent'],
+    ['Medium (40-60%)', '50 percent'],
+    ['', '80 percent'],
+    ['', '45 percent'],
+    ['', '20 percent'],
+    ['', 'Near 0%'],
+  ].map(([risk7day, prob7day], index) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [-40 - index, 12] },
+    properties: { objectid: index + 1, basin: 'Atlantic', prob2day: '10%', risk2day: 'Low', risk7day, prob7day },
+  })),
+});
+assert.deepEqual(
+  decoratedRisk.map(point => point.risk),
+  ['high', 'medium', 'high', 'medium', 'low', 'near-zero'],
+  'a decorated category, and a bare percentage with no category, must both set the right symbol',
+);
+
+// NHC numbers the disturbances it issues, not the ones this parser can place,
+// so a dropped row still consumes its ordinal.
+const withSentinel = parseSummaryOutlookPoints({
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [9999, 9999] }, properties: { objectid: 1, basin: 'Atlantic', prob2day: '10%', risk2day: 'Low', prob7day: '20%', risk7day: 'Low' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-50, 14] }, properties: { objectid: 2, basin: 'Atlantic', prob2day: '10%', risk2day: 'Low', prob7day: '20%', risk7day: 'Low' } },
+    { type: 'Feature', geometry: { type: 'Point', coordinates: [-45, 15] }, properties: { objectid: 3, basin: 'Atlantic', prob2day: '10%', risk2day: 'Low', prob7day: '20%', risk7day: 'Low' } },
+  ],
+});
+assert.deepEqual(
+  withSentinel.map(point => point.disturbance),
+  ['2', '3'],
+  'a disturbance this parser cannot place must not renumber the ones it can',
+);
 
 // Out of season the layer is empty. That is an answer, not a broken contract.
 assert.deepEqual(parseSummaryActiveStorms({ type: 'FeatureCollection', features: [] }), []);

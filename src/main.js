@@ -753,3 +753,11 @@ boot().catch(err => {
 });
 
 initServiceWorkerUpdates();
+
+// Radar packs saved before they had a cache of their own still sit in the
+// service worker's LRU, where browsing radar deletes them. Moving them is a
+// one-shot repair on a lazily loaded module, so it costs nothing on a machine
+// that has never saved one.
+loadStorageManager()
+  .then(({ migrateSavedRadarPacks }) => migrateSavedRadarPacks())
+  .catch(() => { /* Best effort: an unmigrated pack is no worse than before. */ });

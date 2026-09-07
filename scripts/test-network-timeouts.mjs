@@ -101,4 +101,49 @@ assert(
   `source bundle assets reached the network with no deadline: ${JSON.stringify(bundleSpy.budgets)}`,
 );
 
-console.log('network timeout helper ok (deadline, caller cancellation, and a budget on all four injected-transport paths)');
+// The shapes an adversarial review used to walk past the guard. Each is a real
+// way to reach the network with no deadline while spelling something the older
+// rules did not recognise, and each has to stay caught.
+const { findTransportOffenders, stripComments } = await import('./check-network-timeouts.mjs');
+
+const bypasses = {
+  'assignment rather than a default': 'const send = globalThis.fetch;\nexport const go = u => send(u);',
+  'bracket access': 'export const go = (u, { t = globalThis["fetch"] } = {}) => t(u);',
+  'destructured rename': 'const { fetch: send } = globalThis;\nexport const go = u => send(u);',
+  'default split across two lines': 'export const go = (u, { t = globalThis\n  .fetch } = {}) => t(u);',
+  'an or-fallback': 'export const go = (u, d = {}) => (d.impl || globalThis.fetch)(u);',
+  'a bare call': 'export const go = u => fetch(u);',
+  'a renamed transport parameter': 'export const go = (u, { transport = fetch } = {}) => transport(u);',
+};
+for (const [label, source] of Object.entries(bypasses)) {
+  const offenders = findTransportOffenders('src/probe.js', source);
+  assert(offenders.length > 0, `the guard no longer catches ${label}: ${source}`);
+}
+
+// A `//` inside a string is not a comment. Stripping naively ate the rest of
+// the line, and with it a bare fetch( call on a protocol-relative URL check.
+assert(
+  findTransportOffenders('src/probe.js', 'export const go = u => u.startsWith("//") ? fetch(u) : null;').length > 0,
+  'a protocol-relative URL check must not hide the fetch call beside it',
+);
+// A `/*` inside a string is not a comment open, either.
+assert(
+  findTransportOffenders('src/probe.js', 'export const A = "/*";\nexport const go = u => fetch(u);\nexport const B = "*/";').length > 0,
+  'a string containing a block-comment open must not hide the code after it',
+);
+
+// And the shapes that are correct have to stay quiet, or the guard gets turned
+// off rather than obeyed.
+const compliant = [
+  'import { fetchWithTimeout } from "./network.js";\nexport const go = (u, { fetchImpl = fetchWithTimeout } = {}) => fetchImpl(u, {}, 1000);',
+  'import { fetchWithTimeout } from "./network.js";\nexport const go = (u, { fetchImpl } = {}) => fetchWithTimeout(u, {}, 1000, fetchImpl);',
+  '// This comment mentions fetch, which is prose.\nexport const label = "Failed to fetch";',
+];
+for (const source of compliant) {
+  assert.deepEqual(findTransportOffenders('src/probe.js', source), [], `a correct module was reported: ${source}`);
+}
+
+assert.equal(stripComments('const a = "//not a comment"; // gone').trim(), 'const a = "";');
+assert.equal(stripComments('const a = "keep"; // gone', { keepStrings: true }).trim(), 'const a = "keep";');
+
+console.log('network timeout helper ok (deadline, caller cancellation, a budget on all four injected-transport paths, and nine bypasses that stay closed)');

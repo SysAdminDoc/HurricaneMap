@@ -632,13 +632,13 @@ html.high-contrast #map .leaflet-tile-pane {
   .ss-tier-dot,
   .radar-swatch {
     forced-color-adjust: none;
-  }
-
-  /* Colour alone is not a safe encoding where the palette can be replaced, so
-     the bars keep an outline as well. Shape survives even when the fill does
-     not reach a particular display. */
-  .tl-bar {
+    /* Keeping the fill means keeping the app's palette against a background the
+       reader chose, which can land anywhere. Every one of them therefore keeps
+       a system-coloured outline, so the swatch is still findable when its fill
+       happens to sit close to the user's canvas. box-sizing keeps the histogram
+       bars the width they were laid out at. */
     border: 1px solid CanvasText;
+    box-sizing: border-box;
   }
 
   .leaflet-control-zoom a,

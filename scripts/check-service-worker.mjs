@@ -180,11 +180,36 @@ try {
 // remove them. The worker says which pair it is using, and cleans up after
 // itself when its own install fails, but only the caches that install created.
 if (!source.includes('sw_version: SW_VERSION, shell_cache: SHELL_CACHE, data_cache: DATA_CACHE')) {
-  errors.push('sw.js must report its own SW_VERSION, SHELL_CACHE and DATA_CACHE with every offline integrity result.');
+  errors.push('sw.js must name its own SW_VERSION, SHELL_CACHE and DATA_CACHE for the integrity result.');
 }
-if (!source.includes('const preexisting = new Set(await caches.keys()') ||
+// Declaring the names is not reporting them. One of the six returns in
+// classifyOfflineIntegrity omitted the spread, and it was the broken-offline
+// one: precisely when the panel most needs to know which caches are being
+// served, it fell back to guessing the highest version present. Count the
+// returns against the spreads rather than trusting the declaration.
+{
+  const start = source.indexOf('async function classifyOfflineIntegrity()');
+  const end = source.indexOf('\nasync function ', start + 1);
+  const body = start >= 0 ? source.slice(start, end > 0 ? end : undefined) : '';
+  const returns = (body.match(/return\s*\{/g) || []).length;
+  const carried = (body.match(/\.\.\.active,/g) || []).length;
+  if (!body) {
+    errors.push('classifyOfflineIntegrity is missing, so the integrity contract cannot be checked.');
+  } else if (returns !== carried) {
+    errors.push(
+      `classifyOfflineIntegrity has ${returns} object returns but only ${carried} carry ...active; `
+      + 'every integrity result has to name the caches the worker is serving.',
+    );
+  }
+}
+if (!source.includes('const preexisting = await caches.keys().then(names => new Set(names)).catch(() => null);') ||
+    !source.includes('if (preexisting)') ||
     !source.includes('if (!preexisting.has(name)) await caches.delete(name)')) {
-  errors.push('sw.js install must delete the versioned caches it created when it fails, and only those.');
+  errors.push(
+    'sw.js install must delete the versioned caches it created when it fails, and only those, '
+    + 'and must delete nothing at all when it cannot read the cache list: an empty set there reads '
+    + 'as "this install created everything", which on a same-version reinstall is the running shell.',
+  );
 }
 
 if (!/RELEASE_LOCK_NAME/.test(source) ||
