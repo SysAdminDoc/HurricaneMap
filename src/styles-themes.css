@@ -167,21 +167,36 @@ html.light-theme #map .leaflet-tile-pane {
   filter: none;
 }
 
+/* The header's atlas surface. This belongs in the themes layer because the
+   light rule below has to be able to win, and it cannot when the same
+   declarations sit in the shell layer marked !important. */
+.app-header {
+  background: linear-gradient(135deg, rgba(8, 25, 45, 0.97), rgba(7, 18, 34, 0.95));
+  border: 1px solid var(--atlas-edge);
+  box-shadow: var(--atlas-shadow);
+}
+
 html.light-theme .app-header,
 html.light-theme .mobile-actions-menu {
   --atlas-panel-strong: rgba(248, 250, 255, 0.98);
   --atlas-edge: rgba(53, 95, 126, 0.2);
   --atlas-cyan: #087d91;
   --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
-  background: color-mix(in srgb, var(--surface-panel) 97%, transparent) !important;
+  --atlas-shadow: 0 18px 48px rgba(76, 79, 105, 0.18);
+  background: color-mix(in srgb, var(--surface-panel) 97%, transparent);
 }
 
+/* The rail kept the navy of the components layer while its ink tokens flipped
+   to the light palette, which put 10px text at 2.90:1 on it. It takes the same
+   light surface as the header now, so --subtext and --atlas-cyan land on the
+   background they were chosen for. */
 html.light-theme .atlas-context-rail {
   --atlas-panel-strong: rgba(248, 250, 255, 0.98);
   --atlas-edge: rgba(53, 95, 126, 0.2);
   --atlas-cyan: #087d91;
   --atlas-cyan-soft: rgba(8, 125, 145, 0.09);
-  background: rgba(7, 21, 39, 0.9);
+  background: var(--atlas-panel-strong);
+  box-shadow: 0 10px 26px rgba(76, 79, 105, 0.18);
 }
 
 /* The desktop storm panel (>=1121px) is skinned with the same --atlas-* tokens

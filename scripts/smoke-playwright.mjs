@@ -186,10 +186,27 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
         const dark = Math.min(luminance(foreground), luminance(background));
         return (light + 0.05) / (dark + 0.05);
       };
+      // The header paints through the `background` shorthand with a
+      // linear-gradient, which resets background-color to transparent. Reading
+      // only background-color composited the header's ink onto the page behind
+      // it, so the navy slab the light theme used to keep was measured as if it
+      // were the light page.
+      const gradientStops = value => {
+        const image = String(value || '');
+        if (!image.includes('gradient')) return [];
+        return (image.match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/gi) || []).map(parseColor);
+      };
+      const surfaceOf = node => {
+        const style = getComputedStyle(node);
+        const stops = gradientStops(style.backgroundImage);
+        // The darkest stop is the one the text has to survive.
+        if (stops.length) return stops.reduce((worst, stop) => (luminance(stop) < luminance(worst) ? stop : worst));
+        return parseColor(style.backgroundColor);
+      };
       const rootStyle = getComputedStyle(document.documentElement);
       const base = parseColor(rootStyle.getPropertyValue('--base'));
       const header = document.querySelector('.app-header');
-      const headerBackground = composite(parseColor(getComputedStyle(header).backgroundColor), base);
+      const headerBackground = composite(surfaceOf(header), base);
       const titleStart = parseColor(rootStyle.getPropertyValue('--brand-title-start'));
       const titleEnd = parseColor(rootStyle.getPropertyValue('--brand-title-end'));
       const controls = [...header.querySelectorAll('button')].filter(element => {
@@ -201,12 +218,56 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
         color: getComputedStyle(element).color,
         ratio: ratio(composite(parseColor(getComputedStyle(element).color), headerBackground), headerBackground),
       }));
+      // The rail is 10px text on its own surface, and its ink tokens follow the
+      // theme. It kept a hardcoded navy background while they flipped light.
+      // The rail is hidden below 720px, where the header takes its place.
+      const rail = document.querySelector('.atlas-context-rail');
+      const railShown = Boolean(rail) && getComputedStyle(rail).display !== 'none';
+      const railBackground = railShown ? composite(surfaceOf(rail), base) : null;
+      const railInk = railShown ? [...rail.querySelectorAll('span')].filter(element => {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0 && (element.textContent || '').trim();
+      }).map(element => ({
+        id: element.className || 'span',
+        color: getComputedStyle(element).color,
+        ratio: ratio(composite(parseColor(getComputedStyle(element).color), railBackground), railBackground),
+      })) : [];
+
       return {
         title: [ratio(titleStart, headerBackground), ratio(titleEnd, headerBackground)],
         controls,
+        headerLuminance: luminance(headerBackground),
+        railLuminance: railShown ? luminance(railBackground) : null,
+        railInk,
+        railExpected: window.innerWidth > 720,
       };
     });
     const label = `${combination.theme}/${combination.palette}/${combination.highContrast ? 'high-contrast' : 'standard'}`;
+    // The surfaces themselves, not only the ink on them. The light theme's
+    // header and rail overrides live in the themes layer, and an !important
+    // declaration in an earlier layer silently beats them, which is how the
+    // header stayed navy under a light UI for five releases with every ink
+    // check still passing.
+    const surfaces = [['header', audit.headerLuminance], ['context rail', audit.railLuminance]]
+      .filter(([, value]) => value !== null);
+    assert(
+      surfaces.length === (audit.railExpected ? 2 : 1),
+      `${label}: expected ${audit.railExpected ? 2 : 1} measured surfaces, got ${surfaces.length}: the rail check proves nothing`,
+    );
+    for (const [name, value] of surfaces) {
+      if (combination.theme === 'light') {
+        assert(value >= 0.5, `${label}: the ${name} surface stayed dark under the light theme (luminance ${value.toFixed(3)})`);
+      } else {
+        assert(value <= 0.2, `${label}: the ${name} surface is not dark under the dark theme (luminance ${value.toFixed(3)})`);
+      }
+    }
+    assert(
+      audit.railInk.length >= (audit.railExpected ? 3 : 0),
+      `${label}: only ${audit.railInk.length} rail labels were measured`,
+    );
+    const failedRail = audit.railInk.filter(item => item.ratio < 4.5);
+    assert(!failedRail.length, `${label}: context rail text below 4.5:1: ${failedRail.map(item => `${item.id} ${item.ratio.toFixed(2)} (${item.color})`).join(', ')}`);
+
     assert(Math.min(...audit.title) >= 4.5, `${label}: title contrast ${audit.title.map(value => value.toFixed(2)).join(', ')} is below 4.5:1`);
     const failedControls = audit.controls.filter(control => control.ratio < 4.5);
     assert(!failedControls.length, `${label}: header control contrast below 4.5:1: ${failedControls.map(control => `${control.id} ${control.ratio.toFixed(2)} (${control.color})`).join(', ')}`);

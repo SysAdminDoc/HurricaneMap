@@ -49,10 +49,12 @@ header.app-header.glass {
   border-radius: 12px !important;
 }
 
+/* The header's surface is skinned in the themes layer, not here. It used to be
+   declared !important in this layer, and !important reverses layer precedence,
+   so the shell layer beat the themes layer: the light override never applied
+   and the header stayed a navy slab above a light UI while its own buttons
+   switched to light chips. What is left here is what no other layer sets. */
 .app-header {
-  z-index: 3000 !important;
-  background: linear-gradient(135deg, rgba(8, 25, 45, 0.97), rgba(7, 18, 34, 0.95)) !important;
-  border: 1px solid var(--atlas-edge) !important;
-  box-shadow: var(--atlas-shadow) !important;
-  backdrop-filter: blur(18px) saturate(135%) !important;
+  z-index: 3000;
+  backdrop-filter: blur(18px) saturate(135%);
 }
