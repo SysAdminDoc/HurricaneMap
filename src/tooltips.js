@@ -35,10 +35,29 @@ export function initHeaderTooltips() {
   let activeTitle = '';
   let previousDescription = null;
   let showTimer = 0;
+  let hideTimer = 0;
+  // WCAG 2.2 SC 1.4.13 wants hover content dismissible without moving the
+  // pointer or the focus. Escape hides it, and it stays hidden for that control
+  // until the pointer leaves and comes back, or a tooltip the reader has just
+  // dismissed reappears under a stationary cursor.
+  let dismissedButton = null;
 
   function cancelTimer() {
     clearTimeout(showTimer);
     showTimer = 0;
+  }
+
+  // The same rule asks that the pointer be able to move onto the content
+  // without it vanishing. Leaving the button starts a short grace period that
+  // entering the tooltip cancels.
+  function cancelHide() {
+    clearTimeout(hideTimer);
+    hideTimer = 0;
+  }
+
+  function scheduleHide(delay = 140) {
+    cancelHide();
+    hideTimer = setTimeout(hideTooltip, delay);
   }
 
   function cleanupActive() {
@@ -57,6 +76,7 @@ export function initHeaderTooltips() {
 
   function hideTooltip() {
     cancelTimer();
+    cancelHide();
     if (supportsPopover) {
       try {
         if (tooltip.matches(':popover-open')) tooltip.hidePopover();
@@ -103,17 +123,44 @@ export function initHeaderTooltips() {
   }
 
   for (const button of buttons) {
-    button.addEventListener('pointerenter', () => scheduleTooltip(button));
+    button.addEventListener('pointerenter', () => {
+      cancelHide();
+      if (dismissedButton === button) return;
+      scheduleTooltip(button);
+    });
     button.addEventListener('pointerleave', () => {
       cancelTimer();
-      if (document.activeElement !== button || !button.matches(':focus-visible')) hideTooltip();
+      // Leaving the control is what clears a dismissal: coming back is a fresh
+      // request for the tooltip.
+      if (dismissedButton === button) dismissedButton = null;
+      if (document.activeElement !== button || !button.matches(':focus-visible')) scheduleHide();
     });
     button.addEventListener('focus', () => {
+      if (dismissedButton === button) return;
       if (button.matches(':focus-visible')) scheduleTooltip(button, 0);
     });
-    button.addEventListener('blur', hideTooltip);
+    button.addEventListener('blur', () => {
+      if (dismissedButton === button) dismissedButton = null;
+      hideTooltip();
+    });
     button.addEventListener('click', hideTooltip);
   }
+
+  tooltip.addEventListener('pointerenter', cancelHide);
+  tooltip.addEventListener('pointerleave', () => scheduleHide());
+
+  // Capture, so the tooltip is dismissed before anything else acts on Escape,
+  // and the event is stopped only when there was in fact a tooltip to dismiss.
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (!activeButton && !showTimer) return;
+    dismissedButton = activeButton;
+    hideTooltip();
+    if (dismissedButton) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  }, true);
 
   tooltip.addEventListener('toggle', event => {
     if (event.newState === 'closed') cleanupActive();

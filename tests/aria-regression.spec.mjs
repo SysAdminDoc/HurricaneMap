@@ -474,3 +474,66 @@ async function closePanels(page) {
     !document.querySelector('#settings-menu')?.matches(':popover-open')
   ));
 }
+
+// WCAG 2.2 SC 1.4.13 Content on Hover or Focus: hover content has to be
+// dismissible without moving the pointer or the focus, hoverable, and
+// persistent. The header tooltips closed only on pointerleave and blur, so
+// Escape did nothing and moving the pointer toward the tooltip dismissed it.
+// The VPAT claimed all three long before any of them were true.
+test('header tooltips are dismissible with Escape and survive being hovered', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+  const tooltip = page.locator('#header-tooltip');
+  const shown = () => page.evaluate(() => {
+    const element = document.querySelector('#header-tooltip');
+    return Boolean(element) && getComputedStyle(element).display !== 'none';
+  });
+
+  // Driven by dispatched pointer events rather than by mouse geometry: the
+  // tooltip sits below its control, so a synthetic cursor path between the two
+  // proves nothing about which listener ran.
+  const enter = selector => page.dispatchEvent(selector, 'pointerenter');
+  const leave = selector => page.dispatchEvent(selector, 'pointerleave');
+
+  // Persistent: it appears on hover and stays while the pointer is still.
+  await enter('#toggle-filters');
+  await expect(tooltip).toBeVisible();
+  await page.waitForTimeout(400);
+  expect(await shown()).toBe(true);
+
+  // Dismissible: Escape hides it without the pointer or the focus moving.
+  await page.keyboard.press('Escape');
+  await expect(tooltip).toBeHidden();
+
+  // And it stays dismissed. Another pointerenter on the same control, which is
+  // what a stationary cursor produces after any reflow, must not bring it back.
+  await enter('#toggle-filters');
+  await page.waitForTimeout(500);
+  expect(await shown()).toBe(false);
+
+  // Leaving the control and coming back is a fresh request for it.
+  await leave('#toggle-filters');
+  await enter('#toggle-filters');
+  await expect(tooltip).toBeVisible();
+
+  // Hoverable: leaving the control starts a grace period, and entering the
+  // tooltip cancels it.
+  await leave('#toggle-filters');
+  await enter('#header-tooltip');
+  await page.waitForTimeout(400);
+  expect(await shown()).toBe(true);
+
+  // The pointer has to be able to reach it at all for that to mean anything.
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#header-tooltip')).pointerEvents)).not.toBe('none');
+
+  // Leaving the tooltip itself does close it.
+  await leave('#header-tooltip');
+  await expect(tooltip).toBeHidden();
+
+  // Escape with no tooltip open still reaches whatever else listens for it, so
+  // dismissing hover content did not swallow the key for everything else. The
+  // app closes open panels on Escape.
+  await page.click('#toggle-stats');
+  await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 });
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => document.querySelector('#stats-panel')?.hidden === true, null, { timeout: 5_000 });
+});

@@ -9796,7 +9796,11 @@ body.poster-open { overflow: hidden; }
   font-weight: 650;
   line-height: 1.25;
   text-align: center;
-  pointer-events: none;
+  /* WCAG 2.2 SC 1.4.13 asks that hover content stay visible while the pointer
+     moves over it, which a tooltip the pointer passes straight through cannot
+     do. It is not interactive, so nothing here is clickable; it just has to be
+     reachable. */
+  pointer-events: auto;
 }
 
 .header-tooltip:popover-open { display: block; }
