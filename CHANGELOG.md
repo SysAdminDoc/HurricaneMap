@@ -4,6 +4,9 @@ All notable changes to HurricaneMap.
 
 ## Unreleased
 
+### Fixed
+- Active storm tracking and the tropical outlook now work with no edge worker in front of the site. Both read NHC files that carry no CORS header, so on GitHub Pages, on `serve.py` and in the Docker image they used to report "Not available on this deployment" and stop, which is every deployment except a Cloudflare one. NHC's tropical weather summary MapServer publishes the same forecast points and the same formation disturbances and does send a CORS header, so the app reads them from there when the relay is absent. A tracked storm gets its position, intensity, pressure, motion, advisory number and its cone; what only `CurrentStorms.json` has is the advisory and discussion URLs, and the storm card drops the two links rather than showing dead ones. The outlook loses the per-disturbance discussion paragraph and keeps the formation chances and the risk category. Where a worker is deployed nothing changes: the richer products still win, and the MapServer is the fallback for a relay that has broken rather than one that was never there. The diagnostics panel names whichever source answered, and a source that is failing is now offered a retry instead of being declared unavailable.
+
 ### Added
 - The atlas can now be found and cited. The site publishes `robots.txt`, `sitemap.xml`, a canonical URL, and a schema.org `Dataset` block naming HURDAT2, its 27 February 2026 revision, the licence and the Landsea and Franklin citation. A `<noscript>` fallback tells a reader with scripting off what the page is and links the underlying JSON, the STAC catalog and the citation, so the data stays reachable even when the map is not. A gate checks the structured data against `data/metadata.json` and `data/coverage.json`, so it cannot drift into advertising a source or a coverage range this build does not use.
 

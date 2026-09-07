@@ -36,17 +36,23 @@ import {
   idleOptionalFeed,
   isOptionalFeedRequestCurrent,
   reportOptionalFeedResult,
-  unsupportedOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { isMissingProxyRoute, nhcProxyUrl, reportNhcProxyAvailability } from './nhc-proxy.js';
+import { fetchSummaryActiveStorms } from './nhc-summary.js';
 
 const L = window.L;
 
 // www.nhc.noaa.gov sends no CORS header on CurrentStorms.json, so the worker
-// relay is the only way a browser can read it. corsproxy.io used to stand in
-// and now answers 401 to everyone, which turned the fallback into a second
-// error rather than a rescue.
+// relay is the only way a browser can read that file. corsproxy.io used to
+// stand in and now answers 401 to everyone, which turned the fallback into a
+// second error rather than a rescue. Where there is no relay, the storms
+// themselves still come through: NHC's tropical weather summary MapServer does
+// send a CORS header, and src/nhc-summary.js reshapes its forecast points into
+// the same records CurrentStorms.json would have supplied.
+
+const CURRENT_STORMS_SOURCE = 'NOAA NHC CurrentStorms';
+const SUMMARY_SOURCE = 'NOAA NHC tropical weather summary GIS';
 
 let layerGroup = null;
 let badgeEl = null;
@@ -115,18 +121,6 @@ async function fetchAndRender() {
   const countForStatus = result.ok ? storms.length : (lastStorms?.length || 0);
   const state = result.ok ? 'ok' : (result.status === 429 ? 'rate-limit' : 'error');
 
-  // No relay route on this deployment: there is nothing to retry and nothing
-  // to poll for, so stop rather than leaving a permanent error card over the
-  // map with a Retry button that can never succeed.
-  if (!result.ok && result.missingRoute) {
-    if (pollTimer) clearTimeout(pollTimer);
-    pollTimer = null;
-    nextPollAt = null;
-    unsupportedOptionalFeed('active');
-    ensureBadge(0, { state: 'ok' });
-    return;
-  }
-
   if (!result.ok) {
     consecutiveFailures += 1;
     const delay = computeActivePollDelay({
@@ -139,6 +133,7 @@ async function fetchAndRender() {
     failOptionalFeed('active', {
       responseStatus: result.status,
       error: result.error,
+      source: result.source,
       nextRetryAt: nextPollAt,
       requestId: request.requestId,
     });
@@ -166,6 +161,7 @@ async function fetchAndRender() {
   completeOptionalFeed('active', {
     empty: storms.length === 0,
     itemCount: storms.length,
+    source: result.source,
     completedAt: lastSuccessfulFetchAt,
     nextRetryAt: nextPollAt,
     requestId: request.requestId,
@@ -214,7 +210,37 @@ async function tryFetch(url) {
     return { ok: false, status: response.status || 0, storms: [], missingRoute: isMissingProxyRoute(response) };
   }
   const data = await response.json();
-  return { ok: true, status: response.status, storms: (data && data.activeStorms) || [], missingRoute: false };
+  return {
+    ok: true,
+    status: response.status,
+    storms: (data && data.activeStorms) || [],
+    missingRoute: false,
+    source: CURRENT_STORMS_SOURCE,
+  };
+}
+
+// No relay in front of this deployment, so read NHC's own CORS-open summary
+// service instead. It carries the current fix, intensity and advisory number
+// for every active system; only the advisory and discussion URLs are missing,
+// and the storm card drops the links it has no URL for.
+async function fetchSummaryStorms() {
+  try {
+    const storms = await fetchSummaryActiveStorms({
+      fetchImpl: (url, init) => fetchWithTimeout(url, init, REQUEST_TIMEOUT_MS.active),
+    });
+    return { ok: true, status: 200, storms, missingRoute: false, source: SUMMARY_SOURCE };
+  } catch (error) {
+    // A failure here is a failing source, not an absent one: there is
+    // something to retry, so this must not report the feed unsupported.
+    return {
+      ok: false,
+      status: error?.responseStatus || 0,
+      storms: [],
+      missingRoute: false,
+      error,
+      source: SUMMARY_SOURCE,
+    };
+  }
 }
 
 async function fetchCurrentStorms() {
@@ -224,11 +250,12 @@ async function fetchCurrentStorms() {
     // network error is not proof of anything, and neither is a 404 the relay
     // itself served: only an untagged 404 means the route is absent.
     reportNhcProxyAvailability(!result.missingRoute);
-    return result;
+    if (!result.missingRoute) return result;
   } catch (error) {
     reportNhcProxyAvailability(true);
-    return { ok: false, status: 0, storms: [], error };
+    return { ok: false, status: 0, storms: [], error, source: CURRENT_STORMS_SOURCE };
   }
+  return fetchSummaryStorms();
 }
 
 function scheduleNextPoll(delayMs) {

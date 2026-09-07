@@ -54,14 +54,16 @@
     - list:
       - listitem:
         - strong: Tormentas activas
-        - text: "No disponible en esta instalación NOAA NHC CurrentStorms Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+        - text: "/No disponible NOAA NHC tropical weather summary GIS Último éxito: No programado Próximo intento: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Origen: Red/"
+        - button "Reintentar"
       - listitem:
         - strong: Geometría oficial del pronóstico
         - text: "No solicitado NOAA NHC official forecast GIS Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
         - button "Reintentar"
       - listitem:
         - strong: Perspectiva tropical
-        - text: "No disponible en esta instalación NOAA NHC Tropical Weather Outlook Último éxito: No programado Próximo intento: No programado Origen: Ninguno"
+        - text: "No disponible NOAA NHC Tropical Weather Outlook Último éxito: No programado Próximo intento: No programado Origen: Red"
+        - button "Reintentar"
       - listitem:
         - strong: Avisos marinos
         - text: "No solicitado NOAA NHC Marine Wind Warnings Último éxito: No programado Próximo intento: No programado Origen: Ninguno"

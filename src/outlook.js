@@ -2,6 +2,11 @@
 // The fixed KMZ endpoints are fetched through the same-origin Cloudflare
 // allowlist. The 2026 `zerox` style is rendered as a gray X, distinct from
 // the yellow low-risk X used for non-zero formation chances.
+//
+// The KMZ sends no CORS header, so a deployment without the relay reads the
+// same disturbances from NHC's CORS-open summary MapServer instead. That
+// service publishes the formation chances and the risk category but not the
+// discussion paragraph, so those markers carry a shorter tooltip.
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
@@ -11,13 +16,18 @@ import {
   completeOptionalFeed,
   failOptionalFeed,
   idleOptionalFeed,
-  unsupportedOptionalFeed,
 } from './optional-feeds.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
-import { isMissingProxyRoute, nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
+import { nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
+import { fetchSummaryOutlookPoints } from './nhc-summary.js';
 
 const BASINS = ['atl', 'pac', 'cpac'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
+const KMZ_SOURCE = 'NOAA NHC Tropical Weather Outlook';
+const SUMMARY_SOURCE = 'NOAA NHC tropical weather summary GIS';
+// One entry per basin for the KMZ path, plus one for the whole summary
+// service, which publishes every basin in a single layer.
+const SUMMARY_CACHE_KEY = 'summary';
 const cache = new Map();
 
 let layerGroup = null;
@@ -131,13 +141,57 @@ async function fetchBasin(basin, force) {
   if (!response.ok) {
     const error = new Error(`NHC ${basin} outlook returned ${response.status}`);
     error.responseStatus = response.status;
-    error.missingProxyRoute = isMissingProxyRoute(response);
     throw error;
   }
   const kml = await extractKmlFromKmz(await response.arrayBuffer());
   const points = parseOutlookKml(kml, basin);
   cache.set(basin, { fetchedAt: Date.now(), points });
   return points;
+}
+
+function isCacheFresh(key, force) {
+  const cached = cache.get(key);
+  return Boolean(!force && cached && Date.now() - cached.fetchedAt < CACHE_MS);
+}
+
+async function fetchSummaryBasins(force) {
+  if (isCacheFresh(SUMMARY_CACHE_KEY, force)) return cache.get(SUMMARY_CACHE_KEY).points;
+  const points = await fetchSummaryOutlookPoints({
+    fetchImpl: (url, init) => fetchWithTimeout(url, init, REQUEST_TIMEOUT_MS.active),
+  });
+  cache.set(SUMMARY_CACHE_KEY, { fetchedAt: Date.now(), points });
+  return points;
+}
+
+// Where the relay exists the KMZ is the richer product, because it carries the
+// disturbance discussion the MapServer omits. Where it does not, or where the
+// relay answered for no basin at all, the MapServer is the only source a
+// browser can still reach.
+async function loadOutlookPoints(force) {
+  let relayFailure = null;
+  // The active poll has already found out whether the relay exists. Asking
+  // again would 404 once per basin and log three console errors to learn it.
+  if (await nhcProxyAvailable()) {
+    const cacheOrigin = BASINS.every(basin => isCacheFresh(basin, force)) ? 'memory' : 'network';
+    const results = await Promise.allSettled(BASINS.map(basin => fetchBasin(basin, force)));
+    if (results.some(result => result.status === 'fulfilled')) {
+      return {
+        points: results.flatMap(result => result.status === 'fulfilled' ? result.value : []),
+        source: KMZ_SOURCE,
+        cacheOrigin,
+      };
+    }
+    relayFailure = results.find(result => result.status === 'rejected')?.reason || null;
+  }
+  const cacheOrigin = isCacheFresh(SUMMARY_CACHE_KEY, force) ? 'memory' : 'network';
+  try {
+    return { points: await fetchSummaryBasins(force), source: SUMMARY_SOURCE, cacheOrigin };
+  } catch (error) {
+    // Report whichever failure the user could act on: a relay that broke is
+    // the more specific answer, and the summary service is the backstop.
+    const reported = relayFailure || error;
+    return { failed: true, error: reported, responseStatus: reported?.responseStatus || 0 };
+  }
 }
 
 function ensureLayer(map) {
@@ -182,45 +236,23 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     idleOptionalFeed('outlook');
     return { status: 'idle', pointCount: 0 };
   }
-  // The active poll has already found out whether the relay exists. Asking
-  // again would 404 once per basin and log three console errors to learn it.
-  if (!await nhcProxyAvailable()) {
-    clearTropicalOutlook();
-    unsupportedOptionalFeed('outlook');
-    return { status: 'unsupported', pointCount: 0 };
-  }
   const generation = ++renderGeneration;
   const request = beginOptionalFeed('outlook', { cacheOrigin: 'network' });
   ensureLayer(map);
   ensureStatus(map);
-  const cacheOrigin = BASINS.every(basin => {
-    const cached = cache.get(basin);
-    return !force && cached && Date.now() - cached.fetchedAt < CACHE_MS;
-  }) ? 'memory' : 'network';
-  const results = await Promise.allSettled(BASINS.map(basin => fetchBasin(basin, force)));
+  const loaded = await loadOutlookPoints(force);
   if (generation !== renderGeneration) return { status: 'stale', pointCount: 0, requestId: request.requestId };
-  const points = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
-  const failures = results.filter(result => result.status === 'rejected');
-  if (!points.length && failures.length === results.length) {
-    const error = failures[0]?.reason;
-    const responseStatus = error?.responseStatus || 0;
-    // Every basin 404ed on our own relay route, so this deployment has no
-    // worker in front of it. NHC's own KMZ sends no CORS header, so there is
-    // no direct substitute and nothing a retry could reach.
-    if (failures.every(failure => failure.reason?.missingProxyRoute)) {
-      clearTropicalOutlook();
-      unsupportedOptionalFeed('outlook');
-      return { status: 'unsupported', pointCount: 0, responseStatus };
-    }
+  if (loaded.failed) {
     const result = {
       status: 'error',
       pointCount: 0,
-      error,
-      responseStatus,
+      error: loaded.error,
+      responseStatus: loaded.responseStatus,
     };
     failOptionalFeed('outlook', { ...result, requestId: request.requestId });
     return result;
   }
+  const { points, source, cacheOrigin } = loaded;
   layerGroup.clearLayers();
   for (const point of points) {
     const marker = window.L.marker([point.lat, point.lon], {
@@ -242,11 +274,13 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
     status: points.length ? 'rendered' : 'empty',
     pointCount: points.length,
     cacheOrigin,
+    source,
   };
   completeOptionalFeed('outlook', {
     empty: result.status === 'empty',
     itemCount: points.length,
     cacheOrigin,
+    source,
     requestId: request.requestId,
   });
   return result;

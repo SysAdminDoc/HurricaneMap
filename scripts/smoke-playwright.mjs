@@ -36,6 +36,24 @@ async function seedSettings(context, settings) {
   }, settings);
 }
 
+// serve.py has no /nhc/ relay, so the app reads active storms and the tropical
+// outlook straight from NHC's CORS-open summary MapServer. That service is
+// live: whether a storm badge, a cone and outlook markers are on screen would
+// otherwise depend on what the Atlantic was doing when the screenshot was
+// taken. Every context that compares pixels or counts requests answers it with
+// a quiet ocean instead. assertSummaryServiceServesActiveStorms drives the
+// populated case from checked-in fixtures.
+async function stubQuietTropics(context) {
+  await context.route(
+    'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/**',
+    route => route.fulfill({
+      status: 200,
+      contentType: 'application/geo+json',
+      body: JSON.stringify({ type: 'FeatureCollection', features: [] }),
+    }),
+  );
+}
+
 // Playwright's own serviceWorkers:'block' shim is injected into that sandboxed
 // frame too and throws there. Product code inside the globe frame touches
 // neither storage nor service workers, so these are harness noise.
@@ -369,6 +387,7 @@ async function assertStormPanelContrast(browser, baseUrl) {
   ];
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await seedSettings(context, { onboarded: true, theme: 'light', highContrast: false, reducedMotion: true, locale: 'en' });
+  await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
   collectPageErrors(page, pageErrors);
@@ -493,9 +512,122 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
+// A deployment with no /nhc/ relay used to report the active-storm feed and
+// the tropical outlook "not available on this deployment" and stop. NHC's
+// tropical weather summary MapServer answers the same questions with a CORS
+// header, so both feeds work on GitHub Pages with no worker at all. The
+// fixtures were captured from the live service on 2026-09-07.
+async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
+  const fixtures = {
+    5: JSON.parse(await readFile(new URL('../tests/fixtures/nhc-summary-forecast-points.json', import.meta.url), 'utf8')),
+    2: JSON.parse(await readFile(new URL('../tests/fixtures/nhc-summary-outlook-points.json', import.meta.url), 'utf8')),
+  };
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, {
+    onboarded: true, theme: 'dark', highContrast: false, reducedMotion: true, locale: 'en',
+    nhcOutlook: true, nhcForecastCone: false, goesRealtime: false, marineWarnings: false,
+  });
+
+  const summaryLayersRead = [];
+  const relayRoutesTried = [];
+  await context.route(
+    'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/**',
+    route => {
+      const layer = new URL(route.request().url()).pathname.match(/MapServer\/(\d+)\/query$/)?.[1];
+      summaryLayersRead.push(layer);
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/geo+json',
+        body: JSON.stringify(fixtures[layer] || { type: 'FeatureCollection', features: [] }),
+      });
+    },
+  );
+
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if (url.pathname.includes('/nhc/')) relayRoutesTried.push(url.pathname);
+  });
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForFunction(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      return ['active', 'outlook'].every(id => !['idle', 'loading'].includes(feeds.getOptionalFeedState(id).state));
+    }, { timeout: 25000 });
+
+    const feedStates = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      const read = id => {
+        const state = feeds.getOptionalFeedState(id);
+        return { state: state.state, itemCount: state.itemCount, source: state.source };
+      };
+      return { active: read('active'), outlook: read('outlook') };
+    });
+    assert(
+      feedStates.active.state === 'success' && feedStates.active.itemCount === 2,
+      `no relay: the active feed did not read the summary service: ${JSON.stringify(feedStates.active)}`,
+    );
+    assert(
+      feedStates.outlook.state === 'success' && feedStates.outlook.itemCount === 1,
+      `no relay: the outlook did not read the summary service: ${JSON.stringify(feedStates.outlook)}`,
+    );
+    assert(
+      /summary/i.test(feedStates.active.source) && /summary/i.test(feedStates.outlook.source),
+      `no relay: the diagnostics panel credits the wrong source: ${JSON.stringify(feedStates)}`,
+    );
+
+    // Positive control. The relay probe has to have been made and to have
+    // failed, or these feeds were served by something other than the fallback
+    // this asserts.
+    assert(
+      relayRoutesTried.some(path => path.endsWith('/nhc/CurrentStorms.json')),
+      `no relay: the app never probed the relay, so nothing proves the fallback ran: ${relayRoutesTried.join(', ')}`,
+    );
+    assert(
+      summaryLayersRead.includes('5') && summaryLayersRead.includes('2'),
+      `no relay: the summary layers were not both read: ${summaryLayersRead.join(', ')}`,
+    );
+
+    const rendered = await page.evaluate(() => {
+      const badge = document.getElementById('active-storm-badge');
+      return {
+        badgeHidden: badge?.hidden ?? null,
+        badgeLabel: badge?.getAttribute('aria-label') || '',
+        outlookMarkers: document.querySelectorAll('.nhc-outlook-marker').length,
+        unsupported: [...document.querySelectorAll('.optional-feed-status-overlay')]
+          .map(element => element.textContent || '')
+          .filter(text => /not available on this deployment/i.test(text)).length,
+      };
+    });
+    assert(rendered.badgeHidden === false, 'no relay: the active-storm badge stayed hidden with two storms up');
+    assert(/2 active storms/i.test(rendered.badgeLabel), `no relay: badge does not announce both storms: ${rendered.badgeLabel}`);
+    assert(rendered.outlookMarkers === 1, `no relay: expected one outlook marker, saw ${rendered.outlookMarkers}`);
+    assert(rendered.unsupported === 0, 'no relay: a feed still reports itself unavailable on this deployment');
+
+    // The storms are the ones in the fixture, not a coincidence of live data.
+    const stormNames = await page.evaluate(async () => {
+      const summary = await import('/src/nhc-summary.js');
+      const response = await fetch(summary.buildSummaryQueryUrl(summary.SUMMARY_LAYERS.forecastPoints));
+      return summary.parseSummaryActiveStorms(await response.json()).map(storm => storm.name);
+    });
+    assert(
+      stormNames.join(',') === 'Lowell,Marie',
+      `no relay: the rendered storms are not the fixture's: ${stormNames.join(', ')}`,
+    );
+
+    assert(!pageErrors.length, `no relay: page errors during the summary-service fallback: ${pageErrors.join(' | ')}`);
+  } finally {
+    await context.close();
+  }
+}
+
 async function assertFeedListenersDoNotAccumulate(browser, baseUrl) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await seedSettings(context, { onboarded: true, theme: 'dark', highContrast: false, reducedMotion: true, locale: 'en' });
+  await stubQuietTropics(context);
   // Count before any application script runs, so nothing is missed.
   await context.addInitScript(() => {
     if (window.top !== window) return;
@@ -1803,6 +1935,7 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     highContrast: scenario.highContrast,
     locale: 'en',
   });
+  await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
   collectPageErrors(page, pageErrors);
@@ -1835,6 +1968,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     reducedMotion: false,
     locale: 'en',
   });
+  await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
   collectPageErrors(page, pageErrors);
@@ -1940,6 +2074,7 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
       reducedMotion: 'reduce',
     });
     await seedSettings(context, { onboarded: true, locale: 'en' });
+    await stubQuietTropics(context);
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2011,6 +2146,7 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
       reducedMotion: 'reduce',
     });
     await seedSettings(context, { onboarded: true, locale, reducedMotion: true });
+    await stubQuietTropics(context);
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2103,6 +2239,7 @@ async function assertIosInstallGuide(browser, baseUrl) {
       Object.defineProperty(navigator, 'standalone', { configurable: true, value: false });
     });
     await seedSettings(context, { onboarded: true, locale, reducedMotion: true });
+    await stubQuietTropics(context);
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2161,6 +2298,7 @@ async function assertIosInstallGuide(browser, baseUrl) {
     Object.defineProperty(navigator, 'standalone', { configurable: true, value: true });
   });
   await seedSettings(standaloneContext, { onboarded: true, locale: 'en', reducedMotion: true });
+  await stubQuietTropics(standaloneContext);
   const standalonePage = await standaloneContext.newPage();
   try {
     await standalonePage.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2184,6 +2322,7 @@ async function assertSourceLanguageDisclosures(browser, baseUrl) {
       serviceWorkers: 'block',
     });
     await seedSettings(context, { onboarded: true, locale });
+    await stubQuietTropics(context);
     const page = await context.newPage();
     try {
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2241,6 +2380,7 @@ async function assertForcedColorsContract(browser, baseUrl) {
     window.matchMedia = query => query === '(prefers-contrast: more)' ? contrastMedia : nativeMatchMedia(query);
   });
   await seedSettings(context, { schema_version: 1, settings: { onboarded: true, locale: 'en' } });
+  await stubQuietTropics(context);
   const page = await context.newPage();
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -2490,6 +2630,7 @@ try {
     geolocation: { latitude: 25.7617, longitude: -80.1918 },
   });
   await seedSettings(context, { onboarded: true });
+  await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
   collectPageErrors(page, pageErrors);
@@ -3635,6 +3776,7 @@ try {
     serviceWorkers: 'block',
   });
   await seedSettings(mobileContext, { onboarded: true });
+  await stubQuietTropics(mobileContext);
   const mobilePage = await mobileContext.newPage();
   const mobileErrors = [];
   collectPageErrors(mobilePage, mobileErrors);
@@ -3711,6 +3853,7 @@ try {
   await assertComparisonExportParity(browser, baseUrl);
   await assertStormPanelContrast(browser, baseUrl);
   await assertFeedListenersDoNotAccumulate(browser, baseUrl);
+  await assertSummaryServiceServesActiveStorms(browser, baseUrl);
 
   await browser.close();
 

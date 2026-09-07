@@ -1,0 +1,257 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": 3971,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -162.09999999970015,
+          18.000000000100044
+        ]
+      },
+      "properties": {
+        "objectid": 3971,
+        "stormname": "Hurricane Lowell",
+        "stormtype": "MH",
+        "dvlbl": "M",
+        "basin": "EP",
+        "advdate": "800 AM HST Mon Sep 07 2026",
+        "advisnum": "46A",
+        "fcstprd": 120,
+        "gust": 120,
+        "maxwind": 100,
+        "mslp": 955,
+        "ssnum": 3,
+        "datelbl": "8:00 AM Mon",
+        "tcdvlp": "Major Hurricane",
+        "tcdir": 25,
+        "tcspd": 12,
+        "fldatelbl": "2026-09-07 5:00 AM Mon HST",
+        "lat": 18,
+        "lon": -162,
+        "stormnum": 12,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "HST",
+        "validtime": "07/1500",
+        "tau": 0,
+        "idp_source": "ep122026-046A_5day_pts",
+        "idp_subset": "ep122026",
+        "idp_filedate": 1788804191000,
+        "idp_ingestdate": 1788804205000,
+        "binnumber": "CP4"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3972,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -161.6999999996002,
+          19.49999999980031
+        ]
+      },
+      "properties": {
+        "objectid": 3972,
+        "stormname": "Hurricane Lowell",
+        "stormtype": "HU",
+        "dvlbl": "H",
+        "basin": "EP",
+        "advdate": "800 AM HST Mon Sep 07 2026",
+        "advisnum": "46A",
+        "fcstprd": 120,
+        "gust": 115,
+        "maxwind": 95,
+        "mslp": 9999,
+        "ssnum": 2,
+        "datelbl": "2:00 PM Mon",
+        "tcdvlp": "Hurricane",
+        "tcdir": 9999,
+        "tcspd": 9999,
+        "fldatelbl": "2026-09-07 2:00 PM Mon HST",
+        "lat": 20,
+        "lon": -162,
+        "stormnum": 12,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "HST",
+        "validtime": "08/0000",
+        "tau": 12,
+        "idp_source": "ep122026-046A_5day_pts",
+        "idp_subset": "ep122026",
+        "idp_filedate": 1788804191000,
+        "idp_ingestdate": 1788804205000,
+        "binnumber": "CP4"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3973,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -160.90000000029968,
+          22.40000000029994
+        ]
+      },
+      "properties": {
+        "objectid": 3973,
+        "stormname": "Hurricane Lowell",
+        "stormtype": "HU",
+        "dvlbl": "H",
+        "basin": "EP",
+        "advdate": "800 AM HST Mon Sep 07 2026",
+        "advisnum": "46A",
+        "fcstprd": 120,
+        "gust": 105,
+        "maxwind": 85,
+        "mslp": 9999,
+        "ssnum": 2,
+        "datelbl": "2:00 AM Tue",
+        "tcdvlp": "Hurricane",
+        "tcdir": 9999,
+        "tcspd": 9999,
+        "fldatelbl": "2026-09-08 2:00 AM Tue HST",
+        "lat": 22,
+        "lon": -161,
+        "stormnum": 12,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "HST",
+        "validtime": "08/1200",
+        "tau": 24,
+        "idp_source": "ep122026-046A_5day_pts",
+        "idp_subset": "ep122026",
+        "idp_filedate": 1788804191000,
+        "idp_ingestdate": 1788804205000,
+        "binnumber": "CP4"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3937,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -124.40000000039959,
+          24.700000000199964
+        ]
+      },
+      "properties": {
+        "objectid": 3937,
+        "stormname": "Tropical Storm Marie",
+        "stormtype": "TS",
+        "dvlbl": "S",
+        "basin": "EP",
+        "advdate": "800 AM PDT Mon Sep 07 2026",
+        "advisnum": "26",
+        "fcstprd": 120,
+        "gust": 65,
+        "maxwind": 55,
+        "mslp": 988,
+        "ssnum": 0,
+        "datelbl": "8:00 AM Mon",
+        "tcdvlp": "Tropical Storm",
+        "tcdir": 300,
+        "tcspd": 6,
+        "fldatelbl": "2026-09-07 5:00 AM Mon PDT",
+        "lat": 25,
+        "lon": -124,
+        "stormnum": 13,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "PDT",
+        "validtime": "07/1200",
+        "tau": 0,
+        "idp_source": "ep132026-026_5day_pts",
+        "idp_subset": "ep132026",
+        "idp_filedate": 1788793358000,
+        "idp_ingestdate": 1788793373000,
+        "binnumber": "EP3"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3938,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -125.40000000019978,
+          25.10000000029993
+        ]
+      },
+      "properties": {
+        "objectid": 3938,
+        "stormname": "Tropical Storm Marie",
+        "stormtype": "TS",
+        "dvlbl": "S",
+        "basin": "EP",
+        "advdate": "800 AM PDT Mon Sep 07 2026",
+        "advisnum": "26",
+        "fcstprd": 120,
+        "gust": 55,
+        "maxwind": 45,
+        "mslp": 9999,
+        "ssnum": 0,
+        "datelbl": "5:00 PM Mon",
+        "tcdvlp": "Tropical Storm",
+        "tcdir": 9999,
+        "tcspd": 9999,
+        "fldatelbl": "2026-09-07 5:00 PM Mon PDT",
+        "lat": 25,
+        "lon": -125,
+        "stormnum": 13,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "PDT",
+        "validtime": "08/0000",
+        "tau": 12,
+        "idp_source": "ep132026-026_5day_pts",
+        "idp_subset": "ep132026",
+        "idp_filedate": 1788793358000,
+        "idp_ingestdate": 1788793373000,
+        "binnumber": "EP3"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": 3939,
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -126.59999999960019,
+          25.899999999600425
+        ]
+      },
+      "properties": {
+        "objectid": 3939,
+        "stormname": "Tropical Storm Marie",
+        "stormtype": "TS",
+        "dvlbl": "S",
+        "basin": "EP",
+        "advdate": "800 AM PDT Mon Sep 07 2026",
+        "advisnum": "26",
+        "fcstprd": 120,
+        "gust": 50,
+        "maxwind": 40,
+        "mslp": 9999,
+        "ssnum": 0,
+        "datelbl": "5:00 AM Tue",
+        "tcdvlp": "Tropical Storm",
+        "tcdir": 9999,
+        "tcspd": 9999,
+        "fldatelbl": "2026-09-08 5:00 AM Tue PDT",
+        "lat": 26,
+        "lon": -127,
+        "stormnum": 13,
+        "stormsrc": "Tropical Cyclone",
+        "timezone": "PDT",
+        "validtime": "08/1200",
+        "tau": 24,
+        "idp_source": "ep132026-026_5day_pts",
+        "idp_subset": "ep132026",
+        "idp_filedate": 1788793358000,
+        "idp_ingestdate": 1788793373000,
+        "binnumber": "EP3"
+      }
+    }
+  ]
+}

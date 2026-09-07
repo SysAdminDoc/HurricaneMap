@@ -54,14 +54,16 @@
     - list:
       - listitem:
         - strong: Active storms
-        - text: "Not available on this deployment NOAA NHC CurrentStorms Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - text: "/Unavailable NOAA NHC tropical weather summary GIS Last success: Not scheduled Next retry: 8\\/8\\/\\d+, \\d+:\\d+:\\d+ PM Origin: Network/"
+        - button "Retry"
       - listitem:
         - strong: Official forecast geometry
         - text: "Not requested NOAA NHC official forecast GIS Last success: Not scheduled Next retry: Not scheduled Origin: None"
         - button "Retry"
       - listitem:
         - strong: Tropical outlook
-        - text: "Not available on this deployment NOAA NHC Tropical Weather Outlook Last success: Not scheduled Next retry: Not scheduled Origin: None"
+        - text: "Unavailable NOAA NHC Tropical Weather Outlook Last success: Not scheduled Next retry: Not scheduled Origin: Network"
+        - button "Retry"
       - listitem:
         - strong: Marine warnings
         - text: "Not requested NOAA NHC Marine Wind Warnings Last success: Not scheduled Next retry: Not scheduled Origin: None"
