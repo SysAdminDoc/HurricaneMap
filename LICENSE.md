@@ -119,7 +119,11 @@ HurricaneMap's software dependencies are listed in `package.json` and resolved i
 
 ## How to Cite HurricaneMap
 
-For academic papers and reports:
+For academic papers and reports. These are the two formats the app itself
+emits, from the Cite button and in every export's provenance block, with the
+running version and the data release filled in.
+
+In APA form:
 
 > SysAdminDoc (2026). HurricaneMap: Interactive Hurricane Landfall Database. GitHub repository. https://github.com/SysAdminDoc/HurricaneMap. Accessed [DATE]. Data sourced from NOAA's National Hurricane Center HURDAT2 database.
 

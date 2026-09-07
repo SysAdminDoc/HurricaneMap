@@ -127,6 +127,28 @@ if (claude && /ALL FIXES DEFERRED|all version strings synced at 1\.5\.0/.test(cl
   errors.push('CLAUDE.md still describes the completed v1.5.0 audit as deferred');
 }
 
+// README named Cesium 1.144 for a release that pinned 1.145. The policy file is
+// the one the gates verify the SRI hashes against, so it is the authority.
+{
+  const policy = JSON.parse(await readFile(path.join(root, 'security/dependency-security-policy.json'), 'utf8'));
+  const cesium = policy.vendors?.find(vendor => vendor.id === 'cesium')?.version;
+  if (!cesium) {
+    errors.push('dependency-security-policy.json declares no Cesium version to compare the README against');
+  } else if (!readme.includes(`Cesium ${cesium}`)) {
+    const named = readme.match(/Cesium (\d+\.\d+(?:\.\d+)?)/)?.[1] || 'nothing';
+    errors.push(`README names Cesium ${named} but the reviewed pin is ${cesium}`);
+  }
+}
+
+// README pointed readers at LICENSE.md for three citation formats. The app
+// emits two, and LICENSE.md carries those two.
+if (/citation formats \([^)]*Chicago/i.test(readme)) {
+  errors.push('README claims a Chicago citation format that neither LICENSE.md nor src/citation.js provides');
+}
+if (license && (!license.includes('In APA form:') || !license.includes('```bibtex'))) {
+  errors.push('LICENSE.md must show the APA and BibTeX citations the app emits, each named');
+}
+
 if (errors.length) {
   for (const error of errors) console.error(`release truth: ${error}`);
   process.exit(1);
