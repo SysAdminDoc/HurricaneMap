@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
@@ -902,12 +902,40 @@ if (aomlGateSummary) {
   );
 }
 
+// Every radar PNG on disk is 300 KB or so, and the full distribution ships all
+// of them. One frame nothing referenced rode along in every bundle for a year,
+// and the three counts that describe the archive disagreed by one because of
+// it. The manifest is the archive: a file it does not name is not in it, and a
+// name with no file behind it is a broken frame.
+const radarManifestEntries = JSON.parse(await readFile(path.join(root, 'data/radar/manifest.json'), 'utf8'));
+const referencedRadarFrames = new Set(
+  Object.values(radarManifestEntries).flatMap(storm => Object.values(storm?.frames || {})),
+);
+const radarRoot = path.join(root, 'data/radar');
+const radarFilesOnDisk = [];
+for (const entry of await readdir(radarRoot, { withFileTypes: true, recursive: true })) {
+  if (!entry.isFile() || !entry.name.endsWith('.png')) continue;
+  const absolute = path.join(entry.parentPath ?? entry.path, entry.name);
+  radarFilesOnDisk.push(path.relative(radarRoot, absolute).split(path.sep).join('/'));
+}
+for (const file of radarFilesOnDisk) {
+  if (!referencedRadarFrames.has(file)) fail(`data/radar/${file} is not referenced by data/radar/manifest.json`);
+}
+for (const frame of referencedRadarFrames) {
+  if (!radarFilesOnDisk.includes(frame)) fail(`data/radar/manifest.json references a missing frame: ${frame}`);
+}
+
+if (errors.length) printErrorsAndExit();
+
 if (warnings.length) {
   console.warn(`Data validation warnings (${warnings.length}):`);
   for (const warning of warnings) console.warn(`- ${warning}`);
 }
 
-console.log(`data ok (${storms.length} storms, ${landfalls.length} landfalls, ${Object.keys(impacts).length} impact rows)`);
+console.log(
+  `data ok (${storms.length} storms, ${landfalls.length} landfalls, ${Object.keys(impacts).length} impact rows, `
+  + `${radarFilesOnDisk.length} radar frames all named by the manifest)`,
+);
 
 function printErrorsAndExit() {
   console.error(`Data validation failed with ${errors.length} issue${errors.length === 1 ? '' : 's'}:`);

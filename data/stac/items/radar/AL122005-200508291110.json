@@ -95,22 +95,6 @@
       "hurricanemap:distribution": [
         "full"
       ]
-    },
-    "transparent": {
-      "href": "../../../radar/Katrina-2005/t_200508291110_TRANSPARENT.png",
-      "title": "KATRINA 2005-08-29T11:10:00.000Z transparent radar composite",
-      "type": "image/png",
-      "roles": [
-        "data"
-      ],
-      "file:size": 202975,
-      "file:checksum": "sha256:3e632732a7d5e01a1592f50d69a05cc81c4c691ba8ac417ffed76e3d71b22587",
-      "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "hurricanemap:source_date": "2026-05-03",
-      "hurricanemap:license": "public-domain",
-      "hurricanemap:distribution": [
-        "full"
-      ]
     }
   }
 }

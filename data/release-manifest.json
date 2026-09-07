@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "a35e9df569d83d6ce604df63d8464aa3cf1c0bf988187bf58ab024ea48612350",
+      "sha256": "1333a6ec59842994247f2826cda4b095afe657feeb8ca209ec9a9aab5912135a",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-07",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -12760,15 +12760,6 @@
       "sha256": "3e632732a7d5e01a1592f50d69a05cc81c4c691ba8ac417ffed76e3d71b22587",
       "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
       "source_date": "2005-08-29",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Katrina-2005/t_200508291110_TRANSPARENT.png",
-      "bytes": 202975,
-      "sha256": "3e632732a7d5e01a1592f50d69a05cc81c4c691ba8ac417ffed76e3d71b22587",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2026-05-03",
       "generated_at_utc": "2026-08-08T00:00:00Z",
       "schema_version": "IEM-NEXRAD-mosaic"
     },
@@ -27588,8 +27579,8 @@
     },
     {
       "path": "data/stac/items/radar/AL122005-200508291110.json",
-      "bytes": 2902,
-      "sha256": "bde95c339f24ff473c8362d151f8b1c1415b9e07ed6b1f382b4b3a06b33eccfd",
+      "bytes": 2281,
+      "sha256": "d33d7076ced7b2a03f63dbbbb73b2f463d7472ce80518cc948e8ac2eb388841c",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

@@ -9,14 +9,14 @@
     "source_bundle": true
   },
   "payload": {
-    "file_count": 3619,
-    "bytes": 551783155,
+    "file_count": 3618,
+    "bytes": 551579559,
     "mandatory_bytes": 3371980,
     "mandatory_file_count": 162,
-    "source_bundle_bytes": 12476211,
+    "source_bundle_bytes": 12475813,
     "source_bundle_file_count": 3,
     "source_bundle_max_bytes": 13631488,
-    "radar_file_count": 1704,
-    "radar_bytes": 526918763
+    "radar_file_count": 1703,
+    "radar_bytes": 526715788
   }
 }
