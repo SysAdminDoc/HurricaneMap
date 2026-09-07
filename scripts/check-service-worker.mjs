@@ -143,10 +143,36 @@ if (!/const\s+DATA_DB_VERSION\s*=\s*1/.test(source) ||
     !/deleteLegacyDataDbs\(\)/.test(source)) {
   errors.push('sw.js must version IndexedDB and remove superseded database generations during activation.');
 }
-if (!/import\.meta\.url/.test(source) ||
-    !/MODULE_ENTRYPOINTS/.test(source) ||
+if (!/MODULE_ENTRYPOINTS/.test(source) ||
     !/discoverModuleGraph\(\)/.test(source)) {
-  errors.push('module service worker must derive its application shell from MODULE_ENTRYPOINTS and import.meta.url.');
+  errors.push('service worker must derive its application shell from MODULE_ENTRYPOINTS.');
+}
+// Firefox 146 and earlier refuse a module service worker outright, and Firefox
+// ESR 140 is still supported, so src/sw-updates.js registers the same file as a
+// classic worker when the module type is rejected. That works only while the
+// file is valid as a classic script: no static imports, and no import.meta,
+// which is a SyntaxError outside a module. self.location.href is the worker's
+// own URL under both types, so it replaces import.meta.url.
+// The comment above sw.js's base-URL line names import.meta, so this reads the
+// code rather than the prose. A gate that its own explanation can trip is a
+// gate nobody keeps.
+const swCode = source
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')
+  .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+if (/\bimport\s*\.\s*meta\b/.test(swCode)) {
+  errors.push('sw.js must not use import.meta: it is a SyntaxError in the classic worker fallback.');
+}
+if (/^\s*import\s[^(]/m.test(swCode)) {
+  errors.push('sw.js must not carry static import statements: a classic worker cannot parse them.');
+}
+if (!/new URL\('\.\/', self\.location\.href\)/.test(source)) {
+  errors.push('sw.js must resolve its own base from self.location.href, which works under both worker types.');
+}
+try {
+  // The same parser goal a classic worker body is given.
+  new Function(source);
+} catch (error) {
+  errors.push(`sw.js does not parse as a classic script, so the fallback registration cannot work: ${error.message}`);
 }
 // A client cannot tell which versioned caches are being served by looking at
 // the cache list: an install that fails after opening its caches leaves a pair

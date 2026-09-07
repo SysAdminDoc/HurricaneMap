@@ -1,6 +1,9 @@
 import { t } from './i18n.js';
 
 const UPDATE_PROMPT_ID = 'hm-update-prompt';
+// Module first: it is what the file is authored as and what every current
+// engine takes. Classic is the fallback for the engines that refuse it.
+export const WORKER_TYPES = Object.freeze(['module', 'classic']);
 const TOAST_HOST_ID = 'hm-toast-host';
 let lastRegistrationOptions = null;
 let serviceWorkerDiagnostics = Object.freeze({
@@ -9,6 +12,10 @@ let serviceWorkerDiagnostics = Object.freeze({
   controller: 'uncontrolled',
   scope: null,
   scriptUrl: null,
+  // 'module' or 'classic'. Firefox 146 and earlier reject a module worker
+  // registration outright, and Firefox ESR 140 is still supported, so the
+  // diagnostics panel has to say which one is actually running.
+  workerType: null,
   offlineIntegrity: 'unverified',
   offlineIntegrityError: null,
   offlineIntegrityCheckedAt: null,
@@ -51,32 +58,40 @@ export async function retryServiceWorkerRegistration(options = lastRegistrationO
     lastError: null,
   }, documentRef);
   if (!supported) return null;
-  try {
-    const registration = await serviceWorker.register(swPath, {
-      type: 'module',
-      updateViaCache: 'none',
-    });
-    publishDiagnostics({
-      supported: true,
-      registration: 'registered',
-      controller: serviceWorker.controller ? 'controlled' : 'uncontrolled',
-      scope: registration?.scope || null,
-      scriptUrl: registration?.active?.scriptURL || registration?.waiting?.scriptURL || null,
-      lastError: null,
-    }, documentRef);
-    return registration;
-  } catch (error) {
-    publishDiagnostics({
-      supported: true,
-      registration: 'error',
-      controller: navigatorRef?.serviceWorker?.controller ? 'controlled' : 'uncontrolled',
-      lastError: {
-        name: String(error?.name || 'Error').slice(0, 80),
-        message: String(error?.message || 'Service worker registration failed').slice(0, 240),
-      },
-    }, documentRef);
-    return null;
+  // sw.js carries no import statements and no import.meta, so it is a valid
+  // classic script as well as a module. A browser that refuses the module type
+  // gets the same file registered the old way rather than no worker at all,
+  // which is what Firefox ESR 140 was getting: registration 'error', and an
+  // offline-first atlas with no offline.
+  let lastError = null;
+  for (const type of WORKER_TYPES) {
+    try {
+      const registration = await serviceWorker.register(swPath, { type, updateViaCache: 'none' });
+      publishDiagnostics({
+        supported: true,
+        registration: 'registered',
+        workerType: type,
+        controller: serviceWorker.controller ? 'controlled' : 'uncontrolled',
+        scope: registration?.scope || null,
+        scriptUrl: registration?.active?.scriptURL || registration?.waiting?.scriptURL || null,
+        lastError: null,
+      }, documentRef);
+      return registration;
+    } catch (error) {
+      lastError = error;
+    }
   }
+  publishDiagnostics({
+    supported: true,
+    registration: 'error',
+    workerType: null,
+    controller: navigatorRef?.serviceWorker?.controller ? 'controlled' : 'uncontrolled',
+    lastError: {
+      name: String(lastError?.name || 'Error').slice(0, 80),
+      message: String(lastError?.message || 'Service worker registration failed').slice(0, 240),
+    },
+  }, documentRef);
+  return null;
 }
 
 export async function requestOfflineDataRepair({

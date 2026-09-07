@@ -113,6 +113,12 @@ export function buildSanitizedSupportBundle({
     service_worker: {
       supported: Boolean(serviceWorker.supported),
       registration: String(serviceWorker.registration || 'not-checked'),
+      // Which script type is running. A browser that refuses a module worker
+      // falls back to a classic one, and a support bundle that does not say
+      // which cannot explain an offline difference between two machines.
+      worker_type: serviceWorker.workerType === 'module' || serviceWorker.workerType === 'classic'
+        ? serviceWorker.workerType
+        : null,
       controller: String(serviceWorker.controller || 'uncontrolled'),
       scope: serviceWorker.scope ? sanitizeDiagnosticText(serviceWorker.scope) : null,
       script_url: serviceWorker.scriptUrl ? '[service-worker-script]' : null,
@@ -224,7 +230,7 @@ export async function renderOfflineDiagnostics(host) {
   delete host.dataset.refreshing;
   host.innerHTML = `
     <div class="diagnostics-summary">
-      <span><strong>${escapeHtml(t('diagnostics.registration'))}</strong>${escapeHtml(t(`diagnostics.registration.${bundle.service_worker.registration}`))}</span>
+      <span><strong>${escapeHtml(t('diagnostics.registration'))}</strong>${escapeHtml(t(`diagnostics.registration.${bundle.service_worker.registration}`))}${bundle.service_worker.worker_type ? ` (${escapeHtml(t(`diagnostics.workerType.${bundle.service_worker.worker_type}`))})` : ''}</span>
       <span><strong>${escapeHtml(t('diagnostics.controller'))}</strong>${escapeHtml(t(`diagnostics.controller.${bundle.service_worker.controller}`))}</span>
       <span><strong>${escapeHtml(t('diagnostics.storage'))}</strong>${escapeHtml(formatStorageBytes(bundle.storage.usage_bytes))} / ${escapeHtml(formatStorageBytes(bundle.storage.quota_bytes))}</span>
       <span><strong>${escapeHtml(t('diagnostics.release'))}</strong>${escapeHtml(t(`diagnostics.release.${bundle.release.state}`))}</span>

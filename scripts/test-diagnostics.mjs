@@ -9,6 +9,7 @@ import {
   getServiceWorkerDiagnostics,
   requestOfflineIntegrityCheck,
   retryServiceWorkerRegistration,
+  WORKER_TYPES,
 } from '../src/sw-updates.js';
 
 const failedNavigator = {
@@ -35,6 +36,73 @@ assert.equal(await retryServiceWorkerRegistration({
   locationRef: { protocol: 'https:', hostname: 'example.test' },
 }), null);
 assert.equal(getServiceWorkerDiagnostics().registration, 'unsupported');
+
+// Firefox 146 and earlier reject a module service worker outright, and Firefox
+// ESR 140 is still supported. sw.js has no imports and no import.meta, so the
+// same file registers as a classic worker instead of the atlas having no
+// offline at all.
+const registrationAttempts = [];
+const moduleRefusingNavigator = {
+  serviceWorker: {
+    controller: null,
+    register: async (path, options) => {
+      registrationAttempts.push(options?.type);
+      if (options?.type === 'module') throw new TypeError('Type error');
+      return { scope: 'https://example.test/', active: { scriptURL: 'https://example.test/sw.js' } };
+    },
+  },
+};
+const classicRegistration = await retryServiceWorkerRegistration({
+  navigatorRef: moduleRefusingNavigator,
+  documentRef: null,
+  locationRef: { protocol: 'https:', hostname: 'example.test' },
+});
+assert.ok(classicRegistration, 'a browser that refuses a module worker must still get a worker');
+assert.deepEqual(registrationAttempts, WORKER_TYPES, 'module is tried first and classic is the fallback, in that order');
+assert.equal(getServiceWorkerDiagnostics().registration, 'registered');
+assert.equal(
+  getServiceWorkerDiagnostics().workerType,
+  'classic',
+  'the diagnostics panel has to say which worker type is actually running',
+);
+
+// Where the module type is accepted nothing else is attempted.
+const moduleAttempts = [];
+await retryServiceWorkerRegistration({
+  navigatorRef: {
+    serviceWorker: {
+      controller: null,
+      register: async (path, options) => {
+        moduleAttempts.push(options?.type);
+        return { scope: 'https://example.test/' };
+      },
+    },
+  },
+  documentRef: null,
+  locationRef: { protocol: 'https:', hostname: 'example.test' },
+});
+assert.deepEqual(moduleAttempts, ['module'], 'a working module registration must not also register a classic one');
+assert.equal(getServiceWorkerDiagnostics().workerType, 'module');
+
+// Both refused is still an error, and it must not claim a type is running.
+const bothRefused = [];
+assert.equal(await retryServiceWorkerRegistration({
+  navigatorRef: {
+    serviceWorker: {
+      controller: null,
+      register: async (path, options) => {
+        bothRefused.push(options?.type);
+        throw new Error('no worker for you');
+      },
+    },
+  },
+  documentRef: null,
+  locationRef: { protocol: 'https:', hostname: 'example.test' },
+}), null);
+assert.deepEqual(bothRefused, WORKER_TYPES);
+assert.equal(getServiceWorkerDiagnostics().registration, 'error');
+assert.equal(getServiceWorkerDiagnostics().workerType, null);
+assert.match(getServiceWorkerDiagnostics().lastError.message, /no worker for you/, 'the reported error is the last one, not the first');
 
 const emptyRegistrationNavigator = {
   serviceWorker: {

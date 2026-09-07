@@ -119,9 +119,10 @@
     "test:optional-feeds-browser": "playwright test tests/aria-regression.spec.mjs --grep \"optional feed states\" --workers=1",
     "test:browser-matrix": "node scripts/test-browser-matrix.mjs",
     "test:offline-smoke": "node scripts/smoke-offline-service-worker.mjs",
+    "test:offline-smoke:classic": "node -e \"process.env.HURRICANEMAP_FORCE_CLASSIC_SW='1';import('./scripts/smoke-offline-service-worker.mjs')\"",
     "test:globe3d-smoke": "node scripts/smoke-globe3d.mjs",
     "build": "node scripts/run-gates.mjs",
-    "test": "npm run build && npm run test:smoke && npm run test:visual-platform && npm run test:visual && npm run test:aria && npm run test:optional-feeds-browser && npm run test:browser-matrix && npm run test:offline-smoke && npm run test:distribution-offline && npm run test:globe3d-smoke"
+    "test": "npm run build && npm run test:smoke && npm run test:visual-platform && npm run test:visual && npm run test:aria && npm run test:optional-feeds-browser && npm run test:browser-matrix && npm run test:offline-smoke && npm run test:offline-smoke:classic && npm run test:distribution-offline && npm run test:globe3d-smoke"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

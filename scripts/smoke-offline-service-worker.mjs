@@ -98,13 +98,31 @@ try {
     }
     await route.continue();
   });
-  await context.addInitScript(() => {
+  // Firefox 146 and earlier refuse a module service worker outright, and
+  // Firefox ESR 140 is still supported, so the app registers the same file as a
+  // classic worker when the module type is rejected. Playwright's bundled
+  // Firefox is far newer than that and cannot show the failure, so this run
+  // refuses the module type itself and proves the fallback really does serve
+  // the shell offline rather than only that the code path exists.
+  const FORCE_CLASSIC_WORKER = process.env.HURRICANEMAP_FORCE_CLASSIC_SW === '1';
+  await context.addInitScript(force => {
     // Runs in EVERY frame, including the opaque-origin 3D-globe iframe
     // (sandbox="allow-scripts") where storage access throws. Seed the real
     // document only.
     if (window.top !== window) return;
     localStorage.setItem('hm-settings-v1', JSON.stringify({ onboarded: true }));
-  });
+    if (!force || !navigator.serviceWorker) return;
+    const register = navigator.serviceWorker.register.bind(navigator.serviceWorker);
+    window.__hmRegistrationTypes = [];
+    navigator.serviceWorker.register = (path, options) => {
+      window.__hmRegistrationTypes.push(options?.type ?? 'classic');
+      if (options?.type === 'module') {
+        // The shape Firefox throws.
+        return Promise.reject(new TypeError('Type error'));
+      }
+      return register(path, options);
+    };
+  }, FORCE_CLASSIC_WORKER);
   const page = await context.newPage();
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
@@ -164,6 +182,23 @@ try {
       await new Promise(resolve => setTimeout(resolve, 250));
     }
   });
+
+  if (FORCE_CLASSIC_WORKER) {
+    const classic = await page.evaluate(async () => {
+      const updates = await import('/src/sw-updates.js');
+      return {
+        attempts: window.__hmRegistrationTypes || [],
+        workerType: updates.getServiceWorkerDiagnostics().workerType,
+        controlled: Boolean(navigator.serviceWorker.controller),
+      };
+    });
+    assert(
+      classic.attempts.join(',') === 'module,classic',
+      `the forced-classic run did not exercise the fallback: ${JSON.stringify(classic.attempts)}`,
+    );
+    assert(classic.workerType === 'classic', `the classic run reported worker type ${classic.workerType}`);
+    assert(classic.controlled, 'the classic worker registered but never took control of the page');
+  }
   if (!(await page.evaluate(() => Boolean(navigator.serviceWorker.controller)))) {
     await page.reload({ waitUntil: 'load' });
   }
@@ -355,7 +390,11 @@ try {
   await browser.close();
 
   if (pageErrors.length) throw new Error(`page errors: ${pageErrors.join(' | ')}`);
-  console.log(`offline service worker ok (${distribution.profile} profile, ${offlineKeys.length} data records, ${offlineResult.storms} storms, direct SW route probe passed, legacy storage removed, optional caches absent)`);
+  console.log(
+    `offline service worker ok (${distribution.profile} profile, ${offlineKeys.length} data records, `
+    + `${offlineResult.storms} storms, direct SW route probe passed, legacy storage removed, optional caches absent`
+    + `${FORCE_CLASSIC_WORKER ? ', classic worker forced and serving' : ''})`,
+  );
 } finally {
   await new Promise(resolve => server.close(resolve));
 }

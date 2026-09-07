@@ -125,6 +125,9 @@ export const NON_GATE_SCRIPTS = Object.freeze([
   'test:optional-feeds-browser',
   'test:browser-matrix',
   'test:offline-smoke',
+  // The same suite with the module registration refused, which is what Firefox
+  // 146 and earlier do. Runs in the browser lane beside its sibling.
+  'test:offline-smoke:classic',
   'test:globe3d-smoke',
 ]);
 

@@ -36,7 +36,13 @@ const LEGACY_DATA_CACHES = ['hm-data-v1', 'hm-data-v2'];
 const LEGACY_DATA_DBS = ['hm-offline-data-v1', 'hm-offline-data-v2'];
 const RELEASE_MARKER_PATH = './__hurricanemap-release.json';
 const RELEASE_LOCK_NAME = `hurricanemap-release-${SW_VERSION}`;
-const WORKER_BASE_URL = new URL('./', import.meta.url);
+// self.location.href is the worker script's own URL in both a module worker
+// and a classic one, whereas import.meta is a SyntaxError outside a module. The
+// file has no import statements, so this one line is what kept it from parsing
+// as a classic script, and Firefox 146 and earlier reject a module worker
+// registration outright: on Firefox ESR 140, still supported, the atlas had no
+// offline at all. src/sw-updates.js retries as classic when module is refused.
+const WORKER_BASE_URL = new URL('./', self.location.href);
 const MODULE_ENTRYPOINTS = ['./src/main.js'];
 
 const SHELL_ASSETS = [
