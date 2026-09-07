@@ -53,6 +53,16 @@
   --cat-4:   #f38ba8;  /* pink */
   --cat-5:   #cba6f7;  /* mauve */
 
+  /* Comparison pin colours. Each pinned storm gets one, and it is the only
+     thing tying a table column to a track on the map, so it has to be legible
+     as text on the panel and as a line on the basemap. The dark set is the
+     original one; styles-themes.css darkens it for the light theme, where
+     #cba6f7 as text measured 2.00:1. */
+  --pin-1: #cba6f7;
+  --pin-2: #74c7ec;
+  --pin-3: #fab387;
+  --pin-4: #a6e3a1;
+
   /* Semantic status colors */
   --success: #a6e3a1;  /* green */
   --warning: #f9e2af;  /* yellow */

@@ -21,8 +21,27 @@ const L = window.L;
 
 const MAX_PINS = 4;
 
-// Distinct, high-contrast track colors. Each pin gets one in pin order.
-const PIN_COLORS = ['#cba6f7', '#74c7ec', '#fab387', '#a6e3a1'];
+// Each pin gets one slot in pin order, and the colour for that slot comes from
+// the theme rather than from here. The four hexes that used to live in this
+// file were the dark palette, and as table-header text on the light panel they
+// measured between 1.46:1 and 2.00:1. The fallbacks are the dark values, which
+// is what a caller with no document gets.
+const PIN_SLOTS = Object.freeze([
+  { token: '--pin-1', fallback: '#cba6f7' },
+  { token: '--pin-2', fallback: '#74c7ec' },
+  { token: '--pin-3', fallback: '#fab387' },
+  { token: '--pin-4', fallback: '#a6e3a1' },
+]);
+
+export function pinSlotColor(slot) {
+  const entry = PIN_SLOTS[slot];
+  if (!entry) return '';
+  if (typeof document !== 'undefined' && document.documentElement && typeof getComputedStyle === 'function') {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(entry.token).trim();
+    if (value) return value;
+  }
+  return entry.fallback;
+}
 
 const tray = ensureTray();
 const comparePanel = document.getElementById('compare-panel');
@@ -86,14 +105,20 @@ export async function togglePin(storm) {
     // Replace the oldest pin if at capacity.
     removePin(pinned[0].id);
   }
-  const used = pinned.map(p => p.color);
-  const color = PIN_COLORS.find(c => !used.includes(c)) || PIN_COLORS[pinned.length % PIN_COLORS.length];
+  // The slot is the identity that persists; the colour is read from the theme
+  // each time it is drawn, so switching theme cannot leave a track and its
+  // column disagreeing.
+  const used = new Set(pinned.map(p => p.slot));
+  const slot = PIN_SLOTS.findIndex((_, index) => !used.has(index));
+  const assigned = slot >= 0 ? slot : pinned.length % PIN_SLOTS.length;
+  const color = pinSlotColor(assigned);
   const trackLayer = drawTrack(fullStorm, color);
   pinned.push({
     id: fullStorm.id,
     name: fullStorm.name,
     year: fullStorm.year,
     storm: fullStorm,
+    slot: assigned,
     color,
     trackLayer,
   });
@@ -158,8 +183,8 @@ function refreshTray() {
   tray.hidden = false;
   const chips = tray.querySelector('#ct-chips');
   chips.innerHTML = pinned.map(p => `
-    <span class="ct-chip" style="--pin-color:${p.color}">
-      <span class="ct-dot" style="background:${p.color}"></span>
+    <span class="ct-chip" style="--pin-color:${pinSlotColor(p.slot)}">
+      <span class="ct-dot" style="background:${pinSlotColor(p.slot)}"></span>
       <span class="ct-name">${escapeHtml(formatStormName(p.name))} ${p.year}</span>
       <button class="ct-remove" data-id="${p.id}" title="${t('compare.unpin')}">×</button>
     </span>
@@ -184,6 +209,23 @@ export function openComparePanel() {
   }
   renderComparePanel();
 }
+
+// The pin colour is read from the theme when a track is drawn and when a header
+// is written, so switching theme has to redraw both or the table keeps the
+// previous theme's colours while the map moves on. Before these were tokens the
+// hexes were theme-invariant and there was nothing to update, which is also why
+// they were unreadable in the light theme.
+document.addEventListener('hm-settings:change', event => {
+  if (!['theme', 'palette', 'highContrast'].includes(event.detail?.key)) return;
+  const map = getMap();
+  for (const pin of pinned) {
+    if (pin.trackLayer) map.removeLayer(pin.trackLayer);
+    pin.color = pinSlotColor(pin.slot);
+    pin.trackLayer = drawTrack(pin.storm, pin.color);
+  }
+  refreshTray();
+  refreshComparePanelIfOpen();
+});
 
 function refreshComparePanelIfOpen() {
   if (!comparePanel || comparePanel.hidden) return;
@@ -218,9 +260,9 @@ function renderComparePanel() {
     const landfalls = formatComparisonValue(cardRows.landfalls, p);
     const states = formatComparisonValue(cardRows.states, p);
     return `
-      <div class="cp-card" style="--pin-color:${p.color}">
+      <div class="cp-card" style="--pin-color:${pinSlotColor(p.slot)}">
         <div class="cp-card-head">
-          <span class="cp-swatch" style="background:${p.color}"></span>
+          <span class="cp-swatch" style="background:${pinSlotColor(p.slot)}"></span>
           <h3>${escapeHtml(formatStormName(s.name))} (${s.year})</h3>
           <button class="cp-remove" data-id="${s.id}" title="${t('compare.unpin')}">×</button>
         </div>
@@ -249,7 +291,7 @@ function renderComparePanel() {
     }
   }
 
-  const headerCols = pinned.map(p => `<th style="color:${p.color}">${escapeHtml(formatStormName(p.name))} ${p.year}</th>`).join('');
+  const headerCols = pinned.map(p => `<th style="color:${pinSlotColor(p.slot)}"><span class="cp-header-swatch" style="background:${pinSlotColor(p.slot)}" aria-hidden="true"></span>${escapeHtml(formatStormName(p.name))} ${p.year}</th>`).join('');
   const tableBody = comparisonRows.map(row => {
     const cells = pinned.map(p => {
       const val = row.getValue(p);

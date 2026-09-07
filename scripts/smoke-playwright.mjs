@@ -436,6 +436,120 @@ async function assertBasemapNotWatermarked(page) {
 // header and the biography 1.96:1 on navy. Below 1121px the panel uses
 // --surface-panel and reads fine, which is why the mobile baselines stayed
 // green and nothing caught it.
+async function measureContrast(page, targets) {
+  return page.evaluate(selectors => {
+      const parse = value => {
+        const text = String(value).trim();
+        const hex = text.match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+        if (hex) {
+          const expanded = hex[1].length === 3
+            ? [...hex[1]].map(character => character.repeat(2)).join('')
+            : hex[1];
+          return {
+            r: Number.parseInt(expanded.slice(0, 2), 16),
+            g: Number.parseInt(expanded.slice(2, 4), 16),
+            b: Number.parseInt(expanded.slice(4, 6), 16),
+            a: 1,
+          };
+        }
+        const numbers = text.match(/[\d.]+/g);
+        if (!numbers) throw new Error(`Unsupported computed color: ${value}`);
+        const [r, g, b, a] = numbers.map(Number);
+        return { r, g, b, a: a === undefined ? 1 : a };
+      };
+      const over = (front, back) => ({
+        r: front.r * front.a + back.r * (1 - front.a),
+        g: front.g * front.a + back.g * (1 - front.a),
+        b: front.b * front.a + back.b * (1 - front.a),
+        a: 1,
+      });
+      const channel = value => {
+        const normalized = value / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      };
+      const luminance = color => 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
+      const ratio = (a, b) => {
+        const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+        return (high + 0.05) / (low + 0.05);
+      };
+      // The panel and its sticky header paint through the `background`
+      // shorthand with a linear-gradient, which resets background-color to
+      // transparent. Reading only background-color composited the panel's ink
+      // straight onto the page behind it, so a gradient that went dark under
+      // light ink would still have measured clean: the exact defect this
+      // assertion exists to catch.
+      const gradientStops = value => {
+        const image = String(value || '');
+        if (!image.includes('gradient')) return [];
+        return (image.match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/gi) || []).map(parse);
+      };
+      const surfaceOf = node => {
+        const style = getComputedStyle(node);
+        const stops = gradientStops(style.backgroundImage);
+        // The darkest stop is the one the text has to survive.
+        if (stops.length) {
+          return stops.reduce((worst, stop) => (luminance(stop) < luminance(worst) ? stop : worst));
+        }
+        return parse(style.backgroundColor);
+      };
+      // Walk up compositing every translucent background until an opaque one
+      // is reached: the panel's ink sits on a tint on a tint.
+      const backgroundOf = element => {
+        const stack = [];
+        for (let node = element; node; node = node.parentElement) {
+          const background = surfaceOf(node);
+          if (background.a > 0) stack.push(background);
+          if (background.a === 1) break;
+        }
+        let base = { r: 255, g: 255, b: 255, a: 1 };
+        for (let index = stack.length - 1; index >= 0; index--) base = over(stack[index], base);
+        return base;
+      };
+      return selectors.map(([name, selector]) => {
+        const element = document.querySelector(selector);
+        if (!element) return { name, selector, missing: true };
+        const background = backgroundOf(element);
+        const foreground = over(parse(getComputedStyle(element).color), background);
+        return { name, selector, ratio: Number(ratio(foreground, background).toFixed(2)) };
+      });
+  }, targets);
+}
+
+// Both of these carried dark-palette values that stayed put while the ink
+// around them flipped light. Neither is on screen by default, and switching
+// theme re-renders the panel and stops playback, so this runs per profile and
+// does nothing when the surfaces are already there.
+// Two surfaces that cannot be on screen together: opening the comparison takes
+// the storm panel's place, and #play-anim-btn lives inside that panel. Each is
+// therefore staged and measured on its own, and re-staged per theme, because
+// switching theme re-renders the panel and stops playback.
+async function measurePausedPlaybackContrast(page) {
+  await openKatrinaPanel(page);
+  await page.evaluate(() => document.querySelector('#play-anim-btn')?.click());
+  await page.waitForSelector('.play-anim-btn.is-playing', { state: 'attached', timeout: 10000 });
+  await page.evaluate(() => document.querySelector('#play-anim-btn')?.click());
+  await page.waitForSelector('.play-anim-btn.is-paused', { state: 'attached', timeout: 10000 });
+  return measureContrast(page, [['paused playback button', '.play-anim-btn.is-paused']]);
+}
+
+async function measureComparisonHeaderContrast(page) {
+  // Opened every time, not only when the header is absent: a hidden panel keeps
+  // its markup, and the header's colour is written when the table is rendered,
+  // so a stale hidden table would be measured with the previous theme's ink.
+  await page.evaluate(async () => {
+    const data = await import('/src/data.js');
+    const compare = await import('/src/compare.js');
+    await data.ensureStormsLoaded();
+    for (const id of ['AL122005', 'AL041992']) {
+      const storm = data.getAllStorms().find(item => item.id === id);
+      if (storm && !compare.isPinned(id)) await compare.togglePin(storm);
+    }
+    compare.openComparePanel();
+  });
+  await page.waitForSelector('#compare-panel:not([hidden]) th:nth-child(2)', { timeout: 10000 });
+  return measureContrast(page, [['compare column header', '#compare-panel th:nth-child(2)']]);
+}
+
 async function assertStormPanelContrast(browser, baseUrl) {
   const targets = [
     ['title', '#storm-panel .storm-panel-header h2'],
@@ -458,6 +572,9 @@ async function assertStormPanelContrast(browser, baseUrl) {
     await openKatrinaPanel(page);
     await page.waitForSelector('#storm-panel:not([hidden]) .storm-panel-layout');
 
+    // Two more surfaces, both of which have to be rendered to be measured: a
+    // comparison with at least two columns, and playback stopped rather than
+    // never started, because .is-paused is a different rule from .is-playing.
     for (const profile of [
       { theme: 'light', highContrast: false, minimum: 4.5 },
       { theme: 'light', highContrast: true, minimum: 7 },
@@ -475,82 +592,7 @@ async function assertStormPanelContrast(browser, baseUrl) {
       );
       await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
 
-      const measured = await page.evaluate(selectors => {
-        const parse = value => {
-          const text = String(value).trim();
-          const hex = text.match(/^#([\da-f]{3}|[\da-f]{6})$/i);
-          if (hex) {
-            const expanded = hex[1].length === 3
-              ? [...hex[1]].map(character => character.repeat(2)).join('')
-              : hex[1];
-            return {
-              r: Number.parseInt(expanded.slice(0, 2), 16),
-              g: Number.parseInt(expanded.slice(2, 4), 16),
-              b: Number.parseInt(expanded.slice(4, 6), 16),
-              a: 1,
-            };
-          }
-          const numbers = text.match(/[\d.]+/g);
-          if (!numbers) throw new Error(`Unsupported computed color: ${value}`);
-          const [r, g, b, a] = numbers.map(Number);
-          return { r, g, b, a: a === undefined ? 1 : a };
-        };
-        const over = (front, back) => ({
-          r: front.r * front.a + back.r * (1 - front.a),
-          g: front.g * front.a + back.g * (1 - front.a),
-          b: front.b * front.a + back.b * (1 - front.a),
-          a: 1,
-        });
-        const channel = value => {
-          const normalized = value / 255;
-          return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
-        };
-        const luminance = color => 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
-        const ratio = (a, b) => {
-          const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-          return (high + 0.05) / (low + 0.05);
-        };
-        // The panel and its sticky header paint through the `background`
-        // shorthand with a linear-gradient, which resets background-color to
-        // transparent. Reading only background-color composited the panel's ink
-        // straight onto the page behind it, so a gradient that went dark under
-        // light ink would still have measured clean: the exact defect this
-        // assertion exists to catch.
-        const gradientStops = value => {
-          const image = String(value || '');
-          if (!image.includes('gradient')) return [];
-          return (image.match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/gi) || []).map(parse);
-        };
-        const surfaceOf = node => {
-          const style = getComputedStyle(node);
-          const stops = gradientStops(style.backgroundImage);
-          // The darkest stop is the one the text has to survive.
-          if (stops.length) {
-            return stops.reduce((worst, stop) => (luminance(stop) < luminance(worst) ? stop : worst));
-          }
-          return parse(style.backgroundColor);
-        };
-        // Walk up compositing every translucent background until an opaque one
-        // is reached: the panel's ink sits on a tint on a tint.
-        const backgroundOf = element => {
-          const stack = [];
-          for (let node = element; node; node = node.parentElement) {
-            const background = surfaceOf(node);
-            if (background.a > 0) stack.push(background);
-            if (background.a === 1) break;
-          }
-          let base = { r: 255, g: 255, b: 255, a: 1 };
-          for (let index = stack.length - 1; index >= 0; index--) base = over(stack[index], base);
-          return base;
-        };
-        return selectors.map(([name, selector]) => {
-          const element = document.querySelector(selector);
-          if (!element) return { name, selector, missing: true };
-          const background = backgroundOf(element);
-          const foreground = over(parse(getComputedStyle(element).color), background);
-          return { name, selector, ratio: Number(ratio(foreground, background).toFixed(2)) };
-        });
-      }, targets);
+      const measured = await measureContrast(page, targets);
 
       const label = `${profile.theme}${profile.highContrast ? ' + high contrast' : ''} storm panel at 1440px`;
       const missing = measured.filter(row => row.missing);
@@ -560,12 +602,31 @@ async function assertStormPanelContrast(browser, baseUrl) {
         !failed.length,
         `${label}: below ${profile.minimum}:1 — ${failed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
       );
+
+      // Playback paused, and the comparison table open. Both carried
+      // dark-palette values that stayed put while the ink around them flipped
+      // light: the button measured 1.71:1 and the column headers 1.87:1.
+      const extra = [
+        ...await measurePausedPlaybackContrast(page),
+        ...await measureComparisonHeaderContrast(page),
+      ];
+      const extraMissing = extra.filter(row => row.missing);
+      assert(
+        !extraMissing.length,
+        `${label}: could not measure ${extraMissing.map(row => row.selector).join(', ')}; `
+        + 'the playback and comparison surfaces have to be on screen for this to mean anything',
+      );
+      const extraFailed = extra.filter(row => row.ratio < profile.minimum);
+      assert(
+        !extraFailed.length,
+        `${label}: below ${profile.minimum}:1 — ${extraFailed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
+      );
     }
   } finally {
     await context.close();
   }
   if (pageErrors.length) throw new Error(`storm panel contrast page errors: ${pageErrors.join(' | ')}`);
-  console.log('  storm panel contrast ok (light, light + high contrast, dark at 1440px)');
+  console.log('  storm panel contrast ok (light, light + high contrast, dark at 1440px, playback and comparison included)');
 }
 
 // The status host for an optional feed registers two document listeners, and

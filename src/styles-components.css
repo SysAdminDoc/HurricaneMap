@@ -985,6 +985,17 @@ label > input[type="checkbox"] {
 
 .cp-swatch { width: 10px; height: 10px; border-radius: 4px; }
 
+/* The column header's colour was the only thing tying it to a track on the
+   map, which is nothing at all to a reader who cannot separate the four hues. */
+.cp-header-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+  border-radius: 3px;
+  vertical-align: baseline;
+}
+
 .cp-remove {
   background: transparent;
   border: none;
@@ -5547,7 +5558,7 @@ body.timeline-collapsed {
 .play-anim-btn.is-paused {
   color: var(--text);
   background:
-    linear-gradient(135deg, rgba(49, 50, 68, 0.98), rgba(30, 30, 46, 0.98));
+    linear-gradient(135deg, var(--surface-elevated), var(--surface-control));
   border-color: rgba(250, 179, 135, 0.68);
   box-shadow:
     0 0 0 1px rgba(250, 179, 135, 0.22) inset,
@@ -5559,7 +5570,7 @@ body.timeline-collapsed {
 .play-anim-btn.is-paused:hover {
   color: var(--text);
   background:
-    linear-gradient(135deg, rgba(69, 71, 90, 0.98), rgba(49, 50, 68, 0.98));
+    linear-gradient(135deg, var(--surface-control-hover), var(--surface-elevated));
   border-color: rgba(250, 179, 135, 0.84);
 }
 

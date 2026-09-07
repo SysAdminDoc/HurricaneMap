@@ -79,6 +79,15 @@ html.light-theme.high-contrast {
   --tide-landfall: #800020;
   --legend-swatch-border: #000000;
 
+  /* The light theme's pin colours clear AA on the panel but not the AAA bar
+     this mode holds itself to: the mauve measured 5.33:1 where 7:1 is wanted.
+     These four are 8.17:1 to 10.46:1 on white. The dark high-contrast theme
+     already clears it at 10.34:1 with the standard set. */
+  --pin-1: #5b0f9e;
+  --pin-2: #0a3fa8;
+  --pin-3: #8c3200;
+  --pin-4: #0f5a13;
+
   --glass-bg:   rgba(255, 255, 255, 0.98);
   --glass-edge: rgba(0, 0, 0, 0.20);
   --shadow:     0 8px 32px rgba(0, 0, 0, 0.15);
