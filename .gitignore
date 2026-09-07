@@ -28,6 +28,10 @@ Thumbs.db
 # Build / dist
 dist/
 build/
+# An empty tmp/ has sat at the repo root since 2025-07-25, invisible only
+# because it was empty. The first file written there would have shown up in
+# git status and been picked up by git add -A.
+tmp/
 .tmp-bundle/
 *.tgz
 node_modules/

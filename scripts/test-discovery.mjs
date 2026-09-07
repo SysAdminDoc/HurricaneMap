@@ -4,7 +4,7 @@
 // canonical URL, no sitemap, no structured data, and an empty body. These are
 // the pieces that let the atlas be found and cited rather than only demoed.
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -79,7 +79,18 @@ for (const target of ['data/landfalls.json', 'data/storms.json', 'data/metadata.
 }
 assert.match(noscriptHtml, /Landsea/, 'the noscript block must carry the citation');
 
+// GitHub Pages runs this site through the legacy branch build, which means a
+// Jekyll pass on every push. The site is not a Jekyll site, and Jekyll drops
+// paths beginning with an underscore, so the pass is at best wasted and at
+// worst quietly removes a file. .nojekyll turns it off, and it only works if
+// it is actually committed.
+await assert.doesNotReject(
+  access(path.join(root, '.nojekyll')),
+  '.nojekyll must be tracked, or every Pages build runs a Jekyll pass this site does not use',
+);
+
 console.log(
   `discovery contract ok (canonical, robots, ${locations.length} sitemap URLs, `
-  + `Dataset JSON-LD citing ${atlantic.source_date}, noscript with ${(noscriptHtml.match(/href=/g) || []).length} links)`,
+  + `Dataset JSON-LD citing ${atlantic.source_date}, noscript with ${(noscriptHtml.match(/href=/g) || []).length} links, `
+  + 'Jekyll disabled)',
 );
