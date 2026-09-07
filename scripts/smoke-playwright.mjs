@@ -2740,6 +2740,58 @@ async function assertForcedColorsContract(browser, baseUrl) {
       !/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(`${surface.color} ${surface.background} ${surface.border}`) &&
       surface.forcedColorAdjust === 'auto'), `forced-colors panel/control is not legible: ${JSON.stringify(panel)}`);
     await assertNoAxeViolations(page, 'forced-colors storm panel (WCAG 2.2 AA)', '#storm-panel');
+
+    // The year histogram and every colour key ARE the data. Under forced
+    // colours the user agent repaints anything it is allowed to, so without
+    // forced-color-adjust: none the timeline rendered as an empty box, its
+    // legend as blank squares, and the compare, season and radar keys lost the
+    // colour that ties a row to a track on the map.
+    await page.evaluate(async () => {
+      const panels = await import('/src/panels.js');
+      panels.closeAllPanels();
+    });
+    const dataSwatches = await page.evaluate(() => {
+      const seen = [];
+      for (const selector of ['.tl-bar', '.timeline-legend-item i']) {
+        const element = document.querySelector(selector);
+        if (!element) { seen.push({ selector, missing: true }); continue; }
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        seen.push({
+          selector,
+          width: Math.round(rect.width * 100) / 100,
+          height: Math.round(rect.height * 100) / 100,
+          background: style.backgroundColor,
+          border: style.borderTopWidth,
+          forcedColorAdjust: style.forcedColorAdjust,
+        });
+      }
+      return seen;
+    });
+    const missingSwatches = dataSwatches.filter(entry => entry.missing);
+    assert(!missingSwatches.length, `forced-colors: no swatch to measure: ${JSON.stringify(missingSwatches)}`);
+    for (const swatch of dataSwatches) {
+      assert(
+        swatch.forcedColorAdjust === 'none',
+        `forced-colors: ${swatch.selector} lets the user agent repaint the datum: ${JSON.stringify(swatch)}`,
+      );
+      assert(
+        swatch.width > 0 && swatch.height > 0,
+        `forced-colors: ${swatch.selector} has no box: ${JSON.stringify(swatch)}`,
+      );
+      assert(
+        !/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(swatch.background),
+        `forced-colors: ${swatch.selector} lost its fill: ${JSON.stringify(swatch)}`,
+      );
+    }
+    // Colour alone is not safe where the palette can be replaced, so the bars
+    // keep an outline that survives a display which drops the fill.
+    const bar = dataSwatches.find(entry => entry.selector === '.tl-bar');
+    assert(
+      Number.parseFloat(bar.border) > 0,
+      `forced-colors: histogram bars have no outline to fall back on: ${JSON.stringify(bar)}`,
+    );
+
   } finally {
     await context.close();
   }

@@ -618,6 +618,29 @@ html.high-contrast #map .leaflet-tile-pane {
     forced-color-adjust: auto;
   }
 
+  /* These are not decoration: each one IS the datum. Repainting them to Canvas
+     leaves the year histogram an empty box and every legend a column of blank
+     squares, so the reader loses the category key, the comparison key, the
+     season tiers and the radar scale at once. The user agent must keep its
+     hands off them. */
+  .tl-bar,
+  .timeline-legend-item i,
+  .ct-dot,
+  .cp-swatch,
+  .dai-seg,
+  .tal-swatch,
+  .ss-tier-dot,
+  .radar-swatch {
+    forced-color-adjust: none;
+  }
+
+  /* Colour alone is not a safe encoding where the palette can be replaced, so
+     the bars keep an outline as well. Shape survives even when the fill does
+     not reach a particular display. */
+  .tl-bar {
+    border: 1px solid CanvasText;
+  }
+
   .leaflet-control-zoom a,
   .leaflet-control-attribution,
   .leaflet-control-layers,
