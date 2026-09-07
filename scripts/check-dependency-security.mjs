@@ -39,6 +39,23 @@ export function findHighRiskFindings(report) {
   return findings;
 }
 
+// npm audit signatures verifies every installed tarball against the registry's
+// own signing key. An advisory scan cannot see a package that was never
+// tampered with in a way anyone has reported yet; a broken or absent signature
+// says the bytes are not the ones the registry published, which is what the
+// 2025-2026 campaigns produced within minutes of publishing.
+export function findUnsignedPackages(report) {
+  const problems = [];
+  for (const [kind, entries] of [['invalid', report?.invalid], ['missing', report?.missing]]) {
+    for (const entry of Array.isArray(entries) ? entries : []) {
+      const name = entry?.name || entry?.package || 'unknown package';
+      const version = entry?.version ? `@${entry.version}` : '';
+      problems.push({ kind, name: `${name}${version}`, reason: entry?.reason || entry?.integrity || '' });
+    }
+  }
+  return problems;
+}
+
 export function validateAuditSnapshot(snapshot, lockfileSha256, now = new Date()) {
   const errors = [];
   if (snapshot?.schema_version !== 1) errors.push('npm audit snapshot schema_version must be 1');
@@ -78,6 +95,19 @@ async function main() {
     }
   }
 
+  const signatures = process.argv.includes('--offline') ? null : runSignatureAudit();
+  let signatureNote = 'signatures not checked (offline)';
+  if (signatures?.report) {
+    const unsigned = findUnsignedPackages(signatures.report);
+    for (const problem of unsigned) {
+      errors.push(`${problem.kind} registry signature for ${problem.name}${problem.reason ? ` (${problem.reason})` : ''}`);
+    }
+    signatureNote = `${unsigned.length} unsigned or invalid tarballs`;
+  } else if (signatures?.error) {
+    console.warn(`dependency security: npm audit signatures unavailable; ${signatures.error}`);
+  }
+
+  errors.push(...await validateNpmPolicy());
   errors.push(...await validateVendorPolicy(policy));
 
   if (errors.length) {
@@ -89,8 +119,59 @@ async function main() {
   console.log(
     `dependency security ok (${auditSource}; npm ${npmCounts.high || 0} high/${npmCounts.critical || 0} critical; `
     + `Leaflet ${policy.vendors.find(vendor => vendor.id === 'leaflet')?.version}; `
-    + `Cesium ${policy.vendors.find(vendor => vendor.id === 'cesium')?.version})`,
+    + `Cesium ${policy.vendors.find(vendor => vendor.id === 'cesium')?.version}; ${signatureNote})`,
   );
+}
+
+// The install policy is only a policy if it is in the tree. A contributor who
+// deletes .npmrc gets their dependencies the moment they are published again,
+// with install scripts running, which is exactly the window the campaigns used.
+export function validateNpmPolicyText(text) {
+  const errors = [];
+  const settings = new Map();
+  for (const line of String(text || '').split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith(';') || trimmed.startsWith('#')) continue;
+    const [key, ...rest] = trimmed.split('=');
+    settings.set(key.trim(), rest.join('=').trim());
+  }
+  const days = Number(settings.get('min-release-age'));
+  if (!Number.isFinite(days) || days < 2) {
+    errors.push(`.npmrc must set min-release-age to at least 2 days, found ${settings.get('min-release-age') ?? 'nothing'}`);
+  }
+  if (settings.get('ignore-scripts') !== 'true') {
+    errors.push('.npmrc must set ignore-scripts=true; the README documents the explicit npx playwright install');
+  }
+  if (settings.get('allow-git') !== 'none') {
+    errors.push('.npmrc must set allow-git=none; a git dependency carries no registry signature to verify');
+  }
+  return errors;
+}
+
+async function validateNpmPolicy() {
+  try {
+    return validateNpmPolicyText(await readFile(path.join(root, '.npmrc'), 'utf8'));
+  } catch {
+    return ['.npmrc is missing, so nothing constrains how dependencies are installed'];
+  }
+}
+
+function runNpm(args) {
+  const npmCommand = process.platform === 'win32' ? process.execPath : 'npm';
+  const npmArgs = process.platform === 'win32'
+    ? [path.join(path.dirname(process.execPath), 'node_modules/npm/bin/npm-cli.js'), ...args]
+    : args;
+  return execFileSync(npmCommand, npmArgs, { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+}
+
+function runSignatureAudit() {
+  try {
+    return { report: parseAuditReport(runNpm(['audit', 'signatures', '--json'])) };
+  } catch (error) {
+    const report = parseAuditReport(`${error.stdout || ''}
+${error.stderr || ''}`);
+    return report ? { report } : { error: error.message || 'npm audit signatures failed without a JSON report' };
+  }
 }
 
 function runLiveAudit() {

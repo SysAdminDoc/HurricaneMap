@@ -36,9 +36,12 @@ The primary document denies form submissions with its CSP. The Cloudflare Worker
 Local verification:
 
 ```bash
-npm install
+npm ci
+npx playwright install
 npm test
 ```
+
+`.npmrc` installs nothing published in the last three days, refuses install scripts, and refuses git dependencies. Three npm campaigns in 2025 and 2026 delivered their payload as a brand-new patch version of something people already depended on, consumed within minutes: "Mini Shai-Hulud" pushed 637 versions across 317 packages in 22 minutes on 19 May 2026, and CHAINDROP trojanized keyv and cacheable on 4 August 2026. Nothing here needs a dependency the day it ships. Refusing install scripts is why the browser download is a separate step: `npx playwright install` is the one script this repository actually wants to run, so it runs it deliberately. `npm run check:security` verifies every installed tarball against the registry's signing key with `npm audit signatures` alongside the advisory scan, and fails on a missing or invalid signature.
 
 Fast non-browser verification:
 
@@ -115,7 +118,8 @@ To run locally (e.g. after refreshing the HURDAT2 data):
 # Clone
 git clone https://github.com/SysAdminDoc/HurricaneMap.git
 cd HurricaneMap
-npm install
+npm ci
+npx playwright install
 
 # Check NOAA for newer HURDAT2 source files.
 # Use --apply before preprocessing when a new revision is detected.
