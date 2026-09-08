@@ -235,10 +235,9 @@ export function getEnsoForYear(year) {
   if (!DATA.enso) return null;
   const entry = DATA.enso[String(year)];
   if (!entry) return null;
-  if (typeof entry === 'number') {
-    const phase = entry >= 0.5 ? 'El Nino' : entry <= -0.5 ? 'La Nina' : 'Neutral';
-    return { oni: entry, phase };
-  }
+  // A bare number was an older shape of data/enso.json. All 76 entries the
+  // builder emits today are {oni, phase}, and an entry that is neither falls
+  // through to null below, which is what an unreadable entry should do.
   if (typeof entry.oni === 'number') {
     const LABELS = { 'el-nino': 'El Nino', 'la-nina': 'La Nina', 'neutral': 'Neutral' };
     return { oni: entry.oni, phase: LABELS[entry.phase] || 'Neutral' };

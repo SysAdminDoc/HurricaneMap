@@ -513,6 +513,7 @@ export default {
   'savedViews.importStatus.malformed': 'Fichye sa a pa gen JSON ki valab.',
   'savedViews.importStatus.invalid': 'Korije chan ki anba yo anvan enpòtasyon.',
   'savedViews.importStatus.future-version': 'Yon vèsyon pi nouvo ki pa konpatib te kreye fichye sa a.',
+  'savedViews.importStatus.invalid-mode': 'Mòd enpòtasyon sa a se pa youn aplikasyon an ofri.',
   'savedViews.importStatus.unsupported': 'Vèsyon vizyalizasyon sa a pa sipòte.',
   'savedViews.importStatus.write-failed': 'Enpòtasyon an pa t kapab anrejistre. Vizyalizasyon ki te la yo retabli.',
   'savedViews.importError.malformed': 'JSON pa valab.',

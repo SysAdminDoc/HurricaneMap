@@ -394,7 +394,7 @@ function configureWindConeControl(dataset) {
   els.windCones.closest('.globe3d-toggle')?.setAttribute(
     'title',
     count > 0
-      ? `${count.toLocaleString()} wind-radii cone layers available for this storm`
+      ? `${count.toLocaleString(getDateLocale())} wind-radii cone layers available for this storm`
       : 'Wind-radii cones are available when a focused or single selected storm has 2004+ radii data',
   );
 }
@@ -420,12 +420,12 @@ function updateSubtitle(dataset) {
   const stormCount = dataset.storms.length;
   const mode = t(dataset.focusStormId ? 'globe.modeFocused' : 'globe.modeSelection');
   const cones = dataset.windCones?.length
-    ? t('globe.windConeLayers', dataset.windCones.length.toLocaleString())
+    ? t('globe.windConeLayers', dataset.windCones.length.toLocaleString(getDateLocale()))
     : '';
   const cap = dataset.capped ? t('globe.capped') : '';
   els.subtitle.textContent = stormCount === 1
-    ? t('globe.summaryOne', dataset.segments.length.toLocaleString(), cones, mode, cap)
-    : t('globe.summary', stormCount.toLocaleString(), dataset.segments.length.toLocaleString(), cones, mode, cap);
+    ? t('globe.summaryOne', dataset.segments.length.toLocaleString(getDateLocale()), cones, mode, cap)
+    : t('globe.summary', stormCount.toLocaleString(getDateLocale()), dataset.segments.length.toLocaleString(getDateLocale()), cones, mode, cap);
 }
 
 function setStatus(message) {

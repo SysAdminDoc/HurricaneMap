@@ -119,11 +119,13 @@ assert.equal(segmentOnlyReturnPeriods.cat3_years, 5, 'return periods use one eve
 // `Math.asin`, which the equally standard `atan2` spelling of the haversine
 // walks straight past. A private copy needs an Earth radius and it needs
 // inverse trigonometry, so both are refused, in either language.
-const PRIVATE_HAVERSINE = [
-  [/\b(?:Math\.)?asin\s*\(/, 'an asin() call'],
-  [/\b(?:Math\.)?atan2\s*\(/, 'an atan2() call'],
-  [/\b63[0-9]{2}(?:\.[0-9]+)?\b/, 'an Earth radius written out'],
-];
+// Refusing either half on its own was wrong, and noisily so: Math.atan2 is
+// how you compute a compass bearing, and 6350 is a plausible row cap. A
+// distance formula needs the inverse trigonometry AND the radius, so both
+// have to be present before this says anything. The radius pattern also
+// refuses a match inside a longer number, or 1.6371 reads as an Earth radius.
+const INVERSE_TRIG = /\b(?:Math\.)?(asin|atan2)\s*\(/;
+const EARTH_RADIUS = /(?<![\d.])63[0-9]{2}(?:\.[0-9]+)?(?![\d])/;
 for (const [relative, importPattern] of [
   ['./validate-data.mjs', /from '\.\.\/src\/geodesy\.js'/],
   ['./build_aoml_landfalls.py', /from preprocess_hurdat2 import haversine_km/],
@@ -131,12 +133,13 @@ for (const [relative, importPattern] of [
   const source = await readSource(new URL(relative, import.meta.url), 'utf8');
   assert(importPattern.test(source), `${relative} no longer takes its distance arithmetic from the shared implementation`);
   const withoutTheImport = source.replace(/haversine/gi, '');
-  for (const [pattern, what] of PRIVATE_HAVERSINE) {
-    assert(
-      !pattern.test(withoutTheImport),
-      `${relative} contains ${what}, which is how a private haversine gets back in; the reference vectors do not cover it`,
-    );
-  }
+  const trig = INVERSE_TRIG.exec(withoutTheImport);
+  const radius = EARTH_RADIUS.exec(withoutTheImport);
+  assert(
+    !(trig && radius),
+    `${relative} contains ${trig?.[1]}() and the constant ${radius?.[0]}, which together are a private haversine; `
+    + 'the reference vectors do not cover it, so take the distance from src/geodesy.js',
+  );
 }
 
 console.log(`geodesy ok (${vectors.distance_vectors.length} distances, ${vectors.segment_vectors.length} segments, ${catalogueChecks.length} track counts)`);

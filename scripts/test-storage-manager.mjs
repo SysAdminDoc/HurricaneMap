@@ -469,10 +469,12 @@ assert.equal(
     /about 25 MB of about 100 MB \(25%\)/,
     'the browser estimate must be rendered as an approximation, not as an exact pair',
   );
+  // The class name is not the caveat. Assert the sentence the reader gets, or
+  // emptying the catalog value leaves this green.
   assert.match(
     host.innerHTML,
-    /storage-approximate-note/,
-    'the panel must state why those two figures are approximate',
+    /storage-approximate-note[^>]*>[^<]*\brecognise you\b/,
+    'the panel must carry the sentence explaining why those two figures are approximate, not just its container',
   );
 
   const bundle = buildSanitizedSupportBundle({

@@ -57,6 +57,3 @@ export function citationCommentLines(citation, prefix = '# ') {
   return lines;
 }
 
-export function citationText(citation = buildCitation()) {
-  return `APA citation: ${citation.apa}\n\nBibTeX citation:\n${citation.bibtex}`;
-}

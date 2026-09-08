@@ -4,7 +4,7 @@ import {
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
-import { getLocale, initLocale, initLocaleReady, setLocale, t, translateStaticElements } from './i18n.js';
+import { getDateLocale, getLocale, initLocale, initLocaleReady, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { refreshSeasonSummary } from './season.js';
 import { recordView } from './search-history.js';
@@ -380,8 +380,8 @@ async function boot() {
   });
   els.stormCount.textContent = t(
     'status.stormCount',
-    getStats().total_storms.toLocaleString(),
-    getStats().total_landfall_events.toLocaleString(),
+    getStats().total_storms.toLocaleString(getDateLocale()),
+    getStats().total_landfall_events.toLocaleString(getDateLocale()),
   );
 
   // Initialize keyboard shortcuts and navigation.
@@ -688,8 +688,8 @@ function applyFilters() {
   renderLandfalls(visible, onLandfallClick);
   const totalLandfalls = getLandfalls().length;
   const countText = visible.length === totalLandfalls
-    ? t('status.landfalls', visible.length.toLocaleString())
-    : t('status.landfallsOf', visible.length.toLocaleString(), totalLandfalls.toLocaleString());
+    ? t('status.landfalls', visible.length.toLocaleString(getDateLocale()))
+    : t('status.landfallsOf', visible.length.toLocaleString(getDateLocale()), totalLandfalls.toLocaleString(getDateLocale()));
   els.visibleCount.textContent = countText;
   announceToLiveRegion(t('status.showing', countText));
   filterController.updateResetState();

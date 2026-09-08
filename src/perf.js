@@ -1,22 +1,5 @@
 // Performance optimizations: lazy-loading and profiling utilities
 
-const lazyModules = {
-  radar: null,
-};
-
-// Lazy-load radar overlay when user first interacts with it
-export async function ensureRadarLoaded() {
-  if (lazyModules.radar === null) {
-    try {
-      lazyModules.radar = await import('./radar.js');
-    } catch (e) {
-      console.error('Failed to load radar module:', e);
-      lazyModules.radar = false;
-    }
-  }
-  return lazyModules.radar || null;
-}
-
 // Performance monitoring: measure Core Web Vitals (LCP, INP, CLS)
 // Called from main.js to track real user metrics
 export function initPerformanceMonitoring() {

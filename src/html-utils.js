@@ -67,26 +67,3 @@ export function formatStormName(name, { unnamed = unnamedStormLabel } = {}) {
     .replace(/\b([a-z])/g, c => c.toUpperCase());
 }
 
-/**
- * Safely create a text node instead of using innerHTML.
- * Preferred method when you only need to set text content (no HTML).
- */
-export function safeSetText(element, text) {
-  if (!element) return;
-  // Clear existing content and add safe text node
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
-  }
-  if (text) {
-    element.appendChild(document.createTextNode(String(text)));
-  }
-}
-
-/**
- * Safely set innerHTML with escaped content.
- * This is less safe than safeSetText but safer than raw innerHTML with variables.
- */
-export function safeSetHtml(element, html) {
-  if (!element) return;
-  element.innerHTML = html; // Only call after ensuring content is safe
-}

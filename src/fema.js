@@ -1,3 +1,4 @@
+import { getDateLocale } from './i18n.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -274,7 +275,7 @@ export async function fetchFemaDeclarations(
   }
 }
 
-export function formatFemaDate(value, locale = undefined) {
+export function formatFemaDate(value, locale = getDateLocale()) {
   const timestamp = parseTimestamp(value);
   if (timestamp == null) return '';
   return new Date(timestamp).toLocaleDateString(locale, {

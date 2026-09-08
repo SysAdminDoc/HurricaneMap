@@ -84,11 +84,6 @@ async function loadGlossaryOnce() {
   }
 }
 
-/** Get a single glossary entry by term. */
-export function getGlossaryEntry(term) {
-  return glossaryCache[term.toLowerCase()] || null;
-}
-
 /** Search glossary by term or definition. */
 export function searchGlossary(query) {
   if (!glossaryData || glossaryData.length === 0) return [];

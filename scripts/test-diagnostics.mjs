@@ -172,7 +172,11 @@ const bundle = buildSanitizedSupportBundle({
   },
 });
 const serialized = JSON.stringify(bundle);
-assert.equal(bundle.schema_version, 1);
+// 2 since the storage figures were renamed to say they are approximate. A
+// literal here rather than the imported constant on purpose: importing it
+// would make this assertion agree with any future bump automatically, and the
+// point of a schema version is that changing it is a decision somebody makes.
+assert.equal(bundle.schema_version, 2);
 assert.equal(bundle.app.version, '1.9.3');
 assert.equal(bundle.storage.radar_pack_count, 1);
 assert.equal(bundle.coverage.available, true);

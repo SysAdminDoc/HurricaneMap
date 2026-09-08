@@ -491,7 +491,3 @@ async function renderActive(storms) {
 
 }
 
-export function clearActiveOperationalLayers() {
-  clearTropicalOutlook();
-  clearMarineWarnings();
-}

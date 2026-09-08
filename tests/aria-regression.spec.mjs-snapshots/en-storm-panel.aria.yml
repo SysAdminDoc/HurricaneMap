@@ -67,8 +67,8 @@
       - listitem:
         - button /Celia \(\d+\) Cat 4 1 landfall \d+%/
     - heading "Days at intensity" [level=3]
-    - 'img /Days at intensity: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
-    - text: "Total tracked: 7.5 days"
+    - 'img /Days at intensity: TD 1d \d+[hmsp]+, TS 1d \d+[hmsp]+, Cat 1 1d \d+[hmsp]+, Cat 2 \d+[hmsp]+, Cat 3 1d \d+[hmsp]+, Cat 4 \d+[hmsp]+, Cat 5 \d+[hmsp]+/': /TD · 1d \d+[hmsp]+ TS · 1d \d+[hmsp]+ Cat 1 · 1d \d+[hmsp]+ Cat 2 · \d+[hmsp]+ Cat 3 · 1d \d+[hmsp]+ Cat 5 · \d+[hmsp]+/
+    - text: "/Total tracked: 7d \\d+[hmsp]+/"
     - heading "Intensity over time" [level=3]
     - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
     - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/

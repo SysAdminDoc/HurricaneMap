@@ -2212,7 +2212,24 @@ async function waitForMapPaint(page, timeout = 15000) {
     null,
     { timeout },
   ).then(() => true).catch(() => false);
-  return painted ? 'painted' : 'blank';
+  if (painted) return 'painted';
+  // An empty basemap has two causes and they deserve different answers. The
+  // app failing to build the layer is a bug here. OpenStreetMap declining to
+  // serve us is not: its usage policy forbids bulk fetching, and eight
+  // consecutive smoke runs are enough to get throttled, after which every run
+  // fails in seventeen seconds on a tree that is perfectly fine. Ask the tile
+  // server directly rather than guessing which one it is.
+  const upstream = await page.evaluate(async () => {
+    const tile = document.querySelector('#map .leaflet-tile-pane img.leaflet-tile');
+    if (!tile?.src) return null;
+    try {
+      const response = await fetch(tile.src, { cache: 'no-store' });
+      return response.ok ? null : `HTTP ${response.status}`;
+    } catch (error) {
+      return String(error?.message || error).slice(0, 80);
+    }
+  }).catch(() => null);
+  return upstream ? `upstream:${upstream}` : 'blank';
 }
 
 async function captureVisualSnapshot(page, name) {
@@ -2223,7 +2240,12 @@ async function captureVisualSnapshot(page, name) {
   // refused still screenshots at 283 KB, because the header, timeline, markers
   // and panels all paint: 20 KB catches an empty viewport, not an empty
   // basemap. Say which one failed.
-  assert(paint !== 'blank', `${name}: the basemap never painted, so this snapshot is not the picture it claims to be`);
+  if (String(paint).startsWith('upstream:')) {
+    // Loud, and not a failure: the tree is not what is broken.
+    console.warn(`${name}: the basemap did not paint because the tile server answered ${paint.slice('upstream:'.length)}; the snapshot shows the app over an empty map`);
+  } else {
+    assert(paint !== 'blank', `${name}: the basemap never painted, so this snapshot is not the picture it claims to be`);
+  }
   assert(settled, `${name}: a view transition was still running, so this snapshot holds two states at once`);
   const buffer = await page.screenshot({
     path: path.join(visualSnapshotDir, `${name}.png`),
@@ -3522,7 +3544,12 @@ async function assertSupportBundleExport(page) {
   for await (const chunk of stream) chunks.push(chunk);
   const body = Buffer.concat(chunks).toString('utf8');
   const bundle = JSON.parse(body);
-  assert(bundle.schema_version === 1 && bundle.app?.version === expectedGeneratorVersion, 'support bundle is missing app/schema versions');
+  // 2 since the storage figures were renamed to say they are approximate.
+  assert(bundle.schema_version === 2 && bundle.app?.version === expectedGeneratorVersion, 'support bundle is missing app/schema versions');
+  assert(
+    'usage_bytes_approximate' in (bundle.storage || {}) && !('usage_bytes' in (bundle.storage || {})),
+    `support bundle still names the padded browser estimate as though it were exact: ${Object.keys(bundle.storage || {}).join(', ')}`,
+  );
   assert(bundle.storage?.scopes?.length === 5, 'support bundle is missing cache scope versions and sizes');
   assert(['coherent', 'unverified'].includes(bundle.release?.state), `support bundle returned an invalid release state: ${bundle.release?.state}`);
   assert(Array.isArray(bundle.optional_feeds) && bundle.optional_feeds.length >= 10, 'support bundle is missing optional-feed readiness');

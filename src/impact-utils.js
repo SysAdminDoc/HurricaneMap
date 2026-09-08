@@ -1,4 +1,5 @@
 import { MISSING_METRIC } from './metric-presenters.js';
+import { getDateLocale } from './i18n.js';
 
 export function getFatalityCount(impacts) {
   if (!impacts) return null;
@@ -31,7 +32,7 @@ export function getRawDamageText(impacts) {
 export function formatFatalityCount(value) {
   if (!Number.isFinite(value)) return MISSING_METRIC;
   if (value >= 10_000) return `${(value / 1_000).toFixed(0)}k`;
-  return value.toLocaleString();
+  return value.toLocaleString(getDateLocale());
 }
 
 // Storm Events covers the states and territories a U.S. landfall can occur in.

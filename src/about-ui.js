@@ -42,7 +42,7 @@ function formatMetadataDateTime(value) {
 // by the reader's own locale, and changing that is a separate decision from
 // which word stands in for a value that did not load.
 function formatNumber(value) {
-  return Number.isFinite(value) ? value.toLocaleString() : notLoaded();
+  return Number.isFinite(value) ? value.toLocaleString(getDateLocale()) : notLoaded();
 }
 
 function formatValidationPercent(value) {

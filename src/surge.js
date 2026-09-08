@@ -70,4 +70,3 @@ export function setSurgeCategory(cat) {
   activeCategory = cat;
 }
 
-export function getActiveCategory() { return activeCategory; }

@@ -38,7 +38,7 @@
     - strong: /\d+ mi/
     - text: "/\\(\\d+ km\\) · \\d+ kt · \\d+ ago \\d+, \\d+:\\d+ UTC Periodo de retorno \\(radio de \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Impactos" [level=3]
-    - text: /Víctimas mortales \d+,\d+ Daños \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Desastre de mil millones \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ muertes\)/
+    - text: /Víctimas mortales \d+,\d+ Daños \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Desastre de mil millones \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+ muertes\)/
     - 'link "Fuente: Wikipedia"':
       - /url: https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29
     - text: "· Confianza: alta ·"
@@ -67,8 +67,8 @@
       - listitem:
         - button /Celia \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
     - heading "Días con esta intensidad" [level=3]
-    - 'img /Días con esta intensidad: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
-    - text: "Total registrado: 7.5 días"
+    - 'img /Días con esta intensidad: TD 1d \d+[hmsp]+, TS 1d \d+[hmsp]+, Cat 1 1d \d+[hmsp]+, Cat 2 \d+[hmsp]+, Cat 3 1d \d+[hmsp]+, Cat 4 \d+[hmsp]+, Cat 5 \d+[hmsp]+/': /TD · 1d \d+[hmsp]+ TS · 1d \d+[hmsp]+ Cat 1 · 1d \d+[hmsp]+ Cat 2 · \d+[hmsp]+ Cat 3 · 1d \d+[hmsp]+ Cat 5 · \d+[hmsp]+/
+    - text: "/Total registrado: 7d \\d+[hmsp]+/"
     - heading "Intensidad a lo largo del tiempo" [level=3]
     - text: Viento (kt) ↑ Presión (mb) ↓ invertida L = tocamiento de tierra en EE. UU.
     - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/

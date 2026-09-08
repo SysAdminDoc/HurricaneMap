@@ -114,10 +114,6 @@ registerOptionalFeedRetry('sst', async () => {
   return resolved;
 });
 
-export function getSSTTime() {
-  return resolvedTime;
-}
-
 export async function setSSTVisible(visible) {
   if (!visible) {
     activeHandle = null;
@@ -185,9 +181,3 @@ export async function setSSTVisible(visible) {
   handle.attach(sstLayer);
 }
 
-export function setSSTTime(isoTime) {
-  if (sstLayer) {
-    resolvedTime = isoTime;
-    sstLayer.setParams({ time: isoTime });
-  }
-}

@@ -80,15 +80,35 @@ export function renderSimilarStorms(host, similarStorms, onSelect) {
 // Baseline 2025-03-04. Below the floor the old hand-built form is kept, which
 // is wrong in the same way it always was rather than newly broken.
 function formatTrackDuration(hours) {
+  // A track that is not a number is a bug upstream, and Intl.DurationFormat
+  // answers it by throwing rather than by rendering anything, which would take
+  // the whole panel down.
+  // Nothing to name: a zero or negative span has no duration, and a non-finite
+  // one is a bug upstream that Intl.DurationFormat answers by throwing, which
+  // would take the whole panel down.
+  if (!Number.isFinite(hours) || hours <= 0) return '';
   const whole = Math.max(0, Math.round(hours));
   const days = Math.floor(whole / 24);
   const rest = whole % 24;
   if (typeof Intl.DurationFormat !== 'function') {
     return days >= 1 ? `${(whole / 24).toFixed(1)} d` : `${rest} h`;
   }
+  // Zero-valued units are dropped, so {hours: 0} formats to the empty string:
+  // anything under half an hour rounded to nothing and the label vanished,
+  // including from the breakdown a screen reader announces. The shortest
+  // bucket in the shipped data is exactly 0.5 h, one HURDAT pair away from
+  // this. Below an hour, say the minutes.
+  // Zero-valued units are dropped, so {hours: 0} formats to the empty string
+  // and anything under half an hour lost its label entirely, including in the
+  // breakdown a screen reader announces. Under an hour, say the minutes: the
+  // shortest bucket in the shipped data is exactly 0.5 h.
+  if (hours < 1) {
+    const minutes = Math.max(1, Math.round(hours * 60));
+    return new Intl.DurationFormat(getDateLocale(), { style: 'narrow' }).format({ minutes });
+  }
   const parts = {};
   if (days) parts.days = days;
-  if (rest || !days) parts.hours = rest;
+  if (rest) parts.hours = rest;
   return new Intl.DurationFormat(getDateLocale(), { style: 'narrow' }).format(parts);
 }
 

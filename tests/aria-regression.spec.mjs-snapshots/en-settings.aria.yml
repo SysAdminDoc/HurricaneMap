@@ -131,8 +131,9 @@
   - region "Offline storage":
     - heading "Offline storage" [level=3]
     - paragraph: Core historical data is protected. Source files are an optional, user-saved bundle; map tiles and radar packs can be cleared independently.
-    - strong: 0 B / 6.0 GB (0%)
+    - strong: about 0 B of about 6.0 GB (0%)
     - text: Browser-managed storage
+    - paragraph: Browsers round these two figures on purpose, so that a site cannot recognise you by how much you have stored. The per-item sizes below are this app's own count and are exact.
     - list:
       - listitem:
         - strong: Application shell
@@ -163,7 +164,7 @@
     - strong: Page control
     - text: Not controlled
     - strong: Storage
-    - text: 0 B / 6.0 GB
+    - text: about 0 B of about 6.0 GB
     - strong: Release bundle
     - text: Not verified
     - strong: Launch integrity

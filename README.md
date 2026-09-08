@@ -292,7 +292,11 @@ HurricaneMap/
 │   ├── build_aoml_landfalls.py # AOML HTML ground-truth parser + landfall validation
 │   ├── test_aoml_landfalls.py  # Offline parser, metric, and C-marker contract tests
 │   ├── scrape_impacts.py       # Wikipedia impact scraper + normalized fatality/damage fields
-│   └── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
+│   ├── scrape_radar.py         # IEM NEXRAD scraper — populates data/radar/
+│   ├── add_radar_transparency.py # adds a tRNS chunk to scraped radar PNGs
+│   ├── build_rainfall.py       # WPC storm-total rainfall → data/rainfall.json
+│   ├── build_storm_events.py   # NOAA NCEI Storm Events → data/storm-events.json
+│   └── build_tide_stations.py  # NOAA CO-OPS tide gauges → data/tide-stations.json
 └── examplemap.png          # design reference
 ```
 

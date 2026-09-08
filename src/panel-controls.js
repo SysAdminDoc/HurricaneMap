@@ -15,7 +15,7 @@ import {
 import { formatWind } from './settings.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
 import {
   clearAdvisoryReplay,
@@ -33,8 +33,8 @@ export function formatClosest(approach) {
   const point = approach.track_point;
   const wind = point.wind != null ? formatWind(point.wind) : MISSING_METRIC;
   const date = formatTime(point.t);
-  return '<strong>' + mi.toLocaleString() + ' mi</strong> <span class="cp-meta-inline">('
-    + km.toLocaleString() + ' km) · ' + wind + ' · ' + date + '</span>';
+  return '<strong>' + mi.toLocaleString(getDateLocale()) + ' mi</strong> <span class="cp-meta-inline">('
+    + km.toLocaleString(getDateLocale()) + ' km) · ' + wind + ' · ' + date + '</span>';
 }
 
 export function formatReturnPeriods(returnPeriods) {

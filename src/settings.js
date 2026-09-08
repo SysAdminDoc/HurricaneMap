@@ -204,10 +204,6 @@ export function formatWind(kt, opts = {}) {
   });
 }
 
-export function windUnitLabel() {
-  return WIND_UNIT_LABEL[getSetting('windUnit')];
-}
-
 // --- Saffir-Simpson palette --------------------------------------------------
 // Default = Catppuccin Mocha hues (matches CSS vars in :root).
 // Colorblind-safe = ColorBrewer YlOrRd 7-class sequential — distinguishable

@@ -38,7 +38,7 @@
     - strong: /\d+ mi/
     - text: "/\\(\\d+ km\\) · \\d+ kt · \\d+ août \\d+, \\d+:\\d+ UTC Peryòd retou \\(reyon \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Enpak" [level=3]
-    - text: /Viktim \d+,\d+ Dega \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Dezas plizyè milya dola \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ moun ki mouri\)/
+    - text: /Viktim \d+,\d+ Dega \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Dezas plizyè milya dola \$[\d,.]+[bkmBKM]+ \(\d+ USD · 1 \d+ moun ki mouri\)/
     - 'link "Sous: Wikipedya"':
       - /url: https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29
     - text: "· Konfyans: wo ·"
@@ -67,8 +67,8 @@
       - listitem:
         - button /Celia \(\d+\) Cat 4 1 rive atè \d+%/
     - heading "Jou nan entansite sa a" [level=3]
-    - 'img /Jou nan entansite sa a: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
-    - text: "Total swiv: 7.5 jou"
+    - 'img /Jou nan entansite sa a: TD 1j \d+[hmsp]+, TS 1j \d+[hmsp]+, Cat 1 1j \d+[hmsp]+, Cat 2 \d+[hmsp]+, Cat 3 1j \d+[hmsp]+, Cat 4 \d+[hmsp]+, Cat 5 \d+[hmsp]+/': /TD · 1j \d+[hmsp]+ TS · 1j \d+[hmsp]+ Cat 1 · 1j \d+[hmsp]+ Cat 2 · \d+[hmsp]+ Cat 3 · 1j \d+[hmsp]+ Cat 5 · \d+[hmsp]+/
+    - text: "/Total swiv: 7j \\d+[hmsp]+/"
     - heading "Entansite nan tan" [level=3]
     - text: Van (kt) ↑ Presyon (mb) ↓ envèse L = rive atè Ozetazini
     - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/

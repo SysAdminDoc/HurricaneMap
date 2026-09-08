@@ -604,6 +604,7 @@ export default {
   'savedViews.importStatus.malformed': 'Este archivo no contiene JSON válido.',
   'savedViews.importStatus.invalid': 'Corrige los campos indicados antes de importar.',
   'savedViews.importStatus.future-version': 'Este archivo fue creado por una versión más nueva e incompatible.',
+  'savedViews.importStatus.invalid-mode': 'Ese modo de importación no es uno que esta aplicación ofrezca.',
   'savedViews.importStatus.unsupported': 'Esta versión de vistas guardadas no es compatible.',
   'savedViews.importStatus.write-failed': 'No se pudo guardar la importación. Se restauraron las vistas existentes.',
   'savedViews.importError.malformed': 'JSON no válido.',

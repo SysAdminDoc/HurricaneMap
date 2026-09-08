@@ -163,10 +163,6 @@ const COMPARISON_ROW_DEFINITIONS = Object.freeze([
   },
 ]);
 
-export const COMPARISON_ROW_IDS = Object.freeze(
-  COMPARISON_ROW_DEFINITIONS.map(row => row.id),
-);
-
 /** Return the typed row contract bound to the current locale/settings. */
 export function getComparisonRows({
   allStorms = [],

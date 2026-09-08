@@ -92,9 +92,6 @@ export function inflateUSD(amountUSD, fromYear, toYear = BASE_YEAR) {
   return { real: amountUSD * factor, factor, baseYear: toYear };
 }
 
-// Format the BLS year label range for a UI hint.
-export function inflationBaseYear() { return BASE_YEAR; }
-
 // Convenience: pretty-format a millions-USD value with M / B / T suffixes.
 export function formatMillionsUSD(m) {
   if (m == null) return MISSING_METRIC;

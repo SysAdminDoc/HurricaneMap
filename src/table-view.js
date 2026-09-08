@@ -2,7 +2,7 @@ import { categoryLabel, categoryStrength, formatTime, windToCategory } from './d
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { formatWind } from './settings.js';
 import { showPanel, hidePanel } from './panels.js';
-import { getLocale, t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
 const panel = document.getElementById('table-view-panel');
@@ -157,7 +157,7 @@ function render(landfalls) {
       : t('table.category.hurricane', value);
   const count = landfalls.length === 1
     ? t('table.countOne')
-    : t('table.countMany', landfalls.length.toLocaleString(getLocale()));
+    : t('table.countMany', landfalls.length.toLocaleString(getDateLocale()));
 
   body.innerHTML = `
     <div class="table-view-scroll">

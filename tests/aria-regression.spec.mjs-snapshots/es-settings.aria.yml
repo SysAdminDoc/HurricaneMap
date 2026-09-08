@@ -131,8 +131,9 @@
   - region "Almacenamiento sin conexión":
     - heading "Almacenamiento sin conexión" [level=3]
     - paragraph: Los datos históricos principales están protegidos. Los archivos de origen forman un paquete opcional guardado por el usuario; los mosaicos y paquetes de radar se pueden borrar por separado.
-    - strong: 0 B / 6.0 GB (0%)
+    - strong: unos 0 B de unos 6.0 GB (0%)
     - text: Almacenamiento administrado por el navegador
+    - paragraph: Los navegadores redondean estas dos cifras a propósito, para que un sitio no pueda reconocerte por la cantidad que has guardado. Los tamaños por elemento de abajo son el recuento propio de esta aplicación y son exactos.
     - list:
       - listitem:
         - strong: Aplicación
@@ -163,7 +164,7 @@
     - strong: Control de la página
     - text: Sin controlar
     - strong: Almacenamiento
-    - text: 0 B / 6.0 GB
+    - text: unos 0 B de unos 6.0 GB
     - strong: Paquete de lanzamiento
     - text: No verificado
     - strong: Integridad al iniciar

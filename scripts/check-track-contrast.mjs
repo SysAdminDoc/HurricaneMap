@@ -207,12 +207,17 @@ export function cascadeOrder(entryCss) {
     .sort((a, b) => a.rank - b.rank);
 }
 
-// The class list on <html> in each mode a reader can be in. High contrast sits
-// over the default theme, so it carries no light-theme class.
+// The class list on <html> in every mode a reader can actually be in. High
+// contrast is a separate setting from the theme, so it combines with either
+// one: main.js toggles `high-contrast` without touching `light-theme`. Naming
+// only three of the four combinations left `html.light-theme.high-contrast`
+// measured against nothing, and the summary still said it had covered every
+// mode.
 export const MODE_CLASSES = Object.freeze({
   dark: [],
   light: ['light-theme'],
   'high-contrast': ['high-contrast'],
+  'light + high-contrast': ['light-theme', 'high-contrast'],
 });
 
 // Split a selector list on the commas that separate selectors, not on the ones

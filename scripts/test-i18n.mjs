@@ -2,6 +2,9 @@
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
 import { getLocale, loadLocale, setLocale, STRINGS, interpolate, t, tHtml } from '../src/i18n.js';
+import { readFile } from 'node:fs/promises';
+import { prepareSavedViewsImport } from '../src/saved-views.js';
+import { SAVED_VIEWS_SCHEMA_VERSION } from '../src/schema-contract.js';
 import en from '../src/locales/en.js';
 import es from '../src/locales/es.js';
 import ht from '../src/locales/ht.js';
@@ -51,7 +54,7 @@ for (const locale of locales) {
     // supply, and must never drop one either. Dropping was allowed until
     // 2026-09-08 on the grounds that a locale might not need a grammatical
     // suffix, but a placeholder does not carry a suffix, it carries the value:
-    // deleting {0} from 'Total registrado: {0} días' loses the number itself,
+    // deleting {0} from 'Total registrado: {0}' loses the number itself,
     // and nothing went red. No key in any locale drops one, so this needs no
     // exceptions; add one here with its reason if a real case turns up.
     const enPlaceholders = new Set([...catalogs.en[key].matchAll(/\{\d\}/g)].map(match => match[0]));
@@ -187,6 +190,62 @@ for (const contract of localizedSurfaceContracts) {
   }
   for (const literal of contract.forbidden) {
     assert(!source.includes(literal), `${contract.path} still contains untranslated visible copy: ${literal}`);
+  }
+}
+
+// Keys built at runtime from a value, which no static check sees. A missing one
+// does not throw: t() falls back to English and then to the key itself, so the
+// reader is shown "savedViews.importStatus.invalid-mode" as though it were a
+// sentence. That is exactly what shipped.
+//
+// The statuses are collected by driving the module rather than by reading it.
+// A regex over `status: '...'` also picks up `legacy` and `current`, which are
+// set on the success path and never reach the renderer, because
+// saved-views-ui.js only prints the status when there are errors to explain.
+{
+  const cases = [
+    ['not json at all', { mode: 'merge' }],
+    [JSON.stringify({ schema_version: 999, views: [] }), { mode: 'merge' }],
+    [JSON.stringify({ schema_version: 0, views: [] }), { mode: 'merge' }],
+    [JSON.stringify({ schema_version: SAVED_VIEWS_SCHEMA_VERSION, views: [{ name: '' }] }), { mode: 'merge' }],
+    [JSON.stringify({ schema_version: SAVED_VIEWS_SCHEMA_VERSION, views: [] }), { mode: 'sideways' }],
+  ];
+  const rendered = new Set();
+  for (const [input, options] of cases) {
+    const preview = prepareSavedViewsImport(input, { ...options, existing: [] });
+    // saved-views-ui.js renders the status only on the error branch.
+    if ((preview.errors || []).length) rendered.add(preview.status);
+  }
+  assert(
+    rendered.size >= 4,
+    `expected several error statuses to be reachable, got ${[...rendered].join(', ') || 'none'}`,
+  );
+  for (const status of rendered) {
+    assert(
+      Object.hasOwn(en, `savedViews.importStatus.${status}`),
+      `prepareSavedViewsImport returns status "${status}" on a path that renders it, and no catalog has savedViews.importStatus.${status}, so the reader would be shown the key`,
+    );
+  }
+
+  // The same shape in the About dialog, keyed off whatever the coverage data
+  // carries rather than off a list written here.
+  const coverage = JSON.parse(await readFile(new URL('../data/coverage.json', import.meta.url), 'utf8'));
+  const seen = new Set();
+  const walk = (node) => {
+    if (Array.isArray(node)) { node.forEach(walk); return; }
+    if (!node || typeof node !== 'object') return;
+    for (const [key, value] of Object.entries(node)) {
+      if ((key === 'value_status' || key === 'lifecycle_status') && typeof value === 'string') seen.add(value);
+      walk(value);
+    }
+  };
+  walk(coverage);
+  assert(seen.size > 0, 'no value_status found in data/coverage.json, so this check would prove nothing');
+  for (const status of seen) {
+    assert(
+      Object.hasOwn(en, `about.archiveCoverageStatus.${status}`),
+      `data/coverage.json carries value_status "${status}" and no catalog has about.archiveCoverageStatus.${status}`,
+    );
   }
 }
 

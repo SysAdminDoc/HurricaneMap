@@ -131,8 +131,9 @@
   - region "Depo san entènèt":
     - heading "Depo san entènèt" [level=3]
     - paragraph: Done istorik prensipal yo pwoteje. Fichye sous yo se yon pake opsyonèl itilizatè a sove; mozayik kat ak pake rada yo ka efase apa.
-    - strong: 0 B / 6.0 GB (0%)
+    - strong: anviwon 0 B sou anviwon 6.0 GB (0%)
     - text: Depo navigatè a jere
+    - paragraph: Navigatè yo awondi de chif sa yo eksprè, pou yon sit pa ka rekonèt ou daprè konbyen ou estoke. Gwosè chak eleman anba yo se pwòp kontaj aplikasyon an e yo egzak.
     - list:
       - listitem:
         - strong: Aplikasyon an
@@ -163,7 +164,7 @@
     - strong: Kontwòl paj la
     - text: Pa sou kontwòl
     - strong: Depo
-    - text: 0 B / 6.0 GB
+    - text: anviwon 0 B sou anviwon 6.0 GB
     - strong: Pake lage a
     - text: Poko verifye
     - strong: Entegrite lè li lanse

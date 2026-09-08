@@ -50,10 +50,6 @@ export function getHistory() {
   return load();
 }
 
-export function clearHistory() {
-  try { localStorage.removeItem(KEY); } catch (e) { /* noop */ }
-}
-
 export function normalizeHistoryEntry(entry) {
   if (!entry || typeof entry !== 'object') return null;
   const stormId = normalizeText(entry.storm_id, 32);

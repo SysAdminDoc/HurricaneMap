@@ -604,6 +604,7 @@ export default {
   'savedViews.importStatus.malformed': 'This file is not valid JSON.',
   'savedViews.importStatus.invalid': 'Fix the fields below before importing.',
   'savedViews.importStatus.future-version': 'This file was created by a newer, incompatible version.',
+  'savedViews.importStatus.invalid-mode': 'That import mode is not one this app offers.',
   'savedViews.importStatus.unsupported': 'This saved-view version is not supported.',
   'savedViews.importStatus.write-failed': 'The import could not be saved. Existing views were restored.',
   'savedViews.importError.malformed': 'Invalid JSON.',

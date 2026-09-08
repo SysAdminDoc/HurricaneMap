@@ -12,7 +12,11 @@ import {
   retryServiceWorkerRegistration,
 } from './sw-updates.js';
 
-export const SUPPORT_BUNDLE_SCHEMA_VERSION = 1;
+// 2: usage_bytes and quota_bytes became usage_bytes_approximate and
+// quota_bytes_approximate, and estimate_is_padded_by_browser was added. A
+// reader cannot tell two shapes apart under one version number, which is the
+// whole argument for renaming the fields in the first place.
+export const SUPPORT_BUNDLE_SCHEMA_VERSION = 2;
 
 export function sanitizeDiagnosticText(value) {
   return String(value || '')

@@ -5,7 +5,7 @@
 // is the opposite of what the budget is for.
 import { getBillionsFor, getImpactsFor, getMetadata, isDatasetAvailable, windToCategory } from './data.js';
 import { escapeHtml, formatStormName, safeExternalUrl } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import {
   getDamageMillions,
   getRawDamageText,
@@ -92,7 +92,7 @@ export function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   const billionsEndYear = seriesEndYear(billionsStatus);
   if (billions && Number.isFinite(billions.cost_cpi_musd)) {
     const deaths = Number.isFinite(billions.deaths)
-      ? ` · ${billions.deaths.toLocaleString()} ${t('impacts.deaths')}`
+      ? ` · ${billions.deaths.toLocaleString(getDateLocale())} ${t('impacts.deaths')}`
       : '';
     rows.push(`<div class="im-row"><span class="im-label">${t('impacts.ncei')}</span><span class="im-value">${formatMillionsUSD(billions.cost_cpi_musd)} <span class="im-adj">(2024 USD${deaths})</span></span></div>`);
     sources.push(`<a href="https://www.ncei.noaa.gov/access/billions/" target="_blank" rel="noopener">${t('impacts.nceiSource')}</a>`);
