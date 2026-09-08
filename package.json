@@ -4,6 +4,12 @@
   "private": true,
   "type": "module",
   "description": "Static NOAA HURDAT2 hurricane landfall map.",
+  "license": "MIT",
+  "homepage": "https://sysadmindoc.github.io/HurricaneMap/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SysAdminDoc/HurricaneMap.git"
+  },
   "engines": {
     "node": ">=22"
   },

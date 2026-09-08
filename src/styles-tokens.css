@@ -179,7 +179,7 @@
 :root {
   --side-panel-gap: 16px;
   --side-panel-top: calc(96px + var(--safe-top));
-  --side-panel-bottom: 142px;
+  --side-panel-bottom: calc(142px + var(--safe-bottom));
   --side-panel-width: 440px;
 }
 
@@ -251,7 +251,7 @@
 :root {
   --map-first-filter-width: clamp(320px, 27vw, 420px);
   --map-first-panel-width: clamp(380px, 28vw, 460px);
-  --map-first-header-width: min(1100px, calc(100vw - 24px));
+  --map-first-header-width: min(1100px, calc(100vw - 24px - var(--safe-left) - var(--safe-right)));
 }
 
 /* Premium cohesion pass v1.4.3

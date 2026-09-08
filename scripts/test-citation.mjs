@@ -110,14 +110,26 @@ assert.equal(
   packageJson.version,
   `CITATION.cff version ${cffScalars.get('version')} does not match package.json ${packageJson.version}`,
 );
-assert.equal(cffScalars.get('license'), 'MIT');
-assert.equal(cffScalars.get('repository-code'), 'https://github.com/SysAdminDoc/HurricaneMap');
-assert.equal(cffScalars.get('url'), HURRICANEMAP_URL);
+// Compared against package.json rather than against literals repeated here, so
+// these really can be said to fail on drift. package.json carried none of the
+// three until 2026-09-08, which is why the first version of this check could
+// only ever have caught the version.
+assert.equal(cffScalars.get('license'), packageJson.license, 'CITATION.cff licence does not match package.json');
+assert.equal(
+  `${cffScalars.get('repository-code')}.git`,
+  String(packageJson.repository?.url || '').replace(/^git\+/, ''),
+  'CITATION.cff repository-code does not match package.json repository.url',
+);
+assert.equal(cffScalars.get('url'), packageJson.homepage, 'CITATION.cff url does not match package.json homepage');
+assert.equal(packageJson.homepage, HURRICANEMAP_URL, 'package.json homepage does not match the URL the app cites');
 assert.match(cffScalars.get('date-released'), /^\d{4}-\d{2}-\d{2}$/, 'CITATION.cff date-released must be ISO yyyy-mm-dd');
 
 // When the changelog has already dated this version, the two have to agree.
 const changelog = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8');
-const releaseHeading = new RegExp(`^## v${packageJson.version.replace(/\./g, '\\.')}:[^\\n]*\\((\\d{4}-\\d{2}-\\d{2})\\)`, 'm').exec(changelog);
+// Both heading shapes are in use: "## v1.9.3: Title (date)" and
+// "## v1.9.0 - Title (date)". Requiring the colon meant the date check silently
+// did nothing for seven of the released versions.
+const releaseHeading = new RegExp(`^## v${packageJson.version.replace(/\./g, '\\.')}[:\\s-][^\\n]*\\((\\d{4}-\\d{2}-\\d{2})\\)`, 'm').exec(changelog);
 if (releaseHeading) {
   assert.equal(
     cffScalars.get('date-released'),

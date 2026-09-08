@@ -129,6 +129,16 @@ html.light-theme.high-contrast {
   border-radius: 4px;
 }
 
+/* A range input is matched by none of the focus rules above it, so this is the
+   only thing marking it. It used to take an outline from the --focus-color
+   block; when that went, all that was left here was the glow below, and a
+   40%-alpha lavender blur on a white surface is not a focus indicator. The
+   token carries a high-contrast override, which the hard-coded glow does not. */
+.anim-scrubber:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
 .anim-scrubber:focus {
   box-shadow: 0 0 12px rgba(180, 190, 254, 0.4);
 }
@@ -284,10 +294,18 @@ html.high-contrast .globe3d-topbar {
   border: 2px solid #ffffff;
 }
 
-/* The sortable headers and the storm rows both carry tabindex="0", so the
-   shared focus block matches them and has been painting their ring. The outline
-   these used to declare never drew, and it was written in --lavender, which
-   high contrast turns into a near-black meant for use behind white text. */
+/* The sortable headers and the storm rows carry tabindex="0", so the shared
+   block matches them, but it marks focus with a box-shadow and Chromium does
+   not paint one on a <tr> inside a border-collapse table. Measured: focusing a
+   row changed exactly a 2px strip at its bottom edge, which is the shared
+   block's border-color landing on the collapsed border, and nothing else. So
+   these do need their own outline. Not the --lavender they used to use, which
+   high contrast turns into a near-black meant for sitting behind white text. */
+.table-view-table th:focus-visible,
+.table-view-table tr[data-sid]:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

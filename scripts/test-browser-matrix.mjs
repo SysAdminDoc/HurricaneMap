@@ -191,11 +191,26 @@ async function runShellContract(browser, baseUrl, label) {
 // stylesheets read them through --safe-* variables: setting those on the root
 // is the same arithmetic a notched phone performs. The numbers below are an
 // iPhone 15 Pro in portrait.
-const SAFE_AREA = { top: '59px', right: '0px', bottom: '34px', left: '0px' };
+// Portrait puts the inset at the top and bottom; landscape moves it to the
+// sides, which is a different set of rules and was where the header ran off
+// the screen because its real width comes from a token the max-width rule
+// could not reach.
+const SAFE_AREA_CASES = [
+  { orientation: 'portrait', viewport: { width: 393, height: 852 }, insets: { top: '59px', right: '0px', bottom: '34px', left: '0px' } },
+  { orientation: 'landscape', viewport: { width: 852, height: 393 }, insets: { top: '0px', right: '59px', bottom: '21px', left: '59px' } },
+];
 
 async function runStandaloneContract(browser, baseUrl, label) {
+  for (const testCase of SAFE_AREA_CASES) {
+    await runStandaloneCase(browser, baseUrl, `${label} ${testCase.orientation}`, testCase);
+  }
+  return { state: 'passed' };
+}
+
+async function runStandaloneCase(browser, baseUrl, label, { viewport, insets }) {
+  const SAFE_AREA = insets;
   const context = await browser.newContext({
-    viewport: { width: 393, height: 852 },
+    viewport,
     deviceScaleFactor: 3,
     isMobile: true,
     hasTouch: true,
@@ -274,6 +289,24 @@ async function runStandaloneContract(browser, baseUrl, label) {
       await panel.showStorm(landfall);
     });
     await page.waitForSelector('#storm-panel:not([hidden])', { timeout: 15_000 });
+
+    // The ribbon grows upward by the bottom inset, so the panel lane above it
+    // has to reserve the same amount. When it did not, the panel painted over
+    // the timeline: it covered the toggle chip and cut the tops off the bars.
+    const overlap = await page.evaluate(() => {
+      const panel = document.querySelector('#storm-panel:not([hidden])');
+      const ribbon = document.querySelector('.timeline-ribbon');
+      if (!panel || !ribbon) return null;
+      const panelBox = panel.getBoundingClientRect();
+      const ribbonBox = ribbon.getBoundingClientRect();
+      return { panelBottom: panelBox.bottom, ribbonTop: ribbonBox.top, panelTop: panelBox.top };
+    });
+    if (overlap && overlap.panelBottom > overlap.panelTop) {
+      assert(
+        overlap.panelBottom <= overlap.ribbonTop + 0.5,
+        `${label}: the storm panel overlaps the timeline by ${Math.round(overlap.panelBottom - overlap.ribbonTop)}px`,
+      );
+    }
     await page.click('#storm-panel .close-btn');
     await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 10_000 });
 

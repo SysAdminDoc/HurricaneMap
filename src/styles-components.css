@@ -5520,7 +5520,7 @@ body.side-panel-open .season-summary {
   :root {
     --side-panel-gap: 10px;
     --side-panel-top: calc(92px + var(--safe-top));
-    --side-panel-bottom: 112px;
+    --side-panel-bottom: calc(112px + var(--safe-bottom));
   }
 
   body.side-panel-open .filters {
@@ -6167,7 +6167,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 @media (max-width: 720px) {
   :root {
     --side-panel-top: calc(138px + var(--safe-top));
-    --side-panel-bottom: 112px;
+    --side-panel-bottom: calc(112px + var(--safe-bottom));
     --map-left-reserve: 8px;
     --overlay-right-reserve: 8px;
     --overlay-bottom-reserve: 124px;
@@ -6397,7 +6397,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 @media (max-width: 430px) {
   :root {
     --side-panel-top: calc(132px + var(--safe-top));
-    --side-panel-bottom: 108px;
+    --side-panel-bottom: calc(108px + var(--safe-bottom));
   }
 
   .app-header {
@@ -8010,7 +8010,7 @@ body.filters-open .timeline-toggle {
 
 @media (max-width: 720px) {
   :root {
-    --map-first-header-width: calc(100vw - 16px);
+    --map-first-header-width: calc(100vw - 16px - var(--safe-left) - var(--safe-right));
   }
 
   .app-header {
@@ -8447,7 +8447,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 @media (max-width: 720px) {
   body.track-playback-active {
     --side-panel-top: calc(76px + var(--safe-top));
-    --side-panel-bottom: 118px;
+    --side-panel-bottom: calc(118px + var(--safe-bottom));
   }
 
   body.track-playback-active .app-header {
@@ -8880,7 +8880,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     --desktop-shelf-right: 16px;
     --desktop-season-width: clamp(272px, 21vw, 320px);
     --desktop-panel-top: 94px;
-    --side-panel-bottom: calc(var(--desktop-shelf-bottom) + var(--desktop-shelf-height) + var(--desktop-shelf-gap));
+    --side-panel-bottom: calc(var(--desktop-shelf-bottom) + var(--desktop-shelf-height) + var(--desktop-shelf-gap) + var(--safe-bottom));
   }
 
   body.side-panel-open {
@@ -8903,9 +8903,9 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     left: var(--map-left-reserve);
     right: var(--desktop-shelf-right);
     bottom: var(--desktop-shelf-bottom);
-    height: var(--desktop-shelf-height);
+    height: calc(var(--desktop-shelf-height) + var(--safe-bottom));
     min-height: 0;
-    max-height: var(--desktop-shelf-height);
+    max-height: calc(var(--desktop-shelf-height) + var(--safe-bottom));
     box-sizing: border-box;
     padding: 8px 10px calc(8px + var(--safe-bottom));
     border: 1px solid var(--border-strong);
@@ -9055,7 +9055,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 @media (min-width: 769px) and (max-width: 860px) {
   :root {
-    --side-panel-bottom: 132px;
+    --side-panel-bottom: calc(132px + var(--safe-bottom));
   }
 }
 
