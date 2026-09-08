@@ -1506,6 +1506,14 @@ label > input[type="checkbox"] {
   cursor: pointer;
   font-size: 12px;
   transition: all 120ms ease;
+  /* This is a real <button> inside its <li> rather than a list item wearing
+     role="button", which took the listitem role away from every row and left
+     the surrounding <ul> holding none. These four undo the button defaults the
+     grid layout above assumes. */
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
 }
 
 .state-storm-row:hover {

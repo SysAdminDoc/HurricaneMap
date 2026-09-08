@@ -2679,13 +2679,23 @@ async function assertDesktopPanelSystem(page, label) {
   });
   await page.waitForFunction(() => !document.querySelector('#state-panel')?.hidden && /Florida/.test(document.querySelector('#state-panel')?.textContent || ''), { timeout: 10000 });
   await assertPanelFit('#state-panel', 'state panel');
+  // These used to be <li role="button" tabindex="0">, which is what this
+  // assertion checked for. That spelling replaced each row's listitem role, so
+  // the two <ul>s around them contained no list items at all and axe reported
+  // it as a serious violation. The rows are real buttons inside plain <li>s
+  // now, so the attributes are gone and the semantics come from the element:
+  // the property being asserted is unchanged, only the spelling of it.
   const stateRows = await page.evaluate(() => [...document.querySelectorAll('#state-panel .state-storm-row')].map(row => ({
-    role: row.getAttribute('role'),
-    tabIndex: row.getAttribute('tabindex'),
+    tag: row.tagName,
+    parentTag: row.parentElement?.tagName,
+    focusable: row.tabIndex >= 0,
     label: row.getAttribute('aria-label') || '',
   })).slice(0, 12));
   assert(stateRows.length >= 5, `${label}: state panel did not render enough storm rows`);
-  assert(stateRows.every(row => row.role === 'button' && row.tabIndex === '0' && /^Open .+ storm details/.test(row.label)), `${label}: state rows are not keyboard-accessible buttons`);
+  assert(
+    stateRows.every(row => row.tag === 'BUTTON' && row.parentTag === 'LI' && row.focusable && /^Open .+ storm details/.test(row.label)),
+    `${label}: state rows are not keyboard-accessible buttons inside list items`,
+  );
   await page.focus('#state-panel .state-storm-row');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden && /Storm details/.test(document.querySelector('#storm-panel')?.textContent || ''), { timeout: 10000 });

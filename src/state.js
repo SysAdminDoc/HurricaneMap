@@ -150,10 +150,12 @@ export async function openState(stateName) {
     const cls = categoryClass(s.max_cat);
     const stormLabel = `${formatStormName(s.name)} ${s.year}`;
     return `
-      <li class="state-storm-row" data-storm-id="${s.storm_id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(stormLabel)} storm details">
-        <span class="cat-pill ${cls}">${cat}</span>
-        <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
-        <span class="ssr-year">${s.year}</span>
+      <li>
+        <button type="button" class="state-storm-row" data-storm-id="${s.storm_id}" aria-label="Open ${escapeHtml(stormLabel)} storm details">
+          <span class="cat-pill ${cls}">${cat}</span>
+          <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
+          <span class="ssr-year">${s.year}</span>
+        </button>
       </li>
     `;
   }).join('');
@@ -246,11 +248,13 @@ function renderStateStormRows(storms) {
     const cls = categoryClass(s.max_cat);
     const stormLabel = `${formatStormName(s.name)} ${s.year}`;
     return `
-      <li class="state-storm-row" data-storm-id="${s.storm_id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(stormLabel)} storm details">
-        <span class="cat-pill ${cls}">${cat}</span>
-        <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
-        <span class="ssr-year">${s.year}</span>
-        <span class="ssr-count">${s.count} hit${s.count === 1 ? '' : 's'}</span>
+      <li>
+        <button type="button" class="state-storm-row" data-storm-id="${s.storm_id}" aria-label="Open ${escapeHtml(stormLabel)} storm details">
+          <span class="cat-pill ${cls}">${cat}</span>
+          <span class="ssr-name">${escapeHtml(formatStormName(s.name))}</span>
+          <span class="ssr-year">${s.year}</span>
+          <span class="ssr-count">${s.count} hit${s.count === 1 ? '' : 's'}</span>
+        </button>
       </li>
     `;
   }).join('');
@@ -268,11 +272,8 @@ function wireStateStormRows(container, stateName) {
         console.error('Failed to show storm:', e);
       }
     };
+    // A real button already fires click on Enter and Space, so the keydown
+    // handler this used to carry would open the storm twice.
     row.addEventListener('click', openRowStorm);
-    row.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
-      openRowStorm();
-    });
   });
 }

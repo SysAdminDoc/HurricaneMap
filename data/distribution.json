@@ -10,8 +10,8 @@
   },
   "payload": {
     "file_count": 3618,
-    "bytes": 551606197,
-    "mandatory_bytes": 3398618,
+    "bytes": 551606569,
+    "mandatory_bytes": 3398990,
     "mandatory_file_count": 162,
     "source_bundle_bytes": 12475813,
     "source_bundle_file_count": 3,
