@@ -143,7 +143,85 @@ for (const source of compliant) {
   assert.deepEqual(findTransportOffenders('src/probe.js', source), [], `a correct module was reported: ${source}`);
 }
 
+// The shape the older regex rule was documented as unable to see, planted
+// here as a file rather than described: one seam defaulted to the deadline
+// helper and a second beside it with no default. Per-file reasoning let the
+// first excuse the second, and telling that binding apart from a pass-through
+// needs the tree.
+const twoSeams = [
+  'import { fetchWithTimeout } from "./network.js";',
+  'export const safe = (u, { fetchImpl = fetchWithTimeout } = {}) => fetchImpl(u, {}, 1000);',
+  'export const leaky = (u, { fetchImpl } = {}) => fetchImpl(u, {}, 1000);',
+].join('\n');
+const twoSeamOffenders = findTransportOffenders('src/probe.js', twoSeams);
+assert.equal(
+  twoSeamOffenders.length,
+  1,
+  `one defaulted seam must not excuse an undefaulted one beside it: ${JSON.stringify(twoSeamOffenders)}`,
+);
+assert(
+  twoSeamOffenders[0].includes('no default'),
+  `the undefaulted seam must be named as such: ${twoSeamOffenders[0]}`,
+);
+
+// A seam defaulted to something other than the deadline helper.
+assert(
+  findTransportOffenders(
+    'src/probe.js',
+    'const plain = (u, i) => i(u);\nexport const go = (u, { fetchImpl = plain } = {}) => fetchImpl(u);',
+  ).some(offender => offender.includes('plain')),
+  'a seam defaulted to a wrapper of its own must name that wrapper',
+);
+
+// An exported function is the only place a positional seam can be decided by
+// somebody outside this directory.
+assert(
+  findTransportOffenders('src/probe.js', 'export function go(u, fetchImpl) { return fetchImpl(u); }').length > 0,
+  'an exported positional seam with no default must be caught',
+);
+
+// And the direction that matters just as much: the pass-through in an object
+// literal, which is what src/nhc-summary.js writes, is not a binding and must
+// stay quiet. A bracket-depth walk reported exactly this as a violation, which
+// is how the rule ended up too weak to see the case above.
+const passThrough = [
+  'import { fetchWithTimeout } from "./network.js";',
+  'async function layer(name, { fetchImpl = fetchWithTimeout, signal } = {}) {',
+  '  return fetchImpl(name, { signal }, 1000);',
+  '}',
+  'export async function go({ fetchImpl = fetchWithTimeout, signal } = {}) {',
+  '  return layer("points", { fetchImpl, signal });',
+  '}',
+].join('\n');
+assert.deepEqual(
+  findTransportOffenders('src/probe.js', passThrough),
+  [],
+  'a seam passed on in an object literal is not a binding and must not be reported',
+);
+
+// A module-private helper taking the seam positionally is an ordinary argument
+// whose callers are a few lines up and are themselves held to the rule.
+assert.deepEqual(
+  findTransportOffenders(
+    'src/probe.js',
+    [
+      'import { fetchWithTimeout } from "./network.js";',
+      'async function read(fetchImpl) { return fetchImpl("data.json", {}, 1000); }',
+      'export async function go({ fetchImpl = fetchWithTimeout } = {}) { return read(fetchImpl); }',
+    ].join('\n'),
+  ),
+  [],
+  'a private positional helper must not be asked for a default its only callers already supplied',
+);
+
+// A file that cannot be parsed has to fail rather than be waved through, or a
+// syntax error becomes a way past every rule below it.
+assert(
+  findTransportOffenders('src/probe.js', 'export const go = (').some(offender => offender.includes('does not parse')),
+  'an unparseable module must be reported, not skipped',
+);
+
 assert.equal(stripComments('const a = "//not a comment"; // gone').trim(), 'const a = "";');
 assert.equal(stripComments('const a = "keep"; // gone', { keepStrings: true }).trim(), 'const a = "keep";');
 
-console.log('network timeout helper ok (deadline, caller cancellation, a budget on all four injected-transport paths, and nine bypasses that stay closed)');
+console.log('network timeout helper ok (deadline, caller cancellation, a budget on all four injected-transport paths, nine bypasses that stay closed, and the parsed seam rule caught in both directions)');

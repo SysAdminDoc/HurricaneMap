@@ -146,6 +146,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
+    "acorn": "^8.18.0",
     "ajv": "^8.20.0",
     "esbuild": "^0.28.2",
     "playwright": "^1.63.0"
