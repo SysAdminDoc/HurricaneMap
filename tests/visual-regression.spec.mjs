@@ -72,8 +72,8 @@ async function openDeterministicApp(page) {
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
     return loading?.style.display === 'none' && /\d/.test(document.querySelector('#visible-count')?.textContent || '');
-  }, { timeout: 20_000 });
-  await page.waitForFunction(() => document.querySelector('.header-actions')?.dataset.scrollable !== undefined, { timeout: 5_000 });
+  }, null, { timeout: 20_000 });
+  await page.waitForFunction(() => document.querySelector('.header-actions')?.dataset.scrollable !== undefined, null, { timeout: 5_000 });
   await page.addStyleTag({ content: `
     *, *::before, *::after {
       animation: none !important;
@@ -195,7 +195,7 @@ async function openVisualReplay(page) {
   await openVisualStorm(page, 'AL142024');
   await page.check('#advisory-replay-enabled');
   await page.waitForSelector('#advisory-replay-meta', { state: 'visible', timeout: 15_000 });
-  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15_000 });
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), null, { timeout: 15_000 });
   await page.evaluate(() => {
     const panel = document.querySelector('#storm-panel');
     const header = document.querySelector('#panel-sticky-header');
@@ -212,7 +212,7 @@ async function openVisualPlayback(page) {
   await page.waitForFunction(() => (
     document.body.classList.contains('track-playback-active') &&
     document.querySelector('.anim-controls:not([hidden])')
-  ), { timeout: 10_000 });
+  ), null, { timeout: 10_000 });
   await page.locator('.anim-controls [data-act="toggle"]').click();
   await page.locator('.anim-controls .anim-scrubber').fill('420');
 }
@@ -249,7 +249,7 @@ async function openVisualColorblindRadar(page) {
   await page.waitForFunction(() => (
     document.querySelector('#radar-controls .radar-legend')?.dataset.palette === 'colorblind' &&
     window.__hmVisualRadar?.overlay?._url?.startsWith('data:image/png')
-  ), { timeout: 30_000 });
+  ), null, { timeout: 30_000 });
 }
 
 async function closeVisualColorblindRadar(page) {

@@ -174,7 +174,7 @@ try {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
     return loading && loading.style.display === 'none' && /landfalls/.test(visible);
-  }, { timeout: 20000 });
+  }, null, { timeout: 20000 });
 
   await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready;
@@ -368,7 +368,7 @@ try {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
     return loading && loading.style.display === 'none' && /landfalls/.test(visible);
-  }, { timeout: 20000 });
+  }, null, { timeout: 20000 });
 
   const offlineResult = await page.evaluate(async () => {
     const data = await import('/src/data.js');

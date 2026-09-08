@@ -275,7 +275,7 @@ async function assertThemeContrastMatrix(page, { checkMapOverlays = false } = {}
       if (!await page.locator('path.advisory-forecast-line').count()) {
         await openStormPanel(page, 'AL142024');
         await page.check('#advisory-replay-enabled');
-        await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-actual-line'), { timeout: 15000 });
+        await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-actual-line'), null, { timeout: 15000 });
       }
       const overlayColors = await page.evaluate(() => {
         const normalize = value => String(value || '').replace(/\s+/g, '').toLowerCase();
@@ -1379,7 +1379,7 @@ async function assertRelayStillWinsForActiveStorms(browser, baseUrl) {
     await page.waitForFunction(async () => {
       const feeds = await import('/src/optional-feeds.js');
       return !['idle', 'loading'].includes(feeds.getOptionalFeedState('active').state);
-    }, { timeout: 25000 });
+    }, null, { timeout: 25000 });
 
     const state = await page.evaluate(async () => {
       const feeds = await import('/src/optional-feeds.js');
@@ -1517,7 +1517,7 @@ async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
     await page.waitForFunction(async () => {
       const feeds = await import('/src/optional-feeds.js');
       return ['active', 'outlook'].every(id => !['idle', 'loading'].includes(feeds.getOptionalFeedState(id).state));
-    }, { timeout: 25000 });
+    }, null, { timeout: 25000 });
 
     const feedStates = await page.evaluate(async () => {
       const feeds = await import('/src/optional-feeds.js');
@@ -1570,7 +1570,7 @@ async function assertSummaryServiceServesActiveStorms(browser, baseUrl) {
     await page.waitForFunction(async () => {
       const feeds = await import('/src/optional-feeds.js');
       return !['idle', 'loading'].includes(feeds.getOptionalFeedState('forecast').state);
-    }, { timeout: 25000 });
+    }, null, { timeout: 25000 });
     const forecast = await page.evaluate(async () => {
       const feeds = await import('/src/optional-feeds.js');
       const state = feeds.getOptionalFeedState('forecast');
@@ -1630,13 +1630,13 @@ async function assertFeedListenersDoNotAccumulate(browser, baseUrl) {
 
     const storms = ['AL122005', 'AL092022', 'AL112017', 'AL041992', 'AL092017'];
     await openStormPanel(page, storms[0]);
-    await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), { timeout: 15000 });
+    await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), null, { timeout: 15000 });
     const baseline = await page.evaluate(() => ({ ...window.__hmFeedListenerCounts }));
 
     for (let round = 0; round < 2; round++) {
       for (const storm of storms) {
         await openStormPanel(page, storm);
-        await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), { timeout: 15000 });
+        await page.waitForFunction(() => Boolean(document.querySelector('#tides-feed-status')), null, { timeout: 15000 });
       }
     }
 
@@ -1866,7 +1866,7 @@ async function waitForAppReady(page) {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
     return loading && loading.style.display === 'none' && /\d/.test(visible);
-  }, { timeout: 20000 });
+  }, null, { timeout: 20000 });
 }
 
 const femaRouteStates = new WeakMap();
@@ -1933,15 +1933,15 @@ async function openStormPanel(page, stormId) {
     if (!landfall) throw new Error(`Storm ${id} not found`);
     await panel.showStorm(landfall);
   }, stormId);
-  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, null, { timeout: 10000 });
   await page.waitForFunction(() => {
     const status = document.querySelector('#radar-cache-status');
     return status && ['complete', 'partial', 'empty', 'unavailable'].includes(status.dataset.state);
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
   await page.waitForFunction(() => {
     const status = document.querySelector('#fema-context');
     return status && ['success', 'empty', 'error', 'stale', 'offline'].includes(status.dataset.state);
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
 }
 
 async function openKatrinaPanel(page) {
@@ -1954,7 +1954,7 @@ async function assertVideoExport(page) {
     const download = document.querySelector('#video-export-btn');
     const unavailable = document.querySelector('#video-export-unavailable');
     return download && unavailable && (!download.hidden || !unavailable.hidden);
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
 
   if (await button.isHidden()) {
     const unavailable = await page.textContent('#video-export-unavailable');
@@ -1973,6 +1973,7 @@ async function assertVideoExport(page) {
   );
   await page.waitForFunction(
     () => /download started/i.test(document.querySelector('#video-export-status')?.textContent || ''),
+    null,
     { timeout: 10000 },
   );
   await download.delete();
@@ -1990,11 +1991,12 @@ async function assertStormOverlaysStopWithThePanel(page) {
   await page.waitForFunction(
     () => Boolean(document.querySelector('.radar-controls')) &&
       document.querySelectorAll('#map .leaflet-image-layer').length > 0,
+    null,
     { timeout: 20000 },
   );
 
   await page.click('#toggle-stats');
-  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, null, { timeout: 10000 });
 
   const leftovers = await page.evaluate(() => {
     const controls = document.querySelector('.radar-controls');
@@ -2044,7 +2046,7 @@ async function assertRadarRenderModes(page) {
     const layer = window.__hmRemoteRadarSmoke?.overlay;
     return layer instanceof window.L.TileLayer &&
       Object.values(layer._tiles || {}).some(tile => tile.el?.complete && tile.el.naturalWidth > 0);
-  }, { timeout: 30000 });
+  }, null, { timeout: 30000 });
   const remote = await page.evaluate(() => {
     const layer = window.__hmRemoteRadarSmoke?.overlay;
     return {
@@ -2110,7 +2112,7 @@ async function assertRadarRenderModes(page) {
     const layer = window.__hmColorblindRadarSmoke?.overlay;
     return layer instanceof window.L.TileLayer &&
       Object.values(layer._tiles || {}).some(tile => tile.el?.tagName === 'CANVAS' && tile.el.__hmRadarPaletteApplied);
-  }, { timeout: 30000 });
+  }, null, { timeout: 30000 });
   const colorblind = await page.evaluate(() => {
     const layer = window.__hmColorblindRadarSmoke?.overlay;
     const canvases = Object.values(layer?._tiles || {}).filter(tile => tile.el?.tagName === 'CANVAS');
@@ -2142,7 +2144,7 @@ async function assertRadarRenderModes(page) {
 async function assertAdvisoryForecastInViewport(page, stormId) {
   await openStormPanel(page, stormId);
   await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15000 });
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), null, { timeout: 15000 });
   await page.waitForFunction(() => {
     const path = document.querySelector('path.advisory-forecast-line');
     const map = document.querySelector('#map');
@@ -2152,7 +2154,7 @@ async function assertAdvisoryForecastInViewport(page, stormId) {
     return pathRect.width > 0 && pathRect.height > 0 &&
       pathRect.right > mapRect.left && pathRect.left < mapRect.right &&
       pathRect.bottom > mapRect.top && pathRect.top < mapRect.bottom;
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   const geometry = await page.evaluate(() => {
     const path = document.querySelector('path.advisory-forecast-line');
     const map = document.querySelector('#map');
@@ -2194,14 +2196,14 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
     await waitForAppReady(page);
     await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
     await page.click('#toggle-stats');
-    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
 
     // Minimized is not hidden, so this used to slip past the guard and pull the
     // panel back open over the map with focus.
     await page.evaluate(() => { location.hash = '#v=1&storm=AL122005'; });
     await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
     await page.click('#storm-panel .panel-min-btn');
-    await page.waitForFunction(() => document.querySelector('#storm-panel')?.classList.contains('minimized'), { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.classList.contains('minimized'), null, { timeout: 10000 });
     // 'mph', not the 'kt' it already holds: setSetting returns early on an
     // unchanged value, so asking for the default fires no event at all and the
     // guard below is never reached.
@@ -2218,7 +2220,7 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
 
     await page.evaluate(() => { location.hash = ''; });
     await page.click('#toggle-stats');
-    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
 
     for (const [key, value] of [['windUnit', 'mph'], ['damageMode', 'nominal'], ['palette', 'colorblind']]) {
       await page.evaluate(async ([settingKey, settingValue]) => {
@@ -2280,13 +2282,13 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     await page.click('#toggle-filters');
     await page.waitForSelector('#show-tracks:visible', { timeout: 10000 });
     await page.check('#show-tracks');
-    await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, null, { timeout: 15000 });
     const withTracks = await page.evaluate(() => document.querySelectorAll('#map path').length);
 
     await page.evaluate(() => { location.hash = '#v=1&y=2005-2005&t=1&storm=AL122005'; });
     await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
     await page.click('#toggle-stats');
-    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
     await page.waitForFunction(
       (expected) => document.querySelectorAll('#map path').length >= expected,
       withTracks,
@@ -2356,7 +2358,7 @@ async function assertDeferredDataScope(context, baseUrl) {
       await page.waitForFunction(() => {
         const text = document.querySelector('#aoml-validation')?.textContent || '';
         return /precision/.test(text) && /recall/.test(text);
-      }, { timeout: 15000 });
+      }, null, { timeout: 15000 });
     } finally {
       await page.close();
     }
@@ -2457,7 +2459,7 @@ async function assertReleasePinScope(context, baseUrl) {
     await page.click('#toggle-filters');
     await page.waitForSelector('#state-filter:visible', { timeout: 10000 });
     await page.selectOption('#state-filter', 'Florida');
-    await page.waitForFunction(() => /(?:^|&)s=Florida(?:&|$)/.test(location.hash), { timeout: 10000 });
+    await page.waitForFunction(() => /(?:^|&)s=Florida(?:&|$)/.test(location.hash), null, { timeout: 10000 });
     const shaped = await page.evaluate(() => location.href);
     assert(/#v=1&s=Florida&rel=[a-f0-9]{64}$/.test(shaped), `a shaped view did not carry the release pin: ${shaped}`);
 
@@ -2503,7 +2505,7 @@ async function assertDialogAndKeyboardContracts(page) {
     scrollTo(0, 0);
   });
   await page.keyboard.press('Shift+/');
-  await page.waitForFunction(() => document.querySelector('#keyboard-palette')?.open, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#keyboard-palette')?.open, null, { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.classList.contains('palette-close')), 'shortcut dialog did not focus its close button');
   await page.keyboard.press('Tab');
   assert(await page.evaluate(() => document.activeElement?.classList.contains('palette-close')), 'single-control shortcut dialog did not trap Tab');
@@ -2511,7 +2513,7 @@ async function assertDialogAndKeyboardContracts(page) {
   assert(await page.evaluate(() => document.activeElement?.id === 'toggle-info'), 'shortcut dialog did not return focus to its opener');
 
   await page.keyboard.press('Enter');
-  await page.waitForFunction(() => !document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('#info-modal')?.hidden, null, { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.id === 'close-info'), 'About dialog did not focus its close button');
   await page.keyboard.press('Shift+Tab');
   assert(await page.evaluate(() => document.activeElement?.closest('#info-modal') !== null), 'About dialog let reverse focus escape');
@@ -2626,6 +2628,7 @@ async function assertNoOverlayCoversOpenPanel(page, label) {
   });
   await page.waitForFunction(
     () => [...document.querySelectorAll('.optional-feed-status-overlay')].some(element => !element.hidden),
+    null,
     { timeout: 5000 },
   );
   const collisions = await page.evaluate(() => {
@@ -2652,7 +2655,7 @@ async function assertNoOverlayCoversOpenPanel(page, label) {
     const panels = await import('/src/panels.js');
     panels.closeAllPanels();
   });
-  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, null, { timeout: 5000 });
   const visibleWithoutPanel = await page.evaluate(() => [...document.querySelectorAll('.optional-feed-status-overlay')]
     .filter(element => !element.hidden && getComputedStyle(element).display !== 'none')
     .map(element => element.id));
@@ -2829,11 +2832,11 @@ async function assertPlaybackMapMode(page, label, snapshotName = null) {
       controls &&
       !controls.hidden &&
       getComputedStyle(controls).display !== 'none';
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
   await page.waitForFunction(() => {
     const live = document.querySelector('.anim-live-region');
     return live?.getAttribute('role') === 'status' && Boolean(live.textContent?.trim());
-  }, { timeout: 5000 });
+  }, null, { timeout: 5000 });
   await page.waitForTimeout(220);
 
   const layout = await page.evaluate(() => {
@@ -2912,7 +2915,7 @@ async function assertPlaybackMapMode(page, label, snapshotName = null) {
   await page.waitForFunction(() => (
     !document.body.classList.contains('track-playback-active') &&
     !document.querySelector('#storm-panel')?.classList.contains('minimized')
-  ), { timeout: 5000 });
+  ), null, { timeout: 5000 });
 }
 
 async function assertSettingsSurface(page, label) {
@@ -2920,9 +2923,9 @@ async function assertSettingsSurface(page, label) {
     const menu = document.querySelector('#settings-menu');
     if (menu && !menu.matches(':popover-open')) menu.showPopover();
   });
-  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
-  await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 5, { timeout: 5000 });
-  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), null, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelectorAll('#storage-manager .storage-scope').length === 5, null, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', null, { timeout: 10000 });
   const layout = await page.evaluate(() => {
     const menu = document.querySelector('#settings-menu');
     const rect = menu?.getBoundingClientRect();
@@ -3073,7 +3076,7 @@ async function assertDesktopPanelSystem(page, label) {
       timeline &&
       getComputedStyle(summary).display !== 'none' &&
       getComputedStyle(timeline).display !== 'none';
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
 
   const assertPanelFit = async (selector, name) => {
     const layout = await page.evaluate((panelSelector) => {
@@ -3143,7 +3146,7 @@ async function assertDesktopPanelSystem(page, label) {
     const state = await import('/src/state.js');
     await state.openState('Florida');
   });
-  await page.waitForFunction(() => !document.querySelector('#state-panel')?.hidden && /Florida/.test(document.querySelector('#state-panel')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => !document.querySelector('#state-panel')?.hidden && /Florida/.test(document.querySelector('#state-panel')?.textContent || ''), null, { timeout: 10000 });
   await assertPanelFit('#state-panel', 'state panel');
   // These used to be <li role="button" tabindex="0">, which is what this
   // assertion checked for. That spelling replaced each row's listitem role, so
@@ -3169,11 +3172,11 @@ async function assertDesktopPanelSystem(page, label) {
   await assertNoAxeViolations(page, `${label} state panel`, '#state-panel');
   await page.focus('#state-panel .state-storm-row');
   await page.keyboard.press('Enter');
-  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden && /Storm details/.test(document.querySelector('#storm-panel')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden && /Storm details/.test(document.querySelector('#storm-panel')?.textContent || ''), null, { timeout: 10000 });
   await assertPanelFit('#storm-panel', 'storm panel after keyboard state selection');
 
   await page.click('#toggle-stats');
-  await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+  await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
   await assertPanelFit('#stats-panel', 'statistics panel');
   assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
   await assertClimateTrendLinesDraw(page, label);
@@ -3268,7 +3271,7 @@ async function assertSupportBundleExport(page) {
     localStorage.setItem('hm-user-point-v2', JSON.stringify({ lat: 25.7617, lon: -80.1918 }));
     document.querySelector('#settings-menu')?.showPopover();
   });
-  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('#offline-diagnostics')?.dataset.ready === 'true', null, { timeout: 10000 });
   const downloadPromise = page.waitForEvent('download');
   await page.click('[data-diagnostics-export]');
   const download = await downloadPromise;
@@ -3408,13 +3411,13 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     await captureVisualSnapshot(page, `${name}-dark`);
 
     await page.click('#toggle-filters');
-    await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), { timeout: 5000 });
+    await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), null, { timeout: 5000 });
     if (width <= 720) await assertMobileTargetSizes(page, `${name} filters`);
     await captureVisualSnapshot(page, `${name}-filters`);
     await page.click('#toggle-filters');
 
     await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
-    await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), null, { timeout: 5000 });
     if (width <= 720) await assertMobileTargetSizes(page, `${name} settings`);
     await captureVisualSnapshot(page, `${name}-settings`);
     await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
@@ -3457,7 +3460,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
     // The panel's sticky header used to swallow the close button at every
     // width, and a dispatched click could not see it.
     await page.click('#close-panel', { timeout: 5000 });
-    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, null, { timeout: 5000 });
     await openKatrinaPanel(page);
 
     await page.evaluate(async () => {
@@ -3466,7 +3469,7 @@ async function runVisualSnapshotMatrix(browser, baseUrl, { width, height, name }
       const stats = await import('/src/stats.js');
       stats.toggleStats();
     });
-    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
     if (width <= 720) await assertMobileTargetSizes(page, `${name} statistics`);
     await captureVisualSnapshot(page, `${name}-statistics`);
 
@@ -4216,7 +4219,7 @@ try {
   const shortcutPage = await context.newPage();
   await shortcutPage.goto(`${baseUrl}/#stats`, { waitUntil: 'domcontentloaded' });
   await waitForAppReady(shortcutPage);
-  await shortcutPage.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+  await shortcutPage.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, null, { timeout: 10000 });
   await shortcutPage.close();
 
   await page.click('#toggle-info');
@@ -4224,7 +4227,7 @@ try {
     const modal = document.querySelector('#info-modal');
     const text = document.querySelector('#data-provenance-body')?.textContent || '';
     return modal && !modal.hidden && text.includes('hurdat2-atlantic.txt') && text.includes('1851-2025');
-  }, { timeout: 5000 });
+  }, null, { timeout: 5000 });
   const provenanceText = await page.textContent('#data-provenance-body');
   const aboutText = await page.textContent('#info-modal');
   assert(/595\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
@@ -4292,7 +4295,7 @@ try {
     `About did not name when the next HURDAT2 revision is due: ${coverageText.slice(0, 300)}`,
   );
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#info-modal')?.hidden, null, { timeout: 5000 });
 
   await page.evaluate(async () => {
     const updates = await import('/src/sw-updates.js');
@@ -4308,7 +4311,7 @@ try {
   assert(/Update available/.test(updatePromptText), 'service-worker update prompt title did not render.');
   assert(/newest map shell and offline data cache/.test(updatePromptText), 'service-worker update prompt help copy did not render.');
   await page.click('#hm-update-prompt .hm-update-dismiss');
-  await page.waitForFunction(() => document.querySelector('#hm-update-prompt')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#hm-update-prompt')?.hidden, null, { timeout: 5000 });
   await page.evaluate(() => window.__swUpdatePrompt.show());
   await page.click('#hm-update-prompt .hm-update-reload');
   const reloadClicked = await page.evaluate(() => window.__swUpdateReload);
@@ -4338,18 +4341,18 @@ try {
   await page.waitForFunction(() => {
     const panel = document.querySelector('#on-this-date-panel');
     return panel && !panel.hidden && /On this date in history/.test(document.querySelector('#on-this-date-body')?.textContent || '');
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('es'));
-  await page.waitForFunction(() => /Esta fecha en la historia/.test(document.querySelector('#on-this-date-body')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => /Esta fecha en la historia/.test(document.querySelector('#on-this-date-body')?.textContent || ''), null, { timeout: 10000 });
   const onThisDateEs = await page.textContent('#on-this-date-body');
   assert(!/Finding historical|\btoday\b|\bunnamed\b|Show full storm details/.test(onThisDateEs), `On-this-date Spanish surface retained English copy: ${onThisDateEs}`);
   await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('ht'));
-  await page.waitForFunction(() => /Jou sa a nan istwa/.test(document.querySelector('#on-this-date-body')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => /Jou sa a nan istwa/.test(document.querySelector('#on-this-date-body')?.textContent || ''), null, { timeout: 10000 });
   const onThisDateHt = await page.textContent('#on-this-date-body');
   assert(!/Finding historical|\btoday\b|\bunnamed\b|Show full storm details/.test(onThisDateHt), `On-this-date Haitian Creole surface retained English copy: ${onThisDateHt}`);
   await page.evaluate(async () => (await import('/src/i18n.js')).setLocale('en'));
   await page.click('#close-on-this-date');
-  await page.waitForFunction(() => document.querySelector('#on-this-date-panel')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#on-this-date-panel')?.hidden, null, { timeout: 5000 });
 
   // Versioned saved views restore bounded filters, units, and comparison IDs
   // without persisting addresses or arbitrary location coordinates.
@@ -4362,7 +4365,7 @@ try {
     return compare.getPins().length === 2 &&
       settings.getSetting('windUnit') === 'mph' &&
       settings.getSetting('damageMode') === 'nominal';
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
   await page.fill('#saved-view-name', 'Major comparison');
   await page.click('#saved-views-manager [data-action="save"]');
@@ -4453,7 +4456,7 @@ try {
     return compare.getPins().length === 0 &&
       settings.getSetting('windUnit') === 'kt' &&
       settings.getSetting('damageMode') === 'real';
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
 
   // 2026 cone parity: watch/warning overlay renders zone polygons, the
   // pink/blue hatch pattern, and its legend — exercised against stubbed
@@ -4587,14 +4590,14 @@ try {
   await page.waitForFunction(() => {
     const toast = document.querySelector('.hm-toast--warn.is-visible');
     return !!toast && /Something went wrong/.test(toast.textContent || '');
-  }, { timeout: 5000 });
-  await page.waitForFunction(() => !document.querySelector('.hm-toast--warn'), { timeout: 10000 });
+  }, null, { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('.hm-toast--warn'), null, { timeout: 10000 });
 
   await assertBasemapNotWatermarked(page);
   await assertNoAxeViolations(page, 'main view (WCAG 2.2 AA)');
 
   await openKatrinaPanel(page);
-  await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || ''), null, { timeout: 10000 });
   await assertNoAxeViolations(page, 'storm panel (WCAG 2.2 AA)', '#storm-panel');
   const exposureText = await page.textContent('#storm-panel .stat-grid');
   assert(/Est\. exposure/.test(exposureText) && /Cat-2\+ winds/.test(exposureText), `Katrina exposure metric did not render: ${exposureText}`);
@@ -4623,28 +4626,28 @@ try {
   await page.waitForFunction(() => {
     const header = document.querySelector('#panel-sticky-header')?.textContent || '';
     return /Ian \(2022\)/i.test(header) && /AL092022/.test(header);
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   await page.evaluate(() => { location.hash = '#storm=AL122005'; });
   await page.waitForFunction(() => {
     const header = document.querySelector('#panel-sticky-header')?.textContent || '';
     return /Katrina \(2005\)/i.test(header) && /AL122005/.test(header);
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   await page.waitForFunction(() => {
     const impacts = document.querySelector('#storm-panel .impacts-block')?.textContent || '';
     return /Est\. exposure/.test(document.querySelector('#storm-panel .stat-grid')?.textContent || '') &&
       /Billion-dollar disaster/.test(impacts) && /201\.3/.test(impacts.replace(/ /g, ' ')) && /1,833 deaths/.test(impacts);
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
 
   const impactsText = await page.textContent('#storm-panel .impacts-block');
   assert(/Billion-dollar disaster/.test(impactsText) && /\$201\.3B|\$201,297|201\.3/.test(impactsText.replace(/ /g, ' ')), `Katrina NCEI billion-dollar row did not render: ${impactsText}`);
   assert(/1,833 deaths/.test(impactsText), `Katrina NCEI deaths did not render: ${impactsText}`);
 
   await page.check('#cone-retro-enabled');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), null, { timeout: 10000 });
   const circleConePath = await page.getAttribute('path.cone-retro-shape--circle', 'd');
   await page.selectOption('#cone-retro-era', '2026');
   await page.check('#cone-retro-ellipse');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), null, { timeout: 10000 });
   const ellipseCone = await page.evaluate(() => ({
     path: document.querySelector('path.cone-retro-shape--ellipse')?.getAttribute('d') || '',
     legend: document.querySelector('#cone-retro-legend')?.textContent || '',
@@ -4654,13 +4657,14 @@ try {
   assert(/illustrative ellipse/.test(ellipseCone.legend), `retrospective cone legend did not identify ellipse mode: ${ellipseCone.legend}`);
   assert(/not a historical forecast/i.test(ellipseCone.explainer) && /outside any cone/i.test(ellipseCone.explainer), `retrospective cone explainer is incomplete: ${ellipseCone.explainer}`);
   await page.uncheck('#cone-retro-enabled');
-  await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), null, { timeout: 5000 });
 
   // Katrina predates the archived-advisory era, so the replay must say so and
   // release its own control rather than sitting enabled over an empty map.
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => /No archived advisories/.test(document.querySelector('#advisory-replay-status')?.textContent || ''),
+    null,
     { timeout: 10000 },
   );
   const outsideEra = await page.evaluate(() => ({
@@ -4686,6 +4690,7 @@ try {
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
+    null,
     { timeout: 15000 },
   );
   const idaProvenance = await page.textContent('#advisory-replay-provenance');
@@ -4695,6 +4700,7 @@ try {
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
+    null,
     { timeout: 15000 },
   );
   const lauraProvenance = await page.textContent('#advisory-replay-provenance');
@@ -4702,14 +4708,14 @@ try {
 
   await openStormPanel(page, 'AL142024');
   await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 15000 });
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), null, { timeout: 15000 });
   assert((await page.textContent('#advisory-replay-provenance')) === '', 'a complete replay incorrectly showed a provenance note');
 
   // Harvey exercises the expanded historical era: the replay record must carry
   // the annual 2017 NHC cone table rather than falling back to the 2025 pool.
   await openStormPanel(page, 'AL092017');
   await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(() => document.querySelector('path.advisory-cone-shape'), { timeout: 15000 });
+  await page.waitForFunction(() => document.querySelector('path.advisory-cone-shape'), null, { timeout: 15000 });
   const harveyConeEra = await page.evaluate(async () => {
     const archive = await (await fetch('/data/advisories.json')).json();
     return archive.storms.AL092017?.coneEra || null;
@@ -4725,11 +4731,13 @@ try {
   await page.waitForFunction(
     () => /Ian \(2022\)/i.test(document.querySelector('#panel-sticky-header')?.textContent || '') &&
       document.querySelector('#advisory-replay-enabled'),
+    null,
     { timeout: 15000 },
   );
   await page.check('#advisory-replay-enabled');
   await page.waitForFunction(
     () => document.querySelector('path.advisory-forecast-line') && document.querySelector('path.advisory-cone-shape'),
+    null,
     { timeout: 15000 },
   );
   const firstAdvisory = await page.evaluate(() => ({
@@ -4772,6 +4780,7 @@ try {
   );
   await page.waitForFunction(
     () => /(?:^|&)replay=1\.AL092022\.1\.2025(?:&|$)/.test(location.hash),
+    null,
     { timeout: 5000 },
   );
   const replayShareHash = await page.evaluate(() => location.hash);
@@ -4784,6 +4793,7 @@ try {
     () => document.querySelector('#storm-panel')?.hidden === false &&
       document.querySelector('#advisory-replay-enabled')?.checked === true &&
       /Advisory 2 of/.test(document.querySelector('#advisory-replay-meta')?.textContent || ''),
+    null,
     { timeout: 20000 },
   );
   const restoredReplay = await page.evaluate(() => ({
@@ -4801,6 +4811,7 @@ try {
   await page.waitForFunction(
     () => document.querySelector('#advisory-replay-enabled')?.checked === false &&
       document.querySelectorAll('path.advisory-forecast-line').length === 0,
+    null,
     { timeout: 15000 },
   );
   assert(
@@ -4811,6 +4822,7 @@ try {
   await page.waitForFunction(
     () => document.querySelector('#advisory-replay-enabled')?.checked === true &&
       /Advisory 2 of/.test(document.querySelector('#advisory-replay-meta')?.textContent || ''),
+    null,
     { timeout: 15000 },
   );
   await page.locator('#advisory-replay-scrubber').evaluate(element => {
@@ -4820,7 +4832,7 @@ try {
   await page.waitForFunction(() => {
     const scrubber = document.querySelector('#advisory-replay-scrubber');
     return scrubber?.value === scrubber?.max && scrubber?.getAttribute('aria-valuenow') === scrubber?.max;
-  }, { timeout: 10000 });
+  }, null, { timeout: 10000 });
   const finalAdvisory = await page.evaluate(() => {
     const scrubber = document.querySelector('#advisory-replay-scrubber');
     const meta = document.querySelector('#advisory-replay-meta')?.textContent || '';
@@ -4842,18 +4854,18 @@ try {
     `final advisory replay aria value is outside its range: ${JSON.stringify(finalAdvisory)}`,
   );
   await page.uncheck('#advisory-replay-enabled');
-  await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), null, { timeout: 5000 });
   await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), null, { timeout: 10000 });
   await page.check('#cone-retro-enabled');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape'), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape'), null, { timeout: 10000 });
   await page.check('#art-mode-enabled');
-  await page.waitForFunction(() => document.querySelector('path.art-risk-path'), { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('path.art-risk-path'), null, { timeout: 10000 });
   await page.click('#toggle-stats');
   await page.waitForFunction(() => (
     document.querySelector('#storm-panel')?.hidden === true &&
     document.querySelector('#stats-panel')?.hidden === false
-  ), { timeout: 10000 });
+  ), null, { timeout: 10000 });
   const orphanedOverlays = await page.evaluate(() => ({
     stormHidden: document.querySelector('#storm-panel')?.hidden,
     conePaths: document.querySelectorAll('path.cone-retro-shape').length,
@@ -4869,7 +4881,7 @@ try {
   await openKatrinaPanel(page);
 
   await page.check('#art-mode-enabled');
-  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--animated').length === 20 && /20 plausible paths/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--animated').length === 20 && /20 plausible paths/.test(document.querySelector('#art-mode-status')?.textContent || ''), null, { timeout: 5000 });
   const animatedRisk = await page.evaluate(() => ({
     pathCount: document.querySelectorAll('path.art-risk-path').length,
     animationName: getComputedStyle(document.querySelector('path.art-risk-path')).animationName,
@@ -4885,7 +4897,7 @@ try {
     settings.setSetting('reducedMotion', true);
   });
   await page.check('#art-mode-enabled');
-  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--static').length === 20 && /without animation/.test(document.querySelector('#art-mode-status')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelectorAll('path.art-risk-path--static').length === 20 && /without animation/.test(document.querySelector('#art-mode-status')?.textContent || ''), null, { timeout: 5000 });
   const reducedRisk = await page.evaluate(() => ({
     animationName: getComputedStyle(document.querySelector('path.art-risk-path--static')).animationName,
     legend: document.querySelector('#art-mode-legend')?.textContent || '',
@@ -4898,12 +4910,12 @@ try {
   });
 
   await page.click('#toggle-settings');
-  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'), null, { timeout: 5000 });
   await page.hover('#toggle-stats');
   await page.waitForFunction(() => {
     const tooltip = document.querySelector('#header-tooltip');
     return tooltip?.matches(':popover-open') || tooltip?.hasAttribute('data-fallback-open');
-  }, { timeout: 5000 });
+  }, null, { timeout: 5000 });
   const anchoredPopovers = await page.evaluate(() => {
     const rect = element => {
       const value = element.getBoundingClientRect();
@@ -4940,10 +4952,10 @@ try {
   await page.waitForFunction(() => {
     const tooltip = document.querySelector('#header-tooltip');
     return !tooltip.matches(':popover-open') && !tooltip.hasAttribute('data-fallback-open');
-  }, { timeout: 5000 });
+  }, null, { timeout: 5000 });
   assert(await page.getAttribute('#toggle-stats', 'title') === 'Statistics', 'tooltip fallback did not restore the native title');
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => !document.querySelector('#settings-menu')?.matches(':popover-open'), { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('#settings-menu')?.matches(':popover-open'), null, { timeout: 5000 });
   const afterSettingsEscape = await page.evaluate(() => ({
     stormPanelHidden: document.querySelector('#storm-panel')?.hidden,
     yearMin: document.querySelector('#year-min')?.value,
@@ -4953,7 +4965,7 @@ try {
 
   await clickHeaderAction(page, '#toggle-prep');
   await page.waitForSelector('#prep-panel:not([hidden]) #prep-household');
-  await page.waitForFunction(() => document.activeElement?.id === 'prep-panel-title', { timeout: 5000 });
+  await page.waitForFunction(() => document.activeElement?.id === 'prep-panel-title', null, { timeout: 5000 });
   await page.focus('[data-prep-item="water"]');
   await page.keyboard.press('Space');
   await page.waitForFunction(() => document.querySelector('[data-prep-item="water"]')?.checked === true);
@@ -4990,7 +5002,7 @@ try {
   );
   await page.click('#close-prep');
   await clickHeaderAction(page, '#toggle-prep');
-  await page.waitForFunction(() => document.querySelector('#prep-household')?.value === '4' && document.querySelector('[data-prep-item="water"]')?.checked, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#prep-household')?.value === '4' && document.querySelector('[data-prep-item="water"]')?.checked, null, { timeout: 5000 });
   const prepLocales = await page.evaluate(async () => {
     const i18n = await import('/src/i18n.js');
     const prep = await import('/src/prep.js');
@@ -5020,7 +5032,7 @@ try {
     JSON.parse(localStorage.getItem('hm-prep-v1')).state.checked.length === 0 &&
     document.activeElement?.id === 'prep-reset'
   ));
-  await page.waitForFunction(() => /items cleared/i.test(document.querySelector('#map-announce')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => /items cleared/i.test(document.querySelector('#map-announce')?.textContent || ''), null, { timeout: 5000 });
   const prepReset = await page.evaluate(() => ({
     state: JSON.parse(localStorage.getItem('hm-prep-v1')).state,
     focused: document.activeElement?.id,
@@ -5082,7 +5094,7 @@ try {
   assert(/Esri.*World Geocoding Service/i.test(evacDisclosure) && /latitude\/longitude/i.test(evacDisclosure), `evacuation privacy disclosure is incomplete: ${evacDisclosure}`);
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
-  await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', null, { timeout: 5000 });
   const evacAddressResult = await page.textContent('#evac-result');
   assert(/MIAMI-DADE/.test(evacAddressResult) && /not an evacuation order/i.test(evacAddressResult), `address zone result is incomplete: ${evacAddressResult}`);
   assert(await page.getAttribute('#evac-result a', 'href') === 'https://www.floridadisaster.org/knowyourzone/', 'zone result did not link to official Florida verification');
@@ -5099,7 +5111,7 @@ try {
   const geocodeCallsBeforeRace = evacGeocodeCalls;
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
-  await page.waitForFunction(() => /Finding that Florida location/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => /Finding that Florida location/i.test(document.querySelector('#evac-result')?.textContent || ''), null, { timeout: 5000 });
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
   // Sample the class rather than the copy: renderFailure is the only thing
@@ -5131,7 +5143,7 @@ try {
     `a superseded address lookup painted an error while its replacement was still running: ${JSON.stringify(flashedFailure[0])}`,
   );
   evacGeocodeDelayMs = 0;
-  await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', { timeout: 10000 });
+  await page.waitForFunction(() => document.querySelector('.evac-zone-badge strong')?.textContent === 'B', null, { timeout: 10000 });
   const supersededLookup = await page.textContent('#evac-result');
   assert(
     /MIAMI-DADE/.test(supersededLookup),
@@ -5144,14 +5156,14 @@ try {
     const { getMap } = await import('/src/map.js');
     getMap().fire('click', { latlng: { lat: 25.7617, lng: -80.1918 } });
   });
-  await page.waitForFunction(() => /Selected map point/.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => /Selected map point/.test(document.querySelector('#evac-result')?.textContent || ''), null, { timeout: 5000 });
   assert(evacGeocodeCalls === geocodeCallsBeforeMap, 'map-point lookup unexpectedly sent another address to the geocoder');
   assert(await page.locator('.evac-location-marker').count() === 1, 'map zone lookup did not mark the selected point');
 
   evacServiceDown = true;
   await page.fill('#evac-address-input', '1100 Washington Ave, Miami Beach, FL');
   await page.click('#evac-address-form button[type="submit"]');
-  await page.waitForFunction(() => /Layer unavailable/i.test(document.querySelector('#evac-result')?.textContent || ''), { timeout: 5000 });
+  await page.waitForFunction(() => /Layer unavailable/i.test(document.querySelector('#evac-result')?.textContent || ''), null, { timeout: 5000 });
   const evacFallback = await page.evaluate(() => ({
     links: [...document.querySelectorAll('.evac-linkouts a')].map(link => link.textContent.trim()),
     floridaHref: document.querySelector('.evac-linkouts a')?.href || '',
@@ -5163,7 +5175,7 @@ try {
   assert(await page.locator('.evac-location-marker').count() === 0, 'closing the zone panel left its selection marker on the map');
 
   await clickHeaderAction(page, '#toggle-poster');
-  await page.waitForFunction(() => Number(document.querySelector('#poster-canvas')?.dataset.segmentCount) > 1000, { timeout: 15000 });
+  await page.waitForFunction(() => Number(document.querySelector('#poster-canvas')?.dataset.segmentCount) > 1000, null, { timeout: 15000 });
   const poster = await page.evaluate(() => {
     const canvas = document.querySelector('#poster-canvas');
     const context = canvas.getContext('2d');
@@ -5251,7 +5263,7 @@ try {
   );
 
   await page.click('#toggle-filters');
-  await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), { timeout: 5000 });
+  await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'), null, { timeout: 5000 });
   await page.fill('#year-min', '2005');
   await page.dispatchEvent('#year-min', 'change');
   await page.fill('#year-max', '2005');
@@ -5260,7 +5272,7 @@ try {
     const host = document.querySelector('#season-summary');
     const ace = document.querySelector('#season-summary [data-role="ace"] .ss-stat-num')?.textContent?.trim();
     return host && !host.hidden && ace && ace !== '...' && ace !== '-' && ace !== '\u2014';
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   const seasonAce = await page.textContent('#season-summary [data-role="ace"] .ss-stat-num');
   assert(Number.parseFloat(seasonAce) > 0, `season ACE did not compute: ${seasonAce}`);
 
@@ -5272,7 +5284,7 @@ try {
     const host = document.querySelector('#impact-coverage-summary');
     return /244 of 595/.test(host?.textContent || '') &&
       host?.querySelectorAll('.impact-coverage-table tbody tr').length > 100;
-  }, { timeout: 15000 });
+  }, null, { timeout: 15000 });
   const stats = await page.evaluate(() => {
     const climatologyText = document.querySelector('#climatology-chart')?.textContent || '';
     const decadeAceValues = [...document.querySelectorAll('#decade-trends-chart .dt-ace')]
@@ -5320,7 +5332,7 @@ try {
   await page.click('#toggle-compare');
   await page.waitForSelector('#cp-export-btn', { timeout: 10000 });
   await page.click('#cp-export-btn');
-  await page.waitForFunction(() => window.__exportCapture?.csv?.length > 0, { timeout: 5000 });
+  await page.waitForFunction(() => window.__exportCapture?.csv?.length > 0, null, { timeout: 5000 });
   const exportCapture = await page.evaluate(() => window.__exportCapture);
   const csv = exportCapture.csv;
   assert(exportCapture.anchors.length === 1 && exportCapture.anchors[0].attached === true, 'comparison export did not trigger an attached download anchor.');
@@ -5352,7 +5364,7 @@ try {
   await mobilePage.waitForFunction(async () => {
     const feeds = await import('/src/optional-feeds.js');
     return feeds.getOptionalFeedState('active').state !== 'idle';
-  }, { timeout: 20000 });
+  }, null, { timeout: 20000 });
   assert(
     mobileFailedRequests.length <= EXPECTED_FAILED_REQUESTS,
     `a fresh load made ${mobileFailedRequests.length} failing same-origin requests, expected at most ${EXPECTED_FAILED_REQUESTS}: ${mobileFailedRequests.join(', ')}`,
@@ -5374,7 +5386,7 @@ try {
   await mobilePage.waitForFunction(() => {
     const filters = document.querySelector('#filters');
     return filters && !filters.hidden && filters.offsetWidth > 0;
-  }, { timeout: 5000 });
+  }, null, { timeout: 5000 });
   await mobilePage.click('#toggle-filters');
 
   await mobileContext.close();

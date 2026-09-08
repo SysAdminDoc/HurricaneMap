@@ -99,7 +99,7 @@ async function prepareLocalizedPage(page, locale) {
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
     return loading?.style.display === 'none' && /\d/.test(document.querySelector('#visible-count')?.textContent || '');
-  }, { timeout: 20_000 });
+  }, null, { timeout: 20_000 });
   await page.waitForFunction(expected => document.documentElement.lang === expected, locale);
 }
 
@@ -201,7 +201,7 @@ for (const locale of locales) {
     await page.waitForFunction(() => Boolean(document.querySelector('#search-input')?.getAttribute('aria-activedescendant')));
     await dispatchDomKey(page, '#search-input', 'Enter');
     await page.waitForSelector('#storm-panel:not([hidden]) .storm-panel-layout', { timeout: 15_000 });
-    await page.waitForFunction(() => document.activeElement?.closest('#storm-panel') !== null, { timeout: 5_000 });
+    await page.waitForFunction(() => document.activeElement?.closest('#storm-panel') !== null, null, { timeout: 5_000 });
     await assertNoAxeViolations(page, `${locale} storm panel`, '#storm-panel');
     const stormBeforeCloseFocus = await page.evaluate(() => document.activeElement?.closest('#storm-panel') !== null);
     expect(stormBeforeCloseFocus).toBe(true);
@@ -304,7 +304,7 @@ for (const locale of locales) {
     await domFocus(page, '#toggle-globe3d');
     await domClick(page, '#toggle-globe3d');
     await page.waitForSelector('#globe3d-panel:not([hidden])', { timeout: 10_000 });
-    await page.waitForFunction(() => document.querySelector('#globe3d-status')?.textContent && !/loading/i.test(document.querySelector('#globe3d-status')?.textContent || ''), { timeout: 15_000 });
+    await page.waitForFunction(() => document.querySelector('#globe3d-status')?.textContent && !/loading/i.test(document.querySelector('#globe3d-status')?.textContent || ''), null, { timeout: 15_000 });
     await expect(page.locator('#globe3d-panel')).toHaveAttribute('aria-modal', 'true');
     await assertNoAxeViolations(page, `${locale} globe fallback`, '#globe3d-panel');
     await domClick(page, '#close-globe3d');

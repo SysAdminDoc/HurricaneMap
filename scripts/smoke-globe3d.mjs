@@ -208,15 +208,15 @@ try {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
     return loading && loading.style.display === 'none' && /landfalls/.test(visible);
-  }, { timeout: 20000 });
-  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, { timeout: 10000 });
+  }, null, { timeout: 20000 });
+  await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, null, { timeout: 10000 });
 
   await page.click('#toggle-globe3d');
   await page.waitForSelector('#globe3d-panel:not([hidden])', { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.id === 'close-globe3d'), '3D globe dialog did not focus its close button');
   const globeFrame = page.frameLocator('#globe3d-frame');
   await globeFrame.locator('#globe-host canvas').waitFor({ timeout: 90000 });
-  await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.dataset.ready === 'true', { timeout: 90000 });
+  await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.dataset.ready === 'true', null, { timeout: 90000 });
 
   const isolation = await page.evaluate(() => ({
     csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content || '',
@@ -331,7 +331,7 @@ try {
   await page.keyboard.press('Tab');
   assert(await page.evaluate(() => document.activeElement === window.__expectedGlobeFirstFocus), '3D globe dialog did not wrap focus');
   await page.keyboard.press('Escape');
-  await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.hidden, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.hidden, null, { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.id === 'toggle-globe3d'), '3D globe dialog did not return focus to its opener');
 
   await context.close();

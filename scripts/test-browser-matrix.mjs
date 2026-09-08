@@ -40,7 +40,7 @@ async function waitForAppReady(page, label) {
     const loading = document.querySelector('#loading');
     const visible = document.querySelector('#visible-count')?.textContent || '';
     return loading?.style.display === 'none' && /\d/.test(visible);
-  }, { timeout: 30_000 });
+  }, null, { timeout: 30_000 });
   const visible = await page.textContent('#visible-count');
   assert(/landfalls/.test(visible || ''), `${label}: visible-count did not render landfalls`);
 }
@@ -157,10 +157,10 @@ async function runShellContract(browser, baseUrl, label) {
 
     if (!(await page.locator('#search-input').isVisible())) {
       await page.click('#toggle-filters');
-      await page.waitForFunction(() => document.querySelector('#search-input')?.offsetParent !== null, { timeout: 5_000 });
+      await page.waitForFunction(() => document.querySelector('#search-input')?.offsetParent !== null, null, { timeout: 5_000 });
     }
     await page.fill('#search-input', 'Katrina');
-    await page.waitForFunction(() => document.querySelectorAll('#search-results [role="option"]').length > 0, { timeout: 10_000 });
+    await page.waitForFunction(() => document.querySelectorAll('#search-results [role="option"]').length > 0, null, { timeout: 10_000 });
     const searchText = await page.textContent('#search-results');
     assert(/Katrina/i.test(searchText || ''), `${label}: search results did not contain Katrina`);
 
@@ -308,7 +308,7 @@ async function runStandaloneCase(browser, baseUrl, label, { viewport, insets }) 
       );
     }
     await page.click('#storm-panel .close-btn');
-    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 10_000 });
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, null, { timeout: 10_000 });
 
     // The install coachmark advertises a Home Screen install to someone who is
     // already running from the Home Screen.
@@ -332,7 +332,7 @@ async function runOfflineContract(browser, baseUrl, label, setOffline) {
       return { state: 'unsupported', reason: 'service workers unavailable' };
     }
     await waitForAppReady(page, label);
-    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), { timeout: 30_000 });
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller), null, { timeout: 30_000 });
 
     const tuple = await page.evaluate(async () => {
       const cacheNames = await caches.keys();
