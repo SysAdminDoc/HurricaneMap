@@ -2508,6 +2508,31 @@ async function assertSettingsSurface(page, label) {
   await page.evaluate(() => document.querySelector('#settings-menu')?.hidePopover());
 }
 
+// A `points` attribute the SVG parser rejected leaves an empty point list and a
+// zero-area box while the element, its class and its stroke all look healthy,
+// so the chart reads as working with no data. Measure the parsed geometry, not
+// the attribute string.
+async function assertClimateTrendLinesDraw(page, label) {
+  const lines = await page.evaluate(() => Array.from(document.querySelectorAll('#stats-panel polyline.ct-line')).map(line => {
+    const box = line.getBBox();
+    return {
+      name: line.getAttribute('class'),
+      points: line.points.numberOfItems,
+      width: box.width,
+      height: box.height,
+    };
+  }));
+  assert(lines.length === 3, `${label}: expected three climate trend lines, found ${lines.length}`);
+  for (const line of lines) {
+    assert(line.points > 1, `${label}: ${line.name} parsed ${line.points} points, so its curve does not draw`);
+    assert(line.width > 0 && line.height > 0, `${label}: ${line.name} draws an empty ${line.width}x${line.height} box`);
+  }
+  // All three read the same rolling-average series, so a parser that dropped
+  // part of one attribute shows up as a disagreement here.
+  const counts = new Set(lines.map(line => line.points));
+  assert(counts.size === 1, `${label}: trend lines parsed different point counts (${[...counts].join(', ')})`);
+}
+
 async function assertDesktopPanelSystem(page, label) {
   await page.evaluate(async () => {
     const season = await import('/src/season.js');
@@ -2610,6 +2635,7 @@ async function assertDesktopPanelSystem(page, label) {
   await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
   await assertPanelFit('#stats-panel', 'statistics panel');
   assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
+  await assertClimateTrendLinesDraw(page, label);
   const outlookLayout = await page.evaluate(() => {
     const rect = (selector) => {
       const element = document.querySelector(selector);

@@ -249,10 +249,13 @@ function renderClimateTrendsChart(host, trends) {
   const yScaleACE = (val) => plotH - (val / (maxACE || 1)) * plotH * 0.8;
   const yScaleSpeed = (val) => plotH - (val / (maxSpeed || 1)) * plotH * 0.8;
 
-  // Three polylines: landfalls (blue), ACE (lavender), forward speed (green)
-  const lfPath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleLF(d.rolling_avg_landfalls)}`).join(' L ');
-  const acePath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleACE(d.rolling_avg_ace)}`).join(' L ');
-  const speedPath = data.map((d, i) => `${margin.left + xScale(d.year)},${margin.top + yScaleSpeed(d.rolling_avg_speed)}`).join(' L ');
+  // Three polylines: landfalls (blue), ACE (lavender), forward speed (green).
+  // `points` takes a bare coordinate list. An `L` between pairs is `path`
+  // syntax, and one in here makes the SVG parser reject the whole attribute,
+  // so the curve silently does not draw.
+  const lfPath = data.map((d) => `${margin.left + xScale(d.year)},${margin.top + yScaleLF(d.rolling_avg_landfalls)}`).join(' ');
+  const acePath = data.map((d) => `${margin.left + xScale(d.year)},${margin.top + yScaleACE(d.rolling_avg_ace)}`).join(' ');
+  const speedPath = data.map((d) => `${margin.left + xScale(d.year)},${margin.top + yScaleSpeed(d.rolling_avg_speed)}`).join(' ');
 
   const svg = `
     <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="background:var(--mantle);border-radius:8px;border:1px solid var(--surface0);">
