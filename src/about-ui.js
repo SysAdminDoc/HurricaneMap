@@ -5,6 +5,7 @@ import { getAomlValidation, getCoverage, getMetadata, getStats } from './data.js
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { layerDepths, nextRevisionExpectation } from './coverage-claims.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 // About reports on the build itself, so an absent field here means the metadata
 // did not load, not that the value was never recorded. That is a different
@@ -73,6 +74,13 @@ export function createAboutRenderer({
     }
     const detected = validation.detected;
     const truthCount = validation.ground_truth.record_count;
+    // The weakest decade is the honest headline for a check that now runs over
+    // the whole record: an average across 174 years hides the era that is
+    // actually worst, and the era that is worst is the one worth stating.
+    const scored = (validation.per_decade || []).filter(row => typeof row.recall === 'number');
+    const weakest = scored.length
+      ? scored.reduce((worst, row) => (row.recall < worst.recall ? row : worst))
+      : null;
     aomlValidation.innerHTML = t(
       'about.aomlValidationHtml',
       escapeHtml(detected.matched_count),
@@ -81,7 +89,9 @@ export function createAboutRenderer({
       escapeHtml(validation.scope.end_year),
       escapeHtml(formatValidationPercent(detected.precision)),
       escapeHtml(formatValidationPercent(detected.recall)),
-      escapeHtml(validation.inferred?.candidate_count ?? 0),
+      escapeHtml(truthCount - detected.matched_count),
+      escapeHtml(weakest ? weakest.decade : MISSING_METRIC),
+      escapeHtml(weakest ? formatValidationPercent(weakest.recall) : MISSING_METRIC),
     );
   }
 

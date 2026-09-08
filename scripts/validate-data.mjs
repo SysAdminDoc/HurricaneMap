@@ -157,9 +157,13 @@ const NON_CONTINENTAL_STATES = new Set([
   'Alaska', 'American Samoa', 'Guam', 'Hawaii', 'Northern Mariana Islands',
   'Puerto Rico', 'U.S. Virgin Islands',
 ]);
-const AOML_START_YEAR = 1983;
-const AOML_END_YEAR = 1990;
+// The scored span is derived from the table, not written down here: a
+// reference row is only usable as ground truth if it carries a position to
+// match against. This mirrors scored_year_span() in build_aoml_landfalls.py,
+// and the point of recomputing it in a second language is that a bug in one
+// implementation does not silently ratify itself.
 const AOML_MIN_CATEGORY = 1;
+const aomlPositioned = record => Number.isFinite(record?.lat) && Number.isFinite(record?.lon);
 const AOML_MATCH_TIME_HOURS = 12;
 const AOML_MATCH_DISTANCE_KM = 125;
 
@@ -671,33 +675,38 @@ if (!Array.isArray(aoml.records) || aoml.records.length === 0) {
 if (!isObject(aoml.validation)) {
   fail('aoml-landfalls.validation must be an object.');
 } else {
+  const positioned = (aoml.records || []).filter(aomlPositioned);
+  const startYear = Math.min(...positioned.map(record => record.year));
+  const endYear = Math.max(...positioned.map(record => record.year));
+  const inSpan = year => year >= startYear && year <= endYear;
   const truth = (aoml.records || []).filter(record => (
-    record.year >= AOML_START_YEAR
-    && record.year <= AOML_END_YEAR
+    inSpan(record.year)
     && record.direct_landfall
     && (record.category || 0) >= AOML_MIN_CATEGORY
+    && aomlPositioned(record)
   ));
   const predictions = (landfalls || []).filter(record => (
-    record.year >= AOML_START_YEAR
-    && record.year <= AOML_END_YEAR
+    inSpan(record.year)
     && record.category >= AOML_MIN_CATEGORY
     && !NON_CONTINENTAL_STATES.has(record.state)
   ));
-  const inferred = (landfalls || []).filter(record => (
-    record.year >= AOML_START_YEAR
-    && record.year <= AOML_END_YEAR
-    && record.inferred === true
-  ));
+  const inferred = (landfalls || []).filter(record => inSpan(record.year) && record.inferred === true);
   const inferredHurricane = inferred.filter(record => (
     record.category >= AOML_MIN_CATEGORY && !NON_CONTINENTAL_STATES.has(record.state)
   ));
+  // AOML skips 1971-1982, most of HURDAT2's own marking gap, so an inferred
+  // landfall there has no reference to be scored against and is not a miss.
+  const coveredYears = new Set(positioned.map(record => record.year));
+  const inferredScoreable = inferredHurricane.filter(record => coveredYears.has(record.year));
+  const inferredUnscoreable = inferredHurricane.filter(record => !coveredYears.has(record.year));
   const matched = matchAomlRecords(truth, predictions);
-  const inferredMatched = matchAomlRecords(truth, inferredHurricane);
+  const inferredMatched = matchAomlRecords(truth, inferredScoreable);
   const expectedScope = {
-    start_year: AOML_START_YEAR,
-    end_year: AOML_END_YEAR,
+    start_year: startYear,
+    end_year: endYear,
     geography: 'continental U.S.',
     minimum_category: AOML_MIN_CATEGORY,
+    scope_note: 'Every AOML reference row that carries a position, which is the whole published table.',
     matching: { storm_id: 'exact', time_window_hours: AOML_MATCH_TIME_HOURS, distance_km: AOML_MATCH_DISTANCE_KM },
   };
   const expectedDetected = {
@@ -709,8 +718,10 @@ if (!isObject(aoml.validation)) {
   const expectedInferred = {
     candidate_count: inferred.length,
     hurricane_strength_candidate_count: inferredHurricane.length,
+    scoreable_candidate_count: inferredScoreable.length,
+    unscoreable_candidate_count: inferredUnscoreable.length,
     matched_count: inferredMatched,
-    precision: ratio(inferredMatched, inferredHurricane.length),
+    precision: ratio(inferredMatched, inferredScoreable.length),
     recall: ratio(inferredMatched, truth.length),
   };
   if (JSON.stringify(aoml.validation.scope) !== JSON.stringify(expectedScope)) fail('aoml validation scope does not match the build gate.');
@@ -718,10 +729,31 @@ if (!isObject(aoml.validation)) {
     fail('aoml validation ground_truth counts do not match the source rows.');
   }
   if (JSON.stringify(aoml.validation.detected) !== JSON.stringify(expectedDetected)) fail('aoml validation detected metrics are stale or incorrect.');
-  for (const field of ['candidate_count', 'hurricane_strength_candidate_count', 'matched_count', 'precision', 'recall']) {
+  for (const field of ['candidate_count', 'hurricane_strength_candidate_count', 'scoreable_candidate_count', 'unscoreable_candidate_count', 'matched_count', 'precision', 'recall']) {
     if (aoml.validation.inferred?.[field] !== expectedInferred[field]) fail(`aoml validation inferred.${field} is stale or incorrect.`);
   }
-  aomlGateSummary = { truth, predictions, matched, inferred, inferredHurricane, inferredMatched };
+  // Every unmatched reference row has to be named, or "15 misses" is a number
+  // nobody can check.
+  const unmatchedCount = truth.length - matched;
+  const missedRows = aoml.validation.missed_reference_rows;
+  if (!Array.isArray(missedRows) || missedRows.length !== unmatchedCount) {
+    fail(`aoml validation missed_reference_rows must list all ${unmatchedCount} unmatched rows.`);
+  } else if (missedRows.some(row => !row?.storm_id || !row?.t || !Number.isFinite(row?.year))) {
+    fail('aoml validation missed_reference_rows entries must identify the storm, date and year.');
+  }
+  const perDecade = aoml.validation.per_decade;
+  if (!Array.isArray(perDecade) || !perDecade.length) {
+    fail('aoml validation per_decade must report the delta by decade.');
+  } else {
+    const decadeTruth = new Map();
+    for (const record of truth) decadeTruth.set(Math.floor(record.year / 10) * 10, (decadeTruth.get(Math.floor(record.year / 10) * 10) || 0) + 1);
+    for (const row of perDecade) {
+      if ((decadeTruth.get(row.decade) || 0) !== row.ground_truth_count) {
+        fail(`aoml validation per_decade ${row.decade}s ground-truth count is stale.`);
+      }
+    }
+  }
+  aomlGateSummary = { truth, predictions, matched, inferred, inferredHurricane, inferredScoreable, inferredUnscoreable, inferredMatched, startYear, endYear };
 }
 
 for (const [stormId, event] of Object.entries(billions)) {
@@ -887,18 +919,19 @@ if (aomlGateSummary) {
   const truthCount = aomlGateSummary.truth.length;
   const detectedPrecision = ratio(aomlGateSummary.matched, aomlGateSummary.predictions.length);
   const detectedRecall = ratio(aomlGateSummary.matched, truthCount);
-  const inferredPrecision = ratio(aomlGateSummary.inferredMatched, aomlGateSummary.inferredHurricane.length);
+  const inferredPrecision = ratio(aomlGateSummary.inferredMatched, aomlGateSummary.inferredScoreable.length);
   const inferredRecall = ratio(aomlGateSummary.inferredMatched, truthCount);
   const formatMetric = (value, numerator, denominator) => value == null
     ? `not-defined (${numerator} candidates)`
     : `${(value * 100).toFixed(1)}% (${numerator}/${denominator})`;
   console.log(
-    'AOML 1983-1990 ground-truth gate (continental, category >= 1): '
+    `AOML ${aomlGateSummary.startYear}-${aomlGateSummary.endYear} ground-truth gate (continental, category >= 1): `
     + `precision=${formatMetric(detectedPrecision, aomlGateSummary.matched, aomlGateSummary.predictions.length)}, `
     + `recall=${formatMetric(detectedRecall, aomlGateSummary.matched, truthCount)}; `
-    + `inferred hurricane candidates=${aomlGateSummary.inferredHurricane.length}, `
-    + `precision=${formatMetric(inferredPrecision, aomlGateSummary.inferredMatched, aomlGateSummary.inferredHurricane.length)}, `
-    + `recall=${formatMetric(inferredRecall, aomlGateSummary.inferredMatched, truthCount)}`,
+    + `${truthCount - aomlGateSummary.matched} reference rows unmatched; `
+    + `inferred hurricane candidates=${aomlGateSummary.inferredHurricane.length} `
+    + `(${aomlGateSummary.inferredUnscoreable.length} in years AOML does not cover), `
+    + `precision=${formatMetric(inferredPrecision, aomlGateSummary.inferredMatched, aomlGateSummary.inferredScoreable.length)}`,
   );
 }
 

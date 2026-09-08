@@ -3725,7 +3725,46 @@ try {
   const aboutText = await page.textContent('#info-modal');
   assert(/595\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
   assert(/759\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
-  assert(/16 of 16/.test(aboutText) && /100\.0% precision/.test(aboutText), 'About did not render the measured AOML ground-truth result.');
+  // This used to pin "16 of 16" and "100.0% precision", which were the numbers
+  // from a check that only covered 1983-1990. The gate now scores every year
+  // the AOML table gives a position for, so the dialog is held to the artifact
+  // it is rendering rather than to figures typed in here. The artifact's own
+  // correctness is validate:data's job: it recomputes the whole delta from the
+  // raw table in a second language.
+  const aomlExpected = await page.evaluate(async () => {
+    const { getAomlValidation } = await import('/src/data.js');
+    const validation = getAomlValidation();
+    const scored = (validation.per_decade || []).filter(row => typeof row.recall === 'number');
+    const weakest = scored.reduce((worst, row) => (row.recall < worst.recall ? row : worst));
+    return {
+      matched: validation.detected.matched_count,
+      truth: validation.ground_truth.record_count,
+      precision: (validation.detected.precision * 100).toFixed(1),
+      recall: (validation.detected.recall * 100).toFixed(1),
+      unmatched: validation.ground_truth.record_count - validation.detected.matched_count,
+      weakestDecade: weakest.decade,
+      startYear: validation.scope.start_year,
+      endYear: validation.scope.end_year,
+    };
+  });
+  assert(
+    aboutText.includes(`${aomlExpected.matched} of ${aomlExpected.truth}`)
+    && aboutText.includes(`${aomlExpected.precision}% precision`)
+    && aboutText.includes(`${aomlExpected.recall}% recall`),
+    `About did not render the measured AOML ground-truth result (${aomlExpected.matched}/${aomlExpected.truth}).`,
+  );
+  assert(
+    aboutText.includes(`${aomlExpected.unmatched} reference rows unmatched`)
+    && aboutText.includes(`${aomlExpected.weakestDecade}s`),
+    'About did not state how many reference rows went unmatched or which decade is weakest.',
+  );
+  // A silent narrowing of the scored window would leave every ratio looking
+  // healthy, so the span itself is asserted to be the whole published record.
+  assert(
+    aomlExpected.startYear <= 1851 && aomlExpected.endYear >= 2024
+    && aboutText.includes(`${aomlExpected.startYear}`) && aboutText.includes(`${aomlExpected.endYear}`),
+    `About did not state the full scored span (${aomlExpected.startYear}-${aomlExpected.endYear}).`,
+  );
   assert(/Cite this release/.test(aboutText) && /@software\{hurricanemap_/.test(aboutText), 'About did not render copy-paste APA and BibTeX citations.');
   assert(
     expectedGeneratorVersion && provenanceText.includes(`HurricaneMap ${expectedGeneratorVersion}`),

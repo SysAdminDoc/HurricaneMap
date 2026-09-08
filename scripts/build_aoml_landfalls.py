@@ -28,8 +28,11 @@ OUTPUT_PATH = DATA / "aoml-landfalls.json"
 ENCODING = "iso-8859-1"
 MATCH_TIME_HOURS = 12
 MATCH_DISTANCE_KM = 125
-GROUND_TRUTH_START_YEAR = 1983
-GROUND_TRUTH_END_YEAR = 1990
+# The scored scope is every year the AOML table gives a position for, which is
+# the whole published record. It used to be 1983-1990: sixteen rows, scored
+# 100% precision and 100% recall, and was not a defensible basis for the claim
+# that the inferred landfalls are right. The bar for a citable atlas is the one
+# HUTrackDB publishes, a delta over the entire record.
 GROUND_TRUTH_MIN_CATEGORY = 1
 NON_CONTINENTAL_STATES = {
     "Alaska",
@@ -301,6 +304,19 @@ def ratio(numerator: int, denominator: int):
     return round(numerator / denominator, 6) if denominator else None
 
 
+def scored_year_span(records: list[dict]) -> tuple[int, int]:
+    """The years the table can actually be scored over.
+
+    A reference row is only usable as ground truth if it carries a position to
+    match against, so the span is derived from the data rather than written down
+    and left to rot when AOML revises the page.
+    """
+    positioned = [row for row in records if row.get("lat") is not None and row.get("lon") is not None]
+    if not positioned:
+        raise RuntimeError("no AOML reference row carries a position; nothing can be scored")
+    return min(row["year"] for row in positioned), max(row["year"] for row in positioned)
+
+
 def build_validation(records: list[dict]) -> dict:
     try:
         landfalls = json.loads((DATA / "landfalls.json").read_text(encoding="utf-8"))
@@ -309,10 +325,15 @@ def build_validation(records: list[dict]) -> dict:
     if not isinstance(landfalls, list):
         raise RuntimeError("data/landfalls.json must contain an array")
 
-    in_scope = lambda row: GROUND_TRUTH_START_YEAR <= row.get("year", 0) <= GROUND_TRUTH_END_YEAR
+    start_year, end_year = scored_year_span(records)
+    in_scope = lambda row: start_year <= row.get("year", 0) <= end_year
     truth = [
         row for row in records
-        if in_scope(row) and row["direct_landfall"] and (row["category"] or 0) >= GROUND_TRUTH_MIN_CATEGORY
+        if in_scope(row)
+        and row["direct_landfall"]
+        and (row["category"] or 0) >= GROUND_TRUTH_MIN_CATEGORY
+        and row.get("lat") is not None
+        and row.get("lon") is not None
     ]
     predictions = [
         row for row in landfalls
@@ -323,14 +344,56 @@ def build_validation(records: list[dict]) -> dict:
     matches = match_records(truth, predictions)
     inferred = [row for row in landfalls if in_scope(row) and row.get("inferred") is True]
     inferred_hurricane = [row for row in inferred if row.get("category", 0) >= GROUND_TRUTH_MIN_CATEGORY and row.get("state") not in NON_CONTINENTAL_STATES]
-    inferred_matches = match_records(truth, inferred_hurricane)
+
+    # AOML's table skips 1971-1982, and that is most of HURDAT2's own
+    # 1971-1990 marking gap, which is the window the inferred pass exists to
+    # recover. Scoring an inferred landfall against a year the reference does
+    # not cover counts an absent row as a wrong answer, so those are reported
+    # separately as unscoreable rather than folded into the precision.
+    covered_years = {row["year"] for row in records if row.get("lat") is not None and row.get("lon") is not None}
+    inferred_scoreable = [row for row in inferred_hurricane if row.get("year") in covered_years]
+    inferred_unscoreable = [row for row in inferred_hurricane if row.get("year") not in covered_years]
+    inferred_matches = match_records(truth, inferred_scoreable)
+
+    # Which reference rows went unmatched, named well enough for someone to go
+    # and look. A miss here is not automatically a detection failure: several
+    # are a storm the atlas does record, at a position or hour outside the
+    # matching window, and saying which storm is what makes that checkable.
+    matched_truth_ids = {id(row) for row, _ in matches}
+    missed = [
+        {
+            "storm_id": row.get("storm_id"),
+            "name": row.get("name"),
+            "year": row.get("year"),
+            "t": row.get("t"),
+            "category": row.get("category"),
+            "states_affected": row.get("states_affected"),
+        }
+        for row in truth if id(row) not in matched_truth_ids
+    ]
+
+    per_decade = []
+    decades = sorted({row["year"] // 10 * 10 for row in truth} | {row["year"] // 10 * 10 for row in predictions})
+    for decade in decades:
+        decade_truth = [row for row in truth if row["year"] // 10 * 10 == decade]
+        decade_predictions = [row for row in predictions if row["year"] // 10 * 10 == decade]
+        decade_matched = [row for row in decade_truth if id(row) in matched_truth_ids]
+        per_decade.append({
+            "decade": decade,
+            "ground_truth_count": len(decade_truth),
+            "detected_count": len(decade_predictions),
+            "matched_count": len(decade_matched),
+            "precision": ratio(len(decade_matched), len(decade_predictions)),
+            "recall": ratio(len(decade_matched), len(decade_truth)),
+        })
 
     return {
         "scope": {
-            "start_year": GROUND_TRUTH_START_YEAR,
-            "end_year": GROUND_TRUTH_END_YEAR,
+            "start_year": start_year,
+            "end_year": end_year,
             "geography": "continental U.S.",
             "minimum_category": GROUND_TRUTH_MIN_CATEGORY,
+            "scope_note": "Every AOML reference row that carries a position, which is the whole published table.",
             "matching": {
                 "storm_id": "exact",
                 "time_window_hours": MATCH_TIME_HOURS,
@@ -347,13 +410,24 @@ def build_validation(records: list[dict]) -> dict:
             "precision": ratio(len(matches), len(predictions)),
             "recall": ratio(len(matches), len(truth)),
         },
+        "per_decade": per_decade,
+        "missed_reference_rows": missed,
         "inferred": {
             "candidate_count": len(inferred),
             "hurricane_strength_candidate_count": len(inferred_hurricane),
+            "scoreable_candidate_count": len(inferred_scoreable),
+            "unscoreable_candidate_count": len(inferred_unscoreable),
             "matched_count": len(inferred_matches),
-            "precision": ratio(len(inferred_matches), len(inferred_hurricane)),
+            "precision": ratio(len(inferred_matches), len(inferred_scoreable)),
             "recall": ratio(len(inferred_matches), len(truth)),
-            "scope_note": "AOML's 1983-1990 reference rows are hurricane-strength continental impacts; tropical-storm inferred candidates are reported but not scored as hurricane matches.",
+            "unscoreable_years": sorted({row["year"] for row in inferred_unscoreable}),
+            "scope_note": (
+                "AOML's reference rows are hurricane-strength continental impacts; tropical-storm "
+                "inferred candidates are reported but not scored as hurricane matches. The table "
+                "skips 1971-1982, which is most of HURDAT2's own 1971-1990 marking gap and the "
+                "window the inferred pass exists to recover, so candidates in years the reference "
+                "does not cover are counted as unscoreable rather than as wrong answers."
+            ),
         },
     }
 
@@ -420,13 +494,18 @@ def main() -> int:
         validation = payload["validation"]
         detected = validation["detected"]
         inferred = validation["inferred"]
+        scope = validation["scope"]
+        worst = min((row for row in validation["per_decade"] if row["recall"] is not None), key=lambda row: row["recall"], default=None)
         print(
-            "AOML 1983-1990 ground-truth gate (continental, category >= 1): "
+            f"AOML {scope['start_year']}-{scope['end_year']} ground-truth gate (continental, category >= 1): "
             f"precision={format_metric(detected['precision'], detected['matched_count'], detected['record_count'])}, "
             f"recall={format_metric(detected['recall'], detected['matched_count'], validation['ground_truth']['record_count'])}; "
-            f"inferred hurricane candidates={inferred['hurricane_strength_candidate_count']}, "
-            f"precision={format_metric(inferred['precision'], inferred['matched_count'], inferred['hurricane_strength_candidate_count'])}, "
-            f"recall={format_metric(inferred['recall'], inferred['matched_count'], validation['ground_truth']['record_count'])}",
+            f"{len(validation['per_decade'])} decades"
+            + (f", weakest {worst['decade']}s at {format_metric(worst['recall'], worst['matched_count'], worst['ground_truth_count'])}" if worst else "")
+            + f"; {len(validation['missed_reference_rows'])} reference rows unmatched; "
+            f"inferred hurricane candidates={inferred['hurricane_strength_candidate_count']} "
+            f"({inferred['unscoreable_candidate_count']} in years AOML does not cover), "
+            f"precision={format_metric(inferred['precision'], inferred['matched_count'], inferred['scoreable_candidate_count'])}",
         )
         print(f"wrote {OUTPUT_PATH.relative_to(ROOT)} ({len(payload['records'])} rows)")
     return 0

@@ -9315,10 +9315,11 @@
   ],
   "validation": {
     "scope": {
-      "start_year": 1983,
-      "end_year": 1990,
+      "start_year": 1851,
+      "end_year": 2024,
       "geography": "continental U.S.",
       "minimum_category": 1,
+      "scope_note": "Every AOML reference row that carries a position, which is the whole published table.",
       "matching": {
         "storm_id": "exact",
         "time_window_hours": 12,
@@ -9326,22 +9327,333 @@
       }
     },
     "ground_truth": {
-      "record_count": 16,
-      "direct_landfall_count": 16
+      "record_count": 352,
+      "direct_landfall_count": 352
     },
     "detected": {
-      "record_count": 16,
-      "matched_count": 16,
-      "precision": 1.0,
-      "recall": 1.0
+      "record_count": 362,
+      "matched_count": 337,
+      "precision": 0.930939,
+      "recall": 0.957386
     },
+    "per_decade": [
+      {
+        "decade": 1850,
+        "ground_truth_count": 16,
+        "detected_count": 16,
+        "matched_count": 16,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "decade": 1860,
+        "ground_truth_count": 19,
+        "detected_count": 18,
+        "matched_count": 18,
+        "precision": 1.0,
+        "recall": 0.947368
+      },
+      {
+        "decade": 1870,
+        "ground_truth_count": 23,
+        "detected_count": 22,
+        "matched_count": 22,
+        "precision": 1.0,
+        "recall": 0.956522
+      },
+      {
+        "decade": 1880,
+        "ground_truth_count": 24,
+        "detected_count": 28,
+        "matched_count": 24,
+        "precision": 0.857143,
+        "recall": 1.0
+      },
+      {
+        "decade": 1890,
+        "ground_truth_count": 23,
+        "detected_count": 22,
+        "matched_count": 22,
+        "precision": 1.0,
+        "recall": 0.956522
+      },
+      {
+        "decade": 1900,
+        "ground_truth_count": 20,
+        "detected_count": 21,
+        "matched_count": 20,
+        "precision": 0.952381,
+        "recall": 1.0
+      },
+      {
+        "decade": 1910,
+        "ground_truth_count": 22,
+        "detected_count": 21,
+        "matched_count": 21,
+        "precision": 1.0,
+        "recall": 0.954545
+      },
+      {
+        "decade": 1920,
+        "ground_truth_count": 16,
+        "detected_count": 16,
+        "matched_count": 16,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "decade": 1930,
+        "ground_truth_count": 19,
+        "detected_count": 20,
+        "matched_count": 19,
+        "precision": 0.95,
+        "recall": 1.0
+      },
+      {
+        "decade": 1940,
+        "ground_truth_count": 30,
+        "detected_count": 30,
+        "matched_count": 27,
+        "precision": 0.9,
+        "recall": 0.9
+      },
+      {
+        "decade": 1950,
+        "ground_truth_count": 26,
+        "detected_count": 26,
+        "matched_count": 26,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "decade": 1960,
+        "ground_truth_count": 19,
+        "detected_count": 20,
+        "matched_count": 18,
+        "precision": 0.9,
+        "recall": 0.947368
+      },
+      {
+        "decade": 1970,
+        "ground_truth_count": 1,
+        "detected_count": 7,
+        "matched_count": 1,
+        "precision": 0.142857,
+        "recall": 1.0
+      },
+      {
+        "decade": 1980,
+        "ground_truth_count": 16,
+        "detected_count": 17,
+        "matched_count": 16,
+        "precision": 0.941176,
+        "recall": 1.0
+      },
+      {
+        "decade": 1990,
+        "ground_truth_count": 20,
+        "detected_count": 19,
+        "matched_count": 17,
+        "precision": 0.894737,
+        "recall": 0.85
+      },
+      {
+        "decade": 2000,
+        "ground_truth_count": 23,
+        "detected_count": 23,
+        "matched_count": 23,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      {
+        "decade": 2010,
+        "ground_truth_count": 17,
+        "detected_count": 17,
+        "matched_count": 16,
+        "precision": 0.941176,
+        "recall": 0.941176
+      },
+      {
+        "decade": 2020,
+        "ground_truth_count": 18,
+        "detected_count": 19,
+        "matched_count": 15,
+        "precision": 0.789474,
+        "recall": 0.833333
+      }
+    ],
+    "missed_reference_rows": [
+      {
+        "storm_id": "AL071865",
+        "name": null,
+        "year": 1865,
+        "t": "1865-10-23T10:00:00Z",
+        "category": 2,
+        "states_affected": [
+          "BFL2"
+        ]
+      },
+      {
+        "storm_id": "AL091870",
+        "name": "Twin Key West (II)",
+        "year": 1870,
+        "t": "1870-10-20T14:00:00Z",
+        "category": 1,
+        "states_affected": [
+          "BFL1"
+        ]
+      },
+      {
+        "storm_id": "AL041894",
+        "name": null,
+        "year": 1894,
+        "t": "1894-09-25T11:00:00Z",
+        "category": 1,
+        "states_affected": [
+          "BFL1"
+        ]
+      },
+      {
+        "storm_id": "AL021919",
+        "name": null,
+        "year": 1919,
+        "t": "1919-09-10T07:00:00Z",
+        "category": 4,
+        "states_affected": [
+          "BFL4",
+          "CFL2"
+        ]
+      },
+      {
+        "storm_id": "AL131944",
+        "name": null,
+        "year": 1944,
+        "t": "1944-10-18T21:00:00Z",
+        "category": 3,
+        "states_affected": [
+          "BFL3"
+        ]
+      },
+      {
+        "storm_id": "AL041947",
+        "name": null,
+        "year": 1947,
+        "t": "1947-09-16T16:30:00Z",
+        "category": 4,
+        "states_affected": [
+          "CFL4",
+          "BFL2"
+        ]
+      },
+      {
+        "storm_id": "AL081948",
+        "name": null,
+        "year": 1948,
+        "t": "1948-09-21T17:00:00Z",
+        "category": 3,
+        "states_affected": [
+          "BFL4",
+          "CFL2"
+        ]
+      },
+      {
+        "storm_id": "AL091966",
+        "name": "Inez",
+        "year": 1966,
+        "t": "1966-10-05T02:00:00Z",
+        "category": 2,
+        "states_affected": [
+          "BFL2"
+        ]
+      },
+      {
+        "storm_id": "AL051995",
+        "name": "Erin",
+        "year": 1995,
+        "t": "1995-08-03T13:30:00Z",
+        "category": 2,
+        "states_affected": [
+          "AFL2"
+        ]
+      },
+      {
+        "storm_id": "AL071998",
+        "name": "Georges",
+        "year": 1998,
+        "t": "1998-09-25T15:30:00Z",
+        "category": 2,
+        "states_affected": [
+          "BFL2"
+        ]
+      },
+      {
+        "storm_id": "AL131999",
+        "name": "Irene",
+        "year": 1999,
+        "t": "1999-10-15T13:00:00Z",
+        "category": 1,
+        "states_affected": [
+          "BFL1"
+        ]
+      },
+      {
+        "storm_id": "AL112017",
+        "name": "Irma",
+        "year": 2017,
+        "t": "2017-09-10T13:00:00Z",
+        "category": 4,
+        "states_affected": [
+          "BFL4",
+          "CFL1"
+        ]
+      },
+      {
+        "storm_id": "AL142021",
+        "name": "Nicholas",
+        "year": 2021,
+        "t": "2021-09-29T05:30:00Z",
+        "category": 1,
+        "states_affected": [
+          "CTX1"
+        ]
+      },
+      {
+        "storm_id": "AL092022",
+        "name": "Ian",
+        "year": 2022,
+        "t": "2022-09-28T02:00:00Z",
+        "category": 3,
+        "states_affected": [
+          "BFL3"
+        ]
+      },
+      {
+        "storm_id": "AL092023",
+        "name": "Idalia",
+        "year": 2023,
+        "t": "2023-08-30T11:45:00Z",
+        "category": 3,
+        "states_affected": [
+          "AFL3",
+          "IGA1"
+        ]
+      }
+    ],
     "inferred": {
-      "candidate_count": 3,
-      "hurricane_strength_candidate_count": 0,
+      "candidate_count": 56,
+      "hurricane_strength_candidate_count": 10,
+      "scoreable_candidate_count": 3,
+      "unscoreable_candidate_count": 7,
       "matched_count": 0,
-      "precision": null,
+      "precision": 0.0,
       "recall": 0.0,
-      "scope_note": "AOML's 1983-1990 reference rows are hurricane-strength continental impacts; tropical-storm inferred candidates are reported but not scored as hurricane matches."
+      "unscoreable_years": [
+        1974,
+        1977,
+        1979,
+        1980
+      ],
+      "scope_note": "AOML's reference rows are hurricane-strength continental impacts; tropical-storm inferred candidates are reported but not scored as hurricane matches. The table skips 1971-1982, which is most of HURDAT2's own 1971-1990 marking gap and the window the inferred pass exists to recover, so candidates in years the reference does not cover are counted as unscoreable rather than as wrong answers."
     }
   }
 }

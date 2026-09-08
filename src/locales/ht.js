@@ -944,7 +944,7 @@ export default {
   'about.explicitHtml': '<strong>Klè:</strong> dosye HURDAT2 ki gen mak <code>L</code>, siy ofisyèl sant siklòn nan travèse yon kot.',
   'about.inferredHtml': '<strong>Dedwi:</strong> siklòn san mak <code>L</code> ki travèse tè Etazini nan entèval sis èdtan ak entansite twopikal. Pozisyon an entèpole ant obsèvasyon yo; dosye <code>C</code> (pi pre kòt la san li pa touche tè) pa antre.',
   'about.aomlValidationLoading': 'Ap chaje verifikasyon endepandan AOML la…',
-  'about.aomlValidationHtml': '<strong>Verifikasyon mezire:</strong> Tab detaye AOML la jwenn {0} sou {1} kote fòs siklòn te touche tè sou kontinan Etazini nan {2}–{3} ({4}% presizyon; {5}% rekiperasyon). Vèsyon an rapòte tou {6} kandida tanpèt twopikal dedwi ki pa nan sijè referans siklòn sa a sèlman. <a href="https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html" target="_blank" rel="noopener">Sous AOML</a>.',
+  'about.aomlValidationHtml': '<strong>Verifikasyon mezire:</strong> Tab detaye AOML la koresponn ak {0} nan {1} rive atè fòs siklòn nan kontinan Etazini ant {2} ak {3} ({4}% presizyon; {5}% rapèl), e li kite {6} liy referans san koresponn. Deseni ki pi fèb la se {7} ak {8}% rapèl. <a href="https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html" target="_blank" rel="noopener">Sous AOML</a>.',
   'about.aomlValidationUnavailable': '<strong>Verifikasyon mezire:</strong> Atifak referans AOML la pa disponib nan pake done sa a.',
   'about.gapsTitle': 'Limit nou konnen nan done yo',
   'about.gapMarkingHtml': 'HURDAT2 make kote yo touche tè sou kontinan an pou <em>1851-1970 ak depi 1991</em>; deteksyon dedwi jwenn kèk evènman 1971-1990.',
