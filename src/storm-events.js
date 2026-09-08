@@ -89,11 +89,11 @@ export function renderStormEventsHtml(storm, record, metadata = {}) {
     <h3 class="panel-section-h3">${t('stormevents.title')}</h3>
     <div class="storm-events-block">
       <div class="se-row">
-        <span class="se-label">Tornado activity during landfall</span>
+        <span class="se-label">${t('stormevents.tornadoActivity')}</span>
         <span class="se-value">${record.tornado_count || 0} report${record.tornado_count === 1 ? '' : 's'}${tornadoStates ? ` in ${escapeHtml(tornadoStates)}` : ''}${strongest}</span>
       </div>
       <div class="se-row">
-        <span class="se-label">Hail activity during landfall</span>
+        <span class="se-label">${t('stormevents.hailActivity')}</span>
         <span class="se-value">${record.hail_count || 0} report${record.hail_count === 1 ? '' : 's'}${hailStates ? ` in ${escapeHtml(hailStates)}` : ''}${maxHail}</span>
       </div>
       ${renderSampleEvents(record.sample_events)}
@@ -140,7 +140,7 @@ function renderSampleEvents(events) {
         : '';
     return `<li><span>${escapeHtml(event.type)}</span><span>${escapeHtml(place)}</span><span>${escapeHtml(detail)}</span></li>`;
   }).join('');
-  return `<ul class="se-samples" aria-label="Sample matching Storm Events">${rows}</ul>`;
+  return `<ul class="se-samples" aria-label="${t('stormevents.sample')}">${rows}</ul>`;
 }
 
 function emptyBlock(title, message, source) {

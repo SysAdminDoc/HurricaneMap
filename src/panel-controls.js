@@ -392,7 +392,7 @@ export function wirePanelControls({
       try {
         const nowPinned = await togglePin(storm);
         pinButton.classList.toggle('pinned', nowPinned);
-        pinButton.querySelector('.pin-label').textContent = nowPinned ? 'Pinned' : 'Pin to compare';
+        pinButton.querySelector('.pin-label').textContent = nowPinned ? t('compare.pinned') : t('compare.pin');
       } catch (error) {
         console.error('Failed to toggle pin:', error);
         showToast(t('toast.pinFailed'), 'warn');

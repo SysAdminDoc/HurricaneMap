@@ -20,6 +20,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'check:css-variables',
   'check:track-contrast',
   'check:missing-markers',
+  'check:untranslated',
   'test:release-packaging',
   'check:network-timeouts',
   'check:readme-links',

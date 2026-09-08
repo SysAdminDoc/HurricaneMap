@@ -391,12 +391,12 @@ export class RadarOverlay {
         NEXRAD radar — ${escapeHtml(landfall.state)} landfall
       </div>
       <div class="radar-controls-row">
-        <button class="radar-btn" data-act="prev" title="Previous frame">◀</button>
+        <button class="radar-btn" data-act="prev" title="${t('radar.previousFrame')}">◀</button>
         <span class="radar-time" id="radar-time">…</span>
-        <button class="radar-btn" data-act="next" title="Next frame">▶</button>
+        <button class="radar-btn" data-act="next" title="${t('radar.nextFrame')}">▶</button>
         <button class="radar-btn" data-act="loop" title="${loopHint}">▶▶</button>
-        ${totalFrames ? '<button class="radar-btn radar-save" data-act="save" title="Save a bounded offline radar pack for this storm">Save offline</button>' : ''}
-        <button class="radar-btn radar-close" data-act="close" title="Close radar">×</button>
+        ${totalFrames ? `<button class="radar-btn radar-save" data-act="save" title="${t('radar.saveOfflineTitle')}">${t('radar.saveOffline')}</button>` : ''}
+        <button class="radar-btn radar-close" data-act="close" title="${t('radar.closeTitle')}">×</button>
       </div>
       ${radarLegendHtml(this.colorblind)}
       <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>

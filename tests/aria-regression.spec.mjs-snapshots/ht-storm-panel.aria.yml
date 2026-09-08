@@ -6,10 +6,10 @@
   - strong: /Cat 5 \d+ kt/
   - text: Atlantic basin AL122005
   - button "Jwe chemen"
-  - button "📌 Pin to compare"
-  - region "Storm summary":
-    - text: /Tèks edikatif · sous anglè KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Van maksimòm \d+ kt Presyon minimòm \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Touche tè Etazini 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Closest pass to/
-    - combobox "Closest pass to":
+  - button "📌 Kole pou konpare"
+  - region "Rezime siklòn":
+    - text: /Tèks edikatif · sous anglè KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Van maksimòm \d+ kt Presyon minimòm \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Touche tè Etazini 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Pasaj ki pi pre/
+    - combobox "Pasaj ki pi pre":
       - option "Miami, FL" [selected]
       - option "Key West, FL"
       - option "Tampa, FL"
@@ -45,15 +45,15 @@
     - 'link /Sous: NOAA NCEI \(fikse nan \d+\)/':
       - /url: https://www.ncei.noaa.gov/access/billions/
     - heading "Evènman tanpèt bò kote siklòn touche tè" [level=3]
-    - text: Tornado activity during landfall 1 report in Florida · strongest F2 Hail activity during landfall 0 reports
-    - list "Sample matching Storm Events":
+    - text: Aktivite tònad pandan touche tè a 1 report in Florida · strongest F2 Aktivite lagrèl pandan touche tè a 0 reports
+    - list "Echantiyon evènman ki koresponn nan Storm Events":
       - listitem: Tornado MONROE, Florida F2
     - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+[hmsp]+ before to \d+[hmsp]+ after U\.S\. landfall Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Source:/
     - link "NOAA WPC TC Rainfall":
       - /url: https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html
     - heading "Estasyon mare (NOAA CO-OPS)" [level=3]
     - button "Chaje nivo dlo bò kote li touche tè"
-  - region "Storm analysis":
+  - region "Analiz siklòn":
     - heading "Siklòn ki sanble" [level=3]
     - list:
       - listitem: /Ian \(\d+\) Cat 5 3 landfalls \d+%/
@@ -64,23 +64,23 @@
     - heading "Jou nan entansite sa a" [level=3]
     - 'img /Jou nan entansite sa a: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
     - text: "Total tracked: 7.5 days"
-    - heading "Intensity over time" [level=3]
+    - heading "Entansite nan tan" [level=3]
     - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
-    - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
+    - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
     - button "⤓ PNG"
     - button "⤓ SVG"
-  - region "Storm resources":
+  - region "Resous siklòn":
     - heading "U.S. landfalls (chronological)" [level=3]
     - list:
       - listitem:
         - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radà
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
     - status: "/Kach rada: pa gen imaj ki sove \\(\\d+ disponib\\)/"
     - region "Kontèks federal katastwòf la":
       - heading "Kontèks federal katastwòf la" [level=3]
@@ -98,15 +98,15 @@
             - /url: https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries
     - link "Wikipedia":
       - /url: https://en.wikipedia.org/wiki/Special:Search?go=Go&search=Hurricane%20Katrina%20(2005)
-    - link "YouTube footage":
+    - link "Videyo YouTube":
       - /url: https://www.youtube.com/results?search_query=hurricane%20Katrina%202005%20landfall
-    - link "NOAA report":
+    - link "Rapò NOAA":
       - /url: https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl
-    - link "NHC archive":
+    - link "Achiv NHC":
       - /url: https://www.nhc.noaa.gov/archive/2005/AL122005.shtml
     - link "Storm Events (NOAA)":
       - /url: https://www.ncei.noaa.gov/access/storm-events-database/search
-    - link "Recon archive":
+    - link "Achiv rekonesans":
       - /url: https://tropicalatlantic.com/recon/?archive=2005&storm=Katrina
     - text: "Ekspòte chemen:"
     - button "CSV"

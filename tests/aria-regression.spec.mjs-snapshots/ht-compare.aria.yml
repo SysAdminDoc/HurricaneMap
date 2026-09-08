@@ -2,7 +2,7 @@
   - button "Minimize konpare siklòn"
   - button "Fèmen konparezon": ×
   - heading "Konpare siklòn" [level=2]
-  - paragraph: Each storm's track is drawn on the map in a deeper shade of its column color, so it stays readable over the basemap. Pin or unpin via the storm panel or the chip tray.
+  - paragraph: Wout chak siklòn desine sou kat la nan yon ton pi fonse pase koulè kolòn li, konsa li rete lizib sou kat baz la. Kole oswa dekole nan panèl siklòn nan oswa nan plato etikèt la.
   - button "📥 CSV"
   - heading /Katrina \(\d+\)/ [level=3]
   - button "×"
@@ -13,7 +13,7 @@
   - text: "Tonbe sou tè Ozetazini:"
   - strong: "3"
   - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
-  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading /Andrew \(\d+\)/ [level=3]
   - button "×"
   - text: "Cat 5 nan tonbe sou tè Van maksimòm:"
@@ -23,7 +23,7 @@
   - text: "Tonbe sou tè Ozetazini:"
   - strong: "3"
   - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
-  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading "Side-by-side" [level=3]
   - table:
     - rowgroup:

@@ -117,7 +117,7 @@ export async function initGlossary() {
     <div class="glossary-content">
       <div class="glossary-header">
         <h2 id="glossary-title">${t('glossary.title')}</h2>
-        <button class="close-btn" id="close-glossary" title="Close glossary" aria-label="Close glossary">×</button>
+        <button class="close-btn" id="close-glossary" title="${t('glossary.closeTitle')}" aria-label="${t('glossary.closeTitle')}">×</button>
       </div>
       <input type="search" id="glossary-search" class="glossary-search" placeholder="${t('glossary.searchPlaceholder')}" aria-label="${t('glossary.title')}" />
       <p class="content-language-note" data-content-language="en">${t('content.englishSource')}</p>
@@ -140,7 +140,7 @@ export async function initGlossary() {
       glossaryList.innerHTML = `
         <div class="empty-state glossary-empty">
           <strong>${t('glossary.noResults')}</strong>
-          <span>Try a broader term such as wind, pressure, eyewall, surge, or ACE.</span>
+          <span>${t('glossary.broaderTerm')}</span>
         </div>`;
       return;
     }

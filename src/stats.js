@@ -36,8 +36,8 @@ function render() {
   if (!stats) {
     body.innerHTML = `
       <div class="panel-empty-state">
-        <strong>Statistics unavailable.</strong>
-        <span>The summary dataset did not load. Refresh the page or verify the data files are being served.</span>
+        <strong>${t('stats.unavailable')}</strong>
+        <span>${t('stats.unavailableDetail')}</span>
       </div>`;
     return;
   }
@@ -82,17 +82,17 @@ function render() {
     <div class="stats-panel-layout">
       <div class="stats-panel-column stats-panel-column--counts">
         <section class="stats-section stats-section--states">
-          <h3>Landfalls by state</h3>
+          <h3>${t('stats.landfallsByState')}</h3>
           ${stateBars}
         </section>
 
         <section class="stats-section stats-section--categories">
-          <h3>Landfalls by category</h3>
+          <h3>${t('stats.landfallsByCategory')}</h3>
           ${catBars}
         </section>
 
         <section class="stats-section stats-section--cold">
-          <h3>Coastal states with no recorded hurricane landfall</h3>
+          <h3>${t('stats.noHitStates')}</h3>
           <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
           <p class="stats-note">
             Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
@@ -107,7 +107,7 @@ function render() {
 
       <div class="stats-panel-column stats-panel-column--decades">
         <section class="stats-section stats-section--decades">
-          <h3>Landfalls by decade</h3>
+          <h3>${t('stats.landfallsByDecade')}</h3>
           ${decadeBars}
         </section>
       </div>
@@ -150,7 +150,7 @@ function render() {
       if (!ctHost.isConnected) return;
       const trends = computeClimateTrends(getAllStorms());
       if (trends) renderClimateTrendsChart(ctHost, trends);
-      else ctHost.innerHTML = '<p class="panel-muted">No trend data available.</p>';
+      else ctHost.innerHTML = `<p class="panel-muted">${t('stats.noTrendData')}</p>`;
     }).catch(e => {
       if (ctHost.isConnected) {
         ctHost.innerHTML = `<p class="panel-inline-error">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
@@ -226,7 +226,7 @@ function coloredBar(label, count, max, cssVar) {
 
 function renderClimateTrendsChart(host, trends) {
   if (!trends || !trends.rolling || trends.rolling.length === 0) {
-    host.innerHTML = '<p class="panel-muted">No rolling trend data available.</p>';
+    host.innerHTML = `<p class="panel-muted">${t('stats.noRollingTrendData')}</p>`;
     return;
   }
 
@@ -281,18 +281,18 @@ function renderClimateTrendsChart(host, trends) {
       <polyline points="${speedPath}" class="ct-line ct-speed" />
       
       <!-- Y-axis labels -->
-      <text x="${margin.left - 8}" y="${margin.top + 4}" class="ct-label" text-anchor="end" dominant-baseline="middle">High</text>
-      <text x="${margin.left - 8}" y="${margin.top + plotH}" class="ct-label" text-anchor="end" dominant-baseline="middle">Low</text>
+      <text x="${margin.left - 8}" y="${margin.top + 4}" class="ct-label" text-anchor="end" dominant-baseline="middle">${t('stats.high')}</text>
+      <text x="${margin.left - 8}" y="${margin.top + plotH}" class="ct-label" text-anchor="end" dominant-baseline="middle">${t('stats.low')}</text>
       
       <!-- Legend -->
       <circle cx="${margin.left + 12}" cy="12" r="3" class="ct-landfalls" style="fill:var(--sapphire);" />
-      <text x="${margin.left + 22}" y="16" class="ct-label">Landfalls</text>
+      <text x="${margin.left + 22}" y="16" class="ct-label">${t('stats.landfallsLegend')}</text>
       
       <circle cx="${margin.left + 120}" cy="12" r="3" style="fill:var(--lavender);" />
       <text x="${margin.left + 130}" y="16" class="ct-label">ACE</text>
       
       <circle cx="${margin.left + 170}" cy="12" r="3" style="fill:var(--cat-1);" />
-      <text x="${margin.left + 180}" y="16" class="ct-label">Forward speed</text>
+      <text x="${margin.left + 180}" y="16" class="ct-label">${t('stats.forwardSpeed')}</text>
     </svg>
   `;
 

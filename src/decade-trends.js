@@ -133,7 +133,7 @@ export async function renderDecadeTrends(host) {
   
   const series = await buildDecadeTrends();
   if (!series || series.length === 0) {
-    host.innerHTML = `<p>No decade data available.</p>`;
+    host.innerHTML = `<p>${t('stats.noDecadeData')}</p>`;
     return;
   }
 
@@ -162,12 +162,12 @@ export async function renderDecadeTrends(host) {
       <table class="dt-table">
         <thead>
           <tr>
-            <th scope="col" class="dt-decade">Decade</th>
-            <th scope="col" class="dt-named" title="Named storms (≥34kt)">Named</th>
-            <th scope="col" class="dt-major" title="Major hurricanes (≥96kt / Cat 3+)">Major</th>
-            <th scope="col" class="dt-ace" title="Accumulated Cyclone Energy">ACE</th>
-            <th scope="col" class="dt-deadliest">Deadliest</th>
-            <th scope="col" class="dt-costliest">Costliest</th>
+            <th scope="col" class="dt-decade">${t('stats.decadeColumn')}</th>
+            <th scope="col" class="dt-named" title="Named storms (≥34kt)">${t('stats.namedColumn')}</th>
+            <th scope="col" class="dt-major" title="Major hurricanes (≥96kt / Cat 3+)">${t('stats.majorColumn')}</th>
+            <th scope="col" class="dt-ace" title="${t('stats.aceFull')}">ACE</th>
+            <th scope="col" class="dt-deadliest">${t('stats.deadliest')}</th>
+            <th scope="col" class="dt-costliest">${t('stats.costliest')}</th>
           </tr>
         </thead>
         <tbody>

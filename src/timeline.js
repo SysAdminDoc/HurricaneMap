@@ -61,7 +61,7 @@ export function mountTimeline(landfalls, callbacks) {
         <span class="timeline-selection-label" id="timeline-selection-label">${Y0}–${Y1}</span>
         <span class="timeline-source" data-i18n="timeline.source">${t('timeline.source')}</span>
       </div>
-      <div class="timeline-axis" id="timeline-axis" role="slider" aria-label="Year range" aria-valuemin="${Y0}" aria-valuemax="${Y1}" aria-valuenow="${Y0}" aria-valuetext="${Y0} to ${Y1}" tabindex="0"></div>
+      <div class="timeline-axis" id="timeline-axis" role="slider" aria-label="${t('filters.yearRange')}" aria-valuemin="${Y0}" aria-valuemax="${Y1}" aria-valuenow="${Y0}" aria-valuetext="${Y0} to ${Y1}" tabindex="0"></div>
       <div class="timeline-footer">
         <div class="timeline-labels">
           <span>${Y0}</span><span>1900</span><span>1950</span><span>2000</span><span>${Y1}</span>

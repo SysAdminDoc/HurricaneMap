@@ -167,31 +167,31 @@ export async function openState(stateName) {
 
   body.innerHTML = `
     <div class="state-panel-layout">
-      <section class="state-summary-cluster" aria-label="State summary">
+      <section class="state-summary-cluster" aria-label="${t('state.summary')}">
         <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
         <p class="state-sub">Every hurricane and tropical-storm landfall on record (HURDAT2, 1851 onward).</p>
 
         <div class="stat-grid">
-          <div class="stat"><div class="label">Total events</div><div class="value">${total}</div></div>
+          <div class="stat"><div class="label">${t('state.totalEvents')}</div><div class="value">${total}</div></div>
           <div class="stat"><div class="label">Hurricane-strength</div><div class="value">${huCount}</div></div>
           <div class="stat"><div class="label">Major (Cat 3+)</div><div class="value">${majorCount}</div></div>
-          <div class="stat"><div class="label">Distinct storms</div><div class="value">${storms.length}</div></div>
+          <div class="stat"><div class="label">${t('state.distinctStorms')}</div><div class="value">${storms.length}</div></div>
         </div>
       </section>
 
-      <section class="state-distribution-cluster" aria-label="State distributions">
+      <section class="state-distribution-cluster" aria-label="${t('state.distributions')}">
         <section class="state-section state-section--category">
-          <h3 class="panel-section-h3">By category</h3>
+          <h3 class="panel-section-h3">${t('state.byCategory')}</h3>
           ${catHistogramHtml}
         </section>
 
         <section class="state-section state-section--decade">
-          <h3 class="panel-section-h3">By decade</h3>
+          <h3 class="panel-section-h3">${t('state.byDecade')}</h3>
           ${decadeHtml}
         </section>
       </section>
 
-      <section class="state-records-cluster" aria-label="State storm records">
+      <section class="state-records-cluster" aria-label="${t('state.records')}">
         ${worst.length ? `
           <section class="state-section state-section--worst">
             <h3 class="panel-section-h3">Worst on record (top ${worst.length})</h3>
@@ -201,11 +201,11 @@ export async function openState(stateName) {
 
         <section class="state-section state-section--all-storms">
           <div class="state-list-head">
-            <h3 class="panel-section-h3">All storms</h3>
-            <div class="segmented-control state-sort" role="group" aria-label="Sort state storm list">
-              <button class="seg-btn active" type="button" data-sort="newest" aria-pressed="true">Newest</button>
-              <button class="seg-btn" type="button" data-sort="strongest" aria-pressed="false">Strongest</button>
-              <button class="seg-btn" type="button" data-sort="hits" aria-pressed="false">Most hits</button>
+            <h3 class="panel-section-h3">${t('state.allStorms')}</h3>
+            <div class="segmented-control state-sort" role="group" aria-label="${t('state.sortList')}">
+              <button class="seg-btn active" type="button" data-sort="newest" aria-pressed="true">${t('state.newest')}</button>
+              <button class="seg-btn" type="button" data-sort="strongest" aria-pressed="false">${t('stats.strongest')}</button>
+              <button class="seg-btn" type="button" data-sort="hits" aria-pressed="false">${t('state.mostHits')}</button>
             </div>
           </div>
           <ul class="state-storm-list" id="state-storm-list">${fullListHtml}</ul>

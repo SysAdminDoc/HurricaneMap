@@ -327,8 +327,8 @@ function ensureBadge(count, {
     status,
   });
   const links = count > 0 ? `
-      <a class="ab-link" href="https://www.tropicaltidbits.com/storminfo/" target="_blank" rel="noopener" title="Model spaghetti tracks (Tropical Tidbits)">models</a>
-      <a class="ab-link" href="https://www.trackthetropics.com/" target="_blank" rel="noopener" title="Spaghetti model viewer">tracks</a>
+      <a class="ab-link" href="https://www.tropicaltidbits.com/storminfo/" target="_blank" rel="noopener" title="${t('active.spaghettiTitle')}">models</a>
+      <a class="ab-link" href="https://www.trackthetropics.com/" target="_blank" rel="noopener" title="${t('active.spaghettiLabel')}">tracks</a>
     ` : '';
 
   badgeEl.hidden = false;

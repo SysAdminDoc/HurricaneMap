@@ -27,6 +27,7 @@ const ALLOWED = new Map([
   ['Peak rainfall (WPC)', 'WPC product name, kept with its abbreviation'],
   ['American Red Cross', 'organisation name'],
   ['Iowa State IEM NEXRAD archive', 'archive name'],
+  ['Wikipedia', 'the site is called that in every locale, and the link goes to the localized edition'],
 ]);
 
 export function stripComments(text) {
@@ -117,8 +118,10 @@ async function main() {
     process.exit(1);
   }
 
-  // The catalog has to actually be there, or an empty src/ would pass.
-  if (!/'app\.title':/.test(catalog)) {
+  // The catalog has to actually be there, or an empty src/ would pass. This
+  // anchor is a key that exists; the first one written here was not, so the
+  // gate reported the catalog missing on a perfectly good tree.
+  if (!/'header\.title':/.test(catalog)) {
     console.error('untranslated: src/i18n.js does not look like the catalog any more');
     process.exit(1);
   }

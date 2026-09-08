@@ -115,19 +115,19 @@ export function createAboutRenderer({
     dataProvenanceBody.innerHTML = `
       <div class="provenance-grid">
         <div>
-          <span class="provenance-label">Coverage</span>
+          <span class="provenance-label">${t('about.coverage')}</span>
           <strong>${escapeHtml(yearMin)}-${escapeHtml(yearMax)}</strong>
         </div>
         <div>
-          <span class="provenance-label">Records</span>
+          <span class="provenance-label">${t('about.records')}</span>
           <strong>${formatNumber(coverage.storm_count)} storms · ${formatNumber(coverage.landfall_event_count)} landfalls</strong>
         </div>
         <div>
-          <span class="provenance-label">Hurricane landfalls</span>
+          <span class="provenance-label">${t('about.hurricaneLandfalls')}</span>
           <strong>${formatNumber(coverage.hurricane_landfall_count)}</strong>
         </div>
         <div>
-          <span class="provenance-label">Generated</span>
+          <span class="provenance-label">${t('about.generated')}</span>
           <strong>${escapeHtml(formatMetadataDateTime(metadata.generated_at_utc))}</strong>
         </div>
       </div>

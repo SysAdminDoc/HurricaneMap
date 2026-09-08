@@ -11,6 +11,7 @@
 
 import { categoryColor, formatTime, windToCategory } from './data.js';
 import { escapeHtml } from './html-utils.js';
+import { t } from './i18n.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
 const W = 360;          // total width in CSS px
@@ -136,7 +137,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
         <span class="cl-item"><span class="cl-swatch pres"></span>Pressure (mb) ↓ inverted</span>
         <span class="cl-item cl-landfall">L = U.S. landfall</span>
       </div>
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="intensity-svg" role="img" aria-label="Intensity over time chart">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="intensity-svg" role="img" aria-label="${t('chart.intensityAlt')}">
         ${bandRects}
         <line class="intensity-axis-line" x1="${M.left}" y1="${M.top + PH}" x2="${M.left + PW}" y2="${M.top + PH}"/>
         <line class="intensity-axis-line" x1="${M.left}" y1="${M.top}" x2="${M.left}" y2="${M.top + PH}"/>
@@ -186,9 +187,9 @@ export function renderIntensityChart(container, storm, opts = {}) {
     tooltip.hidden = false;
     tooltip.innerHTML = `
       <div class="tt-time">${escapeHtml(formatTime(r.t))}</div>
-      <div class="tt-row"><span>Wind</span><strong>${r.wind ?? '?'} kt</strong></div>
-      <div class="tt-row"><span>Pressure</span><strong>${r.pres ?? MISSING_METRIC} mb</strong></div>
-      <div class="tt-row"><span>Status</span><strong>${escapeHtml(r.status || '?')} · ${catLabel}</strong></div>
+      <div class="tt-row"><span>${t('table.column.wind')}</span><strong>${r.wind ?? MISSING_METRIC} kt</strong></div>
+      <div class="tt-row"><span>${t('table.column.pressure')}</span><strong>${r.pres ?? MISSING_METRIC} mb</strong></div>
+      <div class="tt-row"><span>${t('chart.status')}</span><strong>${escapeHtml(r.status || MISSING_METRIC)} · ${catLabel}</strong></div>
     `;
     // Position tooltip — flip sides if we'd run off the right edge of the panel.
     const ttRect = tooltip.getBoundingClientRect();

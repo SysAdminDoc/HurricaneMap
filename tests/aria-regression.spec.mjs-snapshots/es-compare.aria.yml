@@ -2,7 +2,7 @@
   - button "Minimizar comparar huracanes"
   - button "Cerrar comparación": ×
   - heading "Comparar huracanes" [level=2]
-  - paragraph: Each storm's track is drawn on the map in a deeper shade of its column color, so it stays readable over the basemap. Pin or unpin via the storm panel or the chip tray.
+  - paragraph: La trayectoria de cada huracán se dibuja en el mapa en un tono más oscuro del color de su columna, para que siga siendo legible sobre el mapa base. Fija o quita desde el panel del huracán o la bandeja de fichas.
   - button "📥 CSV"
   - heading /Katrina \(\d+\)/ [level=3]
   - button "×"
@@ -13,7 +13,7 @@
   - text: "Toques de tierra en EE. UU.:"
   - strong: "3"
   - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
-  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading /Andrew \(\d+\)/ [level=3]
   - button "×"
   - text: "Cat 5 en tierra Viento máximo:"
@@ -23,7 +23,7 @@
   - text: "Toques de tierra en EE. UU.:"
   - strong: "3"
   - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
-  - img "Intensity over time chart": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
+  - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading "Side-by-side" [level=3]
   - table:
     - rowgroup:

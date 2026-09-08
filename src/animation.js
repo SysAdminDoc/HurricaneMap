@@ -309,16 +309,16 @@ export class TrackAnimator {
     if (this.controlsHost) this.controlsHost.hidden = false;
     const radarCount = this.radarFrames?.length || 0;
     const radarChip = radarCount
-      ? `<label class="anim-radar-toggle" title="Show NEXRAD reflectivity in lockstep with the simulated UTC clock">
+      ? `<label class="anim-radar-toggle" title="${t('anim.radarLockstep')}">
             <input type="checkbox" class="anim-radar-cb" ${this.radarEnabled ? 'checked' : ''}>
             radar (${radarCount})
           </label>`
       : '<span class="anim-radar-toggle anim-radar-disabled" title="No archived radar for this storm (pre-1995 or out of coverage)">radar unavailable</span>';
     el.innerHTML = `
-      <button class="anim-btn" data-act="toggle" title="Pause playback" aria-label="Pause playback">Pause</button>
-      <button class="anim-btn" data-act="restart" title="Restart playback" aria-label="Restart playback">Restart</button>
+      <button class="anim-btn" data-act="toggle" title="${t('anim.pauseTitle')}" aria-label="${t('anim.pauseTitle')}">${t('anim.pause')}</button>
+      <button class="anim-btn" data-act="restart" title="${t('anim.restartTitle')}" aria-label="${t('anim.restartTitle')}">${t('anim.restart')}</button>
       <input type="range" min="0" max="1000" value="0" class="anim-scrubber" />
-      <select class="anim-speed" title="Playback speed">
+      <select class="anim-speed" title="${t('anim.speed')}">
         <option value="0.5">0.5×</option>
         <option value="1" selected>1×</option>
         <option value="2">2×</option>
@@ -330,7 +330,7 @@ export class TrackAnimator {
         <div class="anim-meta"></div>
       </div>
       <div class="anim-live-region visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
-      <button class="anim-btn anim-close" data-act="close" title="Close animation" aria-label="Close animation">Close</button>
+      <button class="anim-btn anim-close" data-act="close" title="${t('anim.closeTitle')}" aria-label="${t('anim.closeTitle')}">${t('anim.close')}</button>
     `;
     el.hidden = false;
     this.controls = el;

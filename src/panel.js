@@ -201,14 +201,14 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
       const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
       const lfWithYear = { ...lf, year: storm.year };
       const radarBtn = radarApi.available(lfWithYear)
-        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="Show NEXRAD radar at this landfall" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">Radar</button>`
+        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="${t('panel.showRadarTitle')}" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">${t('panel.radarLabel')}</button>`
         : '';
       return `<li>
         <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${escapeHtml(lf.state || t('state.unknown'))}${inferred}</span>
         <span class="when">${formatTime(lf.t)}${radarBtn}</span>
       </li>`;
     }).join('')
-    : '<li><em style="color:var(--text-dim);">No US landfalls on record</em></li>';
+    : `<li><em style="color:var(--text-dim);">${t('panel.noLandfallsRecord')}</em></li>`;
 
   const minPres = presentPressure(storm.min_pres_mb);
 
@@ -260,11 +260,11 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
       </div>
     </div>
     <div class="panel-actions-sticky">
-      <button class="play-anim-btn" id="play-anim-btn" title="Animate the storm traveling its track">
+      <button class="play-anim-btn" id="play-anim-btn" title="${t('panel.animateTitle')}">
         <span class="play-icon" aria-hidden="true"></span><span class="play-label">${t('panel.playTrack')}</span>
       </button>
-      <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="Pin this storm to the comparison tray">
-        <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? 'Pinned' : 'Pin to compare'}</span>
+      <button class="pin-btn ${isPinned(storm.id) ? 'pinned' : ''}" id="pin-btn" title="${t('panel.pinTitle')}">
+        <span class="pin-icon">📌</span><span class="pin-label">${isPinned(storm.id) ? t('compare.pinned') : t('compare.pin')}</span>
       </button>
     </div>
     <div class="panel-playback-host" id="panel-playback-host" hidden></div>
@@ -272,7 +272,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
 
   body.innerHTML = `
     <div class="storm-panel-layout">
-      <section class="storm-summary-cluster" aria-label="Storm summary">
+      <section class="storm-summary-cluster" aria-label="${t('panel.summarySection')}">
         <div class="biography-text" lang="en">
           <span class="content-language-note" data-content-language="en" title="${escapeHtml(t('content.englishSourceDetail'))}">${escapeHtml(t('content.englishSource'))}</span>
           <span>${escapeHtml(biography)}</span>
@@ -291,7 +291,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
         </div>
 
         <div class="closest-pass-row" id="closest-pass-row">
-          <label class="closest-pass-label" for="closest-city">Closest pass to</label>
+          <label class="closest-pass-label" for="closest-city">${t('panel.closestPassTo')}</label>
           <select class="closest-pass-select" id="closest-city">
             ${COASTAL_CITIES.map(c => `<option value="${escapeHtml(c.name)}"${c.name === defaultCity.name ? ' selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
           </select>
@@ -305,22 +305,22 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
         <div class="tides-host" id="tides-host"></div>
       </section>
 
-      <section class="storm-analysis-cluster" aria-label="Storm analysis">
+      <section class="storm-analysis-cluster" aria-label="${t('panel.analysisSection')}">
         <h3 class="panel-section-h3">${t('panel.similarStorms')}</h3>
         <div class="similar-storms-host" id="similar-storms-host"></div>
 
         <h3 class="panel-section-h3">${t('panel.daysAtIntensity')}</h3>
         <div class="dai-host" id="dai-host"></div>
 
-        <h3 class="panel-section-h3">Intensity over time</h3>
+        <h3 class="panel-section-h3">${t('panel.intensityOverTime')}</h3>
         <div class="chart-host" id="chart-host"></div>
         <div class="chart-export-row">
-          <button class="text-btn chart-export-btn" id="chart-export-png" title="Download the intensity chart as a PNG image">⤓ PNG</button>
-          <button class="text-btn chart-export-btn" id="chart-export-svg" title="Download the intensity chart as a vector SVG">⤓ SVG</button>
+          <button class="text-btn chart-export-btn" id="chart-export-png" title="${t('panel.downloadChartPng')}">⤓ PNG</button>
+          <button class="text-btn chart-export-btn" id="chart-export-svg" title="${t('panel.downloadChartSvg')}">⤓ SVG</button>
         </div>
       </section>
 
-      <section class="storm-resources-cluster" aria-label="Storm resources">
+      <section class="storm-resources-cluster" aria-label="${t('panel.resourcesSection')}">
         <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
         <ul class="landfall-list">${landfallsHtml}</ul>
         <div class="radar-cache-status" id="radar-cache-status" data-storm-id="${escapeHtml(storm.id)}" role="status" aria-live="polite">${escapeHtml(t('radar.cacheChecking'))}</div>
@@ -334,12 +334,12 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
 
         <div class="action-row">
           ${wikiUrl ? `<a class="action-btn primary" href="${escapeHtml(wikiUrl)}" target="_blank" rel="noopener">Wikipedia</a>` : ''}
-          ${ytUrl ? `<a class="action-btn" href="${escapeHtml(ytUrl)}" target="_blank" rel="noopener">YouTube footage</a>` : ''}
-          ${noaaReportUrl ? `<a class="action-btn" href="${escapeHtml(noaaReportUrl)}" target="_blank" rel="noopener">NOAA report</a>` : ''}
-          ${nhcWalletUrl ? `<a class="action-btn" href="${escapeHtml(nhcWalletUrl)}" target="_blank" rel="noopener">NHC archive</a>` : ''}
-          ${sliderUrl ? `<a class="action-btn" href="${escapeHtml(sliderUrl)}" target="_blank" rel="noopener">GOES satellite</a>` : ''}
+          ${ytUrl ? `<a class="action-btn" href="${escapeHtml(ytUrl)}" target="_blank" rel="noopener">${t('links.youtube')}</a>` : ''}
+          ${noaaReportUrl ? `<a class="action-btn" href="${escapeHtml(noaaReportUrl)}" target="_blank" rel="noopener">${t('links.noaaReport')}</a>` : ''}
+          ${nhcWalletUrl ? `<a class="action-btn" href="${escapeHtml(nhcWalletUrl)}" target="_blank" rel="noopener">${t('links.nhcArchive')}</a>` : ''}
+          ${sliderUrl ? `<a class="action-btn" href="${escapeHtml(sliderUrl)}" target="_blank" rel="noopener">${t('links.goesSatellite')}</a>` : ''}
           ${tornadoUrl ? `<a class="action-btn" href="${escapeHtml(tornadoUrl)}" title="${escapeHtml(t('links.tornadoHint', tornadoHint?.states, tornadoHint?.from, tornadoHint?.to))}" target="_blank" rel="noopener">Storm Events (NOAA)</a>` : ''}
-          ${reconUrl ? `<a class="action-btn" href="${escapeHtml(reconUrl)}" target="_blank" rel="noopener">Recon archive</a>` : ''}
+          ${reconUrl ? `<a class="action-btn" href="${escapeHtml(reconUrl)}" target="_blank" rel="noopener">${t('links.reconArchive')}</a>` : ''}
         </div>
 
         <div class="export-row">
@@ -544,8 +544,8 @@ function renderSimilarStorms(host, similarStorms) {
   if (!host || !Array.isArray(similarStorms) || similarStorms.length === 0) {
     if (host) host.innerHTML = `
       <div class="panel-empty-state">
-        <strong>No close historical matches.</strong>
-        <span>This storm is unusual across the current similarity dimensions.</span>
+        <strong>${t('panel.noCloseMatches')}</strong>
+        <span>${t('panel.unusualStorm')}</span>
       </div>`;
     return;
   }
@@ -555,8 +555,8 @@ function renderSimilarStorms(host, similarStorms) {
     const cls = categoryClass(windToCategory(s.peak_wind_kt || 0));
     return `<li class="similar-storm-row">
       <span class="similar-storm-name">${escapeHtml(formatStormName(s.name))} (${s.year})</span>
-      <span class="similar-storm-cat cat-pill ${cls}" title="Peak intensity">${cat}</span>
-      <span class="similar-storm-landfalls" title="Number of U.S. landfalls">${s.landfalls} landfall${s.landfalls !== 1 ? 's' : ''}</span>
+      <span class="similar-storm-cat cat-pill ${cls}" title="${t('table.trackPeak')}">${cat}</span>
+      <span class="similar-storm-landfalls" title="${t('panel.landfallCountLabel')}">${s.landfalls} landfall${s.landfalls !== 1 ? 's' : ''}</span>
       <span class="similar-storm-score" title="Similarity score: 0-100 higher=more similar">${score}%</span>
     </li>`;
   }).join('');
@@ -593,7 +593,7 @@ function renderDaysAtIntensity(host, track) {
   ];
   const total = order.reduce((s, t) => s + buckets[t.k], 0);
   if (total <= 0) {
-    host.innerHTML = '<div class="dai-empty">No tier-resolved track data available.</div>';
+    host.innerHTML = `<div class="dai-empty">${t('panel.noTierTrack')}</div>`;
     return;
   }
   const parts = order.filter(tier => buckets[tier.k] > 0).map(tier => {

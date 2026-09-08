@@ -14,6 +14,7 @@
     "check:css-variables": "node scripts/check-css-variables.mjs",
     "check:track-contrast": "node scripts/check-track-contrast.mjs",
     "check:missing-markers": "node scripts/check-missing-markers.mjs",
+    "check:untranslated": "node scripts/check-untranslated-strings.mjs",
     "check:network-timeouts": "node scripts/check-network-timeouts.mjs",
     "check:readme-links": "node scripts/check-readme-links.mjs",
     "check:release-truth": "node scripts/check-release-truth.mjs",

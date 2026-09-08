@@ -62,9 +62,9 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     host.innerHTML = `
       <header>
         <h3>${yearMin === yearMax ? `${yearMin} season` : `${yearMin}–${yearMax}`}</h3>
-        <button class="season-close" type="button" aria-label="Hide season summary">×</button>
+        <button class="season-close" type="button" aria-label="${t('seasonal.hide')}">×</button>
       </header>
-      <p class="season-empty">No US landfalls in this range.</p>`;
+      <p class="season-empty">${t('seasonal.noLandfallsRange')}</p>`;
     host.querySelector('.season-close').addEventListener('click', () => {
       dismissedRange = rangeKey;
       setSeasonSummaryVisible(host, false);
@@ -124,7 +124,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
   host.innerHTML = `
     <header>
       <h3>${titleSpan}${ensoBadge}</h3>
-      <button class="season-close" type="button" aria-label="Hide season summary">×</button>
+      <button class="season-close" type="button" aria-label="${t('seasonal.hide')}">×</button>
     </header>
     <div class="ss-stats">
       <div class="ss-stat">
@@ -276,6 +276,6 @@ function renderSeasonAnalogs(host, targetYear, stormCount, lfCount, ace) {
   host.querySelector('.ss-analogs')?.remove();
   const el = document.createElement('div');
   el.className = 'ss-analogs';
-  el.innerHTML = `<h4>Similar seasons</h4><ul>${rows}</ul>`;
+  el.innerHTML = `<h4>${t('seasonal.similarSeasons')}</h4><ul>${rows}</ul>`;
   host.appendChild(el);
 }
