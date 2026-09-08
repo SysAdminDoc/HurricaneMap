@@ -8,7 +8,7 @@
 import { ensureStormsLoaded, getStorm, categoryLabel, categoryClass, windToCategory } from './data.js';
 import { daysAtIntensity } from './metrics.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { showToast } from './panel-controls.js';
 
 // onSelect rather than an import of showStorm: that lives in panel.js, which
@@ -69,6 +69,29 @@ export function renderSimilarStorms(host, similarStorms, onSelect) {
 // Days-at-intensity stacked horizontal bar. Visualizes how many hours of
 // the storm's life were spent in each Saffir-Simpson tier — gives an
 // at-a-glance sense of "long Cat-4 grinder" vs "brief brushing TS".
+// A span of track time in the reader's own language. These labels were built
+// by hand as `${days.toFixed(1)} d` and `${Math.round(hrs)} h`, so the unit was
+// the English abbreviation whatever language the panel was in: a Spanish reader
+// read "3.2 d" and a Creole reader read the same. Intl.DurationFormat carries
+// the units for every locale, and it is asked through getDateLocale() for the
+// same reason dates are, because ICU has no data for `ht` and would otherwise
+// fall back to the browser's language.
+//
+// Baseline 2025-03-04. Below the floor the old hand-built form is kept, which
+// is wrong in the same way it always was rather than newly broken.
+function formatTrackDuration(hours) {
+  const whole = Math.max(0, Math.round(hours));
+  const days = Math.floor(whole / 24);
+  const rest = whole % 24;
+  if (typeof Intl.DurationFormat !== 'function') {
+    return days >= 1 ? `${(whole / 24).toFixed(1)} d` : `${rest} h`;
+  }
+  const parts = {};
+  if (days) parts.days = days;
+  if (rest || !days) parts.hours = rest;
+  return new Intl.DurationFormat(getDateLocale(), { style: 'narrow' }).format(parts);
+}
+
 export function renderDaysAtIntensity(host, track) {
   if (!host) return;
   const buckets = daysAtIntensity(track);
@@ -89,9 +112,7 @@ export function renderDaysAtIntensity(host, track) {
   const parts = order.filter(tier => buckets[tier.k] > 0).map(tier => {
     const hrs = buckets[tier.k];
     const pct = (hrs / total) * 100;
-    const days = hrs / 24;
-    const dayStr = days >= 1 ? `${days.toFixed(1)} d` : `${Math.round(hrs)} h`;
-    return { tier, pct, dayStr };
+    return { tier, pct, dayStr: formatTrackDuration(hrs) };
   });
   // Segments are presentational children of the role="img" bar — aria-label
   // on a generic div is prohibited (WCAG 4.1.2); the per-tier breakdown goes
@@ -103,7 +124,7 @@ export function renderDaysAtIntensity(host, track) {
   host.innerHTML = `
     <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}: ${daiBreakdown}">${segs}</div>
     <div class="dai-legend">
-      <span class="dai-total">${t('panel.daysTotalTracked', (total / 24).toFixed(1))}</span>
+      <span class="dai-total">${t('panel.daysTotalTracked', formatTrackDuration(total))}</span>
     </div>
   `;
 }

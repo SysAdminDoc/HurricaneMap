@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import { buildClimatologySeries } from '../src/climatology.js';
+import { computeACE } from '../src/metrics.js';
 
 const storms = new Map([
   ['A', {
@@ -36,3 +38,26 @@ assert.ok(Math.abs(result.series[1].ace - 0.36) < 1e-12, `unexpected 2001 ACE: $
 assert.deepEqual(buildClimatologySeries([], () => null), { series: [], yearMin: null, yearMax: null });
 
 console.log('climatology aggregation ok (year buckets, named threshold, ACE, and missing tracks)');
+// A literal figure computed from the shipped data rather than from a fixture.
+// The smoke run prints "2005 ACE 108.8" and asserted only that it was above
+// zero, so every digit of it was unpinned: a change to the summation or to the
+// 34 kt threshold could move the number and nothing would notice.
+//
+// This is not the published 2005 Atlantic ACE of about 250. data/storms.json
+// carries the storms that made a US landfall, seven of them in 2005, and 108.8
+// is their total. It is the figure the app itself renders, which is what this
+// exists to pin.
+{
+  const stormsPath = new URL('../data/storms.json', import.meta.url);
+  const storms = JSON.parse(await readFile(stormsPath, 'utf8'));
+  const rows = Array.isArray(storms) ? storms : Object.values(storms);
+  const terms = rows
+    .filter(storm => String(storm.id || '').startsWith('AL') && String(storm.id || '').endsWith('2005'))
+    .map(storm => computeACE(storm.track || []).value);
+  const total = terms.reduce((sum, term) => sum + term, 0);
+  assert.equal(
+    Number(total.toFixed(1)),
+    108.8,
+    `2005 Atlantic ACE must stay 108.8 across ${terms.length} storms, got ${total.toFixed(3)}`,
+  );
+}

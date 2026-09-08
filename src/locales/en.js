@@ -1078,7 +1078,7 @@ export default {
   'panel.shareViewTitle': 'Copy a link to this exact view (filters and open storm) to your clipboard',
   'panel.windSwathToggle': '🌬️ Show wind-field swath ({0} analyzed records)',
   'panel.estExposure': 'Est. exposure',
-  'panel.daysTotalTracked': 'Total tracked: {0} days',
+  'panel.daysTotalTracked': 'Total tracked: {0}',
   'radar.panelTitle': 'NEXRAD radar: {0} landfall',
   'radar.sourceLine': 'Source: {0}',
   'radar.animateFull': 'Animate full storm ({0} frames)',

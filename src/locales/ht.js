@@ -1053,7 +1053,7 @@ export default {
   'panel.shareViewTitle': 'Kopye yon lyen pou vi egzak sa a (filt yo ak tanpèt ki louvri a) nan paswa a',
   'panel.windSwathToggle': '🌬️ Montre bann chan van an ({0} dosye analize)',
   'panel.estExposure': 'Ekspozisyon estime',
-  'panel.daysTotalTracked': 'Total swiv: {0} jou',
+  'panel.daysTotalTracked': 'Total swiv: {0}',
   'radar.panelTitle': 'Radà NEXRAD: rive atè nan {0}',
   'radar.sourceLine': 'Sous: {0}',
   'radar.animateFull': 'Anime tout tanpèt la ({0} imaj)',

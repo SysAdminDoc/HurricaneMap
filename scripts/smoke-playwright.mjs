@@ -5519,7 +5519,15 @@ try {
     return host && !host.hidden && ace && ace !== '...' && ace !== '-' && ace !== '\u2014';
   }, null, { timeout: 15000 });
   const seasonAce = await page.textContent('#season-summary [data-role="ace"] .ss-stat-num');
-  assert(Number.parseFloat(seasonAce) > 0, `season ACE did not compute: ${seasonAce}`);
+  // Above zero was true of any number at all, and this line goes on to print
+  // "2005 ACE 108.8" as though it had been checked. 108.8 is the total for the
+  // seven 2005 storms data/storms.json carries, pinned at the source in
+  // test-climatology.mjs; this is the same figure having survived the round
+  // trip through the season panel.
+  assert(
+    Math.abs(Number.parseFloat(seasonAce) - 108.8) < 0.05,
+    `the 2005 season panel should read 108.8 ACE, read ${seasonAce}`,
+  );
 
   await page.click('#toggle-stats');
   await page.waitForSelector('#climatology-chart .clim-legend-item', { timeout: 15000 });

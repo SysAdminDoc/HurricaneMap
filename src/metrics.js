@@ -42,7 +42,7 @@ export const DEFAULT_STORM_VECTOR_STATS = {
  *  Atlantic season is ~100, a major hurricane alone is ~10-30. */
 export function computeACE(track) {
   if (!Array.isArray(track) || track.length === 0) return { value: 0, obs_count: 0 };
-  let ace = 0;
+  const terms = [];
   let count = 0;
   for (const r of track) {
     if (r.wind == null || r.wind < TS_THRESHOLD_KT) continue;
@@ -53,9 +53,14 @@ export function computeACE(track) {
     const h = d.getUTCHours();
     const m = d.getUTCMinutes();
     if (h % 6 !== 0 || m !== 0) continue;
-    ace += (r.wind * r.wind) / 1e4;
+    terms.push((r.wind * r.wind) / 1e4);
     count++;
   }
+  // Math.sumPrecise adds without intermediate rounding, so the total does not
+  // depend on the order the observations arrive in. Baseline 2026-04-10, so
+  // engines below the floor (Node 24 among them) take the ordinary sum, which
+  // is what this did before and is correct to the precision anyone reads.
+  const ace = Math.sumPrecise ? Math.sumPrecise(terms) : terms.reduce((sum, term) => sum + term, 0);
   return { value: ace, obs_count: count };
 }
 
@@ -812,7 +817,9 @@ export function computeClimateTrends(allStorms) {
     }
 
     const avg_landfalls = window.reduce((sum, y) => sum + y.landfalls, 0) / window.length;
-    const avg_ace = window.reduce((sum, y) => sum + y.total_ace, 0) / window.length;
+    const aceTerms = window.map(y => y.total_ace);
+    const aceTotal = Math.sumPrecise ? Math.sumPrecise(aceTerms) : aceTerms.reduce((sum, term) => sum + term, 0);
+    const avg_ace = aceTotal / window.length;
     // Forward speed only exists for seasons with storms — zero-filled seasons
     // are absence of data, not 0 km/h, so exclude them from this average.
     const speedYears = window.filter(y => y.named_storms > 0 && y.avg_forward_speed > 0);

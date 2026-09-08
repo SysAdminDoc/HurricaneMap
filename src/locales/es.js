@@ -1075,7 +1075,7 @@ export default {
   'panel.shareViewTitle': 'Copia al portapapeles un enlace a esta vista exacta (filtros y tormenta abierta)',
   'panel.windSwathToggle': '🌬️ Mostrar la franja del campo de viento ({0} registros analizados)',
   'panel.estExposure': 'Exposición est.',
-  'panel.daysTotalTracked': 'Total registrado: {0} días',
+  'panel.daysTotalTracked': 'Total registrado: {0}',
   'radar.panelTitle': 'Radar NEXRAD: tocamiento de tierra en {0}',
   'radar.sourceLine': 'Fuente: {0}',
   'radar.animateFull': 'Animar toda la tormenta ({0} fotogramas)',
