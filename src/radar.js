@@ -384,11 +384,11 @@ export class RadarOverlay {
     }
     el.hidden = false;
     const totalFrames = this.localFrames?.length || 0;
-    const loopHint = totalFrames > 1 ? `Animate full storm (${totalFrames} frames)` : 'Animate ±30 min around landfall';
+    const loopHint = totalFrames > 1 ? t('radar.animateFull', totalFrames) : t('radar.animateLandfall');
     el.innerHTML = `
       <div class="radar-title">
         <span class="radar-pip"></span>
-        NEXRAD radar — ${escapeHtml(landfall.state)} landfall
+        ${t('radar.panelTitle', escapeHtml(landfall.state))}
       </div>
       <div class="radar-controls-row">
         <button class="radar-btn" data-act="prev" title="${t('radar.previousFrame')}">◀</button>
@@ -399,7 +399,7 @@ export class RadarOverlay {
         <button class="radar-btn radar-close" data-act="close" title="${t('radar.closeTitle')}">×</button>
       </div>
       ${radarLegendHtml(this.colorblind)}
-      <div class="radar-source">Source: Iowa State IEM NEXRAD archive</div>
+      <div class="radar-source">${t('radar.sourceLine', 'Iowa State IEM NEXRAD archive')}</div>
       <div id="radar-feed-status" class="optional-feed-status-host"></div>
     `;
     this.controls = el;
@@ -427,7 +427,7 @@ export class RadarOverlay {
         onProgress: ({ saved, total }) => this.setStatus(`Saving radar pack ${saved}/${total}…`),
       });
       const evictionNote = result.persisted ? '' : ` ${t('storage.evictionRisk')}`;
-      this.setStatus(`Saved ${result.saved} radar frames for offline use.${evictionNote}`);
+      this.setStatus(`${t('radar.savedFrames', result.saved)}${evictionNote}`);
       button.textContent = 'Saved';
     } catch (error) {
       this.setStatus(isQuotaExceededError(error)

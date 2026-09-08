@@ -212,10 +212,10 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
     ? storm.us_landfalls.map((lf, idx) => {
       const cat = categoryLabel(lf.category);
       const cls = categoryClass(lf.category);
-      const inferred = lf.inferred ? '<span class="inferred-tag" title="Inferred from track interpolation — no explicit L marker in HURDAT2">inferred</span>' : '';
+      const inferred = lf.inferred ? `<span class="inferred-tag" title="${escapeHtml(t('panel.inferredTitle'))}">${t('panel.inferredTag')}</span>` : '';
       const lfWithYear = { ...lf, year: storm.year };
       const radarBtn = radarApi.available(lfWithYear)
-        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="${t('panel.showRadarTitle')}" aria-label="Show NEXRAD radar for ${escapeHtml(formatTime(lf.t))}">${t('panel.radarLabel')}</button>`
+        ? `<button class="radar-quick-btn" data-lf-idx="${idx}" title="${t('panel.showRadarTitle')}" aria-label="${escapeHtml(t('panel.showRadarFor', formatTime(lf.t)))}">${t('panel.radarLabel')}</button>`
         : '';
       return `<li>
         <span class="where"><span class="cat-pill ${cls}">${cat}</span> ${escapeHtml(lf.state || t('state.unknown'))}${inferred}</span>
@@ -233,19 +233,19 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   const aceStr = Number.isFinite(ace.value) ? formatNumber(ace.value, 1) : MISSING_METRIC;
   const ri = findRapidIntensification(storm.track);
   const riBadge = ri
-    ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">⚡ Rapid intensification (+${ri.delta_kt} kt / 24h)</span>`
+    ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">${t('panel.riFlag', ri.delta_kt)}</span>`
     : '';
 
   const pressureFall = findPressureFall(storm.track);
   const pfBadge = pressureFall
-    ? `<span class="storm-flag pf-flag" title="Explosive deepening: pressure dropped ${formatNumber(pressureFall.drop_mb, 0)} mb in ${Math.round(pressureFall.hours)}h (${formatTime(pressureFall.from_t)} → ${formatTime(pressureFall.to_t)}). The conventional 'explosive' threshold is ≥20 mb / 24h.">📉 Explosive deepening (−${formatNumber(pressureFall.drop_mb, 0)} mb / 24h)</span>`
+    ? `<span class="storm-flag pf-flag" title="Explosive deepening: pressure dropped ${formatNumber(pressureFall.drop_mb, 0)} mb in ${Math.round(pressureFall.hours)}h (${formatTime(pressureFall.from_t)} → ${formatTime(pressureFall.to_t)}). The conventional 'explosive' threshold is ≥20 mb / 24h.">${t('panel.pressureFallFlag', formatNumber(pressureFall.drop_mb, 0))}</span>`
     : '';
 
   // Compute RI risk score
   const riRisk = computeRIRiskScore(storm, allStorms);
   const riRiskTitle = `RI Risk Score: Based on ${riRisk.similar_count} similar historical storms (peak wind ±15kt, genesis month ±1mo, first-24h gain ±10kt). ${riRisk.ri_count} of them experienced RI (≥30kt/24h). Probability: ${Math.round(riRisk.probability * 100)}%.`;
   const riRiskIcon = riRisk.category === 'high' ? '🔴' : riRisk.category === 'medium' ? '🟡' : '🟢';
-  const riRiskTile = `<div class="stat" title="${escapeHtml(riRiskTitle)}"><div class="label">RI risk <span class="metric-info">ⓘ</span></div><div class="value">${riRiskIcon} ${riRisk.category === 'high' ? 'High' : riRisk.category === 'medium' ? 'Medium' : 'Low'}</div></div>`;
+  const riRiskTile = `<div class="stat" title="${escapeHtml(riRiskTitle)}"><div class="label">${t('panel.riRiskLabel')} <span class="metric-info">ⓘ</span></div><div class="value">${riRiskIcon} ${riRisk.category === 'high' ? t('panel.riskHigh') : riRisk.category === 'medium' ? t('panel.riskMedium') : t('panel.riskLow')}</div></div>`;
   const exposure = estimatePopulationExposure(storm);
   const exposureTile = renderExposureStatTile(exposure);
 
@@ -270,9 +270,9 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
     <div class="storm-panel-header">
       <h2 id="storm-panel-title">${escapeHtml(heading)}</h2>
       <div class="meta-row">
-        <span class="cat-pill ${categoryClass(lfCat)}">${lfLabel} at landfall</span>
-        <span>Peak intensity: <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>
-        <span>${storm.basin === 'EP' ? 'Eastern Pacific basin' : 'Atlantic basin'}</span>
+        <span class="cat-pill ${categoryClass(lfCat)}">${t('panel.catAtLandfall', lfLabel)}</span>
+        <span>${t('panel.peakIntensityLabel')} <strong>${peakLabel} ${storm.peak_wind_kt} kt</strong></span>
+        <span>${storm.basin === 'EP' ? t('panel.basinEastPacific') : t('panel.basinAtlantic')}</span>
         <span>${escapeHtml(storm.id)}</span>
       </div>
     </div>
@@ -301,7 +301,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
           <div class="stat"><div class="label">${t('panel.peakWind')}</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
           <div class="stat"><div class="label">${t('panel.minPressure')}</div><div class="value">${minPres}</div></div>
           <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
-          <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">Avg forward speed <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
+          <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">${t('panel.avgForwardSpeed')} <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
           <div class="stat"><div class="label">${t('panel.landfalls')}</div><div class="value">${storm.us_landfall_count ?? 0}</div></div>
           ${exposureTile}
           ${riRiskTile}
@@ -338,7 +338,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
       </section>
 
       <section class="storm-resources-cluster" aria-label="${t('panel.resourcesSection')}">
-        <h3 class="panel-section-h3">U.S. landfalls (chronological)</h3>
+        <h3 class="panel-section-h3">${t('panel.landfallsSection')}</h3>
         <ul class="landfall-list">${landfallsHtml}</ul>
         <div class="radar-cache-status" id="radar-cache-status" data-storm-id="${escapeHtml(storm.id)}" role="status" aria-live="polite">${escapeHtml(t('radar.cacheChecking'))}</div>
         <section class="fema-context" id="fema-context" data-state="loading" aria-labelledby="fema-context-title">
@@ -361,12 +361,12 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
 
         <div class="export-row">
           <span class="export-label">${t('panel.exportTrack')}:</span>
-          <button class="export-btn" data-export="csv" title="Comma-separated values — open in Excel, R, Python pandas">CSV</button>
-          <button class="export-btn" data-export="csv_publication" title="Publication-ready CSV with data dictionary and methodology notes">CSV (publication)</button>
-          <button class="export-btn" data-export="geojson" title="GeoJSON FeatureCollection — open in QGIS, Mapbox, Leaflet">GeoJSON</button>
-          <button class="export-btn" data-export="kml" title="KML — open in Google Earth, ArcGIS">KML</button>
-          <button class="export-btn" data-export="svg_map" title="SVG track map — publication-quality vector graphic">SVG map</button>
-          <button class="export-btn share-btn" id="share-btn" title="Copy a link to this exact view (filters + opened storm) to your clipboard"><span class="share-icon">🔗</span> Share view</button>
+          <button class="export-btn" data-export="csv" title="${escapeHtml(t('panel.exportCsvTitle'))}">CSV</button>
+          <button class="export-btn" data-export="csv_publication" title="${escapeHtml(t('panel.exportCsvPublicationTitle'))}">${t('panel.exportCsvPublication')}</button>
+          <button class="export-btn" data-export="geojson" title="${escapeHtml(t('panel.exportGeojsonTitle'))}">GeoJSON</button>
+          <button class="export-btn" data-export="kml" title="${escapeHtml(t('panel.exportKmlTitle'))}">KML</button>
+          <button class="export-btn" data-export="svg_map" title="${escapeHtml(t('panel.exportSvgMapTitle'))}">${t('panel.exportSvgMap')}</button>
+          <button class="export-btn share-btn" id="share-btn" title="${escapeHtml(t('panel.shareViewTitle'))}"><span class="share-icon">🔗</span> ${t('panel.shareView')}</button>
         </div>
         <section class="video-export-control" aria-labelledby="video-export-title" aria-describedby="video-export-description">
           <h3 id="video-export-title">${t('panel.videoExport')}</h3>
@@ -465,7 +465,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
           <div class="wind-field-row">
             <label class="wf-toggle" title="Show HURDAT2 wind-radii swath (34/50/64 kt) along the track. Available for storms 2004+.">
               <input type="checkbox" id="wf-cb">
-              <span>🌬️ Show wind-field swath (${radiiCount(storm)} analyzed records)</span>
+              <span>${t('panel.windSwathToggle', radiiCount(storm))}</span>
             </label>
           </div>
         ` : ''}
@@ -550,8 +550,8 @@ function renderExposureStatTile(exposure) {
   const tooltip = formatExposureTooltip(exposure);
   return `
     <div class="stat" title="${escapeHtml(tooltip)}">
-      <div class="label">Est. exposure <span class="metric-info">ⓘ</span></div>
-      <div class="value">${formatExposurePeople(exposure.headline_people)} <span style="font-size:11px;color:var(--subtext)">${escapeHtml(exposure.headline_label)} winds</span></div>
+      <div class="label">${t('panel.estExposure')} <span class="metric-info">ⓘ</span></div>
+      <div class="value">${formatExposurePeople(exposure.headline_people)} <span style="font-size:11px;color:var(--subtext)">${t('panel.exposureWinds', escapeHtml(exposure.headline_label))}</span></div>
     </div>
   `;
 }
@@ -571,10 +571,10 @@ function renderSimilarStorms(host, similarStorms) {
     const cat = categoryLabel(windToCategory(s.peak_wind_kt || 0));
     const cls = categoryClass(windToCategory(s.peak_wind_kt || 0));
     return `<li class="similar-storm-row">
-      <span class="similar-storm-name">${escapeHtml(formatStormName(s.name))} (${s.year})</span>
+      <span class="similar-storm-name">${escapeHtml(formatStormName(s.name, { unnamed: t('storm.unnamed') }))} (${s.year})</span>
       <span class="similar-storm-cat cat-pill ${cls}" title="${t('table.trackPeak')}">${cat}</span>
-      <span class="similar-storm-landfalls" title="${t('panel.landfallCountLabel')}">${s.landfalls} landfall${s.landfalls !== 1 ? 's' : ''}</span>
-      <span class="similar-storm-score" title="Similarity score: 0-100 higher=more similar">${score}%</span>
+      <span class="similar-storm-landfalls" title="${t('panel.landfallCountLabel')}">${s.landfalls === 1 ? t('panel.similarLandfallsOne', s.landfalls) : t('panel.similarLandfallsMany', s.landfalls)}</span>
+      <span class="similar-storm-score" title="${escapeHtml(t('panel.similarityScoreTitle'))}">${score}%</span>
     </li>`;
   }).join('');
   host.innerHTML = `<ul class="similar-storms-list">${rows}</ul>`;
@@ -630,7 +630,7 @@ function renderDaysAtIntensity(host, track) {
   host.innerHTML = `
     <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}: ${daiBreakdown}">${segs}</div>
     <div class="dai-legend">
-      <span class="dai-total">Total tracked: ${(total / 24).toFixed(1)} days</span>
+      <span class="dai-total">${t('panel.daysTotalTracked', (total / 24).toFixed(1))}</span>
     </div>
   `;
 }
@@ -674,7 +674,7 @@ async function renderRainfallBlock(host, storm) {
     <div class="panel-info-card">
       <div class="info-card-label">Peak rainfall (WPC)</div>
       <div class="info-card-value">${rec.peak_inches}" at ${escapeHtml(rec.station)}</div>
-      <div class="info-card-source">Source: <a href="https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html" target="_blank" rel="noopener">NOAA WPC TC Rainfall</a></div>
+      <div class="info-card-source">${t('panel.infoSource')} <a href="https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html" target="_blank" rel="noopener">NOAA WPC TC Rainfall</a></div>
     </div>
   `;
 }

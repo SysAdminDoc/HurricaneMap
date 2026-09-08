@@ -43,11 +43,22 @@ export function safeExternalUrl(value, options) {
   return escapeHtml(safeExternalHref(value, options));
 }
 
+// A dozen surfaces render an unnamed storm, and passing the label in at each
+// one meant most of them said "Unnamed" in every locale. i18n.js sets this when
+// a catalog is applied, which it can do because it already imports this module;
+// the dependency the other way would be a cycle. A caller that wants the English
+// word regardless, an export written for publication, passes it explicitly.
+let unnamedStormLabel = 'Unnamed';
+
+export function setUnnamedStormLabel(label) {
+  unnamedStormLabel = label || 'Unnamed';
+}
+
 /**
  * Format HURDAT2 storm names consistently across UI and exports.
  * Data is usually uppercase; unnamed/blank records need stable fallback copy.
  */
-export function formatStormName(name, { unnamed = 'Unnamed' } = {}) {
+export function formatStormName(name, { unnamed = unnamedStormLabel } = {}) {
   if (name == null) return unnamed;
   const value = String(name).trim();
   if (!value || value.toUpperCase() === 'UNNAMED') return unnamed;

@@ -2,7 +2,7 @@
   - button "Minimizar estadísticas"
   - button "Cerrar estadísticas": ×
   - heading "Estadísticas" [level=2]
-  - paragraph: "/\\d+ U\\.S\\.-landfalling storms · \\d+ landfall events · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
+  - paragraph: "/\\d+ tormentas con tocamiento de tierra en EE\\. UU\\. · \\d+ eventos de tocamiento de tierra · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
   - text: 📊 PERSPECTIVA ESTACIONAL NOAA CPC
   - status:
     - strong: Perspectiva estacional
@@ -32,22 +32,22 @@
   - group: Mostrar cobertura por año
   - heading "Toques de tierra por década" [level=3]
   - text: /\d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+/
-  - heading "Climatología anual — ACE, named storms, US landfalls" [level=3]
-  - 'img /Annual climatology: ACE, named storms, US landfalls, \d+ to \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
-  - text: /ACE \(Accumulated Cyclone Energy\) — peak \d+ Named storms \(≥\d+ kt\) — peak \d+ US landfalls — peak \d+/
+  - 'heading "Climatología anual: ACE, tormentas con nombre, tocamientos de tierra en EE. UU." [level=3]'
+  - 'img /Climatología anual: ACE, tormentas con nombre, tocamientos de tierra en EE\. UU\., \d+ a \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
+  - text: /ACE \(energía ciclónica acumulada\), máximo \d+ Tormentas con nombre \(≥\d+ kt\), máximo \d+ Tocamientos de tierra en EE\. UU\., máximo \d+/
   - paragraph:
-    - text: "Top 3 landfall-storm ACE years annotated at top:"
+    - text: "Los 3 años con mayor ACE de tormentas con tocamiento de tierra están anotados arriba:"
     - strong: /\d+/
     - text: /\(\d+\),/
     - strong: /\d+/
     - text: /\(\d+\),/
     - strong: /\d+/
-    - text: /\(\d+\)\. ACE is subtotaled only for storms in this U\.S\.-landfall catalog; the named-storm threshold is the post-\d+ naming convention applied retroactively\./
-  - heading /Tendencias climáticas — \d+-year rolling averages/ [level=3]
+    - text: /\(\d+\)\. El ACE se subtotaliza solo para las tormentas de este catálogo de tocamientos de tierra en EE\. UU\. El umbral de tormenta con nombre es la convención de nombres posterior a \d+ aplicada de forma retroactiva\./
+  - 'heading /Tendencias climáticas: medias móviles de \d+ años/ [level=3]'
   - img: Alto Bajo Toques de tierra ACE Velocidad de avance
   - paragraph:
-    - strong: /Trend direction \(\d+-year rolling avg\):/
-    - text: "Landfalls: ↑ increasing · ACE: ↑ increasing · Speed: ↓ decreasing"
+    - strong: /Dirección de la tendencia \(media móvil de \d+ años\):/
+    - text: "Landfalls: ↑ en aumento · ACE: ↑ en aumento · Speed: ↓ en descenso"
   - heading "Tendencias por década" [level=3]
   - region "Tendencias por década":
     - table:

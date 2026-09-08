@@ -2,13 +2,13 @@
   - button "Minimize detay siklòn"
   - button "Fèmen detay siklòn": ×
   - heading /Katrina \(\d+\)/ [level=2]
-  - text: "Cat 3 at landfall Peak intensity:"
+  - text: "Cat 3 lè li rive atè Entansite maksimòm:"
   - strong: /Cat 5 \d+ kt/
-  - text: Atlantic basin AL122005
+  - text: Basen Atlantik AL122005
   - button "Jwe chemen"
   - button "📌 Kole pou konpare"
   - region "Rezime siklòn":
-    - text: /Tèks edikatif · sous anglè KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Van maksimòm \d+ kt Presyon minimòm \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Touche tè Etazini 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Pasaj ki pi pre/
+    - text: /Tèks edikatif · sous anglè KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Entansifikasyon rapid \(\+\d+ kt \/ \d+è\) 📉 Apwofondisman eksplozif \(−\d+ mb \/ \d+è\) Van maksimòm \d+ kt Presyon minimòm \d+ mb ACE ⓘ \d+\.\d+ Vitès mwayèn deplasman ⓘ \d+ km\/h \(\d+ mph\) Touche tè Etazini 3 Ekspozisyon estime ⓘ [\d,.]+[bkmBKM]+ van Cat-2\+ Risk ER ⓘ 🔴 Wo Pasaj ki pi pre/
     - combobox "Pasaj ki pi pre":
       - option "Miami, FL" [selected]
       - option "Key West, FL"
@@ -36,7 +36,7 @@
       - option "San Diego, CA"
       - option "Cabo San Lucas, MX"
     - strong: /\d+ mi/
-    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Return period \\(\\d+ km radius\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Peryòd retou \\(reyon \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Enpak" [level=3]
     - text: /Viktim \d+,\d+ Dega \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Dezas plizyè milya dola \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ moun ki mouri\)/
     - 'link "Sous: Wikipedya"':
@@ -45,10 +45,10 @@
     - 'link /Sous: NOAA NCEI \(fikse nan \d+\)/':
       - /url: https://www.ncei.noaa.gov/access/billions/
     - heading "Evènman tanpèt bò kote siklòn touche tè" [level=3]
-    - text: Aktivite tònad pandan touche tè a 1 report in Florida · strongest F2 Aktivite lagrèl pandan touche tè a 0 reports
+    - text: Aktivite tònad pandan touche tè a 1 rapò nan Florida · pi fò F2 Aktivite lagrèl pandan touche tè a 0 rapò
     - list "Echantiyon evènman ki koresponn nan Storm Events":
       - listitem: Tornado MONROE, Florida F2
-    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+[hmsp]+ before to \d+[hmsp]+ after U\.S\. landfall Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Source:/
+    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+è anvan jouk \d+è apre rive atè Ozetazini Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Sous:/
     - link "NOAA WPC TC Rainfall":
       - /url: https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html
     - heading "Estasyon mare (NOAA CO-OPS)" [level=3]
@@ -56,31 +56,31 @@
   - region "Analiz siklòn":
     - heading "Siklòn ki sanble" [level=3]
     - list:
-      - listitem: /Ian \(\d+\) Cat 5 3 landfalls \d+%/
-      - listitem: /Belle \(\d+\) Cat 3 2 landfalls \d+%/
-      - listitem: /Carol \(\d+\) Cat 3 2 landfalls \d+%/
-      - listitem: /Unnamed \(\d+\) Cat 4 1 landfall \d+%/
-      - listitem: /Celia \(\d+\) Cat 4 1 landfall \d+%/
+      - listitem: /Ian \(\d+\) Cat 5 3 rive atè \d+%/
+      - listitem: /Belle \(\d+\) Cat 3 2 rive atè \d+%/
+      - listitem: /Carol \(\d+\) Cat 3 2 rive atè \d+%/
+      - listitem: /San non \(\d+\) Cat 4 1 rive atè \d+%/
+      - listitem: /Celia \(\d+\) Cat 4 1 rive atè \d+%/
     - heading "Jou nan entansite sa a" [level=3]
     - 'img /Jou nan entansite sa a: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
-    - text: "Total tracked: 7.5 days"
+    - text: "Total swiv: 7.5 jou"
     - heading "Entansite nan tan" [level=3]
-    - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+    - text: Van (kt) ↑ Presyon (mb) ↓ envèse L = rive atè Ozetazini
     - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
     - button "⤓ PNG"
     - button "⤓ SVG"
   - region "Resous siklòn":
-    - heading "U.S. landfalls (chronological)" [level=3]
+    - heading "Rive atè Ozetazini (nan lòd dat)" [level=3]
     - list:
       - listitem:
         - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
+        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radà
+        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ AM UTC/: Radà
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
+        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
     - status: "/Kach rada: pa gen imaj ki sove \\(\\d+ disponib\\)/"
     - region "Kontèks federal katastwòf la":
       - heading "Kontèks federal katastwòf la" [level=3]
@@ -110,11 +110,11 @@
       - /url: https://www.nhc.noaa.gov/archive/recon/2005/
     - text: "Ekspòte chemen:"
     - button "CSV"
-    - button "CSV (publication)"
+    - button "CSV (piblikasyon)"
     - button "GeoJSON"
     - button "KML"
-    - button "SVG map"
-    - button "🔗 Share view"
+    - button "Kat SVG"
+    - button "🔗 Pataje vi a"
     - region "Ekspòte videyo":
       - heading "Ekspòte videyo" [level=3]
       - paragraph: Kreye yon WebM sou chemen siklòn sa a ak dat li yo, lejann kategori yo, ak atribisyon NOAA.
@@ -230,8 +230,8 @@
         - option /\d+/
       - paragraph: Plizyè chemen sant echantiyonnen kominike ensètitid san yon limit di. Yo se posiblite edikatif, pa previzyon oswa limit konsekans.
       - status
-    - checkbox /🌬️ Show wind-field swath \(\d+ analyzed records\)/
-    - text: /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - checkbox /🌬️ Montre bann chan van an \(\d+ dosye analize\)/
+    - text: /🌬️ Montre bann chan van an \(\d+ dosye analize\)/
     - checkbox /🌊 Montre mak dlo wo obsève \(\d+ mezi USGS\)/
     - text: /🌊 Montre mak dlo wo obsève \(\d+ mezi USGS\)/
   - group: Site vèsyon sa a

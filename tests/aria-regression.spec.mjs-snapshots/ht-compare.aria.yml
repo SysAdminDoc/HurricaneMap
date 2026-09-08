@@ -12,7 +12,7 @@
   - strong: /\d+ mb/
   - text: "Tonbe sou tè Ozetazini:"
   - strong: "3"
-  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - text: · Florida, Louisiana Van (kt) ↑ Presyon (mb) ↓ envèse L = rive atè Ozetazini
   - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading /Andrew \(\d+\)/ [level=3]
   - button "×"
@@ -22,7 +22,7 @@
   - strong: /\d+ mb/
   - text: "Tonbe sou tè Ozetazini:"
   - strong: "3"
-  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - text: · Florida, Louisiana Van (kt) ↑ Presyon (mb) ↓ envèse L = rive atè Ozetazini
   - img "Graf entansite nan tan": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading "Side-by-side" [level=3]
   - table:

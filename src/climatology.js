@@ -4,6 +4,7 @@
 // for the life of the page session.
 import { getLandfalls, ensureStormsLoaded, getStorm } from './data.js';
 import { computeACE } from './metrics.js';
+import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 
 let _cache = null;
@@ -106,7 +107,7 @@ export async function renderClimatologyChart(host) {
 
   host.innerHTML = `
     <div class="clim-chart-wrap">
-      <svg class="clim-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Annual climatology: ACE, named storms, US landfalls, ${yearMin} to ${yearMax}">
+      <svg class="clim-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${escapeHtml(t('clim.chartLabel', yearMin, yearMax))}">
         <!-- baseline -->
         <line class="clim-axis" x1="${padL}" y1="${(padT + innerH).toFixed(1)}" x2="${(padL + innerW).toFixed(1)}" y2="${(padT + innerH).toFixed(1)}" />
         ${annotations}
@@ -119,10 +120,10 @@ export async function renderClimatologyChart(host) {
         ${ticks.join('')}
       </svg>
       <div class="clim-legend">
-        <div class="clim-legend-item"><span class="clim-swatch clim-ace"></span> ACE (Accumulated Cyclone Energy) — peak ${maxACE.toFixed(0)}</div>
-        <div class="clim-legend-item"><span class="clim-swatch clim-named"></span> Named storms (≥34 kt) — peak ${maxNamed}</div>
-        <div class="clim-legend-item"><span class="clim-swatch clim-landfalls"></span> US landfalls — peak ${maxLF}</div>
+        <div class="clim-legend-item"><span class="clim-swatch clim-ace"></span> ${t('clim.legendAce', maxACE.toFixed(0))}</div>
+        <div class="clim-legend-item"><span class="clim-swatch clim-named"></span> ${t('clim.legendNamed', maxNamed)}</div>
+        <div class="clim-legend-item"><span class="clim-swatch clim-landfalls"></span> ${t('clim.legendLandfalls', maxLF)}</div>
       </div>
-      <p class="clim-note">Top 3 landfall-storm ACE years annotated at top: ${top3.map(s => `<strong>${s.year}</strong> (${s.ace.toFixed(0)})`).join(', ')}. ACE is subtotaled only for storms in this U.S.-landfall catalog; the named-storm threshold is the post-1950 naming convention applied retroactively.</p>
+      <p class="clim-note">${t('clim.noteTop3', top3.map(s => `<strong>${s.year}</strong> (${s.ace.toFixed(0)})`).join(', '))} ${t('clim.noteMethod')}</p>
     </div>`;
 }

@@ -154,9 +154,9 @@ export function renderIntensityChart(container, storm, opts = {}) {
   const svg = `
     <div class="intensity-chart">
       <div class="chart-legend">
-        <span class="cl-item"><span class="cl-swatch wind"></span>Wind (kt) ↑</span>
-        <span class="cl-item"><span class="cl-swatch pres"></span>Pressure (mb) ↓ inverted</span>
-        <span class="cl-item cl-landfall">L = U.S. landfall</span>
+        <span class="cl-item"><span class="cl-swatch wind"></span>${t('chart.legendWind')}</span>
+        <span class="cl-item"><span class="cl-swatch pres"></span>${t('chart.legendPressure')}</span>
+        <span class="cl-item cl-landfall">${t('chart.legendLandfall')}</span>
       </div>
       <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="intensity-svg" role="img" aria-label="${t('chart.intensityAlt')}">
         ${bandRects}

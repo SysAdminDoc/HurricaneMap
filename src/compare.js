@@ -217,7 +217,7 @@ export function openComparePanel() {
       <div class="cp-empty">
         <h2>${t('compare.title')}</h2>
         <p>${t('compare.emptyHint')}</p>
-        <p class="hint">Open any landfall, choose <strong>${t('compare.pin')}</strong> in the storm panel, then return here for the full breakdown.</p>
+        <p class="hint">${t('compare.hintHtml', t('compare.pin'))}</p>
       </div>
     `;
     return;

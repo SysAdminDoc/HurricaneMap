@@ -1,6 +1,7 @@
 // Leaflet map + landfall markers + track overlays.
 import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
+import { t } from './i18n.js';
 import { getPaletteColor, prefersReducedMotion } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
@@ -187,7 +188,7 @@ export function renderLandfalls(landfalls, onSelect) {
       weight: isMajor ? 2.2 : 1.6,
       opacity: 0.6,
     };
-    const tt = `${lf.year} ${formatStormName(lf.name, { unnamed: 'Unnamed storm' })} — ${shortCat(lf.category)} • ${lf.state}`;
+    const tt = `${lf.year} ${formatStormName(lf.name, { unnamed: t('map.unnamedStorm') })} — ${shortCat(lf.category)} • ${lf.state}`;
     marker._tooltipText = tt;
     // Grow on hover via Leaflet setStyle (NOT CSS transform — see styles.css).
     marker.on('mouseover', () => setHoveredMarker(marker));

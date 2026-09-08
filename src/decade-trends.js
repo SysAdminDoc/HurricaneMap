@@ -129,7 +129,7 @@ async function buildDecadeTrends() {
 // Render a table-style decade analysis.
 export async function renderDecadeTrends(host) {
   if (!host) return;
-  host.innerHTML = `<div class="dt-loading">Computing decade trends…</div>`;
+  host.innerHTML = `<div class="dt-loading">${t('stats.decadeLoading')}</div>`;
   
   const series = await buildDecadeTrends();
   if (!series || series.length === 0) {
@@ -163,7 +163,7 @@ export async function renderDecadeTrends(host) {
         <thead>
           <tr>
             <th scope="col" class="dt-decade">${t('stats.decadeColumn')}</th>
-            <th scope="col" class="dt-named" title="Named storms (≥34kt)">${t('stats.namedColumn')}</th>
+            <th scope="col" class="dt-named" title="${escapeHtml(t('stats.namedColumnTitle'))}">${t('stats.namedColumn')}</th>
             <th scope="col" class="dt-major" title="Major hurricanes (≥96kt / Cat 3+)">${t('stats.majorColumn')}</th>
             <th scope="col" class="dt-ace" title="${t('stats.aceFull')}">ACE</th>
             <th scope="col" class="dt-deadliest">${t('stats.deadliest')}</th>

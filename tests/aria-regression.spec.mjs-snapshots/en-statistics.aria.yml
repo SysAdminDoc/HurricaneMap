@@ -6,7 +6,7 @@
   - text: 📊 SEASONAL OUTLOOK NOAA CPC
   - status:
     - strong: Seasonal outlook
-    - text: /Current NOAA CPC bundled outlook snapshot 2 records Last good Aug 8, \d+, \d+:\d+ PM/
+    - text: /Current NOAA CPC bundled outlook snapshot 2 records Last good Aug 8, \d+, 4:\d+ PM/
     - button "Retry"
   - strong: "/\\d+ Atlantic: Below-normal season expected/"
   - text: El Niño (strong)
@@ -32,9 +32,9 @@
   - group: Show coverage by year
   - heading "Landfalls by decade" [level=3]
   - text: /\d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+/
-  - heading "Annual climatology — ACE, named storms, US landfalls" [level=3]
-  - 'img /Annual climatology: ACE, named storms, US landfalls, \d+ to \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
-  - text: /ACE \(Accumulated Cyclone Energy\) — peak \d+ Named storms \(≥\d+ kt\) — peak \d+ US landfalls — peak \d+/
+  - 'heading "Annual climatology: ACE, named storms, U.S. landfalls" [level=3]'
+  - 'img /Annual climatology: ACE, named storms, U\.S\. landfalls, \d+ to \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
+  - text: /ACE \(Accumulated Cyclone Energy\), peak \d+ Named storms \(≥\d+ kt\), peak \d+ U\.S\. landfalls, peak \d+/
   - paragraph:
     - text: "Top 3 landfall-storm ACE years annotated at top:"
     - strong: /\d+/
@@ -42,8 +42,8 @@
     - strong: /\d+/
     - text: /\(\d+\),/
     - strong: /\d+/
-    - text: /\(\d+\)\. ACE is subtotaled only for storms in this U\.S\.-landfall catalog; the named-storm threshold is the post-\d+ naming convention applied retroactively\./
-  - heading /Climate trends — \d+-year rolling averages/ [level=3]
+    - text: /\(\d+\)\. ACE is subtotaled only for storms in this U\.S\.-landfall catalog\. The named-storm threshold is the post-\d+ naming convention applied retroactively\./
+  - 'heading /Climate trends: \d+-year rolling averages/ [level=3]'
   - img: High Low Landfalls ACE Forward speed
   - paragraph:
     - strong: /Trend direction \(\d+-year rolling avg\):/

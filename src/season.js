@@ -134,7 +134,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     <div class="ss-stats">
       <div class="ss-stat">
         <span class="ss-stat-num">${stormList.length}</span>
-        <span class="ss-stat-lbl">named storm${stormList.length === 1 ? '' : 's'}</span>
+        <span class="ss-stat-lbl">${stormList.length === 1 ? t('seasonal.namedStormOne') : t('seasonal.namedStormMany')}</span>
       </div>
       <div class="ss-stat">
         <span class="ss-stat-num">${landfalls.length}</span>
@@ -212,7 +212,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       dHost.innerHTML = `${escapeHtml(n)} ${deadliest.storm.year} <span class="ss-meta">${formatFatalityCount(deadliest.value)} dead</span>`;
     } else {
       dHost.classList.remove('ss-loading');
-      dHost.innerHTML = '<span class="ss-meta">no impact records</span>';
+      dHost.innerHTML = `<span class="ss-meta">${t('seasonal.noImpactRecords')}</span>`;
     }
   }
   const cHost = host.querySelector('[data-role="costliest"] dd');
@@ -225,7 +225,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       cHost.innerHTML = `${escapeHtml(n)} ${costliest.storm.year} <span class="ss-meta">— ${adjLabel}</span>`;
     } else {
       cHost.classList.remove('ss-loading');
-      cHost.innerHTML = '<span class="ss-meta">no impact records</span>';
+      cHost.innerHTML = `<span class="ss-meta">${t('seasonal.noImpactRecords')}</span>`;
     }
   }
 

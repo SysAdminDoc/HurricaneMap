@@ -65,7 +65,7 @@ export async function enableStateClicks(map) {
 }
 export async function openState(stateName) {
   showPanel('state-panel');
-  body.innerHTML = `<p class="state-loading">Loading ${escapeHtml(stateName)}…</p>`;
+  body.innerHTML = `<p class="state-loading">${t('state.loading', escapeHtml(stateName))}</p>`;
   await ensureStormsLoaded();
 
   const allLandfalls = getLandfalls();
@@ -79,7 +79,7 @@ export async function openState(stateName) {
       <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
       <div class="state-empty empty-state">
         <strong>${t('state.noLandfalls')}</strong>
-        <span>${escapeHtml(stateName)} is in the coastal-state reference set, but HurricaneMap has no HURDAT2 tropical-storm or hurricane landfall events for it.</span>
+        <span>${t('state.noEventsHtml', escapeHtml(stateName))}</span>
       </div>
     `;
     return;
@@ -171,7 +171,7 @@ export async function openState(stateName) {
     <div class="state-panel-layout">
       <section class="state-summary-cluster" aria-label="${t('state.summary')}">
         <h2 id="state-panel-title">${escapeHtml(stateName)}</h2>
-        <p class="state-sub">Every hurricane and tropical-storm landfall on record (HURDAT2, 1851 onward).</p>
+        <p class="state-sub">${t('state.allLandfallsNote')}</p>
 
         <div class="stat-grid">
           <div class="stat"><div class="label">${t('state.totalEvents')}</div><div class="value">${total}</div></div>
@@ -196,7 +196,7 @@ export async function openState(stateName) {
       <section class="state-records-cluster" aria-label="${t('state.records')}">
         ${worst.length ? `
           <section class="state-section state-section--worst">
-            <h3 class="panel-section-h3">Worst on record (top ${worst.length})</h3>
+            <h3 class="panel-section-h3">${t('state.worstOnRecord', worst.length)}</h3>
             <ul class="state-storm-list">${worstHtml}</ul>
           </section>
         ` : ''}

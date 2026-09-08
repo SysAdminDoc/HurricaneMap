@@ -75,29 +75,29 @@ export function renderStormEventsHtml(storm, record, metadata = {}) {
   if (!record || (!record.tornado_count && !record.hail_count)) {
     return emptyBlock(
       t('stormevents.title'),
-      `No tornado or hail reports were found in affected states from ${before}h before to ${after}h after U.S. landfall.`,
+      t('stormEvents.noneInWindow', before, after),
       source,
     );
   }
 
   const tornadoStates = statesForType(record, 'tornado');
   const hailStates = statesForType(record, 'hail');
-  const maxHail = record.max_hail_in ? ` · largest ${presentNumber(record.max_hail_in, 2)} in` : '';
-  const strongest = record.strongest_tornado_scale ? ` · strongest ${escapeHtml(record.strongest_tornado_scale)}` : '';
+  const maxHail = record.max_hail_in ? t('stormEvents.largestHail', presentNumber(record.max_hail_in, 2)) : '';
+  const strongest = record.strongest_tornado_scale ? t('stormEvents.strongestTornado', escapeHtml(record.strongest_tornado_scale)) : '';
 
   return `
     <h3 class="panel-section-h3">${t('stormevents.title')}</h3>
     <div class="storm-events-block">
       <div class="se-row">
         <span class="se-label">${t('stormevents.tornadoActivity')}</span>
-        <span class="se-value">${record.tornado_count || 0} report${record.tornado_count === 1 ? '' : 's'}${tornadoStates ? ` in ${escapeHtml(tornadoStates)}` : ''}${strongest}</span>
+        <span class="se-value">${record.tornado_count === 1 ? t('stormEvents.reportsOne', 1) : t('stormEvents.reportsMany', record.tornado_count || 0)}${tornadoStates ? t('stormEvents.inStates', escapeHtml(tornadoStates)) : ''}${strongest}</span>
       </div>
       <div class="se-row">
         <span class="se-label">${t('stormevents.hailActivity')}</span>
-        <span class="se-value">${record.hail_count || 0} report${record.hail_count === 1 ? '' : 's'}${hailStates ? ` in ${escapeHtml(hailStates)}` : ''}${maxHail}</span>
+        <span class="se-value">${record.hail_count === 1 ? t('stormEvents.reportsOne', 1) : t('stormEvents.reportsMany', record.hail_count || 0)}${hailStates ? t('stormEvents.inStates', escapeHtml(hailStates)) : ''}${maxHail}</span>
       </div>
       ${renderSampleEvents(record.sample_events)}
-      <div class="se-source">${escapeHtml(source)} · ${before}h before to ${after}h after U.S. landfall</div>
+      <div class="se-source">${escapeHtml(source)} · ${t('stormEvents.window', before, after)}</div>
     </div>
   `;
 }

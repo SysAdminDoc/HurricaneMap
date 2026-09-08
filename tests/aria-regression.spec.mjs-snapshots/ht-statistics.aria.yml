@@ -2,7 +2,7 @@
   - button "Minimize estatistik"
   - button "Fèmen estatistik": ×
   - heading "Estatistik" [level=2]
-  - paragraph: "/\\d+ U\\.S\\.-landfalling storms · \\d+ landfall events · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
+  - paragraph: "/\\d+ tanpèt ki rive atè Ozetazini · \\d+ evènman rive atè · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
   - text: 📊 PÈSPEKTIV SEZON NOAA CPC
   - status:
     - strong: Pèspektiv sezon an
@@ -32,22 +32,22 @@
   - group: Montre kouvèti pa ane
   - heading "Touche tè pa deseni" [level=3]
   - text: /\d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+ \d+[hmsp]+ \d+/
-  - heading "Klimatoloji anyèl — ACE, named storms, US landfalls" [level=3]
-  - 'img /Annual climatology: ACE, named storms, US landfalls, \d+ to \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
-  - text: /ACE \(Accumulated Cyclone Energy\) — peak \d+ Named storms \(≥\d+ kt\) — peak \d+ US landfalls — peak \d+/
+  - 'heading "Klimatoloji anyèl: ACE, tanpèt ki gen non, rive atè Ozetazini" [level=3]'
+  - 'img /Klimatoloji anyèl: ACE, tanpèt ki gen non, rive atè Ozetazini, \d+ pou rive \d+/': /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+/
+  - text: /ACE \(enèji siklòn akimile\), pik \d+ Tanpèt ki gen non \(≥\d+ kt\), pik \d+ Rive atè Ozetazini, pik \d+/
   - paragraph:
-    - text: "Top 3 landfall-storm ACE years annotated at top:"
+    - text: "Twa (3) ane ki gen pi gwo ACE pou tanpèt ki rive atè yo make anwo a:"
     - strong: /\d+/
     - text: /\(\d+\),/
     - strong: /\d+/
     - text: /\(\d+\),/
     - strong: /\d+/
-    - text: /\(\d+\)\. ACE is subtotaled only for storms in this U\.S\.-landfall catalog; the named-storm threshold is the post-\d+ naming convention applied retroactively\./
-  - heading /Tandans klimatik — \d+-year rolling averages/ [level=3]
+    - text: /\(\d+\)\. ACE la kalkile sèlman pou tanpèt ki nan katalòg rive atè Ozetazini an\. Sèy tanpèt ki gen non an se konvansyon non apre \d+ la yo aplike an aryè\./
+  - 'heading /Tandans klimatik: mwayèn woulan sou \d+ an/ [level=3]'
   - img: Wo Ba Touche tè ACE Vitès avanse
   - paragraph:
-    - strong: /Trend direction \(\d+-year rolling avg\):/
-    - text: "Landfalls: ↑ increasing · ACE: ↑ increasing · Speed: ↓ decreasing"
+    - strong: /Direksyon tandans \(mwayèn woulan sou \d+ an\):/
+    - text: "Landfalls: ↑ ap monte · ACE: ↑ ap monte · Speed: ↓ ap desann"
   - heading "Tandans pa deseni" [level=3]
   - region "Tandans pa deseni":
     - table:

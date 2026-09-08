@@ -72,7 +72,7 @@ function render() {
   body.innerHTML = `
     <h2 id="stats-panel-title">${t('stats.title')}</h2>
     <p class="stats-summary">
-      ${stats.total_storms} U.S.-landfalling storms · ${stats.total_landfall_events} landfall events ·
+      ${t('stats.summaryLine', stats.total_storms, stats.total_landfall_events)}
       ${stats.total_hurricane_landfalls} of those at hurricane strength.
       Coverage: ${stats.year_range[0]}–${stats.year_range[1]}.
     </p>
@@ -114,12 +114,12 @@ function render() {
 
       <div class="stats-panel-column stats-panel-column--charts">
         <section class="stats-section stats-section--climatology">
-          <h3>${t('stats.climatologyChart')} — ACE, named storms, US landfalls</h3>
+          <h3>${t('stats.climatologyChartHeading', t('stats.climatologyChart'))}</h3>
           <div id="climatology-chart" class="clim-host"></div>
         </section>
 
         <section class="stats-section stats-section--climate">
-          <h3>${t('stats.climateTrends')} — 10-year rolling averages</h3>
+          <h3>${t('stats.climateTrendsHeading', t('stats.climateTrends'))}</h3>
           <div id="climate-trends-chart" class="climate-trends-host"></div>
         </section>
       </div>
@@ -135,17 +135,17 @@ function render() {
   // Async-render the climatology chart and decade trends after the synchronous stats are mounted.
   const climHost = document.getElementById('climatology-chart');
   if (climHost) renderClimatologyChart(climHost).catch(e => {
-      climHost.innerHTML = `<p class="panel-inline-error">Climatology chart unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+      climHost.innerHTML = `<p class="panel-inline-error">${t('stats.climatologyUnavailable', escapeHtml(e.message || t('stats.unknownError')))}</p>`;
   });
   
   const dtHost = document.getElementById('decade-trends-chart');
   if (dtHost) renderDecadeTrends(dtHost).catch(e => {
-    dtHost.innerHTML = `<p class="panel-inline-error">Decade trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+    dtHost.innerHTML = `<p class="panel-inline-error">${t('stats.decadeUnavailable', escapeHtml(e.message || t('stats.unknownError')))}</p>`;
   });
 
   const ctHost = document.getElementById('climate-trends-chart');
   if (ctHost) {
-    ctHost.innerHTML = '<p class="panel-muted">Loading climate trends…</p>';
+    ctHost.innerHTML = `<p class="panel-muted">${t('stats.climateTrendsLoading')}</p>`;
     ensureStormsLoaded().then(() => {
       if (!ctHost.isConnected) return;
       const trends = computeClimateTrends(getAllStorms());
@@ -153,7 +153,7 @@ function render() {
       else ctHost.innerHTML = `<p class="panel-muted">${t('stats.noTrendData')}</p>`;
     }).catch(e => {
       if (ctHost.isConnected) {
-        ctHost.innerHTML = `<p class="panel-inline-error">Climate trends unavailable: ${escapeHtml(e.message || 'unknown error')}</p>`;
+        ctHost.innerHTML = `<p class="panel-inline-error">${t('stats.climateTrendsUnavailable', escapeHtml(e.message || t('stats.unknownError')))}</p>`;
       }
     });
   }
@@ -302,10 +302,10 @@ function renderClimateTrendsChart(host, trends) {
   host.innerHTML = svg;
   
   // Add a small text summary of trends
-  const trendDir = (slope) => slope > 0 ? '↑ increasing' : slope < 0 ? '↓ decreasing' : '→ stable';
+  const trendDir = (slope) => (slope > 0 ? t('stats.trendIncreasing') : slope < 0 ? t('stats.trendDecreasing') : t('stats.trendStable'));
   const summary = `
     <p class="trend-summary">
-      <strong>Trend direction (10-year rolling avg):</strong><br/>
+      <strong>${t('stats.trendDirectionLabel')}</strong><br/>
       Landfalls: ${trendDir(trends.trends.landfalls_slope)} · 
       ACE: ${trendDir(trends.trends.ace_slope)} · 
       Speed: ${trendDir(trends.trends.speed_slope)}

@@ -47,7 +47,7 @@ export function formatReturnPeriods(returnPeriods) {
   if (returnPeriods.cat1_years) items.push('Cat 1+: ~' + returnPeriods.cat1_years + 'y');
   else if (returnPeriods.cat1_count === 0) items.push('Cat 1+: never');
   if (items.length === 0) return '';
-  return '<span class="return-periods-label">Return period (50 km radius):</span> ' + items.join(' • ');
+  return `<span class="return-periods-label">${t('panel.returnPeriodLabel')}</span> ` + items.join(' • ');
 }
 
 function showToast(message, tone = 'info') {

@@ -12,7 +12,7 @@
   - strong: /\d+ mb/
   - text: "Toques de tierra en EE. UU.:"
   - strong: "3"
-  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - text: · Florida, Louisiana Viento (kt) ↑ Presión (mb) ↓ invertida L = tocamiento de tierra en EE. UU.
   - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading /Andrew \(\d+\)/ [level=3]
   - button "×"
@@ -22,7 +22,7 @@
   - strong: /\d+ mb/
   - text: "Toques de tierra en EE. UU.:"
   - strong: "3"
-  - text: · Florida, Louisiana Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+  - text: · Florida, Louisiana Viento (kt) ↑ Presión (mb) ↓ invertida L = tocamiento de tierra en EE. UU.
   - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L/
   - heading "Side-by-side" [level=3]
   - table:

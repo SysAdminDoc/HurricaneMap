@@ -101,7 +101,7 @@ export function createAboutRenderer({
     const stats = getStats();
     if (!metadata) {
       dataProvenanceBody.innerHTML = `
-        <p class="provenance-empty">Build metadata is unavailable in this data bundle. Counts still come from validated HURDAT2 statistics.</p>`;
+        <p class="provenance-empty">${t('about.provenanceEmpty')}</p>`;
       return;
     }
 
@@ -117,7 +117,7 @@ export function createAboutRenderer({
           <li>
             <strong>${escapeHtml(source.filename || source.id || 'Source file')}</strong>
             <span>${escapeHtml(source.basin || 'Basin')} · ${formatNumber(source.storm_count)} storms · ${range}</span>
-            <span>Modified ${escapeHtml(formatMetadataDate(source.modified_utc))}</span>
+            <span>${t('about.sourceModified', escapeHtml(formatMetadataDate(source.modified_utc)))}</span>
           </li>`;
       }).join('')
       : '';

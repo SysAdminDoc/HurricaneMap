@@ -1,7 +1,7 @@
 // Internationalization (i18n) — English, Spanish (ES-LA), Haitian Creole
 // Single source of truth for all user-facing strings.
 
-import { escapeHtml as escapeHtmlValue } from './html-utils.js';
+import { escapeHtml as escapeHtmlValue, setUnnamedStormLabel } from './html-utils.js';
 import en from './locales/en.js';
 
 const LOCALE_EN = 'en';
@@ -65,6 +65,7 @@ export function setLocale(locale) {
   if (!SUPPORTED_LOCALES.has(locale)) return Promise.resolve(currentLocale);
   const apply = () => {
     currentLocale = locale;
+    setUnnamedStormLabel(t('storm.unnamed'));
     document.documentElement.lang = locale;
     document.dispatchEvent(new CustomEvent('hm-locale:change', { detail: { locale } }));
     return currentLocale;

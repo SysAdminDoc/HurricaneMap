@@ -12,7 +12,7 @@
 
 import { categoryColor, formatTime, windToCategory, categoryLabel } from './data.js';
 import { getStormRadarFrames } from './radar.js';
-import { formatStormName } from './html-utils.js';
+import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
 import { getSetting } from './settings.js';
 import { createRadarImageOverlay } from './radar-palette.js';
@@ -313,7 +313,7 @@ export class TrackAnimator {
             <input type="checkbox" class="anim-radar-cb" ${this.radarEnabled ? 'checked' : ''}>
             radar (${radarCount})
           </label>`
-      : '<span class="anim-radar-toggle anim-radar-disabled" title="No archived radar for this storm (pre-1995 or out of coverage)">radar unavailable</span>';
+      : `<span class="anim-radar-toggle anim-radar-disabled" title="${escapeHtml(t('anim.radarUnavailableTitle'))}">${t('anim.radarUnavailable')}</span>`;
     el.innerHTML = `
       <button class="anim-btn" data-act="toggle" title="${t('anim.pauseTitle')}" aria-label="${t('anim.pauseTitle')}">${t('anim.pause')}</button>
       <button class="anim-btn" data-act="restart" title="${t('anim.restartTitle')}" aria-label="${t('anim.restartTitle')}">${t('anim.restart')}</button>

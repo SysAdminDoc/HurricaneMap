@@ -2,13 +2,13 @@
   - button "Minimizar detalles de la tormenta"
   - button "Cerrar detalles de la tormenta": ×
   - heading /Katrina \(\d+\)/ [level=2]
-  - text: "Cat 3 at landfall Peak intensity:"
+  - text: "Cat 3 al tocar tierra Intensidad máxima:"
   - strong: /Cat 5 \d+ kt/
-  - text: Atlantic basin AL122005
+  - text: Cuenca del Atlántico AL122005
   - button "Reproducir trayectoria"
   - button "📌 Fijar para comparar"
   - region "Resumen del huracán":
-    - text: /Texto educativo · fuente en inglés KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Rapid intensification \(\+\d+ kt \/ \d+[hmsp]+\) 📉 Explosive deepening \(−\d+ mb \/ \d+[hmsp]+\) Viento máximo \d+ kt Presión mínima \d+ mb ACE ⓘ \d+\.\d+ Avg forward speed ⓘ \d+ km\/h \(\d+ mph\) Toques de tierra en EE\. UU\. 3 Est\. exposure ⓘ [\d,.]+[bkmBKM]+ Cat-2\+ winds RI risk ⓘ 🔴 High Paso más cercano a/
+    - text: /Texto educativo · fuente en inglés KATRINA \(\d+\) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of \d+ kt and caused \d+,\d+ fatalities and \$[\d,.]+[bkmBKM]+ in damage\. The storm underwent rapid intensification \(\+\d+ kt in \d+[hmsp]+\), experienced explosive deepening \(−\d+ mb pressure drop\), impacted multiple states\. ⚡ Intensificación rápida \(\+\d+ kt \/ \d+ h\) 📉 Profundización explosiva \(−\d+ mb \/ \d+ h\) Viento máximo \d+ kt Presión mínima \d+ mb ACE ⓘ \d+\.\d+ Velocidad media de avance ⓘ \d+ km\/h \(\d+ mph\) Toques de tierra en EE\. UU\. 3 Exposición est\. ⓘ [\d,.]+[bkmBKM]+ vientos de Cat-2\+ Riesgo de IR ⓘ 🔴 Alto Paso más cercano a/
     - combobox "Paso más cercano a":
       - option "Miami, FL" [selected]
       - option "Key West, FL"
@@ -36,7 +36,7 @@
       - option "San Diego, CA"
       - option "Cabo San Lucas, MX"
     - strong: /\d+ mi/
-    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Return period \\(\\d+ km radius\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Periodo de retorno \\(radio de \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Impactos" [level=3]
     - text: /Víctimas mortales \d+,\d+ Daños \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Desastre de mil millones \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ muertes\)/
     - 'link "Fuente: Wikipedia"':
@@ -45,10 +45,10 @@
     - 'link /Fuente: NOAA NCEI \(congelado en \d+\)/':
       - /url: https://www.ncei.noaa.gov/access/billions/
     - heading "Eventos meteorológicos cerca del toque de tierra" [level=3]
-    - text: Actividad de tornados durante el toque de tierra 1 report in Florida · strongest F2 Actividad de granizo durante el toque de tierra 0 reports
+    - text: Actividad de tornados durante el toque de tierra 1 informe en Florida · más fuerte F2 Actividad de granizo durante el toque de tierra 0 informes
     - list "Muestra de eventos coincidentes de Storm Events":
       - listitem: Tornado MONROE, Florida F2
-    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+[hmsp]+ before to \d+[hmsp]+ after U\.S\. landfall Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Source:/
+    - text: /NOAA\/NCEI Storm Events Database bulk CSV · \d+ h antes hasta \d+ h después del tocamiento de tierra en EE\. UU\. Peak rainfall \(WPC\) \d+\.\d+" at PERRINE 4W FL Fuente:/
     - link "NOAA WPC TC Rainfall":
       - /url: https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html
     - heading "Mareógrafos (NOAA CO-OPS)" [level=3]
@@ -56,31 +56,31 @@
   - region "Análisis del huracán":
     - heading "Huracanes similares" [level=3]
     - list:
-      - listitem: /Ian \(\d+\) Cat 5 3 landfalls \d+%/
-      - listitem: /Belle \(\d+\) Cat 3 2 landfalls \d+%/
-      - listitem: /Carol \(\d+\) Cat 3 2 landfalls \d+%/
-      - listitem: /Unnamed \(\d+\) Cat 4 1 landfall \d+%/
-      - listitem: /Celia \(\d+\) Cat 4 1 landfall \d+%/
+      - listitem: /Ian \(\d+\) Cat 5 3 tocamientos de tierra \d+%/
+      - listitem: /Belle \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
+      - listitem: /Carol \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
+      - listitem: /Sin nombre \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
+      - listitem: /Celia \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
     - heading "Días con esta intensidad" [level=3]
     - 'img /Días con esta intensidad: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
-    - text: "Total tracked: 7.5 days"
+    - text: "Total registrado: 7.5 días"
     - heading "Intensidad a lo largo del tiempo" [level=3]
-    - text: Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall
+    - text: Viento (kt) ↑ Presión (mb) ↓ invertida L = tocamiento de tierra en EE. UU.
     - img "Gráfico de intensidad a lo largo del tiempo": /\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ \d+-\d+ L L L ⚡ RI \+\d+ kt/
     - button "⤓ PNG"
     - button "⤓ SVG"
   - region "Recursos del huracán":
-    - heading "U.S. landfalls (chronological)" [level=3]
+    - heading "Tocamientos de tierra en EE. UU. (cronológico)" [level=3]
     - list:
       - listitem:
         - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
+        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
       - listitem:
         - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Show NEXRAD radar for Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
     - status: "/Caché de radar: no hay imágenes guardadas \\(\\d+ disponibles\\)/"
     - region "Contexto federal del desastre":
       - heading "Contexto federal del desastre" [level=3]
@@ -110,11 +110,11 @@
       - /url: https://www.nhc.noaa.gov/archive/recon/2005/
     - text: "Exportar trayectoria:"
     - button "CSV"
-    - button "CSV (publication)"
+    - button "CSV (publicación)"
     - button "GeoJSON"
     - button "KML"
-    - button "SVG map"
-    - button "🔗 Share view"
+    - button "Mapa SVG"
+    - button "🔗 Compartir vista"
     - region "Exportar video":
       - heading "Exportar video" [level=3]
       - paragraph: Cree un WebM de la trayectoria de esta tormenta con sus fechas, leyenda de categorías y atribución de NOAA.
@@ -230,8 +230,8 @@
         - option /\d+/
       - paragraph: Varias rutas muestreadas del centro comunican incertidumbre sin un límite rígido. Son posibilidades educativas, no pronósticos ni límites de impacto.
       - status
-    - checkbox /🌬️ Show wind-field swath \(\d+ analyzed records\)/
-    - text: /🌬️ Show wind-field swath \(\d+ analyzed records\)/
+    - checkbox /🌬️ Mostrar la franja del campo de viento \(\d+ registros analizados\)/
+    - text: /🌬️ Mostrar la franja del campo de viento \(\d+ registros analizados\)/
     - checkbox /🌊 Mostrar marcas de agua alta observadas \(\d+ mediciones USGS\)/
     - text: /🌊 Mostrar marcas de agua alta observadas \(\d+ mediciones USGS\)/
   - group: Citar esta versión
