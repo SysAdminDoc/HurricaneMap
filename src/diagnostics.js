@@ -1,5 +1,5 @@
 import { escapeHtml } from './html-utils.js';
-import { t } from './i18n.js';
+import { formatRelativeTime, t } from './i18n.js';
 import { getOptionalFeedStates } from './optional-feeds.js';
 import { announceLocalAction } from './confirm-action.js';
 import { formatStorageBytes, inspectStorage } from './storage-manager.js';
@@ -204,10 +204,13 @@ export async function collectOfflineDiagnostics({
 export function formatDiagnosticAge(milliseconds) {
   if (!Number.isFinite(milliseconds)) return t('diagnostics.never');
   const minutes = Math.max(0, Math.round(milliseconds / 60_000));
-  if (minutes < 60) return t('diagnostics.minutesAgo', minutes);
+  if (minutes < 60) return formatRelativeTime(-minutes, 'minute');
   const hours = Math.round(minutes / 60);
-  if (hours < 48) return t('diagnostics.hoursAgo', hours);
-  return t('diagnostics.daysAgo', Math.round(hours / 24));
+  // 24, not 48. The old threshold meant the day branch started at two days, so
+  // the "1 days ago" this was filed against could never actually render and a
+  // full day read as "24 hr. ago" instead.
+  if (hours < 24) return formatRelativeTime(-hours, 'hour');
+  return formatRelativeTime(-Math.round(hours / 24), 'day');
 }
 
 function downloadBundle(bundle, documentRef = document) {

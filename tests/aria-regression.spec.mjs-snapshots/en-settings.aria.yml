@@ -186,7 +186,7 @@
         - strong: Source bundle
         - text: not installed · 0 · 0 B
     - strong: Optional-feed age
-    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful · sst: never successful · hwm: 0 min ago · storm-events: 0 min ago · exposure: 0 min ago · evac: never successful"
+    - text: "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful · sst: never successful · hwm: 0 min. ago · storm-events: 0 min. ago · exposure: 0 min. ago · evac: never successful"
     - strong: Archive coverage
     - text: /\d+ datasets · \d+–\d+ · \d+ storms/
     - list "Archive coverage":

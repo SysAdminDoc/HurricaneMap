@@ -39,37 +39,37 @@
       - button "CHARLEY en South Carolina":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button "CHARLEY en South Carolina":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button "CHARLEY en Florida":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 5 d/
+      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 5 d/
     - listitem:
       - text: /\d+/
       - button "CHARLEY en Florida":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 5 d/
+      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 5 d/
     - listitem:
       - text: /\d+/
       - button "BONNIE en Florida":
         - strong: BONNIE
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 4 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 4 d/
     - listitem:
       - text: /\d+/
       - button "BERTHA en Texas":
         - strong: BERTHA
         - text: ""
-      - text: /TD \d+ kt 9 ago \d+, \d+:\d+ UTC en 1 d/
+      - text: /TD \d+ kt 9 ago \d+, \d+:\d+ UTC mañana/
     - listitem:
       - text: /\d+/
       - button "BERTHA en Louisiana":
@@ -81,7 +81,7 @@
       - button "BARRY en Florida":
         - strong: BARRY
         - text: ""
-      - text: /TS \d+ kt 6 ago \d+, \d+:\d+ UTC hace 2 d/
+      - text: /TS \d+ kt 6 ago \d+, \d+:\d+ UTC anteayer/
     - listitem:
       - text: /\d+/
       - button "ERIN en Florida":
@@ -105,37 +105,37 @@
       - button "BERYL en Louisiana":
         - strong: BERYL
         - text: ""
-      - text: /TS \d+ kt 9 ago \d+, \d+:\d+ UTC en 1 d/
+      - text: /TS \d+ kt 9 ago \d+, \d+:\d+ UTC mañana/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Texas/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button "DANNY en Louisiana":
         - strong: DANNY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 7 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 7 d/
     - listitem:
       - text: /\d+/
       - button "ALLEN en Texas":
         - strong: ALLEN
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button "BELLE en Massachusetts":
         - strong: BELLE
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button "BELLE en New York":
         - strong: BELLE
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button "CELIA en Texas":
@@ -147,31 +147,31 @@
       - button "ABBY en Texas":
         - strong: ABBY
         - text: ""
-      - text: /TS \d+ kt 7 ago \d+, \d+:\d+ UTC hace 1 d/
+      - text: /TS \d+ kt 7 ago \d+, \d+:\d+ UTC ayer/
     - listitem:
       - text: /\d+/
       - button "DOT en Hawaii":
         - strong: DOT
         - text: ""
-      - text: /Cat 1 \d+ kt 7 ago \d+, \d+:\d+ UTC hace 1 d/
+      - text: /Cat 1 \d+ kt 7 ago \d+, \d+:\d+ UTC ayer/
     - listitem:
       - text: /\d+/
       - button "BERTHA en Texas":
         - strong: BERTHA
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button "BETSY en Puerto Rico":
         - strong: BETSY
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 4 d/
+      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 4 d/
     - listitem:
       - text: /\d+/
       - button "CONNIE en North Carolina":
         - strong: CONNIE
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 4 d/
+      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 4 d/
     - listitem:
       - text: /\d+/
       - button "BRENDA en Louisiana":
@@ -183,19 +183,19 @@
       - button "BARBARA en North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button "BARBARA en North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button "BARBARA en North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en North Carolina/:
@@ -207,49 +207,49 @@
       - button /\d+ sin nombre en South Carolina/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 3 d/
+      - text: /Cat 2 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 3 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Texas/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 2 \d+ kt 7 ago \d+, \d+:\d+ UTC hace 1 d/
+      - text: /Cat 2 \d+ kt 7 ago \d+, \d+:\d+ UTC ayer/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 5 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 5 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 3 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 3 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 7 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 7 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Texas/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
@@ -261,7 +261,7 @@
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 3 \d+ kt 6 ago \d+, \d+:\d+ UTC hace 2 d/
+      - text: /Cat 3 \d+ kt 6 ago \d+, \d+:\d+ UTC anteayer/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
@@ -273,25 +273,25 @@
       - button /\d+ sin nombre en Alabama/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 3 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 3 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Mississippi/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 7 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 7 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 6 d/
+      - text: /Cat 1 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 6 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Florida/:
@@ -315,19 +315,19 @@
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 7 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 7 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Alabama/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt 7 ago \d+, \d+:\d+ UTC hace 1 d/
+      - text: /TS \d+ kt 7 ago \d+, \d+:\d+ UTC ayer/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Texas/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC en 5 d/
+      - text: /TS \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 5 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Alabama/:
@@ -339,17 +339,17 @@
       - button /\d+ sin nombre en Texas/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 3 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 5 d/
+      - text: /Cat 3 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 5 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 3 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 3 d/
+      - text: /Cat 3 \d+ kt \d+ ago \d+, \d+:\d+ UTC dentro de 3 d/
     - listitem:
       - text: /\d+/
       - button /\d+ sin nombre en Louisiana/:
         - strong: /\d+ sin nombre/
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC en 2 d/
+      - text: /Cat 4 \d+ kt \d+ ago \d+, \d+:\d+ UTC pasado mañana/
   - group: Citar esta versión

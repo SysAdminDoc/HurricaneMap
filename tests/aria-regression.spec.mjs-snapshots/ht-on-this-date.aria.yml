@@ -9,347 +9,347 @@
       - button "DEBBY nan South Carolina":
         - strong: DEBBY
         - text: ""
-      - text: /TS \d+ kt 8 août \d+, \d+:\d+ UTC jodi a/
+      - text: /TS \d+ kt 8 août \d+, \d+:\d+ UTC aujourd’hui/
     - listitem:
       - text: /\d+/
       - button "DEBBY nan Florida":
         - strong: DEBBY
         - text: ""
-      - text: /Cat 1 \d+ kt 5 août \d+, \d+:\d+ UTC 3 jou pase/
+      - text: /Cat 1 \d+ kt 5 août \d+, \d+:\d+ UTC il y a 3 j/
     - listitem:
       - text: /\d+/
       - button "ISAIAS nan North Carolina":
         - strong: ISAIAS
         - text: ""
-      - text: /Cat 1 \d+ kt 4 août \d+, \d+:\d+ UTC 4 jou pase/
+      - text: /Cat 1 \d+ kt 4 août \d+, \d+:\d+ UTC il y a 4 j/
     - listitem:
       - text: /\d+/
       - button "ISELLE nan Hawaii":
         - strong: ISELLE
         - text: ""
-      - text: /TS \d+ kt 8 août \d+, \d+:\d+ UTC jodi a/
+      - text: /TS \d+ kt 8 août \d+, \d+:\d+ UTC aujourd’hui/
     - listitem:
       - text: /\d+/
       - button "EDOUARD nan Texas":
         - strong: EDOUARD
         - text: ""
-      - text: /TS \d+ kt 5 août \d+, \d+:\d+ UTC 3 jou pase/
+      - text: /TS \d+ kt 5 août \d+, \d+:\d+ UTC il y a 3 j/
     - listitem:
       - text: /\d+/
       - button "CHARLEY nan South Carolina":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button "CHARLEY nan South Carolina":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button "CHARLEY nan Florida":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 5 jou/
+      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 5 j/
     - listitem:
       - text: /\d+/
       - button "CHARLEY nan Florida":
         - strong: CHARLEY
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 5 jou/
+      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 5 j/
     - listitem:
       - text: /\d+/
       - button "BONNIE nan Florida":
         - strong: BONNIE
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 4 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC dans 4 j/
     - listitem:
       - text: /\d+/
       - button "BERTHA nan Texas":
         - strong: BERTHA
         - text: ""
-      - text: /TD \d+ kt 9 août \d+, \d+:\d+ UTC nan 1 jou/
+      - text: /TD \d+ kt 9 août \d+, \d+:\d+ UTC demain/
     - listitem:
       - text: /\d+/
       - button "BERTHA nan Louisiana":
         - strong: BERTHA
         - text: ""
-      - text: /TS \d+ kt 5 août \d+, \d+:\d+ UTC 3 jou pase/
+      - text: /TS \d+ kt 5 août \d+, \d+:\d+ UTC il y a 3 j/
     - listitem:
       - text: /\d+/
       - button "BARRY nan Florida":
         - strong: BARRY
         - text: ""
-      - text: /TS \d+ kt 6 août \d+, \d+:\d+ UTC 2 jou pase/
+      - text: /TS \d+ kt 6 août \d+, \d+:\d+ UTC avant-hier/
     - listitem:
       - text: /\d+/
       - button "ERIN nan Florida":
         - strong: ERIN
         - text: ""
-      - text: /Cat 1 \d+ kt 3 août \d+, \d+:\d+ UTC 5 jou pase/
+      - text: /Cat 1 \d+ kt 3 août \d+, \d+:\d+ UTC il y a 5 j/
     - listitem:
       - text: /\d+/
       - button "ERIN nan Florida":
         - strong: ERIN
         - text: ""
-      - text: /Cat 1 \d+ kt 2 août \d+, \d+:\d+ UTC 6 jou pase/
+      - text: /Cat 1 \d+ kt 2 août \d+, \d+:\d+ UTC il y a 6 j/
     - listitem:
       - text: /\d+/
       - button "CHANTAL nan Texas":
         - strong: CHANTAL
         - text: ""
-      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC 7 jou pase/
+      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC il y a 7 j/
     - listitem:
       - text: /\d+/
       - button "BERYL nan Louisiana":
         - strong: BERYL
         - text: ""
-      - text: /TS \d+ kt 9 août \d+, \d+:\d+ UTC nan 1 jou/
+      - text: /TS \d+ kt 9 août \d+, \d+:\d+ UTC demain/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Texas/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button "DANNY nan Louisiana":
         - strong: DANNY
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 7 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 7 j/
     - listitem:
       - text: /\d+/
       - button "ALLEN nan Texas":
         - strong: ALLEN
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button "BELLE nan Massachusetts":
         - strong: BELLE
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button "BELLE nan New York":
         - strong: BELLE
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button "CELIA nan Texas":
         - strong: CELIA
         - text: ""
-      - text: /Cat 4 \d+ kt 3 août \d+, \d+:\d+ UTC 5 jou pase/
+      - text: /Cat 4 \d+ kt 3 août \d+, \d+:\d+ UTC il y a 5 j/
     - listitem:
       - text: /\d+/
       - button "ABBY nan Texas":
         - strong: ABBY
         - text: ""
-      - text: /TS \d+ kt 7 août \d+, \d+:\d+ UTC 1 jou pase/
+      - text: /TS \d+ kt 7 août \d+, \d+:\d+ UTC hier/
     - listitem:
       - text: /\d+/
       - button "DOT nan Hawaii":
         - strong: DOT
         - text: ""
-      - text: /Cat 1 \d+ kt 7 août \d+, \d+:\d+ UTC 1 jou pase/
+      - text: /Cat 1 \d+ kt 7 août \d+, \d+:\d+ UTC hier/
     - listitem:
       - text: /\d+/
       - button "BERTHA nan Texas":
         - strong: BERTHA
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button "BETSY nan Puerto Rico":
         - strong: BETSY
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 4 jou/
+      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 4 j/
     - listitem:
       - text: /\d+/
       - button "CONNIE nan North Carolina":
         - strong: CONNIE
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 4 jou/
+      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 4 j/
     - listitem:
       - text: /\d+/
       - button "BRENDA nan Louisiana":
         - strong: BRENDA
         - text: ""
-      - text: /TS \d+ kt 1 août \d+, \d+:\d+ UTC 7 jou pase/
+      - text: /TS \d+ kt 1 août \d+, \d+:\d+ UTC il y a 7 j/
     - listitem:
       - text: /\d+/
       - button "BARBARA nan North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button "BARBARA nan North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button "BARBARA nan North Carolina":
         - strong: BARBARA
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan North Carolina/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC 7 jou pase/
+      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC il y a 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan South Carolina/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 3 jou/
+      - text: /Cat 2 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 3 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Texas/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 2 \d+ kt 7 août \d+, \d+:\d+ UTC 1 jou pase/
+      - text: /Cat 2 \d+ kt 7 août \d+, \d+:\d+ UTC hier/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 5 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 5 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 3 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 3 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 7 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Texas/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 2 \d+ kt 8 août \d+, \d+:\d+ UTC jodi a/
+      - text: /Cat 2 \d+ kt 8 août \d+, \d+:\d+ UTC aujourd’hui/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 3 \d+ kt 6 août \d+, \d+:\d+ UTC 2 jou pase/
+      - text: /Cat 3 \d+ kt 6 août \d+, \d+:\d+ UTC avant-hier/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC 7 jou pase/
+      - text: /Cat 1 \d+ kt 1 août \d+, \d+:\d+ UTC il y a 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Alabama/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 3 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 3 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Mississippi/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 7 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 6 jou/
+      - text: /Cat 1 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 2 \d+ kt 1 août \d+, \d+:\d+ UTC 7 jou pase/
+      - text: /Cat 2 \d+ kt 1 août \d+, \d+:\d+ UTC il y a 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 1 \d+ kt 2 août \d+, \d+:\d+ UTC 6 jou pase/
+      - text: /Cat 1 \d+ kt 2 août \d+, \d+:\d+ UTC il y a 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Florida/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt 2 août \d+, \d+:\d+ UTC 6 jou pase/
+      - text: /TS \d+ kt 2 août \d+, \d+:\d+ UTC il y a 6 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 7 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC dans 7 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Alabama/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt 7 août \d+, \d+:\d+ UTC 1 jou pase/
+      - text: /TS \d+ kt 7 août \d+, \d+:\d+ UTC hier/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Texas/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC nan 5 jou/
+      - text: /TS \d+ kt \d+ août \d+, \d+:\d+ UTC dans 5 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Alabama/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /TS \d+ kt 3 août \d+, \d+:\d+ UTC 5 jou pase/
+      - text: /TS \d+ kt 3 août \d+, \d+:\d+ UTC il y a 5 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Texas/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 3 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 5 jou/
+      - text: /Cat 3 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 5 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 3 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 3 jou/
+      - text: /Cat 3 \d+ kt \d+ août \d+, \d+:\d+ UTC dans 3 j/
     - listitem:
       - text: /\d+/
       - button /\d+ san non nan Louisiana/:
         - strong: /\d+ san non/
         - text: ""
-      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC nan 2 jou/
+      - text: /Cat 4 \d+ kt \d+ août \d+, \d+:\d+ UTC après-demain/
   - group: Site vèsyon sa a

@@ -4,6 +4,7 @@
 import { getLocale, loadLocale, setLocale, STRINGS, interpolate, t, tHtml } from '../src/i18n.js';
 import { readFile } from 'node:fs/promises';
 import { prepareSavedViewsImport } from '../src/saved-views.js';
+import { formatDiagnosticAge } from '../src/diagnostics.js';
 import { SAVED_VIEWS_SCHEMA_VERSION } from '../src/schema-contract.js';
 import en from '../src/locales/en.js';
 import es from '../src/locales/es.js';
@@ -161,8 +162,9 @@ const localizedSurfaceContracts = [
   {
     path: '../src/on-this-date.js',
     keys: [
-      'onthisdate.loading', 'onthisdate.offsetToday', 'onthisdate.offsetIn',
-      'onthisdate.offsetAgo', 'onthisdate.atState', 'onthisdate.unnamedYear',
+      // The three offset keys are gone: Intl.RelativeTimeFormat spells the
+      // unit and the plural, and 'auto' supplies "today" without a string.
+      'onthisdate.loading', 'onthisdate.atState', 'onthisdate.unnamedYear',
       'onthisdate.showDetails', 'state.unknown',
     ],
     forbidden: ['Finding historical landfalls near today...', '${lf.year} unnamed', '</strong> at ', 'Show full storm details'],
@@ -247,6 +249,47 @@ for (const contract of localizedSurfaceContracts) {
       `data/coverage.json carries value_status "${status}" and no catalog has about.archiveCoverageStatus.${status}`,
     );
   }
+}
+
+// Relative times come from Intl.RelativeTimeFormat, so the unit and its plural
+// are the language's own rather than something a catalog string spelled. The
+// keys that used to spell them are gone, and nothing may bring them back: a
+// per-locale plural is how English ended up able to say "1 days ago".
+{
+  const DAY = 86_400_000;
+  const cases = [
+    ['en', DAY, /^1 day ago$/],
+    ['en', 2 * DAY, /^2 days ago$/],
+    ['en', 45 * 60_000, /^45 min/],
+    ['es', DAY, /^hace 1 d$/],
+    ['es', 2 * DAY, /^hace 2 d$/],
+    // ICU has no Haitian Creole, so this resolves through fr-HT the way dates
+    // do. French puts U+00A0 between the number and the unit, not a plain
+    // space, which is why these two patterns say \s and the others do not.
+    ['ht', DAY, /^il y a 1\sj$/],
+    ['ht', 2 * DAY, /^il y a 2\sj$/],
+  ];
+  for (const [locale, age, expected] of cases) {
+    await loadLocale(locale);
+    await setLocale(locale);
+    const rendered = formatDiagnosticAge(age);
+    assert(
+      expected.test(rendered),
+      `${locale}: an age of ${age} ms rendered "${rendered}", wanted ${expected}`,
+    );
+  }
+
+  for (const key of [
+    'diagnostics.minutesAgo', 'diagnostics.hoursAgo', 'diagnostics.daysAgo',
+    'onthisdate.offsetToday', 'onthisdate.offsetIn', 'onthisdate.offsetAgo',
+  ]) {
+    assert(
+      !Object.hasOwn(en, key),
+      `${key} is back in the catalog; a per-locale string for a time unit is what this replaced`,
+    );
+  }
+  await loadLocale('en');
+  await setLocale('en');
 }
 
 console.log(`i18n ok (${locales.length} locales, ${enKeys.length} keys each)`);

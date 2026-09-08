@@ -6,7 +6,7 @@ import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { formatWind } from './settings.js';
 import { escapeHtml } from './html-utils.js';
-import { t } from './i18n.js';
+import { formatRelativeTime, t } from './i18n.js';
 import { calendarDistanceDays, isWithinDaysOfToday } from './on-this-date-utils.js';
 
 const panel = document.getElementById('on-this-date-panel');
@@ -30,9 +30,9 @@ function getMonthDay(dateStr) {
 }
 
 function formatCalendarOffset(days) {
-  if (days === 0) return t('onthisdate.offsetToday');
-  const abs = Math.abs(days);
-  return days > 0 ? t('onthisdate.offsetIn', abs) : t('onthisdate.offsetAgo', abs);
+  // 'auto' is what renders 0 as "today" and -1 as "yesterday", which is why
+  // there is no longer a catalog key for either.
+  return formatRelativeTime(days, 'day', { numeric: 'auto' });
 }
 
 export async function showOnThisDate() {

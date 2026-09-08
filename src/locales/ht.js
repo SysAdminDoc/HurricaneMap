@@ -161,9 +161,6 @@ export default {
   'diagnostics.storage': 'Depo',
   'diagnostics.feedAge': 'Laj sous opsyonèl yo',
   'diagnostics.never': 'poko janm reyisi',
-  'diagnostics.minutesAgo': 'sa gen {0} min',
-  'diagnostics.hoursAgo': 'sa gen {0} èdtan',
-  'diagnostics.daysAgo': 'sa gen {0} jou',
   'diagnostics.notInstalled': 'pa enstale',
   'diagnostics.retry': 'Eseye service worker ankò',
   'diagnostics.refresh': 'Rafrechi dyagnostik',
@@ -702,9 +699,6 @@ export default {
 
   // On this date / glossary
   'onthisdate.loading': 'Ap chèche touche tè istorik ki toupre jodi a…',
-  'onthisdate.offsetToday': 'jodi a',
-  'onthisdate.offsetIn': 'nan {0} jou',
-  'onthisdate.offsetAgo': '{0} jou pase',
   'onthisdate.atState': 'nan {0}',
   'onthisdate.unnamedYear': '{0} san non',
   'onthisdate.showDetails': 'Montre tout detay siklòn nan',

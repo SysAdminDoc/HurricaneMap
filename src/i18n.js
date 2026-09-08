@@ -93,6 +93,19 @@ export function getDateLocale(locale = currentLocale) {
   return Intl.DateTimeFormat.supportedLocalesOf([mapped])[0] || LOCALE_EN;
 }
 
+// "3 days ago" and "in 4 days" were assembled from catalog strings that spelled
+// the unit themselves, so each locale carried its own plural handling and none
+// of them had the language's real plural rules: English rendered "1 days ago".
+// Intl.RelativeTimeFormat has had them since 2020.
+//
+// `numeric: 'auto'` is what turns 0 into "today" and -1 into "yesterday", so a
+// caller that wants those words asks for it, and a caller that wants a count
+// every time asks for 'always'.
+export function formatRelativeTime(value, unit, { numeric = 'always' } = {}) {
+  return new Intl.RelativeTimeFormat(getDateLocale(), { numeric, style: 'short' })
+    .format(value, unit);
+}
+
 export function t(key, ...args) {
   const strings = STRINGS[currentLocale] || STRINGS[LOCALE_EN];
   // Partial locales (ht) fall back to English before exposing the raw key.
