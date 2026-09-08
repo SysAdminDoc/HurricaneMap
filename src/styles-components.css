@@ -3380,9 +3380,6 @@ a:hover, [role="button"]:hover {
   white-space: nowrap;
 }
 
-.subtitle-sep {
-  color: var(--overlay);
-}
 
 .header-actions {
   display: flex;
@@ -6210,9 +6207,6 @@ body.side-panel-open .leaflet-top.leaflet-right {
     white-space: nowrap;
   }
 
-  .title-block .subtitle-sep {
-    margin-inline: 0.35em;
-  }
 
   .header-actions {
     grid-area: actions;
@@ -7995,16 +7989,16 @@ body.filters-open .timeline-toggle {
     transform: translateX(8px);
   }
 
-  .title-block .subtitle [data-i18n="header.subtitle"],
-  .title-block .subtitle .subtitle-sep {
-    display: none;
-  }
-
-  .title-block .subtitle-count {
+  /* The tagline used to be hidden here to make room for the storm totals. The
+     totals live in the context rail now, and the rail is hidden at this width,
+     so hiding the tagline as well left an empty box where the header's
+     description should be. */
+  .title-block .subtitle [data-i18n="header.subtitle"] {
     display: block;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -9796,11 +9790,12 @@ body.poster-open { overflow: hidden; }
   font-weight: 650;
   line-height: 1.25;
   text-align: center;
-  /* WCAG 2.2 SC 1.4.13 asks that hover content stay visible while the pointer
-     moves over it, which a tooltip the pointer passes straight through cannot
-     do. It is not interactive, so nothing here is clickable; it just has to be
-     reachable. */
-  pointer-events: auto;
+  /* Never intercepts. It is fixed at z-index 6000 directly over the context
+     rail and the map, and nothing on it is clickable, so accepting the pointer
+     only cost the reader a click on whatever it happened to cover. The
+     hoverable half of WCAG 2.2 SC 1.4.13 is met in src/tooltips.js, which keeps
+     the tooltip open while the pointer is inside its box. */
+  pointer-events: none;
 }
 
 .header-tooltip:popover-open { display: block; }

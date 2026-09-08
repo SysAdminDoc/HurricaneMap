@@ -119,9 +119,11 @@ HurricaneMap's software dependencies are listed in `package.json` and resolved i
 
 ## How to Cite HurricaneMap
 
-For academic papers and reports. These are the two formats the app itself
-emits, from the Cite button and in every export's provenance block, with the
-running version and the data release filled in.
+For academic papers and reports, in the two formats the app also offers. These
+templates cite the project as a whole. The Cite button and each export's
+provenance block build their own APA and BibTeX entries instead, filled in with
+the running version and the HURDAT2 revision, and those are the ones to use when
+citing a particular result.
 
 In APA form:
 

@@ -12,6 +12,7 @@
     "check:sw": "node scripts/check-service-worker.mjs",
     "check:styles": "node scripts/check-style-layers.mjs",
     "check:css-variables": "node scripts/check-css-variables.mjs",
+    "check:track-contrast": "node scripts/check-track-contrast.mjs",
     "check:network-timeouts": "node scripts/check-network-timeouts.mjs",
     "check:readme-links": "node scripts/check-readme-links.mjs",
     "check:release-truth": "node scripts/check-release-truth.mjs",

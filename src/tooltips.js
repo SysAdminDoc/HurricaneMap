@@ -146,8 +146,21 @@ export function initHeaderTooltips() {
     button.addEventListener('click', hideTooltip);
   }
 
-  tooltip.addEventListener('pointerenter', cancelHide);
-  tooltip.addEventListener('pointerleave', () => scheduleHide());
+  // The tooltip takes no pointer events, so it cannot tell the reader has moved
+  // onto it. Its box can: while the pointer is inside it, the pending hide is
+  // held off, and the moment the pointer is outside both the tooltip and its
+  // control the hide runs.
+  function pointerIsOver(element, event) {
+    if (!element) return false;
+    const rect = element.getBoundingClientRect();
+    return event.clientX >= rect.left && event.clientX <= rect.right &&
+      event.clientY >= rect.top && event.clientY <= rect.bottom;
+  }
+  document.addEventListener('pointermove', event => {
+    if (!activeButton) return;
+    if (pointerIsOver(tooltip, event) || pointerIsOver(activeButton, event)) cancelHide();
+    else if (!hideTimer) scheduleHide();
+  }, { passive: true });
 
   // Capture, so the tooltip is dismissed before anything else acts on Escape,
   // and the event is stopped only when there was in fact a tooltip to dismiss.
@@ -156,10 +169,11 @@ export function initHeaderTooltips() {
     if (!activeButton && !showTimer) return;
     dismissedButton = activeButton;
     hideTooltip();
-    if (dismissedButton) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
+    // Deliberately not stopped. WCAG 2.2 SC 1.4.13 asks that hover content can
+    // be dismissed; it does not ask that dismissing it consume the key. An
+    // earlier version stopped propagation from the capture phase, which meant
+    // Escape closed neither the tooltip's panel nor the search palette nor the
+    // glossary while any header tooltip happened to be showing.
   }, true);
 
   tooltip.addEventListener('toggle', event => {

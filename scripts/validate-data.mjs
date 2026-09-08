@@ -914,15 +914,30 @@ const referencedRadarFrames = new Set(
 const radarRoot = path.join(root, 'data/radar');
 const radarFilesOnDisk = [];
 for (const entry of await readdir(radarRoot, { withFileTypes: true, recursive: true })) {
-  if (!entry.isFile() || !entry.name.endsWith('.png')) continue;
+  // .PNG is a PNG. Matching the extension case-sensitively skipped such a file
+  // on the disk scan, and then the manifest entry naming it was reported as a
+  // missing frame.
+  if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.png')) continue;
   const absolute = path.join(entry.parentPath ?? entry.path, entry.name);
   radarFilesOnDisk.push(path.relative(radarRoot, absolute).split(path.sep).join('/'));
 }
+const radarFileSet = new Set(radarFilesOnDisk);
+const toArchivePath = frame => String(frame).split('\\').join('/');
+// A manifest entry written with Windows separators names a file that is really
+// there. That used to be reported twice, once as an unreferenced file and once
+// as a missing frame, when it is one defect and it lives in the manifest.
+const referencedArchivePaths = new Set([...referencedRadarFrames].map(toArchivePath));
 for (const file of radarFilesOnDisk) {
-  if (!referencedRadarFrames.has(file)) fail(`data/radar/${file} is not referenced by data/radar/manifest.json`);
+  if (!referencedArchivePaths.has(file)) fail(`data/radar/${file} is not referenced by data/radar/manifest.json`);
 }
 for (const frame of referencedRadarFrames) {
-  if (!radarFilesOnDisk.includes(frame)) fail(`data/radar/manifest.json references a missing frame: ${frame}`);
+  if (radarFileSet.has(frame)) continue;
+  const archivePath = toArchivePath(frame);
+  if (radarFileSet.has(archivePath)) {
+    fail(`data/radar/manifest.json writes ${frame} with a Windows separator; the archive path is ${archivePath}`);
+  } else {
+    fail(`data/radar/manifest.json references a missing frame: ${frame}`);
+  }
 }
 
 if (errors.length) printErrorsAndExit();

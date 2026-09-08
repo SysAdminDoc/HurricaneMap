@@ -515,25 +515,38 @@ test('header tooltips are dismissible with Escape and survive being hovered', as
   await enter('#toggle-filters');
   await expect(tooltip).toBeVisible();
 
-  // Hoverable: leaving the control starts a grace period, and entering the
-  // tooltip cancels it.
+  // Hoverable: leaving the control starts a grace period, and a pointer inside
+  // the tooltip's box holds it open. The tooltip itself takes no pointer
+  // events, because it is fixed at z-index 6000 over the context rail and the
+  // map and would otherwise swallow a click on either.
+  const box = await tooltip.boundingBox();
   await leave('#toggle-filters');
-  await enter('#header-tooltip');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.waitForTimeout(400);
   expect(await shown()).toBe(true);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#header-tooltip')).pointerEvents)).toBe('none');
+  expect(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id !== 'header-tooltip',
+    { x: box.x + box.width / 2, y: box.y + box.height / 2 })).toBe(true);
 
-  // The pointer has to be able to reach it at all for that to mean anything.
-  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#header-tooltip')).pointerEvents)).not.toBe('none');
-
-  // Leaving the tooltip itself does close it.
-  await leave('#header-tooltip');
+  // Moving off it does close it.
+  await page.mouse.move(700, 700);
   await expect(tooltip).toBeHidden();
 
-  // Escape with no tooltip open still reaches whatever else listens for it, so
-  // dismissing hover content did not swallow the key for everything else. The
-  // app closes open panels on Escape.
+  // Escape must still reach everything else WHILE a tooltip is showing. An
+  // earlier version stopped propagation from the capture phase, so a tooltip
+  // over an open panel meant Escape closed neither.
   await page.click('#toggle-stats');
   await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 });
+  // Blurred first: the click left the stats toggle focused, and closing the
+  // panel returns focus to it, which legitimately opens its own tooltip and
+  // makes "is the tooltip hidden" the wrong question to ask afterwards.
+  await page.evaluate(() => document.querySelector('#toggle-stats')?.blur());
+  await enter('#toggle-filters');
+  await expect(tooltip).toBeVisible();
   await page.keyboard.press('Escape');
+  // Only the panel is asserted here. Closing it returns focus to the control
+  // that opened it, and a focused control opens its own tooltip, so "is a
+  // tooltip showing" a moment later is a race rather than a contract. That the
+  // tooltip is dismissed by Escape is proved above, with nothing else moving.
   await page.waitForFunction(() => document.querySelector('#stats-panel')?.hidden === true, null, { timeout: 5_000 });
 });

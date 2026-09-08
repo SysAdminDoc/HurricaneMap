@@ -565,6 +565,7 @@ async function assertStormPanelContrast(browser, baseUrl) {
   await stubQuietTropics(context);
   const page = await context.newPage();
   const pageErrors = [];
+  const covered = [];
   collectPageErrors(page, pageErrors);
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -579,6 +580,10 @@ async function assertStormPanelContrast(browser, baseUrl) {
       { theme: 'light', highContrast: false, minimum: 4.5 },
       { theme: 'light', highContrast: true, minimum: 7 },
       { theme: 'dark', highContrast: false, minimum: 4.5 },
+      // The fourth combination, which was missing: three of the four were
+      // measured and dark + high contrast was assumed to follow from the other
+      // three. It is its own token set and it holds itself to 7:1.
+      { theme: 'dark', highContrast: true, minimum: 7 },
     ]) {
       await page.evaluate(async ({ theme, highContrast }) => {
         const settings = await import('/src/settings.js');
@@ -621,12 +626,15 @@ async function assertStormPanelContrast(browser, baseUrl) {
         !extraFailed.length,
         `${label}: below ${profile.minimum}:1 — ${extraFailed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
       );
+      // Collected rather than written out below, because the hand-written
+      // summary went on naming three profiles after a fourth was added.
+      covered.push(`${profile.theme}${profile.highContrast ? '+hc' : ''} >= ${profile.minimum}:1`);
     }
   } finally {
     await context.close();
   }
   if (pageErrors.length) throw new Error(`storm panel contrast page errors: ${pageErrors.join(' | ')}`);
-  console.log('  storm panel contrast ok (light, light + high contrast, dark at 1440px, playback and comparison included)');
+  console.log(`  storm panel contrast ok at 1440px (${covered.join(', ')}, playback and comparison included)`);
 }
 
 // The status host for an optional feed registers two document listeners, and
@@ -634,6 +642,69 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
+// Two hover rules, one in the components layer and one in the accessibility
+// layer. The second was unscoped and !important, and !important in the last
+// layer beats everything, so every component hover rule in every theme was dead
+// and any hover styling added there did nothing. It is scoped to high contrast
+// now, which is what it was written for.
+async function assertHoverTreatmentFollowsTheTheme(browser, baseUrl) {
+  const measure = async highContrast => {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+    await seedSettings(context, { onboarded: true, theme: 'dark', highContrast, locale: 'en', reducedMotion: true });
+    await stubQuietTropics(context);
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      const resting = await page.evaluate(() => getComputedStyle(document.querySelector('#toggle-filters')).backgroundColor);
+      await page.hover('#toggle-filters');
+      await page.waitForFunction(
+        previous => getComputedStyle(document.querySelector('#toggle-filters')).backgroundColor !== previous,
+        resting,
+        { timeout: 5000 },
+      );
+      return await page.evaluate(previous => {
+        const element = document.querySelector('#toggle-filters');
+        // The accessibility rule forces exactly this token, so a hovered colour
+        // equal to it means that rule is still winning.
+        // Resolved through the browser rather than compared as text: the token
+        // is authored as #2d2d2d and reported as rgb(45, 45, 45).
+        const probe = document.createElement('div');
+        probe.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--surface-control-hover').trim();
+        document.body.appendChild(probe);
+        const forced = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return { resting: previous, hovered: getComputedStyle(element).backgroundColor, forced };
+      }, resting);
+    } finally {
+      await context.close();
+    }
+  };
+
+  const standard = await measure(false);
+  const contrast = await measure(true);
+  assert(
+    standard.hovered !== standard.resting,
+    `the default theme has no hover treatment: ${JSON.stringify(standard)}`,
+  );
+  assert(
+    contrast.hovered !== contrast.resting,
+    `high contrast lost its hover treatment: ${JSON.stringify(contrast)}`,
+  );
+  // The default theme must NOT land on the token the accessibility rule forces.
+  // Comparing the two themes to each other proves nothing, because that token
+  // has a different value in each of them.
+  const normalize = value => String(value).replace(/s+/g, '');
+  assert(
+    normalize(standard.hovered) !== normalize(standard.forced),
+    `the default theme still hovers to the high-contrast token, so the rule is unscoped: ${standard.hovered}`,
+  );
+  assert(
+    normalize(contrast.hovered) === normalize(contrast.forced),
+    `high contrast no longer uses its own hover token: ${JSON.stringify(contrast)}`,
+  );
+}
+
 // The subtitle is a flex container, and text-overflow does nothing on one, so
 // at 1024px and again at 1378px the header read "...Atlas · 595 st", cut
 // through a word. Either the text fits or it ends in an ellipsis; a clipped
@@ -650,48 +721,91 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
     for (const width of widths) {
       await page.setViewportSize({ width, height: 960 });
       await page.waitForFunction(target => window.innerWidth === target, width);
-      const cut = await page.evaluate(() => [...document.querySelectorAll('.app-header .subtitle, .app-header .subtitle > span, .app-header h1')]
-        .filter(element => {
+      const measured = await page.evaluate(() => {
+        const describe = element => {
           const style = getComputedStyle(element);
-          if (style.display === 'none' || style.visibility === 'hidden') return false;
-          // A one-pixel rounding difference is not a clipped word, and
-          // overflowing is not the defect on its own: an element that shows an
-          // ellipsis overflows by definition. The defect is overflowing with no
-          // ellipsis to show for it, which is how the header read
-          // "...Atlas · 595 st".
-          //
-          // text-overflow does nothing on a flex or grid container, though, and
-          // .subtitle is one. Excusing an element because it DECLARES an
-          // ellipsis it cannot honour is the exact hole this is meant to close,
-          // so a flex container gets no excuse: it either fits or its children
-          // shrink until it does.
-          const honoursEllipsis = style.textOverflow === 'ellipsis' &&
-            !['flex', 'inline-flex', 'grid', 'inline-grid'].includes(style.display);
-          return element.scrollWidth > element.clientWidth + 1 && !honoursEllipsis;
-        })
-        .map(element => ({
-          text: (element.textContent || '').trim().slice(0, 40),
-          scrollWidth: element.scrollWidth,
-          clientWidth: element.clientWidth,
-          textOverflow: getComputedStyle(element).textOverflow,
-        })));
-      assert(!cut.length, `[${locale}] header text is cut with no ellipsis at ${width}px: ${JSON.stringify(cut)}`);
+          return {
+            text: (element.textContent || '').trim().slice(0, 40),
+            scrollWidth: element.scrollWidth,
+            clientWidth: element.clientWidth,
+            display: style.display,
+            overflowX: style.overflowX,
+            textOverflow: style.textOverflow,
+          };
+        };
+        const visible = [...document.querySelectorAll('.app-header .subtitle, .app-header .subtitle > span, .app-header h1')]
+          .filter(element => {
+            const style = getComputedStyle(element);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+          });
+        return {
+          // display: contents generates no box, so scrollWidth and clientWidth
+          // both read 0 and the comparison below says "fits" however far the
+          // text actually runs. That is the measurement failing, not the header
+          // passing, so it is reported instead of skipped.
+          boxless: visible
+            .filter(element => (element.textContent || '').trim() && !element.getClientRects().length)
+            .map(describe),
+          cut: visible
+            .filter(element => {
+              const style = getComputedStyle(element);
+              // A one-pixel rounding difference is not a clipped word, and
+              // overflowing is not the defect on its own: an element that shows
+              // an ellipsis overflows by definition. The defect is overflowing
+              // with no ellipsis to show for it, which is how the header read
+              // "...Atlas · 595 st".
+              //
+              // There are two ways to declare an ellipsis that never renders,
+              // and both have to be refused or the excuse covers more than the
+              // behaviour does. text-overflow is inert on a flex or grid
+              // container, and .subtitle is one. It is equally inert while
+              // overflow-x is visible, because there is nothing clipping the
+              // text for it to replace.
+              const honoursEllipsis = style.textOverflow === 'ellipsis' &&
+                style.overflowX !== 'visible' &&
+                !['flex', 'inline-flex', 'grid', 'inline-grid'].includes(style.display);
+              return element.scrollWidth > element.clientWidth + 1 && !honoursEllipsis;
+            })
+            .map(describe),
+        };
+      });
+      assert(
+        !measured.boxless.length,
+        `[${locale}] header text has no box to measure at ${width}px: ${JSON.stringify(measured.boxless)}`,
+      );
+      assert(!measured.cut.length, `[${locale}] header text is cut with no ellipsis at ${width}px: ${JSON.stringify(measured.cut)}`);
+
+      // Positive control, and at every width rather than only the last one: the
+      // subtitle has to have text on screen, or the loop above passed on an
+      // empty header, and the totals it used to carry have to still be
+      // somewhere a reader can see them, which is now the context rail.
+      // textContent on its own kept saying yes to a rail that layout had
+      // collapsed, so this reads the rendered box as well as the string.
+      const survivors = await page.evaluate(() => {
+        const rendered = element => {
+          if (!element) return null;
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return {
+            text: (element.textContent || '').trim(),
+            visible: style.visibility !== 'hidden' && rect.width > 1 && rect.height > 1,
+            onScreen: rect.left < window.innerWidth && rect.right > 0 && rect.top < window.innerHeight && rect.bottom > 0,
+          };
+        };
+        return {
+          subtitle: rendered(document.querySelector('.app-header .subtitle')),
+          counts: rendered(document.querySelector('.atlas-context-rail #storm-count')),
+        };
+      });
+      assert(
+        survivors.subtitle?.visible && survivors.subtitle.text.length > 20,
+        `[${locale}] the subtitle has no visible text to clip at ${width}px, so the check above proves nothing: ${JSON.stringify(survivors.subtitle)}`,
+      );
+      assert(
+        survivors.counts?.visible && survivors.counts.onScreen && /\d[\d,]*\D+\d[\d,]*/.test(survivors.counts.text),
+        `[${locale}] the totals did not survive the move out of the header at ${width}px: ${JSON.stringify(survivors.counts)}`,
+      );
     }
-    // Positive control: the subtitle has to have text on screen, or the loop
-    // above passed on an empty header. And the totals it used to carry have to
-    // still be somewhere a reader can see them, which is now the context rail.
-    const survivors = await page.evaluate(() => ({
-      subtitle: (document.querySelector('.app-header .subtitle')?.textContent || '').trim(),
-      counts: (document.querySelector('.atlas-context-rail #storm-count')?.textContent || '').trim(),
-    }));
-    assert(
-      survivors.subtitle.length > 20,
-      `[${locale}] the subtitle has no text to clip, so the check proves nothing: "${survivors.subtitle}"`,
-    );
-    assert(
-      /\d[\d,]*\D+\d[\d,]*/.test(survivors.counts),
-      `[${locale}] the totals did not survive the move out of the header: "${survivors.counts}"`,
-    );
   } finally {
     await context.close();
   }
@@ -2889,6 +3003,7 @@ async function assertForcedColorsContract(browser, baseUrl) {
         ['.tal-swatch', 'span'],
         ['.ss-tier-dot', 'span'],
         ['.radar-swatch', 'span'],
+        ['.cp-header-swatch', 'span'],
       ];
       const host = document.createElement('div');
       host.style.position = 'fixed';
@@ -2926,7 +3041,7 @@ async function assertForcedColorsContract(browser, baseUrl) {
       host.remove();
       return measured;
     });
-    assert(dataSwatches.length === 8, `forced-colors: expected eight data swatches, measured ${dataSwatches.length}`);
+    assert(dataSwatches.length === 9, `forced-colors: expected nine data swatches, measured ${dataSwatches.length}`);
     for (const swatch of dataSwatches) {
       assert(
         swatch.forcedColorAdjust === 'none',
@@ -4359,6 +4474,7 @@ try {
   // Spanish is the longest of the three subtitles, and it is where the flex
   // children have to shrink rather than be cut through a word.
   for (const locale of ['en', 'es']) await assertHeaderTextIsNotCut(browser, baseUrl, locale);
+  await assertHoverTreatmentFollowsTheTheme(browser, baseUrl);
 
   await browser.close();
 

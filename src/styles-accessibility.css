@@ -279,20 +279,24 @@ html.high-contrast {
   --disabled-opacity: 0.72;
 }
 
-.icon-btn:hover,
-.text-btn:hover,
-.settings-pill:hover,
-.settings-action:hover,
-.action-btn:hover,
-.export-btn:hover,
-.ct-btn:hover,
-.radar-btn:hover,
-.anim-btn:hover,
-.toggle-row:hover,
-.toggle-row:focus-within,
-.state-storm-row:hover,
-.search-results li:hover,
-.cat-btn:not(.on):hover {
+/* Scoped to high contrast, which is what these were written for. Unscoped and
+   !important in the last layer, they beat every component hover rule in every
+   theme, which is why the white-tint hovers in styles-components.css were dead
+   code and why any hover styling added there did nothing at all. */
+html.high-contrast .icon-btn:hover,
+html.high-contrast .text-btn:hover,
+html.high-contrast .settings-pill:hover,
+html.high-contrast .settings-action:hover,
+html.high-contrast .action-btn:hover,
+html.high-contrast .export-btn:hover,
+html.high-contrast .ct-btn:hover,
+html.high-contrast .radar-btn:hover,
+html.high-contrast .anim-btn:hover,
+html.high-contrast .toggle-row:hover,
+html.high-contrast .toggle-row:focus-within,
+html.high-contrast .state-storm-row:hover,
+html.high-contrast .search-results li:hover,
+html.high-contrast .cat-btn:not(.on):hover {
   background: var(--surface-control-hover) !important;
   border-color: var(--border-accent) !important;
   color: var(--foreground) !important;
@@ -639,7 +643,8 @@ html.high-contrast #map .leaflet-tile-pane {
   .dai-seg,
   .tal-swatch,
   .ss-tier-dot,
-  .radar-swatch {
+  .radar-swatch,
+  .cp-header-swatch {
     forced-color-adjust: none;
     /* Keeping the fill means keeping the app's palette against a background the
        reader chose, which can land anywhere. Every one of them therefore keeps

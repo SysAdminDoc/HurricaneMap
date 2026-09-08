@@ -134,16 +134,27 @@ if (claude && /ALL FIXES DEFERRED|all version strings synced at 1\.5\.0/.test(cl
   const cesium = policy.vendors?.find(vendor => vendor.id === 'cesium')?.version;
   if (!cesium) {
     errors.push('dependency-security-policy.json declares no Cesium version to compare the README against');
-  } else if (!readme.includes(`Cesium ${cesium}`)) {
-    const named = readme.match(/Cesium (\d+\.\d+(?:\.\d+)?)/)?.[1] || 'nothing';
-    errors.push(`README names Cesium ${named} but the reviewed pin is ${cesium}`);
+  } else {
+    // Every mention has to be the pin, not just one of them: a README naming
+    // both the right version and a stale one passed the old substring test.
+    const named = [...readme.matchAll(/Cesium (\d+\.\d+(?:\.\d+)?)/g)].map(match => match[1]);
+    if (!named.length) {
+      errors.push(`README names no Cesium version; the reviewed pin is ${cesium}`);
+    }
+    for (const mention of new Set(named)) {
+      if (mention !== cesium) {
+        errors.push(`README names Cesium ${mention} but the reviewed pin is ${cesium}`);
+      }
+    }
   }
 }
 
 // README pointed readers at LICENSE.md for three citation formats. The app
 // emits two, and LICENSE.md carries those two.
-if (/citation formats \([^)]*Chicago/i.test(readme)) {
-  errors.push('README claims a Chicago citation format that neither LICENSE.md nor src/citation.js provides');
+// Any spelling, not one phrasing: "citation formats (Chicago, ...)",
+// "Chicago-style", "in APA, BibTeX and Chicago form" all made the same claim.
+if (/\bchicago\b/i.test(readme)) {
+  errors.push('README mentions a Chicago citation format that neither LICENSE.md nor src/citation.js provides');
 }
 if (license && (!license.includes('In APA form:') || !license.includes('```bibtex'))) {
   errors.push('LICENSE.md must show the APA and BibTeX citations the app emits, each named');

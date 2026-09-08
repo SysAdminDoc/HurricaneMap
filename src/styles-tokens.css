@@ -53,15 +53,27 @@
   --cat-4:   #f38ba8;  /* pink */
   --cat-5:   #cba6f7;  /* mauve */
 
-  /* Comparison pin colours. Each pinned storm gets one, and it is the only
-     thing tying a table column to a track on the map, so it has to be legible
-     as text on the panel and as a line on the basemap. The dark set is the
-     original one; styles-themes.css darkens it for the light theme, where
-     #cba6f7 as text measured 2.00:1. */
+  /* Comparison pin colours, used for the chip, the card and the table column.
+     The dark set is the original one; styles-themes.css darkens it for the
+     light theme, where #cba6f7 as text measured 2.00:1. */
   --pin-1: #cba6f7;
   --pin-2: #74c7ec;
   --pin-3: #fab387;
   --pin-4: #a6e3a1;
+
+  /* The same four hues for the track on the map, and a separate set because
+     one token cannot do both jobs. The panel is dark in the dark theme, so the
+     colour above has to be light there; the OpenStreetMap basemap is light in
+     both themes (the dark theme only takes it to 0.86 brightness), so a track
+     has to be dark in both. Sharing one token meant a dark-theme track measured
+     between 1.02:1 and 1.81:1 against the map. These four are the deepest of
+     the three sets, which is what carries the polyline's own 0.85 opacity:
+     3.81:1 at worst over the common OSM land, water, forest and building
+     fills, checked by check:track-contrast. */
+  --pin-1-track: #5b0f9e;
+  --pin-2-track: #0a3fa8;
+  --pin-3-track: #8c3200;
+  --pin-4-track: #0f5a13;
 
   /* Semantic status colors */
   --success: #a6e3a1;  /* green */

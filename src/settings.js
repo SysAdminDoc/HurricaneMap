@@ -142,7 +142,15 @@ function attachSystemThemeListener() {
   }
   themeMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
   const onSystemThemeChange = () => {
-    if (getSetting('theme') === 'system') applyThemeToRoot();
+    if (getSetting('theme') !== 'system') return;
+    applyThemeToRoot();
+    // The stored setting has not changed, but the theme on screen has, and
+    // anything that reads a theme token when it renders has to hear about it.
+    // The comparison panel's pin colours were left on the previous theme's
+    // values, which is the 2.00:1 mauve-on-white this was meant to end.
+    document.dispatchEvent(new CustomEvent('hm-settings:change', {
+      detail: { key: 'theme', value: 'system' },
+    }));
   };
   if (typeof themeMediaQuery.addEventListener === 'function') {
     themeMediaQuery.addEventListener('change', onSystemThemeChange);

@@ -19,28 +19,43 @@ export { buildComparisonCSVText, getComparisonRows } from './compare-rows.js';
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
 
-const MAX_PINS = 4;
-
 // Each pin gets one slot in pin order, and the colour for that slot comes from
 // the theme rather than from here. The four hexes that used to live in this
 // file were the dark palette, and as table-header text on the light panel they
 // measured between 1.46:1 and 2.00:1. The fallbacks are the dark values, which
 // is what a caller with no document gets.
+// The track colour is a second token per slot rather than the same one: the
+// panel behind the chip flips with the theme, the basemap under the track does
+// not, so a single value cannot read on both.
 const PIN_SLOTS = Object.freeze([
-  { token: '--pin-1', fallback: '#cba6f7' },
-  { token: '--pin-2', fallback: '#74c7ec' },
-  { token: '--pin-3', fallback: '#fab387' },
-  { token: '--pin-4', fallback: '#a6e3a1' },
+  { token: '--pin-1', fallback: '#cba6f7', trackToken: '--pin-1-track', trackFallback: '#5b0f9e' },
+  { token: '--pin-2', fallback: '#74c7ec', trackToken: '--pin-2-track', trackFallback: '#0a3fa8' },
+  { token: '--pin-3', fallback: '#fab387', trackToken: '--pin-3-track', trackFallback: '#8c3200' },
+  { token: '--pin-4', fallback: '#a6e3a1', trackToken: '--pin-4-track', trackFallback: '#0f5a13' },
 ]);
 
-export function pinSlotColor(slot) {
+// One pin per slot, so the capacity is the palette. Keeping these two in step
+// by hand is what let the "no free slot" branch below look reachable.
+const MAX_PINS = PIN_SLOTS.length;
+
+function resolveSlotColor(slot, token, fallback) {
   const entry = PIN_SLOTS[slot];
   if (!entry) return '';
   if (typeof document !== 'undefined' && document.documentElement && typeof getComputedStyle === 'function') {
-    const value = getComputedStyle(document.documentElement).getPropertyValue(entry.token).trim();
+    const value = getComputedStyle(document.documentElement).getPropertyValue(entry[token]).trim();
     if (value) return value;
   }
-  return entry.fallback;
+  return entry[fallback];
+}
+
+// The chip, card and column colour.
+export function pinSlotColor(slot) {
+  return resolveSlotColor(slot, 'token', 'fallback');
+}
+
+// The map colour for the same slot. Same hue, deep enough for the basemap.
+export function pinSlotTrackColor(slot) {
+  return resolveSlotColor(slot, 'trackToken', 'trackFallback');
 }
 
 const tray = ensureTray();
@@ -48,7 +63,7 @@ const comparePanel = document.getElementById('compare-panel');
 const compareBody = document.getElementById('compare-body');
 const compareCloseBtn = document.getElementById('close-compare');
 
-const pinned = [];          // [{ id, name, year, color, trackLayer }]
+const pinned = [];          // [{ id, name, year, storm, slot, trackLayer }]
 
 function ensureTray() {
   let el = document.getElementById('compare-tray');
@@ -110,16 +125,13 @@ export async function togglePin(storm) {
   // column disagreeing.
   const used = new Set(pinned.map(p => p.slot));
   const slot = PIN_SLOTS.findIndex((_, index) => !used.has(index));
-  const assigned = slot >= 0 ? slot : pinned.length % PIN_SLOTS.length;
-  const color = pinSlotColor(assigned);
-  const trackLayer = drawTrack(fullStorm, color);
+  const trackLayer = drawTrack(fullStorm, slot);
   pinned.push({
     id: fullStorm.id,
     name: fullStorm.name,
     year: fullStorm.year,
     storm: fullStorm,
-    slot: assigned,
-    color,
+    slot,
     trackLayer,
   });
   refreshTray();
@@ -150,7 +162,10 @@ export function clearAll() {
   hidePanel('compare-panel');
 }
 
-function drawTrack(storm, color) {
+// Takes the slot rather than a colour so that no caller can hand it the chip
+// colour by mistake, which is how the track ended up unreadable on the map.
+function drawTrack(storm, slot) {
+  const color = pinSlotTrackColor(slot);
   const map = getMap();
   const group = L.layerGroup();
   const track = storm.track || [];
@@ -220,8 +235,7 @@ document.addEventListener('hm-settings:change', event => {
   const map = getMap();
   for (const pin of pinned) {
     if (pin.trackLayer) map.removeLayer(pin.trackLayer);
-    pin.color = pinSlotColor(pin.slot);
-    pin.trackLayer = drawTrack(pin.storm, pin.color);
+    pin.trackLayer = drawTrack(pin.storm, pin.slot);
   }
   refreshTray();
   refreshComparePanelIfOpen();
@@ -316,7 +330,7 @@ function renderComparePanel() {
 
   compareBody.innerHTML = `
     <h2 id="compare-panel-title">${t('compare.title')}</h2>
-    <p class="cp-hint">Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.</p>
+    <p class="cp-hint">Each storm's track is drawn on the map in a deeper shade of its column color, so it stays readable over the basemap. Pin or unpin via the storm panel or the chip tray.</p>
     <div class="cp-actions">
       <button class="export-btn" id="cp-export-btn" title="Export comparison as CSV">📥 ${t('btn.exportCSV')}</button>
     </div>

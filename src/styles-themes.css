@@ -163,9 +163,10 @@ html.light-theme .basemap-osm {
   filter: none;
 }
 
-/* Pin colours dark enough to read as text on the light panel (4.83:1 at the
-   worst of the four) and as a track on the OpenStreetMap basemap (4.28:1). The
-   dark set is 1.46:1 to 2.00:1 as text here. */
+/* Pin colours dark enough to read as text on the light panel, 4.83:1 at the
+   worst of the four. The dark set is 1.46:1 to 2.00:1 as text here. Tracks on
+   the map use --pin-N-track instead, because these four only reach 2.52:1 once
+   the polyline's 0.85 opacity is composited over the basemap. */
 html.light-theme {
   --pin-1: #8839ef;
   --pin-2: #1e66f5;

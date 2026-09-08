@@ -2,7 +2,7 @@
   - button "Minimize compare storms"
   - button "Close comparison": ×
   - heading "Compare Storms" [level=2]
-  - paragraph: Tracks are drawn on the map in matching colors. Pin or unpin via the storm panel or the chip tray.
+  - paragraph: Each storm's track is drawn on the map in a deeper shade of its column color, so it stays readable over the basemap. Pin or unpin via the storm panel or the chip tray.
   - button "📥 CSV"
   - heading /Katrina \(\d+\)/ [level=3]
   - button "×"
