@@ -683,16 +683,15 @@ export function initStorageManager(host = document.getElementById('storage-manag
   document.addEventListener('hm-storage:change', refresh);
   // This first render happens during boot, before the worker has installed and
   // filled its caches, and `hm-storage:change` only fires for a pack save or a
-  // scope clear. Without these two the panel keeps the boot-time snapshot for
-  // the life of the page and reports "0 entries · 0 B" for caches holding a
-  // hundred and sixty, while the diagnostics block below it reads the same
-  // caches correctly because it also listens for the worker.
+  // scope clear. Without this the panel keeps the boot-time snapshot for the
+  // life of the page and reports "0 entries · 0 B" for caches holding a hundred
+  // and sixty, while the diagnostics block below it reads the same caches
+  // correctly because it also listens for the worker.
+  //
+  // Refreshing on the settings popover opening as well looks like the obvious
+  // companion to this and is not safe: the re-render is async, so it lands
+  // while the reader is already clicking, replaces every button in the panel,
+  // and drops the focus a cancelled confirmation is supposed to return.
   document.addEventListener('hm-service-worker:change', refresh);
-  const settingsMenu = document.getElementById('settings-menu');
-  if (settingsMenu) {
-    settingsMenu.addEventListener('toggle', () => {
-      if (settingsMenu.matches(':popover-open')) refresh();
-    });
-  }
   refresh();
 }
