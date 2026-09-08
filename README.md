@@ -108,6 +108,27 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 
 Earlier release history is maintained in the [CHANGELOG](CHANGELOG.md).
 
+## Download
+
+Every release carries two offline builds. Neither needs Node, npm or a clone, and neither talks to the network once unpacked.
+
+| Profile | Download | Unpacked | Contains |
+| --- | --- | --- | --- |
+| `core` | [`hurricanemap-1.9.3-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-core.tar.gz) (5.7 MB) | 23.5 MB | The whole historical atlas: 595 storms, 759 landfalls, every panel and export |
+| `full` | [`hurricanemap-1.9.3-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-full.tar.gz) (491 MB) | 526 MB | Everything in `core` plus the 1,703 archived NEXRAD radar frames |
+
+Both archives are byte-reproducible: build one yourself with `npm run dist:package` and you get the same SHA-256. The sums are published beside them in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/SHA256SUMS.txt), so a download can be checked with the tool you already have.
+
+```bash
+tar -xzf hurricanemap-1.9.3-core.tar.gz
+sha256sum -c SHA256SUMS.txt      # optional, and worth the two seconds
+cd hurricanemap-1.9.3-core
+python serve.py --port 8765
+# open http://127.0.0.1:8765/
+```
+
+[Older releases](https://github.com/SysAdminDoc/HurricaneMap/releases) carry their notes but not their archives, because the builds that produced them were never kept.
+
 ## Quick start
 
 The map is **already published** on GitHub Pages. Open https://sysadmindoc.github.io/HurricaneMap/ and you're done.

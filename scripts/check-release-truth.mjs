@@ -160,6 +160,24 @@ if (license && (!license.includes('In APA form:') || !license.includes('```bibte
   errors.push('LICENSE.md must show the APA and BibTeX citations the app emits, each named');
 }
 
+// The download section points at release assets by name and by tag, and a
+// version bump leaves every one of them pointing at the previous release. The
+// README is where people arrive, so a stale link there hands them the old build.
+{
+  const linked = new Set([
+    ...[...readme.matchAll(/releases\/download\/v(\d+\.\d+\.\d+)\//g)].map(match => match[1]),
+    ...[...readme.matchAll(/hurricanemap-(\d+\.\d+\.\d+)-(?:core|full)\b/g)].map(match => match[1]),
+  ]);
+  if (!linked.size) {
+    errors.push('README no longer links the release downloads, which is the only place the offline builds are published');
+  }
+  for (const linkedVersion of linked) {
+    if (linkedVersion !== version) {
+      errors.push(`README links the v${linkedVersion} download but this is v${version}`);
+    }
+  }
+}
+
 if (errors.length) {
   for (const error of errors) console.error(`release truth: ${error}`);
   process.exit(1);
