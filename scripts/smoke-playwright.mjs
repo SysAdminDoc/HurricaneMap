@@ -2789,6 +2789,23 @@ async function assertDesktopPanelSystem(page, label) {
   assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
   await assertClimateTrendLinesDraw(page, label);
   await assertPaletteReachesEveryLayer(page, label);
+  // A <header> only exposes the banner role when no sectioning element wraps
+  // it, and <main> used to open before the header and close after everything,
+  // so the app published one landmark where docs/VPAT.html:71 tells a reader to
+  // expect several. Assert the role rather than the markup, because the defect
+  // was that correct-looking markup produced the wrong tree.
+  const landmarkRoles = await page.evaluate(() => {
+    const header = document.querySelector('header.app-header');
+    const main = document.querySelector('main#main');
+    return {
+      headerWrappedBySectioning: Boolean(header?.closest('article, aside, main, nav, section')),
+      hasMain: Boolean(main),
+      headerInsideMain: Boolean(main && header && main.contains(header)),
+    };
+  });
+  assert(landmarkRoles.hasMain, `${label}: the page has no main landmark`);
+  assert(!landmarkRoles.headerInsideMain, `${label}: the header sits inside main, so it is not a banner landmark`);
+  assert(!landmarkRoles.headerWrappedBySectioning, `${label}: a sectioning element wraps the header, which suppresses its banner role`);
   // The by-state and by-decade lists sit two abreast in a grid whose tracks are
   // about 106px wide, and the row's minimums added up to more than that, so the
   // count ran into the label of the column beside it and the panel read
