@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: If you use this atlas or the data it publishes, please cite it.
+title: "HurricaneMap: Interactive U.S. hurricane landfall atlas"
+abstract: >-
+  A static, offline-first web atlas of every recorded U.S. hurricane and
+  tropical-storm landfall from 1851 onward, built from NOAA HURDAT2 best-track
+  data. It publishes per-storm tracks, per-state histories, archived NEXRAD
+  radar loops, and a checksummed data release that a citation can pin.
+type: software
+authors:
+  - given-names: Matt
+    family-names: Parker
+    alias: SysAdminDoc
+repository-code: "https://github.com/SysAdminDoc/HurricaneMap"
+url: "https://sysadmindoc.github.io/HurricaneMap/"
+license: MIT
+version: 1.9.3
+date-released: "2026-08-08"
+keywords:
+  - hurricane
+  - tropical cyclone
+  - landfall
+  - HURDAT2
+  - NOAA
+  - atlas
+  - open data
+references:
+  - type: data
+    title: "HURDAT2 Atlantic hurricane database"
+    authors:
+      - name: "NOAA National Hurricane Center"
+    url: "https://www.nhc.noaa.gov/data/#hurdat"
+  - type: data
+    title: "HURDAT2 Northeast and North Central Pacific hurricane database"
+    authors:
+      - name: "NOAA National Hurricane Center"
+    url: "https://www.nhc.noaa.gov/data/#hurdat"

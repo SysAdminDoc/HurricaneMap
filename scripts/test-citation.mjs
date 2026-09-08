@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { buildCitation } from '../src/citation.js';
+import { buildCitation, HURRICANEMAP_URL } from '../src/citation.js';
 import { buildPublicationCSV } from '../src/export.js';
 import { buildExports } from '../src/metrics.js';
 import { buildQGISGeoJSON } from '../src/qgis.js';
@@ -81,4 +81,49 @@ assert.match(notebook, /def build_citations\(/);
 assert.match(notebook, /APA_CITATION/);
 assert.match(notebook, /BIBTEX_CITATION/);
 
-console.log('citation contracts ok (APA, BibTeX, exports, notebook, and pinned URLs)');
+// CITATION.cff is what GitHub reads to offer "Cite this repository", and it is
+// a third place the version and the project URLs are written down. Nothing here
+// parses YAML: the fields checked are flat top-level scalars, and the indented
+// blocks (authors, keywords, references, the folded abstract) are skipped by
+// requiring the key to start at column zero. Adding a YAML dependency for this
+// would drag in the licence notices and the install policy for one gate.
+const citationFile = readFileSync(new URL('../CITATION.cff', import.meta.url), 'utf8');
+const cffScalars = new Map();
+for (const line of citationFile.split(/\r?\n/)) {
+  const match = /^([a-z][a-z-]*): +(.*)$/.exec(line);
+  if (!match) continue;
+  const value = match[2].trim().replace(/^["'](.*)["']$/, '$1');
+  if (value === '>-' || value === '|' || value === '') continue;
+  cffScalars.set(match[1], value);
+}
+
+for (const required of ['cff-version', 'message', 'title', 'type', 'license', 'version', 'date-released', 'repository-code', 'url']) {
+  assert.ok(cffScalars.has(required), `CITATION.cff is missing the required key ${required}`);
+}
+assert.equal(cffScalars.get('cff-version'), '1.2.0', 'CITATION.cff declares an unexpected schema version');
+assert.equal(cffScalars.get('type'), 'software');
+assert.match(citationFile, /^authors:\n(\s+-\s|\s+\w)/m, 'CITATION.cff must list at least one author');
+
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+assert.equal(
+  cffScalars.get('version'),
+  packageJson.version,
+  `CITATION.cff version ${cffScalars.get('version')} does not match package.json ${packageJson.version}`,
+);
+assert.equal(cffScalars.get('license'), 'MIT');
+assert.equal(cffScalars.get('repository-code'), 'https://github.com/SysAdminDoc/HurricaneMap');
+assert.equal(cffScalars.get('url'), HURRICANEMAP_URL);
+assert.match(cffScalars.get('date-released'), /^\d{4}-\d{2}-\d{2}$/, 'CITATION.cff date-released must be ISO yyyy-mm-dd');
+
+// When the changelog has already dated this version, the two have to agree.
+const changelog = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8');
+const releaseHeading = new RegExp(`^## v${packageJson.version.replace(/\./g, '\\.')}:[^\\n]*\\((\\d{4}-\\d{2}-\\d{2})\\)`, 'm').exec(changelog);
+if (releaseHeading) {
+  assert.equal(
+    cffScalars.get('date-released'),
+    releaseHeading[1],
+    `CITATION.cff date-released ${cffScalars.get('date-released')} disagrees with the changelog heading ${releaseHeading[1]}`,
+  );
+}
+
+console.log('citation contracts ok (APA, BibTeX, exports, notebook, pinned URLs, and CITATION.cff)');

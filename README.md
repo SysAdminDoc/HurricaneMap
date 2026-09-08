@@ -205,7 +205,7 @@ Perfect for:
 - Geographic & statistical software (ArcGIS, R, Python, QGIS)
 - Spreadsheet analysis (Excel, Google Sheets)
 
-See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats.
+See [LICENSE.md](LICENSE.md#how-to-cite-hurricanemap) for citation formats. [`CITATION.cff`](CITATION.cff) carries the same metadata in Citation File Format, which is what GitHub reads for its "Cite this repository" button and what reference managers import. `npm run test:citation` fails if its version, licence or URLs drift from `package.json` and the changelog.
 
 Every analytical panel and the About surface includes a collapsed **Cite this release** control with copy-ready APA and BibTeX text. Both formats carry the HURDAT2 revision date, Atlantic and Eastern Pacific source SHA-256 values, HurricaneMap version, access date, and a release-pinned URL. The storm-panel Share view link carries the same `rel` pin alongside its filters, opened storm, comparison set, and advisory replay state.
 
