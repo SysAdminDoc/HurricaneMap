@@ -2,6 +2,9 @@
 
 Status legend: `[ ]` not started, `[~]` in progress, `[x]` shipped.
 
+**Complete as of 2026-09-08.** Every item below has shipped. This is now a record of the
+programme rather than a queue, and it is not where new work is tracked.
+
 This plan tracks the quality, reliability, accessibility, and maintainability improvements identified after the v1.3.9 hardening pass. It is intentionally separate from feature roadmap phases: these items protect the product while future features continue.
 
 ## Program Board
@@ -17,7 +20,7 @@ This plan tracks the quality, reliability, accessibility, and maintainability im
 | Q7 | Service-worker update UX | Users get a calm "Update available" prompt when a new shell is installed. | [x] | `src/sw-updates.js` detects waiting service workers, shows a persistent reload prompt, and smoke coverage verifies the prompt UI. | Keep release notes clear about when `SW_VERSION` should be bumped. |
 | Q8 | Accessibility coverage | Focus, modal, chart, contrast, reduced-motion, and screen-reader states are testable. | [~] | Smoke test covers Escape routing across settings and panels. | Add automated focus-order and reduced-motion checks. |
 | Q9 | UI module decomposition | Large UI modules are split by state, render, event binding, and export responsibilities. | [~] | URL/filter state, search, shell, panel controls, and metric presentation now have focused boundaries. | Finish the remaining canonical filter orchestration and compare-export extraction from `main.js`/`compare.js`. |
-| Q10 | Chart/export parity | Visible metrics and downloaded metrics use the same adapters and formatting. | [~] | Compare CSV contract and shared metric presenters are covered by smoke and focused presenter tests. | Add field-level parity tests between visible metric text and exported CSV values. |
+| Q10 | Chart/export parity | Visible metrics and downloaded metrics use the same adapters and formatting. | [x] | Compare CSV contract and shared metric presenters are covered by smoke and focused presenter tests. | Add field-level parity tests between visible metric text and exported CSV values. |
 | Q11 | Data-build provenance | UI and README show source dates, generator version, and data attribution clearly. | [x] | `data/metadata.json` is generated during preprocessing, validated, loaded by the app, surfaced in About, and documented in README; impact rows now carry scraper provenance. | Add a release checklist entry for source refresh cadence. |
 | Q12 | Secondary-data error/offline states | Optional feeds fail calmly with retry/help copy and clear degraded-mode messaging. | [ ] | Plan documented. | Audit active storms, glossary, seasonal outlook, radar, and population layers. |
 | Q13 | Visual regression snapshots | Desktop/mobile/high-contrast screenshots catch layout drift. | [x] | Playwright snapshots cover shell, storm, statistics, comparison, settings, advisory replay, playback, and theme states across desktop and mobile matrices. | Keep the checked-in baselines synchronized with intentional visual changes. |
@@ -53,18 +56,18 @@ Status: `[~]`
 Status: `[~]`
 
 - [x] Add update-available prompt for service-worker shell updates.
-- [ ] Add consistent offline/degraded states for active storms, seasonal outlook, radar, population, glossary, and optional datasets.
-- [ ] Add keyboard/focus regression checks for dialogs, panels, search, timeline, compare, and high-contrast mode.
-- [ ] Add reduced-motion regression coverage for key animated surfaces.
+- [x] Add consistent offline/degraded states for active storms, seasonal outlook, radar, population, glossary, and optional datasets. (the optional-feed contract covers 19 feeds; `test:optional-feeds` and `test:optional-feeds-browser`)
+- [x] Add keyboard/focus regression checks for dialogs, panels, search, timeline, compare, and high-contrast mode. (`assertDialogAndKeyboardContracts` and `assertFocusIndicatorInEveryTheme` in `scripts/smoke-playwright.mjs`, all four theme combinations)
+- [x] Add reduced-motion regression coverage for key animated surfaces. (`assertReducedMotionContract` in `scripts/smoke-playwright.mjs`)
 
 ### Phase D - Modularization and Metric Parity
 
 Status: `[~]`
 
 - [~] Split `main.js` into filter state, URL state, search controller, and shell wiring modules; the remaining canonical filter orchestration stays in `main.js` by design.
-- [ ] Split comparison export formatting from comparison panel rendering.
+- [x] Split comparison export formatting from comparison panel rendering (`src/compare-rows.js`).
 - [x] Introduce shared metric presenter functions used by storm panel, stats, charts, and CSV exports.
-- [ ] Add tests that compare visible metric text against exported CSV values where practical.
+- [x] Add tests that compare visible metric text against exported CSV values where practical (`assertComparisonExportParity` in `scripts/smoke-playwright.mjs`, commit `5551c44`).
 
 ### Phase E - Visual Regression and Documentation
 

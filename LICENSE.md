@@ -151,4 +151,7 @@ Or, in BibTeX:
 
 ---
 
-**Last Updated:** 2026-07-29
+**Last Updated:** see this file's history in git.
+
+A date written here has to be maintained by hand and had already fallen six weeks behind the
+file it stamps, which is worse than no date at all: it invites a reader to trust it.
