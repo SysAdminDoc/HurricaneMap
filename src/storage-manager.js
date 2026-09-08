@@ -681,5 +681,18 @@ export function initStorageManager(host = document.getElementById('storage-manag
     host.querySelector(`[data-clear-storage="${scopeId}"]`)?.focus({ preventScroll: true });
   });
   document.addEventListener('hm-storage:change', refresh);
+  // This first render happens during boot, before the worker has installed and
+  // filled its caches, and `hm-storage:change` only fires for a pack save or a
+  // scope clear. Without these two the panel keeps the boot-time snapshot for
+  // the life of the page and reports "0 entries · 0 B" for caches holding a
+  // hundred and sixty, while the diagnostics block below it reads the same
+  // caches correctly because it also listens for the worker.
+  document.addEventListener('hm-service-worker:change', refresh);
+  const settingsMenu = document.getElementById('settings-menu');
+  if (settingsMenu) {
+    settingsMenu.addEventListener('toggle', () => {
+      if (settingsMenu.matches(':popover-open')) refresh();
+    });
+  }
   refresh();
 }

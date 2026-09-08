@@ -322,6 +322,38 @@ try {
   assert(sourceState.keys.length === 4 && sourceState.keys.some(key => key.endsWith('__hurricanemap-source-bundle.json')), 'source bundle cache is missing its marker or assets');
   assert(!sourceState.dataKeys.some(key => ['/data/hurdat2-atlantic.txt', '/data/hurdat2-nepac.txt', '/data/release-manifest.json'].includes(key)), `source bundle leaked into mandatory data cache: ${JSON.stringify(sourceState.dataKeys)}`);
 
+  // The storage panel rendered once during boot and then only for a pack save
+  // or a scope clear, so with the worker active it reported "0 entries · 0 B"
+  // for caches holding a hundred and sixty while the diagnostics block beside
+  // it read the same caches correctly. Mount it, change the caches behind its
+  // back, and announce the worker the way sw-updates does on activation.
+  const storagePanel = await page.evaluate(async () => {
+    const storage = await import('/src/storage-manager.js');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    storage.initStorageManager(host);
+    const settle = () => new Promise(resolve => setTimeout(resolve, 600));
+    await settle();
+    const before = host.textContent.replace(/\s+/g, ' ').trim();
+    await caches.delete('hm-source-bundle-v1');
+    document.dispatchEvent(new CustomEvent('hm-service-worker:change'));
+    await settle();
+    const after = host.textContent.replace(/\s+/g, ' ').trim();
+    host.remove();
+    return { before, after };
+  });
+  const panelEntryCounts = text => [...text.matchAll(/(\d+)\s+entries/g)].map(match => Number(match[1]));
+  const beforeCounts = panelEntryCounts(storagePanel.before);
+  assert(beforeCounts.length >= 2, `storage panel did not list its scopes: ${storagePanel.before.slice(0, 160)}`);
+  assert(
+    beforeCounts.some(count => count > 0),
+    `storage panel reported every scope empty while the worker was active: ${storagePanel.before.slice(0, 160)}`,
+  );
+  assert(
+    storagePanel.before !== storagePanel.after,
+    'storage panel did not re-read its caches when the service worker announced a change',
+  );
+
   // Optional cache pressure/clears must never remove the required historical
   // data store used by the offline app shell.
   await page.evaluate(async () => {
