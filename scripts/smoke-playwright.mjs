@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -2256,7 +2256,124 @@ async function captureVisualSnapshot(page, name) {
   const height = buffer.readUInt32BE(20);
   const viewport = page.viewportSize();
   assert(width === viewport.width && height === viewport.height, `${name}: snapshot dimensions ${width}x${height} do not match ${viewport.width}x${viewport.height}`);
-  assert(buffer.length > 20_000, `${name}: snapshot is unexpectedly small (${buffer.length} bytes)`);
+  if (buffer.length <= 20_000) {
+    // A byte count is not a diagnosis. The one time this fired, the two
+    // mechanisms it was blamed on were both measured and neither makes a small
+    // file: with every tile request refused the same capture is 283 KB, because
+    // the header, timeline, markers and panels all paint, and a view transition
+    // caught mid-flight is larger than a settled frame rather than smaller. So
+    // record what the page looked like at the moment it happened, beside the
+    // PNG that shows it, instead of leaving the next occurrence to be chased
+    // from the number again.
+    const dumpPath = path.join(visualSnapshotDir, `${name}.state.json`);
+    const dump = await describeUndersizedSnapshot(page, name, buffer, paint);
+    await writeFile(dumpPath, `${JSON.stringify(dump, null, 2)}\n`);
+    assert(
+      false,
+      `${name}: snapshot is unexpectedly small (${buffer.length} bytes); page state written to ${dumpPath}`,
+    );
+  }
+}
+
+/**
+ * What the page looked like when a snapshot came back too small. Named fields
+ * rather than one blob, because the point is to tell the candidate causes apart
+ * on sight: an unpainted basemap, a loading overlay that never came down, a
+ * backgrounded tab, or an animation still running.
+ */
+async function describeUndersizedSnapshot(page, name, buffer, paint) {
+  const pageState = await page.evaluate(() => {
+    const pane = document.querySelector('#map .leaflet-tile-pane');
+    const tiles = pane ? [...pane.querySelectorAll('img.leaflet-tile')] : [];
+    const loading = document.getElementById('loading');
+    const map = document.querySelector('#map');
+    const rect = map?.getBoundingClientRect();
+    return {
+      url: location.href,
+      visibility_state: document.visibilityState,
+      ready_state: document.readyState,
+      loading_overlay_display: loading ? getComputedStyle(loading).display : 'absent',
+      loading_overlay_opacity: loading ? getComputedStyle(loading).opacity : null,
+      map_rect: rect ? { width: rect.width, height: rect.height, x: rect.x, y: rect.y } : null,
+      tiles_total: tiles.length,
+      tiles_loaded: tiles.filter(image => image.complete && image.naturalWidth > 0).length,
+      animations: document.getAnimations().slice(0, 20).map(animation => ({
+        pseudo: animation.effect?.pseudoElement || null,
+        state: animation.playState,
+      })),
+      open_panels: [...document.querySelectorAll('.panel')].filter(panel => !panel.hidden).map(panel => panel.id),
+      body_background: getComputedStyle(document.body).backgroundColor,
+    };
+  }).catch(error => ({ evaluate_failed: String(error?.message || error).slice(0, 200) }));
+
+  return {
+    snapshot: name,
+    captured_at: new Date().toISOString(),
+    bytes: buffer.length,
+    png: path.join(visualSnapshotDir, `${name}.png`),
+    map_paint: paint,
+    viewport: page.viewportSize(),
+    page: pageState,
+  };
+}
+
+/**
+ * The diagnosis path is worth nothing unless it runs, and it runs only when a
+ * capture comes back small, which is the thing nobody can reproduce on demand.
+ * So produce one on purpose. A viewport covered in a single flat colour is what
+ * a blank frame compresses to, and it must trip the guard and leave both the
+ * PNG and the state dump behind.
+ */
+async function assertUndersizedSnapshotIsDiagnosed(page) {
+  const name = 'diagnostic-blank-viewport';
+  const pngPath = path.join(visualSnapshotDir, `${name}.png`);
+  const dumpPath = path.join(visualSnapshotDir, `${name}.state.json`);
+  await rm(pngPath, { force: true });
+  await rm(dumpPath, { force: true });
+
+  await page.evaluate(() => {
+    const cover = document.createElement('div');
+    cover.id = 'hm-smoke-blank-cover';
+    cover.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#000';
+    document.body.appendChild(cover);
+  });
+
+  let failure = null;
+  try {
+    await captureVisualSnapshot(page, name);
+  } catch (error) {
+    failure = error;
+  } finally {
+    await page.evaluate(() => document.getElementById('hm-smoke-blank-cover')?.remove());
+  }
+
+  assert(failure, 'a viewport painted one flat colour must trip the snapshot size guard');
+  assert(
+    failure.message.includes('snapshot is unexpectedly small'),
+    `the blanked viewport failed for some other reason: ${failure.message}`,
+  );
+  assert(
+    failure.message.includes(dumpPath),
+    `the size failure must name the state dump it wrote: ${failure.message}`,
+  );
+
+  const dump = JSON.parse(await readFile(dumpPath, 'utf8'));
+  for (const field of ['snapshot', 'bytes', 'png', 'map_paint', 'viewport', 'page']) {
+    assert(field in dump, `the state dump is missing ${field}: ${Object.keys(dump).join(', ')}`);
+  }
+  for (const field of ['url', 'visibility_state', 'loading_overlay_display', 'map_rect', 'tiles_total', 'tiles_loaded', 'animations']) {
+    assert(field in dump.page, `the dumped page state is missing ${field}: ${Object.keys(dump.page).join(', ')}`);
+  }
+  assert(dump.bytes <= 20_000, `the dump must record the size that failed, got ${dump.bytes}`);
+  assert(dump.snapshot === name, `the dump must name its snapshot, got ${dump.snapshot}`);
+  const kept = await stat(pngPath);
+  assert(
+    kept.size === dump.bytes,
+    `the failing PNG must be kept beside the dump at the size the dump reports, ${kept.size} against ${dump.bytes}`,
+  );
+
+  await rm(pngPath, { force: true });
+  await rm(dumpPath, { force: true });
 }
 
 // Impacts, the AOML ground-truth artifact, the NCEI billion-dollar table and the
@@ -4428,6 +4545,7 @@ try {
   await assertActivePopupDomSafety(page);
   await assertAdvisoryTooltipDomSafety(page);
   await assertLocationPrivacyFlow(page);
+  await assertUndersizedSnapshotIsDiagnosed(page);
 
   const migratedSettings = await page.evaluate(
     () => JSON.parse(localStorage.getItem('hm-settings-v1') || 'null'),
