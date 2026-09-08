@@ -81,6 +81,8 @@
     "test:impact-utils": "node scripts/test-impact-utils.mjs",
     "test:impact-coverage": "node scripts/test-impact-coverage.mjs",
     "test:report-export": "node scripts/test-report-export.mjs",
+    "generate:storm-pages": "node scripts/build-storm-pages.mjs",
+    "test:storm-pages": "node scripts/test-storm-pages.mjs",
     "test:citation": "node scripts/test-citation.mjs",
     "test:export-provenance": "node scripts/test-export-provenance.mjs",
     "test:qgis-export": "node scripts/test-qgis-export.mjs",

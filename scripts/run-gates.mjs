@@ -74,6 +74,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'test:impact-coverage',
   'test:report-export',
   'test:citation',
+  'test:storm-pages',
   'test:export-provenance',
   'test:qgis-export',
   'test:geojson-rfc7946',
