@@ -707,7 +707,13 @@ async function assertAboutDialogContrast(browser, baseUrl) {
     await page.click('#toggle-info');
     await page.waitForSelector('#info-modal:not([hidden]) .info-card h3');
 
+    // All four, not just high contrast. The light theme's link colour was the
+    // one below AA here, at 2.79:1, because --sapphire has to work as a
+    // category colour and a surface as well as link text and could not be
+    // darkened for one of those jobs without changing the other two.
     for (const profile of [
+      { theme: 'dark', highContrast: false, minimum: 4.5 },
+      { theme: 'light', highContrast: false, minimum: 4.5 },
       { theme: 'dark', highContrast: true, minimum: 7 },
       { theme: 'light', highContrast: true, minimum: 7 },
     ]) {
@@ -732,7 +738,7 @@ async function assertAboutDialogContrast(browser, baseUrl) {
         !failed.length,
         `${label}: below ${profile.minimum}:1 — ${failed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
       );
-      covered.push(`${profile.theme}+hc >= ${profile.minimum}:1`);
+      covered.push(`${profile.theme}${profile.highContrast ? '+hc' : ''} >= ${profile.minimum}:1`);
     }
   } finally {
     await context.close();

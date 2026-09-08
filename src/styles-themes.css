@@ -11,6 +11,14 @@ html.light-theme {
   --blue:    #1e66f5;
   --lavender:#7c3aed;
   --sapphire:#04a5e5;
+
+  /* --sapphire is the light theme's cyan, and it works as a category colour and
+     as a surface. As link text on a white panel it measured 2.79:1, well under
+     the 4.5:1 AA asks of body text, and it could not simply be darkened because
+     --cat-ts is the same value and the map legend depends on it. The ink token
+     is the half that paints text, so only that moves: 5.93:1 on white and
+     4.88:1 on the darkest light panel. */
+  --ink-link: #0369a1;
   --brand-title-start: #5b21b6;
   --brand-title-end: #075985;
   --sky:     #04a5e5;
