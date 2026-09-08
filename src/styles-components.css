@@ -10230,10 +10230,11 @@ html:not(.light-theme) #map .leaflet-tile-pane {
     scroll-padding-inline-end: 34px;
   }
 
-  .header-actions:focus-visible {
-    outline: 2px solid var(--focus-ring-color);
-    outline-offset: 3px;
-  }
+  /* .header-actions is a <div tabindex="0">, so the accessibility layer's
+     [tabindex]:focus-visible rule matches it, and that layer is later. A focus
+     outline written here computed to outline-style: none at 390px with this
+     query matching, leaving only an outline-offset on an outline that never
+     drew. Focus styling for this control belongs in that layer or nowhere. */
 
   .header-actions[data-scrollable="true"]::before,
   .header-actions[data-scrollable="true"]::after {

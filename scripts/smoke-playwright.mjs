@@ -642,6 +642,105 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
+// WCAG 2.2 SC 2.4.7: a keyboard user has to be able to see where they are, in
+// every theme. Nothing else measured that.
+//
+// The accessibility layer ends with one focus block whose !important flags
+// suppress roughly fifteen per-control focus rules above it in the same layer,
+// and a roadmap item proposed scoping that block to html.high-contrast the way
+// the hover block beside it was scoped. Two things were measured before writing
+// this. Removing the !important changes the focus appearance of four control
+// types, so the flags are load-bearing rather than decorative. Scoping the
+// block, on the other hand, leaves every control still visibly focused: the
+// per-control rules underneath take over. So this asserts the property that
+// actually matters, that an indicator exists, rather than pinning which rule
+// supplies it.
+//
+// Read after the transition settles. Straight after focus() the computed
+// box-shadow is still the transition's transparent starting value, which reads
+// as "this control has no focus ring" for every control in the app.
+async function assertFocusIndicatorInEveryTheme(browser, baseUrl) {
+  const targets = [
+    ['icon button', '#toggle-filters'],
+    ['tabindex container', '.header-actions'],
+    ['search input', '#search-input'],
+    ['category button', '.cat-btn'],
+  ];
+  for (const [theme, highContrast] of [['dark', false], ['dark', true], ['light', false], ['light', true]]) {
+    const label = `${theme}${highContrast ? ' + high contrast' : ''}`;
+    const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+    await seedSettings(context, { onboarded: true, theme, highContrast, locale: 'en', reducedMotion: true });
+    await stubQuietTropics(context);
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.click('#toggle-filters');
+      await page.waitForTimeout(400);
+      // A click leaves the browser in pointer modality, where :focus-visible
+      // does not match a programmatic focus(). One real Tab press restores the
+      // keyboard modality every rule here is written for.
+      await page.keyboard.press('Tab');
+      await page.waitForTimeout(200);
+
+      const applied = await page.evaluate(() => ({
+        theme: document.documentElement.dataset.theme,
+        highContrast: document.documentElement.classList.contains('high-contrast'),
+      }));
+      assert(
+        applied.theme === theme && applied.highContrast === highContrast,
+        `${label}: the mode did not take (${JSON.stringify(applied)}), so nothing below would mean anything`,
+      );
+
+      for (const [name, selector] of targets) {
+        const focused = await page.evaluate(sel => {
+          const element = [...document.querySelectorAll(sel)].find(candidate => candidate.getClientRects().length);
+          if (!element) return false;
+          element.dataset.hmFocusProbe = '1';
+          element.focus();
+          return true;
+        }, selector);
+        assert(focused, `${label}: ${name} (${selector}) is not on screen, so its focus ring cannot be measured`);
+        await page.waitForTimeout(600);
+        const ring = await page.evaluate(() => {
+          const element = document.querySelector('[data-hm-focus-probe="1"]');
+          const style = getComputedStyle(element);
+          const opaque = color => !/rgba\([^)]*,\s*0\s*\)/.test(color) && color !== 'transparent';
+          // Either a real outline, or a shadow with somewhere to be seen: a
+          // width, a spread or an offset, painted in a colour that is not
+          // fully transparent.
+          const outlined = style.outlineStyle !== 'none'
+            && Number.parseFloat(style.outlineWidth) > 0
+            && opaque(style.outlineColor);
+          const shadowed = style.boxShadow !== 'none'
+            && opaque(style.boxShadow)
+            && /(?:^|\s)(?!0px\s+0px\s+0px\s+0px)(-?\d*\.?\d+px\s+){2,3}-?\d*\.?\d+px/.test(style.boxShadow);
+          const result = {
+            focusVisible: element.matches(':focus-visible'),
+            outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
+            boxShadow: style.boxShadow.slice(0, 70),
+            visible: outlined || shadowed,
+          };
+          element.blur();
+          delete element.dataset.hmFocusProbe;
+          return result;
+        });
+        assert(
+          ring.focusVisible,
+          `${label}: ${name} did not match :focus-visible, so this measured the wrong state`,
+        );
+        assert(
+          ring.visible,
+          `${label}: ${name} has no visible focus indicator (${ring.outline}; shadow ${ring.boxShadow})`,
+        );
+      }
+    } finally {
+      await context.close();
+    }
+  }
+  console.log('  focus indicator survives in all four theme combinations');
+}
+
 // Two hover rules, one in the components layer and one in the accessibility
 // layer. The second was unscoped and !important, and !important in the last
 // layer beats everything, so every component hover rule in every theme was dead
@@ -4475,6 +4574,7 @@ try {
   // children have to shrink rather than be cut through a word.
   for (const locale of ['en', 'es']) await assertHeaderTextIsNotCut(browser, baseUrl, locale);
   await assertHoverTreatmentFollowsTheTheme(browser, baseUrl);
+  await assertFocusIndicatorInEveryTheme(browser, baseUrl);
 
   await browser.close();
 
