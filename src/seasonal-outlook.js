@@ -23,24 +23,19 @@ function hasValidSnapshotWindow(snapshot) {
   return Boolean(issued && validUntil && issued <= validUntil);
 }
 
+// Only the accuracy figures live here. The English descriptions that used to
+// sit beside them were rendered from the catalog instead, so nothing read them,
+// and one had already drifted from the string it duplicated: "7-8 named storms,
+// moderate ACE" against the catalog's "7-8 named storms and moderate ACE".
 const SKILL_DATA = {
   'above-normal': {
     accuracy: 72,
-    description: 'Activity above the climatological median.',
-    definition: 'Season has ≥9 named storms, or high ACE.',
-    recentExample: '2020 (30 named storms), 2017 (17 named storms)',
   },
   'below-normal': {
     accuracy: 68,
-    description: 'Activity below the climatological median.',
-    definition: 'Season has <7 named storms, or low ACE.',
-    recentExample: '2013 (2 hurricanes), 2014 (8 named storms)',
   },
   'near-normal': {
     accuracy: 55,
-    description: 'Activity near the climatological median.',
-    definition: 'Season has 7-8 named storms, moderate ACE.',
-    recentExample: '2019 (18 named storms), 2018 (8 named storms)',
   },
 };
 

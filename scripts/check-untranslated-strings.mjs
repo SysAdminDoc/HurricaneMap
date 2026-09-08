@@ -10,6 +10,7 @@
 // literal, and the value of an attribute a screen reader or a tooltip reads
 // out. Anything interpolated is skipped, because t() calls arrive that way.
 import { readdir, readFile } from 'node:fs/promises';
+import { blankCommentsAndRegexes as stripComments } from './js-source.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -29,46 +30,16 @@ const ALLOWED = new Map([
   ['Iowa State IEM NEXRAD archive', 'archive name'],
   ['Wikipedia', 'the site is called that in every locale, and the link goes to the localized edition'],
   ['python -m http.server 8765', 'a command to type, shown in the boot-failure hint'],
+  // The KML document the track export writes. Every downloadable artifact this
+  // app produces states its provenance in English, the same as the CSV data
+  // dictionary and the Markdown report, so that a file which outlives the
+  // session that made it says where it came from in one fixed language.
+  ['HurricaneMap export. Source: NOAA HURDAT2.', 'provenance line in the KML export'],
+  ['APA citation:', 'label in the KML and text exports'],
+  ['BibTeX citation:', 'label in the KML and text exports'],
 ]);
 
-export function stripComments(text) {
-  let output = '';
-  let index = 0;
-  let inString = null;
-  while (index < text.length) {
-    const character = text[index];
-    const next = text[index + 1];
-    if (inString) {
-      if (character === '\\') { output += '  '; index += 2; continue; }
-      if (character === inString) inString = null;
-      output += character;
-      index += 1;
-      continue;
-    }
-    if (character === '"' || character === "'" || character === '`') {
-      inString = character;
-      output += character;
-      index += 1;
-      continue;
-    }
-    if (character === '/' && next === '/') {
-      while (index < text.length && text[index] !== '\n') { output += ' '; index += 1; }
-      continue;
-    }
-    if (character === '/' && next === '*') {
-      while (index < text.length && !(text[index] === '*' && text[index + 1] === '/')) {
-        output += text[index] === '\n' ? '\n' : ' ';
-        index += 1;
-      }
-      output += '  ';
-      index += 2;
-      continue;
-    }
-    output += character;
-    index += 1;
-  }
-  return output;
-}
+export { blankCommentsAndRegexes as stripComments } from './js-source.mjs';
 
 // What a reader sees. A run of text is bounded by a tag on one side and a tag
 // or an interpolation on the other, because an interpolation is a boundary
@@ -93,6 +64,12 @@ const ATTRIBUTE = /\b(title|aria-label|placeholder|alt)="([^"`$<>]*)"/g;
 // positional can see it. The storm panel picked between 'High', 'Medium' and
 // 'Low' this way for its rapid-intensification risk.
 const TERNARY_LABEL = /[?:]\s*'([^'\n]{3,80})'/g;
+
+// `<!-- US landfalls -->` labels the path below it for whoever reads the source.
+// Nobody sees it, and reporting it sends someone to translate a comment.
+export function stripHtmlComments(text) {
+  return String(text).replace(/<!--[\s\S]*?-->/g, match => match.replace(/[^\n]/g, ' '));
+}
 
 const WORD = /[A-Za-z][A-Za-z'-]*/g;
 const CAPITALISED = /^[A-Z][a-z]{2,}$/;
@@ -155,7 +132,7 @@ export function markupLines(code) {
 }
 
 export function findUntranslated(file, text) {
-  const code = stripComments(text);
+  const code = stripHtmlComments(stripComments(text));
   const found = [];
   const rendered = markupLines(code);
   const lines = code.split(/\r?\n/);
@@ -173,14 +150,28 @@ export function findUntranslated(file, text) {
       if (kind !== 'attribute' && !line.includes('<') && !rendered.has(index + 1)) continue;
       // A ternary label only counts inside something being rendered.
       if (kind === 'label' && !line.includes('${')) continue;
-      pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(line)) !== null) {
+      // A non-global regex does not advance lastIndex, so `exec` in a loop
+      // returns the same match forever. That is only survivable while every
+      // path out of the body breaks; adding an allowlist check that continued
+      // instead hung the whole gate on the first allowlisted string it met.
+      // The two line-edge patterns match once by construction, so they are read
+      // once, outside the loop.
+      const candidates = [];
+      if (pattern.global) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(line)) !== null) {
+          candidates.push(match);
+          // The boundary this run ended on can open the next one.
+          pattern.lastIndex = Math.max(pattern.lastIndex - 2, match.index + 1);
+        }
+      } else {
+        const match = pattern.exec(line);
+        if (match) candidates.push(match);
+      }
+
+      for (const match of candidates) {
         const value = match[group].trim();
-        if (!pattern.global && !looksLikeProse(value)) break;
-        // A quoted branch of a ternary in a rendered position is unambiguous, so
-        // one lowercase word counts there: the climate summary picked between
-        // 'increasing', 'decreasing' and 'stable' that way.
         // A quoted branch of a ternary in a rendered position is unambiguous
         // enough that one lowercase word counts, so long as it is part of a
         // phrase: the climate summary picked between 'increasing', 'decreasing'
@@ -195,20 +186,79 @@ export function findUntranslated(file, text) {
         if (!isProse) continue;
         if (ALLOWED.has(value)) continue;
         found.push({ file, line: index + 1, kind, value });
-        if (!pattern.global) break;
-        // The boundary this run ended on can open the next one.
-        pattern.lastIndex = Math.max(pattern.lastIndex - 2, match.index + 1);
       }
     }
   });
   return found;
 }
 
+// The other direction, and the exact one.
+//
+// The scan above is a heuristic: it has to guess which runs of text a reader
+// sees, and every filter that keeps a code fragment out also keeps some real
+// label out. Twenty of the eighty-two labels moved into the catalog on
+// 2026-09-08 were invisible to it, including the one the audit had named:
+// "U.S. landfalls (chronological)" was read as a property access, because
+// `U.S.` has the shape of one.
+//
+// A string that is already in the catalog needs no guessing. If its English
+// value turns up as a literal in a module, somebody has written the label back
+// into the markup, and that is exactly the regression the heuristic was meant
+// to catch and could not.
+export function findCatalogEchoes(file, rawSource, catalogValues) {
+  const source = stripHtmlComments(rawSource);
+  const found = [];
+  const rendered = markupLines(source);
+  const lines = source.split(/\r?\n/);
+  // Where a reader meets a string: inside markup, or assigned to one of the
+  // properties that put text on screen. A lookup table that maps an English
+  // constant from an upstream API to a key is not any of those, and neither is
+  // a filename or a citation, which is why matching a catalog value anywhere in
+  // the file reported seventy things and meant none of them.
+  const UI_SINK = /\.(?:title|textContent|innerText|innerHTML|placeholder|ariaLabel)\s*=|setAttribute\(\s*['"](?:title|aria-label|placeholder|alt)['"]/;
+  for (const [key, value] of catalogValues) {
+    // Placeholders split a value into fragments. The longest one carries enough
+    // of the sentence to be unmistakable; anything short enough to collide with
+    // ordinary code is not worth testing, and a single word is a word.
+    const fragment = value.split(/\{\d+\}/).map(part => part.trim()).sort((a, b) => b.length - a.length)[0] || '';
+    if (fragment.length < 12 || !/\s/.test(fragment)) continue;
+    if (ALLOWED.has(fragment)) continue;
+    let from = 0;
+    while (true) {
+      const at = source.indexOf(fragment, from);
+      if (at === -1) break;
+      from = at + fragment.length;
+      const line = source.slice(0, at).split(/\r?\n/).length;
+      const text = lines[line - 1] || '';
+      if (!rendered.has(line) && !text.includes('<') && !UI_SINK.test(text)) continue;
+      found.push({
+        file,
+        line,
+        kind: 'echo',
+        value: `${fragment} (already in the catalog as ${key})`,
+      });
+      break;
+    }
+  }
+  return found;
+}
+
 async function main() {
   const files = (await readdir(sourceDir)).filter(name => name.endsWith('.js') && !SKIP_FILES.has(name)).sort();
+  // Read the catalog first: the echo check needs its English values, and the
+  // anchor check below needs the file anyway.
+  const catalog = await readFile(path.join(sourceDir, 'locales', 'en.js'), 'utf8');
+  const catalogValues = [...catalog.matchAll(/^\s*'([^']+)':\s*'((?:[^'\\]|\\.)*)',$/gm)]
+    .map(match => [match[1], match[2].replace(/\\'/g, "'").replace(/\\\\/g, '\\')]);
+  if (catalogValues.length < 500) {
+    console.error(`untranslated: only ${catalogValues.length} catalog values were readable; the echo check would prove nothing`);
+    process.exit(1);
+  }
   const found = [];
   for (const file of files) {
-    found.push(...findUntranslated(file, await readFile(path.join(sourceDir, file), 'utf8')));
+    const source = await readFile(path.join(sourceDir, file), 'utf8');
+    found.push(...findUntranslated(file, source));
+    found.push(...findCatalogEchoes(file, stripComments(source), catalogValues));
   }
 
   // An allowlist entry that no longer matches anything is a rule about code
@@ -216,7 +266,6 @@ async function main() {
   // One catalog per locale under src/locales/ since 2026-09-08. English is the
   // one this gate anchors on, because it is the source language and the
   // fallback for every key.
-  const catalog = await readFile(path.join(sourceDir, 'locales', 'en.js'), 'utf8');
   const sources = await Promise.all(files.map(file => readFile(path.join(sourceDir, file), 'utf8')));
   const stale = [...ALLOWED.keys()].filter(value => !sources.some(source => source.includes(value)));
 
@@ -238,7 +287,10 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`untranslated ok (${files.length} modules scanned, ${ALLOWED.size} proper nouns allowed)`);
+  console.log(
+    `untranslated ok (${files.length} modules scanned, ${catalogValues.length} catalog values held to their keys, `
+    + `${ALLOWED.size} proper nouns allowed)`,
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -3,7 +3,7 @@ import {
   ensureStormsLoaded, ensureOptionalData, getStorm, categoryLabel, categoryClass,
   formatTime, getImpactsFor, getAllStorms, windToCategory,
 } from './data.js';
-import { showTrack, clearTracks, getMap } from './map.js';
+import { showTrack, clearFocusTrack, getMap } from './map.js';
 import { TrackAnimator } from './animation.js';
 import { RadarOverlay, getStormRadarFrames } from './radar.js';
 import { renderIntensityChart } from './chart.js';
@@ -42,7 +42,8 @@ import { clearAdvisoryReplay } from './advisory-replay.js';
 import { clearRiskTrajectories } from './art-mode.js';
 import { presentPressure, MISSING_METRIC } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
-import { formatClosest, wirePanelControls } from './panel-controls.js';
+import { formatClosest, showToast, wirePanelControls } from './panel-controls.js';
+import { renderDaysAtIntensity, renderSimilarStorms } from './panel-analysis.js';
 import { renderTrackTimeline } from './table-view.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { inspectRadarFrameCache } from './storage-manager.js';
@@ -135,8 +136,9 @@ document.addEventListener('hm-panel:hidden', event => {
   stopStormOverlays();
   // The track belongs to the panel too. Only the close button used to clear it,
   // so opening any other panel over the storm panel left its track behind on a
-  // map that no longer said which storm it was.
-  clearTracks();
+  // map that no longer said which storm it was. Only the panel's own track:
+  // clearing the whole layer took the "show tracks" filter's lines with it.
+  clearFocusTrack();
 });
 export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   // Sequence guard: rapid marker clicks interleave across the awaits below
@@ -177,8 +179,7 @@ export async function showStorm(landfall, { advisoryReplay = null } = {}) {
     `;
     return;
   }
-  clearTracks();
-  await showTrack(storm.id);
+  await showTrack(storm.id, { focus: true });
   if (seq !== showStormSeq) return;
   if (radiiCount(storm) > 0) {
     try {
@@ -304,7 +305,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
         <div class="stat-grid">
           <div class="stat"><div class="label">${t('panel.peakWind')}</div><div class="value">${formatWind(storm.peak_wind_kt)}${getSetting('windUnit') !== 'kt' ? ` <span style="font-size:11px;color:var(--subtext)">(${storm.peak_wind_kt} kt)</span>` : ''}</div></div>
           <div class="stat"><div class="label">${t('panel.minPressure')}</div><div class="value">${minPres}</div></div>
-          <div class="stat" title="Accumulated Cyclone Energy — Σ(v²/10⁴) over 6-hourly obs ≥ 34 kt. Captures total wind-energy output across the storm's life. Atl. season avg ≈ 100, major hurricanes alone ≈ 10-30."><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
+          <div class="stat" title="${escapeHtml(t('panel.aceTitle'))}"><div class="label">ACE <span class="metric-info">ⓘ</span></div><div class="value">${aceStr}</div></div>
           <div class="stat" title="${escapeHtml(transTitle)}"><div class="label">${t('panel.avgForwardSpeed')} <span class="metric-info">ⓘ</span></div><div class="value">${transStr}</div></div>
           <div class="stat"><div class="label">${t('panel.landfalls')}</div><div class="value">${storm.us_landfall_count ?? 0}</div></div>
           ${exposureTile}
@@ -488,7 +489,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
 
   // Similar storms: compute top-5 neighbors and render.
   const similarStorms = findSimilarStorms(storm, allStorms, 5);
-  renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms);
+  renderSimilarStorms(document.getElementById('similar-storms-host'), similarStorms, showStorm);
   renderStormEventsSummary(document.getElementById('storm-events-host'), storm);
   renderRainfallBlock(document.getElementById('rainfall-host'), storm);
   renderHwmRow(document.getElementById('hwm-row-host'), storm);
@@ -561,86 +562,6 @@ function renderExposureStatTile(exposure) {
 }
 
 
-function renderSimilarStorms(host, similarStorms) {
-  if (!host || !Array.isArray(similarStorms) || similarStorms.length === 0) {
-    if (host) host.innerHTML = `
-      <div class="panel-empty-state">
-        <strong>${t('panel.noCloseMatches')}</strong>
-        <span>${t('panel.unusualStorm')}</span>
-      </div>`;
-    return;
-  }
-  const rows = similarStorms.map(s => {
-    const score = (s.similarity_score * 100).toFixed(0);
-    const cat = categoryLabel(windToCategory(s.peak_wind_kt || 0));
-    const cls = categoryClass(windToCategory(s.peak_wind_kt || 0));
-    return `<li class="similar-storm-row">
-      <span class="similar-storm-name">${escapeHtml(formatStormName(s.name, { unnamed: t('storm.unnamed') }))} (${s.year})</span>
-      <span class="similar-storm-cat cat-pill ${cls}" title="${t('table.trackPeak')}">${cat}</span>
-      <span class="similar-storm-landfalls" title="${t('panel.landfallCountLabel')}">${s.landfalls === 1 ? t('panel.similarLandfallsOne', s.landfalls) : t('panel.similarLandfallsMany', s.landfalls)}</span>
-      <span class="similar-storm-score" title="${escapeHtml(t('panel.similarityScoreTitle'))}">${score}%</span>
-    </li>`;
-  }).join('');
-  host.innerHTML = `<ul class="similar-storms-list">${rows}</ul>`;
-  
-  // Wire clicks to show that storm (find its first landfall in data)
-  host.querySelectorAll('.similar-storm-row').forEach((row, idx) => {
-    row.addEventListener('click', async () => {
-      const similar = similarStorms[idx];
-      await ensureStormsLoaded();
-      const targetStorm = getStorm(similar.storm_id);
-      if (targetStorm && targetStorm.us_landfalls && targetStorm.us_landfalls.length > 0) {
-        // A us_landfalls record has no storm_id of its own, so passing one
-        // straight through left the panel looking up an undefined storm and
-        // showing its "record unavailable" state.
-        showStorm({ ...targetStorm.us_landfalls[0], storm_id: similar.storm_id });
-      }
-    });
-    row.style.cursor = 'pointer';
-  });
-}
-
-// Days-at-intensity stacked horizontal bar. Visualizes how many hours of
-// the storm's life were spent in each Saffir-Simpson tier — gives an
-// at-a-glance sense of "long Cat-4 grinder" vs "brief brushing TS".
-function renderDaysAtIntensity(host, track) {
-  if (!host) return;
-  const buckets = daysAtIntensity(track);
-  const order = [
-    { k: 'td', label: 'TD',    cls: 'cat-ts' },
-    { k: 'ts', label: 'TS',    cls: 'cat-ts' },
-    { k: 'c1', label: 'Cat 1', cls: 'cat-1'  },
-    { k: 'c2', label: 'Cat 2', cls: 'cat-2'  },
-    { k: 'c3', label: 'Cat 3', cls: 'cat-3'  },
-    { k: 'c4', label: 'Cat 4', cls: 'cat-4'  },
-    { k: 'c5', label: 'Cat 5', cls: 'cat-5'  },
-  ];
-  const total = order.reduce((s, t) => s + buckets[t.k], 0);
-  if (total <= 0) {
-    host.innerHTML = `<div class="dai-empty">${t('panel.noTierTrack')}</div>`;
-    return;
-  }
-  const parts = order.filter(tier => buckets[tier.k] > 0).map(tier => {
-    const hrs = buckets[tier.k];
-    const pct = (hrs / total) * 100;
-    const days = hrs / 24;
-    const dayStr = days >= 1 ? `${days.toFixed(1)} d` : `${Math.round(hrs)} h`;
-    return { tier, pct, dayStr };
-  });
-  // Segments are presentational children of the role="img" bar — aria-label
-  // on a generic div is prohibited (WCAG 4.1.2); the per-tier breakdown goes
-  // on the bar's own label instead.
-  const segs = parts.map(({ tier, pct, dayStr }) =>
-    `<div class="dai-seg ${tier.cls}" style="flex-basis:${pct}%" title="${tier.label}: ${dayStr} (${pct.toFixed(0)}%)"><span class="dai-seg-label">${pct >= 8 ? `${tier.label} · ${dayStr}` : ''}</span></div>`,
-  ).join('');
-  const daiBreakdown = parts.map(({ tier, dayStr }) => `${tier.label} ${dayStr}`).join(', ');
-  host.innerHTML = `
-    <div class="dai-bar" role="img" aria-label="${t('panel.daysAtIntensity')}: ${daiBreakdown}">${segs}</div>
-    <div class="dai-legend">
-      <span class="dai-total">${t('panel.daysTotalTracked', (total / 24).toFixed(1))}</span>
-    </div>
-  `;
-}
 
 /** USGS high-water-mark toggle — only for storms with preprocessed marks. */
 async function renderHwmRow(host, storm) {

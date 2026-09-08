@@ -7,6 +7,7 @@ import {
   initialBearingDeg,
   pointToSegmentDistanceKm,
 } from '../src/geodesy.js';
+import { readFile as readSource } from 'node:fs/promises';
 import {
   COASTAL_CITIES,
   closestApproach,
@@ -101,5 +102,26 @@ assert.equal(segmentOnlyReturnPeriods.cat1_count, 2, 'return periods count segme
 assert.equal(segmentOnlyReturnPeriods.cat3_count, 2, 'return periods count segment-only Cat 3 events');
 assert.equal(segmentOnlyReturnPeriods.cat5_count, 0, 'return periods exclude sub-Cat 5 events');
 assert.equal(segmentOnlyReturnPeriods.cat3_years, 5, 'return periods use one event per storm');
+
+// Every consumer of this arithmetic, not just the module that owns it. The
+// independent ground-truth check and the AOML builder each carried a private
+// haversine with the Earth radius written out again, and nothing held either to
+// these vectors: the whole point of recomputing the delta in a second language
+// is lost if the second language quietly uses different maths. They delegate
+// now. validate-data.mjs is top-level script code, so importing it would run a
+// full validation; it is read instead, which is also the check that matters,
+// since the failure mode is somebody writing a fresh copy rather than the
+// shared one being wrong.
+for (const [relative, importPattern] of [
+  ['./validate-data.mjs', /from '\.\.\/src\/geodesy\.js'/],
+  ['./build_aoml_landfalls.py', /from preprocess_hurdat2 import haversine_km/],
+]) {
+  const source = await readSource(new URL(relative, import.meta.url), 'utf8');
+  assert(importPattern.test(source), `${relative} no longer takes its distance arithmetic from the shared implementation`);
+  assert(
+    !/Math\.asin|math\.asin/.test(source.replace(/haversine/gi, '')),
+    `${relative} has grown a private haversine again; the reference vectors do not cover it`,
+  );
+}
 
 console.log(`geodesy ok (${vectors.distance_vectors.length} distances, ${vectors.segment_vectors.length} segments, ${catalogueChecks.length} track counts)`);

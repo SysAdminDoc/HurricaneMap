@@ -55,8 +55,8 @@ export function initMap() {
       const a = L.DomUtil.create('a', 'leaflet-fullscreen-btn', btn);
       a.href = '#';
       a.role = 'button';
-      a.title = 'Toggle fullscreen';
-      a.setAttribute('aria-label', 'Toggle fullscreen');
+      a.title = t('map.toggleFullscreen');
+      a.setAttribute('aria-label', t('map.toggleFullscreen'));
       a.innerHTML = '⛶';
       L.DomEvent.disableClickPropagation(btn);
       L.DomEvent.on(a, 'click', (e) => {
@@ -249,6 +249,18 @@ let trackGeneration = 0;
 export function clearTracks() {
   trackGeneration++;
   trackLayer.clearLayers();
+  focusTrackLayers = [];
+}
+
+// The storm panel and the "show tracks" filter both draw into this one layer,
+// so the panel clearing it took the filter's tracks with it: 239 lines became
+// 33 while the checkbox and the URL both still said the filter was on. The
+// panel owns only what it drew, and removes only that.
+let focusTrackLayers = [];
+
+export function clearFocusTrack() {
+  for (const layer of focusTrackLayers) trackLayer.removeLayer(layer);
+  focusTrackLayers = [];
 }
 
 export async function showTrack(stormId, opts = {}) {
@@ -259,7 +271,7 @@ export async function showTrack(stormId, opts = {}) {
   if (!storm) return null;
   const segments = buildIntensitySegments(storm.track);
   const color = opts.color;
-  const layers = [];
+  const added = [];
   for (const seg of segments) {
     const poly = L.polyline(seg.coords, {
       color: color || categoryColor(seg.cat),
@@ -268,15 +280,24 @@ export async function showTrack(stormId, opts = {}) {
       lineJoin: 'round',
       className: 'track-line',
     });
-    layers.push(poly);
+    added.push(poly);
     poly.addTo(trackLayer);
   }
   // Genesis marker (small empty circle).
   if (storm.track.length) {
     const start = storm.track[0];
-    L.circleMarker([start.lat, start.lon], {
+    const genesis = L.circleMarker([start.lat, start.lon], {
       radius: 3, color: '#cdd6f4', weight: 1, fillOpacity: 0,
-    }).bindTooltip('Genesis', { direction: 'top' }).addTo(trackLayer);
+    }).bindTooltip(t('map.genesis'), { direction: 'top' });
+    added.push(genesis);
+    genesis.addTo(trackLayer);
+  }
+  // The previous focus track goes only after the new one is drawn, so the map
+  // never blinks empty between two storms.
+  if (opts.focus) {
+    const previous = focusTrackLayers;
+    focusTrackLayers = added;
+    for (const layer of previous) trackLayer.removeLayer(layer);
   }
   return storm;
 }

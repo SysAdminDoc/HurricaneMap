@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 
 import { getDamageMillions, getFatalityCount, tornadoSearchHint, tornadoSearchUrl } from '../src/impact-utils.js';
 import { getCoverageYearRange } from '../src/data.js';
-import { buildPublicationCSV, csvEscape, publicationCategoryLabel } from '../src/export.js';
+import { csvEscape } from '../src/csv.js';
+import { buildPublicationCSV, publicationCategoryLabel } from '../src/export.js';
+import { buildExports } from '../src/metrics.js';
+import { escapeCSV } from '../src/compare-rows.js';
 import { inflateUSD } from '../src/inflation.js';
 import { buildFilterTitle, findImpactLeader, generateStatisticalReport } from '../src/report.js';
 
@@ -23,6 +26,51 @@ assert.equal(findImpactLeader(landfalls, getDamageMillions, { getImpacts: id => 
 assert.equal(csvEscape('=HYPERLINK("https://example.com")', { preventFormula: true }), `"'=HYPERLINK(""https://example.com"")"`);
 assert.equal(csvEscape('-89.600', { preventFormula: false }), '-89.600');
 assert.equal(csvEscape('Louisiana, USA'), '"Louisiana, USA"');
+
+// There were three of these and they disagreed: one rendered a null cell empty,
+// one wrote the literal text "null" into it, and only one guarded against a cell
+// a spreadsheet would read as a formula. All three call the same rule now, so
+// the rule is pinned once and every export inherits it.
+assert.equal(csvEscape(null), '');
+assert.equal(csvEscape(undefined), '');
+assert.equal(escapeCSV(null), '');
+assert.equal(escapeCSV(undefined), '');
+assert.equal(csvEscape(0), '0', 'a measured zero is not an empty cell');
+assert.equal(csvEscape(false), 'false');
+// A carriage return ends the record for a strict RFC 4180 reader, so it has to
+// force quoting the way a newline does. Two of the three escapers ignored it.
+assert.equal(csvEscape('a\rb'), '"a\rb"');
+assert.equal(escapeCSV('a\rb'), '"a\rb"');
+assert.equal(escapeCSV('=cmd|calc', { preventFormula: true }), "'=cmd|calc");
+
+// End to end through the track export, which used to write the literal text
+// "null" into every cell a storm had no reading for, and passed a status
+// straight through whatever it began with.
+{
+  const storm = {
+    id: 'AL992099',
+    name: 'TESTSTORM',
+    year: 2099,
+    track: [
+      { t: '2099-09-01T00:00:00Z', lat: 25, lon: -80, wind: 60, pres: null, status: 'TS' },
+      { t: '2099-09-01T06:00:00Z', lat: -26.5, lon: -81, wind: null, pres: 980, status: '=SUM(A1)' },
+    ],
+    us_landfalls: [],
+  };
+  const body = buildExports(storm).csv.body;
+  const dataRows = body.split('\n').filter(line => line.startsWith('2099-'));
+  assert.equal(dataRows.length, 2, `expected two data rows, got ${dataRows.length}`);
+  assert.ok(!/(^|,)null(,|$)/.test(body), `the track CSV wrote a literal null cell: ${dataRows.join(' | ')}`);
+  assert.ok(dataRows[0].includes(',,'), `a missing pressure should be an empty cell: ${dataRows[0]}`);
+  assert.ok(
+    dataRows[1].includes("'=SUM(A1)"),
+    `a status beginning with = reached the sheet as a formula: ${dataRows[1]}`,
+  );
+  assert.ok(
+    dataRows[1].includes('-26.5') && !dataRows[1].includes("'-26.5"),
+    `a negative latitude must stay a number: ${dataRows[1]}`,
+  );
+}
 assert.equal(publicationCategoryLabel(0), 'TD');
 assert.equal(publicationCategoryLabel(-1), 'TS');
 

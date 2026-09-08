@@ -36,7 +36,7 @@
       - option "San Diego, CA"
       - option "Cabo San Lucas, MX"
     - strong: /\d+ mi/
-    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Periodo de retorno \\(radio de \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - text: "/\\(\\d+ km\\) · \\d+ kt · \\d+ ago \\d+, \\d+:\\d+ UTC Periodo de retorno \\(radio de \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Impactos" [level=3]
     - text: /Víctimas mortales \d+,\d+ Daños \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Desastre de mil millones \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ muertes\)/
     - 'link "Fuente: Wikipedia"':
@@ -56,11 +56,16 @@
   - region "Análisis del huracán":
     - heading "Huracanes similares" [level=3]
     - list:
-      - listitem: /Ian \(\d+\) Cat 5 3 tocamientos de tierra \d+%/
-      - listitem: /Belle \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
-      - listitem: /Carol \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
-      - listitem: /Sin nombre \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
-      - listitem: /Celia \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
+      - listitem:
+        - button /Ian \(\d+\) Cat 5 3 tocamientos de tierra \d+%/
+      - listitem:
+        - button /Belle \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
+      - listitem:
+        - button /Carol \(\d+\) Cat 3 2 tocamientos de tierra \d+%/
+      - listitem:
+        - button /Sin nombre \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
+      - listitem:
+        - button /Celia \(\d+\) Cat 4 1 tocamiento de tierra \d+%/
     - heading "Días con esta intensidad" [level=3]
     - 'img /Días con esta intensidad: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
     - text: "Total registrado: 7.5 días"
@@ -73,14 +78,14 @@
     - heading "Tocamientos de tierra en EE. UU. (cronológico)" [level=3]
     - list:
       - listitem:
-        - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - text: /Cat 1 Florida \d+ ago \d+, \d+:\d+ UTC/
+        - button /Mostrar el radar NEXRAD del \d+ ago \d+, \d+:\d+ UTC/: Radar
       - listitem:
-        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
-        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ AM UTC/: Radar
+        - text: /Cat 3 Louisiana \d+ ago \d+, \d+:\d+ UTC/
+        - button /Mostrar el radar NEXRAD del \d+ ago \d+, \d+:\d+ UTC/: Radar
       - listitem:
-        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Mostrar el radar NEXRAD del Aug \d+, \d+, \d+:\d+ PM UTC/: Radar
+        - text: /Cat 3 Louisiana \d+ ago \d+, \d+:\d+ UTC/
+        - button /Mostrar el radar NEXRAD del \d+ ago \d+, \d+:\d+ UTC/: Radar
     - status: "/Caché de radar: no hay imágenes guardadas \\(\\d+ disponibles\\)/"
     - region "Contexto federal del desastre":
       - heading "Contexto federal del desastre" [level=3]

@@ -3,6 +3,7 @@ import {
   getNominalDamageUsd,
 } from './impact-utils.js';
 import { windToCategory, categoryLabel } from './data.js';
+import { csvEscape } from './csv.js';
 import { presentNumber, MISSING_METRIC } from './metric-presenters.js';
 import { buildCitation, citationCommentLines } from './citation.js';
 import {
@@ -297,6 +298,13 @@ export function formatNumber(n, decimals = 0) {
 }
 
 /** Build an export payload for a storm. Returns three string variants. */
+// A storm status, a state name or a storm name can begin with a character a
+// spreadsheet reads as a formula. A latitude cannot, and guarding it would
+// prefix an apostrophe to a number and break the column.
+function csvCell(value) {
+  return csvEscape(value, { preventFormula: typeof value === 'string' });
+}
+
 export function buildExports(storm) {
   const safeName = (storm.name && storm.name !== 'UNNAMED' ? storm.name : 'unnamed').toLowerCase();
   const baseFilename = `hurricanemap-${storm.id}-${safeName}-${storm.year}`;
@@ -325,7 +333,7 @@ function exportCSV(storm, citation = buildCitation()) {
       lfTimes.has(r.t) ? '1' : '0',
     ]);
   }
-  return [...citationCommentLines(citation), '', ...rows.map(r => r.map(csvEscape).join(','))].join('\n');
+  return [...citationCommentLines(citation), '', ...rows.map(r => r.map(csvCell).join(','))].join('\n');
 }
 
 function exportCSVPublication(storm, citation = buildCitation()) {
@@ -375,14 +383,8 @@ function exportCSVPublication(storm, citation = buildCitation()) {
     ]);
   }
   
-  const dataLines = rows.map(r => r.map(csvEscape).join(',')).join('\n');
+  const dataLines = rows.map(r => r.map(csvCell).join(',')).join('\n');
   return headerLines.join('\n') + '\n' + dataLines;
-}
-
-function csvEscape(v) {
-  const s = String(v);
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
 }
 
 function exportGeoJSON(storm, citation = buildCitation()) {

@@ -366,7 +366,7 @@ export class TrackAnimator {
         const btn = this.controls?.querySelector('[data-act="toggle"]');
         if (btn) {
           btn.textContent = 'Play';
-          btn.title = 'Resume playback';
+          btn.title = t('anim.resumeTitle');
           btn.setAttribute('aria-label', btn.title);
         }
         this.emitState();
@@ -411,7 +411,7 @@ export class TrackAnimator {
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
       btn.textContent = this.paused ? 'Play' : 'Pause';
-      btn.title = this.paused ? 'Resume playback' : 'Pause playback';
+      btn.title = this.paused ? t('anim.resumeTitle') : t('anim.pauseTitle');
       btn.setAttribute('aria-label', btn.title);
     }
     if (!this.paused && !this.rafId && this.elapsed < this.duration) {
@@ -427,7 +427,7 @@ export class TrackAnimator {
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
       btn.textContent = 'Pause';
-      btn.title = 'Pause playback';
+      btn.title = t('anim.pauseTitle');
       btn.setAttribute('aria-label', btn.title);
     }
     if (!this.rafId) {
@@ -441,7 +441,7 @@ export class TrackAnimator {
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
       btn.textContent = 'Replay';
-      btn.title = 'Replay track animation';
+      btn.title = t('anim.replayTitle');
       btn.setAttribute('aria-label', btn.title);
     }
     this.emitState();

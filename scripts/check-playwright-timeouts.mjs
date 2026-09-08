@@ -16,9 +16,18 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Comments and regex literals are blanked rather than removed, so every offset
+// still points at the same character. Without this the gate reported on the
+// example in its own header comment, and a regex holding `//` or `/*` blanked
+// the rest of the line or the rest of the file and hid every call after it.
+import { blankCommentsAndRegexes as blankComments } from './js-source.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIRECTORIES = ['scripts', 'tests'];
-const OPTION_KEYS = /\b(timeout|polling)\s*:/;
+// `{ timeout }` shorthand has no colon, and an options object handed over in a
+// variable has no braces at the call at all. Both were missed.
+const OPTION_KEYS = /\b(timeout|polling)\s*[:,}]/;
+const OPTIONS_VARIABLE = /^[A-Za-z_$][\w$]*$/;
 
 // The arguments of one call, split on top-level commas. Strings, template
 // literals, comments and nested brackets are all skipped, so a comma inside an
@@ -47,7 +56,12 @@ export function callArguments(source, openIndex) {
       continue;
     }
     if (character === '/' && source[index + 1] === '*') {
-      index = source.indexOf('*/', index + 2) + 1;
+      // indexOf returns -1 when the comment is never closed, and reading that
+      // as an offset restarted the scan from the top forever: the accumulated
+      // argument text grew until the heap gave out.
+      const close = source.indexOf('*/', index + 2);
+      if (close === -1) return { args: [...args, current], end: source.length };
+      index = close + 1;
       continue;
     }
     if ('([{'.includes(character)) { depth += 1; current += character; continue; }
@@ -63,52 +77,27 @@ export function callArguments(source, openIndex) {
   return { args: [...args, current], end: index };
 }
 
-// Comments are blanked rather than removed, so every offset still points at the
-// same character. Without this the gate reported on the example in its own
-// header comment, which is a call nobody makes.
-export function blankComments(source) {
-  let out = '';
-  let quote = null;
-  for (let index = 0; index < source.length; index += 1) {
-    const character = source[index];
-    if (quote) {
-      out += character;
-      if (character === '\\') { out += source[index + 1] ?? ''; index += 1; continue; }
-      if (character === quote) quote = null;
-      continue;
-    }
-    if (character === '"' || character === "'" || character === '`') { quote = character; out += character; continue; }
-    if (character === '/' && source[index + 1] === '/') {
-      while (index < source.length && source[index] !== '\n') { out += ' '; index += 1; }
-      out += '\n';
-      continue;
-    }
-    if (character === '/' && source[index + 1] === '*') {
-      const close = source.indexOf('*/', index + 2);
-      const stop = close === -1 ? source.length : close + 2;
-      for (; index < stop; index += 1) out += source[index] === '\n' ? '\n' : ' ';
-      index -= 1;
-      continue;
-    }
-    out += character;
-  }
-  return out;
-}
 
 export function findMisplacedOptions(file, rawSource) {
   const source = blankComments(rawSource);
   const found = [];
-  const call = /\bwaitForFunction\s*\(/g;
+  // `page['waitForFunction'](...)` reaches the same method by another spelling.
+  const call = /\bwaitForFunction\s*\(|\[\s*['"]waitForFunction['"]\s*\]\s*\(/g;
   let match;
   while ((match = call.exec(source)) !== null) {
     const openIndex = match.index + match[0].length - 1;
+    if (source[openIndex] !== '(') continue;
     const { args } = callArguments(source, openIndex);
     if (args.length < 2) continue;
     const second = args[1].trim();
     // An options object in the argument position. A genuine argument that
     // happens to be an object is fine unless it carries an option key, which is
-    // what makes it unambiguous.
-    if (!second.startsWith('{') || !OPTION_KEYS.test(second)) continue;
+    // what makes it unambiguous. A bare identifier named like options is the
+    // other way this arrives, and the name is the only signal available without
+    // following the binding.
+    const looksLikeOptions = second.startsWith('{') && OPTION_KEYS.test(second);
+    const namedLikeOptions = OPTIONS_VARIABLE.test(second) && /(?:^|[a-z])(opts|options)$/i.test(second);
+    if (!looksLikeOptions && !namedLikeOptions) continue;
     const line = source.slice(0, match.index).split(/\r?\n/).length;
     found.push({ file, line, second: second.replace(/\s+/g, ' ').slice(0, 60) });
   }

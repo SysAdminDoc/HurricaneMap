@@ -5,6 +5,7 @@
 // from cloud object storage require server-side reprojection/raster processing
 // before they can be overlaid cleanly in Leaflet.
 
+import { escapeHtml as escapeText } from './html-utils.js';
 import { completeOptionalFeed, failOptionalFeed } from './optional-feeds.js';
 
 const GOES_PANE_NAME = 'hm-goes-realtime';
@@ -315,12 +316,3 @@ function formatUtcTime(value) {
   return date.toISOString().slice(11, 16);
 }
 
-function escapeText(value) {
-  return String(value ?? '').replace(/[<>&"']/g, c => ({
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[c]);
-}

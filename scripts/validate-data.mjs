@@ -3,6 +3,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
+import { haversineKm as sharedHaversineKm } from '../src/geodesy.js';
 import { DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
 import {
   getSnapshotStatus,
@@ -167,15 +168,13 @@ const aomlPositioned = record => Number.isFinite(record?.lat) && Number.isFinite
 const AOML_MATCH_TIME_HOURS = 12;
 const AOML_MATCH_DISTANCE_KM = 125;
 
-function haversineKm(a, b) {
-  const toRadians = value => value * Math.PI / 180;
-  const lat1 = toRadians(a.lat);
-  const lat2 = toRadians(b.lat);
-  const dLat = lat2 - lat1;
-  const dLon = toRadians(b.lon) - toRadians(a.lon);
-  const term = Math.sin(dLat / 2) ** 2
-    + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * 6371.0088 * Math.asin(Math.min(1, Math.sqrt(term)));
+// This file re-implements the atlas's own arithmetic in a second language so
+// that a bug in the Python builder cannot ratify itself. Distance is the
+// exception: it was a fourth private copy of the haversine, with its own Earth
+// radius written out again, and nothing held it to the reference vectors the
+// other three are pinned to. It is exported so test:geodesy can drive it.
+export function haversineKm(a, b) {
+  return sharedHaversineKm(a.lat, a.lon, b.lat, b.lon);
 }
 
 function matchAomlRecords(truth, predictions) {

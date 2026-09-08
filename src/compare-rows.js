@@ -18,6 +18,7 @@ import {
   presentWind,
   MISSING_METRIC,
 } from './metric-presenters.js';
+import { csvEscape } from './csv.js';
 import { formatStormName } from './html-utils.js';
 
 const MISSING = MISSING_METRIC;
@@ -189,13 +190,10 @@ export function formatComparisonValue(row, pin) {
   return row.formatValue(row.getValue(pin));
 }
 
-/** Escape a value for CSV (wrap in quotes if it contains CSV syntax). */
-export function escapeCSV(value) {
-  const stringValue = String(value ?? '');
-  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
+/** Escape a value for CSV. Kept as a name because callers import it; the rule
+ * itself lives in one place now. */
+export function escapeCSV(value, options) {
+  return csvEscape(value, options);
 }
 
 /** Build comparison table and narrative CSV without touching browser APIs. */
@@ -211,7 +209,9 @@ export function buildComparisonCSVText({
   const rows = getComparisonRows({ allStorms, translate, windUnit, locale });
   const header = [
     translate('compare.csv.metric'),
-    ...storms.map(pin => `${formatStormName(pin.name)} (${pin.year})`),
+    // The narrative rows below are deliberately English, so the header that
+    // names the same storms is too. A CSV is a file somebody keeps.
+    ...storms.map(pin => `${formatStormName(pin.name, { unnamed: 'Unnamed' })} (${pin.year})`),
   ].map(escapeCSV).join(',');
   const tableRows = rows.map(row => [
     row.label,
@@ -223,7 +223,7 @@ export function buildComparisonCSVText({
     translate('compare.narrativesTitle'),
     `${translate('compare.narrativeLanguage')},${escapeCSV(translate('compare.narrativeLanguageEnglish'))}`,
     ...storms.map(pin => escapeCSV(
-      `${formatStormName(pin.name)} (${pin.year}): ${generateStormBiography(pin.storm, {})}`,
+      `${formatStormName(pin.name, { unnamed: 'Unnamed' })} (${pin.year}): ${generateStormBiography(pin.storm, {})}`,
     )),
   ];
   return [

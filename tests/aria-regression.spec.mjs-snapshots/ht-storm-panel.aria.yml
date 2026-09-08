@@ -56,11 +56,16 @@
   - region "Analiz siklòn":
     - heading "Siklòn ki sanble" [level=3]
     - list:
-      - listitem: /Ian \(\d+\) Cat 5 3 rive atè \d+%/
-      - listitem: /Belle \(\d+\) Cat 3 2 rive atè \d+%/
-      - listitem: /Carol \(\d+\) Cat 3 2 rive atè \d+%/
-      - listitem: /San non \(\d+\) Cat 4 1 rive atè \d+%/
-      - listitem: /Celia \(\d+\) Cat 4 1 rive atè \d+%/
+      - listitem:
+        - button /Ian \(\d+\) Cat 5 3 rive atè \d+%/
+      - listitem:
+        - button /Belle \(\d+\) Cat 3 2 rive atè \d+%/
+      - listitem:
+        - button /Carol \(\d+\) Cat 3 2 rive atè \d+%/
+      - listitem:
+        - button /San non \(\d+\) Cat 4 1 rive atè \d+%/
+      - listitem:
+        - button /Celia \(\d+\) Cat 4 1 rive atè \d+%/
     - heading "Jou nan entansite sa a" [level=3]
     - 'img /Jou nan entansite sa a: TD 1\.5 d, TS 1\.9 d, Cat 1 1\.1 d, Cat 2 \d+ h, Cat 3 1\.0 d, Cat 4 \d+ h, Cat 5 \d+ h/': /TD · 1\.5 d TS · 1\.9 d Cat 1 · 1\.1 d Cat 2 · \d+ h Cat 3 · 1\.0 d Cat 5 · \d+ h/
     - text: "Total swiv: 7.5 jou"

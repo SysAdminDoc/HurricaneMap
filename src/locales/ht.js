@@ -1090,4 +1090,11 @@ export default {
   'stormEvents.inStates': ' nan {0}',
   'stormEvents.strongestTornado': ' · pi fò {0}',
   'stormEvents.largestHail': ' · pi gwo {0} pous',
+  'anim.resumeTitle': 'Rekòmanse lekti a',
+  'anim.replayTitle': 'Repase animasyon trajektwa a',
+  'panel.aceTitle': 'Enèji siklòn akimile: sòm v ki miltipliye pa tèt li divize pa 10 000 pou chak obsèvasyon sis è ki 34 kt oswa plis. Li mezire tout enèji van tanpèt la pwodui pandan lavi li. Yon sezon Atlantik fè anviwon 100; gwo siklòn yo pou kont yo bay ant 10 ak 30.',
+  'map.genesis': 'Kòmansman',
+  'map.toggleFullscreen': 'Chanje ekran konplè',
+  'seasonal.regionLabel': 'Rezime sezon an',
+  'panel.similarUnavailable': 'Tanpèt sa a pa gen okenn dosye rive atè Ozetazini pou louvri.',
 };

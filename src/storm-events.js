@@ -1,5 +1,6 @@
 // NOAA/NCEI Storm Events summary for hurricane landfall windows.
 
+import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { presentNumber } from './metric-presenters.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
@@ -153,12 +154,3 @@ function emptyBlock(title, message, source) {
   `;
 }
 
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[<>&"']/g, c => ({
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[c]);
-}

@@ -2250,6 +2250,62 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
 // own tracks with it: they share one Leaflet layer, so clearing the layer looked
 // like the panel tidying up after itself and was really the filter going blank
 // while its checkbox and the URL both still said it was on.
+// A setting changed from the open settings menu re-renders the storm panel
+// behind it. Re-rendering is not opening, and it must not take focus out of the
+// control the reader is still using.
+async function assertSettingsMenuKeepsFocus(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/#v=1&storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.click('#toggle-settings');
+    await page.waitForSelector('#settings-menu:popover-open', { timeout: 10000 });
+    const unitControl = '#settings-menu [data-set-unit="mph"]';
+    const control = await page.$(unitControl);
+    assert(control, 'the settings menu no longer offers a wind-unit control this can drive');
+    // Reading focus once after the change proved nothing. The re-render is
+    // asynchronous and the steal itself lands inside a requestAnimationFrame,
+    // so the read ran first and passed with the theft still queued: putting the
+    // defect back left this green. Record every focus that leaves the menu, and
+    // count the panel's re-renders so a run where nothing re-rendered fails
+    // rather than passing for the wrong reason.
+    await page.evaluate(() => {
+      window.__hmFocusEscapes = [];
+      window.__hmStormShown = 0;
+      document.addEventListener('focusin', () => {
+        if (document.activeElement?.closest('#settings-menu')) return;
+        window.__hmFocusEscapes.push(
+          document.activeElement?.id || document.activeElement?.className || document.activeElement?.tagName || 'unknown',
+        );
+      });
+      document.addEventListener('hm-panel:shown', (event) => {
+        if (event.detail?.id === 'storm-panel') window.__hmStormShown += 1;
+      });
+    });
+    await control.focus();
+    await control.click();
+    await page.waitForFunction(async () => {
+      const settings = await import('/src/settings.js');
+      return settings.getSetting('windUnit') === 'mph';
+    }, null, { timeout: 10000 });
+    const reRendered = await page.waitForFunction(() => window.__hmStormShown > 0, null, { timeout: 15000 })
+      .then(() => true).catch(() => false);
+    assert(reRendered, 'changing the wind unit never re-rendered the storm panel, so this assertion proved nothing');
+    const escaped = await page.waitForFunction(
+      () => (window.__hmFocusEscapes.length > 0 ? window.__hmFocusEscapes : false),
+      null,
+      { timeout: 2000 },
+    ).then(handle => handle.jsonValue()).catch(() => null);
+    const menuOpen = await page.evaluate(() => document.querySelector('#settings-menu')?.matches(':popover-open') === true);
+    assert(
+      menuOpen && !escaped,
+      `changing a setting from the menu moved focus to ${escaped ? escaped.join(', ') : 'nowhere'}${menuOpen ? '' : ' and closed the menu'}`,
+    );
+  } finally {
+    await page.close();
+  }
+}
 async function assertStormPanelMapContracts(context, baseUrl) {
   const page = await context.newPage();
   try {
@@ -2257,6 +2313,20 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     await waitForAppReady(page);
     await page.waitForSelector('#storm-panel .similar-storm-row', { timeout: 15000 });
     const before = await page.evaluate(() => document.querySelector('#storm-panel h2')?.textContent || '');
+    // Reachable by keyboard: the rows carried cursor:pointer, no tabindex, no
+    // role and no key handling, so nobody navigating by keyboard could open one.
+    const rowIsFocusable = await page.evaluate(() => {
+      const row = document.querySelector('#storm-panel .similar-storm-row');
+      if (!row) return null;
+      row.focus();
+      return { tag: row.tagName, focused: document.activeElement === row };
+    });
+    assert(
+      rowIsFocusable?.focused,
+      `a similar-storms row cannot be focused: ${JSON.stringify(rowIsFocusable)}`,
+    );
+
+    await page.evaluate(() => localStorage.removeItem('hm-search-history-v1'));
     await page.click('#storm-panel .similar-storm-row');
     await page.waitForFunction(
       (previous) => (document.querySelector('#storm-panel h2')?.textContent || '') !== previous,
@@ -2275,6 +2345,35 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     assert(
       /storm=AL\d{6}/.test(opened.hash) && !opened.hash.includes('storm=AL122005'),
       `a similar-storms row did not put its storm in the URL: ${opened.hash}`,
+    );
+    // A us_landfalls record carries no name or year, and the history store drops
+    // an entry without an integer year, so this opened a storm and recorded
+    // nothing at all.
+    const history = await page.evaluate(() => JSON.parse(localStorage.getItem('hm-search-history-v1') || 'null'));
+    assert(
+      history?.entries?.length >= 1 && Number.isInteger(history.entries[0]?.year),
+      `a similar-storms open recorded no view history: ${JSON.stringify(history)}`,
+    );
+
+    // The filter's tracks and the panel's own track share one Leaflet layer.
+    // Opening a storm used to clear the layer and draw only that storm, so the
+    // filter went blank with its checkbox still ticked.
+    await page.goto(`${baseUrl}/#v=1&y=2005-2005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.click('#toggle-filters');
+    await page.waitForSelector('#show-tracks:visible', { timeout: 10000 });
+    await page.check('#show-tracks');
+    await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, null, { timeout: 15000 });
+    const beforeOpen = await page.evaluate(() => document.querySelectorAll('#map path').length);
+    await page.evaluate(() => { location.hash = '#v=1&y=2005-2005&t=1&storm=AL122005'; });
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    const whileOpen = await page.evaluate(() => ({
+      paths: document.querySelectorAll('#map path').length,
+      checked: document.querySelector('#show-tracks')?.checked,
+    }));
+    assert(
+      whileOpen.checked && whileOpen.paths >= beforeOpen,
+      `opening a storm wiped the filter's tracks: ${beforeOpen} paths became ${whileOpen.paths} with the box still ${whileOpen.checked ? 'ticked' : 'clear'}`,
     );
 
     await page.goto(`${baseUrl}/#v=1&y=2005-2005`, { waitUntil: 'domcontentloaded' });
@@ -4213,6 +4312,7 @@ try {
   await assertDeferredDataScope(context, baseUrl);
   await assertSettingsChangeKeepsPanel(context, baseUrl);
   await assertStormPanelMapContracts(context, baseUrl);
+  await assertSettingsMenuKeepsFocus(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);
 
@@ -5255,7 +5355,7 @@ try {
   await openStormPanel(page, 'AL032025');
   await page.waitForFunction(() => /No data,\s*series ended 2024/.test(
     document.querySelector('#storm-panel .impacts-block')?.textContent || '',
-  ), { timeout: 10000 });
+  ), null, { timeout: 10000 });
   const closedSeriesText = await page.textContent('#storm-panel .impacts-block');
   assert(
     /No data,\s*series ended 2024/.test(closedSeriesText),

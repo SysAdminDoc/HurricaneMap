@@ -1115,4 +1115,11 @@ export default {
   'stormEvents.inStates': ' in {0}',
   'stormEvents.strongestTornado': ' · strongest {0}',
   'stormEvents.largestHail': ' · largest {0} in',
+  'anim.resumeTitle': 'Resume playback',
+  'anim.replayTitle': 'Replay track animation',
+  'panel.aceTitle': 'Accumulated Cyclone Energy: the sum of v squared over 10,000 for every six-hourly observation at or above 34 kt. It measures the total wind energy a storm put out over its life. An Atlantic season averages about 100; major hurricanes alone account for 10 to 30.',
+  'map.genesis': 'Genesis',
+  'map.toggleFullscreen': 'Toggle fullscreen',
+  'seasonal.regionLabel': 'Season summary',
+  'panel.similarUnavailable': 'That storm has no U.S. landfall record to open.',
 };

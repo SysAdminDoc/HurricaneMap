@@ -1,6 +1,7 @@
 // P12.1 — Publication-ready export: One-click export of filtered dataset as CSV with documentation
 
 import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
+import { csvEscape } from './csv.js';
 import { buildExportProvenance } from './export-provenance.js';
 import { buildCitation, citationCommentLines } from './citation.js';
 import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
@@ -158,17 +159,6 @@ function downloadCSV(content, filename) {
   link.click();
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-export function csvEscape(value, { preventFormula = false } = {}) {
-  let cell = value == null ? '' : String(value);
-  if (preventFormula && /^[\s]*[=+\-@]/.test(cell)) {
-    cell = `'${cell}`;
-  }
-  if (/[",\r\n]/.test(cell)) {
-    return `"${cell.replace(/"/g, '""')}"`;
-  }
-  return cell;
 }
 
 export function publicationCategoryLabel(category) {

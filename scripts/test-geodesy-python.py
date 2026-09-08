@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from build_aoml_landfalls import haversine_km as aoml_haversine_km
 from preprocess_hurdat2 import haversine_km, point_segment_distance_km
 
 
@@ -11,6 +12,16 @@ TOLERANCE_KM = 1e-6
 for vector in VECTORS["distance_vectors"]:
     actual = haversine_km(*vector["from"], *vector["to"])
     assert abs(actual - vector["expected_km"]) <= TOLERANCE_KM, (vector["name"], actual)
+
+# The AOML ground-truth builder had its own copy, with the Earth radius written
+# out a fourth time. It delegates now, and driving the reference set through its
+# own entry point is what keeps that true.
+for vector in VECTORS["distance_vectors"]:
+    actual = aoml_haversine_km(
+        {"lat": vector["from"][0], "lon": vector["from"][1]},
+        {"lat": vector["to"][0], "lon": vector["to"][1]},
+    )
+    assert abs(actual - vector["expected_km"]) <= TOLERANCE_KM, ("aoml", vector["name"], actual)
 
 for vector in VECTORS["segment_vectors"]:
     actual = point_segment_distance_km(

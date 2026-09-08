@@ -169,6 +169,13 @@ export function showPanel(id) {
   const invoker = normalizedInvoker(document.activeElement);
   const existingPanel = getPanel(id);
   const preserveInvoker = existingPanel && !existingPanel.hidden && panelInvokers.has(id);
+  // A panel that is already on screen is being re-rendered, not opened. Moving
+  // focus to its heading then is a theft: changing the wind unit from the open
+  // settings menu re-renders the storm panel behind it, and focus jumped out of
+  // the menu the reader was still using, mid-interaction.
+  const alreadyOnScreen = Boolean(existingPanel)
+    && existingPanel.hidden === false
+    && !existingPanel.classList.contains('minimized');
   withTransition(() => {
     closePanelsExcept(id);
     const el = getPanel(id);
@@ -179,7 +186,7 @@ export function showPanel(id) {
       el.classList.remove('minimized');
       el.hidden = false;
       document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id } }));
-      focusPanelEntry(el);
+      if (!alreadyOnScreen) focusPanelEntry(el);
     }
     setPanelState();
   });

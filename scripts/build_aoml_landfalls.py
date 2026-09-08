@@ -20,6 +20,8 @@ from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 
+from preprocess_hurdat2 import haversine_km as shared_haversine_km
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 SOURCE_URL = "https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html"
@@ -266,11 +268,13 @@ def parse_records(text: str) -> list[dict]:
 
 
 def haversine_km(a: dict, b: dict) -> float:
-    lat1, lon1, lat2, lon2 = map(math.radians, [a["lat"], a["lon"], b["lat"], b["lon"]])
-    d_lat = lat2 - lat1
-    d_lon = lon2 - lon1
-    term = math.sin(d_lat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(d_lon / 2) ** 2
-    return 2 * 6371.0088 * math.asin(min(1, math.sqrt(term)))
+    """Distance between two positioned records.
+
+    A private copy of the haversine lived here, with the Earth radius written
+    out a fourth time and nothing holding it to the reference vectors the other
+    copies are pinned to. It delegates now, so test:geodesy covers it.
+    """
+    return shared_haversine_km(a["lat"], a["lon"], b["lat"], b["lon"])
 
 
 def match_records(truth: list[dict], predictions: list[dict]) -> list[tuple[dict, dict]]:

@@ -30,7 +30,7 @@ function ensureHost() {
   host.id = HOST_ID;
   host.className = 'season-summary glass';
   host.setAttribute('role', 'complementary');
-  host.setAttribute('aria-label', 'Season summary');
+  host.setAttribute('aria-label', t('seasonal.regionLabel'));
   setSeasonSummaryVisible(host, false);
   // Mount adjacent to the legend at the bottom-left of the map.
   const main = document.querySelector('main') || document.body;

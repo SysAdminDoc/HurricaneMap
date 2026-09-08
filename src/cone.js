@@ -1,3 +1,4 @@
+import { escapeHtml as escapeText } from './html-utils.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // Official NHC forecast context for active storms.
@@ -335,12 +336,3 @@ function normalizeStormName(value) {
   return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
-function escapeText(value) {
-  return String(value ?? '').replace(/[<>&"']/g, c => ({
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[c]);
-}

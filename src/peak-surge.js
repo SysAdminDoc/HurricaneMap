@@ -1,3 +1,4 @@
+import { escapeHtml as escapeText } from './html-utils.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // NHC Peak Storm Surge forecast layer for active storms.
@@ -52,11 +53,6 @@ export function surgeStyle(feet) {
   };
 }
 
-function escapeText(value) {
-  return String(value ?? '').replace(/[<>&"']/g, c => ({
-    '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;',
-  })[c]);
-}
 
 function ensureLayer(map) {
   if (layerGroup && layerMap === map) return;

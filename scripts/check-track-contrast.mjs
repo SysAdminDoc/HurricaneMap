@@ -248,8 +248,25 @@ async function main() {
   const FILTER_DECLARATION_RE = /(?:^|[;{\s])filter\s*:\s*([^;}]+)/g;
   const byFilter = new Map([['none', []]]);
   for (const rule of tilePaneRules(allCss)) {
-    const declarations = [...rule.body.replace(/\{[^{}]*\}/g, ' ').matchAll(FILTER_DECLARATION_RE)];
-    if (!declarations.length) continue;
+    // Nested blocks used to be deleted wholesale before the declarations were
+    // read, which threw away a `filter` inside a nested `@media` that Chromium
+    // applies. A nested block is part of the rule, so its declarations count;
+    // only the selector or condition line is dropped.
+    const flattened = rule.body.replace(/(^|[{};])\s*[@&][^{};]*\{/g, '$1 ').replace(/\}/g, ' ');
+    const declarations = [...flattened.matchAll(FILTER_DECLARATION_RE)];
+    if (!declarations.length) {
+      // A tile-pane rule with no filter at all is ordinary: several set only a
+      // transition or a will-change. An escaped property name is not. `\\66 ilter`
+      // is a spelling Chromium honours and this gate cannot read, and a rule
+      // using it dropped the reported rule count from three to two in silence.
+      if (/\\[0-9a-fA-F]/.test(rule.body)) {
+        errors.push(
+          `${rule.selector} spells a property with a CSS escape, which this gate cannot read; `
+          + 'write the property name out so the filter it may set is measurable',
+        );
+      }
+      continue;
+    }
     const filter = declarations[declarations.length - 1][1]
       .replace(/!important\s*$/i, '')
       .trim()

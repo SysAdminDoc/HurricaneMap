@@ -30,6 +30,7 @@ export function isRetired(name, year) {
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
 // metadata.json  — generated data provenance, coverage, and source details.
 import { assertSupportedDataSchema } from './schema-contract.js';
+import { getLocale } from './i18n.js';
 import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
@@ -336,10 +337,14 @@ export function ktToMph(kt) {
   return roundMetric(convertWindKnots(kt, 'mph'));
 }
 
+// `undefined` here means the browser's locale, which is not the one the reader
+// chose in this app: a Spanish reader on an English-language browser got
+// "Aug 24, 2005" inside an otherwise Spanish panel, and it was baked into the
+// localized accessibility baselines as if it were correct.
 export function formatTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleString(undefined, {
+  return d.toLocaleString(getLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
   }) + ' UTC';

@@ -56,7 +56,11 @@ export function normalizeVideoOptions(options = {}) {
 }
 
 export function formatVideoFilename(storm) {
-  const name = formatStormName(storm?.name).replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'storm';
+  // Explicitly English: a filename is not UI, and a reader who switches locale
+  // between two exports should not get two differently-named files for the same
+  // storm.
+  const name = formatStormName(storm?.name, { unnamed: 'Unnamed' })
+    .replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'storm';
   const year = Number.isInteger(Number(storm?.year)) ? `-${storm.year}` : '';
   return `HurricaneMap-${name}${year}-track.webm`;
 }

@@ -446,7 +446,11 @@ async function boot() {
 
 function restoreExtendedView(decoded) {
   const options = viewOptionsFromDecoded(decoded);
-  if (decoded?.u !== undefined || decoded?.d !== undefined) arrivedWithQualifiers = true;
+  // Whatever qualifies the incoming view stays with it, including the release
+  // pin: a saved view of the default view is exactly `#v=1&rel=<hash>`, and
+  // stripping that on restore lost the citation the saved view existed to keep.
+  // Reassigned rather than latched, so clearing the fragment clears the flag.
+  arrivedWithQualifiers = decoded?.u !== undefined || decoded?.d !== undefined || decoded?.rel !== undefined;
   if (options.windUnit) setSetting('windUnit', options.windUnit);
   if (options.damageMode) setSetting('damageMode', options.damageMode);
   advisoryReplayState = options.advisoryReplay;
@@ -777,20 +781,6 @@ document.addEventListener('storm-panel:close', () => {
   writeHash();
 });
 
-// Closing the storm panel clears the map's track layer, and that layer is also
-// where the "show tracks" filter draws. The checkbox and the URL went on saying
-// tracks were on while the map had none, and the redraw guard's cache key was
-// unchanged so nothing brought them back.
-document.addEventListener('hm-panel:hidden', (event) => {
-  if (event.detail?.id !== 'storm-panel' || !filters.showTracks) return;
-  // panel.js clears the layer from its own listener on this event, and this
-  // module registers first, so redrawing here synchronously would be undone a
-  // moment later. A microtask runs once every listener has had its turn.
-  queueMicrotask(() => {
-    lastTracksKey = '';
-    applyFilters();
-  });
-});
 
 boot().catch(err => {
   console.error('[boot] Boot failed', err);

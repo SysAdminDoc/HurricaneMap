@@ -47,11 +47,19 @@ for (const locale of locales) {
   for (const [key, value] of Object.entries(catalogs[locale])) {
     assert(typeof value === 'string' && value.trim().length > 0, `${locale}.${key} is empty`);
     // A locale may repeat a placeholder (es pluralizes noun+adjective with the
-    // same {1}) or omit one (ht has no plural suffix), but must never reference
-    // a placeholder the English source doesn't supply.
+    // same {1}), but must never reference one the English source does not
+    // supply, and must never drop one either. Dropping was allowed until
+    // 2026-09-08 on the grounds that a locale might not need a grammatical
+    // suffix, but a placeholder does not carry a suffix, it carries the value:
+    // deleting {0} from 'Total registrado: {0} días' loses the number itself,
+    // and nothing went red. No key in any locale drops one, so this needs no
+    // exceptions; add one here with its reason if a real case turns up.
     const enPlaceholders = new Set([...catalogs.en[key].matchAll(/\{\d\}/g)].map(match => match[0]));
-    const unknown = [...new Set([...value.matchAll(/\{\d\}/g)].map(match => match[0]))].filter(ph => !enPlaceholders.has(ph));
+    const localePlaceholders = new Set([...value.matchAll(/\{\d\}/g)].map(match => match[0]));
+    const unknown = [...localePlaceholders].filter(ph => !enPlaceholders.has(ph));
     assert(!unknown.length, `${locale}.${key} references placeholders en does not supply: ${unknown.join(', ')}`);
+    const dropped = [...enPlaceholders].filter(ph => !localePlaceholders.has(ph));
+    assert(!dropped.length, `${locale}.${key} drops placeholders the English string supplies, so the value never reaches the reader: ${dropped.join(', ')}`);
   }
 }
 

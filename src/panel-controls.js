@@ -50,7 +50,9 @@ export function formatReturnPeriods(returnPeriods) {
   return `<span class="return-periods-label">${t('panel.returnPeriodLabel')}</span> ` + items.join(' • ');
 }
 
-function showToast(message, tone = 'info') {
+// Exported so the panel can use the same toast rather than growing a second
+// one: panel.js already imports this module for wirePanelControls.
+export function showToast(message, tone = 'info') {
   let host = document.getElementById('hm-toast-host');
   if (!host) {
     host = document.createElement('div');

@@ -701,7 +701,14 @@ label > input[type="checkbox"] {
   gap: 6px;
 }
 
+/* A button now, not a listener on an <li>, so it needs the type reset a button
+   brings with it. */
 .similar-storm-row {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
   display: grid;
   grid-template-columns: 1fr auto auto auto;
   gap: 8px;
