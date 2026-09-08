@@ -195,7 +195,9 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     }
   }
   const aceCell = host.querySelector('[data-role="ace"] .ss-stat-num');
-  if (aceCell) aceCell.textContent = totalACE > 0 ? totalACE.toFixed(1) : MISSING_METRIC;
+  // Same as the storm panel: a season really can total zero ACE, and that is
+  // a measurement rather than a gap.
+  if (aceCell) aceCell.textContent = Number.isFinite(totalACE) ? totalACE.toFixed(1) : MISSING_METRIC;
 
   const dHost = host.querySelector('[data-role="deadliest"] dd');
   if (dHost) {

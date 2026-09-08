@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { MISSING_METRIC } from '../src/metric-presenters.js';
 import { readFile } from 'node:fs/promises';
 
 import {
@@ -46,5 +47,12 @@ assert.equal(inferredInnerCoreAreaSqMi(fullCircle64, 82, 83), 0, 'Cat-2 area sho
 assert.ok(inferredInnerCoreAreaSqMi(fullCircle64, 140, 137) > 0, 'Cat-5 area should be nonzero above Cat-5 threshold');
 assert.equal(formatExposurePeople(1_250_000), '1.3M', 'exposure formatter should compact millions');
 assert.equal(formatExposurePeople(8_000), '<10K', 'exposure formatter should avoid false precision for very small counts');
+// Zero is a computed answer, not a gap. Only an absent or nonsensical figure
+// gets the not-recorded marker, or a landfall over empty coast reads the same
+// as one whose exposure never got computed.
+assert.equal(formatExposurePeople(0), '0', 'a real zero must render as zero');
+assert.equal(formatExposurePeople(null), MISSING_METRIC, 'an absent figure must render the not-recorded marker');
+assert.equal(formatExposurePeople(Number.NaN), MISSING_METRIC, 'a non-numeric figure must render the not-recorded marker');
+assert.equal(formatExposurePeople(-5), MISSING_METRIC, 'a negative population is not a measurement');
 
 console.log('exposure utils ok');

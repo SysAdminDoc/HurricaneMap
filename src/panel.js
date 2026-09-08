@@ -213,7 +213,10 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   const minPres = presentPressure(storm.min_pres_mb);
 
   const ace = computeACE(storm.track);
-  const aceStr = ace.value > 0 ? formatNumber(ace.value, 1) : MISSING_METRIC;
+  // A storm that never reached tropical-storm strength at a synoptic hour has
+  // an ACE of zero, and zero is the answer. The marker is for a value that
+  // could not be computed at all.
+  const aceStr = Number.isFinite(ace.value) ? formatNumber(ace.value, 1) : MISSING_METRIC;
   const ri = findRapidIntensification(storm.track);
   const riBadge = ri
     ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">⚡ Rapid intensification (+${ri.delta_kt} kt / 24h)</span>`
