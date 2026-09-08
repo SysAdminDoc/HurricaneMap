@@ -67,6 +67,10 @@
   <link rel="modulepreload" href="src/map.js" fetchpriority="high" />
   <link rel="modulepreload" href="src/settings.js" fetchpriority="high" />
   <link rel="modulepreload" href="src/i18n.js" fetchpriority="high" />
+  <!-- The English catalog is a static import of i18n.js, so without this the
+       browser cannot start fetching it until i18n.js has arrived and parsed.
+       Spanish and Creole are deliberately absent: they load on demand. -->
+  <link rel="modulepreload" href="src/locales/en.js" fetchpriority="high" />
   <link rel="modulepreload" href="src/timeline.js" />
   <link rel="modulepreload" href="src/season.js" />
   <link rel="modulepreload" href="src/search-history.js" />

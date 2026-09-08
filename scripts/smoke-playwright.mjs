@@ -3780,11 +3780,11 @@ try {
   const localeStrings = await page.evaluate(async () => {
     const i18n = await import('/src/i18n.js');
     const before = i18n.t('panel.loading');
-    i18n.setLocale('es');
+    await i18n.setLocale('es');
     const es = i18n.t('panel.loading');
-    i18n.setLocale('ht');
+    await i18n.setLocale('ht');
     const ht = i18n.t('panel.loading');
-    i18n.setLocale('en');
+    await i18n.setLocale('en');
     return { before, es, ht };
   });
   assert(/Loading track/.test(localeStrings.before), `EN dynamic string wrong: ${localeStrings.before}`);
@@ -4451,13 +4451,13 @@ try {
   const prepLocales = await page.evaluate(async () => {
     const i18n = await import('/src/i18n.js');
     const prep = await import('/src/prep.js');
-    i18n.setLocale('es');
+    await i18n.setLocale('es');
     prep.renderPrepPanel();
     const es = document.querySelector('#prep-body')?.textContent || '';
-    i18n.setLocale('ht');
+    await i18n.setLocale('ht');
     prep.renderPrepPanel();
     const ht = document.querySelector('#prep-body')?.textContent || '';
-    i18n.setLocale('en');
+    await i18n.setLocale('en');
     prep.renderPrepPanel();
     return { es, ht };
   });

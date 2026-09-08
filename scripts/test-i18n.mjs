@@ -1,7 +1,10 @@
 // Locale contract: every locale carries the full key set (no silent EN
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
-import { getLocale, setLocale, STRINGS, interpolate, t } from '../src/i18n.js';
+import { getLocale, loadLocale, setLocale, STRINGS, interpolate, t } from '../src/i18n.js';
+import en from '../src/locales/en.js';
+import es from '../src/locales/es.js';
+import ht from '../src/locales/ht.js';
 import { readdirSync, readFileSync } from 'node:fs';
 
 globalThis.document = {
@@ -16,22 +19,37 @@ function assert(condition, message) {
   }
 }
 
-const locales = Object.keys(STRINGS);
+// The catalogs live in their own modules so a reader downloads one instead of
+// three, and only English is imported eagerly by src/i18n.js. The key-set
+// contract below is about the catalogs themselves, so read them directly.
+const catalogs = { en, es, ht };
+const locales = Object.keys(catalogs);
 assert(locales.includes('en') && locales.includes('es') && locales.includes('ht'), 'expected en, es, ht locales');
 
-const enKeys = Object.keys(STRINGS.en).sort();
+// The lazy half of that arrangement is its own contract: English has to be
+// there before anything is awaited, because it is the fallback for every key,
+// and asking for the other two has to actually produce them.
+assert(STRINGS.en === en, 'src/i18n.js must import the English catalog eagerly');
+assert(!STRINGS.es && !STRINGS.ht, 'Spanish and Creole must not be loaded until asked for');
+for (const locale of ['es', 'ht']) {
+  const loaded = await loadLocale(locale);
+  assert(loaded === catalogs[locale], `loadLocale('${locale}') did not resolve its catalog`);
+  assert(STRINGS[locale] === catalogs[locale], `loadLocale('${locale}') did not publish into STRINGS`);
+}
+
+const enKeys = Object.keys(catalogs.en).sort();
 for (const locale of locales) {
-  const keys = Object.keys(STRINGS[locale]).sort();
+  const keys = Object.keys(catalogs[locale]).sort();
   const missing = enKeys.filter(key => !keys.includes(key));
   const extra = keys.filter(key => !enKeys.includes(key));
   assert(!missing.length, `${locale} is missing keys: ${missing.slice(0, 10).join(', ')}`);
   assert(!extra.length, `${locale} has keys absent from en: ${extra.slice(0, 10).join(', ')}`);
-  for (const [key, value] of Object.entries(STRINGS[locale])) {
+  for (const [key, value] of Object.entries(catalogs[locale])) {
     assert(typeof value === 'string' && value.trim().length > 0, `${locale}.${key} is empty`);
     // A locale may repeat a placeholder (es pluralizes noun+adjective with the
     // same {1}) or omit one (ht has no plural suffix), but must never reference
     // a placeholder the English source doesn't supply.
-    const enPlaceholders = new Set([...STRINGS.en[key].matchAll(/\{\d\}/g)].map(match => match[0]));
+    const enPlaceholders = new Set([...catalogs.en[key].matchAll(/\{\d\}/g)].map(match => match[0]));
     const unknown = [...new Set([...value.matchAll(/\{\d\}/g)].map(match => match[0]))].filter(ph => !enPlaceholders.has(ph));
     assert(!unknown.length, `${locale}.${key} references placeholders en does not supply: ${unknown.join(', ')}`);
   }
@@ -43,7 +61,7 @@ assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated place
 assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
 assert(t('nonexistent.key') === 'nonexistent.key', 'unknown keys should echo the key');
 for (const locale of ['en', 'es', 'ht']) {
-  setLocale(locale);
+  await setLocale(locale);
   assert(getLocale() === locale, `setLocale did not select ${locale}`);
   assert(document.documentElement.lang === locale, `document language did not update to ${locale}`);
 }
@@ -52,7 +70,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const staticKeys = [...html.matchAll(/data-i18n(?:-html|-title|-placeholder|-aria-label)?="([^"]+)"/g)]
   .map(match => match[1]);
 for (const key of staticKeys) {
-  assert(Object.hasOwn(STRINGS.en, key), `index.html references unknown key: ${key}`);
+  assert(Object.hasOwn(catalogs.en, key), `index.html references unknown key: ${key}`);
 }
 
 // Keep the catalog from accumulating copy that no UI surface can render. A

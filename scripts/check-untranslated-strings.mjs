@@ -104,7 +104,10 @@ async function main() {
 
   // An allowlist entry that no longer matches anything is a rule about code
   // that has gone, and it would quietly excuse a future string of the same name.
-  const catalog = await readFile(path.join(sourceDir, 'i18n.js'), 'utf8');
+  // One catalog per locale under src/locales/ since 2026-09-08. English is the
+  // one this gate anchors on, because it is the source language and the
+  // fallback for every key.
+  const catalog = await readFile(path.join(sourceDir, 'locales', 'en.js'), 'utf8');
   const sources = await Promise.all(files.map(file => readFile(path.join(sourceDir, file), 'utf8')));
   const stale = [...ALLOWED.keys()].filter(value => !sources.some(source => source.includes(value)));
 
@@ -122,7 +125,7 @@ async function main() {
   // anchor is a key that exists; the first one written here was not, so the
   // gate reported the catalog missing on a perfectly good tree.
   if (!/'header\.title':/.test(catalog)) {
-    console.error('untranslated: src/i18n.js does not look like the catalog any more');
+    console.error('untranslated: src/locales/en.js does not look like the catalog any more');
     process.exit(1);
   }
 

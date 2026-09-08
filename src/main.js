@@ -4,7 +4,7 @@ import {
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
-import { getLocale, initLocale, setLocale, t, translateStaticElements } from './i18n.js';
+import { getLocale, initLocale, initLocaleReady, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
 import { refreshSeasonSummary } from './season.js';
 import { recordView } from './search-history.js';
@@ -241,7 +241,11 @@ async function boot() {
   // — the settings default ('en') is always truthy and previously reverted
   // first-time Spanish/Creole visitors to English unconditionally.
   initLocale();
-  if (hasStoredSetting('locale')) setLocale(getSetting('locale'));
+  // Spanish and Creole catalogs load on demand, so wait for whichever this
+  // reader needs before the first translation pass. Otherwise the shell paints
+  // in English and flips a moment later. English resolves immediately, since
+  // its catalog is imported with the module.
+  await (hasStoredSetting('locale') ? setLocale(getSetting('locale')) : initLocaleReady());
   initManifestLocale(getLocale());
   translateStaticElements();
   initCitationUI();

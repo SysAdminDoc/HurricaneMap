@@ -21,7 +21,10 @@ const sourceDir = path.join(root, 'src');
 // Where each marker is allowed to be spelled out, and why.
 const OWNERS = new Map([
   ['metric-presenters.js', 'declares MISSING_METRIC, the one marker'],
-  ['i18n.js', 'holds the localized "not loaded" wording for all three locales'],
+  // The catalogs moved to src/locales/ on 2026-09-08. This scan reads src/*.js
+  // and does not descend, so they are out of it either way, which is right:
+  // translated copy is where the wording is supposed to be spelled out.
+  ['i18n.js', 'the locale plumbing; the wording itself lives in src/locales/'],
 ]);
 
 // Comment text is prose about the rule, not a marker being rendered.
@@ -109,10 +112,18 @@ async function main() {
   if (!/export const MISSING_METRIC = '—';/.test(presenters)) {
     offenders.push({ file: 'metric-presenters.js', line: 0, marker: 'MISSING_METRIC', instead: 'declare it here; every other module reads it from this file' });
   }
-  const catalog = await readFile(path.join(sourceDir, 'i18n.js'), 'utf8');
-  const localized = [...catalog.matchAll(/'metric\.notLoaded':/g)].length;
-  if (localized !== 3) {
-    offenders.push({ file: 'i18n.js', line: 0, marker: "metric.notLoaded", instead: `declare it in all three locales; found ${localized}` });
+  // One catalog per locale under src/locales/ since 2026-09-08, so a reader
+  // downloads the language they asked for instead of all three. Every one of
+  // them still has to carry the wording.
+  const localeFiles = ['en', 'es', 'ht'];
+  const localized = [];
+  for (const locale of localeFiles) {
+    const catalog = await readFile(path.join(sourceDir, 'locales', `${locale}.js`), 'utf8');
+    if (/'metric\.notLoaded':/.test(catalog)) localized.push(locale);
+  }
+  if (localized.length !== localeFiles.length) {
+    const absent = localeFiles.filter(locale => !localized.includes(locale));
+    offenders.push({ file: 'locales/', line: 0, marker: 'metric.notLoaded', instead: `declare it in every locale; missing from ${absent.join(', ')}` });
   }
 
   if (offenders.length) {

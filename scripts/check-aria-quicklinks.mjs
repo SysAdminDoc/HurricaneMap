@@ -13,7 +13,14 @@ import { fileURLToPath } from 'node:url';
 
 // i18n.js resolves the initial locale from the document element.
 globalThis.document = { documentElement: { lang: 'en' }, dispatchEvent() {} };
-const { STRINGS } = await import('../src/i18n.js');
+// The catalogs live in their own modules since 2026-09-08 and only English is
+// imported eagerly, so read all three directly rather than through STRINGS,
+// which would be missing the two this gate exists to check.
+const STRINGS = {
+  en: (await import('../src/locales/en.js')).default,
+  es: (await import('../src/locales/es.js')).default,
+  ht: (await import('../src/locales/ht.js')).default,
+};
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const LOCALES = ['en', 'es', 'ht'];
