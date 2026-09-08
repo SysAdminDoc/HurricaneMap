@@ -1,6 +1,6 @@
 // HurricaneMap entry point.
 import {
-  loadInitial, getLandfalls, getStats, getMetadata, filterLandfalls,
+  loadInitial, ensureOptionalData, getLandfalls, getStats, getMetadata, filterLandfalls,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
@@ -56,8 +56,11 @@ function once(loader) {
   };
 }
 
-const loadPanel = once(() => import('./panel.js'));
-const loadStats = once(() => import('./stats.js'));
+// The storm panel, the statistics panel and the text report are the surfaces
+// that read the deferred datasets. Each fetches its module and that data at the
+// same time, so opening one costs a single round trip rather than two.
+const loadPanel = once(async () => (await Promise.all([import('./panel.js'), ensureOptionalData()]))[0]);
+const loadStats = once(async () => (await Promise.all([import('./stats.js'), ensureOptionalData()]))[0]);
 const loadOnThisDate = once(() => import('./on-this-date.js'));
 const loadCompare = once(() => import('./compare.js'));
 const loadState = once(() => import('./state.js'));
@@ -69,7 +72,7 @@ const loadGlossary = once(() => import('./glossary.js'));
 const loadKeyboard = once(() => import('./keyboard.js'));
 const loadGlobe3D = once(() => import('./globe3d.js'));
 const loadExport = once(() => import('./export.js'));
-const loadReport = once(() => import('./report.js'));
+const loadReport = once(async () => (await Promise.all([import('./report.js'), ensureOptionalData()]))[0]);
 const loadQgis = once(() => import('./qgis.js'));
 const loadTableView = once(() => import('./table-view.js'));
 const loadSpatialSearch = once(() => import('./spatial-search.js'));
@@ -187,7 +190,7 @@ const loadAboutRenderer = once(async () => {
 });
 
 async function renderAbout() {
-  const aboutRenderer = await loadAboutRenderer();
+  const [aboutRenderer] = await Promise.all([loadAboutRenderer(), ensureOptionalData()]);
   aboutRenderer.renderAomlValidation();
   aboutRenderer.renderDataProvenance();
   aboutRenderer.renderArchiveCoverage();
@@ -273,7 +276,6 @@ async function boot() {
     requestAnimationFrame(() => mainTarget?.focus({ preventScroll: true }));
   });
   await loadInitial();
-  await renderAbout();
   syncYearBoundsFromData();
   filterController.populateStateFilter(getStats()?.by_state);
   // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.
@@ -310,6 +312,7 @@ async function boot() {
     getVisibleLandfalls: () => currentVisibleLandfalls,
     getOpenStormId: () => openStormId,
     openGlossary: openGlossaryLazy,
+    onAboutOpen: renderAbout,
     refreshTimelineScope,
   });
   wireSettingsControls();

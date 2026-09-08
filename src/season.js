@@ -1,7 +1,7 @@
 // Season summary card. Surfaces when the year filter narrows to a small
 // window (1-3 years). Shows total named storms touching the US, landfall
 // count by Saffir tier, total ACE, strongest landfall, deadliest, costliest.
-import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, categoryLabel, categoryStrength, getEnsoForYear } from './data.js';
+import { getLandfalls, getStorm, getImpactsFor, ensureStormsLoaded, ensureOptionalData, categoryLabel, categoryStrength, getEnsoForYear } from './data.js';
 import { computeACE } from './metrics.js';
 import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
@@ -56,6 +56,11 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     setSeasonSummaryVisible(host, false);
     return;
   }
+  // The ENSO badge and the impact rows further down both read deferred data.
+  // This card only renders for a span of three years or fewer, so it is never
+  // on the first screen and waiting here costs a reader nothing they can see.
+  await ensureOptionalData();
+  if (seq !== refreshSeq) return;
   const landfalls = getLandfalls().filter(lf => lf.year >= yearMin && lf.year <= yearMax);
   if (!landfalls.length) {
     setSeasonSummaryVisible(host, true);

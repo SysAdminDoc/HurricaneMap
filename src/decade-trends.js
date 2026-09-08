@@ -1,6 +1,6 @@
 // Decade-by-decade trend analysis: named-storm count, major-hurricane %,
 // ACE total, deadliest and costliest storms per decade.
-import { getStats, getLandfalls, ensureStormsLoaded, getStorm, getImpactsFor } from './data.js';
+import { getStats, getLandfalls, ensureStormsLoaded, ensureOptionalData, getStorm, getImpactsFor } from './data.js';
 import { computeACE } from './metrics.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import {
@@ -118,7 +118,7 @@ export function buildDecadeTrendSeries(
 // Compute decade-level aggregates with details.
 async function buildDecadeTrends() {
   if (_cache) return _cache;
-  await ensureStormsLoaded();
+  await Promise.all([ensureStormsLoaded(), ensureOptionalData()]);
   const stats = getStats();
   if (!stats) return null;
 

@@ -49,6 +49,8 @@ const DATA = {
 
 let stormsLoaded = false;
 let stormsPromise = null;
+let optionalLoaded = false;
+let optionalPromise = null;
 
 async function fetchJson(url, { optional = false, fallback = null, priority } = {}) {
   try {
@@ -65,16 +67,15 @@ async function fetchJson(url, { optional = false, fallback = null, priority } = 
   }
 }
 
+// The datasets the first paint blocks on. The map, the timeline, the header and
+// the filters read these four and nothing else, so this is the whole of what a
+// reader waits for before the atlas is usable.
 export async function loadInitial() {
-  const [lf, st, md, cv, im, bn, enso, aoml] = await Promise.all([
+  const [lf, st, md, cv] = await Promise.all([
     fetchJson('data/landfalls.json', { priority: 'high' }),
     fetchJson('data/stats.json', { priority: 'high' }),
     fetchJson('data/metadata.json', { optional: true, fallback: null }),
     fetchJson('data/coverage.json', { priority: 'high' }),
-    fetchJson('data/impacts.json', { optional: true, fallback: {} }),
-    fetchJson('data/billions.json', { optional: true, fallback: null }),
-    fetchJson('data/enso.json', { optional: true, fallback: null }),
-    fetchJson('data/aoml-landfalls.json', { optional: true, fallback: null }),
   ]);
   if (!Array.isArray(lf)) throw new Error('landfalls.json did not contain an array');
   if (!st || typeof st !== 'object') throw new Error('stats.json did not contain an object');
@@ -83,12 +84,36 @@ export async function loadInitial() {
   DATA.stats = st || { total_storms: 0, total_landfall_events: 0 };
   DATA.metadata = md && typeof md === 'object' ? md : null;
   DATA.coverage = cv && typeof cv === 'object' ? cv : null;
-  DATA.impacts = im || {};
-  DATA.billions = bn && typeof bn === 'object' && !Array.isArray(bn) ? bn : {};
-  DATA.billionsAvailable = Boolean(bn && typeof bn === 'object' && !Array.isArray(bn));
-  DATA.enso = enso && typeof enso === 'object' ? enso : null;
-  DATA.aoml = aoml && typeof aoml === 'object' ? aoml : null;
+  // Start the rest now so a panel opened a second later already has it, but do
+  // not hold the map for it. Nothing awaits this deliberately: every optional
+  // fetch resolves to its fallback rather than rejecting.
+  ensureOptionalData();
   return DATA;
+}
+
+// Impacts, the AOML ground-truth artifact, the NCEI billion-dollar table and the
+// ONI series come to 460 KB and none of them paints anything. They feed the
+// storm panel, the statistics and season panels, the text report and the About
+// dialog, all of which are reached by an explicit action, so each of those
+// entry points waits on this instead of the first screen doing it for them.
+export function ensureOptionalData() {
+  if (optionalLoaded) return Promise.resolve(DATA);
+  if (optionalPromise) return optionalPromise;
+  optionalPromise = Promise.all([
+    fetchJson('data/impacts.json', { optional: true, fallback: {} }),
+    fetchJson('data/billions.json', { optional: true, fallback: null }),
+    fetchJson('data/enso.json', { optional: true, fallback: null }),
+    fetchJson('data/aoml-landfalls.json', { optional: true, fallback: null }),
+  ]).then(([im, bn, enso, aoml]) => {
+    DATA.impacts = im || {};
+    DATA.billions = bn && typeof bn === 'object' && !Array.isArray(bn) ? bn : {};
+    DATA.billionsAvailable = Boolean(bn && typeof bn === 'object' && !Array.isArray(bn));
+    DATA.enso = enso && typeof enso === 'object' ? enso : null;
+    DATA.aoml = aoml && typeof aoml === 'object' ? aoml : null;
+    optionalLoaded = true;
+    return DATA;
+  });
+  return optionalPromise;
 }
 
 export function getImpactsFor(stormId) {

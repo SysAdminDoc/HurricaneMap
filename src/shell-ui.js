@@ -16,6 +16,7 @@ export function wireApplicationShell({
   getVisibleLandfalls,
   getOpenStormId,
   openGlossary,
+  onAboutOpen,
   refreshTimelineScope,
 }) {
   const els = elements;
@@ -63,6 +64,11 @@ export function wireApplicationShell({
   els.toggleInfoBtn.addEventListener('click', () => {
     els.infoModal.hidden = false;
     releaseInfoFocus = activateDialogFocus(els.infoModal, { initialFocus: '#close-info' });
+    // The dialog opens on the markup that is already there, including the
+    // "loading" line for the ground-truth check, and fills in when the data it
+    // reads arrives. It used to be rendered during boot, which made every
+    // reader wait on a 220 KB artifact for a dialog most of them never open.
+    onAboutOpen?.();
   });
   els.closeInfo.addEventListener('click', closeInfoModal);
   els.infoModal.addEventListener('click', event => {

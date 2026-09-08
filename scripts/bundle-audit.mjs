@@ -8,6 +8,7 @@ import * as esbuild from 'esbuild';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outdir = path.join(root, '.tmp-bundle');
 const INITIAL_GZIP_BUDGET = 100 * 1024;
+const BOOT_DATA_GZIP_BUDGET = 32 * 1024;
 const FIRST_PAINT_WATERFALL_DEPTH_BUDGET = 2;
 
 const indexHtml = await readFile(path.join(root, 'index.html'), 'utf8');
@@ -51,6 +52,53 @@ const fontRequestDepth = fontsPreloaded ? 1 : 2;
 const firstPaintWaterfallDepth = Math.max(cssRequestDepth, firstDataRequestDepth, fontRequestDepth);
 if (firstPaintWaterfallDepth > FIRST_PAINT_WATERFALL_DEPTH_BUDGET) {
   console.error(`First-paint request waterfall depth ${firstPaintWaterfallDepth} exceeds budget ${FIRST_PAINT_WATERFALL_DEPTH_BUDGET}.`);
+  process.exit(1);
+}
+
+// What the first paint waits for in data, not just in code. The lists are read
+// out of src/data.js rather than written down here, so a dataset moved between
+// the awaited set and the deferred one changes this measurement immediately
+// instead of leaving a stale table behind.
+const dataSource = await readFile(path.join(root, 'src/data.js'), 'utf8');
+function datasetsIn(source, pattern, description) {
+  const block = source.match(pattern);
+  if (!block) {
+    console.error(`Bundle audit could not find ${description} in src/data.js.`);
+    process.exit(1);
+  }
+  const files = [...block[1].matchAll(/'(data\/[^']+\.json)'/g)].map(match => match[1]);
+  if (!files.length) {
+    console.error(`Bundle audit found no datasets in ${description}.`);
+    process.exit(1);
+  }
+  return files;
+}
+const bootDatasets = datasetsIn(
+  dataSource,
+  /export async function loadInitial\(\)[\s\S]*?await Promise\.all\(\[([\s\S]*?)\]\);/,
+  "loadInitial's awaited dataset list",
+);
+const deferredDatasets = datasetsIn(
+  dataSource,
+  /export function ensureOptionalData\(\)[\s\S]*?Promise\.all\(\[([\s\S]*?)\]\)/,
+  "ensureOptionalData's dataset list",
+);
+const bothWays = bootDatasets.filter(file => deferredDatasets.includes(file));
+if (bothWays.length) {
+  console.error(`Datasets are both awaited at boot and deferred: ${bothWays.join(', ')}`);
+  process.exit(1);
+}
+const bootDataSizes = await Promise.all(bootDatasets.map(async (file) => ({
+  file,
+  gzip: gzipSync(await readFile(path.join(root, file))).byteLength,
+})));
+const bootDataGzip = bootDataSizes.reduce((sum, entry) => sum + entry.gzip, 0);
+const deferredDataGzip = (await Promise.all(deferredDatasets.map(async (file) => (
+  gzipSync(await readFile(path.join(root, file))).byteLength
+)))).reduce((sum, bytes) => sum + bytes, 0);
+if (bootDataGzip > BOOT_DATA_GZIP_BUDGET) {
+  console.error(`First-paint data is ${formatBytes(bootDataGzip)} gzip, over the ${formatBytes(BOOT_DATA_GZIP_BUDGET)} target.`);
+  for (const entry of bootDataSizes) console.error(`- ${entry.file}: ${formatBytes(entry.gzip)} gzip`);
   process.exit(1);
 }
 
@@ -107,7 +155,7 @@ if (initialGzip > INITIAL_GZIP_BUDGET) {
 const largestLazy = lazyChunks.slice(0, 5)
   .map(chunk => `${path.basename(chunk.file)} ${formatBytes(chunk.raw)} raw`)
   .join(', ');
-console.log(`bundle audit ok (initial ${formatBytes(initialGzip)} gzip across ${initialFiles.size} file${initialFiles.size === 1 ? '' : 's'}; ${lazyChunks.length} lazy chunks${largestLazy ? `; largest: ${largestLazy}` : ''}; first-paint waterfall depth ${firstPaintWaterfallDepth}/${FIRST_PAINT_WATERFALL_DEPTH_BUDGET})`);
+console.log(`bundle audit ok (initial ${formatBytes(initialGzip)} gzip across ${initialFiles.size} file${initialFiles.size === 1 ? '' : 's'}; ${lazyChunks.length} lazy chunks${largestLazy ? `; largest: ${largestLazy}` : ''}; first-paint waterfall depth ${firstPaintWaterfallDepth}/${FIRST_PAINT_WATERFALL_DEPTH_BUDGET}; boot data ${formatBytes(bootDataGzip)}/${formatBytes(BOOT_DATA_GZIP_BUDGET)} gzip across ${bootDatasets.length}, ${formatBytes(deferredDataGzip)} deferred across ${deferredDatasets.length})`);
 
 function collectStaticImports(entryFile, outputs, seen = new Set()) {
   if (seen.has(entryFile)) return seen;

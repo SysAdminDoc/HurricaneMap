@@ -2108,6 +2108,56 @@ async function captureVisualSnapshot(page, name) {
   assert(buffer.length > 20_000, `${name}: snapshot is unexpectedly small (${buffer.length} bytes)`);
 }
 
+// Impacts, the AOML ground-truth artifact, the NCEI billion-dollar table and the
+// ONI series are two thirds of the boot payload and paint nothing. Hold all four
+// open: the atlas has to become usable anyway, and the two surfaces that read
+// them have to fill in once they land.
+async function assertDeferredDataScope(context, baseUrl) {
+  const deferred = ['impacts.json', 'billions.json', 'enso.json', 'aoml-landfalls.json'];
+  // Long enough that the app is up well before it, short enough that the data
+  // fetch's own 10s timeout never fires, so the four arrive rather than falling
+  // back. Boot waiting on any of them cannot beat this deadline.
+  const HOLD_MS = 6000;
+  const page = await context.newPage();
+  const heldUntil = Date.now() + HOLD_MS;
+  const requested = new Map(deferred.map((file) => {
+    let seen = null;
+    const promise = new Promise((resolve) => { seen = resolve; });
+    return [file, { promise, seen }];
+  }));
+  try {
+    for (const file of deferred) {
+      await page.route(`**/data/${file}`, async (route) => {
+        requested.get(file).seen();
+        const remaining = heldUntil - Date.now();
+        if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
+        await route.continue();
+      });
+    }
+    await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    const readyAt = Date.now();
+    assert(readyAt < heldUntil, `the first screen waited ${readyAt - heldUntil}ms past the deferred datasets`);
+    await Promise.all([...requested.values()].map(entry => entry.promise));
+    const beforeRelease = await page.evaluate(async () => {
+      const { getAomlValidation, getImpactsFor } = await import('/src/data.js');
+      return { aoml: Boolean(getAomlValidation()), impacts: Boolean(getImpactsFor('AL122005')) };
+    });
+    assert(!beforeRelease.aoml && !beforeRelease.impacts, `deferred datasets resolved before they were released: ${JSON.stringify(beforeRelease)}`);
+
+    // ... and the two surfaces that read them fill in once they land.
+    await page.evaluate(() => { location.hash = '#v=1&storm=AL122005'; });
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.click('#toggle-info');
+    await page.waitForFunction(() => {
+      const text = document.querySelector('#aoml-validation')?.textContent || '';
+      return /precision/.test(text) && /recall/.test(text);
+    }, { timeout: 15000 });
+  } finally {
+    await page.close();
+  }
+}
+
 // The data-release pin makes a shared link cite an exact release, which is worth
 // having on a link somebody meant to share and not on the address bar of a page
 // they just opened. Cold load: no fragment at all. Shape the view: the pin rides
@@ -2121,6 +2171,11 @@ async function assertReleasePinScope(context, baseUrl) {
     assert(cold.hash === '', `a cold load put a fragment on the address bar: ${cold.hash}`);
     assert(!cold.href.includes('#'), `a cold load left a '#' in the URL: ${cold.href}`);
 
+    // The filters panel starts collapsed at every viewport, and its contents are
+    // visibility:hidden until it is opened, so shaping the view means taking the
+    // same first step a reader does.
+    await page.click('#toggle-filters');
+    await page.waitForSelector('#state-filter:visible', { timeout: 10000 });
     await page.selectOption('#state-filter', 'Florida');
     await page.waitForFunction(() => /(?:^|&)s=Florida(?:&|$)/.test(location.hash), { timeout: 10000 });
     const shaped = await page.evaluate(() => location.href);
@@ -3850,6 +3905,7 @@ try {
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
 
   await assertReleasePinScope(context, baseUrl);
+  await assertDeferredDataScope(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);
 
