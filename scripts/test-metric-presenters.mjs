@@ -193,10 +193,17 @@ for (const relative of [
 // for anyone reading the file later. That text is a claim about the arithmetic,
 // so it is held to the same constant: a corrected factor cannot be applied in
 // the code and left wrong in the documentation beside it.
-const MPH_FACTOR_IN_PROSE = /mph[^\n]{0,40}?(\d+\.\d+)/g;
-for (const relative of ['../src/export.js', '../src/qgis.js']) {
+// Forty characters was not enough: the CSV data dictionary puts 66 between
+// "mph" and the number, so the one header a reader is most likely to trust was
+// the line this could not reach. The number also comes first as often as it
+// comes second, as it does in the notebook's f-string, so both orders count.
+const MPH_FACTOR_IN_PROSE = /mph[^\n]{0,120}?(\d+\.\d{2,})|(\d+\.\d{2,})[^\n]{0,60}?mph/g;
+// The starter notebook is in here too. It carried 1.15, an independent copy
+// that was already wrong, and being a .ipynb rather than a .js is not a reason
+// for a reader to get a different number.
+for (const relative of ['../src/export.js', '../src/qgis.js', '../src/report.js', '../notebooks/analysis-starter.ipynb']) {
   const source = await readFile(new URL(relative, import.meta.url), 'utf8');
-  const quoted = [...source.matchAll(MPH_FACTOR_IN_PROSE)].map(match => match[1]);
+  const quoted = [...source.matchAll(MPH_FACTOR_IN_PROSE)].map(match => match[1] ?? match[2]);
   assert.ok(quoted.length, `${relative} no longer documents the knots-to-mph factor`);
   for (const factor of quoted) {
     assert.equal(
@@ -205,6 +212,24 @@ for (const relative of ['../src/export.js', '../src/qgis.js']) {
       `${relative} documents mph = knots x ${factor} while WIND_FACTORS.mph is ${WIND_FACTORS.mph}`,
     );
   }
+}
+
+// And the one remaining independent constant: the km-to-miles factor is
+// declared once in metrics.js and once in geodesy.js's nautical-mile constant,
+// which is byte-identical to the kmh wind factor. Nothing had ever compared
+// them, so kmhToMph could drift from kmToMiles inside the same module.
+{
+  const metrics = await readFile(new URL('../src/metrics.js', import.meta.url), 'utf8');
+  const inlined = [...metrics.matchAll(/\*\s*0\.6\d+/g)].map(match => match[0]);
+  assert.deepEqual(inlined, [], `src/metrics.js inlines the km-to-miles factor instead of using KM_TO_MI: ${inlined.join(', ')}`);
+  const geodesy = await readFile(new URL('../src/geodesy.js', import.meta.url), 'utf8');
+  const nautical = /KM_PER_NAUTICAL_MILE\s*=\s*([\d.]+)/.exec(geodesy);
+  assert.ok(nautical, 'src/geodesy.js no longer declares KM_PER_NAUTICAL_MILE');
+  assert.equal(
+    Number(nautical[1]),
+    WIND_FACTORS.kmh,
+    'a knot is a nautical mile per hour, so these two constants have to agree',
+  );
 }
 
 console.log('metric presenters ok (UI, report, CSV, and QGIS parity)');

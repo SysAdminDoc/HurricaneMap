@@ -8,7 +8,11 @@ import * as esbuild from 'esbuild';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outdir = path.join(root, '.tmp-bundle');
 const INITIAL_GZIP_BUDGET = 100 * 1024;
-const BOOT_DATA_GZIP_BUDGET = 32 * 1024;
+// The awaited four come to 21.9 KB gzip. A budget with ten kilobytes of slack
+// let enso.json, billions.json, rainfall.json or tide-stations.json move into
+// the awaited set and still pass, which is the whole class of change this is
+// meant to catch, so the slack is about one kilobyte.
+const BOOT_DATA_GZIP_BUDGET = 23 * 1024;
 const FIRST_PAINT_WATERFALL_DEPTH_BUDGET = 2;
 
 const indexHtml = await readFile(path.join(root, 'index.html'), 'utf8');

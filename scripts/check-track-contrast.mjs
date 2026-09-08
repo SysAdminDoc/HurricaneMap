@@ -102,6 +102,46 @@ function degreesFromAngle(raw, number) {
   throw new Error(`hue-rotate() angle unit this gate cannot convert: "${raw}"`);
 }
 
+export function stripCssComments(css) {
+  return String(css).replace(/\/\*[\s\S]*?\*\//g, ' ');
+}
+
+// Every rule whose selector names the tile pane, with its full block. Braces are
+// counted, so a nested block inside the rule stays part of it instead of ending
+// it early.
+export function tilePaneRules(css) {
+  const rules = [];
+  const target = '.leaflet-tile-pane';
+  let from = 0;
+  while (true) {
+    const hit = css.indexOf(target, from);
+    if (hit === -1) break;
+    from = hit + target.length;
+    const open = css.indexOf('{', hit);
+    if (open === -1) break;
+    // The selector runs back to the end of whatever came before it.
+    let selectorStart = 0;
+    for (const boundary of ['}', '{', ';']) {
+      const found = css.lastIndexOf(boundary, hit);
+      if (found > selectorStart) selectorStart = found + 1;
+    }
+    const selector = css.slice(selectorStart, open).trim().replace(/\s+/g, ' ');
+    if (!selector.includes(target)) continue;
+    let depth = 0;
+    let close = open;
+    for (; close < css.length; close += 1) {
+      if (css[close] === '{') depth += 1;
+      else if (css[close] === '}') {
+        depth -= 1;
+        if (depth === 0) break;
+      }
+    }
+    rules.push({ selector, body: css.slice(open + 1, close) });
+    from = close;
+  }
+  return rules;
+}
+
 // Returns the filtered colour, or throws naming the function it cannot apply.
 export function applyCssFilter(rgb, filter) {
   const text = String(filter || '').trim();
@@ -194,22 +234,28 @@ async function main() {
   // What the basemap actually looks like. The rules are found rather than
   // named: this used to read three hard-coded selectors, so a fourth rule
   // repainting the tile pane (a palette mode, say) would have been a basemap
-  // nothing measured. The filter pattern has to reject `backdrop-filter`, which
-  // these same stylesheets use twenty times; without a boundary it matched that
-  // first and had the gate reporting on a surface nobody renders.
-  const TILE_PANE_RULE_RE = /([^{}]*\.leaflet-tile-pane[^{}]*)\{([^}]*)\}/g;
-  const FILTER_DECLARATION_RE = /(?:^|[;{\s])filter\s*:\s*([^;}]+)/;
-  const allCss = [...stylesheets.values()].join('\n');
-  // An unfiltered tile pane is always one of the surfaces, whether or not a rule
-  // spells it out, because a theme that declares no filter renders exactly that.
+  // nothing measured.
+  //
+  // Three things this has to get right, each of which it got wrong first.
+  // Comments are stripped before anything else, or a comment that merely
+  // mentions the tile pane is read as the selector of the rule after it. The
+  // block is found by counting braces rather than stopping at the first `}`,
+  // so a nested `&:hover { }` cannot shadow the declaration under it. And the
+  // LAST `filter` in the block wins, the way a browser resolves it, with
+  // `backdrop-filter` excluded by a boundary because these stylesheets use it
+  // twenty times and matching it means measuring a surface nobody renders.
+  const allCss = stripCssComments([...stylesheets.values()].join('\n'));
+  const FILTER_DECLARATION_RE = /(?:^|[;{\s])filter\s*:\s*([^;}]+)/g;
   const byFilter = new Map([['none', []]]);
-  for (const rule of allCss.matchAll(TILE_PANE_RULE_RE)) {
-    const selector = rule[1].trim().replace(/\s+/g, ' ');
-    const declaration = FILTER_DECLARATION_RE.exec(rule[2]);
-    if (!declaration) continue;
-    const filter = declaration[1].trim();
+  for (const rule of tilePaneRules(allCss)) {
+    const declarations = [...rule.body.replace(/\{[^{}]*\}/g, ' ').matchAll(FILTER_DECLARATION_RE)];
+    if (!declarations.length) continue;
+    const filter = declarations[declarations.length - 1][1]
+      .replace(/!important\s*$/i, '')
+      .trim()
+      .toLowerCase();
     if (!byFilter.has(filter)) byFilter.set(filter, []);
-    byFilter.get(filter).push(selector);
+    byFilter.get(filter).push(rule.selector);
   }
   if (byFilter.size < 2) {
     errors.push('no rule filters the tile pane any more, so this gate cannot tell what the basemap looks like');

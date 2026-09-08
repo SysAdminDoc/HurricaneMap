@@ -120,8 +120,14 @@ async function lazyStartActiveStormPolling() {
   return startActiveStormPolling();
 }
 
+// A fragment that arrived carrying a unit or a damage mode keeps carrying it,
+// so forwarding a link somebody shared does not quietly drop what they shared.
+// A cold load with nothing in the fragment still gets none.
+let arrivedWithQualifiers = false;
+
 function writeHash() {
   const newHash = encodeHashState(filters, {
+    keepQualifiers: arrivedWithQualifiers,
     openStormId,
     comparisonIds,
     advisoryReplay: advisoryReplayState,
@@ -440,6 +446,7 @@ async function boot() {
 
 function restoreExtendedView(decoded) {
   const options = viewOptionsFromDecoded(decoded);
+  if (decoded?.u !== undefined || decoded?.d !== undefined) arrivedWithQualifiers = true;
   if (options.windUnit) setSetting('windUnit', options.windUnit);
   if (options.damageMode) setSetting('damageMode', options.damageMode);
   advisoryReplayState = options.advisoryReplay;
@@ -747,7 +754,11 @@ document.addEventListener('hm-storm:open', (event) => {
 // one on screen. A hidden panel re-renders from current settings the next time
 // it is opened.
 function refreshOpenStormPanel() {
-  if (!openStormId || document.getElementById('storm-panel')?.hidden !== false) return;
+  const panel = document.getElementById('storm-panel');
+  // Minimized is not hidden: panels.js only adds a class, so reading `hidden`
+  // alone let a unit change pull a minimized panel back open over the map and
+  // take focus with it.
+  if (!openStormId || !panel || panel.hidden !== false || panel.classList.contains('minimized')) return;
   const landfall = getLandfalls().find(x => x.storm_id === openStormId);
   if (landfall) onLandfallClick(landfall);
 }
@@ -764,6 +775,21 @@ document.addEventListener('storm-panel:close', () => {
   openStormId = null;
   advisoryReplayState = null;
   writeHash();
+});
+
+// Closing the storm panel clears the map's track layer, and that layer is also
+// where the "show tracks" filter draws. The checkbox and the URL went on saying
+// tracks were on while the map had none, and the redraw guard's cache key was
+// unchanged so nothing brought them back.
+document.addEventListener('hm-panel:hidden', (event) => {
+  if (event.detail?.id !== 'storm-panel' || !filters.showTracks) return;
+  // panel.js clears the layer from its own listener on this event, and this
+  // module registers first, so redrawing here synchronously would be undone a
+  // moment later. A microtask runs once every listener has had its turn.
+  queueMicrotask(() => {
+    lastTracksKey = '';
+    applyFilters();
+  });
 });
 
 boot().catch(err => {

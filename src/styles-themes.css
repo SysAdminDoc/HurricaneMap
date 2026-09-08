@@ -138,7 +138,10 @@ html.light-theme {
   --intensity-landfall: #c9184a;
   --intensity-ri: #c9184a;
   --intensity-dot-stroke: rgba(0, 0, 0, 0.55);
-  --intensity-cursor: rgba(124, 58, 237, 0.60);
+  /* 0.60 alpha put this at 2.66:1 on the light chart ground, under the 3:1 a
+     non-text graphic asks for. It is a hairline the reader is pointing at, so
+     it is drawn solid rather than tinted. */
+  --intensity-cursor: rgba(90, 32, 190, 0.95);
   --on-accent: #ffffff;
   --leaflet-control-bg: rgba(255, 255, 255, 0.94);
 }

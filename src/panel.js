@@ -1,6 +1,6 @@
 // Storm details panel + Wikipedia/YouTube quicklinks.
 import {
-  ensureStormsLoaded, getStorm, categoryLabel, categoryClass,
+  ensureStormsLoaded, ensureOptionalData, getStorm, categoryLabel, categoryClass,
   formatTime, getImpactsFor, getAllStorms, windToCategory,
 } from './data.js';
 import { showTrack, clearTracks, getMap } from './map.js';
@@ -161,7 +161,11 @@ export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   // switching storms — the wind-field swath otherwise outlives its checkbox,
   // and the radar controls kept the previous storm's title.
   stopStormOverlays();
-  await ensureStormsLoaded();
+  // Not only through main.js's lazy loader: On This Date and the state panel's
+  // storm list import showStorm directly, and without this they rendered
+  // "NOAA NCEI data unavailable" and "no impact record is bundled" as facts
+  // while both files were still in flight.
+  await Promise.all([ensureStormsLoaded(), ensureOptionalData()]);
   if (seq !== showStormSeq) return;
   const storm = getStorm(landfall.storm_id);
   if (!storm) {
@@ -586,7 +590,10 @@ function renderSimilarStorms(host, similarStorms) {
       await ensureStormsLoaded();
       const targetStorm = getStorm(similar.storm_id);
       if (targetStorm && targetStorm.us_landfalls && targetStorm.us_landfalls.length > 0) {
-        showStorm(targetStorm.us_landfalls[0]);
+        // A us_landfalls record has no storm_id of its own, so passing one
+        // straight through left the panel looking up an undefined storm and
+        // showing its "record unavailable" state.
+        showStorm({ ...targetStorm.us_landfalls[0], storm_id: similar.storm_id });
       }
     });
     row.style.cursor = 'pointer';

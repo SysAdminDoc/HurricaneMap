@@ -574,7 +574,7 @@ export function computeTranslationStats(track) {
 
 /** km/h → mph helper for display. */
 export function kmhToMph(kmh) {
-  return kmh * 0.621371;
+  return kmh * KM_TO_MI;
 }
 
 /** Days-at-intensity histogram.

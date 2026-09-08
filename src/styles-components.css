@@ -572,7 +572,11 @@ label > input[type="checkbox"] {
 
 .cl-swatch.wind { background: var(--intensity-wind-line); }
 
-.cl-swatch.pres { background: linear-gradient(to right, var(--sapphire) 0%, var(--sapphire) 50%, transparent 50%, transparent 100%); background-size: 6px 2px; height: 2px; }
+/* The swatch legends the pressure line, so it reads the same token. Left on
+   --sapphire it measured 2.67:1 in the light theme while the line beside it
+   measured 6.73:1, which is the swatch claiming a colour the chart does not
+   draw. */
+.cl-swatch.pres { background: linear-gradient(to right, var(--intensity-pressure-line) 0%, var(--intensity-pressure-line) 50%, transparent 50%, transparent 100%); background-size: 6px 2px; height: 2px; }
 
 .cl-landfall { color: var(--intensity-landfall); }
 

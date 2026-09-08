@@ -81,6 +81,12 @@ html.light-theme.high-contrast {
   --intensity-landfall: #8a0020;
   --intensity-ri: #8a0020;
   --intensity-pressure-line: var(--ink-link);
+  /* The dark block sets this from --border-strong, which is white at 38% there
+     and therefore invisible on a white chart: the six reference lines at 34,
+     64, 83, 96, 113 and 137 kt simply were not drawn. */
+  --intensity-grid-line: rgba(0, 0, 0, 0.55);
+  --intensity-cursor: var(--text);
+  --intensity-dot-stroke: var(--text);
   --brand-title-start: #000000;
   --brand-title-end: #0047b2;
 

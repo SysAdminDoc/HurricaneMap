@@ -47,6 +47,10 @@ export function encodeHashState(filters, {
   damageMode = 'real',
   dataRevision = '',
   pinDataRevision = false,
+  // A link shared with nothing but a unit applied that unit and then dropped it
+  // from the address bar, so forwarding the link again lost it. Whatever arrived
+  // in the fragment stays in it.
+  keepQualifiers = false,
   yearMinDefault = YEAR_FALLBACK_MIN,
   yearMaxDefault = YEAR_FALLBACK_MAX,
 } = {}) {
@@ -87,7 +91,7 @@ export function encodeHashState(filters, {
   const QUALIFIERS = new Set(['rel', 'u', 'd']);
   const shaped = key => current[key] !== defaults[key] && (current[key] || key === 'c');
   const hasShapedState = Object.keys(current).some(key => !QUALIFIERS.has(key) && shaped(key));
-  const emitQualifiers = pinDataRevision || hasShapedState;
+  const emitQualifiers = pinDataRevision || hasShapedState || keepQualifiers;
   const parts = [];
   for (const key of Object.keys(current)) {
     if (QUALIFIERS.has(key) && !emitQualifiers) continue;

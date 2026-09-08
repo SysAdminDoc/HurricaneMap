@@ -582,6 +582,34 @@ const CHART_MARK_TARGETS = [
   ['chart landfall label', '#storm-panel .intensity-landfall-label', 'fill', null],
   ['chart wind line', '#storm-panel .intensity-wind-line', 'stroke', 3],
   ['chart pressure line', '#storm-panel .intensity-pressure-line', 'stroke', 3],
+  // Measuring four of seven marks let the RI overlay keep a frozen Mocha pink
+  // at 1.96:1 in the light theme with the run still green, and left the grid
+  // lines white on white in light high contrast.
+  ['chart RI line', '#storm-panel .intensity-ri-line', 'stroke', 3],
+  ['chart RI dot', '#storm-panel .intensity-ri-dot', 'fill', 3],
+  ['chart RI label', '#storm-panel .intensity-ri-label', 'fill', null],
+  // A dashed reference line behind the data is decorative: the axis labels
+  // beside it carry the reading, and at 3:1 it would compete with the series.
+  // It is held to being drawn at all, because in light high contrast it was
+  // white on white at 1.00:1, which is not a faint gridline but a missing one.
+  ['chart grid line', '#storm-panel .intensity-grid-line', 'stroke', 1.25],
+  ['chart cursor', '#storm-panel .chart-cursor', 'stroke', 3],
+  ['chart legend landfall', '#storm-panel .cl-landfall', 'color', null],
+];
+// Every mark the chart reads a token for. A colour frozen back into the markup
+// or the stylesheet stops moving between themes, which a ratio check can miss
+// whenever the frozen value happens to pass.
+const CHART_THEME_MARKS = [
+  ['landfall rule', '.intensity-landfall-line', 'stroke'],
+  ['landfall label', '.intensity-landfall-label', 'fill'],
+  ['category dot outline', '.chart-dot', 'stroke'],
+  ['RI line', '.intensity-ri-line', 'stroke'],
+  ['RI dot', '.intensity-ri-dot', 'fill'],
+  ['grid line', '.intensity-grid-line', 'stroke'],
+  ['cursor', '.chart-cursor', 'stroke'],
+  ['wind line', '.intensity-wind-line', 'stroke'],
+  ['pressure line', '.intensity-pressure-line', 'stroke'],
+  ['legend pressure swatch', '.cl-swatch.pres', 'backgroundImage'],
 ];
 
 async function assertStormPanelContrast(browser, baseUrl) {
@@ -669,10 +697,10 @@ async function assertStormPanelContrast(browser, baseUrl) {
       // it would go unnoticed. Reading both back per profile says the whole
       // chart follows the theme rather than one mark that happens to be
       // measured.
-      chartLandfallStrokes.push(await page.evaluate(() => ({
-        landfall: getComputedStyle(document.querySelector('#storm-panel .intensity-landfall-line')).stroke,
-        dot: getComputedStyle(document.querySelector('#storm-panel .chart-dot')).stroke,
-      })));
+      chartLandfallStrokes.push(await page.evaluate((marks) => Object.fromEntries(marks.map(([name, selector, property]) => {
+        const element = document.querySelector(`#storm-panel ${selector}`);
+        return [name, element ? getComputedStyle(element)[property] : 'MISSING'];
+      })), CHART_THEME_MARKS));
       // Collected rather than written out below, because the hand-written
       // summary went on naming three profiles after a fourth was added.
       covered.push(`${profile.theme}${profile.highContrast ? '+hc' : ''} >= ${profile.minimum}:1`);
@@ -681,10 +709,11 @@ async function assertStormPanelContrast(browser, baseUrl) {
     await context.close();
   }
   if (pageErrors.length) throw new Error(`storm panel contrast page errors: ${pageErrors.join(' | ')}`);
-  // Per mark, not per combination: a signature built from both marks together
-  // stays varied when one of them is frozen, because the other still moves.
-  for (const mark of ['landfall', 'dot']) {
+  // Per mark, not per combination: a signature built from several marks together
+  // stays varied when one of them is frozen, because the others still move.
+  for (const [mark] of CHART_THEME_MARKS) {
     const values = chartLandfallStrokes.map(row => row[mark]);
+    assert(!values.includes('MISSING'), `the chart's ${mark} mark was not on screen to measure`);
     assert(
       new Set(values).size >= 2,
       `the chart's ${mark} mark does not follow the theme: ${values.join(' | ')}`,
@@ -2167,6 +2196,30 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
     await page.click('#toggle-stats');
     await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
 
+    // Minimized is not hidden, so this used to slip past the guard and pull the
+    // panel back open over the map with focus.
+    await page.evaluate(() => { location.hash = '#v=1&storm=AL122005'; });
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.click('#storm-panel .panel-min-btn');
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.classList.contains('minimized'), { timeout: 10000 });
+    // 'mph', not the 'kt' it already holds: setSetting returns early on an
+    // unchanged value, so asking for the default fires no event at all and the
+    // guard below is never reached.
+    await page.evaluate(async () => {
+      const settings = await import('/src/settings.js');
+      settings.setSetting('windUnit', 'mph');
+    });
+    const minimized = await page.waitForFunction(
+      () => document.querySelector('#storm-panel')?.classList.contains('minimized') === false,
+      null,
+      { timeout: 2000 },
+    ).then(() => false).catch(() => true);
+    assert(minimized, 'a unit change re-expanded a minimized storm panel');
+
+    await page.evaluate(() => { location.hash = ''; });
+    await page.click('#toggle-stats');
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+
     for (const [key, value] of [['windUnit', 'mph'], ['damageMode', 'nominal'], ['palette', 'colorblind']]) {
       await page.evaluate(async ([settingKey, settingValue]) => {
         const settings = await import('/src/settings.js');
@@ -2176,6 +2229,7 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
       // change passes whether or not the steal is coming. Watch for it instead.
       const stolen = await page.waitForFunction(
         () => document.querySelector('#storm-panel')?.hidden === false,
+        null,
         { timeout: 2000 },
       ).then(() => true).catch(() => false);
       assert(!stolen, `changing ${key} pulled the storm panel back over the statistics panel`);
@@ -2189,20 +2243,86 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
   }
 }
 
+// Two things the storm panel owes the map. A similar-storms row has to open the
+// storm it names, and closing the panel must not take the "show tracks" filter's
+// own tracks with it: they share one Leaflet layer, so clearing the layer looked
+// like the panel tidying up after itself and was really the filter going blank
+// while its checkbox and the URL both still said it was on.
+async function assertStormPanelMapContracts(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/#v=1&storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel .similar-storm-row', { timeout: 15000 });
+    const before = await page.evaluate(() => document.querySelector('#storm-panel h2')?.textContent || '');
+    await page.click('#storm-panel .similar-storm-row');
+    await page.waitForFunction(
+      (previous) => (document.querySelector('#storm-panel h2')?.textContent || '') !== previous,
+      before,
+      { timeout: 15000 },
+    );
+    const opened = await page.evaluate(() => ({
+      heading: document.querySelector('#storm-panel h2')?.textContent || '',
+      body: document.querySelector('#panel-body')?.textContent || '',
+      hash: location.hash,
+    }));
+    assert(
+      !/record unavailable/i.test(opened.body),
+      `a similar-storms row could not open its storm: ${opened.heading}`,
+    );
+    assert(
+      /storm=AL\d{6}/.test(opened.hash) && !opened.hash.includes('storm=AL122005'),
+      `a similar-storms row did not put its storm in the URL: ${opened.hash}`,
+    );
+
+    await page.goto(`${baseUrl}/#v=1&y=2005-2005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.click('#toggle-filters');
+    await page.waitForSelector('#show-tracks:visible', { timeout: 10000 });
+    await page.check('#show-tracks');
+    await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, { timeout: 15000 });
+    const withTracks = await page.evaluate(() => document.querySelectorAll('#map path').length);
+
+    await page.evaluate(() => { location.hash = '#v=1&y=2005-2005&t=1&storm=AL122005'; });
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.click('#toggle-stats');
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+    await page.waitForFunction(
+      (expected) => document.querySelectorAll('#map path').length >= expected,
+      withTracks,
+      { timeout: 10000 },
+    ).catch(() => {});
+    const afterOtherPanel = await page.evaluate(() => ({
+      paths: document.querySelectorAll('#map path').length,
+      checked: document.querySelector('#show-tracks')?.checked,
+    }));
+    assert(
+      afterOtherPanel.checked && afterOtherPanel.paths >= withTracks,
+      `opening another panel wiped the filter's tracks: ${withTracks} paths became ${afterOtherPanel.paths} with the box still ${afterOtherPanel.checked ? 'ticked' : 'clear'}`,
+    );
+  } finally {
+    await page.close();
+  }
+}
+
 async function assertDeferredDataScope(context, baseUrl) {
   const deferred = ['impacts.json', 'billions.json', 'enso.json', 'aoml-landfalls.json'];
-  // Long enough that the app is up well before it, short enough that the data
-  // fetch's own 10s timeout never fires, so the four arrive rather than falling
-  // back. Boot waiting on any of them cannot beat this deadline.
+  // Long enough that the app is up and one assertion has run while the four are
+  // still unanswered, short enough that the data fetch's own 10s timeout never
+  // fires, so they arrive rather than falling back to nothing. Each case gets
+  // its own page and its own hold: sharing one budget across all of them let a
+  // later assertion run after the release and pass for the wrong reason.
   const HOLD_MS = 6000;
-  const page = await context.newPage();
-  const heldUntil = Date.now() + HOLD_MS;
-  const requested = new Map(deferred.map((file) => {
-    let seen = null;
-    const promise = new Promise((resolve) => { seen = resolve; });
-    return [file, { promise, seen }];
-  }));
-  try {
+
+  // Hold the four open on a fresh page and hand back when they were requested.
+  const heldPage = async (holdMs = HOLD_MS) => {
+    const page = await context.newPage();
+    const heldUntil = Date.now() + holdMs;
+    const requested = new Map(deferred.map((file) => {
+      let seen = null;
+      const promise = new Promise((resolve) => { seen = resolve; });
+      return [file, { promise, seen }];
+    }));
     for (const file of deferred) {
       await page.route(`**/data/${file}`, async (route) => {
         requested.get(file).seen();
@@ -2211,27 +2331,90 @@ async function assertDeferredDataScope(context, baseUrl) {
         await route.continue();
       });
     }
-    await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
-    await waitForAppReady(page);
-    const readyAt = Date.now();
-    assert(readyAt < heldUntil, `the first screen waited ${readyAt - heldUntil}ms past the deferred datasets`);
-    await Promise.all([...requested.values()].map(entry => entry.promise));
-    const beforeRelease = await page.evaluate(async () => {
-      const { getAomlValidation, getImpactsFor } = await import('/src/data.js');
-      return { aoml: Boolean(getAomlValidation()), impacts: Boolean(getImpactsFor('AL122005')) };
-    });
-    assert(!beforeRelease.aoml && !beforeRelease.impacts, `deferred datasets resolved before they were released: ${JSON.stringify(beforeRelease)}`);
+    return { page, heldUntil, requested };
+  };
 
-    // ... and the two surfaces that read them fill in once they land.
-    await page.evaluate(() => { location.hash = '#v=1&storm=AL122005'; });
-    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
-    await page.click('#toggle-info');
-    await page.waitForFunction(() => {
-      const text = document.querySelector('#aoml-validation')?.textContent || '';
-      return /precision/.test(text) && /recall/.test(text);
-    }, { timeout: 15000 });
-  } finally {
-    await page.close();
+  // 1. The atlas becomes usable while all four are still unanswered, and the two
+  //    surfaces that read them fill in once they land.
+  {
+    const { page, heldUntil, requested } = await heldPage();
+    try {
+      await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      const readyAt = Date.now();
+      assert(readyAt < heldUntil, `the first screen waited ${readyAt - heldUntil}ms past the deferred datasets`);
+      await Promise.all([...requested.values()].map(entry => entry.promise));
+      const beforeRelease = await page.evaluate(async () => {
+        const { getAomlValidation, getImpactsFor } = await import('/src/data.js');
+        return { aoml: Boolean(getAomlValidation()), impacts: Boolean(getImpactsFor('AL122005')) };
+      });
+      assert(!beforeRelease.aoml && !beforeRelease.impacts, `deferred datasets resolved before they were released: ${JSON.stringify(beforeRelease)}`);
+
+      await page.evaluate(() => { location.hash = '#v=1&storm=AL122005'; });
+      await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+      await page.click('#toggle-info');
+      await page.waitForFunction(() => {
+        const text = document.querySelector('#aoml-validation')?.textContent || '';
+        return /precision/.test(text) && /recall/.test(text);
+      }, { timeout: 15000 });
+    } finally {
+      await page.close();
+    }
+  }
+
+  // 2. On This Date imports showStorm from panel.js directly rather than through
+  //    main.js's lazy loader, so it used to render "NOAA NCEI data unavailable"
+  //    and "no impact record is bundled" as statements of fact while both files
+  //    were still in flight. Watch for the claim appearing rather than reading
+  //    the panel once: a single read runs after the release as easily as before
+  //    it, and passes either way.
+  {
+    // The hold has to end inside the data fetch's own 10s timeout, or the four
+    // fall back to nothing and the panel says "unavailable" for a real reason.
+    // Boot plus the storms archive plus opening two panels does not fit in that,
+    // so the page is warmed first with no routes registered: the reload refetches
+    // the deferred four while everything else comes from the browser cache.
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.evaluate(async () => {
+        const { ensureStormsLoaded } = await import('/src/data.js');
+        await ensureStormsLoaded();
+      });
+      const heldUntil = Date.now() + 9000;
+      for (const file of deferred) {
+        await page.route(`**/data/${file}`, async (route) => {
+          const remaining = heldUntil - Date.now();
+          if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
+          await route.continue();
+        });
+      }
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.click('#toggle-on-this-date');
+      await page.waitForSelector('.otd-link', { timeout: 15000 });
+      await page.click('.otd-link');
+      // The third argument is the options: passed second it is read as the page
+      // function's argument, the default 30s timeout applies, and a probe whose
+      // whole meaning is "within 1.5 seconds" quietly becomes "within thirty".
+      const claimedTooEarly = await page.waitForFunction(
+        () => /unavailable|not bundled|no wikipedia impact record/i
+          .test(document.querySelector('#storm-panel')?.textContent || ''),
+        null,
+        { timeout: 1500 },
+      ).then(() => true).catch(() => false);
+      assert(
+        Date.now() < heldUntil,
+        `the On This Date check ran ${Date.now() - heldUntil}ms after its hold expired, so it proved nothing`,
+      );
+      assert(
+        !claimedTooEarly,
+        'a storm opened from On This Date called the deferred data unavailable while it was still loading',
+      );
+    } finally {
+      await page.close();
+    }
   }
 }
 
@@ -4026,6 +4209,7 @@ try {
   await assertReleasePinScope(context, baseUrl);
   await assertDeferredDataScope(context, baseUrl);
   await assertSettingsChangeKeepsPanel(context, baseUrl);
+  await assertStormPanelMapContracts(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);
 
