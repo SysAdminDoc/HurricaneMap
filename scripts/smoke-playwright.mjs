@@ -2168,8 +2168,63 @@ async function assertAdvisoryForecastInViewport(page, stormId) {
   assert(geometry.path && geometry.map, `${stormId}: advisory forecast viewport geometry is missing`);
 }
 
+// Two things have to have settled before a screenshot means anything.
+//
+// The basemap: a capture taken before any tile arrives is the app chrome over
+// an empty map, which is a different picture from the one every other capture
+// in the run takes. desktop-location-privacy is the first of the run and the
+// only one taken this early, so it was the only one that raced.
+//
+// And any view transition. showPanel wraps its DOM update in
+// document.startViewTransition, and a waitForSelector resolves INSIDE that
+// update callback, so the capture lands while Chromium is cross-fading the
+// old snapshot into the new one. Measured: at the moment the privacy panel's
+// selector resolves, five ::view-transition animations are running and the
+// PNG is 787 KB against 591 KB settled, because it holds two frames at once.
+// Playwright's animations:'disabled' does not cover view transitions.
+async function waitForViewTransition(page, timeout = 5000) {
+  return page.waitForFunction(
+    () => !document.getAnimations().some(
+      animation => typeof animation.effect?.pseudoElement === 'string'
+        && animation.effect.pseudoElement.includes('view-transition'),
+    ),
+    null,
+    { timeout },
+  ).then(() => true).catch(() => false);
+}
+
+async function waitForMapPaint(page, timeout = 15000) {
+  const state = await page.evaluate(() => {
+    const el = document.querySelector('#map');
+    if (!el) return 'absent';
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 ? 'onscreen' : 'hidden';
+  });
+  if (state !== 'onscreen') return state;
+  const painted = await page.waitForFunction(
+    () => {
+      const pane = document.querySelector('#map .leaflet-tile-pane');
+      if (!pane) return false;
+      const tiles = [...pane.querySelectorAll('img.leaflet-tile')];
+      if (tiles.length === 0) return false;
+      return tiles.filter(image => image.complete && image.naturalWidth > 0).length >= Math.min(4, tiles.length);
+    },
+    null,
+    { timeout },
+  ).then(() => true).catch(() => false);
+  return painted ? 'painted' : 'blank';
+}
+
 async function captureVisualSnapshot(page, name) {
   await mkdir(visualSnapshotDir, { recursive: true });
+  const paint = await waitForMapPaint(page);
+  const settled = await waitForViewTransition(page);
+  // The byte guard below cannot see this. A map with every tile request
+  // refused still screenshots at 283 KB, because the header, timeline, markers
+  // and panels all paint: 20 KB catches an empty viewport, not an empty
+  // basemap. Say which one failed.
+  assert(paint !== 'blank', `${name}: the basemap never painted, so this snapshot is not the picture it claims to be`);
+  assert(settled, `${name}: a view transition was still running, so this snapshot holds two states at once`);
   const buffer = await page.screenshot({
     path: path.join(visualSnapshotDir, `${name}.png`),
     animations: 'disabled',
