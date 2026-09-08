@@ -1,7 +1,7 @@
 // Leaflet map + landfall markers + track overlays.
 import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
-import { prefersReducedMotion } from './settings.js';
+import { getPaletteColor, prefersReducedMotion } from './settings.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -10,6 +10,7 @@ let map;
 let landfallLayer;
 let trackLayer;
 let heatLayer = null;
+let heatGradientKey = '';
 let activeMarker = null;
 let hoveredMarker = null;
 let landfallTooltip = null;
@@ -311,23 +312,34 @@ export function setHeatmap(enabled, landfalls) {
     const weight = c <= 0 ? 0.4 : 0.55 + c * 0.09;  // TS .4, Cat1 .64, Cat5 1.0
     return [lf.lat, lf.lon, weight];
   });
+  // The gradient runs through the category palette rather than a copy of its
+  // hexes, so choosing the colourblind palette reaches the heatmap too. Leaflet
+  // reads the gradient once when the layer is built, so a palette change has to
+  // rebuild it: reusing the layer would repaint the markers and leave the heat
+  // underneath them saying the opposite.
+  const gradient = {
+    0.10: getPaletteColor(-1),
+    0.30: getPaletteColor(1),
+    0.50: getPaletteColor(2),
+    0.70: getPaletteColor(3),
+    0.85: getPaletteColor(4),
+    1.00: getPaletteColor(5),
+  };
+  const gradientKey = Object.values(gradient).join(',');
+  if (heatLayer && heatGradientKey !== gradientKey) {
+    map.removeLayer(heatLayer);
+    heatLayer = null;
+  }
   if (heatLayer) {
     heatLayer.setLatLngs(points);
   } else {
+    heatGradientKey = gradientKey;
     heatLayer = L.heatLayer(points, {
       radius: 22,
       blur: 28,
       maxZoom: 9,
       max: 1.0,
-      // Catppuccin-tinted gradient: cold blue → green → yellow → orange → red → mauve
-      gradient: {
-        0.10: '#74c7ec',
-        0.30: '#a6e3a1',
-        0.50: '#f9e2af',
-        0.70: '#fab387',
-        0.85: '#f38ba8',
-        1.00: '#cba6f7',
-      },
+      gradient,
     }).addTo(map);
   }
   // Dim the underlying dots so the heatmap reads cleanly.

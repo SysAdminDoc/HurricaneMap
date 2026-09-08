@@ -14,6 +14,23 @@ import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
+/**
+ * A category colour at a given opacity.
+ *
+ * The palette tokens are declared as hex, and a custom property reads back as
+ * the text it was declared with, so this handles #rgb and #rrggbb and passes
+ * anything else through. A colour it cannot parse is returned unchanged rather
+ * than dropped, which keeps a band visible instead of silently blank.
+ */
+function withAlpha(color, alpha) {
+  const value = String(color || '').trim();
+  const hex = /^#([\da-f]{3}|[\da-f]{6})$/i.exec(value);
+  if (!hex) return value;
+  const full = hex[1].length === 3 ? [...hex[1]].map(c => c + c).join('') : hex[1];
+  const [r, g, b] = [0, 2, 4].map(i => Number.parseInt(full.slice(i, i + 2), 16));
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 const W = 360;          // total width in CSS px
 const H = 160;          // total height
 const M = { top: 14, right: 38, bottom: 28, left: 38 };
@@ -54,13 +71,17 @@ export function renderIntensityChart(container, storm, opts = {}) {
 
   // Saffir-Simpson reference bands on the wind axis (faint horizontal stripes).
   const bandY = (kt) => yWind(kt);
+  // Read the category colours rather than repeating them. These were the
+  // Catppuccin hexes written out, so selecting the colourblind palette
+  // repainted the map and the timeline and left this chart's own bands saying
+  // the opposite, which is the one thing the setting promises not to do.
   const bandRects = [
-    { y0: bandY(64), y1: bandY(83), color: 'rgba(166,227,161,0.06)' },   // Cat 1
-    { y0: bandY(83), y1: bandY(96), color: 'rgba(249,226,175,0.06)' },   // Cat 2
-    { y0: bandY(96), y1: bandY(113), color: 'rgba(250,179,135,0.06)' }, // Cat 3
-    { y0: bandY(113), y1: bandY(137), color: 'rgba(243,139,168,0.06)' }, // Cat 4
-    { y0: bandY(137), y1: bandY(WIND_DOMAIN[1]), color: 'rgba(203,166,247,0.06)' }, // Cat 5
-  ].map(b => `<rect x="${M.left}" y="${b.y1}" width="${PW}" height="${b.y0 - b.y1}" fill="${b.color}"/>`).join('');
+    { y0: bandY(64), y1: bandY(83), cat: 1 },
+    { y0: bandY(83), y1: bandY(96), cat: 2 },
+    { y0: bandY(96), y1: bandY(113), cat: 3 },
+    { y0: bandY(113), y1: bandY(137), cat: 4 },
+    { y0: bandY(137), y1: bandY(WIND_DOMAIN[1]), cat: 5 },
+  ].map(b => `<rect x="${M.left}" y="${b.y1}" width="${PW}" height="${b.y0 - b.y1}" fill="${withAlpha(categoryColor(b.cat), 0.06)}"/>`).join('');
 
   // Y-axis tick labels (wind on left, pressure on right).
   const windTicks = [34, 64, 83, 96, 113, 137].filter(k => k <= WIND_DOMAIN[1]);

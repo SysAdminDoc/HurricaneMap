@@ -11,6 +11,7 @@
 // is hidden in the panel for those.
 
 import { getMap } from './map.js';
+import { categoryColor } from './data.js';
 
 // Indices into the 12-int radii array set by preprocess_hurdat2.py:
 //   [r34_NE, r34_SE, r34_SW, r34_NW,
@@ -77,10 +78,14 @@ export function showWindField(storm) {
 
   // Build three threshold passes — paint 34 kt outline first (lightest), then
   // 50 kt and 64 kt fills on top so the strongest core sits visually inside.
+  // Colours come from the category palette rather than repeating its hexes, so
+  // the colourblind setting reaches the wind field as well as the markers. The
+  // three thresholds map onto the categories whose colours they always used:
+  // tropical storm, Cat 3 and Cat 4.
   const PASSES = [
-    { offset: 0,  color: '#74c7ec', fillOpacity: 0.04, weight: 1, dashArray: null },     // 34 kt sapphire
-    { offset: 4,  color: '#fab387', fillOpacity: 0.07, weight: 1, dashArray: null },     // 50 kt peach
-    { offset: 8,  color: '#f38ba8', fillOpacity: 0.10, weight: 1.2, dashArray: null },   // 64 kt pink (hurricane)
+    { offset: 0,  color: categoryColor(-1), fillOpacity: 0.04, weight: 1, dashArray: null },   // 34 kt
+    { offset: 4,  color: categoryColor(3), fillOpacity: 0.07, weight: 1, dashArray: null },    // 50 kt
+    { offset: 8,  color: categoryColor(4), fillOpacity: 0.10, weight: 1.2, dashArray: null },  // 64 kt (hurricane)
   ];
 
   for (const pass of PASSES) {

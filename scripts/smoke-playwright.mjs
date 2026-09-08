@@ -2591,6 +2591,50 @@ async function assertSettingsSurface(page, label) {
 // zero-area box while the element, its class and its stroke all look healthy,
 // so the chart reads as working with no data. Measure the parsed geometry, not
 // the attribute string.
+// The colourblind palette is a promise that category colour means the same
+// thing everywhere: "Keeps category color meaning consistent across the map and
+// panels." It reached the markers and the timeline, which read the tokens, and
+// not the heatmap gradient, the wind-field rings or the chart's Saffir-Simpson
+// bands, which each carried a copy of the Catppuccin hexes. Selecting the
+// palette repainted half the app and left the other half contradicting it.
+async function assertPaletteReachesEveryLayer(page, label) {
+  const sample = async palette => page.evaluate(async nextPalette => {
+    const settings = await import('/src/settings.js');
+    const data = await import('/src/data.js');
+    const chart = await import('/src/chart.js');
+    settings.setSetting('palette', nextPalette);
+    settings.invalidatePaletteCache();
+    settings.applyPaletteToBody();
+    await data.ensureStormsLoaded();
+    const storm = data.getAllStorms().find(item => item.id === 'AL122005');
+    const host = document.createElement('div');
+    chart.renderIntensityChart(host, storm);
+    return {
+      gradient: [-1, 1, 2, 3, 4, 5].map(category => settings.getPaletteColor(category)),
+      bands: [...host.innerHTML.matchAll(/<rect[^>]*fill="(rgba\([^"]*\))"/g)].map(match => match[1]),
+    };
+  }, palette);
+
+  const before = await sample('default');
+  const after = await sample('colorblind');
+  await page.evaluate(async () => {
+    const settings = await import('/src/settings.js');
+    settings.setSetting('palette', 'default');
+    settings.invalidatePaletteCache();
+    settings.applyPaletteToBody();
+  });
+
+  assert(before.bands.length >= 5, `${label}: the intensity chart drew no category bands`);
+  assert(
+    JSON.stringify(before.gradient) !== JSON.stringify(after.gradient),
+    `${label}: the category palette did not change when the colourblind setting was selected`,
+  );
+  assert(
+    JSON.stringify(before.bands) !== JSON.stringify(after.bands),
+    `${label}: the intensity chart's category bands ignore the colourblind palette`,
+  );
+}
+
 async function assertClimateTrendLinesDraw(page, label) {
   const lines = await page.evaluate(() => Array.from(document.querySelectorAll('#stats-panel polyline.ct-line')).map(line => {
     const box = line.getBBox();
@@ -2730,6 +2774,7 @@ async function assertDesktopPanelSystem(page, label) {
   await assertPanelFit('#stats-panel', 'statistics panel');
   assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
   await assertClimateTrendLinesDraw(page, label);
+  await assertPaletteReachesEveryLayer(page, label);
   const outlookLayout = await page.evaluate(() => {
     const rect = (selector) => {
       const element = document.querySelector(selector);
