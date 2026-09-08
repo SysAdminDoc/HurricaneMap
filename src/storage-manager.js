@@ -599,6 +599,10 @@ export async function renderStorageManager(host, { inspect = inspectStorage } = 
   const iosInstallGuide = isIosSafari() ? `
     <div class="storage-install-guide">
       <p class="settings-help">${escapeHtml(t('storage.iosInstallHelp'))}</p>
+      <p class="settings-help storage-ios-eviction">
+        <strong class="storage-copy-flag">${escapeHtml(t('storage.iosEvictionFlag'))}</strong>
+        <span>${escapeHtml(t('storage.iosEvictionWindow'))}</span>
+      </p>
       <button class="settings-action storage-ios-install" type="button" data-ios-install-guide aria-haspopup="dialog">${escapeHtml(t('storage.iosInstallAction'))}</button>
     </div>` : '';
   // The browser refused to protect this origin and there is saved offline data

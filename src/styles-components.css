@@ -3777,6 +3777,27 @@ select {
   background: color-mix(in srgb, var(--atlas-cyan-soft) 70%, transparent);
 }
 
+.storage-ios-eviction {
+  display: grid;
+  gap: 0.3rem;
+}
+
+/* Says out loud that the paragraph below it is documented rather than observed.
+   The seven-day rule is MDN's; Apple's own write-up does not mention it, and
+   nobody here has watched it happen on a device. */
+.storage-copy-flag {
+  justify-self: start;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--text-dim);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .storage-install-guide .settings-help {
   margin: 0;
 }
