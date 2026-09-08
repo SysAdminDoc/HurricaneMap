@@ -299,6 +299,10 @@ export function initServiceWorkerUpdates({
   const serviceWorker = navigatorRef.serviceWorker;
   let waitingWorker = null;
   let reloadRequested = false;
+  // Whether this page was already under a worker. The first controller a page
+  // ever acquires also fires controllerchange, and prompting there would ask a
+  // reader to reload a page that has only just finished loading.
+  const startedControlled = Boolean(serviceWorker.controller);
 
   const prompt = createUpdatePrompt({
     documentRef,
@@ -316,7 +320,20 @@ export function initServiceWorkerUpdates({
     publishDiagnostics({ controller: serviceWorker.controller ? 'controlled' : 'uncontrolled' }, documentRef);
     if (reloadRequested && typeof locationRef.reload === 'function') {
       locationRef.reload();
+      return;
     }
+    if (!startedControlled) return;
+    // Somebody accepted the update in another tab. This one still holds the
+    // old module graph, and every lazy import() from here on resolves against
+    // the new version, so the tab runs two versions of the app at once. Only
+    // the tab that clicked used to hear about it. Reload if nobody is looking,
+    // and otherwise ask, the same way the clicking tab was asked, rather than
+    // pulling the page out from under someone mid-read.
+    if (documentRef.visibilityState === 'hidden' && typeof locationRef.reload === 'function') {
+      locationRef.reload();
+      return;
+    }
+    prompt?.show();
   });
 
   windowRef.addEventListener('load', () => {

@@ -198,20 +198,59 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// The last activate-time validation failure, so the diagnostics panel can say
+// why a worker is serving without having verified its bundle. Cleared on every
+// activate, because a stale one would outlive the problem it describes.
+let lastActivateError = null;
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(withReleaseLock(async () => {
-    await validateReleaseBundle();
-    const keys = await caches.keys();
-    await Promise.all(keys.map((k) => {
-      if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== RADAR_PACK_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
-    }));
-    if (self.registration.navigationPreload) {
-      await self.registration.navigationPreload.enable();
+    // Validation must not be able to skip what follows it. This was the first
+    // await in the handler, so a throw abandoned the cache cleanup, the
+    // navigation preload, the pruning and clients.claim() alike. A worker
+    // activates whether or not its waitUntil settles, so the result was an
+    // activated worker that had taken control of nothing and left every
+    // superseded cache in place: the pages stayed on the old worker until a
+    // manual reload, which is exactly when nobody performs one.
+    // Three independent things, and none of them may cost the others. This was
+    // one straight-line sequence with validateReleaseBundle first, so a throw
+    // there abandoned the cleanup and the claim alike, and a worker activates
+    // whether or not its waitUntil settles: the result was an activated worker
+    // controlling no page, with every open tab left on the previous version
+    // and nothing said about it until somebody reloaded by hand.
+    lastActivateError = null;
+    const recordFailure = (error) => {
+      lastActivateError ??= {
+        at: new Date().toISOString(),
+        message: String(error?.message || error).slice(0, 240),
+      };
+    };
+
+    try {
+      await validateReleaseBundle();
+    } catch (error) {
+      recordFailure(error);
     }
-    await pruneOfflineData();
-    await pruneSourceBundle();
-    await deleteLegacyDataDbs();
-    self.clients.claim();
+
+    try {
+      // The names this deletes belong to no version the worker still serves,
+      // so they are worth reclaiming even when the bundle did not verify.
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => {
+        if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== RADAR_PACK_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
+      }));
+      if (self.registration.navigationPreload) {
+        await self.registration.navigationPreload.enable();
+      }
+      await pruneOfflineData();
+      await pruneSourceBundle();
+      await deleteLegacyDataDbs();
+    } catch (error) {
+      recordFailure(error);
+    } finally {
+      // Taking control is not housekeeping and must not depend on it.
+      self.clients.claim();
+    }
   }));
 });
 
@@ -554,7 +593,14 @@ async function reportOfflineIntegrity(event) {
       error: String(error?.message || error).slice(0, 240),
     };
   }
-  event.source?.postMessage({ type: 'OFFLINE_INTEGRITY_RESULT', ...result });
+  // A worker that activated without verifying its bundle is serving anyway,
+  // and until now the only trace was a rejected waitUntil in a console nobody
+  // was watching. Carry it to the panel that exists to answer this question.
+  event.source?.postMessage({
+    type: 'OFFLINE_INTEGRITY_RESULT',
+    ...result,
+    last_activate_error: lastActivateError,
+  });
 }
 
 async function repairOfflineData(event) {

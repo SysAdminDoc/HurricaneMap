@@ -20,6 +20,7 @@
     "check:css-variables": "node scripts/check-css-variables.mjs",
     "check:track-contrast": "node scripts/check-track-contrast.mjs",
     "check:missing-markers": "node scripts/check-missing-markers.mjs",
+    "test:sw-activate": "node scripts/test-service-worker-activate.mjs",
     "check:dead-exports": "node scripts/check-dead-exports.mjs",
     "check:date-locale": "node scripts/check-date-locale.mjs",
     "check:untranslated": "node scripts/check-untranslated-strings.mjs",
