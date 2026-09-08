@@ -19,7 +19,7 @@ Open `http://127.0.0.1:8080/`.
 ## Notes
 
 - The container runs as a non-root `hurricanemap` user.
-- The Docker base is pinned to `python:3.12-alpine@sha256:6d43704baacd1bfbe7c295d7f13079d5d8104ed33568873133f8fc69980419df`; update it only as an intentional, reviewed image refresh.
+- The Docker base is pinned to `python:3.14-alpine@sha256:c6ead215bfd31f1e433d968853b7a769989117115b728874824e6c0a27cb96fc`; update it only as an intentional, reviewed image refresh. `serve.py` uses only `argparse`, `functools`, `http.server` and `urllib.parse`, so the runtime major version is not load-bearing beyond staying on a supported line.
 - Port `8080` is exposed.
 - The bundled `serve.py` applies `Cache-Control: no-cache`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy: strict-origin-when-cross-origin` to every response. It adds the primary-document CSP, including `form-action 'none'` and `frame-ancestors 'self'`, to `/` and `/index.html`. Plain `python -m http.server` does not provide these deployment headers and is not equivalent.
 - The healthcheck requests `/data/metadata.json`, which verifies both the web server and the generated data bundle.
