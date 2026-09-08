@@ -6681,10 +6681,17 @@ body.side-panel-open .leaflet-top.leaflet-right {
     grid-column: 1 / -1;
   }
 
+  /* Two of these sit side by side in a grid whose tracks are about 106px wide.
+     The row's own minimums came to 56 + 20 + 24 plus two 8px gaps, which is
+     116px, so every row overflowed its track and the count ran into the label
+     of the column beside it: the panel read "273Texas". The label and the bar
+     can both shrink now, the count sizes itself, and the gaps are tighter. */
   .stats-panel .stats-section--states .bar-row,
   .stats-panel .stats-section--decades .bar-row {
     display: grid;
-    grid-template-columns: minmax(56px, 72px) minmax(20px, 1fr) 24px;
+    grid-template-columns: minmax(0, 72px) minmax(12px, 1fr) auto;
+    column-gap: 6px;
+    min-width: 0;
     margin-bottom: 1px;
   }
 

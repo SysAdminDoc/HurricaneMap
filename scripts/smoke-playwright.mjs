@@ -2775,6 +2775,31 @@ async function assertDesktopPanelSystem(page, label) {
   assert(await page.locator('#stats-panel .citation-block').count() === 1, `${label}: statistics panel did not expose a release citation`);
   await assertClimateTrendLinesDraw(page, label);
   await assertPaletteReachesEveryLayer(page, label);
+  // The by-state and by-decade lists sit two abreast in a grid whose tracks are
+  // about 106px wide, and the row's minimums added up to more than that, so the
+  // count ran into the label of the column beside it and the panel read
+  // "273Texas". Measured rather than eyeballed, because a 0.2px overlap looks
+  // like kerning in a screenshot.
+  const barCollisions = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('#stats-panel .bar-row')];
+    const out = [];
+    for (const row of rows) {
+      const count = row.querySelector('.count');
+      if (!count) continue;
+      const countBox = count.getBoundingClientRect();
+      for (const other of rows) {
+        if (other === row) continue;
+        const otherLabel = other.querySelector('.label');
+        if (!otherLabel) continue;
+        const labelBox = otherLabel.getBoundingClientRect();
+        if (Math.abs(labelBox.top - countBox.top) > 4) continue;
+        const gap = labelBox.left - countBox.right;
+        if (gap > -2 && gap < 4) out.push(`${count.textContent}|${otherLabel.textContent.trim()} gap ${gap.toFixed(1)}px`);
+      }
+    }
+    return out.slice(0, 6);
+  });
+  assert(!barCollisions.length, `${label}: stats bar rows collide with the next column: ${barCollisions.join(', ')}`);
   const outlookLayout = await page.evaluate(() => {
     const rect = (selector) => {
       const element = document.querySelector(selector);
