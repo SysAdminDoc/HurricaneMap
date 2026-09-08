@@ -32,7 +32,24 @@ assert.equal(settings.locale, 'es');
 assert.equal(settings.onboarded, true);
 assert.equal(Object.hasOwn(settings, 'unknownKey'), false);
 
-assert.deepEqual(normalizeSettings(null), normalizeSettings({}));
+// Spelled out rather than normalizeSettings(null) === normalizeSettings({}),
+// which only proved the two arguments agree and would have stayed green if
+// every default changed at once.
+assert.deepEqual(normalizeSettings(null), {
+  windUnit: 'kt',
+  theme: 'dark',
+  palette: 'default',
+  damageMode: 'real',
+  nhcForecastCone: true,
+  nhcOutlook: true,
+  marineWarnings: false,
+  goesRealtime: false,
+  locale: 'en',
+  highContrast: false,
+  reducedMotion: false,
+  onboarded: false,
+});
+assert.deepEqual(normalizeSettings({}), normalizeSettings(null));
 
 const legacy = migrateSettingsRecord({ windUnit: 'mph', locale: 'es', unknownKey: 'ignored' });
 assert.equal(legacy.status, 'legacy');

@@ -22,12 +22,26 @@ import {
   getComparisonRows,
 } from '../src/compare-rows.js';
 
-for (const category of [-1, 0, 1, 2, 3, 4, 5]) {
-  assert.equal(categoryLabel(category), presentCategory(category));
-  assert.equal(
-    publicationCategoryLabel(category),
-    presentCategory(category, { style: 'short', missing: '' }),
-  );
+// Literal expectations, not `labelA(x) === labelB(x)`. Comparing two functions
+// proves they delegate to each other and nothing about what either returns, so
+// both could drift together and stay green.
+// [category, display label, publication label]. The publication style drops the
+// "Cat " prefix because a CSV column is already titled Category, which is a
+// real difference between the two and one that comparing the two functions to
+// each other could never have shown.
+const CATEGORY_LABELS = [
+  [-1, 'TS', 'TS'],
+  [0, 'TD', 'TD'],
+  [1, 'Cat 1', '1'],
+  [2, 'Cat 2', '2'],
+  [3, 'Cat 3', '3'],
+  [4, 'Cat 4', '4'],
+  [5, 'Cat 5', '5'],
+];
+for (const [category, display, publication] of CATEGORY_LABELS) {
+  assert.equal(presentCategory(category), display, `presentCategory(${category})`);
+  assert.equal(categoryLabel(category), display, `categoryLabel(${category})`);
+  assert.equal(publicationCategoryLabel(category), publication, `publicationCategoryLabel(${category})`);
 }
 assert.equal(presentCategory(null), '—');
 assert.equal(presentCategory(6, { style: 'short', missing: '' }), '');
@@ -39,7 +53,11 @@ assert.equal(presentWind(100, { unit: 'mph' }), '115 mph');
 assert.equal(presentWind(100, { unit: 'kmh', decimals: 1 }), '185.2 km/h');
 assert.equal(presentWind(null), '—');
 assert.equal(convertWindKnots(100, 'mph'), 115.07799999999999);
-assert.equal(ktToMph(100), roundMetric(convertWindKnots(100, 'mph')));
+// 100 kt is 115.078 mph, rounded to 115. Deriving the expected value by
+// calling the converter would have made this pass for any conversion factor.
+assert.equal(ktToMph(100), 115);
+assert.equal(ktToMph(64), 74);
+assert.equal(presentWind(64, { unit: 'mph' }), '74 mph');
 
 assert.equal(presentNumber(108.75, 1), '108.8');
 assert.equal(presentNumber(null, 1), '—');
