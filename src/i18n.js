@@ -101,7 +101,32 @@ export function getDateLocale(locale = currentLocale) {
 // `numeric: 'auto'` is what turns 0 into "today" and -1 into "yesterday", so a
 // caller that wants those words asks for it, and a caller that wants a count
 // every time asks for 'always'.
+// ICU carries no data for Haitian Creole, so the fr-HT mapping that keeps dates
+// working answers in French, and a Creole reader was shown "il y a 3 j" where
+// the catalog had said "sa gen 3 jou". Taking the words from the language is
+// right everywhere ICU knows the language. Where it does not, they have to come
+// from somewhere, and for this one the rule is trivial: Kreyol marks no
+// agreement on number, so a single pattern per unit is correct for every count.
+// That is the rule ICU would encode if it carried the locale, not a per-locale
+// guess at plurals of the kind the catalog keys were.
+const HT_RELATIVE_UNITS = { minute: 'min', hour: 'èdtan', day: 'jou' };
+
+function formatCreoleRelativeTime(value, unit, numeric) {
+  const word = HT_RELATIVE_UNITS[unit];
+  if (!word) return null;
+  const count = Math.abs(value);
+  if (numeric === 'auto' && count === 0) return unit === 'day' ? 'jodi a' : null;
+  return value < 0 ? `sa gen ${count} ${word}` : `nan ${count} ${word}`;
+}
+
 export function formatRelativeTime(value, unit, { numeric = 'always' } = {}) {
+  // A shared export reached from more than one panel, so a value that cannot be
+  // formatted says nothing rather than throwing the panel away with it.
+  if (!Number.isFinite(value)) return '';
+  if (currentLocale === LOCALE_HT) {
+    const creole = formatCreoleRelativeTime(value, unit, numeric);
+    if (creole) return creole;
+  }
   return new Intl.RelativeTimeFormat(getDateLocale(), { numeric, style: 'short' })
     .format(value, unit);
 }

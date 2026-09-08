@@ -263,11 +263,15 @@ for (const contract of localizedSurfaceContracts) {
     ['en', 45 * 60_000, /^45 min/],
     ['es', DAY, /^hace 1 d$/],
     ['es', 2 * DAY, /^hace 2 d$/],
-    // ICU has no Haitian Creole, so this resolves through fr-HT the way dates
-    // do. French puts U+00A0 between the number and the unit, not a plain
-    // space, which is why these two patterns say \s and the others do not.
-    ['ht', DAY, /^il y a 1\sj$/],
-    ['ht', 2 * DAY, /^il y a 2\sj$/],
+    // ICU has no Haitian Creole. Dates resolve through fr-HT because a French
+    // date is at least a date, but a French sentence is not Creole, and these
+    // used to assert "il y a 1 j" for a reader who reads Kreyol. The words come
+    // from the one place they can, and the language makes that cheap: no
+    // agreement on number, so the same pattern is right for every count.
+    ['ht', DAY, /^sa gen 1 jou$/],
+    ['ht', 2 * DAY, /^sa gen 2 jou$/],
+    ['ht', 45 * 60_000, /^sa gen 45 min$/],
+    ['ht', 5 * 3_600_000, /^sa gen 5 èdtan$/],
   ];
   for (const [locale, age, expected] of cases) {
     await loadLocale(locale);
