@@ -642,8 +642,15 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // A registry keyed by element never matched, so every re-render added another
 // pair still rendering into a node that had been thrown away. The unit test
 // pins the registry; this pins the thing a reader actually does.
-// WCAG 2.2 SC 2.4.7: a keyboard user has to be able to see where they are, in
-// every theme. Nothing else measured that.
+// WCAG 2.2 SC 2.4.7 asks that a keyboard user can see where they are, and SC
+// 1.4.11 puts a number on "see": 3:1 against what is behind it. Nothing else
+// measured either, and the first version of this measured only whether a ring
+// was declared at all, which passed three ways it should not have. A shadow of
+// "0px 0px 0px 0px" paints nothing and passed. A ring at alpha 0.01 passed. A
+// two-layer shadow whose second layer was transparent failed a plainly visible
+// first layer, because the test read the whole string at once. Measuring the
+// contrast of each layer against the surface behind it answers all three, and
+// it caught what presence could not: the default dark theme's ring was 1.70:1.
 //
 // The accessibility layer ends with one focus block whose !important flags
 // suppress roughly fifteen per-control focus rules above it in the same layer,
@@ -659,6 +666,8 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // Read after the transition settles. Straight after focus() the computed
 // box-shadow is still the transition's transparent starting value, which reads
 // as "this control has no focus ring" for every control in the app.
+const MINIMUM_FOCUS_RING_RATIO = 3;
+
 async function assertFocusIndicatorInEveryTheme(browser, baseUrl) {
   const targets = [
     ['icon button', '#toggle-filters'],
@@ -702,36 +711,131 @@ async function assertFocusIndicatorInEveryTheme(browser, baseUrl) {
         }, selector);
         assert(focused, `${label}: ${name} (${selector}) is not on screen, so its focus ring cannot be measured`);
         await page.waitForTimeout(600);
-        const ring = await page.evaluate(() => {
+        const ring = await page.evaluate(minimum => {
           const element = document.querySelector('[data-hm-focus-probe="1"]');
           const style = getComputedStyle(element);
-          const opaque = color => !/rgba\([^)]*,\s*0\s*\)/.test(color) && color !== 'transparent';
-          // Either a real outline, or a shadow with somewhere to be seen: a
-          // width, a spread or an offset, painted in a colour that is not
-          // fully transparent.
-          const outlined = style.outlineStyle !== 'none'
-            && Number.parseFloat(style.outlineWidth) > 0
-            && opaque(style.outlineColor);
-          const shadowed = style.boxShadow !== 'none'
-            && opaque(style.boxShadow)
-            && /(?:^|\s)(?!0px\s+0px\s+0px\s+0px)(-?\d*\.?\d+px\s+){2,3}-?\d*\.?\d+px/.test(style.boxShadow);
+
+          const parse = value => {
+            const text = String(value || '').trim();
+            if (!text || text === 'transparent' || text === 'none') return null;
+            const rgb = text.match(/^rgba?\(([^)]*)\)/i);
+            if (!rgb) return { unsupported: text };
+            const numbers = rgb[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+            if (numbers.length < 3 || numbers.some(Number.isNaN)) return { unsupported: text };
+            return { r: numbers[0], g: numbers[1], b: numbers[2], a: numbers.length > 3 ? numbers[3] : 1 };
+          };
+          const over = (front, back) => ({
+            r: front.r * front.a + back.r * (1 - front.a),
+            g: front.g * front.a + back.g * (1 - front.a),
+            b: front.b * front.a + back.b * (1 - front.a),
+            a: 1,
+          });
+          const channel = value => {
+            const normalized = value / 255;
+            return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+          };
+          const luminance = color => 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
+          const ratio = (a, b) => {
+            const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+            return (high + 0.05) / (low + 0.05);
+          };
+
+          const surfaceOf = node => {
+            const nodeStyle = getComputedStyle(node);
+            const image = String(nodeStyle.backgroundImage || '');
+            if (image.includes('gradient')) {
+              // The darkest stop is the one the ring has to survive.
+              const stops = (image.match(/rgba?\([^)]*\)|#[\da-f]{3,8}\b/gi) || []).map(parse).filter(stop => stop && !stop.unsupported);
+              if (stops.length) return stops.reduce((worst, stop) => (luminance(stop) < luminance(worst) ? stop : worst));
+            }
+            return parse(nodeStyle.backgroundColor);
+          };
+          const opaqueBackdrop = start => {
+            const white = { r: 255, g: 255, b: 255, a: 1 };
+            let stack = [];
+            for (let host = start; host; host = host.parentElement) {
+              const surface = surfaceOf(host);
+              if (!surface || surface.unsupported) continue;
+              if (surface.a <= 0) continue;
+              stack.push(surface);
+              if (surface.a >= 1) break;
+            }
+            if (!stack.length) return white;
+            return stack.reverse().reduce((back, front) => (front.a >= 1 ? front : over(front, back)), white);
+          };
+
+          // Top-level commas only: a layer's colour carries its own.
+          const splitLayers = text => {
+            const layers = [];
+            let depth = 0;
+            let current = '';
+            for (const character of String(text)) {
+              if (character === '(') depth += 1;
+              if (character === ')') depth -= 1;
+              if (character === ',' && depth === 0) { layers.push(current); current = ''; continue; }
+              current += character;
+            }
+            if (current.trim()) layers.push(current);
+            return layers.map(layer => layer.trim()).filter(Boolean);
+          };
+
+          // An outset ring is painted over whatever is behind the element; an
+          // inset one over the element's own background.
+          const outerBackdrop = opaqueBackdrop(element.parentElement);
+          const innerSurface = surfaceOf(element);
+          const insetBackdrop = innerSurface && !innerSurface.unsupported && innerSurface.a > 0
+            ? over(innerSurface, outerBackdrop)
+            : outerBackdrop;
+
+          const candidates = [];
+          const unsupported = [];
+
+          if (style.outlineStyle !== 'none' && Number.parseFloat(style.outlineWidth) > 0) {
+            const color = parse(style.outlineColor);
+            if (color?.unsupported) unsupported.push(`outline-color ${color.unsupported}`);
+            else if (color) candidates.push({ what: 'outline', ratio: ratio(over(color, outerBackdrop), outerBackdrop) });
+          }
+
+          if (style.boxShadow && style.boxShadow !== 'none') {
+            for (const layer of splitLayers(style.boxShadow)) {
+              const inset = /\binset\b/.test(layer);
+              const color = parse(layer);
+              if (color?.unsupported) { unsupported.push(`box-shadow ${color.unsupported}`); continue; }
+              if (!color) continue;
+              // A layer with no offset, no blur and no spread paints nothing,
+              // whatever colour it is written in.
+              const lengths = (layer.replace(/^rgba?\([^)]*\)/i, '').match(/-?\d*\.?\d+px/g) || []).map(Number.parseFloat);
+              if (!lengths.length || lengths.every(length => length === 0)) continue;
+              const backdrop = inset ? insetBackdrop : outerBackdrop;
+              candidates.push({ what: inset ? 'inset shadow' : 'shadow', ratio: ratio(over(color, backdrop), backdrop) });
+            }
+          }
+
+          const best = candidates.reduce((highest, candidate) => (candidate.ratio > highest.ratio ? candidate : highest), { what: 'nothing', ratio: 0 });
           const result = {
             focusVisible: element.matches(':focus-visible'),
             outline: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
-            boxShadow: style.boxShadow.slice(0, 70),
-            visible: outlined || shadowed,
+            boxShadow: style.boxShadow.slice(0, 90),
+            unsupported,
+            best: { what: best.what, ratio: Number(best.ratio.toFixed(2)) },
+            visible: best.ratio >= minimum,
           };
           element.blur();
           delete element.dataset.hmFocusProbe;
           return result;
-        });
+        }, MINIMUM_FOCUS_RING_RATIO);
         assert(
           ring.focusVisible,
           `${label}: ${name} did not match :focus-visible, so this measured the wrong state`,
         );
         assert(
+          !ring.unsupported.length,
+          `${label}: ${name} paints its focus ring in a colour this gate cannot measure (${ring.unsupported.join(', ')})`,
+        );
+        assert(
           ring.visible,
-          `${label}: ${name} has no visible focus indicator (${ring.outline}; shadow ${ring.boxShadow})`,
+          `${label}: ${name} draws a focus indicator of only ${ring.best.ratio}:1 (${ring.best.what}), under ${MINIMUM_FOCUS_RING_RATIO}:1`
+          + ` — outline ${ring.outline}; shadow ${ring.boxShadow}`,
         );
       }
     } finally {
@@ -793,7 +897,9 @@ async function assertHoverTreatmentFollowsTheTheme(browser, baseUrl) {
   // The default theme must NOT land on the token the accessibility rule forces.
   // Comparing the two themes to each other proves nothing, because that token
   // has a different value in each of them.
-  const normalize = value => String(value).replace(/s+/g, '');
+  // \s, not s. Written without the backslash this stripped the letter s out of
+  // the colour strings and normalised nothing at all.
+  const normalize = value => String(value).replace(/\s+/g, '');
   assert(
     normalize(standard.hovered) !== normalize(standard.forced),
     `the default theme still hovers to the high-contrast token, so the rule is unscoped: ${standard.hovered}`,
@@ -808,8 +914,19 @@ async function assertHoverTreatmentFollowsTheTheme(browser, baseUrl) {
 // at 1024px and again at 1378px the header read "...Atlas · 595 st", cut
 // through a word. Either the text fits or it ends in an ellipsis; a clipped
 // word with neither is the defect.
+// Displays whose clientWidth and scrollWidth describe a real content area.
+// Anything else, display: contents and plain inline included, reports 0 for
+// both and would read as "this text fits".
+const MEASURABLE_DISPLAYS = new Set([
+  'block', 'flex', 'grid', 'inline-block', 'inline-flex', 'inline-grid',
+  'flow-root', 'list-item', 'table', 'table-cell', 'table-row', 'table-caption',
+]);
+
 async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
-  const widths = [1024, 1280, 1378, 1440];
+  // 390 is in the list because the context rail is hidden below 720px, which
+  // is the one width where the totals leave the shell entirely.
+  const widths = [1440, 1378, 1280, 1024, 390];
+  let railTotals = [];
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await seedSettings(context, { onboarded: true, theme: 'dark', locale, reducedMotion: true });
   await stubQuietTropics(context);
@@ -820,7 +937,8 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
     for (const width of widths) {
       await page.setViewportSize({ width, height: 960 });
       await page.waitForFunction(target => window.innerWidth === target, width);
-      const measured = await page.evaluate(() => {
+      const measured = await page.evaluate(MEASURABLE_DISPLAYS_LIST => {
+        const MEASURABLE_DISPLAYS = new Set(MEASURABLE_DISPLAYS_LIST);
         const describe = element => {
           const style = getComputedStyle(element);
           return {
@@ -842,8 +960,19 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
           // both read 0 and the comparison below says "fits" however far the
           // text actually runs. That is the measurement failing, not the header
           // passing, so it is reported instead of skipped.
+          // scrollWidth and clientWidth are only meaningful on a box that has
+          // a content area. display: contents has no box at all, and an inline
+          // box returns 0 for both by spec, so either reads as "fits" however
+          // far its text runs. Only display: contents was refused before, and
+          // the spans in this list avoid the inline case solely because
+          // .subtitle is a flex container, which blockifies them: the exact
+          // property this is meant to be robust against.
           boxless: visible
-            .filter(element => (element.textContent || '').trim() && !element.getClientRects().length)
+            .filter(element => {
+              if (!(element.textContent || '').trim()) return false;
+              if (!element.getClientRects().length) return true;
+              return !MEASURABLE_DISPLAYS.has(getComputedStyle(element).display);
+            })
             .map(describe),
           cut: visible
             .filter(element => {
@@ -867,32 +996,69 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
             })
             .map(describe),
         };
-      });
+      }, [...MEASURABLE_DISPLAYS]);
       assert(
         !measured.boxless.length,
         `[${locale}] header text has no box to measure at ${width}px: ${JSON.stringify(measured.boxless)}`,
       );
       assert(!measured.cut.length, `[${locale}] header text is cut with no ellipsis at ${width}px: ${JSON.stringify(measured.cut)}`);
 
-      // Positive control, and at every width rather than only the last one: the
+      // Positive control, at every width rather than only the last one: the
       // subtitle has to have text on screen, or the loop above passed on an
       // empty header, and the totals it used to carry have to still be
-      // somewhere a reader can see them, which is now the context rail.
-      // textContent on its own kept saying yes to a rail that layout had
-      // collapsed, so this reads the rendered box as well as the string.
+      // somewhere a reader can reach.
+      //
+      // Three earlier versions of this were weaker than they read. textContent
+      // alone said yes to a rail layout had collapsed. Measuring a rect said
+      // yes to a rail inside an overflow:hidden box of zero height, and to one
+      // at opacity 0, because it read the count's own box and nothing above it.
+      // And it ran only at desktop widths, where the rail is always shown.
       const survivors = await page.evaluate(() => {
+        const intersect = (a, b) => {
+          const left = Math.max(a.left, b.left);
+          const right = Math.min(a.right, b.right);
+          const top = Math.max(a.top, b.top);
+          const bottom = Math.min(a.bottom, b.bottom);
+          return right - left > 1 && bottom - top > 1 ? { left, right, top, bottom } : null;
+        };
         const rendered = element => {
           if (!element) return null;
-          const style = getComputedStyle(element);
-          const rect = element.getBoundingClientRect();
+          const text = (element.textContent || '').trim();
+          // checkVisibility covers display, visibility and opacity: 0 on the
+          // element and its ancestors.
+          const displayed = element.checkVisibility
+            ? element.checkVisibility({ opacityProperty: true, visibilityProperty: true, contentVisibilityAuto: true })
+            : getComputedStyle(element).visibility !== 'hidden';
+          let box = element.getBoundingClientRect();
+          let opacity = 1;
+          let clipped = false;
+          for (let host = element; host; host = host.parentElement) {
+            const style = getComputedStyle(host);
+            opacity *= Number.parseFloat(style.opacity);
+            if (host === element) continue;
+            // A scroll container with no room clips its child out of sight
+            // while the child keeps a box of its own.
+            if (style.overflow !== 'visible' || style.overflowX !== 'visible' || style.overflowY !== 'visible') {
+              const next = box && intersect(box, host.getBoundingClientRect());
+              if (!next) { clipped = true; break; }
+              box = next;
+            }
+          }
+          const viewport = { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
           return {
-            text: (element.textContent || '').trim(),
-            visible: style.visibility !== 'hidden' && rect.width > 1 && rect.height > 1,
-            onScreen: rect.left < window.innerWidth && rect.right > 0 && rect.top < window.innerHeight && rect.bottom > 0,
+            text,
+            visible: Boolean(displayed && !clipped && box && opacity > 0.05 && box.right - box.left > 1 && box.bottom - box.top > 1),
+            onScreen: Boolean(box && !clipped && intersect(box, viewport)),
           };
         };
         return {
           subtitle: rendered(document.querySelector('.app-header .subtitle')),
+          // The count element, not the whole rail: the rail also carries the
+          // year range, and taking the first two numbers off the rail took
+          // 1851 and 2025, which the Statistics panel prints too, so the mobile
+          // check below compared the wrong pair and passed while the totals
+          // were gone. Visibility still accounts for the rail, because
+          // rendered() walks the ancestors.
           counts: rendered(document.querySelector('.atlas-context-rail #storm-count')),
         };
       });
@@ -901,9 +1067,35 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
         `[${locale}] the subtitle has no visible text to clip at ${width}px, so the check above proves nothing: ${JSON.stringify(survivors.subtitle)}`,
       );
       assert(
-        survivors.counts?.visible && survivors.counts.onScreen && /\d[\d,]*\D+\d[\d,]*/.test(survivors.counts.text),
-        `[${locale}] the totals did not survive the move out of the header at ${width}px: ${JSON.stringify(survivors.counts)}`,
+        survivors.counts?.visible === Boolean(width > 720),
+        `[${locale}] the context rail is ${survivors.counts?.visible ? 'shown' : 'hidden'} at ${width}px, which is not what the layout says: ${JSON.stringify(survivors.counts)}`,
       );
+
+      if (survivors.counts?.visible) {
+        const numbers = survivors.counts.text.match(/\d[\d,]*/g) || [];
+        assert(
+          survivors.counts.onScreen && numbers.length >= 2,
+          `[${locale}] the totals did not survive the move out of the header at ${width}px: ${JSON.stringify(survivors.counts)}`,
+        );
+        railTotals = numbers.slice(0, 2);
+      } else {
+        // Below 720px the rail is hidden on purpose, and the totals it carries
+        // are then on no part of the shell at all. They are still one tap away
+        // in the Statistics panel, and that is the claim being made, so it is
+        // the claim that gets checked rather than assumed.
+        assert(railTotals.length === 2, `[${locale}] no desktop width ran before ${width}px, so there is nothing to compare the mobile totals against`);
+        await page.click('#toggle-stats');
+        await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 });
+        const statsText = await page.evaluate(() => (document.querySelector('#stats-panel')?.textContent || '').replace(/\s+/g, ' ').trim());
+        for (const total of railTotals) {
+          assert(
+            statsText.includes(total),
+            `[${locale}] at ${width}px the rail is hidden and the Statistics panel does not carry ${total} either, so the totals are on no surface: ${statsText.slice(0, 160)}`,
+          );
+        }
+        await page.click('#toggle-stats');
+        await page.waitForFunction(() => document.querySelector('#stats-panel')?.hidden === true, null, { timeout: 10_000 });
+      }
     }
   } finally {
     await context.close();
@@ -3087,9 +3279,9 @@ async function assertForcedColorsContract(browser, baseUrl) {
       const panels = await import('/src/panels.js');
       panels.closeAllPanels();
     });
-    // All eight, not the two that happen to be on screen. The other six had no
-    // test at all, so the only evidence they were fixed was that the CSS had
-    // been written. Each is built here with the class the app gives it, because
+    // All nine, not the two that happen to be on screen. The rest had no test
+    // at all, so the only evidence they were fixed was that the CSS had been
+    // written. Each is built here with the class the app gives it, because
     // the rule is keyed on the class and several of them only exist while a
     // panel that is not open would be.
     const dataSwatches = await page.evaluate(() => {

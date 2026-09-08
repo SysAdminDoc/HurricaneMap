@@ -5,12 +5,19 @@
 // distributed. This stages the profile, archives it, and writes the SHA-256 a
 // reader needs to check what they downloaded.
 //
-// The archive is byte-reproducible: entries sorted by name, and every
-// timestamp, owner and mode fixed. Two runs from the same commit produce the
-// same hash, which is the only reason publishing a hash beside the file is
-// worth anything. (GNU tar 1.35 already writes a zero gzip mtime field, so
-// nothing here has to ask it to; that was checked rather than assumed, and an
-// inert GZIP=-n was dropped after.)
+// The archive is reproducible for the things tar is told to fix: entries sorted
+// by name, and every timestamp and owner pinned. Two runs from the same commit
+// on the same machine produce the same hash, which is the only reason
+// publishing a hash beside the file is worth anything. (GNU tar 1.35 already
+// writes a zero gzip mtime field, so nothing here has to ask it to; that was
+// checked rather than assumed, and an inert GZIP=-n was dropped after.)
+//
+// Two things it does NOT fix, said plainly because an earlier version of this
+// comment claimed otherwise. Permission bits come from the staging filesystem;
+// there is no --mode here, and nothing in this repository is tracked
+// executable, so it has not mattered yet. And --gzip delegates to whatever
+// zlib the local tar was built against, so a different tar build can compress
+// the same bytes differently.
 //
 // --verify builds it twice and compares, which catches the archive picking up
 // the build clock. It cannot catch entry order, because readdir returns the
@@ -31,10 +38,13 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // GNU tar. bsdtar, which is what ships in Windows itself, has no --sort and
 // writes entries in readdir order, so the archive would differ between machines
 // for the same input and the published hash would be a lie.
-export function resolveGnuTar(candidates = ['tar', 'bsdtar']) {
+// `probe` is injected so the refusal can be tested. Without it the only path a
+// test could reach on a machine where `tar` IS GNU tar was the "command not
+// found" one, and deleting the GNU check outright left the suite green.
+export function resolveGnuTar(candidates = ['tar', 'bsdtar'], probe = command => execFileSync(command, ['--version'], { encoding: 'utf8' })) {
   for (const candidate of candidates) {
     try {
-      const version = execFileSync(candidate, ['--version'], { encoding: 'utf8' }).split('\n')[0];
+      const version = String(probe(candidate)).split('\n')[0];
       if (/GNU tar/i.test(version)) return { command: candidate, version: version.trim() };
     } catch {
       // Not on PATH, or not a tar at all. Try the next one.

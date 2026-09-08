@@ -137,12 +137,19 @@ if (claude && /ALL FIXES DEFERRED|all version strings synced at 1\.5\.0/.test(cl
   } else {
     // Every mention has to be the pin, not just one of them: a README naming
     // both the right version and a stale one passed the old substring test.
-    const named = [...readme.matchAll(/Cesium (\d+\.\d+(?:\.\d+)?)/g)].map(match => match[1]);
+    // "CesiumJS", a "v" prefix and a line break between the name and the number
+    // all named a version the first pattern here walked straight past, and
+    // "1.145.0" against a pin of "1.145" failed a README that was right.
+    const named = [...readme.matchAll(/Cesium(?:JS)?\s+v?(\d+(?:\.\d+){1,2})/gi)].map(match => match[1]);
+    const sameVersion = (a, b) => {
+      const parts = value => value.split('.').map(Number).concat([0, 0]).slice(0, 3);
+      return parts(a).every((part, index) => part === parts(b)[index]);
+    };
     if (!named.length) {
       errors.push(`README names no Cesium version; the reviewed pin is ${cesium}`);
     }
     for (const mention of new Set(named)) {
-      if (mention !== cesium) {
+      if (!sameVersion(mention, cesium)) {
         errors.push(`README names Cesium ${mention} but the reviewed pin is ${cesium}`);
       }
     }
@@ -164,16 +171,23 @@ if (license && (!license.includes('In APA form:') || !license.includes('```bibte
 // version bump leaves every one of them pointing at the previous release. The
 // README is where people arrive, so a stale link there hands them the old build.
 {
-  const linked = new Set([
-    ...[...readme.matchAll(/releases\/download\/v(\d+\.\d+\.\d+)\//g)].map(match => match[1]),
-    ...[...readme.matchAll(/hurricanemap-(\d+\.\d+\.\d+)-(?:core|full)\b/g)].map(match => match[1]),
-  ]);
-  if (!linked.size) {
-    errors.push('README no longer links the release downloads, which is the only place the offline builds are published');
+  // An actual asset URL has to be there. Counting bare filenames meant a
+  // Download section made entirely of a `tar -xzf hurricanemap-1.9.3-core.tar.gz`
+  // fence, with no link at all, satisfied the check.
+  const assetUrls = [...readme.matchAll(/releases\/download\/v(\d+\.\d+\.\d+)\//g)].map(match => match[1]);
+  if (!assetUrls.length) {
+    errors.push('README links no release asset, which is the only place the offline builds are published');
   }
-  for (const linkedVersion of linked) {
-    if (linkedVersion !== version) {
-      errors.push(`README links the v${linkedVersion} download but this is v${version}`);
+  // Filenames and release-page links go stale the same way an asset URL does,
+  // so every version the README writes down has to be this one.
+  const mentioned = new Set([
+    ...assetUrls,
+    ...[...readme.matchAll(/hurricanemap-(\d+\.\d+\.\d+)-(?:core|full)\b/g)].map(match => match[1]),
+    ...[...readme.matchAll(/releases\/tag\/v(\d+\.\d+\.\d+)\b/g)].map(match => match[1]),
+  ]);
+  for (const mentionedVersion of mentioned) {
+    if (mentionedVersion !== version) {
+      errors.push(`README points at v${mentionedVersion} but this is v${version}`);
     }
   }
 }

@@ -922,19 +922,24 @@ for (const entry of await readdir(radarRoot, { withFileTypes: true, recursive: t
   radarFilesOnDisk.push(path.relative(radarRoot, absolute).split(path.sep).join('/'));
 }
 const radarFileSet = new Set(radarFilesOnDisk);
-const toArchivePath = frame => String(frame).split('\\').join('/');
-// A manifest entry written with Windows separators names a file that is really
-// there. That used to be reported twice, once as an unreferenced file and once
-// as a missing frame, when it is one defect and it lives in the manifest.
-const referencedArchivePaths = new Set([...referencedRadarFrames].map(toArchivePath));
+// Separators, a leading "./" and letter case are all ways of writing the same
+// path. A manifest entry that differs from the file only in one of those names
+// a file that is really there, and it is one defect, in the manifest. Reporting
+// it as both an unreferenced file and a missing frame is what this untangles,
+// and making the extension scan case-insensitive without this brought the
+// double report straight back for a name that differed only in case.
+const toArchivePath = frame => String(frame).split('\\').join('/').replace(/^\.\//, '');
+const canonical = frame => toArchivePath(frame).toLowerCase();
+const diskByCanonical = new Map(radarFilesOnDisk.map(file => [canonical(file), file]));
+const referencedCanonical = new Set([...referencedRadarFrames].map(canonical));
 for (const file of radarFilesOnDisk) {
-  if (!referencedArchivePaths.has(file)) fail(`data/radar/${file} is not referenced by data/radar/manifest.json`);
+  if (!referencedCanonical.has(canonical(file))) fail(`data/radar/${file} is not referenced by data/radar/manifest.json`);
 }
 for (const frame of referencedRadarFrames) {
   if (radarFileSet.has(frame)) continue;
-  const archivePath = toArchivePath(frame);
-  if (radarFileSet.has(archivePath)) {
-    fail(`data/radar/manifest.json writes ${frame} with a Windows separator; the archive path is ${archivePath}`);
+  const onDisk = diskByCanonical.get(canonical(frame));
+  if (onDisk) {
+    fail(`data/radar/manifest.json writes ${frame}, but the file on disk is ${onDisk}; the manifest has to name it exactly`);
   } else {
     fail(`data/radar/manifest.json references a missing frame: ${frame}`);
   }

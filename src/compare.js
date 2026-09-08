@@ -28,10 +28,10 @@ const L = window.L;
 // panel behind the chip flips with the theme, the basemap under the track does
 // not, so a single value cannot read on both.
 const PIN_SLOTS = Object.freeze([
-  { token: '--pin-1', fallback: '#cba6f7', trackToken: '--pin-1-track', trackFallback: '#5b0f9e' },
-  { token: '--pin-2', fallback: '#74c7ec', trackToken: '--pin-2-track', trackFallback: '#0a3fa8' },
-  { token: '--pin-3', fallback: '#fab387', trackToken: '--pin-3-track', trackFallback: '#8c3200' },
-  { token: '--pin-4', fallback: '#a6e3a1', trackToken: '--pin-4-track', trackFallback: '#0f5a13' },
+  { token: '--pin-1', fallback: '#cba6f7', trackToken: '--pin-1-track', trackFallback: '#4d0b86' },
+  { token: '--pin-2', fallback: '#74c7ec', trackToken: '--pin-2-track', trackFallback: '#08347f' },
+  { token: '--pin-3', fallback: '#fab387', trackToken: '--pin-3-track', trackFallback: '#6e2600' },
+  { token: '--pin-4', fallback: '#a6e3a1', trackToken: '--pin-4-track', trackFallback: '#0c4a10' },
 ]);
 
 // One pin per slot, so the capacity is the palette. Keeping these two in step

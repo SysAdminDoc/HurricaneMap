@@ -117,7 +117,7 @@ Every release carries two offline builds. Neither needs Node, npm or a clone, an
 | `core` | [`hurricanemap-1.9.3-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-core.tar.gz) (5.7 MB) | 23.5 MB | The whole historical atlas: 595 storms, 759 landfalls, every panel and export |
 | `full` | [`hurricanemap-1.9.3-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-full.tar.gz) (491 MB) | 526 MB | Everything in `core` plus the 1,703 archived NEXRAD radar frames |
 
-Both archives are byte-reproducible: build one yourself with `npm run dist:package` and you get the same SHA-256. The sums are published beside them in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/SHA256SUMS.txt), so a download can be checked with the tool you already have.
+Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/SHA256SUMS.txt), which is what to check a download against.
 
 ```bash
 tar -xzf hurricanemap-1.9.3-core.tar.gz

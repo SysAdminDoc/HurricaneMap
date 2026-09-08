@@ -52,12 +52,20 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   assert.equal(archiveName(version, 'full'), `hurricanemap-${version}-full.tar.gz`);
 }
 
-// bsdtar is refused however it is spelled. It cannot sort entries, so it cannot
-// produce the archive whose hash gets published.
+// bsdtar is refused. It cannot sort entries, so it cannot produce the archive
+// whose hash gets published. The version string is injected rather than read
+// from PATH: on a machine where `tar` really is GNU tar, the only branch a test
+// could otherwise reach was "command not found", and removing the GNU check
+// entirely left this file green.
 {
+  const bsd = () => 'bsdtar 3.7.2 - libarchive 3.7.2 zlib/1.2.12';
+  const gnu = () => 'tar (GNU tar) 1.35\nCopyright (C) 2023 Free Software Foundation, Inc.';
+  assert.equal(resolveGnuTar(['tar', 'bsdtar'], bsd), null, 'bsdtar must be refused');
+  assert.equal(resolveGnuTar(['tar'], gnu)?.version, 'tar (GNU tar) 1.35');
+  // The second candidate is reached when the first is not a tar at all.
+  const mixed = command => (command === 'tar' ? bsd() : gnu());
+  assert.equal(resolveGnuTar(['tar', 'bsdtar'], mixed)?.command, 'bsdtar');
   assert.equal(resolveGnuTar(['definitely-not-a-tar-command']), null);
-  const found = resolveGnuTar();
-  if (found) assert.match(found.version, /GNU tar/);
 }
 
 console.log('release packaging ok (notes extraction, version boundary, archive naming, tar flavour)');

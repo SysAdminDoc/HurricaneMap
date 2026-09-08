@@ -271,7 +271,9 @@ html.high-contrast {
   --border-strong: rgba(255, 255, 255, 0.38);
   --border-accent: currentColor;
   --focus-ring-color: var(--text);
-  --focus-ring-soft: 0 0 0 4px rgba(255, 255, 255, 0.34);
+  /* 0.34 measured 2.89:1 on black, under the 3:1 this mode is meant to exceed
+     comfortably. Opaque, it is 17:1 to 21:1. */
+  --focus-ring-soft: 0 0 0 4px #ffffff;
   --intensity-wind-line: var(--text);
   --intensity-pressure-line: var(--sapphire);
   --intensity-grid-line: var(--border-strong);

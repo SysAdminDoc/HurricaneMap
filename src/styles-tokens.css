@@ -66,14 +66,17 @@
      colour above has to be light there; the OpenStreetMap basemap is light in
      both themes (the dark theme only takes it to 0.86 brightness), so a track
      has to be dark in both. Sharing one token meant a dark-theme track measured
-     between 1.02:1 and 1.81:1 against the map. These four are the deepest of
-     the three sets, which is what carries the polyline's own 0.85 opacity:
-     3.81:1 at worst over the common OSM land, water, forest and building
-     fills, checked by check:track-contrast. */
-  --pin-1-track: #5b0f9e;
-  --pin-2-track: #0a3fa8;
-  --pin-3-track: #8c3200;
-  --pin-4-track: #0f5a13;
+     between 1.02:1 and 1.81:1 against the map. These four carry the polyline's
+     own 0.85 opacity and reach 3.80:1 at worst over the common OSM paper, land,
+     water, forest and building fills, in BOTH themes: check:track-contrast
+     applies the dark theme's own tile filter before measuring, because that
+     filter turns the forest fill from #add19e into #b3a8df and it is the
+     surface most readers see a track on. Measuring the raw fills instead put
+     the same palette at 3.13:1 there while reporting 3.81. */
+  --pin-1-track: #4d0b86;
+  --pin-2-track: #08347f;
+  --pin-3-track: #6e2600;
+  --pin-4-track: #0c4a10;
 
   /* Semantic status colors */
   --success: #a6e3a1;  /* green */
@@ -191,7 +194,12 @@
   --border-accent: rgba(180, 190, 254, 0.42);
   --shadow-theme-lg: 0 18px 60px rgba(0, 0, 0, 0.34);
   --focus-ring-color: rgba(180, 190, 254, 0.62);
-  --focus-ring-soft: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  /* 0.24 measured 1.70:1 against the app background and 1.75:1 on a panel,
+     against the 3:1 WCAG 2.2 asks of a focus indicator. The light and
+     high-contrast light rings were raised for exactly this reason and the two
+     dark ones were missed; 0.75 puts this at 5.76:1 to 6.31:1. The outline is
+     switched off for these controls, so this glow is the whole indicator. */
+  --focus-ring-soft: 0 0 0 3px rgba(180, 190, 254, 0.75);
   --intensity-wind-line: #cdd6f4;
   --intensity-pressure-line: #74c7ec;
   --intensity-grid-line: rgba(205, 214, 244, 0.20);
