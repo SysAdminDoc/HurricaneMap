@@ -30,6 +30,14 @@
   --blue:    #89b4fa;
   --lavender:#b4befe;
   --sapphire:#74c7ec;
+
+  /* The same three accents where they paint text, a marker or a chart stroke
+     instead of a surface sitting behind white text. High contrast has to move
+     ink and surface in opposite directions, so they cannot share one value. In
+     every other theme these follow the accent above and nothing changes. */
+  --ink-accent:   var(--lavender);
+  --ink-link:     var(--sapphire);
+  --ink-link-alt: var(--blue);
   --brand-title-start: #b4befe;
   --brand-title-end: #74c7ec;
   --sky:     #89dcfe;

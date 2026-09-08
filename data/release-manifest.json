@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "39649dad30d478246d03e8208bfdf8946fcf38c00464abe8345822383df9475e",
+      "sha256": "8de323274d0ce3d1a799da87b2dfe74cdf0d7aec5588301f4493bd1458c76349",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

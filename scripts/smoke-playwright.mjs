@@ -668,6 +668,66 @@ async function assertStormPanelContrast(browser, baseUrl) {
 // as "this control has no focus ring" for every control in the app.
 const MINIMUM_FOCUS_RING_RATIO = 3;
 
+// High contrast darkens the accent tokens so white text can sit on top of
+// them, which is the opposite of what accent-coloured TEXT needs on a
+// near-black page. While both roles shared one value, turning the
+// accessibility feature ON took the About dialog's headings from 9.87:1 to
+// 1.51:1 and its links from 9.35:1 to 2.56:1, so the toggle made this text
+// unreadable rather than clearer. Only the high-contrast profiles are asserted
+// here: the light theme's own link colour is below AA for a different reason
+// and has its own roadmap item.
+async function assertAboutDialogContrast(browser, baseUrl) {
+  const targets = [
+    ['about section heading', '#info-modal .info-card h3'],
+    ['about link', '#info-modal .info-card a'],
+  ];
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  await seedSettings(context, { onboarded: true, theme: 'dark', highContrast: true, reducedMotion: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  const pageErrors = [];
+  const covered = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.click('#toggle-info');
+    await page.waitForSelector('#info-modal:not([hidden]) .info-card h3');
+
+    for (const profile of [
+      { theme: 'dark', highContrast: true, minimum: 7 },
+      { theme: 'light', highContrast: true, minimum: 7 },
+    ]) {
+      await page.evaluate(async ({ theme, highContrast }) => {
+        const settings = await import('/src/settings.js');
+        settings.setSetting('theme', theme);
+        settings.setSetting('highContrast', highContrast);
+      }, profile);
+      await page.waitForFunction(
+        ({ theme, highContrast }) => document.documentElement.dataset.theme === theme &&
+          document.documentElement.classList.contains('high-contrast') === highContrast,
+        profile,
+      );
+      await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
+
+      const measured = await measureContrast(page, targets);
+      const label = `${profile.theme} + high contrast About dialog at 1440px`;
+      const missing = measured.filter(row => row.missing);
+      assert(!missing.length, `${label}: could not measure ${missing.map(row => row.selector).join(', ')}`);
+      const failed = measured.filter(row => row.ratio < profile.minimum);
+      assert(
+        !failed.length,
+        `${label}: below ${profile.minimum}:1 — ${failed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
+      );
+      covered.push(`${profile.theme}+hc >= ${profile.minimum}:1`);
+    }
+  } finally {
+    await context.close();
+  }
+  if (pageErrors.length) throw new Error(`about dialog contrast page errors: ${pageErrors.join(' | ')}`);
+  console.log(`about dialog contrast ok (${covered.join(', ')})`);
+}
+
 async function assertFocusIndicatorInEveryTheme(browser, baseUrl) {
   const targets = [
     ['icon button', '#toggle-filters'],
@@ -4784,6 +4844,7 @@ try {
   await assertForcedColorsContract(browser, baseUrl);
   await assertComparisonExportParity(browser, baseUrl);
   await assertStormPanelContrast(browser, baseUrl);
+  await assertAboutDialogContrast(browser, baseUrl);
   await assertFeedListenersDoNotAccumulate(browser, baseUrl);
   await assertSummaryServiceServesActiveStorms(browser, baseUrl);
   await assertRelayStillWinsForActiveStorms(browser, baseUrl);

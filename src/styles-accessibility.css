@@ -15,6 +15,14 @@ html.high-contrast {
   --blue:    #0047b2;  /* darkened for 7:1+ on white text */
   --lavender:#4a0080;
   --sapphire:#00539b;
+
+  /* Those three are darkened to carry white text on top of them. Text painted
+     IN an accent needs the opposite treatment on this near-black background,
+     so the ink tokens go light here. Measured against #000, #0a0a0a, #1a1a1a
+     and #2d2d2d: nothing below 8:1. */
+  --ink-accent:   #d0bfff;
+  --ink-link:     #9fdcff;
+  --ink-link-alt: #a8c7ff;
   --brand-title-start: #ffffff;
   --brand-title-end: #7dd3fc;
 
@@ -60,6 +68,13 @@ html.light-theme.high-contrast {
   --blue:    #0047b2;  /* same darker blue */
   --lavender:#4a0080;
   --sapphire:#00539b;
+
+  /* Here the page is white, so ink stays dark. The surface values are close to
+     right already; sapphire and blue are taken down far enough to clear 7:1 on
+     --surface0 (#d0d0d0) as well as on the white panels. */
+  --ink-accent:   #4a0080;
+  --ink-link:     #003d73;
+  --ink-link-alt: #003472;
   --brand-title-start: #000000;
   --brand-title-end: #0047b2;
 

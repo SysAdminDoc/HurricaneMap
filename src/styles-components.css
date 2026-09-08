@@ -83,7 +83,7 @@
   gap: 4px;
 }
 
-.active-storm-card a { color: var(--blue); }
+.active-storm-card a { color: var(--ink-link-alt); }
 
 @media (max-width: 720px) {
   .nhc-outlook-legend,
@@ -218,7 +218,7 @@
 }
 
 .filter-row--year.active-filter > label {
-  color: var(--blue);
+  color: var(--ink-link-alt);
 }
 
 input[type="number"], input[type="search"], select {
@@ -617,7 +617,7 @@ label > input[type="checkbox"] {
   min-width: 130px;
 }
 
-.tt-time { color: var(--lavender); font-size: 10px; margin-bottom: 4px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.tt-time { color: var(--ink-accent); font-size: 10px; margin-bottom: 4px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
 
 .tt-row { display: flex; justify-content: space-between; gap: 12px; line-height: 1.5; }
 
@@ -726,7 +726,7 @@ label > input[type="checkbox"] {
 }
 
 .similar-storm-score {
-  color: var(--lavender);
+  color: var(--ink-accent);
   font-weight: 600;
   font-size: 11px;
   text-align: right;
@@ -1210,7 +1210,7 @@ label > input[type="checkbox"] {
   color: var(--subtext);
 }
 
-.im-source a { color: var(--sapphire); }
+.im-source a { color: var(--ink-link); }
 
 .storm-events-host {
   margin-top: 10px;
@@ -1425,12 +1425,12 @@ label > input[type="checkbox"] {
 }
 
 .goes-source-link {
-  color: var(--sapphire);
+  color: var(--ink-link);
   text-decoration: none;
 }
 
 .goes-source-link:hover {
-  color: var(--lavender);
+  color: var(--ink-accent);
   text-decoration: underline;
 }
 
@@ -1592,7 +1592,7 @@ label > input[type="checkbox"] {
 }
 
 .otd-link:hover {
-  color: var(--lavender);
+  color: var(--ink-accent);
 }
 
 .otd-details {
@@ -1709,7 +1709,7 @@ label > input[type="checkbox"] {
 
 .info-card h2 { margin: 0 0 12px; font-size: 22px; }
 
-.info-card h3 { margin: 16px 0 6px; font-size: 13px; color: var(--lavender); }
+.info-card h3 { margin: 16px 0 6px; font-size: 13px; color: var(--ink-accent); }
 
 .info-card ul { padding-left: 20px; }
 
@@ -1911,7 +1911,7 @@ label > input[type="checkbox"] {
   margin-top: 16px;
 }
 
-.info-card a { color: var(--sapphire); }
+.info-card a { color: var(--ink-link); }
 
 .info-card code {
   background: var(--mantle);
@@ -1972,7 +1972,7 @@ label > input[type="checkbox"] {
   font-size: 10px;
 }
 
-.leaflet-control-attribution a { color: var(--sapphire); }
+.leaflet-control-attribution a { color: var(--ink-link); }
 
 .leaflet-control-zoom a {
   background: var(--mantle);
@@ -2507,7 +2507,7 @@ label > input[type="checkbox"] {
 }
 
 .fema-context-heading a,
-.fema-record-link { color: var(--sapphire); font-size: 0.68rem; }
+.fema-record-link { color: var(--ink-link); font-size: 0.68rem; }
 
 .fema-context-body,
 .fema-service-note,
@@ -2547,7 +2547,7 @@ label > input[type="checkbox"] {
 .fema-areas-label { color: var(--subtext); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; }
 .fema-state-list { display: grid; gap: 3px; }
 .fema-state-group { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 5px; color: var(--text); font-size: 0.68rem; line-height: 1.35; }
-.fema-state-group strong { color: var(--lavender); }
+.fema-state-group strong { color: var(--ink-accent); }
 .fema-state-group span { overflow-wrap: anywhere; }
 .fema-no-area { color: var(--subtext); font-size: 0.68rem; }
 .fema-record-link { justify-self: start; }
@@ -2625,7 +2625,7 @@ label > input[type="checkbox"] {
 }
 
 .hurricane-icon {
-  color: var(--lavender);
+  color: var(--ink-accent);
   animation: spinSmooth 2.5s cubic-bezier(0.4, 0.0, 0.2, 1.0) infinite;
 }
 
@@ -2865,7 +2865,7 @@ a, [role="button"] {
 }
 
 a:hover, [role="button"]:hover {
-  color: var(--lavender);
+  color: var(--ink-accent);
 }
 
 /* Phase 3: Better State Feedback */
@@ -4332,7 +4332,7 @@ select {
 
 .shortcut-group h3 {
   margin: 0 0 10px;
-  color: var(--lavender);
+  color: var(--ink-accent);
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -4448,7 +4448,7 @@ kbd {
 }
 
 .onb-step {
-  color: var(--sapphire);
+  color: var(--ink-link);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -7370,7 +7370,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 }
 
 .track-timeline > summary::marker,
-.track-timeline-observations > summary::marker { color: var(--lavender); }
+.track-timeline-observations > summary::marker { color: var(--ink-accent); }
 
 .track-timeline-count {
   color: var(--subtext);
@@ -7455,7 +7455,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 .info-card-source { font-size: 11px; color: var(--subtext); margin-top: 6px; }
 
-.info-card-source a { color: var(--sapphire); }
+.info-card-source a { color: var(--ink-link); }
 
 .enso-badge {
   display: inline-block;
@@ -7589,7 +7589,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 .wind-context-links,
 .wind-context-disclaimer { margin: 6px 0 0; font-size: 11px; color: var(--subtext); line-height: 1.4; }
 
-.wind-context-links a { color: var(--blue); }
+.wind-context-links a { color: var(--ink-link-alt); }
 
 .wind-context-disclaimer {
   border-left: 3px solid var(--yellow);
@@ -9315,7 +9315,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .forecast-skill-definition { color: var(--text); }
 
-.forecast-skill-sources a { color: var(--blue); }
+.forecast-skill-sources a { color: var(--ink-link-alt); }
 
 .advisory-replay-control,
 .cone-retro-control,
@@ -9359,7 +9359,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   line-height: 1.45;
 }
 
-.cone-retro-control .cone-retro-status { color: var(--blue); min-height: 1em; }
+.cone-retro-control .cone-retro-status { color: var(--ink-link-alt); min-height: 1em; }
 
 .advisory-replay-control p {
   margin: 0;
@@ -9368,7 +9368,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   line-height: 1.45;
 }
 
-.advisory-replay-control .cone-retro-status { color: var(--blue); min-height: 1em; }
+.advisory-replay-control .cone-retro-status { color: var(--ink-link-alt); min-height: 1em; }
 
 .advisory-replay-steps {
   display: grid;
@@ -9433,7 +9433,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .advisory-swatch--actual { background: var(--map-overlay-actual); }
 
-.advisory-replay-discussion a { color: var(--blue); }
+.advisory-replay-discussion a { color: var(--ink-link-alt); }
 
 .art-mode-control p {
   margin: 0;
@@ -9442,7 +9442,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   line-height: 1.45;
 }
 
-.art-mode-control .cone-retro-status { color: var(--lavender); min-height: 1em; }
+.art-mode-control .cone-retro-status { color: var(--ink-accent); min-height: 1em; }
 
 .art-mode-control select {
   min-height: 36px;
@@ -9533,7 +9533,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .prep-sources { display: flex; flex-wrap: wrap; gap: 8px 14px; }
 
-.prep-sources a { color: var(--blue); }
+.prep-sources a { color: var(--ink-link-alt); }
 
 .prep-calculator,
 .prep-checklist {
@@ -9570,7 +9570,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   border-radius: 8px;
 }
 
-.prep-totals strong { color: var(--blue); font-size: 1.35rem; }
+.prep-totals strong { color: var(--ink-link-alt); font-size: 1.35rem; }
 
 .prep-totals span { font-weight: 650; }
 
@@ -9590,7 +9590,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 .prep-group { display: grid; gap: 2px; margin: 0; padding: 0; border: 0; }
 
-.prep-group legend { margin-bottom: 4px; color: var(--lavender); font-size: 0.72rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; }
+.prep-group legend { margin-bottom: 4px; color: var(--ink-accent); font-size: 0.72rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; }
 
 .prep-item {
   display: flex;
@@ -9666,7 +9666,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 .evac-order { color: var(--yellow); }
 
 .evac-result a,
-.evac-linkouts a { color: var(--blue); }
+.evac-linkouts a { color: var(--ink-link-alt); }
 
 .evac-result-links { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; }
 
@@ -10321,7 +10321,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 }
 
 .citation-block summary {
-  color: var(--lavender);
+  color: var(--ink-accent);
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 700;

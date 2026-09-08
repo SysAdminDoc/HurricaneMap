@@ -262,8 +262,8 @@ function renderClimateTrendsChart(host, trends) {
       <defs>
         <style>
           .ct-line { fill: none; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
-          .ct-landfalls { stroke: var(--sapphire); }
-          .ct-ace { stroke: var(--lavender); }
+          .ct-landfalls { stroke: var(--ink-link); }
+          .ct-ace { stroke: var(--ink-accent); }
           .ct-speed { stroke: var(--cat-1); }
           .ct-axis { stroke: var(--surface0); stroke-width: 1; }
           .ct-label { font-size: 11px; fill: var(--subtext); }
@@ -288,10 +288,10 @@ function renderClimateTrendsChart(host, trends) {
       <text x="${margin.left - 8}" y="${margin.top + plotH}" class="ct-label" text-anchor="end" dominant-baseline="middle">${t('stats.low')}</text>
       
       <!-- Legend -->
-      <circle cx="${margin.left + 12}" cy="12" r="3" class="ct-landfalls" style="fill:var(--sapphire);" />
+      <circle cx="${margin.left + 12}" cy="12" r="3" class="ct-landfalls" style="fill:var(--ink-link);" />
       <text x="${margin.left + 22}" y="16" class="ct-label">${t('stats.landfallsLegend')}</text>
       
-      <circle cx="${margin.left + 120}" cy="12" r="3" style="fill:var(--lavender);" />
+      <circle cx="${margin.left + 120}" cy="12" r="3" style="fill:var(--ink-accent);" />
       <text x="${margin.left + 130}" y="16" class="ct-label">ACE</text>
       
       <circle cx="${margin.left + 170}" cy="12" r="3" style="fill:var(--cat-1);" />
