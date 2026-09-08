@@ -89,4 +89,23 @@ const imported = importSavedViews(transfer, { mode: 'replace' });
 assert.equal(imported.ok, true);
 assert.deepEqual(loadSavedViews().map(view => view.name), ['Katrina class', 'Katrina class (2)']);
 
-console.log('saved views ok (CRUD/export, strict import preview, deterministic merge, atomic rollback)');
+// Saving compared names exactly while importing compared them case-folded, so
+// two views differing only in case could both be saved and then silently become
+// one on the way back in. The two paths agree now, and the round trip is what
+// proves it: a count that changes across export and import is the defect.
+storage.clear();
+saveCurrentView('Gulf coast', '#v=1&s=TX');
+saveCurrentView('Gulf Coast', '#v=1&s=LA');
+const savedNames = loadSavedViews().map(view => view.name);
+assert.equal(savedNames.length, 1, `names differing only in case must not both be saved: ${savedNames.join(', ')}`);
+assert.equal(savedNames[0], 'Gulf Coast', 'the later save must replace the earlier one');
+
+const roundTrip = importSavedViews(exportSavedViews(), { mode: 'replace' });
+assert.equal(roundTrip.ok, true);
+assert.deepEqual(
+  loadSavedViews().map(view => view.name),
+  savedNames,
+  'an export and import round trip must not change the saved views',
+);
+
+console.log('saved views ok (CRUD/export, strict import preview, deterministic merge, atomic rollback, case-folded names)');

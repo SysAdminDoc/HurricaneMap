@@ -46,7 +46,11 @@ export function loadSavedViews(storage = globalThis.localStorage) {
 export function saveCurrentView(name, hash) {
   const view = normalizeSavedView({ name, hash });
   if (!view) return null;
-  const views = [view, ...loadSavedViews().filter(item => item.name !== view.name)].slice(0, MAX_VIEWS);
+  // Case-insensitively, to match the import path. Saving compared names
+  // exactly while importing compared them folded, so "Gulf coast" and "Gulf
+  // Coast" could both be saved and then silently become one on the way back in.
+  const replaced = view.name.toLocaleLowerCase();
+  const views = [view, ...loadSavedViews().filter(item => item.name.toLocaleLowerCase() !== replaced)].slice(0, MAX_VIEWS);
   persist(views);
   return view;
 }
