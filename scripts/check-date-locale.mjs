@@ -24,9 +24,26 @@ const sourceDir = path.join(root, 'src');
 // `ht`, so a raw app locale resolves to the runtime default and a Creole reader
 // on a German browser reads German digit grouping. A number formatter is not a
 // date, so it is listed separately and judged on its locale argument alone.
-const ALWAYS_A_DATE = ['toLocaleDateString', 'toLocaleTimeString', 'DateTimeFormat'];
+const ALWAYS_A_DATE = [
+  'toLocaleDateString',
+  'toLocaleTimeString',
+  'DateTimeFormat',
+  // Same shape, same gap. Both were introduced while this list named neither,
+  // so the exact bug this gate exists to catch was reachable through them.
+  'RelativeTimeFormat',
+  'DurationFormat',
+];
 const ALWAYS_A_NUMBER = ['NumberFormat'];
 const AMBIGUOUS = ['toLocaleString'];
+const WATCHED = new Set([...ALWAYS_A_DATE, ...ALWAYS_A_NUMBER, ...AMBIGUOUS]);
+
+// Which Intl constructors this gate has an opinion about. Listing the two that
+// slipped past would fix the spelling and leave the class open: the next one
+// arrives the same way, silently. So the rule is inverted. Every Intl member
+// src/ names must be either watched above or declared here as taking no locale,
+// and anything else fails until somebody decides which it is.
+const LOCALE_FREE_INTL = new Set(['getCanonicalLocales', 'supportedValuesOf', 'Locale']);
+const INTL_MEMBER = /\bIntl\.([A-Za-z_$][\w$]*)/g;
 const DATE_FIELD = /\b(year|month|day|weekday|hour|minute|second|timeZone|dateStyle|timeStyle|era|hour12)\s*:/;
 const BAD_FIRST_ARGUMENT = /^(undefined|getLocale\(\))$/;
 
@@ -87,12 +104,19 @@ async function main() {
     .filter(name => name.endsWith('.js'))
     .sort();
   const faults = [];
+  // Every Intl member src/ reaches for has to be one this gate judges.
+  const unwatched = new Map();
   let scanned = 0;
   for (const name of files) {
     const file = `src/${name.replace(/\\/g, '/')}`;
     const source = await readFile(path.join(sourceDir, name), 'utf8');
     scanned += 1;
     faults.push(...findDateLocaleFaults(file, source));
+    for (const match of blankCommentsAndRegexes(source).matchAll(INTL_MEMBER)) {
+      const member = match[1];
+      if (WATCHED.has(member) || LOCALE_FREE_INTL.has(member)) continue;
+      if (!unwatched.has(member)) unwatched.set(member, file);
+    }
   }
 
   // The mapping itself has to resolve, or this gate is enforcing a helper that
@@ -109,7 +133,7 @@ async function main() {
     }
   }
 
-  if (faults.length || unresolved.length) {
+  if (faults.length || unresolved.length || unwatched.size) {
     for (const fault of faults) {
       console.error(
         `date locale: ${fault.file}:${fault.line} formats for a reader with ${fault.method}(${fault.argument}), `
@@ -117,10 +141,19 @@ async function main() {
       );
     }
     for (const problem of unresolved) console.error(`date locale: ${problem}`);
+    for (const [member, where] of unwatched) {
+      console.error(
+        `date locale: ${where} uses Intl.${member}, which this gate does not judge. `
+        + 'Add it to the watched list if it takes a locale, or to LOCALE_FREE_INTL if it does not.',
+      );
+    }
     process.exit(1);
   }
 
-  console.log(`date locale ok (${scanned} modules scanned, ${locales.size} locales resolve through getDateLocale)`);
+  console.log(
+    `date locale ok (${scanned} modules scanned, ${WATCHED.size} Intl surfaces watched, `
+    + `${locales.size} locales resolve through getDateLocale)`,
+  );
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
