@@ -9937,17 +9937,24 @@ html:not(.light-theme) #map .leaflet-tile-pane {
   box-shadow: inset 0 -2px 0 var(--atlas-cyan);
 }
 
+/* Two lines rather than an ellipsis. On one line an 82px cap cut "3D STORM
+   GLOBE" to "3D STORM G…" in English, and Spanish needed 144px for "GLOBO 3D DE
+   TORMENTAS", which ten buttons cannot have inside a 1100px header. Widening
+   the header is not available either: at 1280px it would run under the
+   active-storm card. Wrapping keeps every label readable in all three locales
+   at the width the header already has. */
 .header-action-label {
   max-width: 82px;
   overflow: hidden;
   color: currentColor;
   font-size: 9px;
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.055em;
-  text-overflow: ellipsis;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-align: center;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .mobile-more-btn {

@@ -1082,6 +1082,20 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
       );
       assert(!measured.cut.length, `[${locale}] header text is cut with no ellipsis at ${width}px: ${JSON.stringify(measured.cut)}`);
 
+      // The action labels are held to a stricter rule than the check above,
+      // which accepts an ellipsis as a legitimate way to overflow. For these an
+      // ellipsis IS the defect: the header read "3D STORM G..." in English and
+      // clipped "Globo 3D de tormentas" by 62px in Spanish, and the label is
+      // the only text on the button. They wrap to two lines instead, so nothing
+      // should overflow at any of these widths in any locale.
+      const clippedActionLabels = await page.evaluate(() => [...document.querySelectorAll('.app-header .header-action-label')]
+        .filter(element => element.getClientRects().length && element.scrollWidth > element.clientWidth + 1)
+        .map(element => `${element.textContent.trim()} (+${element.scrollWidth - element.clientWidth}px)`));
+      assert(
+        !clippedActionLabels.length,
+        `header action labels are clipped at ${width}px in ${locale}: ${clippedActionLabels.join(', ')}`,
+      );
+
       // Positive control, at every width rather than only the last one: the
       // subtitle has to have text on screen, or the loop above passed on an
       // empty header, and the totals it used to carry have to still be
@@ -4994,7 +5008,7 @@ try {
   await assertHeaderStackingAndBlur(browser, baseUrl);
   // Spanish is the longest of the three subtitles, and it is where the flex
   // children have to shrink rather than be cut through a word.
-  for (const locale of ['en', 'es']) await assertHeaderTextIsNotCut(browser, baseUrl, locale);
+  for (const locale of ['en', 'es', 'ht']) await assertHeaderTextIsNotCut(browser, baseUrl, locale);
   await assertHoverTreatmentFollowsTheTheme(browser, baseUrl);
   await assertFocusIndicatorInEveryTheme(browser, baseUrl);
 
