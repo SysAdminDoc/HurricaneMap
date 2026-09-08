@@ -3,7 +3,7 @@
 import { getLandfalls, filterLandfalls, getCoverageYearRange } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
 import { buildCitation, citationCommentLines } from './citation.js';
-import { presentCategory, roundMetric } from './metric-presenters.js';
+import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
 
 export function buildPublicationCSV(filters, {
   generatedAt = new Date().toISOString(),
@@ -33,7 +33,7 @@ export function buildPublicationCSV(filters, {
   
   for (const lf of filtered) {
     // Ensure defaults for undefined values
-    const windMph = Number.isFinite(lf.wind) ? roundMetric(lf.wind * 1.15078) : '';
+    const windMph = Number.isFinite(lf.wind) ? roundMetric(convertWindKnots(lf.wind, 'mph')) : '';
     // Landfall records carry only the ISO timestamp `t` — derive the
     // documented month/day/hour columns from it.
     const when = lf.t ? new Date(lf.t) : null;

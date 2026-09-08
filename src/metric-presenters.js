@@ -10,7 +10,11 @@
 // caller, through t('metric.notLoaded'); a real zero is printed as a zero.
 export const MISSING_METRIC = '—';
 
-const WIND_FACTORS = Object.freeze({
+// The one place these live. Three other modules used to carry their own copy of
+// 1.15078, and the CSV and QGIS exports print the number in their own header
+// text, so a corrected factor could have been applied in one place and
+// documented in another.
+export const WIND_FACTORS = Object.freeze({
   kt: 1,
   mph: 1.15078,
   kmh: 1.852,

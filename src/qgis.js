@@ -3,7 +3,7 @@
 import { ensureStormsLoaded, filterLandfalls, getAllStorms, getCoverageYearRange, getLandfalls } from './data.js';
 import { buildExportProvenance } from './export-provenance.js';
 import { buildCitation } from './citation.js';
-import { presentCategory, roundMetric } from './metric-presenters.js';
+import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
 
 export async function exportQGISGeoJSON(filters) {
   await ensureStormsLoaded();
@@ -93,7 +93,7 @@ export function buildQGISGeoJSON({
         latitude: roundNumber(lf.lat, 3),
         longitude: roundNumber(lf.lon, 3),
         wind_speed_kt: Number.isFinite(lf.wind) ? lf.wind : null,
-        wind_speed_mph: Number.isFinite(lf.wind) ? Math.round(lf.wind * 1.15078) : null,
+        wind_speed_mph: Number.isFinite(lf.wind) ? Math.round(convertWindKnots(lf.wind, 'mph')) : null,
         pressure_mb: Number.isFinite(lf.pres) ? lf.pres : null,
         category: presentCategory(lf.category, { style: 'short', missing: '' }),
         state: lf.state || null,

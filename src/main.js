@@ -630,22 +630,13 @@ function wireSettingsControls() {
       applyPaletteToBody();
       lastTracksKey = '';
       applyFilters();
-      // If a storm panel is open, re-open it so its colors refresh too.
-      if (openStormId) {
-        const lf = getLandfalls().find(x => x.storm_id === openStormId);
-        if (lf) onLandfallClick(lf);
-      }
+      refreshOpenStormPanel();
     }
-    if (e.detail.key === 'windUnit' && openStormId) {
-      const lf = getLandfalls().find(x => x.storm_id === openStormId);
-      if (lf) onLandfallClick(lf);
+    if (e.detail.key === 'windUnit') {
+      refreshOpenStormPanel();
     }
     if (e.detail.key === 'damageMode') {
-      // Re-render storm panel with new damage formatting + refresh season card.
-      if (openStormId) {
-        const lf = getLandfalls().find(x => x.storm_id === openStormId);
-        if (lf) onLandfallClick(lf);
-      }
+      refreshOpenStormPanel();
       refreshSeasonSummary({ yearMin: filters.yearMin, yearMax: filters.yearMax });
     }
     if (e.detail.key === 'highContrast') {
@@ -727,8 +718,11 @@ async function redrawTracks(visible) {
   }
 }
 
-function onLandfallClick(landfall, marker, { advisoryReplay = undefined } = {}) {
-  focusLandfall(landfall);
+// The bookkeeping that has to happen whichever way a storm panel was opened:
+// the canonical id, the replay state that belongs to it, the view history and
+// the URL. showStorm announces every open, so the entry points that bypass the
+// map's click handler land here too.
+function adoptOpenStorm(landfall, { advisoryReplay = undefined } = {}) {
   openStormId = landfall.storm_id;
   const requestedReplay = advisoryReplay === undefined
     ? advisoryReplayState
@@ -738,6 +732,29 @@ function onLandfallClick(landfall, marker, { advisoryReplay = undefined } = {}) 
     : null;
   recordView(landfall);
   writeHash();
+}
+
+document.addEventListener('hm-storm:open', (event) => {
+  const landfall = event.detail?.landfall;
+  if (!landfall?.storm_id || landfall.storm_id === openStormId) return;
+  adoptOpenStorm(landfall);
+});
+
+// Colour, unit and damage-mode changes re-render the storm panel by re-opening
+// it, and opening a panel closes every other one and takes focus. Doing that
+// while the reader is looking at the statistics panel throws them back to a
+// storm they opened earlier, so it only happens while the storm panel is the
+// one on screen. A hidden panel re-renders from current settings the next time
+// it is opened.
+function refreshOpenStormPanel() {
+  if (!openStormId || document.getElementById('storm-panel')?.hidden !== false) return;
+  const landfall = getLandfalls().find(x => x.storm_id === openStormId);
+  if (landfall) onLandfallClick(landfall);
+}
+
+function onLandfallClick(landfall, marker, { advisoryReplay = undefined } = {}) {
+  focusLandfall(landfall);
+  adoptOpenStorm(landfall, { advisoryReplay });
   showStormLazy(landfall, { advisoryReplay: advisoryReplayState }).catch((error) => {
     console.error('Failed to open storm panel:', error);
   });

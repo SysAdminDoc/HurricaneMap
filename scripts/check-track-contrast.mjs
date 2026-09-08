@@ -191,35 +191,45 @@ async function main() {
     if (!fallbacks.has(slot)) errors.push(`src/compare.js declares no trackFallback for --pin-${slot}-track`);
   }
 
-  // What the basemap actually looks like in each theme. The light theme sets
-  // the tile pane back to filter: none; the dark theme, which is the default,
-  // recolours it, and that is the surface most readers see a track on.
-  const themes = [];
+  // What the basemap actually looks like. The rules are found rather than
+  // named: this used to read three hard-coded selectors, so a fourth rule
+  // repainting the tile pane (a palette mode, say) would have been a basemap
+  // nothing measured. The filter pattern has to reject `backdrop-filter`, which
+  // these same stylesheets use twenty times; without a boundary it matched that
+  // first and had the gate reporting on a surface nobody renders.
+  const TILE_PANE_RULE_RE = /([^{}]*\.leaflet-tile-pane[^{}]*)\{([^}]*)\}/g;
+  const FILTER_DECLARATION_RE = /(?:^|[;{\s])filter\s*:\s*([^;}]+)/;
   const allCss = [...stylesheets.values()].join('\n');
-  const darkFilter = allCss.match(/html:not\(\.light-theme\)\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
-  const lightFilter = allCss.match(/html\.light-theme\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
-  // High contrast is a third basemap, not a variant of the dark one. Its rule
-  // takes the tile pane back to filter: none while the track tokens stay on
-  // their high-contrast values, so a reader in that mode sees a combination
-  // neither of the other two measures. Reading only two themes meant the
-  // strictest mode was the one nothing checked.
-  const highContrastFilter = allCss.match(/html\.high-contrast\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
-  if (!darkFilter) {
-    errors.push('no rule filters the dark-theme tile pane any more, so this gate cannot tell what the basemap looks like');
+  // An unfiltered tile pane is always one of the surfaces, whether or not a rule
+  // spells it out, because a theme that declares no filter renders exactly that.
+  const byFilter = new Map([['none', []]]);
+  for (const rule of allCss.matchAll(TILE_PANE_RULE_RE)) {
+    const selector = rule[1].trim().replace(/\s+/g, ' ');
+    const declaration = FILTER_DECLARATION_RE.exec(rule[2]);
+    if (!declaration) continue;
+    const filter = declaration[1].trim();
+    if (!byFilter.has(filter)) byFilter.set(filter, []);
+    byFilter.get(filter).push(selector);
   }
-  if (!highContrastFilter) {
-    errors.push('no rule sets the high-contrast tile pane filter any more, so this gate cannot tell what that basemap looks like');
+  if (byFilter.size < 2) {
+    errors.push('no rule filters the tile pane any more, so this gate cannot tell what the basemap looks like');
   }
-  for (const [name, filter] of [['dark', darkFilter], ['light', lightFilter ?? 'none'], ['high-contrast', highContrastFilter]]) {
-    if (filter === undefined) continue;
+  // Two rules that render the same pixels are one basemap. The light theme and
+  // the high-contrast rule both take the pane back to `filter: none`, and there
+  // is no high-contrast override for the track tokens, so counting them as
+  // separate surfaces claimed coverage this gate does not have.
+  const themes = [];
+  for (const [filter, selectors] of byFilter) {
+    const name = selectors.length ? selectors.join(', ') : 'an unfiltered tile pane';
     const surfaces = {};
+    let measurable = true;
     try {
       for (const [surface, hex] of Object.entries(BASEMAP_SURFACES)) surfaces[surface] = applyCssFilter(parseHex(hex), filter);
     } catch (error) {
-      errors.push(`the ${name} theme's tile filter cannot be measured: ${error.message}`);
-      continue;
+      errors.push(`the tile filter on ${name} cannot be measured: ${error.message}`);
+      measurable = false;
     }
-    themes.push({ name, filter: String(filter).trim(), surfaces });
+    if (measurable) themes.push({ name, filter, surfaces });
   }
 
   const measured = [];
@@ -246,8 +256,8 @@ async function main() {
           measured.push({ slot, theme: theme.name, surface, value: candidate.value, file: candidate.file, ratio });
           if (ratio < MINIMUM_RATIO) {
             errors.push(
-              `${candidate.file}: --pin-${slot}-track ${candidate.value} is ${ratio.toFixed(2)}:1 on the ${theme.name} theme's `
-              + `${surface} fill at ${opacity} opacity, under ${MINIMUM_RATIO}:1`,
+              `${candidate.file}: --pin-${slot}-track ${candidate.value} is ${ratio.toFixed(2)}:1 on the ${surface} fill of `
+              + `the basemap rendered by ${theme.name}, at ${opacity} opacity, under ${MINIMUM_RATIO}:1`,
             );
           }
         }
@@ -262,8 +272,9 @@ async function main() {
 
   const worst = measured.reduce((lowest, row) => (row.ratio < lowest.ratio ? row : lowest));
   console.log(
-    `track contrast ok (${measured.length} measurements at ${opacity} opacity across ${themes.length} rendered basemaps, worst `
-    + `${worst.ratio.toFixed(2)}:1 for --pin-${worst.slot}-track on the ${worst.theme} theme's ${worst.surface} fill)`,
+    `track contrast ok (${measured.length} measurements at ${opacity} opacity across ${themes.length} distinct basemaps `
+    + `from ${[...byFilter.values()].reduce((n, list) => n + Math.max(1, list.length), 0)} tile-pane rules, worst `
+    + `${worst.ratio.toFixed(2)}:1 for --pin-${worst.slot}-track on the ${worst.surface} fill of the basemap rendered by ${worst.theme})`,
   );
 }
 

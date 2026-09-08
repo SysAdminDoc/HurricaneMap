@@ -48,6 +48,32 @@ function cats(filters) {
   assert.equal(viewOptionsFromDecoded(decodeHashState(shaped)).dataRevision, REL);
 }
 
+// The wind unit and damage mode come from stored settings, so main.js hands
+// them to every writeHash. A reader who once chose mph has not shaped the URL
+// they just opened, and used to get a 64-character fragment for it anyway.
+{
+  const REL = 'b'.repeat(64);
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const opts = {
+    dataRevision: REL, windUnit: 'mph', damageMode: 'nominal',
+    yearMinDefault: 1851, yearMaxDefault: 2025,
+  };
+  assert.equal(encodeHashState(filters, opts), '');
+
+  // A capture records them, so a saved view reopens in the units it was saved in.
+  assert.equal(
+    encodeHashState(filters, { ...opts, pinDataRevision: true }),
+    `#v=1&u=mph&d=nominal&rel=${REL}`,
+  );
+
+  // So does any URL the reader did shape.
+  const shaped = encodeHashState(filters, { ...opts, openStormId: 'AL122005' });
+  assert.equal(shaped, `#v=1&storm=AL122005&u=mph&d=nominal&rel=${REL}`);
+  const restored = viewOptionsFromDecoded(decodeHashState(shaped));
+  assert.equal(restored.windUnit, 'mph');
+  assert.equal(restored.damageMode, 'nominal');
+}
+
 {
   const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
   filters.categories = new Set(['5', '4', '3']);

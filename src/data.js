@@ -30,7 +30,7 @@ export function isRetired(name, year) {
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
 // metadata.json  — generated data provenance, coverage, and source details.
 import { assertSupportedDataSchema } from './schema-contract.js';
-import { presentCategory, roundMetric } from './metric-presenters.js';
+import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 const DATA = {
@@ -333,7 +333,7 @@ export function windToCategory(kt) {
 }
 
 export function ktToMph(kt) {
-  return roundMetric(Number.isFinite(kt) ? kt * 1.15078 : null);
+  return roundMetric(convertWindKnots(kt, 'mph'));
 }
 
 export function formatTime(iso) {

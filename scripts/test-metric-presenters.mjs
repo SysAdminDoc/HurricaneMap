@@ -13,6 +13,7 @@ import {
   presentPressure,
   presentWind,
   roundMetric,
+  WIND_FACTORS,
 } from '../src/metric-presenters.js';
 import { buildQGISGeoJSON } from '../src/qgis.js';
 import {
@@ -57,6 +58,43 @@ assert.equal(convertWindKnots(100, 'mph'), 115.07799999999999);
 // calling the converter would have made this pass for any conversion factor.
 assert.equal(ktToMph(100), 115);
 assert.equal(ktToMph(64), 74);
+
+// The knot conversions live in one table. Three modules used to hold their own
+// copy of 1.15078, and the CSV and QGIS headers still print the number as text,
+// so both the arithmetic and the documentation are held to the same constant.
+assert.equal(WIND_FACTORS.mph, 1.15078);
+assert.equal(WIND_FACTORS.kmh, 1.852);
+// Binary floating point puts 100 kt at 115.07799999999999 mph, so these carry a
+// tolerance rather than the literal the arithmetic happens to produce.
+const closeTo = (actual, expected) => assert.ok(
+  Math.abs(actual - expected) < 1e-9,
+  `expected ${actual} to be within 1e-9 of ${expected}`,
+);
+closeTo(convertWindKnots(100, 'mph'), 115.078);
+closeTo(convertWindKnots(100, 'kmh'), 185.2);
+assert.equal(convertWindKnots(100, 'kt'), 100);
+assert.equal(convertWindKnots(100, 'furlongs'), null);
+assert.equal(convertWindKnots(Number.NaN, 'mph'), null);
+assert.equal(presentWind(64, { unit: 'mph', decimals: null }), '74 mph');
+assert.equal(presentWind(64, { unit: 'mph', suffix: false }), '74');
+assert.equal(presentWind(null, { unit: 'mph' }), MISSING_METRIC);
+
+assert.equal(roundMetric(115.078), 115);
+assert.equal(roundMetric(115.078, 2), 115.08);
+assert.equal(roundMetric(Number.NaN), null);
+
+assert.equal(presentCategory(0, { style: 'long' }), 'Tropical Depression');
+assert.equal(presentCategory(-1, { style: 'long' }), 'Tropical Storm');
+assert.equal(presentCategory(3, { style: 'long' }), 'Category 3');
+assert.equal(presentCategory(6), MISSING_METRIC);
+assert.equal(presentCategory(null), MISSING_METRIC);
+
+assert.equal(presentDamageMillions(0.5), '$500K');
+assert.equal(presentDamageMillions(5), '$5M');
+assert.equal(presentDamageMillions(50), '$50M');
+assert.equal(presentDamageMillions(1500), '$1.5B');
+assert.equal(presentDamageMillions(125000), '$125B');
+assert.equal(presentDamageMillions(null), MISSING_METRIC);
 assert.equal(presentWind(64, { unit: 'mph' }), '74 mph');
 
 assert.equal(presentNumber(108.75, 1), '108.8');
@@ -149,6 +187,24 @@ for (const relative of [
 ]) {
   const source = await readFile(new URL(relative, import.meta.url), 'utf8');
   assert.match(source, /metric-presenters\.js/, `${relative} does not use shared metric presenters`);
+}
+
+// The CSV and QGIS exports print the conversion factor in their own header text
+// for anyone reading the file later. That text is a claim about the arithmetic,
+// so it is held to the same constant: a corrected factor cannot be applied in
+// the code and left wrong in the documentation beside it.
+const MPH_FACTOR_IN_PROSE = /mph[^\n]{0,40}?(\d+\.\d+)/g;
+for (const relative of ['../src/export.js', '../src/qgis.js']) {
+  const source = await readFile(new URL(relative, import.meta.url), 'utf8');
+  const quoted = [...source.matchAll(MPH_FACTOR_IN_PROSE)].map(match => match[1]);
+  assert.ok(quoted.length, `${relative} no longer documents the knots-to-mph factor`);
+  for (const factor of quoted) {
+    assert.equal(
+      factor,
+      String(WIND_FACTORS.mph),
+      `${relative} documents mph = knots x ${factor} while WIND_FACTORS.mph is ${WIND_FACTORS.mph}`,
+    );
+  }
 }
 
 console.log('metric presenters ok (UI, report, CSV, and QGIS parity)');

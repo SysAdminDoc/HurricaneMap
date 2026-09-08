@@ -77,18 +77,21 @@ export function encodeHashState(filters, {
     rel: normalizeDataRevision(dataRevision),
     replay: encodeAdvisoryReplayState(advisoryReplay, { stormId: openStormId }),
   };
-  // The release pin qualifies a view rather than being one. Emitting it on its
-  // own turned every cold load into a 64-character fragment for a page the
-  // reader never shaped, so it rides along only when other state is already
-  // going into the URL, or when a caller is deliberately capturing a link
-  // (a saved view, a citation) and wants the exact data release recorded.
-  const hasShapedState = Object.keys(current).some(key => key !== 'rel'
-    && current[key] !== defaults[key] && (current[key] || key === 'c'));
-  const emitRelease = pinDataRevision || hasShapedState;
+  // These qualify a view rather than being one. The release pin says which data
+  // release a link cites; the unit and damage mode come from stored settings, so
+  // they describe how the reader has the app set up rather than anything they
+  // did to this URL. Emitting any of them alone turned a cold load into a
+  // fragment for a page nobody shaped, so they ride along only when other state
+  // is already going into the URL, or when a caller is deliberately capturing a
+  // link (a saved view, a citation) and wants them recorded.
+  const QUALIFIERS = new Set(['rel', 'u', 'd']);
+  const shaped = key => current[key] !== defaults[key] && (current[key] || key === 'c');
+  const hasShapedState = Object.keys(current).some(key => !QUALIFIERS.has(key) && shaped(key));
+  const emitQualifiers = pinDataRevision || hasShapedState;
   const parts = [];
   for (const key of Object.keys(current)) {
-    if (key === 'rel' && !emitRelease) continue;
-    if (current[key] !== defaults[key] && (current[key] || key === 'c')) {
+    if (QUALIFIERS.has(key) && !emitQualifiers) continue;
+    if (shaped(key)) {
       parts.push(`${key}=${encodeURIComponent(current[key])}`);
     }
   }

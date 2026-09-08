@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { migrateSettingsRecord, normalizeSettings } from '../src/settings.js';
+import { migrateSettingsRecord, normalizeSettings, prefersMoreContrast } from '../src/settings.js';
 
 const settings = normalizeSettings({
   windUnit: 'mph',
@@ -35,7 +35,7 @@ assert.equal(Object.hasOwn(settings, 'unknownKey'), false);
 // Spelled out rather than normalizeSettings(null) === normalizeSettings({}),
 // which only proved the two arguments agree and would have stayed green if
 // every default changed at once.
-assert.deepEqual(normalizeSettings(null), {
+const EXPECTED_DEFAULTS = {
   windUnit: 'kt',
   theme: 'dark',
   palette: 'default',
@@ -48,8 +48,30 @@ assert.deepEqual(normalizeSettings(null), {
   highContrast: false,
   reducedMotion: false,
   onboarded: false,
-});
-assert.deepEqual(normalizeSettings({}), normalizeSettings(null));
+};
+assert.deepEqual(normalizeSettings(null), EXPECTED_DEFAULTS);
+assert.deepEqual(normalizeSettings({}), EXPECTED_DEFAULTS);
+
+// highContrast above is false because this harness has no matchMedia, not
+// because anything defaults it. It is seeded from the OS preference, so pinning
+// it without saying so would have pinned Node rather than the product: flipping
+// the seeding would not have failed a thing.
+{
+  const original = Object.hasOwn(globalThis, 'window') ? globalThis.window : undefined;
+  try {
+    globalThis.window = { matchMedia: query => ({ matches: query === '(prefers-contrast: more)' }) };
+    assert.equal(prefersMoreContrast(), true);
+    assert.equal(normalizeSettings(null).highContrast, true, 'an OS contrast preference must seed an unset highContrast');
+    // A stored false still wins: the seed applies to an unset value only.
+    assert.equal(normalizeSettings({ highContrast: false }).highContrast, false);
+    globalThis.window = { matchMedia: () => ({ matches: false }) };
+    assert.equal(prefersMoreContrast(), false);
+    assert.equal(normalizeSettings(null).highContrast, false);
+  } finally {
+    if (original === undefined) delete globalThis.window;
+    else globalThis.window = original;
+  }
+}
 
 const legacy = migrateSettingsRecord({ windUnit: 'mph', locale: 'es', unknownKey: 'ignored' });
 assert.equal(legacy.status, 'legacy');

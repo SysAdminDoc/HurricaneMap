@@ -2112,6 +2112,40 @@ async function captureVisualSnapshot(page, name) {
 // ONI series are two thirds of the boot payload and paint nothing. Hold all four
 // open: the atlas has to become usable anyway, and the two surfaces that read
 // them have to fill in once they land.
+// A unit or colour change re-renders the storm panel by re-opening it, and
+// opening a panel closes the others and takes focus. A reader who opened a storm
+// earlier and is now reading the statistics panel must not be thrown back to it.
+async function assertSettingsChangeKeepsPanel(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/#v=1&storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.click('#toggle-stats');
+    await page.waitForFunction(() => !document.querySelector('#stats-panel')?.hidden, { timeout: 10000 });
+
+    for (const [key, value] of [['windUnit', 'mph'], ['damageMode', 'nominal'], ['palette', 'colorblind']]) {
+      await page.evaluate(async ([settingKey, settingValue]) => {
+        const settings = await import('/src/settings.js');
+        settings.setSetting(settingKey, settingValue);
+      }, [key, value]);
+      // The re-open is asynchronous, so reading the DOM straight after the
+      // change passes whether or not the steal is coming. Watch for it instead.
+      const stolen = await page.waitForFunction(
+        () => document.querySelector('#storm-panel')?.hidden === false,
+        { timeout: 2000 },
+      ).then(() => true).catch(() => false);
+      assert(!stolen, `changing ${key} pulled the storm panel back over the statistics panel`);
+      assert(
+        await page.evaluate(() => document.querySelector('#stats-panel')?.hidden === false),
+        `changing ${key} closed the statistics panel`,
+      );
+    }
+  } finally {
+    await page.close();
+  }
+}
+
 async function assertDeferredDataScope(context, baseUrl) {
   const deferred = ['impacts.json', 'billions.json', 'enso.json', 'aoml-landfalls.json'];
   // Long enough that the app is up well before it, short enough that the data
@@ -2171,6 +2205,26 @@ async function assertReleasePinScope(context, baseUrl) {
     assert(cold.hash === '', `a cold load put a fragment on the address bar: ${cold.hash}`);
     assert(!cold.href.includes('#'), `a cold load left a '#' in the URL: ${cold.href}`);
 
+    // Same again for a reader who has settings stored. The unit and the damage
+    // mode reach writeHash from settings on every load, so with them counted as
+    // shaped state a cold load carried a fragment for anyone who had ever
+    // changed either one.
+    const configured = await context.newPage();
+    try {
+      await configured.addInitScript(() => {
+        if (window.top !== window) return;
+        localStorage.setItem('hm-settings-v1', JSON.stringify({
+          onboarded: true, schema_version: 1, windUnit: 'mph', damageMode: 'nominal',
+        }));
+      });
+      await configured.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(configured);
+      const stored = await configured.evaluate(() => location.href);
+      assert(!stored.includes('#'), `a cold load with stored settings put a fragment on the address bar: ${stored}`);
+    } finally {
+      await configured.close();
+    }
+
     // The filters panel starts collapsed at every viewport, and its contents are
     // visibility:hidden until it is opened, so shaping the view means taking the
     // same first step a reader does.
@@ -2189,6 +2243,28 @@ async function assertReleasePinScope(context, baseUrl) {
       assert(value === 'Florida', `a shared release-pinned link did not restore its view: ${value}`);
     } finally {
       await shared.close();
+    }
+
+    // The Share button copies whatever is in the address bar, and it only exists
+    // inside an open storm panel. Opening one from On This Date bypasses the
+    // map's click handler, so the URL used to describe a different view than the
+    // panel on screen.
+    const viaOnThisDate = await context.newPage();
+    try {
+      await viaOnThisDate.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(viaOnThisDate);
+      await viaOnThisDate.click('#toggle-on-this-date');
+      await viaOnThisDate.waitForSelector('.otd-link', { timeout: 15000 });
+      const stormId = await viaOnThisDate.getAttribute('.otd-link', 'data-storm-id');
+      await viaOnThisDate.click('.otd-link');
+      await viaOnThisDate.waitForSelector('#share-btn', { timeout: 15000 });
+      const copied = await viaOnThisDate.evaluate(() => location.href);
+      assert(
+        copied.includes(`storm=${stormId}`) && /&rel=[a-f0-9]{64}/.test(copied),
+        `Share would copy a link that does not describe the open storm: ${copied}`,
+      );
+    } finally {
+      await viaOnThisDate.close();
     }
   } finally {
     await page.close();
@@ -3906,6 +3982,7 @@ try {
 
   await assertReleasePinScope(context, baseUrl);
   await assertDeferredDataScope(context, baseUrl);
+  await assertSettingsChangeKeepsPanel(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);
 

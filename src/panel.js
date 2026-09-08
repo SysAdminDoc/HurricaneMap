@@ -120,22 +120,36 @@ closeBtn.addEventListener('click', () => {
   // overlay teardown, so only the parts unique to a real close belong here.
   hidePanel('storm-panel');
   cancelFemaRequest();
-  clearTracks();
   document.dispatchEvent(new CustomEvent('storm-panel:close'));
 });
 // Other managed panels hide the storm panel through panels.js. Keep map-owned
 // storm overlays tied to that panel rather than leaving orphaned geometry and
 // legends over the newly opened surface.
+let showStormSeq = 0;
 document.addEventListener('hm-panel:hidden', event => {
   if (event.detail?.id !== 'storm-panel') return;
+  // Closing is as much a reason to abandon a render as opening a different
+  // storm is. A render still working through its awaits would otherwise finish
+  // into a panel nobody is looking at and leave its track drawn on the map.
+  showStormSeq += 1;
   stopStormOverlays();
+  // The track belongs to the panel too. Only the close button used to clear it,
+  // so opening any other panel over the storm panel left its track behind on a
+  // map that no longer said which storm it was.
+  clearTracks();
 });
-let showStormSeq = 0;
 export async function showStorm(landfall, { advisoryReplay = null } = {}) {
   // Sequence guard: rapid marker clicks interleave across the awaits below
   // (storms.json / exposure-index loads); only the latest click may render.
   const seq = ++showStormSeq;
   showPanel('storm-panel');
+  // Three places open this panel without going through the map's own click
+  // handler: On This Date, the state panel's storm list and the similar-storms
+  // rows. They left the URL describing whatever was open before, so the Share
+  // button copied a link to a different view than the one on screen. Saying so
+  // here covers every entry point, present and future, instead of asking each
+  // caller to remember.
+  document.dispatchEvent(new CustomEvent('hm-storm:open', { detail: { landfall } }));
   stickyHeader.innerHTML = '';
   body.innerHTML = `
     <div class="storm-loading-state" role="status" aria-live="polite">

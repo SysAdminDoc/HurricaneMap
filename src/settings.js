@@ -23,7 +23,7 @@ const DEFAULTS = {
   marineWarnings: false,  // Opt in to broad 0-24 hour marine wind-warning polygons
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' | 'ht'
-  highContrast: false,     // WCAG AAA 7:1+ contrast; OS contrast seeds an unset value
+  highContrast: false,     // WCAG AAA 7:1+ contrast, or whatever the OS asks for
   reducedMotion: false,    // In-app override: reduce animations independent of OS setting
   onboarded: false,
 };
@@ -58,8 +58,14 @@ export function prefersMoreContrast() {
     window.matchMedia('(prefers-contrast: more)').matches;
 }
 
+// highContrast is the one setting the OS gets a say in. Reading the default
+// through `||` rather than overwriting it keeps the declared value live: written
+// as a plain override, DEFAULTS.highContrast was dead text that every read
+// replaced, so changing it changed nothing and no test could tell. The key has
+// to stay in DEFAULTS regardless, because setSetting uses that object as its
+// allowlist and would otherwise ignore the setting entirely.
 function createDefaultSettings() {
-  return { ...DEFAULTS, highContrast: prefersMoreContrast() };
+  return { ...DEFAULTS, highContrast: DEFAULTS.highContrast || prefersMoreContrast() };
 }
 
 function load() {
