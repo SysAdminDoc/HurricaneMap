@@ -137,8 +137,11 @@
   --radius-lg: 14px;
   --control-bg: rgba(17, 17, 27, 0.72);
   --control-bg-hover: rgba(180, 190, 254, 0.10);
-  --focus-color: rgba(180, 190, 254, 0.62);
-  --focus-shadow: 0 0 0 3px rgba(180, 190, 254, 0.24);
+  /* --focus-color and --focus-shadow used to live here. The only rule reading
+     them was the suppressed block in the accessibility layer, and --focus-shadow
+     had no high-contrast override, so had that block ever won, high contrast
+     would have silently dropped to the weaker default ring. Focus now goes
+     through --focus-ring-color and --focus-ring-soft, which both do. */
   --surface-sunken: rgba(17, 17, 27, 0.54);
   --surface-raised: rgba(49, 50, 68, 0.72);
 }

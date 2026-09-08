@@ -113,91 +113,32 @@ html.light-theme.high-contrast {
   --shadow-xl:  0 12px 48px rgba(0, 0, 0, 0.2);
 }
 
+/* Focus is painted in ONE place, the block further down whose selector list
+   covers every button, link, [role="button"], [tabindex] and the number, search
+   and select inputs. Roughly fifteen per-control rules used to sit here setting
+   an outline, a box-shadow and a border-colour for those same controls, and not
+   one of them reached the screen: the block below carried !important and
+   suppressed all of them. They have been deleted rather than left looking
+   load-bearing, and the !important went with them, because nothing is left for
+   it to suppress.
+   What survives here is only what that block does NOT set: a border-radius so
+   the ring follows the control's corners, the backgrounds two controls change
+   on focus, and the controls its selector never matched, which are the range
+   input, the checkbox and the radio. */
 .side-panel :is(h1, h2, h3)[tabindex="-1"]:focus-visible {
-  outline: 3px solid var(--focus-ring-color);
-  outline-offset: 4px;
   border-radius: 4px;
-}
-
-.icon-btn:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 3px var(--focus-ring-color);
-  border-color: rgba(180, 190, 254, 0.5);
-}
-
-input[type="number"]:focus,
-input[type="search"]:focus,
-select:focus {
-  outline: none;
-  border-color: var(--lavender);
-  background: var(--crust);
-  box-shadow: inset 0 0 0 2px rgba(180, 190, 254, 0.3), 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.cat-btn:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 3px var(--focus-ring-color), var(--shadow-sm);
-}
-
-.text-btn:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 3px var(--focus-ring-color), var(--shadow-sm);
-  border-color: var(--lavender);
-}
-
-.close-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.action-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.pin-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.ct-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.anim-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
 }
 
 .anim-scrubber:focus {
   box-shadow: 0 0 12px rgba(180, 190, 254, 0.4);
 }
 
+/* A select, so the shared block paints its ring; only the background is its
+   own. Its border-colour used to be set here too, and once the !important came
+   off, .anim-speed:focus would have outranked select:focus on specificity and
+   taken the ring back. */
 .anim-speed:focus {
-  border-color: var(--lavender);
   background: rgba(180, 190, 254, 0.08);
-  outline: none;
-}
-
-.play-anim-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.2);
-}
-
-.anim-radar-toggle:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.radar-quick-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
-}
-
-.radar-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(180, 190, 254, 0.15);
 }
 
 /* Phase 2: Input Focus Enhancement */
@@ -210,9 +151,14 @@ textarea:focus-visible {
     var(--focus-ring-soft);
 }
 
+/* The shared block's selector never matches these two, so this really is their
+   focus ring. It used to be drawn in --lavender, which high contrast redefines
+   to a near-black #4a0080 for use behind white text: the ring measured 1.5:1 on
+   the high-contrast page, which is no ring at all. --focus-ring-color is the
+   token the rest of the focus system uses and high contrast takes it to white. */
 input[type="checkbox"]:focus-visible,
 input[type="radio"]:focus-visible {
-  outline: 2px solid var(--lavender);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -221,41 +167,17 @@ input[type="radio"]:focus-visible {
 }
 
 a:focus-visible, [role="button"]:focus-visible {
-  outline: 2px solid var(--lavender);
-  outline-offset: 2px;
   border-radius: 2px;
 }
 
 .timeline-toggle:focus-visible {
-  outline: 2px solid var(--focus-ring-color);
   border-radius: 8px;
-}
-
-.icon-btn:focus-visible,
-.text-btn:focus-visible,
-.action-btn:focus-visible,
-.export-btn:focus-visible,
-.settings-pill:focus-visible,
-.settings-action:focus-visible,
-.cat-btn:focus-visible,
-.close-btn:focus-visible,
-.radar-btn:focus-visible,
-.anim-btn:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-a:focus-visible,
-[role="button"]:focus-visible {
-  outline: 2px solid var(--focus-color);
-  outline-offset: 2px;
-  box-shadow: var(--focus-shadow);
 }
 
 input[type="number"]:focus,
 input[type="search"]:focus,
 select:focus {
   background: var(--surface-raised);
-  border-color: var(--focus-color);
 }
 
 html.high-contrast {
@@ -319,6 +241,11 @@ html.high-contrast .cat-btn:not(.on):hover {
   color: var(--foreground) !important;
 }
 
+/* The one focus treatment, for every control the app has. The !important flags
+   this used to carry existed only to beat the per-control rules above, which
+   are gone, so they are gone too. Order still matters: this sits after the
+   input/select/textarea rule so a focused select takes this ring rather than
+   that one, which is the behaviour the flags used to force. */
 input[type="number"]:focus,
 input[type="search"]:focus,
 select:focus,
@@ -326,9 +253,9 @@ button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
 [tabindex]:focus-visible {
-  outline: none !important;
-  border-color: var(--focus-ring-color) !important;
-  box-shadow: var(--focus-ring-soft) !important;
+  outline: none;
+  border-color: var(--focus-ring-color);
+  box-shadow: var(--focus-ring-soft);
 }
 
 html.high-contrast {
@@ -357,9 +284,10 @@ html.high-contrast .globe3d-topbar {
   border: 2px solid #ffffff;
 }
 
-.table-view-table th:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
-
-.table-view-table tr[data-sid]:focus-visible { outline: 2px solid var(--lavender); outline-offset: -2px; }
+/* The sortable headers and the storm rows both carry tabindex="0", so the
+   shared focus block matches them and has been painting their ring. The outline
+   these used to declare never drew, and it was written in --lavender, which
+   high contrast turns into a near-black meant for use behind white text. */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -380,7 +308,10 @@ html.high-contrast .globe3d-topbar {
   body.side-panel-open .season-summary { transform: none !important; }
 }
 
-.sp-list li:focus { outline: 2px solid var(--lavender); outline-offset: -2px; }
+/* Same as the table rows: these list items carry tabindex="0", so the shared
+   block paints their keyboard ring. This rule keyed on :focus rather than
+   :focus-visible, so the one thing it still did was draw a ring after a mouse
+   click, which no other control in the app does. */
 
 .panel-min-btn:focus-visible {
   border-color: var(--focus-ring-color);
@@ -479,9 +410,12 @@ html.high-contrast:not(.light-theme) {
   --foreground-subtle: #a6a6a6;
 }
 
-.settings-menu .toggle-row:has(input:focus-visible),
-.settings-pill:focus-visible,
-.settings-action:focus-visible {
+/* The row is not the focused element, so the shared block never reached it and
+   this outline is the only thing marking which toggle has focus. The two button
+   selectors that used to share this rule are gone: they ARE matched by the
+   shared block, so their outline had been suppressed all along and painting it
+   now would be a change, not a fix. */
+.settings-menu .toggle-row:has(input:focus-visible) {
   outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }

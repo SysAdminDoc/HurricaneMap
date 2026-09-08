@@ -69,8 +69,6 @@ html.light-theme .icon-btn {
 html.light-theme {
   --control-bg: rgba(255, 255, 255, 0.72);
   --control-bg-hover: rgba(30, 102, 245, 0.08);
-  --focus-color: rgba(124, 58, 237, 0.52);
-  --focus-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
   --surface-sunken: rgba(255, 255, 255, 0.64);
   --surface-raised: rgba(255, 255, 255, 0.78);
 }
