@@ -26,6 +26,28 @@ function cats(filters) {
   assert.equal(encodeHashState(filters, { yearMinDefault: 1851, yearMaxDefault: 2025 }), '');
 }
 
+// A cold load hands encodeHashState the live data release. That alone must not
+// put a 64-character fragment on a URL the reader never shaped.
+{
+  const REL = 'a'.repeat(64);
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const opts = { dataRevision: REL, yearMinDefault: 1851, yearMaxDefault: 2025 };
+  assert.equal(encodeHashState(filters, opts), '');
+
+  // A deliberate capture (a saved view, a citation) records the release even
+  // when the view is the default one, and it decodes back.
+  const pinned = encodeHashState(filters, { ...opts, pinDataRevision: true });
+  assert.equal(pinned, `#v=1&rel=${REL}`);
+  assert.equal(viewOptionsFromDecoded(decodeHashState(pinned)).dataRevision, REL);
+
+  // Once any other state is going into the URL, the release rides along in its
+  // usual position so a shared link still cites an exact release.
+  filters.state = 'Florida';
+  const shaped = encodeHashState(filters, { ...opts, openStormId: 'AL122005' });
+  assert.equal(shaped, `#v=1&s=Florida&storm=AL122005&rel=${REL}`);
+  assert.equal(viewOptionsFromDecoded(decodeHashState(shaped)).dataRevision, REL);
+}
+
 {
   const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
   filters.categories = new Set(['5', '4', '3']);

@@ -339,6 +339,9 @@ async function boot() {
       yearMinDefault: YEAR_MIN_DEFAULT,
       yearMaxDefault: YEAR_MAX_DEFAULT,
       dataRevision: currentDataRevision(),
+      // A saved view is an explicit capture, so it records its data release
+      // even when the view itself is the default one.
+      pinDataRevision: true,
     }) || '#v=1',
     restoreHash: hash => { location.hash = hash; },
   });

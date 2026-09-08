@@ -46,6 +46,7 @@ export function encodeHashState(filters, {
   windUnit = 'kt',
   damageMode = 'real',
   dataRevision = '',
+  pinDataRevision = false,
   yearMinDefault = YEAR_FALLBACK_MIN,
   yearMaxDefault = YEAR_FALLBACK_MAX,
 } = {}) {
@@ -76,8 +77,17 @@ export function encodeHashState(filters, {
     rel: normalizeDataRevision(dataRevision),
     replay: encodeAdvisoryReplayState(advisoryReplay, { stormId: openStormId }),
   };
+  // The release pin qualifies a view rather than being one. Emitting it on its
+  // own turned every cold load into a 64-character fragment for a page the
+  // reader never shaped, so it rides along only when other state is already
+  // going into the URL, or when a caller is deliberately capturing a link
+  // (a saved view, a citation) and wants the exact data release recorded.
+  const hasShapedState = Object.keys(current).some(key => key !== 'rel'
+    && current[key] !== defaults[key] && (current[key] || key === 'c'));
+  const emitRelease = pinDataRevision || hasShapedState;
   const parts = [];
   for (const key of Object.keys(current)) {
+    if (key === 'rel' && !emitRelease) continue;
     if (current[key] !== defaults[key] && (current[key] || key === 'c')) {
       parts.push(`${key}=${encodeURIComponent(current[key])}`);
     }

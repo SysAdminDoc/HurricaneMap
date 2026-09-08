@@ -2108,6 +2108,38 @@ async function captureVisualSnapshot(page, name) {
   assert(buffer.length > 20_000, `${name}: snapshot is unexpectedly small (${buffer.length} bytes)`);
 }
 
+// The data-release pin makes a shared link cite an exact release, which is worth
+// having on a link somebody meant to share and not on the address bar of a page
+// they just opened. Cold load: no fragment at all. Shape the view: the pin rides
+// along, and the resulting URL restores what it describes.
+async function assertReleasePinScope(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    const cold = await page.evaluate(() => ({ hash: location.hash, href: location.href }));
+    assert(cold.hash === '', `a cold load put a fragment on the address bar: ${cold.hash}`);
+    assert(!cold.href.includes('#'), `a cold load left a '#' in the URL: ${cold.href}`);
+
+    await page.selectOption('#state-filter', 'Florida');
+    await page.waitForFunction(() => /(?:^|&)s=Florida(?:&|$)/.test(location.hash), { timeout: 10000 });
+    const shaped = await page.evaluate(() => location.href);
+    assert(/#v=1&s=Florida&rel=[a-f0-9]{64}$/.test(shaped), `a shaped view did not carry the release pin: ${shaped}`);
+
+    const shared = await context.newPage();
+    try {
+      await shared.goto(shaped, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(shared);
+      const value = await shared.evaluate(() => document.querySelector('#state-filter')?.value || '');
+      assert(value === 'Florida', `a shared release-pinned link did not restore its view: ${value}`);
+    } finally {
+      await shared.close();
+    }
+  } finally {
+    await page.close();
+  }
+}
+
 async function assertDialogAndKeyboardContracts(page) {
   await page.evaluate(async () => {
     document.querySelector('#toggle-info')?.focus();
@@ -3809,10 +3841,15 @@ try {
     })),
     visible: document.querySelector('#visible-count')?.textContent || '',
   }));
-  assert(/^#v=1&rel=[a-f0-9]{64}$/.test(restored.hash), `invalid default hash was not canonicalized to the current data release: ${restored.hash}`);
+  // A hash whose every value is invalid leaves the reader on the default view,
+  // which is not a view they shaped, so canonicalizing it must clear the
+  // fragment rather than swap it for a 64-character release pin.
+  assert(restored.hash === '', `invalid default hash was not cleared: ${restored.hash}`);
   assert(restored.state === '', `invalid state filter was not cleared: ${restored.state}`);
   assert(restored.categories.length === 6 && restored.categories.every(category => category.on && category.pressed === 'true'), 'invalid category hash did not restore default categories');
   assert(/landfalls/.test(restored.visible), `visible-count did not render: ${restored.visible}`);
+
+  await assertReleasePinScope(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);
 

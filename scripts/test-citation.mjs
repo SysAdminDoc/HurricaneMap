@@ -29,6 +29,7 @@ assert.match(citation.url, /#v=1&rel=[a-f0-9]{64}$/);
 const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
 const pinnedHash = encodeHashState(filters, {
   dataRevision: citation.release.release_pin,
+  pinDataRevision: true,
   yearMinDefault: 1851,
   yearMaxDefault: 2025,
 });
