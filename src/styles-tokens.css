@@ -228,6 +228,13 @@
   --intensity-pressure-line: #74c7ec;
   --intensity-grid-line: rgba(205, 214, 244, 0.20);
   --intensity-axis-line: rgba(205, 214, 244, 0.38);
+  /* The landfall rule, the rapid-intensification overlay, the dot outline and
+     the hover cursor. These were written into the SVG as literal Mocha values,
+     so the chart kept its dark palette inside a light-theme storm panel. */
+  --intensity-landfall: #f38ba8;
+  --intensity-ri: #f38ba8;
+  --intensity-dot-stroke: rgba(0, 0, 0, 0.40);
+  --intensity-cursor: rgba(180, 190, 254, 0.60);
   --on-accent: #11111b;
   --disabled-opacity: 0.58;
   --leaflet-control-bg: rgba(24, 24, 37, 0.92);

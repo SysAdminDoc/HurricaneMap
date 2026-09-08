@@ -135,6 +135,10 @@ html.light-theme {
   --intensity-pressure-line: #005f87;
   --intensity-grid-line: rgba(76, 79, 105, 0.30);
   --intensity-axis-line: rgba(76, 79, 105, 0.58);
+  --intensity-landfall: #c9184a;
+  --intensity-ri: #c9184a;
+  --intensity-dot-stroke: rgba(0, 0, 0, 0.55);
+  --intensity-cursor: rgba(124, 58, 237, 0.60);
   --on-accent: #ffffff;
   --leaflet-control-bg: rgba(255, 255, 255, 0.94);
 }

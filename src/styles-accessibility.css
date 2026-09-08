@@ -75,6 +75,12 @@ html.light-theme.high-contrast {
   --ink-accent:   #4a0080;
   --ink-link:     #003d73;
   --ink-link-alt: #003472;
+  /* The dark high-contrast block above sets these for a black ground. On a
+     white one its #ff9db3 measured 1.58:1, which is the same defect this pass
+     was fixing, one theme over. */
+  --intensity-landfall: #8a0020;
+  --intensity-ri: #8a0020;
+  --intensity-pressure-line: var(--ink-link);
   --brand-title-start: #000000;
   --brand-title-end: #0047b2;
 
@@ -222,9 +228,16 @@ html.high-contrast {
      comfortably. Opaque, it is 17:1 to 21:1. */
   --focus-ring-soft: 0 0 0 4px #ffffff;
   --intensity-wind-line: var(--text);
-  --intensity-pressure-line: var(--sapphire);
+  /* --sapphire measured 2.43:1 against the high-contrast panel, under the 3:1
+     a non-text graphic asks for. The link ink in this mode is already tuned for
+     this ground. */
+  --intensity-pressure-line: var(--ink-link);
   --intensity-grid-line: var(--border-strong);
   --intensity-axis-line: var(--text);
+  --intensity-landfall: #ff9db3;
+  --intensity-ri: #ff9db3;
+  --intensity-dot-stroke: var(--text);
+  --intensity-cursor: var(--text);
   --disabled-opacity: 0.72;
 }
 

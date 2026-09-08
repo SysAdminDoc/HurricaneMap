@@ -518,12 +518,20 @@ async function measureContrast(page, targets) {
         for (let index = stack.length - 1; index >= 0; index--) base = over(stack[index], base);
         return base;
       };
-      return selectors.map(([name, selector]) => {
+      return selectors.map(([name, selector, property = 'color', minimum = null]) => {
         const element = document.querySelector(selector);
         if (!element) return { name, selector, missing: true };
+        const style = getComputedStyle(element);
         const background = backgroundOf(element);
-        const foreground = over(parse(getComputedStyle(element).color), background);
-        return { name, selector, ratio: Number(ratio(foreground, background).toFixed(2)) };
+        // SVG geometry paints through stroke and fill, and the chart dims its
+        // landfall rule with element opacity, which getComputedStyle reports
+        // separately from the colour. Reading the colour alone measured a mark
+        // 30% more solid than the one on screen.
+        const paint = parse(style[property]);
+        const elementOpacity = Number(style.opacity);
+        if (Number.isFinite(elementOpacity)) paint.a *= elementOpacity;
+        const foreground = over(paint, background);
+        return { name, selector, minimum, ratio: Number(ratio(foreground, background).toFixed(2)) };
       });
   }, targets);
 }
@@ -563,6 +571,19 @@ async function measureComparisonHeaderContrast(page) {
   return measureContrast(page, [['compare column header', '#compare-panel th:nth-child(2)']]);
 }
 
+// The intensity chart is drawn as an SVG string inside the storm panel, and the
+// panel switches theme under it. Its landfall rule, its label and the
+// rapid-intensification overlay carried literal Catppuccin Mocha values, so a
+// light-theme reader got a dark-palette pink at 2.31:1 on a white chart. The
+// geometry is held to the 3:1 WCAG asks of a non-text graphic; the "L" and the
+// RI caption are text and take the profile's own minimum.
+const CHART_MARK_TARGETS = [
+  ['chart landfall rule', '#storm-panel .intensity-landfall-line', 'stroke', 3],
+  ['chart landfall label', '#storm-panel .intensity-landfall-label', 'fill', null],
+  ['chart wind line', '#storm-panel .intensity-wind-line', 'stroke', 3],
+  ['chart pressure line', '#storm-panel .intensity-pressure-line', 'stroke', 3],
+];
+
 async function assertStormPanelContrast(browser, baseUrl) {
   const targets = [
     ['title', '#storm-panel .storm-panel-header h2'],
@@ -579,6 +600,7 @@ async function assertStormPanelContrast(browser, baseUrl) {
   const page = await context.newPage();
   const pageErrors = [];
   const covered = [];
+  const chartLandfallStrokes = [];
   collectPageErrors(page, pageErrors);
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -610,15 +632,15 @@ async function assertStormPanelContrast(browser, baseUrl) {
       );
       await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
 
-      const measured = await measureContrast(page, targets);
+      const measured = await measureContrast(page, [...targets, ...CHART_MARK_TARGETS]);
 
       const label = `${profile.theme}${profile.highContrast ? ' + high contrast' : ''} storm panel at 1440px`;
       const missing = measured.filter(row => row.missing);
       assert(!missing.length, `${label}: could not measure ${missing.map(row => row.selector).join(', ')}`);
-      const failed = measured.filter(row => row.ratio < profile.minimum);
+      const failed = measured.filter(row => row.ratio < (row.minimum ?? profile.minimum));
       assert(
         !failed.length,
-        `${label}: below ${profile.minimum}:1 — ${failed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
+        `${label}: ${failed.map(row => `${row.name} ${row.ratio} under ${row.minimum ?? profile.minimum}`).join(', ')}`,
       );
 
       // Playback paused, and the comparison table open. Both carried
@@ -639,6 +661,18 @@ async function assertStormPanelContrast(browser, baseUrl) {
         !extraFailed.length,
         `${label}: below ${profile.minimum}:1 — ${extraFailed.map(row => `${row.name} ${row.ratio}`).join(', ')}`,
       );
+      // The chart marks used to be literals in the SVG string, which pass a
+      // ratio check in whichever theme they were picked for and never move.
+      // The landfall rule is covered by the ratios above, since no single
+      // frozen red clears 3:1 on both a white and a black panel. The dot
+      // outline is not: it is a hairline with no ratio of its own, so freezing
+      // it would go unnoticed. Reading both back per profile says the whole
+      // chart follows the theme rather than one mark that happens to be
+      // measured.
+      chartLandfallStrokes.push(await page.evaluate(() => ({
+        landfall: getComputedStyle(document.querySelector('#storm-panel .intensity-landfall-line')).stroke,
+        dot: getComputedStyle(document.querySelector('#storm-panel .chart-dot')).stroke,
+      })));
       // Collected rather than written out below, because the hand-written
       // summary went on naming three profiles after a fourth was added.
       covered.push(`${profile.theme}${profile.highContrast ? '+hc' : ''} >= ${profile.minimum}:1`);
@@ -647,7 +681,16 @@ async function assertStormPanelContrast(browser, baseUrl) {
     await context.close();
   }
   if (pageErrors.length) throw new Error(`storm panel contrast page errors: ${pageErrors.join(' | ')}`);
-  console.log(`  storm panel contrast ok at 1440px (${covered.join(', ')}, playback and comparison included)`);
+  // Per mark, not per combination: a signature built from both marks together
+  // stays varied when one of them is frozen, because the other still moves.
+  for (const mark of ['landfall', 'dot']) {
+    const values = chartLandfallStrokes.map(row => row[mark]);
+    assert(
+      new Set(values).size >= 2,
+      `the chart's ${mark} mark does not follow the theme: ${values.join(' | ')}`,
+    );
+  }
+  console.log(`  storm panel contrast ok at 1440px (${covered.join(', ')}, chart marks follow all four themes, playback and comparison included)`);
 }
 
 // The status host for an optional feed registers two document listeners, and

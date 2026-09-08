@@ -574,7 +574,7 @@ label > input[type="checkbox"] {
 
 .cl-swatch.pres { background: linear-gradient(to right, var(--sapphire) 0%, var(--sapphire) 50%, transparent 50%, transparent 100%); background-size: 6px 2px; height: 2px; }
 
-.cl-landfall { color: rgba(243,139,168,0.9); }
+.cl-landfall { color: var(--intensity-landfall); }
 
 .intensity-svg {
   width: 100%;
@@ -589,6 +589,22 @@ label > input[type="checkbox"] {
 .intensity-grid-line { stroke: var(--intensity-grid-line); }
 
 .intensity-axis-line { stroke: var(--intensity-axis-line); }
+
+/* The chart lives inside the storm panel, which switches theme under it, so
+   these read tokens rather than carrying colours in the markup. */
+.intensity-landfall-line { stroke: var(--intensity-landfall); opacity: 0.7; }
+
+.intensity-landfall-label { fill: var(--intensity-landfall); opacity: 0.9; }
+
+.intensity-ri-line,
+.intensity-ri-dot { stroke: var(--intensity-ri); }
+
+.intensity-ri-dot,
+.intensity-ri-label { fill: var(--intensity-ri); }
+
+.intensity-ri-dot { stroke: var(--intensity-dot-stroke); }
+
+.chart-cursor { stroke: var(--intensity-cursor); }
 
 .intensity-svg .ax-tick {
   font-size: 9px;

@@ -111,8 +111,8 @@ export function renderIntensityChart(container, storm, opts = {}) {
   // Landfall markers (red dashed verticals).
   const landfallLines = (storm.us_landfalls || []).map(lf => {
     const x = xOf(lf.t);
-    return `<line x1="${x}" x2="${x}" y1="${M.top}" y2="${M.top + PH}" stroke="rgba(243,139,168,0.7)" stroke-width="1" stroke-dasharray="3 3"/>
-            <text x="${x}" y="${M.top - 3}" text-anchor="middle" fill="rgba(243,139,168,0.9)" font-size="9">L</text>`;
+    return `<line class="intensity-landfall-line" x1="${x}" x2="${x}" y1="${M.top}" y2="${M.top + PH}" stroke-width="1" stroke-dasharray="3 3"/>
+            <text class="intensity-landfall-label" x="${x}" y="${M.top - 3}" text-anchor="middle" font-size="9">L</text>`;
   }).join('');
 
   // Wind line + colored dots.
@@ -124,7 +124,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
     const x = xOf(r.t);
     const y = yWind(r.wind);
     const c = categoryColor(windToCategory(r.wind));
-    return `<circle data-i="${i}" cx="${x}" cy="${y}" r="2.5" fill="${c}" stroke="rgba(0,0,0,0.4)" stroke-width="0.6" class="chart-dot"/>`;
+    return `<circle data-i="${i}" cx="${x}" cy="${y}" r="2.5" fill="${c}" stroke="var(--intensity-dot-stroke)" stroke-width="0.6" class="chart-dot"/>`;
   }).join('');
 
   // Pressure line.
@@ -143,10 +143,10 @@ export function renderIntensityChart(container, storm, opts = {}) {
       const xMid = (x1 + x2) / 2;
       const yLabel = Math.min(y1, y2) - 6;
       riOverlay = `
-        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(243,139,168,0.85)" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="${x1}" cy="${y1}" r="3.5" fill="rgba(243,139,168,1)" stroke="rgba(0,0,0,0.4)" stroke-width="0.6"/>
-        <circle cx="${x2}" cy="${y2}" r="3.5" fill="rgba(243,139,168,1)" stroke="rgba(0,0,0,0.4)" stroke-width="0.6"/>
-        <text x="${xMid}" y="${yLabel}" text-anchor="middle" fill="rgba(243,139,168,1)" font-size="9" font-weight="600">⚡ RI +${ri.delta_kt} kt</text>
+        <line class="intensity-ri-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="3" stroke-linecap="round"/>
+        <circle class="intensity-ri-dot" cx="${x1}" cy="${y1}" r="3.5" stroke-width="0.6"/>
+        <circle class="intensity-ri-dot" cx="${x2}" cy="${y2}" r="3.5" stroke-width="0.6"/>
+        <text class="intensity-ri-label" x="${xMid}" y="${yLabel}" text-anchor="middle" font-size="9" font-weight="600">⚡ RI +${ri.delta_kt} kt</text>
       `;
     }
   }
@@ -171,7 +171,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
         ${windLine}
         ${riOverlay}
         ${dots}
-        <line class="chart-cursor" x1="-10" x2="-10" y1="${M.top}" y2="${M.top + PH}" stroke="rgba(180,190,254,0.6)" stroke-width="1" style="display:none"/>
+        <line class="chart-cursor" x1="-10" x2="-10" y1="${M.top}" y2="${M.top + PH}" stroke-width="1" style="display:none"/>
       </svg>
       <div class="chart-tooltip" hidden></div>
     </div>
