@@ -452,6 +452,19 @@ async function measureContrast(page, targets) {
             a: 1,
           };
         }
+        // color(srgb r g b / a) gives 0-1 components. Reading them as 0-255
+        // makes a white surface measure as near-black, which is a contrast
+        // number that looks like a finding. Any color-mix() surface computes
+        // to this form.
+        const srgb = text.match(/^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)$/i);
+        if (srgb) {
+          return {
+            r: Number(srgb[1]) * 255,
+            g: Number(srgb[2]) * 255,
+            b: Number(srgb[3]) * 255,
+            a: srgb[4] === undefined ? 1 : Number(srgb[4]),
+          };
+        }
         const numbers = text.match(/[\d.]+/g);
         if (!numbers) throw new Error(`Unsupported computed color: ${value}`);
         const [r, g, b, a] = numbers.map(Number);
@@ -2696,6 +2709,11 @@ async function assertDesktopPanelSystem(page, label) {
     stateRows.every(row => row.tag === 'BUTTON' && row.parentTag === 'LI' && row.focusable && /^Open .+ storm details/.test(row.label)),
     `${label}: state rows are not keyboard-accessible buttons inside list items`,
   );
+  // The shape assertion above would still pass if the <li>s picked up
+  // role="presentation", which axe reports as a serious `list` violation. No
+  // other axe scope covers this panel, because every whole-page run happens
+  // with it closed.
+  await assertNoAxeViolations(page, `${label} state panel`, '#state-panel');
   await page.focus('#state-panel .state-storm-row');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden && /Storm details/.test(document.querySelector('#storm-panel')?.textContent || ''), { timeout: 10000 });

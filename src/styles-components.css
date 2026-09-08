@@ -1508,11 +1508,15 @@ label > input[type="checkbox"] {
   transition: all 120ms ease;
   /* This is a real <button> inside its <li> rather than a list item wearing
      role="button", which took the listitem role away from every row and left
-     the surrounding <ul> holding none. These four undo the button defaults the
-     grid layout above assumes. */
+     the surrounding <ul> holding none. These undo the button defaults the grid
+     layout above assumes. font-weight is one of them: the UA's `font`
+     shorthand resets it to 400, and high contrast sets 500 on the root, so
+     without this the rows were the only text in the panel that stayed light
+     when the reader asked for bolder type. */
   width: 100%;
   text-align: left;
   font-family: inherit;
+  font-weight: inherit;
   color: inherit;
 }
 
@@ -1593,7 +1597,7 @@ label > input[type="checkbox"] {
   padding: 0;
   font: inherit;
   text-decoration: underline;
-  text-decoration-color: var(--lavender);
+  text-decoration-color: var(--ink-accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
   transition: color 120ms ease;
@@ -3777,9 +3781,19 @@ select {
   background: color-mix(in srgb, var(--atlas-cyan-soft) 70%, transparent);
 }
 
+/* Deliberately not .settings-help as well: the install guide already holds one
+   of those and the accessibility suite addresses it as the only one. This
+   repeats the typography rather than sharing the class. */
 .storage-ios-eviction {
   display: grid;
   gap: 0.3rem;
+  margin: 0;
+  color: var(--foreground-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
 }
 
 /* Says out loud that the paragraph below it is documented rather than observed.
@@ -7747,9 +7761,9 @@ body.side-panel-open .leaflet-top.leaflet-right {
   vector-effect: non-scaling-stroke;
 }
 
-.clim-ace { stroke: var(--lavender); }
+.clim-ace { stroke: var(--ink-accent); }
 
-.clim-named { stroke: var(--sapphire); }
+.clim-named { stroke: var(--ink-link); }
 
 .clim-landfalls { stroke: var(--peach); }
 
@@ -7795,9 +7809,9 @@ body.side-panel-open .leaflet-top.leaflet-right {
   border-radius: 2px;
 }
 
-.clim-swatch.clim-ace { background: var(--lavender); }
+.clim-swatch.clim-ace { background: var(--ink-accent); }
 
-.clim-swatch.clim-named { background: var(--sapphire); }
+.clim-swatch.clim-named { background: var(--ink-link); }
 
 .clim-swatch.clim-landfalls { background: var(--peach); }
 

@@ -599,7 +599,7 @@ export async function renderStorageManager(host, { inspect = inspectStorage } = 
   const iosInstallGuide = isIosSafari() ? `
     <div class="storage-install-guide">
       <p class="settings-help">${escapeHtml(t('storage.iosInstallHelp'))}</p>
-      <p class="settings-help storage-ios-eviction">
+      <p class="storage-ios-eviction">
         <strong class="storage-copy-flag">${escapeHtml(t('storage.iosEvictionFlag'))}</strong>
         <span>${escapeHtml(t('storage.iosEvictionWindow'))}</span>
       </p>
@@ -634,6 +634,27 @@ export async function renderStorageManager(host, { inspect = inspectStorage } = 
 export function initStorageManager(host = document.getElementById('storage-manager')) {
   if (!host) return;
   const refresh = () => renderStorageManager(host);
+
+  // A re-render replaces every button in the panel. The action handlers below
+  // do that deliberately and put focus back by selector afterwards, but a
+  // re-render arriving on its own must never land while the reader is inside
+  // the panel: the confirmation dialog holds its invoker by reference, so a
+  // replaced invoker means a cancelled confirmation drops focus to the top of
+  // the page. Publishers are slow enough for this to be reachable, since
+  // retrying the worker registration announces a change with a 20-second await
+  // still outstanding. Deferred work is picked up when focus leaves.
+  let deferred = false;
+  const readerIsBusy = () => host.contains(document.activeElement) ||
+    Boolean(document.querySelector('#confirm-local-action[open]'));
+  const refreshIfIdle = async () => {
+    if (readerIsBusy()) { deferred = true; return; }
+    deferred = false;
+    await refresh();
+  };
+  host.addEventListener('focusout', () => {
+    if (deferred) setTimeout(refreshIfIdle, 0);
+  });
+
   host.addEventListener('click', async event => {
     const installGuideButton = event.target.closest?.('[data-ios-install-guide]');
     if (installGuideButton) {
@@ -684,18 +705,20 @@ export function initStorageManager(host = document.getElementById('storage-manag
     announceLocalAction(message);
     host.querySelector(`[data-clear-storage="${scopeId}"]`)?.focus({ preventScroll: true });
   });
-  document.addEventListener('hm-storage:change', refresh);
-  // This first render happens during boot, before the worker has installed and
+  // The first render happens during boot, before the worker has installed and
   // filled its caches, and `hm-storage:change` only fires for a pack save or a
-  // scope clear. Without this the panel keeps the boot-time snapshot for the
-  // life of the page and reports "0 entries · 0 B" for caches holding a hundred
-  // and sixty, while the diagnostics block below it reads the same caches
-  // correctly because it also listens for the worker.
-  //
-  // Refreshing on the settings popover opening as well looks like the obvious
-  // companion to this and is not safe: the re-render is async, so it lands
-  // while the reader is already clicking, replaces every button in the panel,
-  // and drops the focus a cancelled confirmation is supposed to return.
-  document.addEventListener('hm-service-worker:change', refresh);
+  // scope clear. Three triggers are needed to keep the numbers true: the worker
+  // announcing itself covers install and activation; the popover opening covers
+  // everything the worker cached quietly in between, which is how the map-tile
+  // scope grows and the one case where this panel and the diagnostics block
+  // below it could still be caught disagreeing.
+  document.addEventListener('hm-storage:change', refreshIfIdle);
+  document.addEventListener('hm-service-worker:change', refreshIfIdle);
+  const settingsMenu = document.getElementById('settings-menu');
+  if (settingsMenu) {
+    settingsMenu.addEventListener('toggle', () => {
+      if (settingsMenu.matches(':popover-open')) refreshIfIdle();
+    });
+  }
   refresh();
 }
