@@ -54,7 +54,7 @@
     - list:
       - listitem:
         - strong: Tanpèt aktif
-        - text: "/Pa disponib NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Orijin: Rezo/"
+        - text: "/Pa disponib NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+ Orijin: Rezo/"
         - button "Eseye ankò"
       - listitem:
         - strong: Jewometri previzyon ofisyèl
@@ -114,15 +114,15 @@
         - button "Eseye ankò"
       - listitem:
         - strong: Mak pi wo dlo a rive
-        - text: "/Aktyèl · \\d+ anrejistreman USGS high-water marks Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman USGS high-water marks Dènye siksè: \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+ Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Rapò evènman tanpèt
-        - text: "/Aktyèl · \\d+ anrejistreman NOAA NCEI Storm Events Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman NOAA NCEI Storm Events Dènye siksè: \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+ Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Ekspozisyon popilasyon
-        - text: "/Aktyèl · \\d+ anrejistreman Bundled state population densities Dènye siksè: 8\\/8\\/\\d+, 4:\\d+:\\d+ PM Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
+        - text: "/Aktyèl · \\d+ anrejistreman Bundled state population densities Dènye siksè: \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+ Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan/"
         - button "Eseye ankò"
       - listitem:
         - strong: Zòn evakyasyon

@@ -1,5 +1,5 @@
 import { ensureStormsLoaded, getAllStorms, windToCategory, categoryColor } from './data.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { activateDialogFocus } from './dialog-focus.js';
 
 const GLOBE_PROTOCOL = 'hm-globe-v1';
@@ -433,7 +433,7 @@ function setStatus(message) {
 }
 
 function formatTimelineDate(value) {
-  return new Date(value).toLocaleString(undefined, {
+  return new Date(value).toLocaleString(getDateLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

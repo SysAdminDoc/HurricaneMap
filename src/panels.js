@@ -51,6 +51,26 @@ function focusPanelEntry(el) {
   });
 }
 
+// A re-render replaces the panel's markup, so whatever the reader had focused
+// inside it is gone and focus falls to <body>. Opening a similar-storms row is
+// exactly that: the button that was activated is destroyed by the re-render it
+// triggers, and a keyboard reader was left at the top of the document with no
+// idea where they were. Only when focus was inside this panel to begin with:
+// a reader driving the settings menu is not inside the panel, and moving them
+// is the theft this guard exists to prevent.
+function restoreFocusAfterRerender(el) {
+  requestAnimationFrame(() => {
+    if (!el || el.hidden || el.classList.contains('minimized')) return;
+    const active = document.activeElement;
+    const stillPlaced = active
+      && active !== document.body
+      && active !== document.documentElement
+      && active.isConnected;
+    if (stillPlaced) return;
+    focusPanelEntry(el);
+  });
+}
+
 function restorePanelInvoker(el) {
   const invoker = panelInvokers.get(el.id);
   panelInvokers.delete(el.id);
@@ -176,6 +196,7 @@ export function showPanel(id) {
   const alreadyOnScreen = Boolean(existingPanel)
     && existingPanel.hidden === false
     && !existingPanel.classList.contains('minimized');
+  const focusWasInside = Boolean(existingPanel) && existingPanel.contains(document.activeElement);
   withTransition(() => {
     closePanelsExcept(id);
     const el = getPanel(id);
@@ -187,6 +208,7 @@ export function showPanel(id) {
       el.hidden = false;
       document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id } }));
       if (!alreadyOnScreen) focusPanelEntry(el);
+      else if (focusWasInside) restoreFocusAfterRerender(el);
     }
     setPanelState();
   });

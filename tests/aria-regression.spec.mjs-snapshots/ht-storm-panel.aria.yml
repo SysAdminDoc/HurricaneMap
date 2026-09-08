@@ -36,7 +36,7 @@
       - option "San Diego, CA"
       - option "Cabo San Lucas, MX"
     - strong: /\d+ mi/
-    - text: "/\\(\\d+ km\\) · \\d+ kt · Aug \\d+, \\d+, \\d+:\\d+ PM UTC Peryòd retou \\(reyon \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
+    - text: "/\\(\\d+ km\\) · \\d+ kt · \\d+ août \\d+, \\d+:\\d+ UTC Peryòd retou \\(reyon \\d+ km\\): Cat 3\\+: ~\\d+\\.3y • Cat 1\\+: ~8\\.2y/"
     - heading "Enpak" [level=3]
     - text: /Viktim \d+,\d+ Dega \$[\d,.]+[bkmBKM]+ \(\d+ USD · \$[\d,.]+[bkmBKM]+ nominal\) Dezas plizyè milya dola \$[\d,.]+[bkmBKM]+ \(\d+ USD · \d+,\d+ moun ki mouri\)/
     - 'link "Sous: Wikipedya"':
@@ -78,14 +78,14 @@
     - heading "Rive atè Ozetazini (nan lòd dat)" [level=3]
     - list:
       - listitem:
-        - text: /Cat 1 Florida Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
+        - text: /Cat 1 Florida \d+ août \d+, \d+:\d+ UTC/
+        - button /Montre radà NEXRAD pou \d+ août \d+, \d+:\d+ UTC/: Radà
       - listitem:
-        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ AM UTC/
-        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ AM UTC/: Radà
+        - text: /Cat 3 Louisiana \d+ août \d+, \d+:\d+ UTC/
+        - button /Montre radà NEXRAD pou \d+ août \d+, \d+:\d+ UTC/: Radà
       - listitem:
-        - text: /Cat 3 Louisiana Aug \d+, \d+, \d+:\d+ PM UTC/
-        - button /Montre radà NEXRAD pou Aug \d+, \d+, \d+:\d+ PM UTC/: Radà
+        - text: /Cat 3 Louisiana \d+ août \d+, \d+:\d+ UTC/
+        - button /Montre radà NEXRAD pou \d+ août \d+, \d+:\d+ UTC/: Radà
     - status: "/Kach rada: pa gen imaj ki sove \\(\\d+ disponib\\)/"
     - region "Kontèks federal katastwòf la":
       - heading "Kontèks federal katastwòf la" [level=3]

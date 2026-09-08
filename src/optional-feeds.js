@@ -1,5 +1,5 @@
 import { escapeHtml } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 
 export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   active: { labelKey: 'feeds.active', source: 'NOAA NHC CurrentStorms' },
@@ -285,7 +285,7 @@ export function getOptionalFeedStates() {
 
 function formatTime(value) {
   if (!Number.isFinite(value)) return t('feeds.never');
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString(getDateLocale());
 }
 
 function stateLabel(feed) {

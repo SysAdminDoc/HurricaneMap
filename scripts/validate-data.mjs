@@ -170,12 +170,10 @@ const AOML_MATCH_DISTANCE_KM = 125;
 
 // This file re-implements the atlas's own arithmetic in a second language so
 // that a bug in the Python builder cannot ratify itself. Distance is the
-// exception: it was a fourth private copy of the haversine, with its own Earth
+// exception: it was a fourth private copy of the haversine with its own Earth
 // radius written out again, and nothing held it to the reference vectors the
-// other three are pinned to. It is exported so test:geodesy can drive it.
-export function haversineKm(a, b) {
-  return sharedHaversineKm(a.lat, a.lon, b.lat, b.lon);
-}
+// other three are pinned to. There is no wrapper to test now because there is
+// nothing left to wrap; the call below is the shared implementation.
 
 function matchAomlRecords(truth, predictions) {
   const pairs = [];
@@ -183,7 +181,7 @@ function matchAomlRecords(truth, predictions) {
     predictions.forEach((prediction, predictionIndex) => {
       if (prediction.storm_id !== truthRecord.storm_id) return;
       const timeHours = Math.abs(Date.parse(prediction.t) - Date.parse(truthRecord.t)) / (3600 * 1000);
-      const distanceKm = haversineKm(truthRecord, prediction);
+      const distanceKm = sharedHaversineKm(truthRecord.lat, truthRecord.lon, prediction.lat, prediction.lon);
       if (timeHours <= AOML_MATCH_TIME_HOURS && distanceKm <= AOML_MATCH_DISTANCE_KM) {
         pairs.push({ timeHours, distanceKm, truthIndex, predictionIndex });
       }

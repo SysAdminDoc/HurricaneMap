@@ -78,6 +78,21 @@ export function getLocale() {
   return currentLocale;
 }
 
+// ICU carries no data for `ht`, so `toLocaleString('ht', ...)` resolves to the
+// runtime default, which is the browser locale this app deliberately does not
+// use: a Creole reader on an English browser got "Aug 24, 2005" inside an
+// otherwise Creole panel, and the accessibility baselines had it recorded as
+// correct. French is Haiti's other official language and ICU does carry
+// `fr-HT`, so dates resolve there. Anything unresolvable lands on English by
+// name rather than on whatever the browser happens to be, because falling back
+// to the reader's browser is the bug this exists to remove.
+const DATE_LOCALES = { [LOCALE_HT]: 'fr-HT' };
+
+export function getDateLocale(locale = currentLocale) {
+  const mapped = DATE_LOCALES[locale] || locale;
+  return Intl.DateTimeFormat.supportedLocalesOf([mapped])[0] || LOCALE_EN;
+}
+
 export function t(key, ...args) {
   const strings = STRINGS[currentLocale] || STRINGS[LOCALE_EN];
   // Partial locales (ht) fall back to English before exposing the raw key.

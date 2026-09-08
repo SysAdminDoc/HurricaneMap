@@ -1434,7 +1434,7 @@ async function assertRelayStillWinsForActiveStorms(browser, baseUrl) {
       return card.querySelector('p')?.textContent || '';
     });
     assert(
-      !/0 kt/.test(missingIntensity),
+      !/\b0 kt\b/.test(missingIntensity),
       `an unreported intensity rendered as calm: "${missingIntensity}"`,
     );
 
@@ -2300,11 +2300,6 @@ async function assertSettingsChangeKeepsPanel(context, baseUrl) {
   }
 }
 
-// Two things the storm panel owes the map. A similar-storms row has to open the
-// storm it names, and closing the panel must not take the "show tracks" filter's
-// own tracks with it: they share one Leaflet layer, so clearing the layer looked
-// like the panel tidying up after itself and was really the filter going blank
-// while its checkbox and the URL both still said it was on.
 // A setting changed from the open settings menu re-renders the storm panel
 // behind it. Re-rendering is not opening, and it must not take focus out of the
 // control the reader is still using.
@@ -2361,6 +2356,88 @@ async function assertSettingsMenuKeepsFocus(context, baseUrl) {
     await page.close();
   }
 }
+// Activating a similar-storms row re-renders the panel, which destroys the very
+// button that was activated. Focus fell to <body>, so a keyboard reader was
+// returned to the top of the document with no idea where they were. Making the
+// rows focusable without this is worse than leaving them unreachable.
+async function assertRowActivationKeepsFocus(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/#v=1&storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel .similar-storm-row', { timeout: 15000 });
+    const before = await page.evaluate(() => document.querySelector('#storm-panel h2')?.textContent || '');
+    await page.focus('#storm-panel .similar-storm-row');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      (heading) => (document.querySelector('#storm-panel h2')?.textContent || '') !== heading,
+      before,
+      { timeout: 15000 },
+    );
+    // The move is deferred to an animation frame, so watch for it rather than
+    // sampling once; reading straight after the re-render passes either way.
+    const landed = await page.waitForFunction(
+      () => {
+        const active = document.activeElement;
+        return Boolean(active) && active !== document.body && active !== document.documentElement;
+      },
+      null,
+      { timeout: 3000 },
+    ).then(() => true).catch(() => false);
+    const where = await page.evaluate(() => ({
+      tag: document.activeElement?.tagName || null,
+      inPanel: Boolean(document.activeElement?.closest('#storm-panel')),
+      heading: document.querySelector('#storm-panel h2')?.textContent || '',
+    }));
+    assert(before && where.heading && where.heading !== before, `activating a similar-storms row did not open another storm: ${where.heading}`);
+    assert(landed && where.inPanel, `activating a similar-storms row dropped focus to ${where.tag}`);
+  } finally {
+    await page.close();
+  }
+}
+
+// applyFilters() empties the one Leaflet layer the panel's track lives in, and
+// a theme or high-contrast change goes through it. The panel stayed open naming
+// a storm with no track on the map, and nothing redrew it.
+async function assertThemeChangeKeepsStormTrack(context, baseUrl) {
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/#v=1&storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    await page.waitForFunction(() => document.querySelectorAll('#map path').length > 5, null, { timeout: 15000 });
+    const before = await page.evaluate(() => document.querySelectorAll('#map path').length);
+    for (const [key, value] of [['theme', 'light'], ['highContrast', true]]) {
+      await page.evaluate(async ([settingKey, settingValue]) => {
+        const settings = await import('/src/settings.js');
+        settings.setSetting(settingKey, settingValue);
+      }, [key, value]);
+      const redrawn = await page.waitForFunction(
+        (expected) => document.querySelectorAll('#map path').length >= expected,
+        before,
+        { timeout: 10000 },
+      ).then(() => true).catch(() => false);
+      const state = await page.evaluate(() => ({
+        paths: document.querySelectorAll('#map path').length,
+        open: document.querySelector('#storm-panel')?.hidden === false,
+        heading: document.querySelector('#storm-panel h2')?.textContent || '',
+      }));
+      assert(state.open, `changing ${key} closed the storm panel`);
+      assert(
+        redrawn && state.paths >= before,
+        `changing ${key} left the open panel (${state.heading}) with no track: ${before} paths became ${state.paths}`,
+      );
+    }
+  } finally {
+    await page.close();
+  }
+}
+
+// Two things the storm panel owes the map. A similar-storms row has to open the
+// storm it names, and closing the panel must not take the "show tracks" filter's
+// own tracks with it: they share one Leaflet layer, so clearing the layer looked
+// like the panel tidying up after itself and was really the filter going blank
+// while its checkbox and the URL both still said it was on.
 async function assertStormPanelMapContracts(context, baseUrl) {
   const page = await context.newPage();
   try {
@@ -2422,6 +2499,17 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     const beforeOpen = await page.evaluate(() => document.querySelectorAll('#map path').length);
     await page.evaluate(() => { location.hash = '#v=1&y=2005-2005&t=1&storm=AL122005'; });
     await page.waitForSelector('#storm-panel .im-row', { timeout: 15000 });
+    // The same hash change turns the filter on, and its redraw is asynchronous,
+    // so the first row can appear while the layer is still being rebuilt.
+    // Sampling the count there caught a transient dip of a few paths and failed
+    // on a map that was about to be correct. Wait for the recovery the way the
+    // sibling assertion below already does: a real wipe never recovers, so this
+    // still fails on the defect it was written for.
+    await page.waitForFunction(
+      (expected) => document.querySelectorAll('#map path').length >= expected,
+      beforeOpen,
+      { timeout: 10000 },
+    ).catch(() => {});
     const whileOpen = await page.evaluate(() => ({
       paths: document.querySelectorAll('#map path').length,
       checked: document.querySelector('#show-tracks')?.checked,
@@ -4367,6 +4455,8 @@ try {
   await assertDeferredDataScope(context, baseUrl);
   await assertSettingsChangeKeepsPanel(context, baseUrl);
   await assertStormPanelMapContracts(context, baseUrl);
+  await assertRowActivationKeepsFocus(context, baseUrl);
+  await assertThemeChangeKeepsStormTrack(context, baseUrl);
   await assertSettingsMenuKeepsFocus(context, baseUrl);
 
   await assertDialogAndKeyboardContracts(page);

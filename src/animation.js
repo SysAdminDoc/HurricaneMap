@@ -365,7 +365,7 @@ export class TrackAnimator {
         this.paused = true;
         const btn = this.controls?.querySelector('[data-act="toggle"]');
         if (btn) {
-          btn.textContent = 'Play';
+          btn.textContent = t('anim.play');
           btn.title = t('anim.resumeTitle');
           btn.setAttribute('aria-label', btn.title);
         }
@@ -410,7 +410,7 @@ export class TrackAnimator {
     }
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
-      btn.textContent = this.paused ? 'Play' : 'Pause';
+      btn.textContent = this.paused ? t('anim.play') : t('anim.pause');
       btn.title = this.paused ? t('anim.resumeTitle') : t('anim.pauseTitle');
       btn.setAttribute('aria-label', btn.title);
     }
@@ -426,7 +426,7 @@ export class TrackAnimator {
     this.paused = false;
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
-      btn.textContent = 'Pause';
+      btn.textContent = t('anim.pause');
       btn.title = t('anim.pauseTitle');
       btn.setAttribute('aria-label', btn.title);
     }

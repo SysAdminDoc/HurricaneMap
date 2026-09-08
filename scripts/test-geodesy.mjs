@@ -107,21 +107,36 @@ assert.equal(segmentOnlyReturnPeriods.cat3_years, 5, 'return periods use one eve
 // independent ground-truth check and the AOML builder each carried a private
 // haversine with the Earth radius written out again, and nothing held either to
 // these vectors: the whole point of recomputing the delta in a second language
-// is lost if the second language quietly uses different maths. They delegate
-// now. validate-data.mjs is top-level script code, so importing it would run a
-// full validation; it is read instead, which is also the check that matters,
-// since the failure mode is somebody writing a fresh copy rather than the
-// shared one being wrong.
+// is lost if the second language quietly uses different maths.
+//
+// This is a source check, and it says so, because the two consumers cannot be
+// driven the same way. build_aoml_landfalls.py IS driven by these vectors, in
+// test-geodesy-python.py. validate-data.mjs is 997 lines of top-level script,
+// so importing it runs a full validation; rather than keep an exported wrapper
+// nothing could reach, the wrapper is gone and the call site uses the shared
+// implementation directly. What remains to catch is somebody writing a fresh
+// copy, and the first version of this check could not: it looked for
+// `Math.asin`, which the equally standard `atan2` spelling of the haversine
+// walks straight past. A private copy needs an Earth radius and it needs
+// inverse trigonometry, so both are refused, in either language.
+const PRIVATE_HAVERSINE = [
+  [/\b(?:Math\.)?asin\s*\(/, 'an asin() call'],
+  [/\b(?:Math\.)?atan2\s*\(/, 'an atan2() call'],
+  [/\b63[0-9]{2}(?:\.[0-9]+)?\b/, 'an Earth radius written out'],
+];
 for (const [relative, importPattern] of [
   ['./validate-data.mjs', /from '\.\.\/src\/geodesy\.js'/],
   ['./build_aoml_landfalls.py', /from preprocess_hurdat2 import haversine_km/],
 ]) {
   const source = await readSource(new URL(relative, import.meta.url), 'utf8');
   assert(importPattern.test(source), `${relative} no longer takes its distance arithmetic from the shared implementation`);
-  assert(
-    !/Math\.asin|math\.asin/.test(source.replace(/haversine/gi, '')),
-    `${relative} has grown a private haversine again; the reference vectors do not cover it`,
-  );
+  const withoutTheImport = source.replace(/haversine/gi, '');
+  for (const [pattern, what] of PRIVATE_HAVERSINE) {
+    assert(
+      !pattern.test(withoutTheImport),
+      `${relative} contains ${what}, which is how a private haversine gets back in; the reference vectors do not cover it`,
+    );
+  }
 }
 
 console.log(`geodesy ok (${vectors.distance_vectors.length} distances, ${vectors.segment_vectors.length} segments, ${catalogueChecks.length} track counts)`);

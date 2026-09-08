@@ -1,7 +1,7 @@
 // Storm comparison mode — pin up to 4 storms, view their tracks color-coded
 // on the map and side-by-side intensity charts in a comparison panel.
 
-import { getLocale, t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { ensureStormsLoaded, getStorm, getAllStorms, categoryClass } from './data.js';
 import { getMap } from './map.js';
 import { renderIntensityChart } from './chart.js';
@@ -253,7 +253,7 @@ function renderComparePanel() {
   const comparisonRows = getComparisonRows({
     allStorms: getAllStorms(),
     windUnit: getSetting('windUnit'),
-    locale: getLocale(),
+    locale: getDateLocale(),
   });
   const rowsById = new Map(comparisonRows.map(row => [row.id, row]));
   const cardRows = {
@@ -369,7 +369,7 @@ function exportComparisonCSV(storms) {
     allStorms: getAllStorms(),
     translate: t,
     windUnit: getSetting('windUnit'),
-    locale: getLocale(),
+    locale: getDateLocale(),
   });
 
   // Trigger download

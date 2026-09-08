@@ -1001,6 +1001,7 @@ export default {
   'anim.radarLockstep': 'Montre refleksyon NEXRAD la sinkwonize ak revèy UTC simile a',
   'anim.pauseTitle': 'Kanpe lekti a',
   'anim.pause': 'Kanpe',
+  'anim.play': 'Jwe',
   'anim.restartTitle': 'Rekòmanse lekti a',
   'anim.restart': 'Rekòmanse',
   'anim.speed': 'Vitès lekti',

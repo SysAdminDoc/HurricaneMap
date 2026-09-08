@@ -56,14 +56,14 @@
         - rowheader "Pwen chemen"
         - cell /\d+/
         - cell /\d+/
-      - row /Kreyasyon Aug \d+, \d+ Aug \d+, \d+/:
+      - row /Kreyasyon \d+ août \d+ \d+ août \d+/:
         - rowheader "Kreyasyon"
-        - cell /Aug \d+, \d+/
-        - cell /Aug \d+, \d+/
-      - row /Final Aug \d+, \d+ Aug \d+, \d+/:
+        - cell /\d+ août \d+/
+        - cell /\d+ août \d+/
+      - row /Final \d+ août \d+ \d+ août \d+/:
         - rowheader "Final"
-        - cell /Aug \d+, \d+/
-        - cell /Aug \d+, \d+/
+        - cell /\d+ août \d+/
+        - cell /\d+ août \d+/
       - row "Eta ki touche Florida, Louisiana Florida, Louisiana":
         - rowheader "Eta ki touche"
         - cell "Florida, Louisiana"

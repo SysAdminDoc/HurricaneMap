@@ -1026,6 +1026,7 @@ export default {
   'anim.radarLockstep': 'Show NEXRAD reflectivity in lockstep with the simulated UTC clock',
   'anim.pauseTitle': 'Pause playback',
   'anim.pause': 'Pause',
+  'anim.play': 'Play',
   'anim.restartTitle': 'Restart playback',
   'anim.restart': 'Restart',
   'anim.speed': 'Playback speed',

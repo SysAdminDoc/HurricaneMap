@@ -192,15 +192,95 @@ export function applyCssFilter(rgb, filter) {
   if (!threw) throw new Error('angle-unit regression: an unconvertible unit must throw rather than be read as degrees');
 }
 
-// Which theme a selector belongs to. `html:not(.light-theme)` contains the
-// text `.light-theme`, so the negation has to be tested first or every dark
-// rule reads as a light one.
-export function themeScope(selector) {
-  const text = String(selector).toLowerCase();
-  if (text.includes('.high-contrast')) return 'high-contrast';
-  if (text.includes(':not(.light-theme)')) return 'dark';
-  if (text.includes('.light-theme')) return 'light';
-  return 'base';
+// The cascade order is declared, not guessed. src/styles.css names the layers
+// and assigns each stylesheet to exactly one. Reading the directory and sorting
+// by filename put styles-accessibility.css (the LAST layer) first and
+// styles-tokens.css (the FIRST layer) second from last, so "the last
+// declaration wins" was inverted for precisely the two sheets that decide this.
+// A `:root` override in the themes or accessibility layer paints in every
+// browser and was invisible here.
+export function cascadeOrder(entryCss) {
+  const declared = /@layer\s+([^;{]+);/.exec(entryCss);
+  const order = declared ? declared[1].split(',').map(name => name.trim()) : [];
+  return [...entryCss.matchAll(/@import\s+url\(\s*['"]\.\/([^'"]+)['"]\s*\)\s*layer\(\s*([\w-]+)\s*\)/g)]
+    .map(match => ({ file: `src/${match[1]}`, layer: match[2], rank: order.indexOf(match[2]) }))
+    .sort((a, b) => a.rank - b.rank);
+}
+
+// The class list on <html> in each mode a reader can be in. High contrast sits
+// over the default theme, so it carries no light-theme class.
+export const MODE_CLASSES = Object.freeze({
+  dark: [],
+  light: ['light-theme'],
+  'high-contrast': ['high-contrast'],
+});
+
+// Split a selector list on the commas that separate selectors, not on the ones
+// inside :not(), :is() or :where().
+export function splitSelectorList(selector) {
+  const parts = [];
+  let depth = 0;
+  let current = '';
+  for (const character of String(selector)) {
+    if (character === '(') depth += 1;
+    else if (character === ')') depth -= 1;
+    if (character === ',' && depth === 0) { parts.push(current); current = ''; continue; }
+    current += character;
+  }
+  parts.push(current);
+  return parts.map(part => part.trim()).filter(Boolean);
+}
+
+// Does this selector apply to a reader whose <html> carries these classes?
+// Only the root compound decides, because everything that themes this app
+// hangs off html or :root. Evaluating the selector beats classifying it by
+// substring: `html:not( .light-theme )` reads as light to a substring test,
+// `html:not(.light-theme):not(.high-contrast)` reads as high contrast, and
+// `html.light-theme, html:not(.light-theme)` reads as one mode when it covers
+// both. Each of those spellings paints somewhere the old test never looked.
+export function selectorApplies(selector, classes) {
+  const present = new Set(classes);
+  return splitSelectorList(selector).some((part) => {
+    let depth = 0;
+    let root = '';
+    for (const character of part) {
+      if (character === '(') depth += 1;
+      else if (character === ')') depth -= 1;
+      else if (depth === 0 && /[\s>+~]/.test(character)) break;
+      root += character;
+    }
+    const forbidden = new Set();
+    for (const negation of root.matchAll(/:not\(([^()]*)\)/g)) {
+      for (const found of negation[1].matchAll(/\.([\w-]+)/g)) forbidden.add(found[1]);
+    }
+    const required = new Set();
+    for (const found of root.replace(/:not\([^()]*\)/g, '').matchAll(/\.([\w-]+)/g)) required.add(found[1]);
+    if ([...required].some(name => !present.has(name))) return false;
+    return ![...forbidden].some(name => present.has(name));
+  });
+}
+
+// A conditional at-rule this gate does not model is a rule that may or may not
+// paint, and measuring it either way is a guess. Report it rather than guess.
+export function enclosingConditions(css, index) {
+  const conditions = [];
+  let depth = 0;
+  for (let i = index - 1; i >= 0; i -= 1) {
+    const character = css[i];
+    if (character === '}') depth += 1;
+    else if (character === '{') {
+      if (depth === 0) {
+        let start = 0;
+        for (const boundary of ['}', '{', ';']) {
+          const found = css.lastIndexOf(boundary, i - 1);
+          if (found > start) start = found + 1;
+        }
+        const prelude = css.slice(start, i).trim().replace(/\s+/g, ' ');
+        if (/^@(media|supports|container)\b/.test(prelude)) conditions.push(prelude);
+      } else depth -= 1;
+    }
+  }
+  return conditions;
 }
 
 // The selector of the rule a declaration sits in, found by walking back to the
@@ -226,19 +306,37 @@ export function declaringSelector(css, index) {
   return css.slice(start, open).trim().replace(/\s+/g, ' ');
 }
 
-// The three modes a reader can be in. High contrast sits last because the
-// accessibility layer is last, so its tile-pane rule beats the dark theme's at
-// equal specificity and a high-contrast reader gets the unfiltered basemap in
-// either theme.
-const SCOPES = ['dark', 'light', 'high-contrast'];
 const EXEMPTION_MARKER = 'data-hm-exemption="map-geometry-non-text-contrast"';
 
 async function main() {
-  const files = (await readdir(styleDir)).filter(name => name.endsWith('.css')).sort();
-  const stylesheets = new Map();
-  for (const file of files) stylesheets.set(`src/${file}`, await readFile(path.join(styleDir, file), 'utf8'));
-  const compareJs = await readFile(path.join(root, 'src/compare.js'), 'utf8');
+  const entry = await readFile(path.join(styleDir, 'styles.css'), 'utf8');
+  const order = cascadeOrder(entry);
   const errors = [];
+
+  // A stylesheet outside the main cascade is fine on its own: globe-host.css
+  // is loaded by the sandboxed globe.html and never reaches this document. One
+  // that declares a track colour or filters the tile pane is not fine, because
+  // its position in the cascade decides the answer and nothing here knows it.
+  const imported = new Set(order.map(item => item.file));
+  for (const name of (await readdir(styleDir)).filter(file => file.endsWith('.css') && file !== 'styles.css').sort()) {
+    const file = `src/${name}`;
+    if (imported.has(file)) continue;
+    const css = stripCssComments(await readFile(path.join(styleDir, name), 'utf8'));
+    const declares = /--pin-[1-4]-track:/.test(css) || tilePaneRules(css).length > 0;
+    if (declares) {
+      errors.push(`${file} declares a track colour or a tile-pane rule but src/styles.css does not import it, so its place in the cascade is unknown`);
+    }
+  }
+  for (const item of order) {
+    if (item.rank < 0) errors.push(`${item.file} is imported into layer ${item.layer}, which src/styles.css never declares`);
+  }
+
+  const stylesheets = [];
+  for (const item of order) {
+    const raw = await readFile(path.join(styleDir, path.basename(item.file)), 'utf8');
+    stylesheets.push({ ...item, css: stripCssComments(raw) });
+  }
+  const compareJs = await readFile(path.join(root, 'src/compare.js'), 'utf8');
 
   // The polyline's alpha, read from the call that draws it rather than assumed.
   const opacityMatch = compareJs.match(/\bopacity:\s*([0-9.]+),/);
@@ -248,24 +346,35 @@ async function main() {
     process.exit(1);
   }
 
-  // Every declaration of a track token in every stylesheet, with the selector
-  // it was written under. Reading a subset was its own bug: the shell and
-  // utilities layers are both later than tokens, so an override in either would
-  // have been invisible. Reading the value without its selector was the next
-  // one: a high-contrast override measured against the dark theme's basemap is
-  // a colour nobody sees on a surface nobody renders.
+  // Every declaration of a track token, in cascade order, with the selector it
+  // was written under. Reading a subset was the first bug here; reading the
+  // value without its selector was the second; ordering by filename rather than
+  // by layer was the third, and it inverted the two sheets that matter.
   const declarations = new Map();
-  for (const [file, raw] of stylesheets) {
-    const css = stripCssComments(raw);
-    for (const match of css.matchAll(/--pin-([1-4])-track:\s*([^;]+);/g)) {
+  for (const [rank, sheet] of stylesheets.entries()) {
+    for (const match of sheet.css.matchAll(/--pin-([1-4])-track:\s*([^;]+);/g)) {
       const slot = Number(match[1]);
-      const selector = declaringSelector(css, match.index);
       if (!declarations.has(slot)) declarations.set(slot, []);
-      declarations.get(slot).push({ file, value: match[2].trim(), selector, scope: themeScope(selector) });
+      declarations.get(slot).push({
+        file: sheet.file,
+        value: match[2].trim(),
+        selector: declaringSelector(sheet.css, match.index),
+        conditions: enclosingConditions(sheet.css, match.index),
+        rank,
+        at: match.index,
+      });
     }
   }
   for (const slot of [1, 2, 3, 4]) {
     if (!declarations.has(slot)) errors.push(`no stylesheet declares --pin-${slot}-track`);
+    for (const entry of declarations.get(slot) || []) {
+      if (entry.conditions.length) {
+        errors.push(
+          `${entry.file} declares --pin-${slot}-track inside ${entry.conditions.join(' inside ')}, a condition this `
+          + 'gate cannot evaluate, so whether a reader sees this colour is unknown',
+        );
+      }
+    }
   }
 
   const fallbacks = new Map(
@@ -289,54 +398,70 @@ async function main() {
   // LAST `filter` in the block wins, the way a browser resolves it, with
   // `backdrop-filter` excluded by a boundary because these stylesheets use it
   // twenty times and matching it means measuring a surface nobody renders.
-  const allCss = stripCssComments([...stylesheets.values()].join('\n'));
   const FILTER_DECLARATION_RE = /(?:^|[;{\s])filter\s*:\s*([^;}]+)/g;
   const paneFilters = [];
-  for (const rule of tilePaneRules(allCss)) {
-    // Nested blocks used to be deleted wholesale before the declarations were
-    // read, which threw away a `filter` inside a nested `@media` that Chromium
-    // applies. A nested block is part of the rule, so its declarations count;
-    // only the selector or condition line is dropped.
-    const flattened = rule.body.replace(/(^|[{};])\s*[@&][^{};]*\{/g, '$1 ').replace(/\}/g, ' ');
-    const found = [...flattened.matchAll(FILTER_DECLARATION_RE)];
-    if (!found.length) {
-      // A tile-pane rule with no filter at all is ordinary: several set only a
-      // transition or a will-change. An escaped property name is not. A
-      // hex-escaped spelling is one Chromium honours and this gate cannot read,
-      // and a rule using it dropped the reported rule count from three to two
-      // in silence.
-      if (/\\[0-9a-fA-F]/.test(rule.body)) {
-        errors.push(
-          `${rule.selector} spells a property with a CSS escape, which this gate cannot read; `
-          + 'write the property name out so the filter it may set is measurable',
-        );
+  for (const [rank, sheet] of stylesheets.entries()) {
+    for (const rule of tilePaneRules(sheet.css)) {
+      // Nested blocks used to be deleted wholesale before the declarations were
+      // read, which threw away a `filter` inside a nested `@media` that
+      // Chromium applies. A nested block is part of the rule, so its
+      // declarations count; only the selector or condition line is dropped.
+      const flattened = rule.body.replace(/(^|[{};])\s*[@&][^{};]*\{/g, '$1 ').replace(/\}/g, ' ');
+      const found = [...flattened.matchAll(FILTER_DECLARATION_RE)];
+      if (!found.length) {
+        // A tile-pane rule with no filter at all is ordinary: several set only
+        // a transition or a will-change. An escaped property name is not. A
+        // hex-escaped spelling is one Chromium honours and this gate cannot
+        // read, and a rule using it dropped the reported rule count from three
+        // to two in silence.
+        if (/\\[0-9a-fA-F]/.test(rule.body)) {
+          errors.push(
+            `${rule.selector} spells a property with a CSS escape, which this gate cannot read; `
+            + 'write the property name out so the filter it may set is measurable',
+          );
+        }
+        continue;
       }
-      continue;
+      const at = sheet.css.indexOf(rule.body);
+      const conditions = at === -1 ? [] : enclosingConditions(sheet.css, at);
+      if (conditions.length) {
+        errors.push(
+          `${sheet.file} filters the tile pane inside ${conditions.join(' inside ')}, a condition this gate cannot `
+          + 'evaluate, so the basemap a reader sees is unknown',
+        );
+        continue;
+      }
+      paneFilters.push({
+        file: sheet.file,
+        selector: rule.selector,
+        filter: found[found.length - 1][1].replace(/!important\s*$/i, '').trim().toLowerCase(),
+        rank,
+        at,
+      });
     }
-    const filter = found[found.length - 1][1].replace(/!important\s*$/i, '').trim().toLowerCase();
-    paneFilters.push({ selector: rule.selector, filter, scope: themeScope(rule.selector) });
   }
   if (!paneFilters.length) {
     errors.push('no rule filters the tile pane any more, so this gate cannot tell what the basemap looks like');
   }
 
-  // Resolve each mode to the one basemap and the four tokens a reader in that
-  // mode actually gets. Pairing them is the point: measuring every token
-  // against every basemap counted combinations nobody renders, and it would
-  // reject a high-contrast override for failing on the dark theme's basemap,
-  // which is a surface that override never appears on.
-  const pick = (list, scope) => {
-    const scoped = list.filter(entry => entry.scope === scope);
-    const base = list.filter(entry => entry.scope === 'base');
-    const chosen = scoped.length ? scoped : base;
-    return chosen.length ? chosen[chosen.length - 1] : null;
+  // Resolve each mode to the one basemap and the four colours a reader in that
+  // mode actually gets: every entry whose selector applies, latest layer wins,
+  // then latest within the layer. Pairing them is the point. Measuring every
+  // colour against every basemap counted combinations nobody renders, and it
+  // would reject a high-contrast override for failing on the dark theme's
+  // basemap, a surface that override never appears on.
+  const pick = (list, mode) => {
+    const applies = list
+      .filter(entry => selectorApplies(entry.selector, MODE_CLASSES[mode]))
+      .sort((a, b) => (a.rank - b.rank) || (a.at - b.at));
+    return applies.length ? applies[applies.length - 1] : null;
   };
 
   const modes = [];
-  for (const scope of SCOPES) {
-    const pane = pick(paneFilters, scope);
+  for (const mode of Object.keys(MODE_CLASSES)) {
+    const pane = pick(paneFilters, mode);
     if (!pane) {
-      errors.push(`no tile-pane rule applies in ${scope}, so this gate cannot tell what that reader's basemap looks like`);
+      errors.push(`no tile-pane rule applies in ${mode}, so this gate cannot tell what that reader's basemap looks like`);
       continue;
     }
     const surfaces = {};
@@ -352,38 +477,39 @@ async function main() {
     if (!measurable) continue;
     const tokens = new Map();
     for (const slot of [1, 2, 3, 4]) {
-      const declaration = pick(declarations.get(slot) || [], scope);
+      const declaration = pick(declarations.get(slot) || [], mode);
       if (declaration) tokens.set(slot, declaration);
+      else errors.push(`no declaration of --pin-${slot}-track applies in ${mode}`);
     }
-    modes.push({ scope, pane, surfaces, tokens });
+    modes.push({ mode, pane, surfaces, tokens });
   }
 
   // src/compare.js hard-codes a fallback for each token, used when the custom
-  // property is missing. It has to agree with the default declaration.
+  // property is missing. It has to agree with what a default reader resolves.
   for (const slot of [1, 2, 3, 4]) {
     const base = pick(declarations.get(slot) || [], 'dark');
     if (base && fallbacks.has(slot) && fallbacks.get(slot).toLowerCase() !== base.value.toLowerCase()) {
       errors.push(
-        `src/compare.js falls back to ${fallbacks.get(slot)} for slot ${slot} but ${base.file} declares ${base.value}`,
+        `src/compare.js falls back to ${fallbacks.get(slot)} for slot ${slot} but ${base.file} resolves to ${base.value}`,
       );
     }
   }
 
   const measured = [];
-  for (const mode of modes) {
-    for (const [slot, declaration] of mode.tokens) {
+  for (const entry of modes) {
+    for (const [slot, declaration] of entry.tokens) {
       const rgb = parseHex(declaration.value);
       if (!rgb) {
         errors.push(`${declaration.file} gives --pin-${slot}-track a value this gate cannot measure: ${declaration.value}`);
         continue;
       }
-      for (const [surface, background] of Object.entries(mode.surfaces)) {
+      for (const [surface, background] of Object.entries(entry.surfaces)) {
         const ratio = contrastRatio(composite(rgb, background, opacity), background);
-        measured.push({ slot, scope: mode.scope, surface, value: declaration.value, file: declaration.file, ratio });
+        measured.push({ slot, mode: entry.mode, surface, value: declaration.value, file: declaration.file, ratio });
         if (ratio < MINIMUM_RATIO) {
           errors.push(
             `${declaration.file}: --pin-${slot}-track ${declaration.value} is ${ratio.toFixed(2)}:1 on the ${surface} fill of `
-            + `the basemap a ${mode.scope} reader sees (${mode.pane.selector}), at ${opacity} opacity, under ${MINIMUM_RATIO}:1`,
+            + `the basemap a ${entry.mode} reader sees (${entry.pane.selector}), at ${opacity} opacity, under ${MINIMUM_RATIO}:1`,
           );
         }
       }
@@ -393,24 +519,35 @@ async function main() {
   // High contrast is a mode a reader turns on to get more separation, and on
   // the map it gets none: its tile-pane rule takes the basemap back to
   // unfiltered, which is what the light theme does, and there is no
-  // high-contrast value for any of the four track tokens. That is a defensible
+  // high-contrast value for any of the four track colours. That is a defensible
   // position, and the VPAT states it with the measurements behind it. It is not
   // a defensible silence, so this fails if the claim goes missing while the
   // situation that needs it stays.
-  const signature = mode => [
-    mode.pane.filter,
-    ...[1, 2, 3, 4].map(slot => mode.tokens.get(slot)?.value ?? 'unset'),
+  const signature = entry => [
+    entry.pane.filter,
+    ...[1, 2, 3, 4].map(slot => entry.tokens.get(slot)?.value ?? 'unset'),
   ].join('|');
-  const highContrast = modes.find(mode => mode.scope === 'high-contrast');
+  const highContrast = modes.find(entry => entry.mode === 'high-contrast');
   const twin = highContrast
-    && modes.find(mode => mode.scope !== 'high-contrast' && signature(mode) === signature(highContrast));
-  if (twin) {
+    && modes.find(entry => entry.mode !== 'high-contrast' && signature(entry) === signature(highContrast));
+  if (highContrast) {
     const vpat = await readFile(path.join(root, 'docs/VPAT.html'), 'utf8').catch(() => '');
-    if (!vpat.includes(EXEMPTION_MARKER)) {
+    const stated = vpat.includes(EXEMPTION_MARKER);
+    if (twin && !stated) {
       errors.push(
-        `high contrast renders the same basemap and the same track colours as the ${twin.scope} theme, and `
+        `high contrast renders the same basemap and the same track colours as the ${twin.mode} theme, and `
         + `docs/VPAT.html does not carry ${EXEMPTION_MARKER}. Either give high contrast its own basemap or its own `
-        + 'track tokens, or state the exemption in the VPAT so the mode stops claiming coverage it does not have',
+        + 'track colours, or state the exemption in the VPAT so the mode stops claiming coverage it does not have',
+      );
+    }
+    // The mirror. An exemption left standing after high contrast grew its own
+    // basemap is a claim about the product that is no longer true, and a
+    // selector that quietly stops matching would otherwise retire the check
+    // without anyone deciding to.
+    if (!twin && stated) {
+      errors.push(
+        'high contrast now renders its own basemap or its own track colours, so the exemption in docs/VPAT.html is '
+        + `stale; remove ${EXEMPTION_MARKER} and the paragraph explaining it`,
       );
     }
   }
@@ -421,16 +558,16 @@ async function main() {
   }
 
   const worst = measured.reduce((lowest, row) => (row.ratio < lowest.ratio ? row : lowest));
-  const perMode = modes.map(mode => {
-    const rows = measured.filter(row => row.scope === mode.scope);
+  const perMode = modes.map((entry) => {
+    const rows = measured.filter(row => row.mode === entry.mode);
     const low = rows.reduce((lowest, row) => (row.ratio < lowest.ratio ? row : lowest));
-    return `${mode.scope} ${low.ratio.toFixed(2)}:1`;
+    return `${entry.mode} ${low.ratio.toFixed(2)}:1`;
   });
   console.log(
     `track contrast ok (${measured.length} measurements at ${opacity} opacity across ${modes.length} modes from `
-    + `${paneFilters.length} tile-pane rules; worst per mode ${perMode.join(', ')}; worst overall `
-    + `${worst.ratio.toFixed(2)}:1 for --pin-${worst.slot}-track on the ${worst.surface} fill in ${worst.scope}`
-    + `${twin ? `; high contrast matches the ${twin.scope} theme and is exempted in the VPAT` : ''})`,
+    + `${paneFilters.length} tile-pane rules in ${stylesheets.length} layered stylesheets; worst per mode `
+    + `${perMode.join(', ')}; worst overall ${worst.ratio.toFixed(2)}:1 for --pin-${worst.slot}-track on the `
+    + `${worst.surface} fill in ${worst.mode}${twin ? `; high contrast matches the ${twin.mode} theme and is exempted in the VPAT` : ''})`,
   );
 }
 

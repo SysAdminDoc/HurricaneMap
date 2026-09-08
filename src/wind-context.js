@@ -1,5 +1,5 @@
 import { escapeHtml } from './html-utils.js';
-import { getLocale, t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { pointToSegmentDistanceKm } from './geodesy.js';
 import {
   beginOptionalFeed,
@@ -236,7 +236,7 @@ export function renderWindContext(host, result) {
     return;
   }
 
-  const locale = getLocale();
+  const locale = getDateLocale();
   const issued = new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',

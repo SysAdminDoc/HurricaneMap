@@ -6,7 +6,7 @@
   - button "Avi anvan" [disabled]: ◀
   - slider "Nimewo avi": "0"
   - button "Avi apre": ▶
-  - paragraph: /Avi 1 sou \d+ · Nimewo avi NHC 1 · Bay Oct 5, \d+, \d+:\d+ PM UTC/
+  - paragraph: /Avi 1 sou \d+ · Nimewo avi NHC 1 · Bay 5 oct\. \d+, \d+:\d+ UTC/
   - paragraph
   - list:
     - listitem: Previzyon preliminè jan yo te bay li

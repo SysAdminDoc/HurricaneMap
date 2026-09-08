@@ -1,5 +1,5 @@
 import { escapeHtml } from './html-utils.js';
-import { getLocale, t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import {
   getOptionalFeedDefinition,
   getOptionalFeedState,
@@ -17,7 +17,7 @@ const mounts = new Map();
 
 function formatTimestamp(value) {
   if (!Number.isFinite(value)) return t('feeds.never');
-  return new Intl.DateTimeFormat(getLocale(), {
+  return new Intl.DateTimeFormat(getDateLocale(), {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value));

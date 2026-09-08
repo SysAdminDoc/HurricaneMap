@@ -1023,6 +1023,7 @@ export default {
   'anim.radarLockstep': 'Mostrar la reflectividad NEXRAD sincronizada con el reloj UTC simulado',
   'anim.pauseTitle': 'Pausar la reproducción',
   'anim.pause': 'Pausar',
+  'anim.play': 'Reproducir',
   'anim.restartTitle': 'Reiniciar la reproducción',
   'anim.restart': 'Reiniciar',
   'anim.speed': 'Velocidad de reproducción',

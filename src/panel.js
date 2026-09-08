@@ -366,7 +366,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
 
         <div class="export-row">
           <span class="export-label">${t('panel.exportTrack')}:</span>
-          <button class="export-btn" data-export="csv" title="${escapeHtml(t('panel.exportCsvTitle'))}">CSV</button>
+          <button class="export-btn" data-export="csv" title="${escapeHtml(t('panel.exportCsvTitle'))}">${escapeHtml(t('btn.exportCSV'))}</button>
           <button class="export-btn" data-export="csv_publication" title="${escapeHtml(t('panel.exportCsvPublicationTitle'))}">${t('panel.exportCsvPublication')}</button>
           <button class="export-btn" data-export="geojson" title="${escapeHtml(t('panel.exportGeojsonTitle'))}">GeoJSON</button>
           <button class="export-btn" data-export="kml" title="${escapeHtml(t('panel.exportKmlTitle'))}">KML</button>

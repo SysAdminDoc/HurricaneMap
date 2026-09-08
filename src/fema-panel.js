@@ -1,5 +1,5 @@
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { FEMA_SOURCE_URL, fetchFemaDeclarations, formatFemaDate } from './fema.js';
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 
@@ -10,8 +10,11 @@ export function cancelFemaRequest() {
   femaController = null;
 }
 
+// documentElement.lang is 'ht' for a Creole reader and ICU carries no data
+// for it, so this resolved to the browser's locale; `|| undefined` was the
+// browser's locale outright.
 function femaLocale() {
-  return document.documentElement?.lang || undefined;
+  return getDateLocale(document.documentElement?.lang || undefined);
 }
 
 function renderFemaDeclaration(record) {

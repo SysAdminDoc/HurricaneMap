@@ -30,7 +30,7 @@ export function isRetired(name, year) {
 // stats.json     — pre-computed roll-ups (by state, decade, year, category).
 // metadata.json  — generated data provenance, coverage, and source details.
 import { assertSupportedDataSchema } from './schema-contract.js';
-import { getLocale } from './i18n.js';
+import { getDateLocale } from './i18n.js';
 import { convertWindKnots, presentCategory, roundMetric } from './metric-presenters.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
@@ -344,7 +344,7 @@ export function ktToMph(kt) {
 export function formatTime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleString(getLocale(), {
+  return d.toLocaleString(getDateLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
   }) + ' UTC';

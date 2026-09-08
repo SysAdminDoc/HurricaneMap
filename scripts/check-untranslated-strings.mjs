@@ -10,7 +10,7 @@
 // literal, and the value of an attribute a screen reader or a tooltip reads
 // out. Anything interpolated is skipped, because t() calls arrive that way.
 import { readdir, readFile } from 'node:fs/promises';
-import { blankCommentsAndRegexes as stripComments } from './js-source.mjs';
+import { blankCommentsAndRegexes as stripComments, findControlBytes } from './js-source.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -205,6 +205,28 @@ export function findUntranslated(file, text) {
 // value turns up as a literal in a module, somebody has written the label back
 // into the markup, and that is exactly the regression the heuristic was meant
 // to catch and could not.
+// Is this occurrence the entire text node or the entire quoted value, rather
+// than a word inside something longer? Anything else is a coincidence for a
+// short string: `class="compare-row"` contains "compare", and a sentence
+// contains its own words.
+function fillsItsSlot(source, at, length, isUiSink) {
+  let before = at - 1;
+  while (before >= 0 && /\s/.test(source[before])) before -= 1;
+  let after = at + length;
+  while (after < source.length && /\s/.test(source[after])) after += 1;
+  const opening = source[before];
+  const closing = source[after];
+  if (opening === '>' && closing === '<') return true;
+  // A quoted short string only counts where the line is assigning text to the
+  // screen. `feed.state === 'stale'`, `' active'` in a class list and the
+  // `'unavailable'` half of a t() key are all whole quoted values, and all
+  // three are code.
+  return isUiSink && Boolean(opening) && opening === closing && /['"`]/.test(opening);
+}
+
+export const covered = new Set();
+export const skipped = new Set();
+
 export function findCatalogEchoes(file, rawSource, catalogValues) {
   const source = stripHtmlComments(rawSource);
   const found = [];
@@ -215,13 +237,25 @@ export function findCatalogEchoes(file, rawSource, catalogValues) {
   // constant from an upstream API to a key is not any of those, and neither is
   // a filename or a citation, which is why matching a catalog value anywhere in
   // the file reported seventy things and meant none of them.
-  const UI_SINK = /\.(?:title|textContent|innerText|innerHTML|placeholder|ariaLabel)\s*=|setAttribute\(\s*['"](?:title|aria-label|placeholder|alt)['"]/;
+  // Leaflet puts text on screen through its own calls, and a tooltip is as
+  // visible as a heading: `bindTooltip('Genesis')` slipped past a list that
+  // knew only about DOM properties, which is how the map's own labels stayed
+  // outside a check written to find exactly that.
+  const UI_SINK = /\.(?:title|textContent|innerText|innerHTML|placeholder|ariaLabel)\s*=|setAttribute\(\s*['"](?:title|aria-label|placeholder|alt)['"]|\b(?:bindTooltip|bindPopup|setTooltipContent|setPopupContent|announceToLiveRegion)\s*\(/;
   for (const [key, value] of catalogValues) {
-    // Placeholders split a value into fragments. The longest one carries enough
-    // of the sentence to be unmistakable; anything short enough to collide with
-    // ordinary code is not worth testing, and a single word is a word.
+    // Placeholders split a value into fragments; the longest carries the most
+    // sentence. A long fragment is unmistakable wherever it turns up, so a
+    // substring match is enough. A short one is not: "Compare", "Timeline" and
+    // "Settings" are ordinary English words and ordinary identifiers, and
+    // skipping them left 311 of 1052 catalog values, 30% of the catalog and
+    // most of the button labels, outside the only check here that does not
+    // guess. They are tested too, but only where the whole text node or the
+    // whole attribute is the string, which a class name or a longer sentence
+    // containing the word can never be.
     const fragment = value.split(/\{\d+\}/).map(part => part.trim()).sort((a, b) => b.length - a.length)[0] || '';
-    if (fragment.length < 12 || !/\s/.test(fragment)) continue;
+    if (fragment.length < 3) { skipped.add(key); continue; }
+    covered.add(key);
+    const wholeValueOnly = fragment.length < 12 || !/\s/.test(fragment);
     if (ALLOWED.has(fragment)) continue;
     let from = 0;
     while (true) {
@@ -231,6 +265,7 @@ export function findCatalogEchoes(file, rawSource, catalogValues) {
       const line = source.slice(0, at).split(/\r?\n/).length;
       const text = lines[line - 1] || '';
       if (!rendered.has(line) && !text.includes('<') && !UI_SINK.test(text)) continue;
+      if (wholeValueOnly && !fillsItsSlot(source, at, fragment.length, UI_SINK.test(text))) continue;
       found.push({
         file,
         line,
@@ -258,6 +293,14 @@ async function main() {
   for (const file of files) {
     const source = await readFile(path.join(sourceDir, file), 'utf8');
     found.push(...findUntranslated(file, source));
+    for (const stray of findControlBytes(source)) {
+      found.push({
+        file,
+        line: stray.line,
+        kind: 'control',
+        value: `a ${stray.code} control character at column ${stray.column}, which is invisible here and matches nothing in a regex`,
+      });
+    }
     found.push(...findCatalogEchoes(file, stripComments(source), catalogValues));
   }
 
@@ -271,6 +314,10 @@ async function main() {
 
   if (found.length || stale.length) {
     for (const entry of found) {
+      if (entry.kind === 'control') {
+        console.error(`untranslated: ${entry.file}:${entry.line} contains ${entry.value}; delete the character`);
+        continue;
+      }
       console.error(`untranslated: ${entry.file}:${entry.line} renders "${entry.value}" as a literal; move it into src/i18n.js and call t()`);
     }
     for (const value of stale) {
@@ -287,9 +334,12 @@ async function main() {
     process.exit(1);
   }
 
+  // How many of them it actually looked at, not just how many exist. The
+  // filters that keep code fragments out were silently exempting 30% of the
+  // catalog, and a line reading "1052 catalog values" gave no way to notice.
   console.log(
-    `untranslated ok (${files.length} modules scanned, ${catalogValues.length} catalog values held to their keys, `
-    + `${ALLOWED.size} proper nouns allowed)`,
+    `untranslated ok (${files.length} modules scanned, ${covered.size} of ${catalogValues.length} catalog values `
+    + `held to their keys, ${skipped.size} too short to test, ${ALLOWED.size} proper nouns allowed)`,
   );
 }
 

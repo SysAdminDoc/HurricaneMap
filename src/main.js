@@ -699,6 +699,20 @@ function applyFilters() {
     lastTracksKey = '';
     clearTracks();
   }
+  // Both branches empty the one Leaflet layer the storm panel's own track
+  // lives in, so a theme change, a high-contrast toggle or a timeline brush
+  // left an open panel naming a storm with no track on the map and no way to
+  // get it back. Every one of those paths funnels through here, which is why
+  // the redraw belongs here rather than beside each caller: the palette branch
+  // only escaped because it happened to call refreshOpenStormPanel() too.
+  // redrawTracks is async but clears synchronously before its first await, so
+  // this cannot be undone by the call above it.
+  // Only while the panel is actually on screen. openStormId is cleared by the
+  // close button's event and not by a hash change that drops the storm, so
+  // redrawing on the id alone resurrected the track of a storm whose panel had
+  // already gone: forty phantom paths that nothing owned and nothing cleared.
+  const openPanel = document.getElementById('storm-panel');
+  if (openStormId && openPanel && openPanel.hidden === false) showTrack(openStormId, { focus: true });
   setHeatmap(filters.showHeatmap, visible);
   refreshTimelineScope();
   highlightYearRange(filters.yearMin, filters.yearMax);

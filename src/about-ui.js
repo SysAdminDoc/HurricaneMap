@@ -3,7 +3,7 @@
 
 import { getAomlValidation, getCoverage, getMetadata, getStats } from './data.js';
 import { escapeHtml } from './html-utils.js';
-import { t } from './i18n.js';
+import { getDateLocale, t } from './i18n.js';
 import { layerDepths, nextRevisionExpectation } from './coverage-claims.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
@@ -16,7 +16,7 @@ function formatMetadataDate(value) {
   if (!value) return notLoaded();
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(getDateLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -28,7 +28,7 @@ function formatMetadataDateTime(value) {
   if (!value) return notLoaded();
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-  return `${date.toLocaleString(undefined, {
+  return `${date.toLocaleString(getDateLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
