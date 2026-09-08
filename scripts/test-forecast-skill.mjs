@@ -66,4 +66,26 @@ assert(
 );
 assert.match(panelSource, /renderForecastSkill\(document\.getElementById\('forecast-skill-host'\), storm\)/);
 
-console.log('official forecast skill ok (2021-2025 OFCL vs best track, basin tables, distinct samples)');
+// escapeHtml keeps a URL inside its attribute; it does not stop a javascript:
+// one being a link. These URLs come from a bundled JSON file the service worker
+// checksums at install but not on every runtime read, so they go through the
+// same sanitiser as every other outbound link in the app. A URL that does not
+// survive it has to render as text, not as a link to nowhere.
+const hostileData = JSON.parse(JSON.stringify(data));
+hostileData.sources.summary = 'javascript:alert(1)';
+hostileData.sources.methodology = 'data:text/html,<script>alert(1)</script>';
+hostileData.basins.AL.url = 'javascript:void(0)';
+const hostileHost = { innerHTML: '' };
+renderForecastSkillData(hostileHost, { basin: 'AL' }, hostileData);
+assert(!/javascript:/i.test(hostileHost.innerHTML), 'a javascript: source URL must never reach an href');
+assert(!/data:text\/html/i.test(hostileHost.innerHTML), 'a data: source URL must never reach an href');
+assert(!/<a /.test(hostileHost.innerHTML.split('forecast-skill-sources')[1] || ''), 'a rejected source URL must render as plain text, not a link');
+assert.match(hostileHost.innerHTML, /Individual error file/, 'the label still has to be readable when its URL is rejected');
+
+// The same render with the real URLs still produces links, so the assertion
+// above is not passing merely because nothing renders at all.
+const safeHost = { innerHTML: '' };
+renderForecastSkillData(safeHost, { basin: 'AL' }, data);
+assert.match(safeHost.innerHTML, /<a href="https:\/\/www\.nhc\.noaa\.gov/, 'a legitimate https source URL must still render as a link');
+
+console.log('official forecast skill ok (2021-2025 OFCL vs best track, basin tables, distinct samples, hostile source URLs rejected)');

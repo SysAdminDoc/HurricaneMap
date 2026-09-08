@@ -3,7 +3,7 @@
 // modeled SLOSH MOM overlay. Preprocessed by scripts/build_hwm.py into
 // data/surge-obs/<STORMID>.json ([[lat, lon, elev_ft, env], ...]).
 import { getMap } from './map.js';
-import { t } from './i18n.js';
+import { t, tHtml } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { disposeMapLayer, registerMapLayer } from './layer-registry.js';
 import {
@@ -103,7 +103,7 @@ export async function showHwm(stormId) {
       fillOpacity: 0.85,
       className: 'hwm-marker',
     }).bindTooltip(
-      `${t('hwm.mark')}: ${escapeText(elevFt.toFixed(1))} ft · ${env === 'R' ? t('hwm.riverine') : t('hwm.coastal')}`,
+      `${tHtml('hwm.mark')}: ${escapeText(elevFt.toFixed(1))} ft · ${env === 'R' ? tHtml('hwm.riverine') : tHtml('hwm.coastal')}`,
       { direction: 'top' },
     ).addTo(nextLayerGroup);
   }

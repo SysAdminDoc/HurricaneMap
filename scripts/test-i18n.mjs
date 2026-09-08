@@ -1,7 +1,7 @@
 // Locale contract: every locale carries the full key set (no silent EN
 // fallbacks for missing keys), values are non-empty, and numbered
 // placeholders agree across locales.
-import { getLocale, loadLocale, setLocale, STRINGS, interpolate, t } from '../src/i18n.js';
+import { getLocale, loadLocale, setLocale, STRINGS, interpolate, t, tHtml } from '../src/i18n.js';
 import en from '../src/locales/en.js';
 import es from '../src/locales/es.js';
 import ht from '../src/locales/ht.js';
@@ -60,6 +60,15 @@ assert(t('status.landfalls', 42) === '42 landfalls', 'placeholder substitution f
 assert(interpolate('{0} / {0}', 'repeat') === 'repeat / repeat', 'repeated placeholders should all resolve');
 assert(interpolate('Value: {0}', '$&') === 'Value: $&', 'replacement-pattern characters should stay literal');
 assert(t('nonexistent.key') === 'nonexistent.key', 'unknown keys should echo the key');
+
+// t() splices its arguments in as they are, because most of its callers assign
+// the result to textContent, where escaping would show a literal &amp; for any
+// name containing an ampersand. tHtml() is the variant for a string about to be
+// inserted as HTML, and the popup-sink gate treats only that one as safe.
+assert(t('status.landfalls', '<b>x</b>') === '<b>x</b> landfalls', 't() must not escape, so text callers are unaffected');
+assert(tHtml('status.landfalls', '<b>x</b>') === '&lt;b&gt;x&lt;/b&gt; landfalls', 'tHtml() must escape a string argument');
+assert(tHtml('status.landfalls', 42) === '42 landfalls', 'tHtml() must leave a number alone');
+assert(tHtml('status.landfalls', 'Smith & Jones') === 'Smith &amp; Jones landfalls', 'tHtml() must escape an ampersand');
 for (const locale of ['en', 'es', 'ht']) {
   await setLocale(locale);
   assert(getLocale() === locale, `setLocale did not select ${locale}`);

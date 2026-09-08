@@ -1,4 +1,4 @@
-import { escapeHtml, formatStormName } from './html-utils.js';
+import { escapeHtml, formatStormName, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
@@ -22,8 +22,16 @@ export function basinForStorm(storm) {
   return storm?.basin === 'EP' ? 'EP' : 'AL';
 }
 
+// escapeHtml stops a URL breaking out of the attribute; it does not stop a
+// `javascript:` one from being a link. These come from a bundled JSON file that
+// the service worker checksums at install but not on every runtime read, and
+// every other outbound link in the app goes through this helper, so this one
+// does too. A URL that does not survive it renders as plain text rather than as
+// a link to nowhere.
 function sourceLink(url, label) {
-  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
+  const href = safeExternalUrl(url);
+  if (!href) return escapeHtml(label);
+  return `<a href="${href}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
 }
 
 export function renderForecastSkillData(host, storm, data) {

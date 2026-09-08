@@ -9,7 +9,12 @@ import { fileURLToPath } from 'node:url';
 const srcDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'src');
 const SINK_RE = /\.(?:bindPopup|bindTooltip|setContent)\(\s*`([\s\S]*?)`/g;
 const INTERPOLATION_RE = /\$\{([^{}]*)\}/g;
-const SAFE_RE = /escapeHtml|escapeText|\bt\(/;
+// t() does not escape its arguments: interpolate() splices them in as they are,
+// because most callers assign the result to textContent, where escaping would
+// put a literal &amp; on screen. So a t() call is not evidence that an
+// interpolation is safe. tHtml() is the escaping variant and is what belongs
+// inside a sink that renders raw HTML.
+const SAFE_RE = /escapeHtml|escapeText|\btHtml\(/;
 const POPUP_LITERAL_RE = /\.bindPopup\(\s*([`'"])/g;
 const POPUP_BUILDER_RE = /\.bindPopup\(\s*([A-Za-z_$][\w$]*)\s*\(/g;
 const POPUP_VARIABLE_RE = /\.bindPopup\(\s*([A-Za-z_$][\w$]*)\s*(?=,|\))/g;
@@ -51,9 +56,12 @@ function findPopupStringOffenders(text, file) {
 // Regression fixtures: multiline templates and a nearby safe interpolation
 // must not hide a separate unsafe value.
 const multilineFixture = ['marker.bindPopup(`', '  ${dangerous}', '`)'].join('\n');
-const mixedFixture = "marker.bindTooltip(`${t('safe')} ${dangerous}`)";
+const mixedFixture = "marker.bindTooltip(`${tHtml('safe')} ${dangerous}`)";
+// A bare t() is no longer a safe interpolation, so this must be caught.
+const bareTranslationFixture = "marker.bindTooltip(`${t('unescaped', name)}`)";
 if (findOffenders(multilineFixture, 'fixture.js').length !== 1 ||
-    findOffenders(mixedFixture, 'fixture.js').length !== 1) {
+    findOffenders(mixedFixture, 'fixture.js').length !== 1 ||
+    findOffenders(bareTranslationFixture, 'fixture.js').length !== 1) {
   throw new Error('popup sink guard regression fixtures failed');
 }
 const popupFixture = [

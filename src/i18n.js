@@ -1,6 +1,7 @@
 // Internationalization (i18n) — English, Spanish (ES-LA), Haitian Creole
 // Single source of truth for all user-facing strings.
 
+import { escapeHtml as escapeHtmlValue } from './html-utils.js';
 import en from './locales/en.js';
 
 const LOCALE_EN = 'en';
@@ -82,6 +83,21 @@ export function t(key, ...args) {
   let str = strings[key] || STRINGS[LOCALE_EN][key] || key;
 
   return interpolate(str, ...args);
+}
+
+/**
+ * `t()` for a string that is about to be inserted as HTML.
+ *
+ * `t()` itself cannot escape its arguments. Most of its callers assign the
+ * result to `textContent`, where escaping would put a literal `&amp;` on screen
+ * for any storm or state whose name contains an ampersand, so the decision has
+ * to be made at the call site rather than inside `interpolate`. This is that
+ * call site. The catalog string is left alone, because the keys ending in
+ * `Html` carry deliberate markup; only the interpolated values are escaped,
+ * which is where a value from data or from a user could arrive.
+ */
+export function tHtml(key, ...args) {
+  return t(key, ...args.map(arg => (typeof arg === 'string' ? escapeHtmlValue(arg) : arg)));
 }
 
 export function interpolate(template, ...args) {
