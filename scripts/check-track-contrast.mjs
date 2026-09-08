@@ -87,6 +87,21 @@ const hueRotateMatrix = degrees => {
   ];
 };
 
+// CSS angles come in four units and hue-rotate() accepts all of them. Reading
+// `100grad` or `0.25turn` as degrees is not an approximation, it is a different
+// rotation: those two and `90deg` are the same angle, and treating them as 100
+// and 0.25 degrees gave three different colours. Anything unrecognised throws,
+// which is how the rest of this function already behaves.
+function degreesFromAngle(raw, number) {
+  const text = String(raw).trim().toLowerCase();
+  if (text.endsWith('grad')) return (number * 360) / 400;
+  if (text.endsWith('turn')) return number * 360;
+  if (text.endsWith('rad')) return (number * 180) / Math.PI;
+  if (text.endsWith('deg')) return number;
+  if (/^[+-]?[\d.]+(e[+-]?\d+)?$/.test(text)) return number;
+  throw new Error(`hue-rotate() angle unit this gate cannot convert: "${raw}"`);
+}
+
 // Returns the filtered colour, or throws naming the function it cannot apply.
 export function applyCssFilter(rgb, filter) {
   const text = String(filter || '').trim();
@@ -104,7 +119,7 @@ export function applyCssFilter(rgb, filter) {
       case 'sepia': out = applyMatrix(out, between(IDENTITY, SEPIA, amount)); break;
       case 'grayscale': out = applyMatrix(out, between(IDENTITY, GRAYSCALE, amount)); break;
       case 'saturate': out = applyMatrix(out, saturateMatrix(amount)); break;
-      case 'hue-rotate': out = applyMatrix(out, hueRotateMatrix(raw.endsWith('rad') ? (number * 180) / Math.PI : number)); break;
+      case 'hue-rotate': out = applyMatrix(out, hueRotateMatrix(degreesFromAngle(raw, number))); break;
       case 'brightness': out = out.map(value => clamp(value * amount)); break;
       case 'contrast': out = out.map(value => clamp(value * amount + 255 * (0.5 - 0.5 * amount))); break;
       case 'invert': out = out.map(value => clamp(value * (1 - amount) + (255 - value) * amount)); break;
@@ -117,6 +132,24 @@ export function applyCssFilter(rgb, filter) {
   const leftover = text.replace(/([a-z-]+)\(\s*([^)]*)\)/gi, '').trim();
   if (!consumed || leftover) throw new Error(`could not read the whole filter: "${text}"`);
   return out.map(Math.round);
+}
+
+// Regression fixtures for the angle handling. 90deg, 100grad and 0.25turn are
+// the same rotation, and reading the last two as degrees silently produced two
+// different colours, which is worse than failing: the gate would have reported
+// a contrast figure for a basemap nobody sees. Anything it cannot convert has
+// to throw, the way an unknown filter function already does.
+{
+  const probe = parseHex('9ecfde');
+  const asDegrees = String(applyCssFilter(probe, 'hue-rotate(90deg)'));
+  for (const spelling of ['hue-rotate(100grad)', 'hue-rotate(0.25turn)', 'hue-rotate(1.5708rad)']) {
+    if (String(applyCssFilter(probe, spelling)) !== asDegrees) {
+      throw new Error(`angle-unit regression: ${spelling} does not match hue-rotate(90deg)`);
+    }
+  }
+  let threw = false;
+  try { applyCssFilter(probe, 'hue-rotate(90quux)'); } catch { threw = true; }
+  if (!threw) throw new Error('angle-unit regression: an unconvertible unit must throw rather than be read as degrees');
 }
 
 async function main() {
@@ -165,10 +198,19 @@ async function main() {
   const allCss = [...stylesheets.values()].join('\n');
   const darkFilter = allCss.match(/html:not\(\.light-theme\)\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
   const lightFilter = allCss.match(/html\.light-theme\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
+  // High contrast is a third basemap, not a variant of the dark one. Its rule
+  // takes the tile pane back to filter: none while the track tokens stay on
+  // their high-contrast values, so a reader in that mode sees a combination
+  // neither of the other two measures. Reading only two themes meant the
+  // strictest mode was the one nothing checked.
+  const highContrastFilter = allCss.match(/html\.high-contrast\s*#map\s*\.leaflet-tile-pane\s*\{[^}]*?filter:\s*([^;]+);/)?.[1];
   if (!darkFilter) {
     errors.push('no rule filters the dark-theme tile pane any more, so this gate cannot tell what the basemap looks like');
   }
-  for (const [name, filter] of [['dark', darkFilter], ['light', lightFilter ?? 'none']]) {
+  if (!highContrastFilter) {
+    errors.push('no rule sets the high-contrast tile pane filter any more, so this gate cannot tell what that basemap looks like');
+  }
+  for (const [name, filter] of [['dark', darkFilter], ['light', lightFilter ?? 'none'], ['high-contrast', highContrastFilter]]) {
     if (filter === undefined) continue;
     const surfaces = {};
     try {
