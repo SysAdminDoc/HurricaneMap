@@ -180,6 +180,113 @@ async function runShellContract(browser, baseUrl, label) {
   }
 }
 
+// iOS 26 opens any Home Screen site as a web app whether or not anyone went
+// through an install flow, so the standalone layout is now reached by people
+// who never saw it offered, and there is no browser chrome to fall back on.
+// Two things have to hold there. Nothing may depend on chrome the web app does
+// not have, and the overlays have to inset themselves out of the status bar and
+// the home indicator once viewport-fit=cover lets the insets be non-zero.
+//
+// Nothing can give env(safe-area-inset-*) a value from a test, which is why the
+// stylesheets read them through --safe-* variables: setting those on the root
+// is the same arithmetic a notched phone performs. The numbers below are an
+// iPhone 15 Pro in portrait.
+const SAFE_AREA = { top: '59px', right: '0px', bottom: '34px', left: '0px' };
+
+async function runStandaloneContract(browser, baseUrl, label) {
+  const context = await browser.newContext({
+    viewport: { width: 393, height: 852 },
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+    serviceWorkers: 'block',
+  });
+  try {
+    await context.addInitScript(insets => {
+      // A real installed web app reports standalone, which is what suppresses
+      // the "add to Home Screen" coachmark. Patch the query rather than the
+      // whole of matchMedia so every other media query still answers honestly.
+      const nativeMatchMedia = window.matchMedia.bind(window);
+      window.matchMedia = query => (/display-mode:\s*(standalone|fullscreen)/.test(query)
+        ? { matches: true, media: query, onchange: null, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent: () => false }
+        : nativeMatchMedia(query));
+      document.addEventListener('DOMContentLoaded', () => {
+        for (const [side, value] of Object.entries(insets)) {
+          document.documentElement.style.setProperty(`--safe-${side}`, value);
+        }
+      });
+    }, SAFE_AREA);
+    const page = await preparePage(context, baseUrl);
+    await waitForAppReady(page, label);
+
+    const standalone = await page.evaluate(() => window.matchMedia('(display-mode: standalone)').matches);
+    assert(standalone, `${label}: standalone display mode was not emulated`);
+
+    const safeTop = Number.parseFloat(SAFE_AREA.top);
+    const safeBottom = Number.parseFloat(SAFE_AREA.bottom);
+    const layout = await page.evaluate(() => {
+      const box = selector => {
+        const el = document.querySelector(selector);
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, width: rect.width, height: rect.height };
+      };
+      return {
+        header: box('.app-header'),
+        moreActions: box('#toggle-mobile-actions'),
+        // The ribbon itself is meant to run to the bottom edge; what must clear
+        // the home indicator is the part carrying the axis and the legend.
+        timelineSurface: box('.timeline-ribbon'),
+        timeline: box('.timeline-ribbon .timeline-inner'),
+        viewport: { width: innerWidth, height: innerHeight },
+      };
+    });
+
+    assert(layout.header, `${label}: header did not render in standalone`);
+    // The status bar sits over the top inset, so a header that starts above it
+    // is a header partly under the clock on a real device.
+    assert(
+      layout.header.top >= safeTop,
+      `${label}: header starts at ${Math.round(layout.header.top)}px, inside the ${safeTop}px status-bar inset`,
+    );
+    assert(
+      layout.header.right <= layout.viewport.width + 0.5 && layout.header.left >= 0,
+      `${label}: header escapes the viewport in standalone`,
+    );
+    assert(layout.moreActions, `${label}: the action rail's overflow control did not render`);
+    assert(
+      layout.moreActions.bottom <= layout.viewport.height && layout.moreActions.top >= 0,
+      `${label}: the action rail is not reachable in standalone`,
+    );
+    assert(layout.timelineSurface, `${label}: the timeline did not render in standalone`);
+    assert(layout.timeline, `${label}: the timeline rendered without its content`);
+    assert(
+      layout.timeline.bottom <= layout.viewport.height - safeBottom + 0.5,
+      `${label}: the timeline's content ends at ${Math.round(layout.timeline.bottom)}px, inside the ${safeBottom}px home-indicator inset`,
+    );
+
+    // No browser chrome means the app's own dismissal is the only way back.
+    await page.evaluate(async () => {
+      const data = await import('/src/data.js');
+      const panel = await import('/src/panel.js');
+      await data.ensureStormsLoaded();
+      const landfall = data.getLandfalls().find(item => item.storm_id === 'AL122005');
+      await panel.showStorm(landfall);
+    });
+    await page.waitForSelector('#storm-panel:not([hidden])', { timeout: 15_000 });
+    await page.click('#storm-panel .close-btn');
+    await page.waitForFunction(() => document.querySelector('#storm-panel')?.hidden === true, { timeout: 10_000 });
+
+    // The install coachmark advertises a Home Screen install to someone who is
+    // already running from the Home Screen.
+    const offersInstall = await page.evaluate(async () => (await import('/src/onboarding.js')).isIosSafari());
+    assert(!offersInstall, `${label}: the app still offers a Home Screen install while running standalone`);
+    return { state: 'passed' };
+  } finally {
+    await context.close();
+  }
+}
+
 async function runOfflineContract(browser, baseUrl, label, setOffline) {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 860 },
@@ -240,11 +347,12 @@ try {
     }
     try {
       await runShellContract(browser, baseUrl, engine.name);
+      await runStandaloneContract(browser, baseUrl, engine.name);
       const offline = await runOfflineContract(browser, baseUrl, engine.name, setOffline);
       if (offline.state === 'unsupported') {
-        console.log(`${engine.name}: shell/manifest/search/panel passed; offline cache unsupported (${offline.reason})`);
+        console.log(`${engine.name}: shell/manifest/search/panel/standalone passed; offline cache unsupported (${offline.reason})`);
       } else {
-        console.log(`${engine.name}: shell/manifest/search/panel/offline passed (${offline.storms} storms)`);
+        console.log(`${engine.name}: shell/manifest/search/panel/standalone/offline passed (${offline.storms} storms)`);
       }
       results.push({ name: engine.name, state: 'passed', offline: offline.state });
     } finally {

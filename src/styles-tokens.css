@@ -137,6 +137,19 @@
   --radius-lg: 14px;
   --control-bg: rgba(17, 17, 27, 0.72);
   --control-bg-hover: rgba(180, 190, 254, 0.10);
+  /* The viewport opts into viewport-fit=cover, so on a notched phone, and in
+     particular on iOS 26 where any Home Screen site opens as a web app with no
+     browser chrome to sit behind, these are non-zero and the overlays inset
+     themselves out of the status bar and the home indicator. Everywhere else
+     they are 0, which is why every use goes through max(): with a zero inset
+     the layout is exactly what it was. Routing them through variables is also
+     what makes them testable, since nothing can give env() a value from a test
+     but --safe-top can be set on the root and the header watched to move. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
   /* --focus-color and --focus-shadow used to live here. The only rule reading
      them was the suppressed block in the accessibility layer, and --focus-shadow
      had no high-contrast override, so had that block ever won, high contrast
@@ -165,7 +178,7 @@
    surfaces constrained below it. */
 :root {
   --side-panel-gap: 16px;
-  --side-panel-top: 96px;
+  --side-panel-top: calc(96px + var(--safe-top));
   --side-panel-bottom: 142px;
   --side-panel-width: 440px;
 }

@@ -339,4 +339,19 @@ test.describe('critical mobile workflows', () => {
     await openVisualSettings(page);
     await expectMatrixScreenshot(page, 'matrix-mobile-settings.webp');
   });
+
+  // iOS 26 opens any Home Screen site as a web app, so this layout is reached
+  // by people who never went through an install flow, and there is no browser
+  // chrome behind the status bar or the home indicator. Nothing can give
+  // env(safe-area-inset-*) a value from a test, which is why the stylesheets
+  // read them through --safe-* variables; setting those is the same arithmetic
+  // a notched phone performs. The numbers are an iPhone 15 Pro in portrait.
+  test('hold their shape with the safe-area insets a notched phone applies', async ({ page }) => {
+    await openDeterministicApp(page);
+    await page.evaluate(() => {
+      document.documentElement.style.setProperty('--safe-top', '59px');
+      document.documentElement.style.setProperty('--safe-bottom', '34px');
+    });
+    await expectMatrixScreenshot(page, 'matrix-mobile-standalone-insets.webp');
+  });
 });

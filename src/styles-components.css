@@ -2050,7 +2050,7 @@ label > input[type="checkbox"] {
 
 .anim-controls {
   position: fixed;
-  bottom: max(8px, env(safe-area-inset-bottom));
+  bottom: max(8px, var(--safe-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: 2400;
@@ -3013,12 +3013,16 @@ a:hover, [role="button"]:hover {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 140px;
+  /* The bar stays edge to edge, because a floating gap under a full-bleed dock
+     looks like a rendering fault. Its contents are padded clear of the home
+     indicator instead, and the box grows by the same amount so the histogram
+     keeps its height. Zero inset everywhere but a notched phone. */
+  height: calc(140px + var(--safe-bottom));
   z-index: 800;
   display: flex;
   align-items: stretch;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 8px 12px calc(8px + var(--safe-bottom));
   border-top: 1px solid var(--glass-edge);
   transition: height 200ms ease, padding 200ms ease;
 }
@@ -3150,8 +3154,8 @@ a:hover, [role="button"]:hover {
 /* Responsive timeline */
 @media (max-width: 1200px) {
   .timeline-ribbon {
-    height: 120px;
-    padding: 6px 10px;
+    height: calc(120px + var(--safe-bottom));
+    padding: 6px 10px calc(6px + var(--safe-bottom));
     gap: 10px;
   }
 
@@ -3171,8 +3175,8 @@ a:hover, [role="button"]:hover {
 
 @media (max-width: 768px) {
   .timeline-ribbon {
-    height: 110px;
-    padding: 6px 8px;
+    height: calc(110px + var(--safe-bottom));
+    padding: 6px 8px calc(6px + var(--safe-bottom));
     gap: 8px;
   }
 
@@ -3191,8 +3195,8 @@ a:hover, [role="button"]:hover {
 
 @media (max-width: 480px) {
   .timeline-ribbon {
-    height: 100px;
-    padding: 4px 6px;
+    height: calc(100px + var(--safe-bottom));
+    padding: 4px 6px calc(4px + var(--safe-bottom));
     gap: 6px;
   }
 
@@ -3297,7 +3301,7 @@ a:hover, [role="button"]:hover {
 /* Phase 4: Landscape Optimization */
 @media (orientation: landscape) and (max-height: 500px) {
   .app-header {
-    top: 8px;
+    top: max(8px, var(--safe-top));
     padding: 6px 10px;
     gap: 8px;
   }
@@ -4576,8 +4580,8 @@ kbd {
 
 @media (max-width: 720px) {
   .app-header {
-    left: 8px;
-    top: 8px;
+    left: max(8px, var(--safe-left));
+    top: max(8px, var(--safe-top));
     width: calc(100vw - 16px);
     max-width: none;
   }
@@ -5515,7 +5519,7 @@ body.side-panel-open .season-summary {
 @media (max-width: 860px) {
   :root {
     --side-panel-gap: 10px;
-    --side-panel-top: 92px;
+    --side-panel-top: calc(92px + var(--safe-top));
     --side-panel-bottom: 112px;
   }
 
@@ -5937,8 +5941,8 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 @media (max-width: 720px) {
   .app-header {
-    top: 8px;
-    left: 8px;
+    top: max(8px, var(--safe-top));
+    left: max(8px, var(--safe-left));
     width: calc(100vw - 16px);
     padding: 10px 12px;
   }
@@ -6162,7 +6166,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 @media (max-width: 720px) {
   :root {
-    --side-panel-top: 138px;
+    --side-panel-top: calc(138px + var(--safe-top));
     --side-panel-bottom: 112px;
     --map-left-reserve: 8px;
     --overlay-right-reserve: 8px;
@@ -6392,7 +6396,7 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 @media (max-width: 430px) {
   :root {
-    --side-panel-top: 132px;
+    --side-panel-top: calc(132px + var(--safe-top));
     --side-panel-bottom: 108px;
   }
 
@@ -7296,8 +7300,8 @@ body.side-panel-open .leaflet-top.leaflet-right {
 
 @media (max-width: 720px) {
   .globe3d-topbar {
-    top: 8px;
-    left: 8px;
+    top: max(8px, var(--safe-top));
+    left: max(8px, var(--safe-left));
     right: 8px;
     grid-template-columns: 1fr;
     align-items: stretch;
@@ -8075,7 +8079,7 @@ body.track-playback-active .storm-panel.minimized .panel-restore-bar {
 body.track-playback-active .anim-controls:not(.anim-controls-inline) {
   position: fixed;
   top: auto;
-  bottom: max(12px, env(safe-area-inset-bottom));
+  bottom: max(12px, var(--safe-bottom));
   left: 50%;
   right: auto;
   transform: translateX(-50%);
@@ -8132,7 +8136,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-meta 
   }
 
   body.track-playback-active .anim-controls:not(.anim-controls-inline) {
-    bottom: max(8px, env(safe-area-inset-bottom));
+    bottom: max(8px, var(--safe-bottom));
     width: calc(100vw - 16px);
     max-width: calc(100vw - 16px);
     max-height: min(36vh, 300px);
@@ -8442,7 +8446,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
 
 @media (max-width: 720px) {
   body.track-playback-active {
-    --side-panel-top: 76px;
+    --side-panel-top: calc(76px + var(--safe-top));
     --side-panel-bottom: 118px;
   }
 
@@ -8547,7 +8551,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
   }
 
   body.track-playback-active .anim-controls:not(.anim-controls-inline) {
-    bottom: max(6px, env(safe-area-inset-bottom));
+    bottom: max(6px, var(--safe-bottom));
   }
 }
 
@@ -8903,7 +8907,7 @@ body.track-playback-active .anim-controls:not(.anim-controls-inline) .anim-radar
     min-height: 0;
     max-height: var(--desktop-shelf-height);
     box-sizing: border-box;
-    padding: 8px 10px;
+    padding: 8px 10px calc(8px + var(--safe-bottom));
     border: 1px solid var(--border-strong);
     border-radius: var(--hm-radius-xl);
     background: color-mix(in srgb, var(--surface-panel) 95%, transparent);

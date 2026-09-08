@@ -14,6 +14,8 @@ const visualSnapshots = readdirSync(resolve('tests', 'visual-regression.spec.mjs
 assert.match(visualSpec, /\.webp/);
 assert.match(visualSpec, /quality:\s*100/);
 assert.equal(visualSnapshots.filter((name) => name.endsWith('.png')).length, 0, 'visual baselines must not remain PNGs');
-assert.equal(visualSnapshots.filter((name) => name.endsWith('-win32.webp')).length, 16, 'visual WebP baseline count changed unexpectedly');
+// 17 since 2026-09-08: matrix-mobile-standalone-insets covers the layout a
+// notched phone gives the app in standalone, which iOS 26 reaches by default.
+assert.equal(visualSnapshots.filter((name) => name.endsWith('-win32.webp')).length, 17, 'visual WebP baseline count changed unexpectedly');
 
-console.log('visual platform and baseline gates ok (Windows runs; Linux/macOS skip clearly; 16 lossless WebP baselines)');
+console.log('visual platform and baseline gates ok (Windows runs; Linux/macOS skip clearly; 17 lossless WebP baselines)');

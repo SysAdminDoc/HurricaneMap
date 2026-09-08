@@ -11,8 +11,8 @@ main#main:focus {
 .app-header,
 header.app-header.glass {
   position: absolute;
-  top: 16px;
-  left: 12px;
+  top: max(16px, var(--safe-top));
+  left: max(12px, var(--safe-left));
   /* Above every panel and overlay: the header owns the top-left corner and its
      controls have to stay clickable while a panel is open. This used to be
      declared as 3000 further down the file and won only because it was
@@ -32,9 +32,9 @@ header.app-header.glass {
 
 .app-header {
   position: absolute;
-  top: 16px;
-  left: 12px;
-  max-width: min(960px, calc(100vw - 24px));
+  top: max(16px, var(--safe-top));
+  left: max(12px, var(--safe-left));
+  max-width: min(960px, calc(100vw - 24px - var(--safe-left) - var(--safe-right)));
 }
 
 .app-header {
