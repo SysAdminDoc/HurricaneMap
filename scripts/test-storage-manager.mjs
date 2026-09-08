@@ -23,6 +23,7 @@ import {
   selectBoundedRadarFrames,
   summarizeStorageEstimate,
 } from '../src/storage-manager.js';
+import { buildSanitizedSupportBundle } from '../src/diagnostics.js';
 
 globalThis.crypto ||= webcrypto;
 
@@ -444,5 +445,47 @@ assert.equal(
   'unverified',
   'guessing the newest caches must be what reports the half-installed tuple, or the fix above proves nothing',
 );
+
+// StorageManager.estimate() is padded on purpose, against fingerprinting, so a
+// figure rendered to the byte is wrong by design. The panel has to say so, and
+// the support bundle has to carry the caveat in the field names, because a
+// bundle is read by somebody who was not here when it was made and may
+// otherwise diff two runs and chase a delta the browser invented.
+{
+  const host = { innerHTML: '' };
+  await renderStorageManager(host, {
+    inspect: async () => ({
+      usage: 25 * 1024 * 1024,
+      quota: 100 * 1024 * 1024,
+      percent: 25,
+      persisted: true,
+      scopes: [],
+      packs: {},
+      release: { state: 'coherent' },
+    }),
+  });
+  assert.match(
+    host.innerHTML,
+    /about 25 MB of about 100 MB \(25%\)/,
+    'the browser estimate must be rendered as an approximation, not as an exact pair',
+  );
+  assert.match(
+    host.innerHTML,
+    /storage-approximate-note/,
+    'the panel must state why those two figures are approximate',
+  );
+
+  const bundle = buildSanitizedSupportBundle({
+    storage: { usage: 25, quota: 100, persisted: true, scopes: [], packs: {} },
+  });
+  assert.equal(bundle.storage.usage_bytes_approximate, 25);
+  assert.equal(bundle.storage.quota_bytes_approximate, 100);
+  assert.equal(bundle.storage.estimate_is_padded_by_browser, true);
+  assert.equal(
+    'usage_bytes' in bundle.storage,
+    false,
+    'the exact-sounding field name must be gone, or a reader will keep treating a padded number as exact',
+  );
+}
 
 console.log('storage manager ok (quota rollback, required-data guard, bounded radar/source packs, persistence on save, active release tuple over the newest one present)');

@@ -592,9 +592,18 @@ export async function renderStorageManager(host, { inspect = inspectStorage } = 
   if (!host) return;
   host.innerHTML = `<p class="settings-help">${escapeHtml(t('storage.loading'))}</p>`;
   const snapshot = await inspect();
+  // StorageManager.estimate() is padded on purpose, to stop a site
+  // fingerprinting a visitor by how much they have stored, so a figure printed
+  // to the byte is wrong by design. The per-scope sizes below are this app's
+  // own count of what it wrote and stay exact.
   const usage = snapshot.usage == null
     ? t('storage.unavailable')
-    : `${formatStorageBytes(snapshot.usage)} / ${formatStorageBytes(snapshot.quota)}${snapshot.percent == null ? '' : ` (${snapshot.percent}%)`}`;
+    : t(
+      snapshot.percent == null ? 'storage.usageApprox' : 'storage.usageApproxPercent',
+      formatStorageBytes(snapshot.usage),
+      formatStorageBytes(snapshot.quota),
+      String(snapshot.percent),
+    );
   const packCount = Object.keys(snapshot.packs).length;
   const iosInstallGuide = isIosSafari() ? `
     <div class="storage-install-guide">
@@ -615,6 +624,7 @@ export async function renderStorageManager(host, { inspect = inspectStorage } = 
       <strong>${escapeHtml(usage)}</strong>
       <span>${escapeHtml(snapshot.persisted ? t('storage.persisted') : t('storage.bestEffort'))}</span>
     </div>
+    <p class="settings-help storage-approximate-note">${escapeHtml(t('storage.approximateNote'))}</p>
     ${evictionWarning}
     ${iosInstallGuide}
     <div class="storage-scopes" role="list">

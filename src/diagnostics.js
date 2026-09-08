@@ -131,8 +131,11 @@ export function buildSanitizedSupportBundle({
     },
     storage: {
       persisted: Boolean(storage.persisted),
-      usage_bytes: Number.isFinite(storage.usage) ? storage.usage : null,
-      quota_bytes: Number.isFinite(storage.quota) ? storage.quota : null,
+      // Padded by the browser against fingerprinting. Named so that whoever
+      // reads this bundle does not diff two runs and chase a phantom delta.
+      usage_bytes_approximate: Number.isFinite(storage.usage) ? storage.usage : null,
+      quota_bytes_approximate: Number.isFinite(storage.quota) ? storage.quota : null,
+      estimate_is_padded_by_browser: true,
       radar_pack_count: storage.packs && typeof storage.packs === 'object'
         ? Object.keys(storage.packs).length
         : 0,
@@ -233,7 +236,7 @@ export async function renderOfflineDiagnostics(host) {
     <div class="diagnostics-summary">
       <span><strong>${escapeHtml(t('diagnostics.registration'))}</strong>${escapeHtml(t(`diagnostics.registration.${bundle.service_worker.registration}`))}${bundle.service_worker.worker_type ? ` (${escapeHtml(t(`diagnostics.workerType.${bundle.service_worker.worker_type}`))})` : ''}</span>
       <span><strong>${escapeHtml(t('diagnostics.controller'))}</strong>${escapeHtml(t(`diagnostics.controller.${bundle.service_worker.controller}`))}</span>
-      <span><strong>${escapeHtml(t('diagnostics.storage'))}</strong>${escapeHtml(formatStorageBytes(bundle.storage.usage_bytes))} / ${escapeHtml(formatStorageBytes(bundle.storage.quota_bytes))}</span>
+      <span><strong>${escapeHtml(t('diagnostics.storage'))}</strong>${escapeHtml(t('storage.usageApprox', formatStorageBytes(bundle.storage.usage_bytes_approximate), formatStorageBytes(bundle.storage.quota_bytes_approximate)))}</span>
       <span><strong>${escapeHtml(t('diagnostics.release'))}</strong>${escapeHtml(t(`diagnostics.release.${bundle.release.state}`))}</span>
       <span><strong>${escapeHtml(t('diagnostics.integrity'))}</strong>${escapeHtml(t(`diagnostics.integrity.${bundle.offline_integrity.state}`))}</span>
     </div>
