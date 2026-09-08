@@ -198,60 +198,66 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// The last activate-time validation failure, so the diagnostics panel can say
-// why a worker is serving without having verified its bundle. Cleared on every
-// activate, because a stale one would outlive the problem it describes.
-let lastActivateError = null;
+// What happened the last time this worker instance activated, so the
+// diagnostics panel can say why a worker is serving without having verified
+// its bundle. Null carries its own meaning and is not the same as a clean run:
+// a worker terminated for idleness and respawned to answer a message has not
+// activated in this instance and knows nothing, which used to be impossible to
+// tell apart from an activate that found nothing wrong.
+let lastActivate = null;
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(withReleaseLock(async () => {
-    // Validation must not be able to skip what follows it. This was the first
-    // await in the handler, so a throw abandoned the cache cleanup, the
-    // navigation preload, the pruning and clients.claim() alike. A worker
-    // activates whether or not its waitUntil settles, so the result was an
-    // activated worker that had taken control of nothing and left every
-    // superseded cache in place: the pages stayed on the old worker until a
-    // manual reload, which is exactly when nobody performs one.
-    // Three independent things, and none of them may cost the others. This was
-    // one straight-line sequence with validateReleaseBundle first, so a throw
-    // there abandoned the cleanup and the claim alike, and a worker activates
-    // whether or not its waitUntil settles: the result was an activated worker
-    // controlling no page, with every open tab left on the previous version
-    // and nothing said about it until somebody reloaded by hand.
-    lastActivateError = null;
+  event.waitUntil((async () => {
+    lastActivate = { at: new Date().toISOString(), failures: [] };
     const recordFailure = (error) => {
-      lastActivateError ??= {
-        at: new Date().toISOString(),
-        message: String(error?.message || error).slice(0, 240),
-      };
+      const message = String(error?.message || error).slice(0, 240);
+      if (!lastActivate.failures.includes(message)) lastActivate.failures.push(message);
     };
 
+    // Taking control is not housekeeping, and it must not queue behind it
+    // either. This sat in a finally inside withReleaseLock, which takes an
+    // origin-wide exclusive lock that install holds across a full precache and
+    // that repairOfflineData holds across a re-download started from the
+    // diagnostics panel. A finally defends against a throw and nothing else:
+    // behind a lock somebody else is holding, the handler never arrives there
+    // at all. A worker activates whether or not its waitUntil settles, so
+    // either way the result was an activated worker controlling no page, with
+    // every open tab left on the previous version and nothing said about it
+    // until a manual reload, which is exactly when nobody performs one.
     try {
-      await validateReleaseBundle();
+      await self.clients.claim();
     } catch (error) {
       recordFailure(error);
     }
 
-    try {
-      // The names this deletes belong to no version the worker still serves,
-      // so they are worth reclaiming even when the bundle did not verify.
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => {
-        if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== RADAR_PACK_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
-      }));
-      if (self.registration.navigationPreload) {
-        await self.registration.navigationPreload.enable();
+    await withReleaseLock(async () => {
+      // Validation must not be able to skip the cleanup either. It was the
+      // first await in one straight-line handler, so a throw there abandoned
+      // the cache deletion, the navigation preload and the pruning alike.
+      try {
+        await validateReleaseBundle();
+      } catch (error) {
+        recordFailure(error);
       }
-      await pruneOfflineData();
-      await pruneSourceBundle();
-      await deleteLegacyDataDbs();
-    } catch (error) {
-      recordFailure(error);
-    } finally {
-      // Taking control is not housekeeping and must not depend on it.
-      self.clients.claim();
-    }
-  }));
+
+      try {
+        // The names this deletes belong to no version the worker still serves,
+        // so they are worth reclaiming even when the bundle did not verify.
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => {
+          if (k !== SHELL_CACHE && k !== DATA_CACHE && k !== TILE_CACHE && k !== RADAR_CACHE && k !== RADAR_PACK_CACHE && k !== SOURCE_BUNDLE_CACHE) return caches.delete(k);
+        }));
+        if (self.registration.navigationPreload) {
+          await self.registration.navigationPreload.enable();
+        }
+        await pruneOfflineData();
+        await pruneSourceBundle();
+        await deleteLegacyDataDbs();
+      } catch (error) {
+        recordFailure(error);
+      }
+    });
+  })());
 });
 
 function isShell(url) {
@@ -599,7 +605,7 @@ async function reportOfflineIntegrity(event) {
   event.source?.postMessage({
     type: 'OFFLINE_INTEGRITY_RESULT',
     ...result,
-    last_activate_error: lastActivateError,
+    last_activate: lastActivate,
   });
 }
 

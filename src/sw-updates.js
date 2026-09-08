@@ -157,6 +157,19 @@ export async function requestOfflineIntegrityCheck({
         swVersion: typeof event.data.sw_version === 'string' ? event.data.sw_version : null,
         shellCache: typeof event.data.shell_cache === 'string' ? event.data.shell_cache : null,
         dataCache: typeof event.data.data_cache === 'string' ? event.data.data_cache : null,
+        // Null means this worker instance never ran activate, which is not the
+        // same as an activate that found nothing wrong. The worker reports the
+        // difference and it is worth carrying: a field added to this message
+        // and left out of this list is discarded on arrival and reads as
+        // absent evidence rather than as a gap in the wiring.
+        lastActivate: event.data.last_activate && typeof event.data.last_activate === 'object'
+          ? {
+            at: typeof event.data.last_activate.at === 'string' ? event.data.last_activate.at : null,
+            failures: Array.isArray(event.data.last_activate.failures)
+              ? event.data.last_activate.failures.slice(0, 8).map(entry => String(entry).slice(0, 240))
+              : [],
+          }
+          : null,
       });
     };
     const timer = setTimeout(() => finish({ state: 'unverified', error: 'offline-integrity-timeout' }), timeoutMs);
@@ -323,6 +336,12 @@ export function initServiceWorkerUpdates({
       return;
     }
     if (!startedControlled) return;
+    // Whatever was waiting is the controller now, so the button must not try to
+    // hurry it along. Clicking Reload posted SKIP_WAITING to an already active
+    // worker, which does nothing, and then waited for a second
+    // controllerchange that was never going to come: a dead button, and the
+    // only control this prompt offers.
+    waitingWorker = null;
     // Somebody accepted the update in another tab. This one still holds the
     // old module graph, and every lazy import() from here on resolves against
     // the new version, so the tab runs two versions of the app at once. Only
