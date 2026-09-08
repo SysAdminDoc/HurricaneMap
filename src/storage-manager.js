@@ -4,6 +4,7 @@ import { announceLocalAction, confirmLocalAction } from './confirm-action.js';
 import { isIosSafari, showIosInstallCoachmark } from './onboarding.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { getServiceWorkerDiagnostics } from './sw-updates.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 export const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
@@ -32,7 +33,7 @@ const QUOTA_HEADROOM = 0.95;
 
 export function formatStorageBytes(value) {
   const bytes = Number(value);
-  if (!Number.isFinite(bytes) || bytes < 0) return '—';
+  if (!Number.isFinite(bytes) || bytes < 0) return MISSING_METRIC;
   if (bytes < 1024) return `${Math.round(bytes)} B`;
   const units = ['KB', 'MB', 'GB', 'TB'];
   let amount = bytes / 1024;

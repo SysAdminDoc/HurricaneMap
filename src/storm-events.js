@@ -1,6 +1,7 @@
 // NOAA/NCEI Storm Events summary for hurricane landfall windows.
 
 import { t } from './i18n.js';
+import { presentNumber } from './metric-presenters.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import {
   beginOptionalFeed,
@@ -81,7 +82,7 @@ export function renderStormEventsHtml(storm, record, metadata = {}) {
 
   const tornadoStates = statesForType(record, 'tornado');
   const hailStates = statesForType(record, 'hail');
-  const maxHail = record.max_hail_in ? ` · largest ${formatNumber(record.max_hail_in, 2)} in` : '';
+  const maxHail = record.max_hail_in ? ` · largest ${presentNumber(record.max_hail_in, 2)} in` : '';
   const strongest = record.strongest_tornado_scale ? ` · strongest ${escapeHtml(record.strongest_tornado_scale)}` : '';
 
   return `
@@ -150,13 +151,6 @@ function emptyBlock(title, message, source) {
       <div class="se-source">${escapeHtml(source)}</div>
     </div>
   `;
-}
-
-function formatNumber(value, decimals = 0) {
-  return Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
 }
 
 function escapeHtml(value) {

@@ -7,6 +7,7 @@
 
 import { categoryColor, categoryLabel, formatTime, windToCategory } from './data.js';
 import { formatStormName } from './html-utils.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 export const VIDEO_FPS_OPTIONS = Object.freeze([24, 30, 60]);
 export const VIDEO_DURATION_OPTIONS = Object.freeze([5, 10, 15, 30]);
@@ -254,7 +255,7 @@ function drawHeader(context, storm, track, current, currentCategory, width) {
   context.textAlign = 'right';
   context.fillStyle = categoryColor(currentCategory);
   context.font = '700 18px Inter, Segoe UI, sans-serif';
-  context.fillText(`${categoryLabel(currentCategory)} · ${current.wind == null ? '—' : `${Math.round(current.wind)} kt`}`, width - EXPORT_PADDING.right, 44);
+  context.fillText(`${categoryLabel(currentCategory)} · ${current.wind == null ? MISSING_METRIC : `${Math.round(current.wind)} kt`}`, width - EXPORT_PADDING.right, 44);
   context.fillStyle = '#a6adc8';
   context.font = '500 14px Inter, Segoe UI, sans-serif';
   context.fillText(formatTime(current.t), width - EXPORT_PADDING.right, 70);
@@ -328,7 +329,7 @@ function drawCurrentPoint(context, point, color, category, wind) {
   context.fill();
   context.fillStyle = '#cdd6f4';
   context.font = '700 13px Inter, Segoe UI, sans-serif';
-  context.fillText(wind == null ? '—' : `${Math.round(wind)} kt`, point.x + 18, point.y - 16);
+  context.fillText(wind == null ? MISSING_METRIC : `${Math.round(wind)} kt`, point.x + 18, point.y - 16);
   context.restore();
 }
 

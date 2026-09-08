@@ -10,6 +10,7 @@ import {
   getRawFatalityText,
 } from './impact-utils.js';
 import { t } from './i18n.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 let _cache = null;
 
@@ -146,12 +147,12 @@ export async function renderDecadeTrends(host) {
       <td class="dt-deadliest">
         ${d.deadliest
           ? `<span title="Deaths: ${escapeHtml(d.deadliest.rawDeaths)}">${escapeHtml(formatStormName(d.deadliest.name))} (${d.deadliest.year})</span>`
-          : '—'}
+          : MISSING_METRIC}
       </td>
       <td class="dt-costliest">
         ${d.costliest
           ? `<span title="Damages: ${escapeHtml(d.costliest.rawDamages)}">${escapeHtml(formatStormName(d.costliest.name))} (${d.costliest.year})</span>`
-          : '—'}
+          : MISSING_METRIC}
       </td>
     </tr>
   `).join('');

@@ -1,3 +1,5 @@
+import { MISSING_METRIC } from './metric-presenters.js';
+
 export function getFatalityCount(impacts) {
   if (!impacts) return null;
   if (Number.isFinite(impacts.deaths_total)) return impacts.deaths_total;
@@ -27,7 +29,7 @@ export function getRawDamageText(impacts) {
 }
 
 export function formatFatalityCount(value) {
-  if (!Number.isFinite(value)) return '—';
+  if (!Number.isFinite(value)) return MISSING_METRIC;
   if (value >= 10_000) return `${(value / 1_000).toFixed(0)}k`;
   return value.toLocaleString();
 }

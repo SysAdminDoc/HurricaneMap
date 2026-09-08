@@ -3,6 +3,7 @@ import { escapeHtml, formatStormName } from './html-utils.js';
 import { formatWind } from './settings.js';
 import { showPanel, hidePanel } from './panels.js';
 import { getLocale, t } from './i18n.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 const panel = document.getElementById('table-view-panel');
 const body = document.getElementById('table-view-body');
@@ -170,8 +171,8 @@ function render(landfalls) {
             <td>${escapeHtml(formatStormName(lf.name))}</td>
             <td><span class="cat-pill cat-${lf.category <= 0 ? 'ts' : lf.category}">${escapeHtml(category(lf.category))}</span></td>
             <td>${escapeHtml(lf.state || '')}</td>
-            <td>${lf.wind ? formatWind(lf.wind) : '—'}</td>
-            <td>${lf.pres ? `${lf.pres} mb` : '—'}</td>
+            <td>${lf.wind ? formatWind(lf.wind) : MISSING_METRIC}</td>
+            <td>${lf.pres ? `${lf.pres} mb` : MISSING_METRIC}</td>
           </tr>`).join('')}
         </tbody>
       </table>

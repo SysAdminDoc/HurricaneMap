@@ -9,6 +9,8 @@
 // Methodology: real_2024 = nominal * (CPI_2024 / CPI_year)
 // Edge case: storms before 1850 fall back to nominal (no CPI data).
 
+import { MISSING_METRIC } from './metric-presenters.js';
+
 const CPI = {
   1850: 7.86, 1851: 7.86, 1852: 7.86, 1853: 7.86, 1854: 8.43,
   1855: 8.62, 1856: 8.62, 1857: 8.81, 1858: 8.05, 1859: 8.05,
@@ -95,7 +97,7 @@ export function inflationBaseYear() { return BASE_YEAR; }
 
 // Convenience: pretty-format a millions-USD value with M / B / T suffixes.
 export function formatMillionsUSD(m) {
-  if (m == null) return '—';
+  if (m == null) return MISSING_METRIC;
   if (m >= 1_000_000) return `$${(m / 1_000_000).toFixed(2)}T`;
   if (m >= 1000) return `$${(m / 1000).toFixed(1)}B`;
   if (m >= 1) return `$${m.toFixed(1)}M`;

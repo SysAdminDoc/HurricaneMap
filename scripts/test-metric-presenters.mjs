@@ -5,6 +5,7 @@ import { categoryLabel, ktToMph } from '../src/data.js';
 import { publicationCategoryLabel } from '../src/export.js';
 import {
   convertWindKnots,
+  MISSING_METRIC,
   presentCategory,
   presentDamageMillions,
   presentFatalities,
@@ -47,7 +48,12 @@ assert.equal(presentPressure(null), '—');
 assert.equal(presentFatalities(1), '1 fatality');
 assert.equal(presentFatalities(12_000), '12k fatalities');
 assert.equal(presentDamageMillions(1500), '$1.5B');
-assert.equal(presentDamageMillions(null), 'N/A');
+// Was 'N/A'. These two presenters were the last surface spelling an absent
+// value differently from every other one, so their default is now the single
+// MISSING_METRIC marker. A caller that wants its own token still passes one.
+assert.equal(presentDamageMillions(null), MISSING_METRIC);
+assert.equal(presentFatalities(null), MISSING_METRIC);
+assert.equal(presentDamageMillions(null, { missing: 'nothing recorded' }), 'nothing recorded');
 
 const qgis = buildQGISGeoJSON({
   landfalls: [{

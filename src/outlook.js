@@ -20,6 +20,7 @@ import {
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
 import { fetchSummaryOutlookPoints } from './nhc-summary.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 const BASINS = ['atl', 'pac', 'cpac'];
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -263,7 +264,7 @@ export async function renderTropicalOutlook({ map, enabled = true, force = false
       keyboard: true,
       title: `${t('outlook.disturbance')} ${point.disturbance}`.trim(),
     });
-    const chance = `${t('outlook.twoDay')}: ${point.twoDay || '—'} · ${t('outlook.sevenDay')}: ${point.sevenDay || '—'}`;
+    const chance = `${t('outlook.twoDay')}: ${point.twoDay || MISSING_METRIC} · ${t('outlook.sevenDay')}: ${point.sevenDay || MISSING_METRIC}`;
     marker.bindTooltip(`<strong>${escapeHtml(`${t('outlook.disturbance')} ${point.disturbance}`.trim())}</strong><br>${escapeHtml(chance)}${point.discussion ? `<br>${escapeHtml(point.discussion)}` : ''}`, { direction: 'top', sticky: true });
     layerGroup.addLayer(marker);
   }

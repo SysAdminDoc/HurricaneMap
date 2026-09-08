@@ -3,7 +3,7 @@ import {
   getNominalDamageUsd,
 } from './impact-utils.js';
 import { windToCategory, categoryLabel } from './data.js';
-import { presentNumber } from './metric-presenters.js';
+import { presentNumber, MISSING_METRIC } from './metric-presenters.js';
 import { buildCitation, citationCommentLines } from './citation.js';
 import {
   haversineKm as geodesicDistanceKm,
@@ -449,7 +449,7 @@ function exportKML(storm, citation = buildCitation()) {
       <name>Landfall: ${xml(lf.state)} (Cat ${lf.category})</name>
       <description><![CDATA[
         ${xml(lf.t)} UTC<br/>
-        Wind: ${lf.wind ?? '?'} kt · Pressure: ${lf.pres ?? '—'} mb
+        Wind: ${lf.wind ?? MISSING_METRIC} kt · Pressure: ${lf.pres ?? MISSING_METRIC} mb
       ]]></description>
       <styleUrl>#landfallStyle</styleUrl>
       <Point><coordinates>${lf.lon},${lf.lat},0</coordinates></Point>

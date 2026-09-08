@@ -16,10 +16,11 @@ import {
   presentNumber,
   presentPressure,
   presentWind,
+  MISSING_METRIC,
 } from './metric-presenters.js';
 import { formatStormName } from './html-utils.js';
 
-const MISSING = '—';
+const MISSING = MISSING_METRIC;
 
 function finiteOrNull(value) {
   return Number.isFinite(value) ? value : null;

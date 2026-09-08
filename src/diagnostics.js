@@ -4,6 +4,7 @@ import { getOptionalFeedStates } from './optional-feeds.js';
 import { announceLocalAction } from './confirm-action.js';
 import { formatStorageBytes, inspectStorage } from './storage-manager.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 import {
   getServiceWorkerDiagnostics,
   requestOfflineIntegrityCheck,
@@ -246,7 +247,7 @@ export async function renderOfflineDiagnostics(host) {
     <div class="diagnostics-coverage">
       <strong>${escapeHtml(t('diagnostics.coverage'))}</strong>
       ${bundle.coverage.available
-        ? `<span>${escapeHtml(t('diagnostics.coverageSummary', bundle.coverage.datasets.length, bundle.coverage.catalog.year_range?.join('–') || '—', bundle.coverage.catalog.storm_count ?? '—'))}</span>
+        ? `<span>${escapeHtml(t('diagnostics.coverageSummary', bundle.coverage.datasets.length, bundle.coverage.catalog.year_range?.join('–') || MISSING_METRIC, bundle.coverage.catalog.storm_count ?? MISSING_METRIC))}</span>
            <div class="diagnostics-coverage-list" role="list" tabindex="0" aria-label="${escapeHtml(t('diagnostics.coverage'))}">${bundle.coverage.datasets.map(dataset => `<span role="listitem"><strong>${escapeHtml(dataset.label || dataset.id)}</strong><small>${escapeHtml(dataset.value_status)} · ${escapeHtml(dataset.year_range?.join('–') || t('diagnostics.coverageNoRange'))}${dataset.availability.runnable ? '' : ` · ${escapeHtml(t('diagnostics.coverageNotRunnable'))}`}</small></span>`).join('')}</div>`
         : `<span>${escapeHtml(t('diagnostics.coverageUnavailable'))}</span>`}
     </div>

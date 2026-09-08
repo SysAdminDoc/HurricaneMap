@@ -11,6 +11,7 @@
 
 import { categoryColor, formatTime, windToCategory } from './data.js';
 import { escapeHtml } from './html-utils.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 
 const W = 360;          // total width in CSS px
 const H = 160;          // total height
@@ -186,7 +187,7 @@ export function renderIntensityChart(container, storm, opts = {}) {
     tooltip.innerHTML = `
       <div class="tt-time">${escapeHtml(formatTime(r.t))}</div>
       <div class="tt-row"><span>Wind</span><strong>${r.wind ?? '?'} kt</strong></div>
-      <div class="tt-row"><span>Pressure</span><strong>${r.pres ?? '—'} mb</strong></div>
+      <div class="tt-row"><span>Pressure</span><strong>${r.pres ?? MISSING_METRIC} mb</strong></div>
       <div class="tt-row"><span>Status</span><strong>${escapeHtml(r.status || '?')} · ${catLabel}</strong></div>
     `;
     // Position tooltip — flip sides if we'd run off the right edge of the panel.

@@ -1,6 +1,13 @@
 // Pure presentation rules shared by UI, reports, and machine-readable exports.
-// Callers choose the missing-value token appropriate to their surface.
-
+// No i18n here on purpose: exports and reports have to read the same whoever
+// generated them.
+//
+// One marker for a value that was never recorded, and every surface uses it.
+// The same absent value used to render as this dash in the stat grid, "N/A" in
+// the impact rows and in reports, and "Unavailable" in About, so a reader could
+// not tell those apart, or tell any of them from a real zero. A value that
+// failed to LOAD is a different statement and gets a localized word from the
+// caller, through t('metric.notLoaded'); a real zero is printed as a zero.
 export const MISSING_METRIC = '—';
 
 const WIND_FACTORS = Object.freeze({
@@ -70,7 +77,7 @@ export function presentPressure(pressureMb, { missing = MISSING_METRIC } = {}) {
   return Number.isFinite(pressureMb) ? `${presentNumber(pressureMb)} mb` : missing;
 }
 
-export function presentFatalities(value, { missing = 'N/A' } = {}) {
+export function presentFatalities(value, { missing = MISSING_METRIC } = {}) {
   if (!Number.isFinite(value)) return missing;
   const count = value >= 10_000
     ? `${Math.round(value / 1_000)}k`
@@ -78,7 +85,7 @@ export function presentFatalities(value, { missing = 'N/A' } = {}) {
   return `${count} ${value === 1 ? 'fatality' : 'fatalities'}`;
 }
 
-export function presentDamageMillions(value, { missing = 'N/A' } = {}) {
+export function presentDamageMillions(value, { missing = MISSING_METRIC } = {}) {
   if (!Number.isFinite(value)) return missing;
   if (value >= 1000) {
     const billions = value / 1000;

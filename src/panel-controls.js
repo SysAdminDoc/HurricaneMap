@@ -13,6 +13,7 @@ import {
   buildExports, downloadBlob,
 } from './metrics.js';
 import { formatWind } from './settings.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { t } from './i18n.js';
 import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
@@ -26,11 +27,11 @@ import {
 import { clearRiskTrajectories, renderRiskTrajectories } from './art-mode.js';
 
 export function formatClosest(approach) {
-  if (!approach) return '—';
+  if (!approach) return MISSING_METRIC;
   const mi = Math.round(approach.distance_mi);
   const km = Math.round(approach.distance_km);
   const point = approach.track_point;
-  const wind = point.wind != null ? formatWind(point.wind) : '—';
+  const wind = point.wind != null ? formatWind(point.wind) : MISSING_METRIC;
   const date = formatTime(point.t);
   return '<strong>' + mi.toLocaleString() + ' mi</strong> <span class="cp-meta-inline">('
     + km.toLocaleString() + ' km) · ' + wind + ' · ' + date + '</span>';

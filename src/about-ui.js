@@ -6,8 +6,13 @@ import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
 import { layerDepths, nextRevisionExpectation } from './coverage-claims.js';
 
+// About reports on the build itself, so an absent field here means the metadata
+// did not load, not that the value was never recorded. That is a different
+// statement from the dash the data surfaces use, and it is localized.
+const notLoaded = () => t('metric.notLoaded');
+
 function formatMetadataDate(value) {
-  if (!value) return 'Unavailable';
+  if (!value) return notLoaded();
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   return date.toLocaleDateString(undefined, {
@@ -19,7 +24,7 @@ function formatMetadataDate(value) {
 }
 
 function formatMetadataDateTime(value) {
-  if (!value) return 'Unavailable';
+  if (!value) return notLoaded();
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   return `${date.toLocaleString(undefined, {
@@ -32,12 +37,15 @@ function formatMetadataDateTime(value) {
   })} UTC`;
 }
 
+// Not presentNumber, which pins en-US grouping. This dialog has always grouped
+// by the reader's own locale, and changing that is a separate decision from
+// which word stands in for a value that did not load.
 function formatNumber(value) {
-  return Number.isFinite(value) ? value.toLocaleString() : 'Unavailable';
+  return Number.isFinite(value) ? value.toLocaleString() : notLoaded();
 }
 
 function formatValidationPercent(value) {
-  return Number.isFinite(value) ? (value * 100).toFixed(1) : 'Unavailable';
+  return Number.isFinite(value) ? (value * 100).toFixed(1) : notLoaded();
 }
 
 function formatCoverageRange(range) {
@@ -94,7 +102,7 @@ export function createAboutRenderer({
       ? metadata.sources.map(source => {
         const range = Array.isArray(source.storm_year_range)
           ? `${escapeHtml(source.storm_year_range[0])}-${escapeHtml(source.storm_year_range[1])}`
-          : 'Unavailable';
+          : notLoaded();
         return `
           <li>
             <strong>${escapeHtml(source.filename || source.id || 'Source file')}</strong>

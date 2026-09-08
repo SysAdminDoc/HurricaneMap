@@ -8,6 +8,7 @@ import {
   presentCategory,
   presentDamageMillions,
   presentFatalities,
+  MISSING_METRIC,
 } from './metric-presenters.js';
 
 export function generateStatisticalReport(filters, {
@@ -96,7 +97,7 @@ ${title}
 | **Total Landfalls** | ${filtered.length} |
 | **Unique Storms** | ${uniqueStorms} |
 | **Year Range** | ${filters.yearMin}-${filters.yearMax} |
-| **Strongest Wind** | ${strongestStorm ? strongestStorm.wind + ' kt - ' + strongestStorm.name + ' (' + strongestStorm.year + ')' : 'N/A'} |
+| **Strongest Wind** | ${strongestStorm ? strongestStorm.wind + ' kt - ' + strongestStorm.name + ' (' + strongestStorm.year + ')' : MISSING_METRIC} |
 | **Deadliest Storm** | ${formatImpactLeader(deadliestStorm, formatFatalities)} |
 | **Costliest Storm** | ${formatImpactLeader(costliestStorm, formatDamageMillions)} |
 
@@ -215,9 +216,9 @@ function landfallMonth(lf) {
 }
 
 function formatLandfallDate(lf) {
-  if (!lf) return 'N/A';
+  if (!lf) return MISSING_METRIC;
   const when = landfallDateUTC(lf);
-  if (!when) return String(lf.year ?? 'N/A');
+  if (!when) return String(lf.year ?? MISSING_METRIC);
   return `${monthName(when.getUTCMonth() + 1)} ${when.getUTCDate()}, ${lf.year}`;
 }
 
@@ -287,7 +288,7 @@ function findStrongestStorm(landfalls) {
 }
 
 function formatImpactLeader(leader, formatter) {
-  if (!leader) return 'N/A';
+  if (!leader) return MISSING_METRIC;
   return `${leader.name || 'UNNAMED'} (${leader.year}) - ${formatter(leader.value)}`;
 }
 

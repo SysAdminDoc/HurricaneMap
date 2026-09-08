@@ -7,6 +7,7 @@ import { getSetting } from './settings.js';
 import { inflateUSD, formatMillionsUSD } from './inflation.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 import {
   formatFatalityCount,
   getDamageMillions,
@@ -194,7 +195,7 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
     }
   }
   const aceCell = host.querySelector('[data-role="ace"] .ss-stat-num');
-  if (aceCell) aceCell.textContent = totalACE > 0 ? totalACE.toFixed(1) : '—';
+  if (aceCell) aceCell.textContent = totalACE > 0 ? totalACE.toFixed(1) : MISSING_METRIC;
 
   const dHost = host.querySelector('[data-role="deadliest"] dd');
   if (dHost) {

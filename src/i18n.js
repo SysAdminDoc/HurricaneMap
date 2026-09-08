@@ -669,6 +669,10 @@ export const STRINGS = {
     'about.archiveDistribution': 'bundled: {0}',
     'about.archiveLifecycle': 'lifecycle: {0}',
     'about.archiveUnavailable': 'unavailable',
+    // "We could not load this", which is not the same as "this was never
+    // recorded". The latter is the dash from metric-presenters.js, and a real
+    // zero is printed as a zero.
+    'metric.notLoaded': 'Unavailable',
     'about.archiveCoverageStatus.final': 'final',
     'about.archiveCoverageStatus.inferred': 'inferred',
     'about.archiveCoverageStatus.operational': 'operational',
@@ -1603,6 +1607,7 @@ export const STRINGS = {
     'about.archiveDistribution': 'incluido: {0}',
     'about.archiveLifecycle': 'ciclo de vida: {0}',
     'about.archiveUnavailable': 'no disponible',
+    'metric.notLoaded': 'No disponible',
     'about.archiveCoverageStatus.final': 'final',
     'about.archiveCoverageStatus.inferred': 'inferido',
     'about.archiveCoverageStatus.operational': 'operativo',
@@ -2472,6 +2477,7 @@ export const STRINGS = {
     'about.archiveDistribution': 'nan pake: {0}',
     'about.archiveLifecycle': 'sik lavi: {0}',
     'about.archiveUnavailable': 'pa disponib',
+    'metric.notLoaded': 'Pa disponib',
     'about.archiveCoverageStatus.final': 'final',
     'about.archiveCoverageStatus.inferred': 'dedwi',
     'about.archiveCoverageStatus.operational': 'operasyonèl',

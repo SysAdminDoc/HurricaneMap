@@ -7,6 +7,7 @@
 // model.
 
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { MISSING_METRIC } from './metric-presenters.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,
@@ -177,7 +178,7 @@ export function estimatePopulationExposure(storm, options = {}) {
 }
 
 export function formatExposurePeople(value) {
-  if (!Number.isFinite(value) || value <= 0) return '—';
+  if (!Number.isFinite(value) || value <= 0) return MISSING_METRIC;
   if (value < 10_000) return '<10K';
   if (value < 950_000) return `${Math.round(value / 1_000).toLocaleString()}K`;
   if (value < 9_950_000) return `${(value / 1_000_000).toFixed(1)}M`;

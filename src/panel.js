@@ -40,7 +40,7 @@ import { renderStormEventsSummary } from './storm-events.js';
 import { clearRetrospectiveCone } from './cone-retro.js';
 import { clearAdvisoryReplay } from './advisory-replay.js';
 import { clearRiskTrajectories } from './art-mode.js';
-import { presentPressure } from './metric-presenters.js';
+import { presentPressure, MISSING_METRIC } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
 import { formatClosest, wirePanelControls } from './panel-controls.js';
 import { renderTrackTimeline } from './table-view.js';
@@ -213,7 +213,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   const minPres = presentPressure(storm.min_pres_mb);
 
   const ace = computeACE(storm.track);
-  const aceStr = ace.value > 0 ? formatNumber(ace.value, 1) : '—';
+  const aceStr = ace.value > 0 ? formatNumber(ace.value, 1) : MISSING_METRIC;
   const ri = findRapidIntensification(storm.track);
   const riBadge = ri
     ? `<span class="storm-flag ri-flag" title="Rapid intensification: gained ${ri.delta_kt} kt in ${Math.round(ri.hours)}h (${formatTime(ri.from_t)} → ${formatTime(ri.to_t)}). NHC threshold is ≥30 kt / 24h.">⚡ Rapid intensification (+${ri.delta_kt} kt / 24h)</span>`
@@ -235,7 +235,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
   const transStats = computeTranslationStats(storm.track);
   const transStr = transStats
     ? `${formatNumber(transStats.mean_kmh, 0)} km/h <span style="font-size:11px;color:var(--subtext)">(${formatNumber(kmhToMph(transStats.mean_kmh), 0)} mph)</span>`
-    : '—';
+    : MISSING_METRIC;
   const transTitle = transStats
     ? `Mean forward speed: ${formatNumber(transStats.mean_kmh, 1)} km/h. Peak: ${formatNumber(transStats.max_kmh, 0)} km/h${transStats.stalled_hours > 0 ? ` · stalled (<10 km/h) for ${formatNumber(transStats.stalled_hours, 0)} h total` : ''}.`
     : 'Translation speed unavailable — insufficient consecutive obs.';
