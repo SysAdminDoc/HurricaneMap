@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CACHE_CONTRACT, DATA_SCHEMA_VERSION } from '../src/schema-contract.js';
+import { SNAPSHOT_PATH, SNAPSHOT_MAX_AGE_DAYS } from './check-outbound-links.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = relative => readFile(path.join(root, relative), 'utf8');
@@ -165,6 +166,39 @@ if (/\bchicago\b/i.test(readme)) {
 }
 if (license && (!license.includes('In APA form:') || !license.includes('```bibtex'))) {
   errors.push('LICENSE.md must show the APA and BibTeX citations the app emits, each named');
+}
+
+// check:links probes every outbound URL against the live web, which means it
+// cannot be a release gate. What an offline gate set CAN notice is that nobody
+// has run the online one lately, which is the only reason the snapshot exists.
+{
+  const snapshotText = await readOptional(SNAPSHOT_PATH);
+  if (!snapshotText) {
+    errors.push(`${SNAPSHOT_PATH} is missing; run npm run check:links -- --write`);
+  } else {
+    let snapshot;
+    try {
+      snapshot = JSON.parse(snapshotText);
+    } catch {
+      snapshot = null;
+      errors.push(`${SNAPSHOT_PATH} is not readable JSON`);
+    }
+    const checkedAt = snapshot?.checkedAt ? Date.parse(`${snapshot.checkedAt}T00:00:00Z`) : NaN;
+    if (!Number.isFinite(checkedAt)) {
+      if (snapshot) errors.push(`${SNAPSHOT_PATH} records no usable checkedAt date`);
+    } else {
+      const days = Math.floor((Date.now() - checkedAt) / 86_400_000);
+      if (days > SNAPSHOT_MAX_AGE_DAYS) {
+        errors.push(
+          `${SNAPSHOT_PATH} was last green ${days} days ago, over the ${SNAPSHOT_MAX_AGE_DAYS}-day limit; `
+          + 'run npm run check:links -- --write',
+        );
+      }
+      if (days < 0) {
+        errors.push(`${SNAPSHOT_PATH} is dated ${snapshot.checkedAt}, which is in the future`);
+      }
+    }
+  }
 }
 
 // The download section points at release assets by name and by tag, and a

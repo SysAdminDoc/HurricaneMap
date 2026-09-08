@@ -74,17 +74,33 @@ function assertHttpsUrl(value, label) {
   assert.equal(nhcWalletUrlFor({ ...katrina, year: 1994 }), null);
 }
 
-// The recon archive is Atlantic-only and thins out before 1989.
+// The recon archive is Atlantic-only and NHC serves it from 1989.
+//
+// These expectations changed with the target. The link used to be built for
+// tropicalatlantic.com as a per-storm query, and every assertion below about
+// name encoding described that URL. That host now redirects to
+// tropicalglobe.com and drops the path and the query on the way, so the button
+// landed on an unrelated homepage for every storm, and the same path on the new
+// host answers 403 even to a browser. The tests were not wrong; they pinned a
+// URL shape that no longer leads anywhere, and the name-encoding assertions
+// went with it because the name is no longer in the URL.
 {
   assertHttpsUrl(reconArchiveUrl(katrina), 'reconArchiveUrl');
-  assert.match(reconArchiveUrl(katrina), /archive=2005&storm=Katrina/);
-  assert.equal(reconArchiveUrl({ ...katrina, basin: 'EP' }), null, 'the mirror carries no eastern Pacific storms');
-  assert.equal(reconArchiveUrl({ ...katrina, year: 1988 }), null);
-  assert.equal(reconArchiveUrl(unnamed), null, 'the archive is indexed by name');
-  const awkwardRecon = reconArchiveUrl({ ...katrina, name: 'A&B#C D' });
-  assert.ok(!/[ #]/.test(awkwardRecon.split('?')[1].split('storm=')[1]), 'the storm name must arrive encoded');
-  const stormParam = new URL(awkwardRecon).searchParams.get('storm');
-  assert.ok(stormParam.includes('&') && stormParam.includes('#'), 'the name must survive the round trip intact');
+  assert.equal(reconArchiveUrl(katrina), 'https://www.nhc.noaa.gov/archive/recon/2005/');
+  assert.equal(reconArchiveUrl({ ...katrina, basin: 'EP' }), null, 'recon flights are an Atlantic-basin product');
+  assert.equal(reconArchiveUrl({ ...katrina, year: 1989 }), 'https://www.nhc.noaa.gov/archive/recon/1989/');
+  assert.equal(reconArchiveUrl({ ...katrina, year: 1988 }), null, '1988 is a 404 at NHC');
+  // A per-year directory needs no storm name, so an unnamed storm inside the
+  // covered years gets the link its year deserves rather than nothing. The
+  // shared `unnamed` fixture is a 1950 storm, which the year guard refuses on
+  // its own account, so this uses one from a year NHC actually serves.
+  assert.equal(reconArchiveUrl({ ...unnamed, year: 2005 }), 'https://www.nhc.noaa.gov/archive/recon/2005/');
+  assert.equal(reconArchiveUrl(unnamed), null, 'and 1950 is still before the archive begins');
+  assert.equal(
+    reconArchiveUrl({ ...katrina, name: 'A&B#C D' }),
+    'https://www.nhc.noaa.gov/archive/recon/2005/',
+    'a name with URL-significant characters cannot reach the URL at all now',
+  );
 }
 
 // SLIDER. GOES-19 replaced GOES-16 as GOES-East on 2025-04-07 and the old

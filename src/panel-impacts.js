@@ -118,17 +118,23 @@ export function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
   `;
 }
 
-/** Aircraft reconnaissance archive (Tropical Atlantic mirror). Hurricane
- *  Hunters fly into Atlantic-basin storms threatening land — vortex
- *  messages, high-density observations, and dropsonde data. The archive
- *  is per-storm and best surfaced via search rather than a constructed URL. */
+/** Aircraft reconnaissance archive, from NHC itself. Hurricane Hunters fly into
+ *  Atlantic-basin storms threatening land: vortex messages, high-density
+ *  observations and dropsonde data.
+ *
+ *  This used to point at tropicalatlantic.com, which now redirects to
+ *  tropicalglobe.com and drops both the path and the query on the way, so every
+ *  storm's "Recon archive" button landed on an unrelated homepage. The same
+ *  path on the new host answers 403 even to a browser. check:links found it.
+ *
+ *  NHC publishes the products itself, one directory per year. That is coarser
+ *  than a per-storm page, so the storm name is no longer part of the URL and no
+ *  longer gates the link: an unnamed storm's year has a recon directory like
+ *  any other. 1989 is the earliest year NHC serves; 1988 is a 404, checked. */
 export function reconArchiveUrl(storm) {
   if (storm.basin !== 'AL') return null;
-  if (storm.year < 1989) return null;  // Tropical Atlantic archive thins out before this
-  if (!storm.name || storm.name === 'UNNAMED') return null;
-  const name = formatStormName(storm.name);
-  // Tropical Atlantic uses a per-storm storm-archive page indexed by name+year.
-  return `https://tropicalatlantic.com/recon/?archive=${storm.year}&storm=${encodeURIComponent(name)}`;
+  if (storm.year < 1989) return null;
+  return `https://www.nhc.noaa.gov/archive/recon/${storm.year}/`;
 }
 
 export function nhcWalletUrlFor(storm) {

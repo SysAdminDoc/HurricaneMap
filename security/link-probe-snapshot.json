@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-09-08",
+  "urlCount": 60,
+  "probed": 56,
+  "skipped": [
+    "www.youtube.com",
+    "vdem.virginia.gov",
+    "geocode.arcgis.com",
+    "api.tidesandcurrents.noaa.gov"
+  ],
+  "note": "Written by npm run check:links -- --write. check:release-truth fails when this is more than 60 days old."
+}

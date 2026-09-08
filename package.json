@@ -24,6 +24,7 @@
     "check:licenses": "node scripts/check-licenses.mjs",
     "check:security": "node scripts/check-dependency-security.mjs",
     "check:security:offline": "node scripts/check-dependency-security.mjs --offline",
+    "check:links": "node scripts/check-outbound-links.mjs",
     "check:pages-size": "node scripts/check-pages-size.mjs",
     "check:release-manifest": "node scripts/check-release-manifest.mjs",
     "check:stac": "node scripts/check-stac.mjs",

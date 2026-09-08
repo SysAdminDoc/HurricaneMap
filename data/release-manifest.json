@@ -60,7 +60,7 @@
       "bytes": 2777,
       "sha256": "402882ed84b6533229ece48775bfd27613e8fbddfe643ffca948dcbc55f5db1f",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
-      "source_date": "2026-08-02",
+      "source_date": "2026-09-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
       "schema_version": 1
     },
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "3ec10e807ebee9f64ab13630f67ba09fba1765a4344c08b6447ffe63022de766",
+      "sha256": "4d6ff70bd80233f98a156a9ba0c519633e067370e316c67b0571a2acfd487013",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

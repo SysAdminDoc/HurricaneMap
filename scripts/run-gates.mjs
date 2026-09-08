@@ -120,6 +120,9 @@ export const GATE_SCRIPTS = Object.freeze([
 // `npm test` chains these after this runner; they are deliberately not here.
 export const NON_GATE_SCRIPTS = Object.freeze([
   'check:security:offline',
+  // Probes the live web, so it cannot sit in an offline gate set. Its snapshot
+  // going stale is what check:release-truth notices.
+  'check:links',
   'test:distribution-offline',
   'test:smoke',
   'test:visual',
