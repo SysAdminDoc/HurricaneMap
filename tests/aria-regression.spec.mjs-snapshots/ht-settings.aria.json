@@ -1,0 +1,920 @@
+[
+  {
+    "role": "dialog",
+    "name": "Paramèt",
+    "children": [
+      {
+        "role": "heading",
+        "name": "Paramèt",
+        "level": 2
+      },
+      {
+        "role": "paragraph",
+        "text": "Ajiste inite, aksè, ak kouch tanpèt aktif. Chanjman yo rete sou aparèy sa a."
+      },
+      {
+        "role": "region",
+        "name": "Lekti",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Lekti",
+            "level": 3
+          },
+          "Inite van",
+          {
+            "role": "paragraph",
+            "text": "Itilize nan panno, graf, ak ekspòtasyon."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Inite van",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Ne",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "mph"
+              },
+              {
+                "role": "radio",
+                "name": "km/h"
+              }
+            ]
+          },
+          "Chif domaj",
+          {
+            "role": "paragraph",
+            "text": "Konpare pèt istorik jan yo rapòte yo oswa ajiste ak CPI."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Ajisteman domaj",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Nominal"
+              },
+              {
+                "role": "radio",
+                "name": "USD 2024",
+                "checked": true
+              }
+            ]
+          },
+          "Lang",
+          {
+            "role": "paragraph",
+            "text": "Mete etikèt yo ajou san chanje done yo."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Lang",
+            "children": [
+              {
+                "role": "radio",
+                "name": "English"
+              },
+              {
+                "role": "radio",
+                "name": "Español"
+              },
+              {
+                "role": "radio",
+                "name": "Kreyòl",
+                "checked": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Aparans",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Aparans",
+            "level": 3
+          },
+          "Tèm",
+          {
+            "role": "paragraph",
+            "text": "Chwazi aparans kat la pou limyè kote w ye a."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Tèm",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Fonse",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Klè"
+              },
+              {
+                "role": "radio",
+                "name": "Sistèm"
+              }
+            ]
+          },
+          "Palèt koulè",
+          {
+            "role": "paragraph",
+            "text": "Kenbe siyifikasyon kategori yo menm sou kat ak panno."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Palèt koulè",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Pa defo",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Pou je ki pa wè koulè"
+              }
+            ]
+          },
+          {
+            "role": "checkbox",
+            "name": "Gwo kontrast Fè tèks, bòdi, ak konsantrasyon pi fò."
+          },
+          "Gwo kontrast Fè tèks, bòdi, ak konsantrasyon pi fò.",
+          {
+            "role": "checkbox",
+            "name": "Diminye mouvman Kenbe chanjman yo klè ak mwens animasyon.",
+            "checked": true
+          },
+          "Diminye mouvman Kenbe chanjman yo klè ak mwens animasyon."
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Èd pou tanpèt aktif",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Èd pou tanpèt aktif",
+            "level": 3
+          },
+          {
+            "role": "checkbox",
+            "name": "Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib.",
+            "checked": true
+          },
+          "Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib.",
+          {
+            "role": "checkbox",
+            "name": "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.",
+            "checked": true
+          },
+          "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.",
+          {
+            "role": "checkbox",
+            "name": "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–24 èdtan sou lanmè."
+          },
+          "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–24 èdtan sou lanmè.",
+          {
+            "role": "checkbox",
+            "name": "Fon satelit GOES Ajoute imaj an dirèk dèyè tanpèt aktif lè li disponib."
+          },
+          "Fon satelit GOES Ajoute imaj an dirèk dèyè tanpèt aktif lè li disponib.",
+          {
+            "role": "button",
+            "name": "Rejwe vizit byenveni"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Dyagnostik done opsyonèl",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Dyagnostik done opsyonèl",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Eta sous an dirèk ak sou demann. Lè yon mizajou echwe, dènye bon done yo rete ak yon etikèt si yo disponib."
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Tanpèt aktif"
+                  },
+                  "Pa disponib NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: 08/08/2026 16:45:00 Orijin: Rezo",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Jewometri previzyon ofisyèl"
+                  },
+                  "Poko mande NOAA NHC official forecast GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pèspektiv twopikal"
+                  },
+                  "Pa disponib NOAA NHC Tropical Weather Outlook Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Avètisman sou lanmè"
+                  },
+                  "Poko mande NOAA NHC Marine Wind Warnings Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Avètisman kot ak andedan tè"
+                  },
+                  "Poko mande NOAA/NWS active alerts Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Previzyon pi gwo mare tanpèt"
+                  },
+                  "Poko mande NOAA NHC Peak Storm Surge Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Imaj GOES"
+                  },
+                  "Poko mande NOAA/NESDIS/STAR GOES Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mezi mare"
+                  },
+                  "Poko mande NOAA CO-OPS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Achiv rada"
+                  },
+                  "Poko mande Iowa State IEM NEXRAD archive Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Deklarasyon federal pou katastwòf"
+                  },
+                  "Pa disponib FEMA Disaster Declarations Summaries Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Rezo",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Gid van NHC"
+                  },
+                  "Poko mande NOAA NHC tropical weather summary GIS Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pèspektiv sezon an"
+                  },
+                  "Poko mande NOAA CPC bundled outlook snapshot Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Dansite popilasyon"
+                  },
+                  "Poko mande SEDAC GPWv4 population-density tiles Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Glosè"
+                  },
+                  "Poko mande HurricaneMap bundled glossary Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Tanperati sifas lanmè a"
+                  },
+                  "Poko mande PacIOOS CoralTemp sea-surface temperature Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mak pi wo dlo a rive"
+                  },
+                  "Aktyèl · 25 anrejistreman USGS high-water marks Dènye siksè: 08/08/2026 16:30:00 Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Rapò evènman tanpèt"
+                  },
+                  "Aktyèl · 157 anrejistreman NOAA NCEI Storm Events Dènye siksè: 08/08/2026 16:30:00 Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Ekspozisyon popilasyon"
+                  },
+                  "Aktyèl · 52 anrejistreman Bundled state population densities Dènye siksè: 08/08/2026 16:30:00 Pwochen tantativ: Pa pwograme Orijin: Done san entènèt ki vini ladan",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Zòn evakyasyon"
+                  },
+                  "Poko mande Florida ArcGIS evacuation zones Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Depo san entènèt",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Depo san entènèt",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Done istorik prensipal yo pwoteje. Fichye sous yo se yon pake opsyonèl itilizatè a sove; mozayik kat ak pake rada yo ka efase apa."
+          },
+          {
+            "role": "strong",
+            "text": "anviwon 0 B sou anviwon 6.0 GB (0%)"
+          },
+          "Depo navigatè a jere",
+          {
+            "role": "paragraph",
+            "text": "Navigatè yo awondi de chif sa yo eksprè, pou yon sit pa ka rekonèt ou daprè konbyen ou estoke. Gwosè chak eleman anba yo se pwòp kontaj aplikasyon an e yo egzak."
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Aplikasyon an"
+                  },
+                  "Pwoteje · 0 eleman · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Done istorik"
+                  },
+                  "Pwoteje · 0 eleman · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mozayik kat"
+                  },
+                  "Opsyonèl · 0 eleman · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Efase"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pake rada"
+                  },
+                  "Opsyonèl · 0 eleman · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Efase"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pake sous"
+                  },
+                  "Opsyonèl · 0 eleman · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Sove pake sous"
+                  },
+                  {
+                    "role": "button",
+                    "name": "Efase"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "status"
+          },
+          {
+            "role": "paragraph",
+            "text": "Pake rada tanpèt ki sove: 0"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Dyagnostik san entènèt",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Dyagnostik san entènèt",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Eta service worker, kach, depo, ak sous pou rezoud pwoblèm san entènèt."
+          },
+          {
+            "role": "strong",
+            "text": "Anrejistreman"
+          },
+          "Anrejistre (worker modil)",
+          {
+            "role": "strong",
+            "text": "Kontwòl paj la"
+          },
+          "Pa sou kontwòl",
+          {
+            "role": "strong",
+            "text": "Depo"
+          },
+          "anviwon 0 B sou anviwon 6.0 GB",
+          {
+            "role": "strong",
+            "text": "Pake lage a"
+          },
+          "Poko verifye",
+          {
+            "role": "strong",
+            "text": "Entegrite lè li lanse"
+          },
+          "Poko tcheke",
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Aplikasyon an"
+                  },
+                  "pa enstale · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Done istorik"
+                  },
+                  "pa enstale · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mozayik kat"
+                  },
+                  "pa enstale · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pake rada"
+                  },
+                  "pa enstale · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pake sous"
+                  },
+                  "pa enstale · 0 · 0 B"
+                ]
+              }
+            ]
+          },
+          {
+            "role": "strong",
+            "text": "Laj sous opsyonèl yo"
+          },
+          "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi · sst: poko janm reyisi · hwm: sa gen 0 min · storm-events: sa gen 0 min · exposure: sa gen 0 min · evac: poko janm reyisi",
+          {
+            "role": "strong",
+            "text": "Kouvèti achiv la"
+          },
+          "15 done · 1851–2025 · 595 tanpèt",
+          {
+            "role": "list",
+            "name": "Kouvèti achiv la",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NHC HURDAT2 best-track and derived landfall data"
+                  },
+                  "final · 1851–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "AOML detailed U.S. hurricane landfall table"
+                  },
+                  "final · 1851–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Community-sourced storm impacts"
+                  },
+                  "inferred · 1950–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA NCEI Billion-Dollar Weather and Climate Disasters"
+                  },
+                  "closed · 1980–2024 · pa ka kouri"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA PSL Oceanic Niño Index snapshot"
+                  },
+                  "final · 1950–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/CPC and CSU seasonal outlook snapshot"
+                  },
+                  "operational · 2026–2026"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NHC official forecast skill summary"
+                  },
+                  "final · 2021–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NHC archived advisory replay"
+                  },
+                  "operational · 2015–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NCEI Storm Events coincidence data"
+                  },
+                  "final · 1953–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA tropical cyclone rainfall reports"
+                  },
+                  "final · 1950–2020"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Iowa State IEM archived NEXRAD composites"
+                  },
+                  "final · 1995–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "USGS observed high-water marks"
+                  },
+                  "final · 2003–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA CO-OPS tide-station index"
+                  },
+                  "final · pa gen peryòd"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "U.S. Census state boundary polygons"
+                  },
+                  "final · pa gen peryòd"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "HurricaneMap glossary"
+                  },
+                  "final · pa gen peryòd"
+                ]
+              }
+            ]
+          },
+          {
+            "role": "button",
+            "name": "Repare kounye a"
+          },
+          {
+            "role": "button",
+            "name": "Eseye service worker ankò"
+          },
+          {
+            "role": "button",
+            "name": "Rafrechi dyagnostik"
+          },
+          {
+            "role": "button",
+            "name": "Ekspòte JSON sipò"
+          },
+          {
+            "role": "paragraph",
+            "text": "Ekspòtasyon an gen sèlman vèsyon ak erè teknik, li pa janm gen pozisyon, adrès, rechèch, vizyalizasyon anrejistre, oswa repons preparasyon."
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Vizyalizasyon anrejistre",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Vizyalizasyon anrejistre",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Vizyalizasyon anrejistre pa janm gen adrès oswa pozisyon ou chwazi. Pozisyon aparèy la rete sèlman pandan sesyon an sof si ou chwazi sonje li pandan 24 èdtan."
+          },
+          "Non vizyalizasyon anrejistre a",
+          {
+            "role": "textbox",
+            "name": "Non vizyalizasyon anrejistre a",
+            "placeholder": "Non vizyalizasyon an"
+          },
+          {
+            "role": "button",
+            "name": "Anrejistre sa a"
+          },
+          {
+            "role": "button",
+            "name": "Ekspòte JSON",
+            "disabled": true
+          },
+          {
+            "role": "button",
+            "name": "Enpòte JSON"
+          },
+          "Enpòte JSON",
+          {
+            "role": "button",
+            "name": "Enpòte JSON"
+          },
+          {
+            "role": "status"
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "text": "Pa gen vizyalizasyon anrejistre sou aparèy sa a."
+              }
+            ]
+          }
+        ]
+      },
+      "Sove sou aparèy sa a. Pa gen kont, pwofil swivi, oswa senkronizasyon nwaj."
+    ]
+  }
+]

@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -147,6 +147,39 @@ async function dispatchDomKey(page, selector, key, extra = {}) {
   }, { target: selector, keyName: key, init: extra });
 }
 
+// Two of these panels are compared as JSON rather than as the YAML markup the
+// rest use. YAML packs a node's role, name and state onto one line, so a diff
+// reports a rewritten line and leaves you to work out which of those actually
+// moved. The JSON tree puts each on its own property and the diff names it.
+//
+// These are also the two whose YAML had drifted furthest into regexes:
+// /Cat 5 \d+ kt/ had stopped checking Katrina's peak wind at all, and the
+// settings menu carried thirteen more of the same shape. The values here are
+// literal, which is stricter, and the frozen clock and pinned timezone above
+// are what make that reproducible.
+//
+// toMatchSnapshot is deliberately not used: it stamps the platform into the
+// file name, and an accessibility tree is not platform-specific the way a
+// screenshot is. These baselines are written and rewritten by the same
+// --update-snapshots flag as the rest, read off the run's own config.
+const ariaJsonDir = path.join(root, 'tests', 'aria-regression.spec.mjs-snapshots');
+
+async function expectAriaJson(page, selector, name) {
+  const tree = await page.locator(selector).ariaSnapshotJSON();
+  const file = path.join(ariaJsonDir, `${name}.aria.json`);
+  const baseline = await readFile(file, 'utf8').catch(() => null);
+  // 'missing' is the mode a plain run uses, so an absent baseline is written
+  // once and an existing one is still compared. 'all' and 'changed' rewrite.
+  const mode = test.info().config.updateSnapshots;
+  if (mode === 'all' || mode === 'changed' || (baseline === null && mode === 'missing')) {
+    await mkdir(ariaJsonDir, { recursive: true });
+    await writeFile(file, `${JSON.stringify(tree, null, 2)}\n`);
+    return;
+  }
+  expect(baseline, `${name}.aria.json is missing; rerun with --update-snapshots`).not.toBeNull();
+  expect(tree, `${name} accessibility tree changed`).toEqual(JSON.parse(baseline));
+}
+
 async function assertNoAxeViolations(page, label, selector) {
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice'])
@@ -161,12 +194,12 @@ for (const locale of locales) {
     await prepareLocalizedPage(page, locale);
 
     await openStorm(page, 'AL122005');
-    await expect(page.locator('#storm-panel')).toMatchAriaSnapshot({ name: `${locale}-storm-panel.aria.yml` });
+    await expectAriaJson(page, '#storm-panel', `${locale}-storm-panel`);
 
     await closePanels(page);
     await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
     await page.waitForSelector('#settings-menu:popover-open', { timeout: 5_000 });
-    await expect(page.locator('#settings-menu')).toMatchAriaSnapshot({ name: `${locale}-settings.aria.yml` });
+    await expectAriaJson(page, '#settings-menu', `${locale}-settings`);
 
     await closePanels(page);
     await openStorm(page, 'AL142024');

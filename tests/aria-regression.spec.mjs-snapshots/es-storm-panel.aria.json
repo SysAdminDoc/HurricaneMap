@@ -1,0 +1,935 @@
+[
+  {
+    "role": "region",
+    "name": "Katrina (2005)",
+    "children": [
+      {
+        "role": "button",
+        "name": "Minimizar detalles de la tormenta"
+      },
+      {
+        "role": "button",
+        "name": "Cerrar detalles de la tormenta",
+        "text": "×"
+      },
+      {
+        "role": "heading",
+        "name": "Katrina (2005)",
+        "level": 2
+      },
+      "Cat 3 al tocar tierra Intensidad máxima:",
+      {
+        "role": "strong",
+        "text": "Cat 5 150 kt"
+      },
+      "Cuenca del Atlántico AL122005",
+      {
+        "role": "button",
+        "name": "Reproducir trayectoria"
+      },
+      {
+        "role": "button",
+        "name": "📌 Fijar para comparar"
+      },
+      {
+        "role": "region",
+        "name": "Resumen del huracán",
+        "children": [
+          "Texto educativo · fuente en inglés KATRINA (2005) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of 150 kt and caused 1,392 fatalities and $125B in damage. The storm underwent rapid intensification (+50 kt in 24h), experienced explosive deepening (−46 mb pressure drop), impacted multiple states. ⚡ Intensificación rápida (+50 kt / 24 h) 📉 Profundización explosiva (−46 mb / 24 h) Viento máximo 150 kt Presión mínima 902 mb ACE ⓘ 20.0 Velocidad media de avance ⓘ 19 km/h (12 mph) Toques de tierra en EE. UU. 3 Exposición est. ⓘ 474K vientos de Cat-2+ Riesgo de IR ⓘ 🔴 Alto Paso más cercano a",
+          {
+            "role": "combobox",
+            "name": "Paso más cercano a",
+            "children": [
+              {
+                "role": "option",
+                "name": "Miami, FL",
+                "selected": true
+              },
+              {
+                "role": "option",
+                "name": "Key West, FL"
+              },
+              {
+                "role": "option",
+                "name": "Tampa, FL"
+              },
+              {
+                "role": "option",
+                "name": "Jacksonville, FL"
+              },
+              {
+                "role": "option",
+                "name": "Daytona Beach, FL"
+              },
+              {
+                "role": "option",
+                "name": "Pensacola, FL"
+              },
+              {
+                "role": "option",
+                "name": "Mobile, AL"
+              },
+              {
+                "role": "option",
+                "name": "New Orleans, LA"
+              },
+              {
+                "role": "option",
+                "name": "Galveston, TX"
+              },
+              {
+                "role": "option",
+                "name": "Houston, TX"
+              },
+              {
+                "role": "option",
+                "name": "Corpus Christi, TX"
+              },
+              {
+                "role": "option",
+                "name": "Brownsville, TX"
+              },
+              {
+                "role": "option",
+                "name": "Savannah, GA"
+              },
+              {
+                "role": "option",
+                "name": "Charleston, SC"
+              },
+              {
+                "role": "option",
+                "name": "Wilmington, NC"
+              },
+              {
+                "role": "option",
+                "name": "Cape Hatteras, NC"
+              },
+              {
+                "role": "option",
+                "name": "Norfolk, VA"
+              },
+              {
+                "role": "option",
+                "name": "Washington, DC"
+              },
+              {
+                "role": "option",
+                "name": "New York, NY"
+              },
+              {
+                "role": "option",
+                "name": "Boston, MA"
+              },
+              {
+                "role": "option",
+                "name": "San Juan, PR"
+              },
+              {
+                "role": "option",
+                "name": "Honolulu, HI"
+              },
+              {
+                "role": "option",
+                "name": "Hilo, HI"
+              },
+              {
+                "role": "option",
+                "name": "San Diego, CA"
+              },
+              {
+                "role": "option",
+                "name": "Cabo San Lucas, MX"
+              }
+            ]
+          },
+          {
+            "role": "strong",
+            "text": "12 mi"
+          },
+          "(19 km) · 70 kt · 25 ago 2005, 23:52 UTC Periodo de retorno (radio de 50 km): Cat 3+: ~17.3y • Cat 1+: ~8.2y",
+          {
+            "role": "heading",
+            "name": "Impactos",
+            "level": 3
+          },
+          "Víctimas mortales 1,392 Daños $200.8B (2024 USD · $125.0B nominal) Desastre de mil millones $201.3B (2024 USD · 1833 muertes)",
+          {
+            "role": "link",
+            "name": "Fuente: Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29"
+          },
+          "· Confianza: alta ·",
+          {
+            "role": "link",
+            "name": "Fuente: NOAA NCEI (congelado en 2024)",
+            "url": "https://www.ncei.noaa.gov/access/billions/"
+          },
+          {
+            "role": "heading",
+            "name": "Eventos meteorológicos cerca del toque de tierra",
+            "level": 3
+          },
+          "Actividad de tornados durante el toque de tierra 1 informe en Florida · más fuerte F2 Actividad de granizo durante el toque de tierra 0 informes",
+          {
+            "role": "list",
+            "name": "Muestra de eventos coincidentes de Storm Events",
+            "children": [
+              {
+                "role": "listitem",
+                "text": "Tornado MONROE, Florida F2"
+              }
+            ]
+          },
+          "NOAA/NCEI Storm Events Database bulk CSV · 24 h antes hasta 48 h después del tocamiento de tierra en EE. UU. Peak rainfall (WPC) 16.43\" at PERRINE 4W FL Fuente:",
+          {
+            "role": "link",
+            "name": "NOAA WPC TC Rainfall",
+            "url": "https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html"
+          },
+          {
+            "role": "heading",
+            "name": "Mareógrafos (NOAA CO-OPS)",
+            "level": 3
+          },
+          {
+            "role": "button",
+            "name": "Cargar niveles de agua cerca del toque de tierra"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Análisis del huracán",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Huracanes similares",
+            "level": 3
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Ian (2022) Cat 5 3 tocamientos de tierra 99%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Belle (1976) Cat 3 2 tocamientos de tierra 98%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Carol (1954) Cat 3 2 tocamientos de tierra 98%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Sin nombre (1856) Cat 4 1 tocamiento de tierra 97%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Celia (1970) Cat 4 1 tocamiento de tierra 97%"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "heading",
+            "name": "Días con esta intensidad",
+            "level": 3
+          },
+          {
+            "role": "img",
+            "name": "Días con esta intensidad: TD 1d 12h, TS 1d 23h, Cat 1 1d 2h, Cat 2 18h, Cat 3 1d 1h, Cat 4 11h, Cat 5 18h",
+            "text": "TD · 1d 12h TS · 1d 23h Cat 1 · 1d 2h Cat 2 · 18h Cat 3 · 1d 1h Cat 5 · 18h"
+          },
+          "Total registrado: 7d 12h",
+          {
+            "role": "heading",
+            "name": "Intensidad a lo largo del tiempo",
+            "level": 3
+          },
+          "Viento (kt) ↑ Presión (mb) ↓ invertida L = tocamiento de tierra en EE. UU.",
+          {
+            "role": "img",
+            "name": "Gráfico de intensidad a lo largo del tiempo",
+            "text": "34 64 83 96 113 137 880 920 960 1000 08-23 08-25 08-27 08-29 08-31 L L L ⚡ RI +50 kt"
+          },
+          {
+            "role": "button",
+            "name": "⤓ PNG"
+          },
+          {
+            "role": "button",
+            "name": "⤓ SVG"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Recursos del huracán",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Tocamientos de tierra en EE. UU. (cronológico)",
+            "level": 3
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 1 Florida 25 ago 2005, 22:30 UTC",
+                  {
+                    "role": "button",
+                    "name": "Mostrar el radar NEXRAD del 25 ago 2005, 22:30 UTC",
+                    "text": "Radar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 3 Louisiana 29 ago 2005, 11:10 UTC",
+                  {
+                    "role": "button",
+                    "name": "Mostrar el radar NEXRAD del 29 ago 2005, 11:10 UTC",
+                    "text": "Radar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 3 Louisiana 29 ago 2005, 14:45 UTC",
+                  {
+                    "role": "button",
+                    "name": "Mostrar el radar NEXRAD del 29 ago 2005, 14:45 UTC",
+                    "text": "Radar"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "status",
+            "text": "Caché de radar: no hay imágenes guardadas (22 disponibles)"
+          },
+          {
+            "role": "region",
+            "name": "Contexto federal del desastre",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Contexto federal del desastre",
+                "level": 3
+              },
+              {
+                "role": "link",
+                "name": "Fuente FEMA",
+                "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries"
+              },
+              {
+                "role": "status",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Declaraciones federales de desastre"
+                  },
+                  "No disponible FEMA Disaster Declarations Summaries Cantidad desconocida Aún no se ha cargado correctamente",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "status",
+                "children": [
+                  {
+                    "role": "paragraph",
+                    "text": "Las declaraciones de FEMA no están disponibles ahora."
+                  },
+                  {
+                    "role": "paragraph",
+                    "children": [
+                      "No se puede confirmar una declaración hasta que responda la fuente.",
+                      {
+                        "role": "link",
+                        "name": "Fuente FEMA",
+                        "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "link",
+            "name": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Special:Search?go=Go&search=Hurricane%20Katrina%20(2005)"
+          },
+          {
+            "role": "link",
+            "name": "Videos de YouTube",
+            "url": "https://www.youtube.com/results?search_query=hurricane%20Katrina%202005%20landfall"
+          },
+          {
+            "role": "link",
+            "name": "Informe de la NOAA",
+            "url": "https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl"
+          },
+          {
+            "role": "link",
+            "name": "Archivo del NHC",
+            "url": "https://www.nhc.noaa.gov/archive/2005/AL122005.shtml"
+          },
+          {
+            "role": "link",
+            "name": "Storm Events (NOAA)",
+            "url": "https://www.ncei.noaa.gov/access/storm-events-database/search"
+          },
+          {
+            "role": "link",
+            "name": "Archivo de reconocimiento",
+            "url": "https://www.nhc.noaa.gov/archive/recon/2005/"
+          },
+          "Exportar trayectoria:",
+          {
+            "role": "button",
+            "name": "CSV"
+          },
+          {
+            "role": "button",
+            "name": "CSV (publicación)"
+          },
+          {
+            "role": "button",
+            "name": "GeoJSON"
+          },
+          {
+            "role": "button",
+            "name": "KML"
+          },
+          {
+            "role": "button",
+            "name": "Mapa SVG"
+          },
+          {
+            "role": "button",
+            "name": "🔗 Compartir vista"
+          },
+          {
+            "role": "region",
+            "name": "Exportar video",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Exportar video",
+                "level": 3
+              },
+              {
+                "role": "paragraph",
+                "text": "Cree un WebM de la trayectoria de esta tormenta con sus fechas, leyenda de categorías y atribución de NOAA."
+              },
+              "Velocidad de fotogramas",
+              {
+                "role": "combobox",
+                "name": "Velocidad de fotogramas",
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "24 fps"
+                  },
+                  {
+                    "role": "option",
+                    "name": "30 fps",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "60 fps"
+                  }
+                ]
+              },
+              "Duración",
+              {
+                "role": "combobox",
+                "name": "Duración",
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "5 segundos"
+                  },
+                  {
+                    "role": "option",
+                    "name": "10 segundos",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "15 segundos"
+                  },
+                  {
+                    "role": "option",
+                    "name": "30 segundos"
+                  }
+                ]
+              },
+              {
+                "role": "button",
+                "name": "Descargar WebM"
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Destreza real de pronóstico del NHC",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Destreza real de pronóstico del NHC",
+                "level": 3
+              },
+              "Medido",
+              {
+                "role": "paragraph",
+                "text": "Atlántico · 2021-2025 · pronósticos oficiales OFCL"
+              },
+              {
+                "role": "paragraph",
+                "text": "Medido con pronósticos oficiales archivados frente a la trayectoria final del análisis posterior a la temporada. Son promedios de cuenca, no una puntuación de Katrina."
+              },
+              {
+                "role": "table",
+                "name": "Atlántico · 2021-2025 · pronósticos oficiales OFCL",
+                "children": [
+                  {
+                    "role": "caption",
+                    "text": "Atlántico · 2021-2025 · pronósticos oficiales OFCL"
+                  },
+                  {
+                    "role": "rowgroup",
+                    "children": [
+                      {
+                        "role": "row",
+                        "name": "Plazo Trayectoria mn Intensidad kt Muestra N",
+                        "children": [
+                          {
+                            "role": "columnheader",
+                            "name": "Plazo"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Trayectoria mn"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Intensidad kt"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Muestra N"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "rowgroup",
+                    "children": [
+                      {
+                        "role": "row",
+                        "name": "0 h 6.9 1.3 1676",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "0 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "6.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1676"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "12 h 22.3 5.0 1504",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "12 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "22.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "5.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1504"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "24 h 33.6 7.1 1336",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "24 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "33.6"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "7.1"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1336"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "36 h 44.0 8.5 1182",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "36 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "44.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "8.5"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1182"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "48 h 55.9 9.9 1049",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "48 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "55.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "9.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1049"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "60 h 70.5 10.8 923",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "60 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "70.5"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "10.8"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "923"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "72 h 86.4 11.6 805",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "72 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "86.4"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "11.6"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "805"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "96 h 124.9 13.3 613",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "96 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "124.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "13.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "613"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "120 h 181.0 14.7 464",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "120 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "181.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "14.7"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "464"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Trayectoria es el error medio de posición por gran círculo; intensidad es el error absoluto medio del viento máximo."
+              },
+              {
+                "role": "paragraph",
+                "text": "Versión de trayectoria final: 2026-05-18"
+              },
+              {
+                "role": "paragraph",
+                "children": [
+                  {
+                    "role": "link",
+                    "name": "Tabla quinquenal del NHC",
+                    "url": "https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf"
+                  },
+                  "·",
+                  {
+                    "role": "link",
+                    "name": "Archivo de errores individuales",
+                    "url": "https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_ATL_TI_errors.txt"
+                  },
+                  "·",
+                  {
+                    "role": "link",
+                    "name": "Definiciones",
+                    "url": "https://www.nhc.noaa.gov/verification/verify2.shtml"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "group",
+            "text": "Línea de tiempo textual de la trayectoria 34 observaciones · 17 momentos de peligro"
+          },
+          {
+            "role": "region",
+            "name": "Repetición de avisos",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Repetición de avisos",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Repetir los pronósticos emitidos"
+              },
+              "Repetir los pronósticos emitidos",
+              {
+                "role": "paragraph",
+                "text": "Recorre los pronósticos que el NHC emitió realmente para esta tormenta, tomados literalmente del registro ATCF archivado, junto a la mejor trayectoria final."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Reconstrucción ilustrativa del cono",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Reconstrucción ilustrativa del cono",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Mostrar cono educativo"
+              },
+              "Mostrar cono educativo Época de estadísticas de error",
+              {
+                "role": "combobox",
+                "name": "Época de estadísticas de error",
+                "disabled": true,
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "2015",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "2025"
+                  },
+                  {
+                    "role": "option",
+                    "name": "2026"
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico. Un cono muestra por dónde puede pasar el centro y no dice nada sobre el riesgo de vientos fuertes, que llegan mucho más allá de él. Este se dibuja alrededor de una trayectoria que ya se conoce, así que no expresa ninguna probabilidad."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Trayectorias de riesgo animadas",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Trayectorias de riesgo animadas",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Mostrar 20 rutas plausibles"
+              },
+              "Mostrar 20 rutas plausibles Época de estadísticas de error",
+              {
+                "role": "combobox",
+                "name": "Época de estadísticas de error",
+                "disabled": true,
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "2015",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "2025"
+                  },
+                  {
+                    "role": "option",
+                    "name": "2026"
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Varias rutas muestreadas del centro comunican incertidumbre sin un límite rígido. Son posibilidades educativas, no pronósticos ni límites de impacto."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "checkbox",
+            "name": "🌬️ Mostrar la franja del campo de viento (24 registros analizados)"
+          },
+          "🌬️ Mostrar la franja del campo de viento (24 registros analizados)",
+          {
+            "role": "checkbox",
+            "name": "🌊 Mostrar marcas de agua alta observadas (824 mediciones USGS)"
+          },
+          "🌊 Mostrar marcas de agua alta observadas (824 mediciones USGS)"
+        ]
+      },
+      {
+        "role": "group",
+        "text": "Citar esta versión"
+      }
+    ]
+  }
+]

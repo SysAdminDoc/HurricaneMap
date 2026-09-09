@@ -1,0 +1,935 @@
+[
+  {
+    "role": "region",
+    "name": "Katrina (2005)",
+    "children": [
+      {
+        "role": "button",
+        "name": "Minimize storm details"
+      },
+      {
+        "role": "button",
+        "name": "Close storm details",
+        "text": "×"
+      },
+      {
+        "role": "heading",
+        "name": "Katrina (2005)",
+        "level": 2
+      },
+      "Cat 3 at landfall Peak intensity:",
+      {
+        "role": "strong",
+        "text": "Cat 5 150 kt"
+      },
+      "Atlantic basin AL122005",
+      {
+        "role": "button",
+        "name": "Play track"
+      },
+      {
+        "role": "button",
+        "name": "📌 Pin to compare"
+      },
+      {
+        "role": "region",
+        "name": "Storm summary",
+        "children": [
+          "Educational text · English source KATRINA (2005) was a Category 5 hurricane that formed in August in the Caribbean and made 3 landfalls in Florida, Louisiana, with peak intensity of 150 kt and caused 1,392 fatalities and $125B in damage. The storm underwent rapid intensification (+50 kt in 24h), experienced explosive deepening (−46 mb pressure drop), impacted multiple states. ⚡ Rapid intensification (+50 kt / 24h) 📉 Explosive deepening (−46 mb / 24h) Peak wind 150 kt Min pressure 902 mb ACE ⓘ 20.0 Avg forward speed ⓘ 19 km/h (12 mph) U.S. landfalls 3 Est. exposure ⓘ 474K Cat-2+ winds RI risk ⓘ 🔴 High Closest pass to",
+          {
+            "role": "combobox",
+            "name": "Closest pass to",
+            "children": [
+              {
+                "role": "option",
+                "name": "Miami, FL",
+                "selected": true
+              },
+              {
+                "role": "option",
+                "name": "Key West, FL"
+              },
+              {
+                "role": "option",
+                "name": "Tampa, FL"
+              },
+              {
+                "role": "option",
+                "name": "Jacksonville, FL"
+              },
+              {
+                "role": "option",
+                "name": "Daytona Beach, FL"
+              },
+              {
+                "role": "option",
+                "name": "Pensacola, FL"
+              },
+              {
+                "role": "option",
+                "name": "Mobile, AL"
+              },
+              {
+                "role": "option",
+                "name": "New Orleans, LA"
+              },
+              {
+                "role": "option",
+                "name": "Galveston, TX"
+              },
+              {
+                "role": "option",
+                "name": "Houston, TX"
+              },
+              {
+                "role": "option",
+                "name": "Corpus Christi, TX"
+              },
+              {
+                "role": "option",
+                "name": "Brownsville, TX"
+              },
+              {
+                "role": "option",
+                "name": "Savannah, GA"
+              },
+              {
+                "role": "option",
+                "name": "Charleston, SC"
+              },
+              {
+                "role": "option",
+                "name": "Wilmington, NC"
+              },
+              {
+                "role": "option",
+                "name": "Cape Hatteras, NC"
+              },
+              {
+                "role": "option",
+                "name": "Norfolk, VA"
+              },
+              {
+                "role": "option",
+                "name": "Washington, DC"
+              },
+              {
+                "role": "option",
+                "name": "New York, NY"
+              },
+              {
+                "role": "option",
+                "name": "Boston, MA"
+              },
+              {
+                "role": "option",
+                "name": "San Juan, PR"
+              },
+              {
+                "role": "option",
+                "name": "Honolulu, HI"
+              },
+              {
+                "role": "option",
+                "name": "Hilo, HI"
+              },
+              {
+                "role": "option",
+                "name": "San Diego, CA"
+              },
+              {
+                "role": "option",
+                "name": "Cabo San Lucas, MX"
+              }
+            ]
+          },
+          {
+            "role": "strong",
+            "text": "12 mi"
+          },
+          "(19 km) · 70 kt · Aug 25, 2005, 11:52 PM UTC Return period (50 km radius): Cat 3+: ~17.3y • Cat 1+: ~8.2y",
+          {
+            "role": "heading",
+            "name": "Impacts",
+            "level": 3
+          },
+          "Fatalities 1,392 Damage $200.8B (2024 USD · $125.0B nominal) Billion-dollar disaster $201.3B (2024 USD · 1,833 deaths)",
+          {
+            "role": "link",
+            "name": "Source: Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Hurricane_Katrina_%282005%29"
+          },
+          "· Confidence: high ·",
+          {
+            "role": "link",
+            "name": "Source: NOAA NCEI (frozen at 2024)",
+            "url": "https://www.ncei.noaa.gov/access/billions/"
+          },
+          {
+            "role": "heading",
+            "name": "Storm Events near landfall",
+            "level": 3
+          },
+          "Tornado activity during landfall 1 report in Florida · strongest F2 Hail activity during landfall 0 reports",
+          {
+            "role": "list",
+            "name": "Sample matching Storm Events",
+            "children": [
+              {
+                "role": "listitem",
+                "text": "Tornado MONROE, Florida F2"
+              }
+            ]
+          },
+          "NOAA/NCEI Storm Events Database bulk CSV · 24h before to 48h after U.S. landfall Peak rainfall (WPC) 16.43\" at PERRINE 4W FL Source:",
+          {
+            "role": "link",
+            "name": "NOAA WPC TC Rainfall",
+            "url": "https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html"
+          },
+          {
+            "role": "heading",
+            "name": "Tide gauges (NOAA CO-OPS)",
+            "level": 3
+          },
+          {
+            "role": "button",
+            "name": "Load water levels around landfall"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Storm analysis",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Similar storms",
+            "level": 3
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Ian (2022) Cat 5 3 landfalls 99%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Belle (1976) Cat 3 2 landfalls 98%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Carol (1954) Cat 3 2 landfalls 98%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Unnamed (1856) Cat 4 1 landfall 97%"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "button",
+                    "name": "Celia (1970) Cat 4 1 landfall 97%"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "heading",
+            "name": "Days at intensity",
+            "level": 3
+          },
+          {
+            "role": "img",
+            "name": "Days at intensity: TD 1d 12h, TS 1d 23h, Cat 1 1d 2h, Cat 2 18h, Cat 3 1d 1h, Cat 4 11h, Cat 5 18h",
+            "text": "TD · 1d 12h TS · 1d 23h Cat 1 · 1d 2h Cat 2 · 18h Cat 3 · 1d 1h Cat 5 · 18h"
+          },
+          "Total tracked: 7d 12h",
+          {
+            "role": "heading",
+            "name": "Intensity over time",
+            "level": 3
+          },
+          "Wind (kt) ↑ Pressure (mb) ↓ inverted L = U.S. landfall",
+          {
+            "role": "img",
+            "name": "Intensity over time chart",
+            "text": "34 64 83 96 113 137 880 920 960 1000 08-23 08-25 08-27 08-29 08-31 L L L ⚡ RI +50 kt"
+          },
+          {
+            "role": "button",
+            "name": "⤓ PNG"
+          },
+          {
+            "role": "button",
+            "name": "⤓ SVG"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Storm resources",
+        "children": [
+          {
+            "role": "heading",
+            "name": "U.S. landfalls (chronological)",
+            "level": 3
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 1 Florida Aug 25, 2005, 10:30 PM UTC",
+                  {
+                    "role": "button",
+                    "name": "Show NEXRAD radar for Aug 25, 2005, 10:30 PM UTC",
+                    "text": "Radar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 3 Louisiana Aug 29, 2005, 11:10 AM UTC",
+                  {
+                    "role": "button",
+                    "name": "Show NEXRAD radar for Aug 29, 2005, 11:10 AM UTC",
+                    "text": "Radar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  "Cat 3 Louisiana Aug 29, 2005, 02:45 PM UTC",
+                  {
+                    "role": "button",
+                    "name": "Show NEXRAD radar for Aug 29, 2005, 02:45 PM UTC",
+                    "text": "Radar"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "status",
+            "text": "Radar cache: no frames cached (22 available)"
+          },
+          {
+            "role": "region",
+            "name": "Federal disaster context",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Federal disaster context",
+                "level": 3
+              },
+              {
+                "role": "link",
+                "name": "FEMA source",
+                "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries"
+              },
+              {
+                "role": "status",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Federal disaster declarations"
+                  },
+                  "Unavailable FEMA Disaster Declarations Summaries Record count unknown No successful load yet",
+                  {
+                    "role": "button",
+                    "name": "Retry"
+                  }
+                ]
+              },
+              {
+                "role": "status",
+                "children": [
+                  {
+                    "role": "paragraph",
+                    "text": "FEMA declarations are unavailable right now."
+                  },
+                  {
+                    "role": "paragraph",
+                    "children": [
+                      "No declaration can be confirmed until the source responds.",
+                      {
+                        "role": "link",
+                        "name": "FEMA source",
+                        "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "link",
+            "name": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Special:Search?go=Go&search=Hurricane%20Katrina%20(2005)"
+          },
+          {
+            "role": "link",
+            "name": "YouTube footage",
+            "url": "https://www.youtube.com/results?search_query=hurricane%20Katrina%202005%20landfall"
+          },
+          {
+            "role": "link",
+            "name": "NOAA report",
+            "url": "https://www.nhc.noaa.gov/data/tcr/index.php?season=2005&basin=atl"
+          },
+          {
+            "role": "link",
+            "name": "NHC archive",
+            "url": "https://www.nhc.noaa.gov/archive/2005/AL122005.shtml"
+          },
+          {
+            "role": "link",
+            "name": "Storm Events (NOAA)",
+            "url": "https://www.ncei.noaa.gov/access/storm-events-database/search"
+          },
+          {
+            "role": "link",
+            "name": "Recon archive",
+            "url": "https://www.nhc.noaa.gov/archive/recon/2005/"
+          },
+          "Export track:",
+          {
+            "role": "button",
+            "name": "CSV"
+          },
+          {
+            "role": "button",
+            "name": "CSV (publication)"
+          },
+          {
+            "role": "button",
+            "name": "GeoJSON"
+          },
+          {
+            "role": "button",
+            "name": "KML"
+          },
+          {
+            "role": "button",
+            "name": "SVG map"
+          },
+          {
+            "role": "button",
+            "name": "🔗 Share view"
+          },
+          {
+            "role": "region",
+            "name": "Video export",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Video export",
+                "level": 3
+              },
+              {
+                "role": "paragraph",
+                "text": "Create a WebM of this storm’s track with its dates, category legend, and NOAA attribution."
+              },
+              "Frame rate",
+              {
+                "role": "combobox",
+                "name": "Frame rate",
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "24 fps"
+                  },
+                  {
+                    "role": "option",
+                    "name": "30 fps",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "60 fps"
+                  }
+                ]
+              },
+              "Duration",
+              {
+                "role": "combobox",
+                "name": "Duration",
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "5 seconds"
+                  },
+                  {
+                    "role": "option",
+                    "name": "10 seconds",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "15 seconds"
+                  },
+                  {
+                    "role": "option",
+                    "name": "30 seconds"
+                  }
+                ]
+              },
+              {
+                "role": "button",
+                "name": "Download WebM"
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Actual NHC forecast skill",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Actual NHC forecast skill",
+                "level": 3
+              },
+              "Measured",
+              {
+                "role": "paragraph",
+                "text": "Atlantic · 2021-2025 · OFCL official forecasts"
+              },
+              {
+                "role": "paragraph",
+                "text": "Measured from archived official forecasts compared with the final post-season best track. These are basin-wide means, not a score for Katrina."
+              },
+              {
+                "role": "table",
+                "name": "Atlantic · 2021-2025 · OFCL official forecasts",
+                "children": [
+                  {
+                    "role": "caption",
+                    "text": "Atlantic · 2021-2025 · OFCL official forecasts"
+                  },
+                  {
+                    "role": "rowgroup",
+                    "children": [
+                      {
+                        "role": "row",
+                        "name": "Lead Track n mi Intensity kt Sample N",
+                        "children": [
+                          {
+                            "role": "columnheader",
+                            "name": "Lead"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Track n mi"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Intensity kt"
+                          },
+                          {
+                            "role": "columnheader",
+                            "name": "Sample N"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "role": "rowgroup",
+                    "children": [
+                      {
+                        "role": "row",
+                        "name": "0 h 6.9 1.3 1676",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "0 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "6.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1676"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "12 h 22.3 5.0 1504",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "12 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "22.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "5.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1504"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "24 h 33.6 7.1 1336",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "24 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "33.6"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "7.1"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1336"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "36 h 44.0 8.5 1182",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "36 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "44.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "8.5"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1182"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "48 h 55.9 9.9 1049",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "48 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "55.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "9.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "1049"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "60 h 70.5 10.8 923",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "60 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "70.5"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "10.8"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "923"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "72 h 86.4 11.6 805",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "72 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "86.4"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "11.6"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "805"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "96 h 124.9 13.3 613",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "96 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "124.9"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "13.3"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "613"
+                          }
+                        ]
+                      },
+                      {
+                        "role": "row",
+                        "name": "120 h 181.0 14.7 464",
+                        "children": [
+                          {
+                            "role": "rowheader",
+                            "name": "120 h"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "181.0"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "14.7"
+                          },
+                          {
+                            "role": "cell",
+                            "name": "464"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Track is mean great-circle position error; intensity is mean absolute maximum-wind error."
+              },
+              {
+                "role": "paragraph",
+                "text": "Best-track snapshot: 2026-05-18"
+              },
+              {
+                "role": "paragraph",
+                "children": [
+                  {
+                    "role": "link",
+                    "name": "NHC five-year table",
+                    "url": "https://www.nhc.noaa.gov/verification/pdfs/OFCL_5-yr_averages.pdf"
+                  },
+                  "·",
+                  {
+                    "role": "link",
+                    "name": "Individual error file",
+                    "url": "https://www.nhc.noaa.gov/verification/errors/1989-present_OFCL_v_BCD5_ind_ATL_TI_errors.txt"
+                  },
+                  "·",
+                  {
+                    "role": "link",
+                    "name": "Definitions",
+                    "url": "https://www.nhc.noaa.gov/verification/verify2.shtml"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "group",
+            "text": "Textual track timeline 34 observations · 17 hazard highlights"
+          },
+          {
+            "role": "region",
+            "name": "Advisory replay",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Advisory replay",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Replay issued forecasts"
+              },
+              "Replay issued forecasts",
+              {
+                "role": "paragraph",
+                "text": "Steps through the forecasts NHC actually issued for this storm, read verbatim from the archived ATCF advisory record, beside the final best track."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Illustrative cone reconstruction",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Illustrative cone reconstruction",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Show educational cone"
+              },
+              "Show educational cone Error-statistics era",
+              {
+                "role": "combobox",
+                "name": "Error-statistics era",
+                "disabled": true,
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "2015",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "2025"
+                  },
+                  {
+                    "role": "option",
+                    "name": "2026"
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Applies published NHC error radii to the observed centerline for comparison. It is not a historical forecast. A cone shows where a centre might go and says nothing about the risk of strong winds, which reach well outside it. This one is drawn around a track that is already known, so it carries no probability at all."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "region",
+            "name": "Animated risk trajectories",
+            "children": [
+              {
+                "role": "heading",
+                "name": "Animated risk trajectories",
+                "level": 3
+              },
+              {
+                "role": "checkbox",
+                "name": "Show 20 plausible paths"
+              },
+              "Show 20 plausible paths Error-statistics era",
+              {
+                "role": "combobox",
+                "name": "Error-statistics era",
+                "disabled": true,
+                "children": [
+                  {
+                    "role": "option",
+                    "name": "2015",
+                    "selected": true
+                  },
+                  {
+                    "role": "option",
+                    "name": "2025"
+                  },
+                  {
+                    "role": "option",
+                    "name": "2026"
+                  }
+                ]
+              },
+              {
+                "role": "paragraph",
+                "text": "Multiple sampled center paths communicate uncertainty without a hard boundary. They are educational possibilities, not forecasts or impact limits."
+              },
+              {
+                "role": "status"
+              }
+            ]
+          },
+          {
+            "role": "checkbox",
+            "name": "🌬️ Show wind-field swath (24 analyzed records)"
+          },
+          "🌬️ Show wind-field swath (24 analyzed records)",
+          {
+            "role": "checkbox",
+            "name": "🌊 Show observed high-water marks (824 USGS surveys)"
+          },
+          "🌊 Show observed high-water marks (824 USGS surveys)"
+        ]
+      },
+      {
+        "role": "group",
+        "text": "Cite this release"
+      }
+    ]
+  }
+]

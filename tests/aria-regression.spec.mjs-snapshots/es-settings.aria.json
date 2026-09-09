@@ -1,0 +1,920 @@
+[
+  {
+    "role": "dialog",
+    "name": "Configuración",
+    "children": [
+      {
+        "role": "heading",
+        "name": "Configuración",
+        "level": 2
+      },
+      {
+        "role": "paragraph",
+        "text": "Ajusta unidades, accesibilidad y capas de tormentas activas. Los cambios quedan en este dispositivo."
+      },
+      {
+        "role": "region",
+        "name": "Lectura",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Lectura",
+            "level": 3
+          },
+          "Unidades de viento",
+          {
+            "role": "paragraph",
+            "text": "Se usa en paneles, gráficos y exportaciones."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Unidad de viento",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Nudos",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "mph"
+              },
+              {
+                "role": "radio",
+                "name": "km/h"
+              }
+            ]
+          },
+          "Cifras de daños",
+          {
+            "role": "paragraph",
+            "text": "Compara pérdidas históricas como fueron reportadas o ajustadas por IPC."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Ajuste de daños",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Nominal"
+              },
+              {
+                "role": "radio",
+                "name": "USD 2024",
+                "checked": true
+              }
+            ]
+          },
+          "Idioma",
+          {
+            "role": "paragraph",
+            "text": "Actualiza las etiquetas sin cambiar los datos."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Idioma",
+            "children": [
+              {
+                "role": "radio",
+                "name": "English"
+              },
+              {
+                "role": "radio",
+                "name": "Español",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Kreyòl"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Apariencia",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Apariencia",
+            "level": 3
+          },
+          "Tema",
+          {
+            "role": "paragraph",
+            "text": "Elige la interfaz del mapa que funcione mejor con tu iluminación."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Tema",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Oscuro",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Claro"
+              },
+              {
+                "role": "radio",
+                "name": "Sistema"
+              }
+            ]
+          },
+          "Paleta de colores",
+          {
+            "role": "paragraph",
+            "text": "Mantiene el significado de las categorías en el mapa y los paneles."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Paleta de colores",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Predeterminada",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Daltonismo"
+              }
+            ]
+          },
+          {
+            "role": "checkbox",
+            "name": "Modo de alto contraste Refuerza texto, bordes y enfoques."
+          },
+          "Modo de alto contraste Refuerza texto, bordes y enfoques.",
+          {
+            "role": "checkbox",
+            "name": "Reducir movimiento Mantiene cambios claros con menos animación.",
+            "checked": true
+          },
+          "Reducir movimiento Mantiene cambios claros con menos animación."
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Ayudas de tormentas activas",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Ayudas de tormentas activas",
+            "level": 3
+          },
+          {
+            "role": "checkbox",
+            "name": "Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible.",
+            "checked": true
+          },
+          "Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible.",
+          {
+            "role": "checkbox",
+            "name": "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.",
+            "checked": true
+          },
+          "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.",
+          {
+            "role": "checkbox",
+            "name": "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–24 horas."
+          },
+          "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–24 horas.",
+          {
+            "role": "checkbox",
+            "name": "Fondo satelital GOES Agrega imágenes en vivo detrás de tormentas activas cuando están disponibles."
+          },
+          "Fondo satelital GOES Agrega imágenes en vivo detrás de tormentas activas cuando están disponibles.",
+          {
+            "role": "button",
+            "name": "Reproducir gira de bienvenida"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Diagnóstico de datos opcionales",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Diagnóstico de datos opcionales",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Estado de fuentes en vivo y bajo demanda. Si una actualización falla, se conservan y etiquetan los últimos datos válidos disponibles."
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Tormentas activas"
+                  },
+                  "No disponible NOAA NHC tropical weather summary GIS Último éxito: No programado Próximo intento: 8/8/2026, 16:45:00 Origen: Red",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Geometría oficial del pronóstico"
+                  },
+                  "No solicitado NOAA NHC official forecast GIS Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Perspectiva tropical"
+                  },
+                  "No disponible NOAA NHC Tropical Weather Outlook Último éxito: No programado Próximo intento: No programado Origen: Red",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Avisos marinos"
+                  },
+                  "No solicitado NOAA NHC Marine Wind Warnings Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Alertas costeras e interiores"
+                  },
+                  "No solicitado NOAA/NWS active alerts Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Pronóstico de marejada máxima"
+                  },
+                  "No solicitado NOAA NHC Peak Storm Surge Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Imágenes GOES"
+                  },
+                  "No solicitado NOAA/NESDIS/STAR GOES Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mareógrafos"
+                  },
+                  "No solicitado NOAA CO-OPS Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Radar archivado"
+                  },
+                  "No solicitado Iowa State IEM NEXRAD archive Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Declaraciones federales de desastre"
+                  },
+                  "No disponible FEMA Disaster Declarations Summaries Último éxito: No programado Próximo intento: No programado Origen: Red",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Guía de viento del NHC"
+                  },
+                  "No solicitado NOAA NHC tropical weather summary GIS Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Perspectiva estacional"
+                  },
+                  "No solicitado NOAA CPC bundled outlook snapshot Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Densidad de población"
+                  },
+                  "No solicitado SEDAC GPWv4 population-density tiles Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Glosario"
+                  },
+                  "No solicitado HurricaneMap bundled glossary Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Temperatura de la superficie del mar"
+                  },
+                  "No solicitado PacIOOS CoralTemp sea-surface temperature Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Marcas de nivel máximo"
+                  },
+                  "Actual · 25 registros USGS high-water marks Último éxito: 8/8/2026, 16:30:00 Próximo intento: No programado Origen: Datos sin conexión incluidos",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Informes de eventos de tormenta"
+                  },
+                  "Actual · 157 registros NOAA NCEI Storm Events Último éxito: 8/8/2026, 16:30:00 Próximo intento: No programado Origen: Datos sin conexión incluidos",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Exposición de población"
+                  },
+                  "Actual · 52 registros Bundled state population densities Último éxito: 8/8/2026, 16:30:00 Próximo intento: No programado Origen: Datos sin conexión incluidos",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Zonas de evacuación"
+                  },
+                  "No solicitado Florida ArcGIS evacuation zones Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Almacenamiento sin conexión",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Almacenamiento sin conexión",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Los datos históricos principales están protegidos. Los archivos de origen forman un paquete opcional guardado por el usuario; los mosaicos y paquetes de radar se pueden borrar por separado."
+          },
+          {
+            "role": "strong",
+            "text": "unos 0 B de unos 6.0 GB (0%)"
+          },
+          "Almacenamiento administrado por el navegador",
+          {
+            "role": "paragraph",
+            "text": "Los navegadores redondean estas dos cifras a propósito, para que un sitio no pueda reconocerte por la cantidad que has guardado. Los tamaños por elemento de abajo son el recuento propio de esta aplicación y son exactos."
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Aplicación"
+                  },
+                  "Protegido · 0 elementos · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Datos históricos"
+                  },
+                  "Protegido · 0 elementos · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mosaicos del mapa"
+                  },
+                  "Opcional · 0 elementos · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Borrar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Paquetes de radar"
+                  },
+                  "Opcional · 0 elementos · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Borrar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Paquete de origen"
+                  },
+                  "Opcional · 0 elementos · 0 B",
+                  {
+                    "role": "button",
+                    "name": "Guardar paquete de origen"
+                  },
+                  {
+                    "role": "button",
+                    "name": "Borrar"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "status"
+          },
+          {
+            "role": "paragraph",
+            "text": "Paquetes de radar guardados: 0"
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Diagnóstico sin conexión",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Diagnóstico sin conexión",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Estado del service worker, caché, almacenamiento y fuentes para solucionar problemas sin conexión."
+          },
+          {
+            "role": "strong",
+            "text": "Registro"
+          },
+          "Registrado (worker de módulo)",
+          {
+            "role": "strong",
+            "text": "Control de la página"
+          },
+          "Sin controlar",
+          {
+            "role": "strong",
+            "text": "Almacenamiento"
+          },
+          "unos 0 B de unos 6.0 GB",
+          {
+            "role": "strong",
+            "text": "Paquete de lanzamiento"
+          },
+          "No verificado",
+          {
+            "role": "strong",
+            "text": "Integridad al iniciar"
+          },
+          "Sin comprobar",
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Aplicación"
+                  },
+                  "no instalado · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Datos históricos"
+                  },
+                  "no instalado · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Mosaicos del mapa"
+                  },
+                  "no instalado · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Paquetes de radar"
+                  },
+                  "no instalado · 0 · 0 B"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Paquete de origen"
+                  },
+                  "no instalado · 0 · 0 B"
+                ]
+              }
+            ]
+          },
+          {
+            "role": "strong",
+            "text": "Antigüedad de fuentes opcionales"
+          },
+          "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito · population: nunca tuvo éxito · glossary: nunca tuvo éxito · sst: nunca tuvo éxito · hwm: hace 0 min · storm-events: hace 0 min · exposure: hace 0 min · evac: nunca tuvo éxito",
+          {
+            "role": "strong",
+            "text": "Cobertura del archivo"
+          },
+          "15 conjuntos · 1851–2025 · 595 tormentas",
+          {
+            "role": "list",
+            "name": "Cobertura del archivo",
+            "children": [
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NHC HURDAT2 best-track and derived landfall data"
+                  },
+                  "final · 1851–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "AOML detailed U.S. hurricane landfall table"
+                  },
+                  "final · 1851–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Community-sourced storm impacts"
+                  },
+                  "inferred · 1950–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA NCEI Billion-Dollar Weather and Climate Disasters"
+                  },
+                  "closed · 1980–2024 · no ejecutable"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA PSL Oceanic Niño Index snapshot"
+                  },
+                  "final · 1950–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/CPC and CSU seasonal outlook snapshot"
+                  },
+                  "operational · 2026–2026"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NHC official forecast skill summary"
+                  },
+                  "final · 2021–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NHC archived advisory replay"
+                  },
+                  "operational · 2015–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA/NCEI Storm Events coincidence data"
+                  },
+                  "final · 1953–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA tropical cyclone rainfall reports"
+                  },
+                  "final · 1950–2020"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Iowa State IEM archived NEXRAD composites"
+                  },
+                  "final · 1995–2025"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "USGS observed high-water marks"
+                  },
+                  "final · 2003–2024"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "NOAA CO-OPS tide-station index"
+                  },
+                  "final · sin rango"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "U.S. Census state boundary polygons"
+                  },
+                  "final · sin rango"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "HurricaneMap glossary"
+                  },
+                  "final · sin rango"
+                ]
+              }
+            ]
+          },
+          {
+            "role": "button",
+            "name": "Reparar ahora"
+          },
+          {
+            "role": "button",
+            "name": "Reintentar service worker"
+          },
+          {
+            "role": "button",
+            "name": "Actualizar diagnóstico"
+          },
+          {
+            "role": "button",
+            "name": "Exportar JSON de soporte"
+          },
+          {
+            "role": "paragraph",
+            "text": "La exportación incluye solo versiones y errores técnicos; nunca ubicaciones, direcciones, búsquedas, vistas guardadas ni respuestas de preparación."
+          }
+        ]
+      },
+      {
+        "role": "region",
+        "name": "Vistas guardadas",
+        "children": [
+          {
+            "role": "heading",
+            "name": "Vistas guardadas",
+            "level": 3
+          },
+          {
+            "role": "paragraph",
+            "text": "Las vistas guardadas nunca incluyen direcciones ni ubicaciones seleccionadas. La ubicación del dispositivo permanece solo durante la sesión, salvo que decidas recordarla durante 24 horas."
+          },
+          "Nombre de la vista guardada",
+          {
+            "role": "textbox",
+            "name": "Nombre de la vista guardada",
+            "placeholder": "Nombre de la vista"
+          },
+          {
+            "role": "button",
+            "name": "Guardar actual"
+          },
+          {
+            "role": "button",
+            "name": "Exportar JSON",
+            "disabled": true
+          },
+          {
+            "role": "button",
+            "name": "Importar JSON"
+          },
+          "Importar JSON",
+          {
+            "role": "button",
+            "name": "Importar JSON"
+          },
+          {
+            "role": "status"
+          },
+          {
+            "role": "list",
+            "children": [
+              {
+                "role": "listitem",
+                "text": "No hay vistas guardadas en este dispositivo."
+              }
+            ]
+          }
+        ]
+      },
+      "Guardado en este dispositivo. Sin cuenta, perfil de seguimiento ni sincronización en la nube."
+    ]
+  }
+]

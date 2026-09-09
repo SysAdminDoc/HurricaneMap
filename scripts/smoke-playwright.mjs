@@ -2660,7 +2660,7 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     await page.goto(`${baseUrl}/#v=1&y=2005-2005`, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
     await page.click('#toggle-filters');
-    await page.waitForSelector('#show-tracks:visible', { timeout: 10000 });
+    await page.locator('#show-tracks').visible().waitFor({ timeout: 10000 });
     await page.check('#show-tracks');
     await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, null, { timeout: 15000 });
     const beforeOpen = await page.evaluate(() => document.querySelectorAll('#map path').length);
@@ -2689,7 +2689,7 @@ async function assertStormPanelMapContracts(context, baseUrl) {
     await page.goto(`${baseUrl}/#v=1&y=2005-2005`, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
     await page.click('#toggle-filters');
-    await page.waitForSelector('#show-tracks:visible', { timeout: 10000 });
+    await page.locator('#show-tracks').visible().waitFor({ timeout: 10000 });
     await page.check('#show-tracks');
     await page.waitForFunction(() => document.querySelectorAll('#map path').length > 40, null, { timeout: 15000 });
     const withTracks = await page.evaluate(() => document.querySelectorAll('#map path').length);
@@ -2866,7 +2866,7 @@ async function assertReleasePinScope(context, baseUrl) {
     // visibility:hidden until it is opened, so shaping the view means taking the
     // same first step a reader does.
     await page.click('#toggle-filters');
-    await page.waitForSelector('#state-filter:visible', { timeout: 10000 });
+    await page.locator('#state-filter').visible().waitFor({ timeout: 10000 });
     await page.selectOption('#state-filter', 'Florida');
     await page.waitForFunction(() => /(?:^|&)s=Florida(?:&|$)/.test(location.hash), null, { timeout: 10000 });
     const shaped = await page.evaluate(() => location.href);

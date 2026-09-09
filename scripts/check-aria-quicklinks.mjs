@@ -65,39 +65,40 @@ let checkedUrls = 0;
 
 for (const locale of LOCALES) {
   const expected = rawLabels.map(raw => resolveLabel(raw, locale));
-  const snapshotPath = path.join(root, SNAPSHOT_DIR, `${locale}-storm-panel.aria.yml`);
-  const lines = (await readFile(snapshotPath, 'utf8')).split('\n');
+  const snapshotPath = path.join(root, SNAPSHOT_DIR, `${locale}-storm-panel.aria.json`);
+  const tree = JSON.parse(await readFile(snapshotPath, 'utf8'));
 
   // The quicklink row sits immediately above the export row in the DOM, and
   // the snapshot preserves that order. Anchoring on the export label finds the
   // run without needing a marker the accessibility tree does not carry.
   const exportText = STRINGS[locale]?.[exportLabelKey];
   if (!exportText) fail(`${locale} does not define ${exportLabelKey}`);
-  const exportIndex = lines.findIndex(line => line.includes(`- text: "${exportText}:"`));
-  if (exportIndex < 0) fail(`${locale}-storm-panel.aria.yml has no "${exportText}:" export row to anchor on`);
 
-  // Indentation matters: the FEMA section above the row nests its own links
-  // deeper, and without pinning the depth the walk runs straight into them.
+  // The JSON tree keeps siblings in one array, so the row is the trailing run
+  // of links in whichever array holds the export label. The old YAML walk had
+  // to pin indentation to stop itself climbing into the FEMA links above,
+  // which nest deeper; sibling identity says the same thing exactly.
+  const siblingsOf = node => {
+    if (Array.isArray(node)) {
+      if (node.includes(`${exportText}:`)) return node;
+      for (const child of node) {
+        const hit = siblingsOf(child);
+        if (hit) return hit;
+      }
+      return null;
+    }
+    return node && typeof node === 'object' && node.children ? siblingsOf(node.children) : null;
+  };
+  const siblings = siblingsOf(tree);
+  if (!siblings) fail(`${locale}-storm-panel.aria.json has no "${exportText}:" export row to anchor on`);
+
   const found = [];
-  let rowIndent = null;
-  let pendingUrl = null;
-  for (let i = exportIndex - 1; i >= 0; i--) {
-    const line = lines[i];
-    const link = line.match(/^(\s*)- link "(.+)":$/);
-    if (link && (rowIndent === null || link[1] === rowIndent)) {
-      rowIndent = link[1];
-      found.unshift({ label: link[2], url: pendingUrl });
-      pendingUrl = null;
-      continue;
-    }
-    const url = line.match(/^\s*- \/url: (.+)$/);
-    if (url) {
-      pendingUrl = url[1].trim();
-      continue;
-    }
-    break;
+  for (let i = siblings.indexOf(`${exportText}:`) - 1; i >= 0; i--) {
+    const node = siblings[i];
+    if (!node || typeof node !== 'object' || node.role !== 'link') break;
+    found.unshift({ label: node.name, url: node.url });
   }
-  if (!found.length) fail(`${locale}-storm-panel.aria.yml records no quicklinks above its export row`);
+  if (!found.length) fail(`${locale}-storm-panel.aria.json records no quicklinks above its export row`);
 
   // Not every quicklink renders for every storm, so the snapshot holds a
   // subset. It must still be an ordered subset of what src/panel.js emits.
@@ -105,7 +106,7 @@ for (const locale of LOCALES) {
   for (const { label } of found) {
     const at = expected.indexOf(label, cursor);
     if (at < 0) {
-      fail(`${locale}-storm-panel.aria.yml expects the quicklink "${label}", which src/panel.js does not render in that order. src/panel.js emits: ${expected.join(', ')}`);
+      fail(`${locale}-storm-panel.aria.json expects the quicklink "${label}", which src/panel.js does not render in that order. src/panel.js emits: ${expected.join(', ')}`);
     }
     cursor = at + 1;
   }
@@ -115,16 +116,16 @@ for (const locale of LOCALES) {
   // would still leave test:aria red and this gate green. Every host and path
   // a snapshot pins has to still appear in the source that builds the link.
   for (const { label, url } of found) {
-    if (!url) fail(`${locale}-storm-panel.aria.yml records the quicklink "${label}" with no URL`);
+    if (!url) fail(`${locale}-storm-panel.aria.json records the quicklink "${label}" with no URL`);
     const { host, pathname } = new URL(url);
     if (!linkSource.includes(host)) {
-      fail(`${locale}-storm-panel.aria.yml pins "${label}" at ${host}, a host the panel no longer builds links for`);
+      fail(`${locale}-storm-panel.aria.json pins "${label}" at ${host}, a host the panel no longer builds links for`);
     }
     // Fixed paths are a contract; per-storm paths are assembled at render time
     // and only their host is checkable here.
     const fixedPath = pathname.length > 1 && !/\d/.test(pathname);
     if (fixedPath && !linkSource.includes(pathname)) {
-      fail(`${locale}-storm-panel.aria.yml pins "${label}" at ${pathname}, a path the panel no longer contains`);
+      fail(`${locale}-storm-panel.aria.json pins "${label}" at ${pathname}, a path the panel no longer contains`);
     }
     checkedUrls++;
   }
