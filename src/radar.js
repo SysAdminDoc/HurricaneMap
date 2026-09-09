@@ -233,6 +233,7 @@ export class RadarOverlay {
     this.stormId = null;
     this.localFrames = null;     // sorted array of {ts, date, url} for full-storm loop
     this.currentFrame = null;
+    this.frameFailed = false;
     this.landfallIndex = null;
     this.feedRequestId = null;
     this.colorblind = isColorblindPalette();
@@ -345,6 +346,7 @@ export class RadarOverlay {
     }
     const config = REGIONS[this.region];
     this.currentFrame = frame;
+    this.frameFailed = false;
     if (frame.source === 'remote') {
       const options = {
         opacity: 1.0,
@@ -376,13 +378,21 @@ export class RadarOverlay {
   }
 
   onFrameLoadFailed(frame) {
+    // Latched until the next successful draw. step() has a branch at either end
+    // of the frame list that re-renders the status without drawing anything,
+    // and without this it put the timestamp straight back over a blank map: two
+    // clicks of the forward button after a failure and the panel was claiming a
+    // frame again.
     // Only the frame still on screen. A frame the reader has already stepped
     // past may fail after its overlay was replaced, and reporting that would
     // blame the frame they are looking at.
     if (this.currentFrame !== frame || !this.overlay) return;
     this.map.removeLayer(this.overlay);
     this.overlay = null;
-    this.setStatus(t('radar.frameUnreadable', formatTime(frame.date.toISOString())));
+    this.frameFailed = true;
+    // No time in the message: the status line IS the timestamp display, so
+    // clearing it means the reader cannot read a time off a blank map.
+    this.setStatus(t('radar.frameUnreadable'));
     // The status host mounted in buildControls turns this into a retry that
     // reopens the storm at this landfall.
     failOptionalFeed('radar', {
@@ -475,7 +485,11 @@ export class RadarOverlay {
       if (idx < 0) idx = 0;
       const next = this.localFrames[Math.max(0, Math.min(this.localFrames.length - 1, idx + direction))];
       if (next.ts === curStamp) {
-        this.setStatus(`(${direction > 0 ? 'last' : 'first'} frame) ${this.timestampLabel()}`);
+        // Nothing is redrawn on this branch, so a frame that failed to load is
+        // still the frame on screen and the status must not go back to a time.
+        this.setStatus(this.frameFailed
+          ? t('radar.frameUnreadable')
+          : `(${direction > 0 ? 'last' : 'first'} frame) ${this.timestampLabel()}`);
         return;
       }
       this.currentDate = next.date;

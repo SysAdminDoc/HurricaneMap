@@ -218,7 +218,7 @@ export default {
   'radar.savingPackProgress': 'Y ap anrejistre pak rada a {0}/{1}…',
   'radar.savedButton': 'Anrejistre',
   'radar.noFrameAt': 'Pa gen imaj a {0}',
-  'radar.frameUnreadable': 'Imaj {0} la pa t ka parèt.',
+  'radar.frameUnreadable': 'Imaj sa a pa t ka parèt.',
   'radar.failedToLoad': 'Nou pa t kapab chaje {0}',
   'radar.buildingLoop': 'Y ap bati bouk la (y ap tcheke IEM)…',
   'radar.noLoopFrames': 'Pa gen imaj disponib pou bouk la.',

@@ -65,23 +65,34 @@ function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}) {
 }
 
 /**
- * Tell assistive technology when the region around a feed is being replaced.
+ * Tell assistive technology when the side panel around a feed is being replaced.
  *
- * Without this a screen reader is handed a region that still reads as its old
+ * Without this a screen reader is handed a panel that still reads as its old
  * contents while a fetch is in flight, with nothing to say it is being
- * replaced. Recomputed from every feed host inside the region rather than from
- * this one, because a panel can carry several: clearing the flag when one
- * settles would announce a region as ready while another was still loading.
- * Any state that is not `loading` clears it, so a failure cannot leave a region
- * busy forever.
+ * replaced. Recomputed from every feed status host inside the panel rather than
+ * from this one, because a panel can carry several: clearing the flag when one
+ * settles would announce it as ready while another was still loading. Any state
+ * that is not `loading` clears it, so a failure cannot leave a panel busy
+ * forever, which is worse than never marking it.
+ *
+ * Deliberately a managed side panel and not any region. The filter drawer is a
+ * region too, and it holds the storm search and every filter control alongside
+ * one feed: marking the whole of it busy while a tile layer loads would tell a
+ * reader that the search box is being replaced, which is not true. Feeds whose
+ * status card is appended to the body have no panel around them at all and are
+ * left alone rather than given a wrong one.
+ *
+ * Scoped to status hosts, not to anything carrying the two attributes: the
+ * diagnostics list renders a row per feed with the same pair, and counting
+ * those would make one region busy for every feed in the app.
  */
 function markRegionBusy(host) {
-  const region = host.parentElement?.closest('[role="region"]');
-  if (!region) return;
-  const busy = [...region.querySelectorAll('[data-feed][data-state]')]
+  const panel = host.parentElement?.closest('.side-panel[role="region"]');
+  if (!panel) return;
+  const busy = [...panel.querySelectorAll('.optional-feed-status-host[data-feed]')]
     .some(node => node.dataset.state === 'loading');
-  if (busy) region.setAttribute('aria-busy', 'true');
-  else region.removeAttribute('aria-busy');
+  if (busy) panel.setAttribute('aria-busy', 'true');
+  else panel.removeAttribute('aria-busy');
 }
 
 export function mountOptionalFeedStatus(host, feedId, { onRetry = null, now = Date.now } = {}) {

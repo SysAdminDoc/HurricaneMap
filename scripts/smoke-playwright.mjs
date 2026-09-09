@@ -2062,8 +2062,19 @@ async function assertUnreadableRadarFrameIsReported(page) {
       }, 0);
     });
 
-    // The frame that never painted must not be left on the map, and the status
-    // must stop claiming a time.
+    // A frame was chosen and the local image path was taken. Without this the
+    // wait below is satisfied by the constructor's own `overlay = null`, so a
+    // run where show() drew nothing at all would read as a pass.
+    const chosen = await page.evaluate(() => ({
+      frame: window.__hmBrokenRadarSmoke?.currentFrame?.url || '',
+      source: window.__hmBrokenRadarSmoke?.currentFrame?.source || '',
+    }));
+    assert(
+      chosen.source === 'local' && /^data\/radar\/Allison-1995\/.*\.png$/.test(chosen.frame),
+      `the broken-frame case did not take the local image path: ${JSON.stringify(chosen)}`,
+    );
+
+    // The frame that never painted must not be left on the map.
     await page.waitForFunction(
       () => window.__hmBrokenRadarSmoke?.overlay === null,
       null,
@@ -2071,14 +2082,25 @@ async function assertUnreadableRadarFrameIsReported(page) {
     ).catch(() => {
       throw new Error('a radar frame that failed to load was left on the map');
     });
+    // What the status WOULD have said if the frame had painted, built by the
+    // app's own formatter rather than guessed at with a regex. A hand-written
+    // pattern here was satisfied by every real timestamp the app produces,
+    // because they read "Jun 5, 1995, 02:00 PM UTC" and the pattern expected a
+    // bare clock time.
+    const wouldHaveSaid = await page.evaluate(async () => {
+      const { formatTime } = await import('/src/data.js');
+      const frame = window.__hmBrokenRadarSmoke?.currentFrame;
+      return frame ? formatTime(frame.date.toISOString()) : '';
+    });
+    assert(wouldHaveSaid, 'could not build the timestamp this frame would have shown');
     const reported = await page.evaluate(() => ({
       status: document.getElementById('radar-time')?.textContent || '',
-      feed: document.querySelector('#radar-feed-status')?.textContent || '',
+      feedState: document.querySelector('#radar-feed-status')?.dataset.state || '',
       retry: Boolean(document.querySelector('#radar-feed-status button')),
     }));
     assert(
-      !/^\d{1,2}:\d{2}/.test(reported.status.trim()) && !/\d{1,2}:\d{2}\s*(AM|PM)?( · online)?$/i.test(reported.status.trim()),
-      `the radar status still reads as a timestamp after the frame failed: ${JSON.stringify(reported.status)}`,
+      !reported.status.includes(wouldHaveSaid),
+      `the radar status still shows the frame's timestamp after it failed: ${JSON.stringify(reported.status)}`,
     );
     assert(
       /could not be displayed/i.test(reported.status),
@@ -2086,20 +2108,59 @@ async function assertUnreadableRadarFrameIsReported(page) {
     );
     // Reported through the same optional-feed host every other feed uses, so it
     // reaches the diagnostics panel and offers the retry that host already
-    // wires to reopening the storm.
-    assert(reported.retry, `the failed radar frame offered no retry: ${JSON.stringify(reported.feed)}`);
+    // wires to reopening the storm. The button alone proves nothing: the host
+    // shows one for a successful feed too, so the state it is showing is the
+    // part that has to be a failure.
+    assert(reported.retry, 'the failed radar frame offered no retry');
+    assert(
+      reported.feedState === 'stale' || reported.feedState === 'error',
+      `the radar status host still reads as a success: ${reported.feedState}`,
+    );
+
+    // Stepping past the last frame re-renders the status without drawing
+    // anything. It used to put the timestamp straight back over a map with no
+    // overlay on it, two clicks after the failure.
+    //
+    // Walked one step at a time, letting each failed draw settle first: the
+    // image error that removes an overlay is asynchronous, and a straggler
+    // arriving after the end-of-list branch would rewrite the status and hide
+    // exactly what this is checking.
+    const currentStamp = () => page.evaluate(
+      () => window.__hmBrokenRadarSmoke?.currentDate?.toISOString() || '',
+    );
+    let reachedEnd = false;
+    for (let index = 0; index < 12 && !reachedEnd; index += 1) {
+      const before = await currentStamp();
+      await page.evaluate(() => window.__hmBrokenRadarSmoke.step(+1));
+      await page.waitForFunction(
+        () => window.__hmBrokenRadarSmoke?.overlay === null,
+        null,
+        { timeout: 15000 },
+      ).catch(() => {
+        throw new Error('a frame that failed to load was left on the map by stepping');
+      });
+      reachedEnd = (await currentStamp()) === before;
+    }
+    assert(reachedEnd, 'stepping never reached the end of the frame list');
+    const afterStepping = await page.evaluate(() => ({
+      status: document.getElementById('radar-time')?.textContent || '',
+    }));
+    assert(
+      !/(?<![\d:])\d{1,2}:\d{2}(?![\d:])/.test(afterStepping.status),
+      `stepping past the last unreadable frame put a time back on a blank map: ${JSON.stringify(afterStepping.status)}`,
+    );
+
     const feed = await page.evaluate(async () => {
       const feeds = await import('/src/optional-feeds.js');
       const state = feeds.getOptionalFeedState('radar');
       return { state: state?.state, detail: state?.detail };
     });
-    // The radar has already served frames by this point in the run, so the feed
-    // degrades to 'stale' and files the failure kind in detail rather than
-    // going to 'error' outright. Both are failures that offer a retry; what
-    // must not happen is the feed still reading as a success.
+    // Deterministically 'stale', not 'error': show() calls completeOptionalFeed
+    // three statements before draw()'s image can fail, so the feed always has
+    // last-good data by the time failOptionalFeed runs and always takes its
+    // hasLastGood branch. The failure kind is filed in detail.
     assert(
-      (feed.state === 'error' && feed.detail === null)
-      || (feed.state === 'stale' && feed.detail === 'error'),
+      feed.state === 'stale' && feed.detail === 'error',
       `the radar feed did not record the frame failure: ${JSON.stringify(feed)}`,
     );
   } finally {

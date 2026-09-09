@@ -221,7 +221,7 @@ export default {
   'radar.savingPackProgress': 'Guardando el paquete de radar {0}/{1}…',
   'radar.savedButton': 'Guardado',
   'radar.noFrameAt': 'Sin imagen a las {0}',
-  'radar.frameUnreadable': 'No se pudo mostrar el cuadro de {0}.',
+  'radar.frameUnreadable': 'No se pudo mostrar este cuadro.',
   'radar.failedToLoad': 'No se pudo cargar {0}',
   'radar.buildingLoop': 'Creando el bucle (consultando IEM)…',
   'radar.noLoopFrames': 'No hay imágenes disponibles para el bucle.',

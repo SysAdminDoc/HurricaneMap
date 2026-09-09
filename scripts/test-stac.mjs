@@ -78,16 +78,23 @@ assert.ok(
 // ------------------------------------------------------------------- Monty
 //
 // The catalog deliberately declares no Monty field. Checked on 2026-09-09
-// against the released v1.3.0 schema rather than assumed: declaring the
-// extension makes monty:country_codes, monty:hazard_codes, monty:corr_id and a
-// role from event/hazard/impact/response required on the item's properties, and
-// the schema sets additionalProperties:false over the monty: namespace. Nothing
-// here can satisfy that honestly. A radar reflectivity frame is not an event, a
-// hazard, an impact or a response; the HURDAT2 item covers 595 storms and so
-// has no single country or correlation; and monty:corr_id is defined as "the
-// unique identifier assigned by the Monty system", which a HURDAT2 storm id is
-// not. So no hurricanemap: field has a Monty equivalent that can be emitted
-// under both names, and this guard exists to stop one being added by halves.
+// against the released v1.3.0 schema rather than assumed.
+//
+// One field does map: monty:src_event_id is "the identifier of the event in the
+// source system, used to group items belonging to the same source event", which
+// is what hurricanemap:storm_id does for the 1,703 radar items. What blocks
+// emitting it is the rest of the contract. Declaring the extension makes
+// monty:country_codes, monty:hazard_codes, monty:corr_id and a role from
+// event/hazard/impact/response required on an item's properties, with
+// additionalProperties:false over the monty: namespace, and nothing here can
+// supply those honestly: a radar reflectivity frame is not an event, a hazard,
+// an impact or a response, the HURDAT2 item covers 595 storms and so has no
+// single country, and monty:corr_id is "the unique identifier assigned by the
+// Monty system", which a HURDAT2 storm id is not and which cannot be looked up
+// because Monty's API is 401-gated. Emitting src_event_id alone would be a
+// monty: field on an item that does not declare the extension, which is worse
+// than saying nothing. So this guard stops the extension being adopted by
+// halves, and the decision to adopt it properly is a roadmap item.
 for (const [relative, body] of generated) {
   assert.ok(!body.includes('monty:'), `${relative} declares a Monty field; see the note above`);
   assert.ok(

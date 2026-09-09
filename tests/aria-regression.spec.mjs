@@ -778,5 +778,50 @@ test('a region fetching a feed is announced busy, and never left busy', async ({
     await expect(panel).not.toHaveAttribute('aria-busy', 'true');
   }
 
-  await assertNoAxeViolations(page, 'storm panel with a busy region', '#storm-panel');
+  // Swept while it is actually busy. Running axe after everything settled asked
+  // nothing about aria-busy at all.
+  await drive('beginOptionalFeed');
+  await expect(panel).toHaveAttribute('aria-busy', 'true');
+  await assertNoAxeViolations(page, 'storm panel while a region is busy', '#storm-panel');
+  await drive('completeOptionalFeed', { itemCount: 1 });
+  await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+
+  // The filter drawer is a region too, and it holds the storm search and every
+  // filter control beside one feed. Marking the whole of it busy while a tile
+  // layer loads would tell a reader the search box is being replaced. The
+  // layer is switched on first, because that is what mounts the status host
+  // this rule is about; driving the feed with no host mounted would assert
+  // nothing.
+  await page.evaluate(async () => {
+    const population = await import('/src/population.js');
+    population.setPopulation(true);
+  });
+  await expect(page.locator('#filters #population-feed-status')).toHaveAttribute('data-feed', 'population');
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.beginOptionalFeed('population');
+  });
+  await expect(page.locator('#filters #population-feed-status')).toHaveAttribute('data-state', 'loading');
+  await expect(page.locator('#filters')).not.toHaveAttribute('aria-busy', 'true');
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.completeOptionalFeed('population', { itemCount: 1 });
+    const population = await import('/src/population.js');
+    population.setPopulation(false);
+  });
+
+  // The diagnostics list renders a row per feed carrying the same data-feed and
+  // data-state pair as a status host. If one ever lands inside a panel, it must
+  // not hold that panel busy on behalf of every feed in the app.
+  await page.evaluate(() => {
+    const row = document.createElement('div');
+    row.className = 'feed-diagnostic';
+    row.dataset.feed = 'forecast';
+    row.dataset.state = 'loading';
+    row.id = 'hm-fake-diagnostic-row';
+    document.getElementById('storm-panel')?.appendChild(row);
+  });
+  await drive('completeOptionalFeed', { itemCount: 1 });
+  await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+  await page.evaluate(() => document.getElementById('hm-fake-diagnostic-row')?.remove());
 });
