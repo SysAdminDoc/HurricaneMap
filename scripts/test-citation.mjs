@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { buildCitation, HURRICANEMAP_URL } from '../src/citation.js';
+import { buildCitation, citationCommentLines, HURRICANEMAP_URL } from '../src/citation.js';
 import { buildPublicationCSV } from '../src/export.js';
 import { buildExports } from '../src/metrics.js';
 import { buildQGISGeoJSON } from '../src/qgis.js';
@@ -137,6 +137,59 @@ if (releaseHeading) {
     releaseHeading[1],
     `CITATION.cff date-released ${cffScalars.get('date-released')} disagrees with the changelog heading ${releaseHeading[1]}`,
   );
+}
+
+// ---------------------------------------------------------------- per storm
+//
+// Every storm page used to emit the same BibTeX key and the same title, so two
+// storms could not sit in one bibliography and neither entry recorded which
+// storm the reader actually used. The key takes the HURDAT2 id rather than the
+// name, because names repeat across basins and decades and ids do not.
+{
+  const katrina = buildCitation({
+    accessDate: '2026-08-03',
+    url: 'https://sysadmindoc.github.io/HurricaneMap/storms/katrina-2005/',
+    storm: { id: 'AL122005', name: 'Katrina', year: 2005 },
+  });
+  const andrew = buildCitation({
+    accessDate: '2026-08-03',
+    url: 'https://sysadmindoc.github.io/HurricaneMap/storms/andrew-1992/',
+    storm: { id: 'AL041992', name: 'Andrew', year: 1992 },
+  });
+
+  const keyOf = citation => citation.bibtex.match(/@software\{([^,]+),/)?.[1];
+  assert.equal(keyOf(katrina), 'hurricanemap_al122005_2026');
+  assert.equal(keyOf(andrew), 'hurricanemap_al041992_2026');
+  assert.notEqual(keyOf(katrina), keyOf(andrew), 'two storms must not share a BibTeX key');
+
+  // The entry has to say which storm it is, in both directions a reader reads.
+  assert.match(katrina.apa, /Katrina \(2005\) \[AL122005\]/);
+  assert.match(katrina.bibtex, /title = \{Katrina \(2005\) in HurricaneMap/);
+  assert.match(andrew.apa, /Andrew \(1992\) \[AL041992\]/);
+
+  // Two storms named the same in different years stay distinct, which is the
+  // case a name-derived key would collide on.
+  const earlier = buildCitation({ accessDate: '2026-08-03', storm: { id: 'AL091995', name: 'Opal', year: 1995 } });
+  const later = buildCitation({ accessDate: '2026-08-03', storm: { id: 'AL152021', name: 'Opal', year: 2021 } });
+  assert.notEqual(keyOf(earlier), keyOf(later), 'a repeated storm name must still produce distinct keys');
+
+  // Without a storm the release citation is unchanged.
+  const release = buildCitation({ accessDate: '2026-08-03' });
+  assert.equal(keyOf(release), 'hurricanemap_2026');
+  assert.doesNotMatch(release.apa, /\[AL\d{6}\]/);
+
+  // RIS travels beside APA and BibTeX everywhere they appear.
+  for (const citation of [release, katrina]) {
+    assert.match(citation.ris, /^TY {2}- DATA$/m);
+    assert.match(citation.ris, /^ER {2}- ?$/m);
+    assert.match(citation.ris, new RegExp(`^UR {2}- ${citation.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm'));
+  }
+  assert.match(katrina.ris, /^TI {2}- Katrina \(2005\) in HurricaneMap/m);
+
+  const lines = citationCommentLines(katrina, '# ');
+  assert.ok(lines.some(line => line.includes('APA citation:')), 'export comments lost APA');
+  assert.ok(lines.some(line => line.includes('BibTeX citation:')), 'export comments lost BibTeX');
+  assert.ok(lines.some(line => line.includes('RIS citation:')), 'export comments never gained RIS');
 }
 
 console.log('citation contracts ok (APA, BibTeX, exports, notebook, pinned URLs, and CITATION.cff)');

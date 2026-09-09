@@ -178,7 +178,11 @@ function renderStormPage(storm, landfalls, context) {
   const url = `${SITE}storms/${slug}/`;
   const title = `${headline(storm)} landfalls and track`;
   const summary = summarySentence(storm, landfalls);
-  const citation = buildCitation({ accessDate, url });
+  const citation = buildCitation({
+    accessDate,
+    url,
+    storm: { id: storm.id, name: displayName(storm), year: storm.year },
+  });
   const basin = storm.basin === 'EP' ? 'Eastern Pacific' : 'Atlantic';
 
   const jsonLd = {
@@ -253,11 +257,13 @@ ${landfallTable(landfalls)}
 ${trackTable(storm)}
   </div>
 
-  <h2>Cite this release</h2>
+  <h2>Cite this storm</h2>
   <p>APA</p>
   <pre>${escapeHtml(citation.apa)}</pre>
   <p>BibTeX</p>
   <pre>${escapeHtml(citation.bibtex)}</pre>
+  <p>RIS</p>
+  <pre>${escapeHtml(citation.ris)}</pre>
 
   <p><a href="../../#v=1&amp;storm=${escapeHtml(storm.id)}">Open ${escapeHtml(displayName(storm))} on the interactive map</a></p>
 </main>

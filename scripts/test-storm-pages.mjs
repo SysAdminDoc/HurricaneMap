@@ -48,7 +48,17 @@ assert.match(katrinaPage, /name="twitter:card"/);
 assert.match(katrinaPage, /#v=1&amp;storm=AL122005/, 'the page must link into the map at this storm');
 assert.match(katrinaPage, /NOAA HURDAT2 best track, revision \d{4}-\d{2}-\d{2}/, 'the page must state the HURDAT2 revision');
 assert.match(katrinaPage, /@software\{hurricanemap_/, 'the page must carry a BibTeX citation');
-assert.match(katrinaPage, /SysAdminDoc\. \(\d{4}\)\. HurricaneMap/, 'the page must carry an APA citation');
+// A storm page cites the storm, not just the release. The old form asserted
+// here, `SysAdminDoc. (YYYY). HurricaneMap`, was identical on all 595 pages,
+// which is the defect: two storms could not sit in one bibliography and neither
+// entry recorded which storm the reader used.
+assert.match(
+  katrinaPage,
+  /SysAdminDoc\. \(\d{4}\)\. Katrina \(2005\) \[AL122005\] in HurricaneMap/,
+  'the page must carry an APA citation naming the storm',
+);
+assert.match(katrinaPage, /@software\{hurricanemap_al122005_\d{4},/, 'the BibTeX key must carry the HURDAT2 id');
+assert.match(katrinaPage, /TY {2}- DATA/, 'the page must offer RIS beside APA and BibTeX');
 
 // A real table, not a placeholder: one row per observation, and no script.
 const bodyRows = [...katrinaPage.matchAll(/<tbody>([\s\S]*?)<\/tbody>/g)].map(match => (match[1].match(/<tr>/g) || []).length);

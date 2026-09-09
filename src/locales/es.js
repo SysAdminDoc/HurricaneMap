@@ -807,6 +807,7 @@ export default {
   'citation.title': 'Citar esta versión',
   'citation.description': 'Copia una cita reproducible con la revisión HURDAT2, los hashes de origen, la versión de la aplicación y la fecha de acceso.',
   'citation.apa': 'APA',
+  'citation.ris': 'RIS',
   'citation.bibtex': 'BibTeX',
   'citation.copy': 'Copiar',
   'citation.copied': 'Cita copiada.',

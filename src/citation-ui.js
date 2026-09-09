@@ -10,6 +10,7 @@ export function renderCitationBlock() {
   const citation = buildCitation();
   const apaId = citationId('apa');
   const bibtexId = citationId('bibtex');
+  const risId = citationId('ris');
   return `
     <details class="citation-block" data-citation-block>
       <summary>${escapeHtml(t('citation.title'))}</summary>
@@ -27,6 +28,13 @@ export function renderCitationBlock() {
           <button type="button" class="text-btn citation-copy-btn" data-citation-copy="bibtex">${escapeHtml(t('citation.copy'))}</button>
         </div>
         <textarea id="${bibtexId}" data-citation-value="bibtex" readonly rows="8" spellcheck="false" aria-label="${escapeHtml(t('citation.bibtex'))}">${escapeHtml(citation.bibtex)}</textarea>
+      </div>
+      <div class="citation-field">
+        <div class="citation-field-heading">
+          <label for="${risId}">${escapeHtml(t('citation.ris'))}</label>
+          <button type="button" class="text-btn citation-copy-btn" data-citation-copy="ris">${escapeHtml(t('citation.copy'))}</button>
+        </div>
+        <textarea id="${risId}" data-citation-value="ris" readonly rows="8" spellcheck="false" aria-label="${escapeHtml(t('citation.ris'))}">${escapeHtml(citation.ris)}</textarea>
       </div>
       <p class="citation-status" data-citation-status role="status" aria-live="polite"></p>
     </details>`;

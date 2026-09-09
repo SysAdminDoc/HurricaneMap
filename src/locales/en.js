@@ -810,6 +810,7 @@ export default {
   'citation.title': 'Cite this release',
   'citation.description': 'Copy a reproducible citation with the HURDAT2 revision, source hashes, app version, and access date.',
   'citation.apa': 'APA',
+  'citation.ris': 'RIS',
   'citation.bibtex': 'BibTeX',
   'citation.copy': 'Copy',
   'citation.copied': 'Citation copied.',

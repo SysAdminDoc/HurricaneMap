@@ -715,6 +715,7 @@ export default {
   'citation.title': 'Site vèsyon sa a',
   'citation.description': 'Kopye yon sitasyon ki ka verifye ak revizyon HURDAT2, hash sous yo, vèsyon aplikasyon an ak dat aksè a.',
   'citation.apa': 'APA',
+  'citation.ris': 'RIS',
   'citation.bibtex': 'BibTeX',
   'citation.copy': 'Kopye',
   'citation.copied': 'Sitasyon an kopye.',

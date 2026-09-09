@@ -440,7 +440,7 @@ function exportGeoJSON(storm, citation = buildCitation()) {
   return JSON.stringify({
     type: 'FeatureCollection',
     features,
-    metadata: { citation: { apa: citation.apa, bibtex: citation.bibtex, url: citation.url } },
+    metadata: { citation: { apa: citation.apa, bibtex: citation.bibtex, ris: citation.ris, url: citation.url } },
   }, null, 2);
 }
 
