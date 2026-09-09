@@ -19,9 +19,10 @@ import { fileURLToPath } from 'node:url';
 
 import { buildCitation } from '../src/citation.js';
 import { formatStormName } from '../src/html-utils.js';
+import { COASTAL_CITIES } from '../src/metrics.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SITE = 'https://sysadmindoc.github.io/HurricaneMap/';
+export const SITE = 'https://sysadmindoc.github.io/HurricaneMap/';
 const OUT_DIR = path.join(root, 'storms');
 
 const STATUS_LABELS = new Map([
@@ -35,7 +36,7 @@ const STATUS_LABELS = new Map([
   ['DB', 'Disturbance'],
 ]);
 
-const escapeHtml = value => String(value ?? '')
+export const escapeHtml = value => String(value ?? '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
@@ -45,7 +46,13 @@ const escapeHtml = value => String(value ?? '')
 // JSON-LD sits inside a <script>, where the only sequence that can end the
 // element early is "</". Escaping the slash keeps the document well formed
 // without disturbing the JSON.
-const escapeJsonLd = value => JSON.stringify(value).replace(/</g, '\\u003c');
+export const escapeJsonLd = value => JSON.stringify(value).replace(/</g, '\\u003c');
+
+// The city pages share this rule so a slug can be derived without loading any
+// storm data, which is what lets the sitemap list them from COASTAL_CITIES.
+export function citySlug(city) {
+  return String(city.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
 
 export function stormSlug(storm) {
   const name = String(storm.name || '').trim();
@@ -66,7 +73,7 @@ function statusLabel(status) {
   return STATUS_LABELS.get(status) || status || 'Not recorded';
 }
 
-function displayName(storm) {
+export function displayName(storm) {
   // HURDAT2 stores names in capitals. The app title-cases them for display and
   // these pages have to read the same way, or the same storm looks like two.
   const name = String(storm.name || '').trim();
@@ -75,13 +82,13 @@ function displayName(storm) {
     : `Unnamed storm ${storm.id}`;
 }
 
-function headline(storm) {
+export function headline(storm) {
   const peak = storm.landfall_max_category ?? null;
   const kind = peak !== null && peak >= 1 ? 'Hurricane' : 'Storm';
   return `${kind} ${displayName(storm)} (${storm.year})`;
 }
 
-function formatUtc(value) {
+export function formatUtc(value) {
   if (!value) return 'Not recorded';
   return String(value).replace('T', ' ').replace(':00Z', ' UTC').replace('Z', ' UTC');
 }
@@ -149,7 +156,7 @@ ${rows}
     </table>`;
 }
 
-const PAGE_CSS = `:root{color-scheme:dark light;--bg:#11111b;--fg:#cdd6f4;--muted:#a6adc8;--line:#313244;--link:#89b4fa}
+export const PAGE_CSS = `:root{color-scheme:dark light;--bg:#11111b;--fg:#cdd6f4;--muted:#a6adc8;--line:#313244;--link:#89b4fa}
 @media(prefers-color-scheme:light){:root{--bg:#eff1f5;--fg:#4c4f69;--muted:#6c6f85;--line:#ccd0dd;--link:#1e66f5}}
 *{box-sizing:border-box}
 body{margin:0;padding:0 1rem 4rem;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -296,7 +303,7 @@ function renderIndexPage(entries, context) {
 <style>${PAGE_CSS}</style>
 </head>
 <body>
-<header><a href="../">HurricaneMap</a></header>
+<header><a href="../">HurricaneMap</a> <span aria-hidden="true">·</span> <a href="../cities/">Hurricane history by city</a></header>
 <main>
   <h1>All storms</h1>
   <p>${escapeHtml(description)}</p>
@@ -314,7 +321,11 @@ function renderSitemap(entries, revisionDate) {
   const urls = [
     { loc: SITE, changefreq: 'monthly', priority: '1.0' },
     { loc: `${SITE}storms/`, changefreq: 'monthly', priority: '0.7' },
+    { loc: `${SITE}cities/`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE}data/stac/catalog.json`, changefreq: 'yearly', priority: '0.5' },
+    // Derived from COASTAL_CITIES rather than from a build result, so the
+    // sitemap does not depend on the order the two page builders run in.
+    ...COASTAL_CITIES.map(city => ({ loc: `${SITE}cities/${citySlug(city)}/`, changefreq: 'yearly', priority: '0.6' })),
     ...entries.map(entry => ({ loc: `${SITE}storms/${entry.slug}/`, changefreq: 'yearly', priority: '0.6' })),
   ];
   const body = urls.map(entry => `  <url>

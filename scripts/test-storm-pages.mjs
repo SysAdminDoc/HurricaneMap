@@ -9,7 +9,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
-import { buildStormPages, stormSlug, categoryLabel } from './build-storm-pages.mjs';
+import { buildStormPages, citySlug, stormSlug, categoryLabel } from './build-storm-pages.mjs';
+import { buildCityPages } from './build-city-pages.mjs';
+import { COASTAL_CITIES } from '../src/metrics.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -87,7 +89,11 @@ assert.equal(scriptless, storms.length + 1, 'every storm page and the index must
 // The sitemap has to list them, or nothing can find them.
 const sitemap = bySlug.get('sitemap.xml');
 const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
-assert.equal(locations.length, storms.length + 3, 'sitemap must list the site, the index, the catalog and every storm');
+assert.equal(
+  locations.length,
+  storms.length + COASTAL_CITIES.length + 4,
+  'sitemap must list the site, both indexes, the catalog, every storm and every city',
+);
 assert.ok(locations.includes('https://sysadmindoc.github.io/HurricaneMap/storms/katrina-2005/'));
 assert.equal(new Set(locations).size, locations.length, 'sitemap contains duplicate URLs');
 
@@ -99,4 +105,93 @@ assert.equal(categoryLabel(-1), 'Tropical storm');
 const megabytes = first.bytes / 1024 / 1024;
 assert.ok(megabytes < 40, `storm pages grew to ${megabytes.toFixed(1)} MB, which needs a deliberate decision`);
 
-console.log(`storm pages ok (${first.entries.length} storms, reproducible, ${megabytes.toFixed(1)} MB, ${locations.length} sitemap URLs)`);
+// ------------------------------------------------------------- city pages
+//
+// The city pages answer the question a resident actually asks, so what matters
+// is that each one is about its own city and says so where a search engine and
+// a reader both look: the title, the heading and the description.
+const cityFirst = await buildCityPages({ write: false });
+const citySecond = await buildCityPages({ write: false });
+assert.equal(cityFirst.checksum, citySecond.checksum, 'city page generation is not reproducible');
+assert.equal(cityFirst.entries.length, COASTAL_CITIES.length, `expected one page per coastal city (${COASTAL_CITIES.length})`);
+assert.equal(cityFirst.files.length, COASTAL_CITIES.length + 1, 'expected one page per city plus the index');
+assert.equal(new Set(cityFirst.entries.map(entry => entry.slug)).size, COASTAL_CITIES.length, 'city slugs are not unique');
+
+for (const file of cityFirst.files) {
+  const onDisk = await readFile(path.join(root, file.path), 'utf8');
+  assert.equal(onDisk, file.body, `${file.path} on disk differs from a fresh build; run npm run generate:city-pages`);
+}
+
+const cityPages = new Map(cityFirst.files.map(file => [file.path.replace(/\\/g, '/'), file.body]));
+const escapeRe = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const descriptions = new Map();
+for (const city of COASTAL_CITIES) {
+  const slug = citySlug(city);
+  const page = cityPages.get(`cities/${slug}/index.html`);
+  assert.ok(page, `${city.name} has no page`);
+
+  // Named in all three places, or the page is about hurricanes in general and
+  // ranks for nothing.
+  const title = /<title>([^<]*)<\/title>/.exec(page)?.[1] || '';
+  const heading = /<h1>([^<]*)<\/h1>/.exec(page)?.[1] || '';
+  const description = /<meta name="description" content="([^"]*)">/.exec(page)?.[1] || '';
+  assert.match(title, new RegExp(escapeRe(city.name)), `${city.name} is not named in its <title>`);
+  assert.match(heading, new RegExp(escapeRe(city.name)), `${city.name} is not named in its <h1>`);
+  // The description leads with the count and reads better without the state
+  // repeated, so the short form is what it has to carry. A city with no record
+  // names itself in full, which contains the short form either way.
+  assert.match(
+    description,
+    new RegExp(escapeRe(city.name.split(',')[0].trim())),
+    `${city.name} is not named in its meta description`,
+  );
+
+  assert.ok(
+    !descriptions.has(description),
+    `${city.name} shares its description with ${descriptions.get(description)}`,
+  );
+  descriptions.set(description, city.name);
+
+  assert.match(
+    page,
+    /<link rel="canonical" href="https:\/\/sysadmindoc\.github\.io\/HurricaneMap\/cities\//,
+    `${city.name} has no canonical URL`,
+  );
+  assert.equal(
+    (page.match(/<script(?! type="application\/ld\+json")/g) || []).length,
+    0,
+    `${city.name}: city pages must not depend on JavaScript`,
+  );
+
+  const cityJsonLd = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(page)[1]);
+  const cityDataset = cityJsonLd['@graph'].find(node => node['@type'] === 'Dataset');
+  assert.ok(cityDataset, `${city.name}: city pages must carry Dataset structured data`);
+  assert.equal(
+    cityDataset.spatialCoverage.geo.latitude,
+    city.lat,
+    `${city.name}: structured data must carry the city's own coordinates`,
+  );
+
+  assert.ok(
+    locations.includes(`https://sysadmindoc.github.io/HurricaneMap/cities/${slug}/`),
+    `${city.name} is missing from the sitemap`,
+  );
+}
+
+// A sampled city whose record is well known, so the page is checked against
+// facts rather than only against its own shape.
+const miami = cityPages.get('cities/miami-fl/index.html');
+assert.match(miami, /Category 1 or stronger/, 'the return-period table is missing');
+assert.match(miami, /<a href="\.\.\/\.\.\/storms\/andrew-1992\/">/, 'Miami must list Andrew and link to its page');
+assert.match(
+  miami,
+  /href="\.\.\/\.\.\/#v=1&amp;y=\d{4}-\d{4}&amp;s=Florida"/,
+  'Miami must deep-link into the map scoped to its own record',
+);
+// The chronological list and the summary have to be counting the same events,
+// or the page argues with itself.
+const miamiRows = (/<caption>Every archived storm[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/.exec(miami)?.[1].match(/<tr>/g) || []).length;
+const miamiSummary = /(\d+) storms in the HurricaneMap archive/.exec(miami)?.[1];
+assert.equal(miamiRows, Number(miamiSummary), `Miami's list has ${miamiRows} rows but its summary claims ${miamiSummary}`);
+
+console.log(`storm pages ok (${first.entries.length} storms, ${cityFirst.entries.length} cities, reproducible, ${megabytes.toFixed(1)} MB, ${locations.length} sitemap URLs)`);
