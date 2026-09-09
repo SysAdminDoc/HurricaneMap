@@ -2592,16 +2592,28 @@ async function assertSavedViewReplaceIsConfirmed(page) {
     `replace did not put the imported view in place of the old one: ${JSON.stringify(afterReplace)}`,
   );
 
-  // --- merge mode does not ask --------------------------------------------
+  // --- merge mode does not ask, and does commit ---------------------------
+  // Start from a store holding ONLY the view merge must preserve. Leaving the
+  // replace step's view in place made the post-condition true before the click,
+  // so a merge that silently no-opped passed.
   await page.evaluate(async () => {
     const store = await import('/src/saved-views.js');
+    localStorage.removeItem('hm-saved-views-v1');
     store.saveCurrentView('Keep me', '#v=1&h=1');
   });
+  const beforeMerge = await names();
+  assert(
+    beforeMerge.length === 1 && beforeMerge[0] === 'Keep me',
+    `the merge step did not start from one known view: ${JSON.stringify(beforeMerge)}`,
+  );
   await loadFixture();
   await page.check('input[name="saved-view-import-mode"][value="merge"]');
   await page.click('[data-action="commit-import"]');
+  // The imported view has to actually arrive, which is what proves the commit
+  // happened rather than that the pre-state already satisfied a count.
   await page.waitForFunction(
-    () => (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || []).length >= 2,
+    () => (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || [])
+      .some(view => view.name === 'Imported one'),
     null,
     { timeout: 8000 },
   );
@@ -2610,13 +2622,13 @@ async function assertSavedViewReplaceIsConfirmed(page) {
   );
   assert(!dialogOpened, 'merge mode asked for confirmation, which it has no reason to');
   const afterMerge = await names();
-  // Merge renames duplicates rather than dropping them, so importing a view
-  // whose name is already present yields "Imported one (2)". What matters is
-  // that the view already on the device survived, which is the whole
-  // difference between merge and replace.
   assert(
-    afterMerge.includes('Keep me') && afterMerge.length > 1,
+    afterMerge.includes('Keep me'),
     `merge destroyed the view already on the device: ${JSON.stringify(afterMerge)}`,
+  );
+  assert(
+    afterMerge.includes('Imported one') && afterMerge.length === 2,
+    `merge did not add the imported view beside the existing one: ${JSON.stringify(afterMerge)}`,
   );
 
   await page.evaluate(() => {

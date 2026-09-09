@@ -10,6 +10,7 @@ globalThis.localStorage = {
 const {
   deleteSavedView,
   exportSavedViews,
+  hasStoredSavedViews,
   importSavedViews,
   loadSavedViews,
   migrateSavedViewsRecord,
@@ -107,5 +108,36 @@ assert.deepEqual(
   savedNames,
   'an export and import round trip must not change the saved views',
 );
+
+// ------------------------------------------------ record existence vs count
+//
+// The replace-import confirmation used to ask "how many views can I read?",
+// which is [] for a record with an unknown schema_version or one truncated to
+// invalid JSON. importSavedViews overwrites the key either way, so the guard
+// was skipped exactly when the reader had data that could not be shown to them
+// and the bytes went with no prompt. It asks "is anything stored?" now.
+{
+  const key = 'hm-saved-views-v1';
+
+  storage.clear();
+  assert.equal(hasStoredSavedViews(), false, 'an empty store holds nothing');
+
+  storage.set(key, JSON.stringify({ schema_version: 1, views: [] }));
+  assert.equal(hasStoredSavedViews(), true, 'an empty but present record still exists');
+  assert.equal(loadSavedViews().length, 0);
+
+  // A schema this build does not know. Readable count is 0; a record is there.
+  storage.set(key, JSON.stringify({ schema_version: 99, views: [{ id: 'a', name: 'Future', hash: '#v=1' }] }));
+  assert.equal(loadSavedViews().length, 0, 'an unsupported schema reads as no views');
+  assert.equal(hasStoredSavedViews(), true, 'but the record is still there to be destroyed');
+
+  // Truncated JSON. Same shape, no future version required.
+  storage.set(key, '{"schema_version":1,"views":[{"id"');
+  assert.equal(loadSavedViews().length, 0, 'invalid JSON reads as no views');
+  assert.equal(hasStoredSavedViews(), true, 'but the record is still there to be destroyed');
+
+  storage.clear();
+  assert.equal(hasStoredSavedViews(), false);
+}
 
 console.log('saved views ok (CRUD/export, strict import preview, deterministic merge, atomic rollback, case-folded names)');

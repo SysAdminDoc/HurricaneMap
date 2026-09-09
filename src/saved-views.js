@@ -31,6 +31,23 @@ export function migrateSavedViewsRecord(record) {
   return { value: normalizeList(record.views), status: 'current', shouldPersist: false };
 }
 
+/**
+ * Whether anything is stored under the saved-views key, readable or not.
+ *
+ * loadSavedViews returns [] for a record it cannot read: bad JSON, or a
+ * schema_version it does not know. importSavedViews in replace mode overwrites
+ * the key either way, so a guard that counts readable views skips the
+ * confirmation exactly when the reader has data that cannot be shown to them,
+ * and the bytes go without a prompt.
+ */
+export function hasStoredSavedViews(storage = globalThis.localStorage) {
+  try {
+    return Boolean(storage?.getItem?.(SAVED_VIEWS_STORAGE_KEY));
+  } catch {
+    return false;
+  }
+}
+
 export function loadSavedViews(storage = globalThis.localStorage) {
   try {
     const raw = storage?.getItem(SAVED_VIEWS_STORAGE_KEY);

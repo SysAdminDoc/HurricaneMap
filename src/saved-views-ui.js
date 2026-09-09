@@ -2,6 +2,7 @@ import {
   deleteSavedView,
   exportSavedViews,
   importSavedViews,
+  hasStoredSavedViews,
   loadSavedViews,
   prepareSavedViewsImport,
   saveCurrentView,
@@ -104,14 +105,19 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
       render();
       host.querySelector('[data-action="choose-import"]')?.focus({ preventScroll: true });
     } else if (button.dataset.action === 'commit-import') {
-      // Replacing destroys every saved view on this device, so it is confirmed
-      // the way deleting a single one already was. Without this the smaller
-      // destructive action was guarded and the total one was not.
-      const replacing = importMode === 'replace' ? loadSavedViews().length : 0;
-      if (replacing > 0) {
+      // Replacing destroys whatever is stored, so it is confirmed the way
+      // deleting a single view already was. The guard asks whether a record
+      // EXISTS rather than how many views can be read from it: a record with a
+      // schema this build does not know, or one truncated to invalid JSON,
+      // loads as zero views and would otherwise have been overwritten with no
+      // prompt at all.
+      if (importMode === 'replace' && hasStoredSavedViews()) {
+        const readable = loadSavedViews().length;
         const confirmed = await confirmLocalAction({
           title: t('savedViews.confirmReplaceTitle'),
-          message: t('savedViews.confirmReplaceBody', replacing),
+          message: readable > 0
+            ? t('savedViews.confirmReplaceBody', readable)
+            : t('savedViews.confirmReplaceUnreadable'),
           confirmLabel: t('savedViews.confirmReplaceAction'),
           invoker: button,
         });

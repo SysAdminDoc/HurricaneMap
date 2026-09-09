@@ -688,6 +688,7 @@ export default {
   'savedViews.importError.date': 'Debe ser una fecha válida.',
   'savedViews.importError.write': 'El almacenamiento del navegador rechazó la escritura.',
   'savedViews.delete': 'Eliminar {0}',
+  'savedViews.confirmReplaceUnreadable': 'Este dispositivo tiene vistas guardadas que esta versión no puede leer. Importar las reemplaza y no se pueden recuperar.',
   'savedViews.confirmReplaceTitle': '¿Reemplazar todas las vistas guardadas?',
   'savedViews.confirmReplaceBody': 'Esto elimina {0} vistas guardadas de este dispositivo y pone las importadas en su lugar. No se puede deshacer.',
   'savedViews.confirmReplaceAction': 'Reemplazar todo',

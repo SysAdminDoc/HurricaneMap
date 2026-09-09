@@ -688,6 +688,7 @@ export default {
   'savedViews.importError.date': 'Must be a valid date.',
   'savedViews.importError.write': 'Browser storage rejected the write.',
   'savedViews.delete': 'Delete {0}',
+  'savedViews.confirmReplaceUnreadable': 'This device has saved views this version cannot read. Importing replaces them, and they cannot be recovered.',
   'savedViews.confirmReplaceTitle': 'Replace all saved views?',
   'savedViews.confirmReplaceBody': 'This removes {0} saved views from this device and puts the imported ones in their place. This cannot be undone.',
   'savedViews.confirmReplaceAction': 'Replace all',

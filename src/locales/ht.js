@@ -600,6 +600,7 @@ export default {
   'savedViews.importError.date': 'Li dwe yon dat ki valab.',
   'savedViews.importError.write': 'Depo navigatè a refize ekriti a.',
   'savedViews.delete': 'Efase {0}',
+  'savedViews.confirmReplaceUnreadable': 'Aparèy sa a gen vü ki anrejistre vèsyon sa a pa ka li. Enpòte a ranplase yo, epi ou pa ka jwenn yo ankò.',
   'savedViews.confirmReplaceTitle': 'Ranplase tout vü ki anrejistre yo?',
   'savedViews.confirmReplaceBody': 'Sa a efase {0} vü ki anrejistre sou aparèy sa a epi li mete sa yo enpòte yo nan plas yo. Ou pa ka defè sa.',
   'savedViews.confirmReplaceAction': 'Ranplase tout',
