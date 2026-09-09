@@ -3,6 +3,7 @@ import {
   loadInitial, ensureOptionalData, getLandfalls, getStats, getMetadata, filterLandfalls,
 } from './data.js';
 import { initMap, renderLandfalls, focusLandfall, showTrack, clearTracks, setHeatmap, announceToLiveRegion } from './map.js';
+import { renderTrackColorLegend } from './track-ramps.js';
 import { applyPaletteToBody, applyThemeToRoot, getSetting, hasStoredSetting, invalidatePaletteCache, setSetting } from './settings.js';
 import { getDateLocale, getLocale, initLocale, initLocaleReady, setLocale, t, translateStaticElements } from './i18n.js';
 import { mountTimeline, highlightYearRange, redraw as redrawTimeline } from './timeline.js';
@@ -133,6 +134,7 @@ function writeHash() {
     advisoryReplay: advisoryReplayState,
     windUnit: getSetting('windUnit'),
     damageMode: getSetting('damageMode'),
+    trackColorBy: getSetting('trackColorBy'),
     yearMinDefault: YEAR_MIN_DEFAULT,
     yearMaxDefault: YEAR_MAX_DEFAULT,
     dataRevision: currentDataRevision(),
@@ -322,6 +324,9 @@ async function boot() {
     refreshTimelineScope,
   });
   wireSettingsControls();
+  // A stored non-category encoding has to bring its legend up with it, or the
+  // map loads recoloured with nothing on screen saying by what.
+  renderTrackColorLegend(getSetting('trackColorBy'));
   deferNonCritical(async () => {
     try {
       const [{ initOptionalFeedDiagnostics }, { initStorageManager }, { initOfflineDiagnostics }] = await Promise.all([
@@ -345,6 +350,7 @@ async function boot() {
       advisoryReplay: advisoryReplayState,
       windUnit: getSetting('windUnit'),
       damageMode: getSetting('damageMode'),
+      trackColorBy: getSetting('trackColorBy'),
       yearMinDefault: YEAR_MIN_DEFAULT,
       yearMaxDefault: YEAR_MAX_DEFAULT,
       dataRevision: currentDataRevision(),
@@ -450,9 +456,11 @@ function restoreExtendedView(decoded) {
   // pin: a saved view of the default view is exactly `#v=1&rel=<hash>`, and
   // stripping that on restore lost the citation the saved view existed to keep.
   // Reassigned rather than latched, so clearing the fragment clears the flag.
-  arrivedWithQualifiers = decoded?.u !== undefined || decoded?.d !== undefined || decoded?.rel !== undefined;
+  arrivedWithQualifiers = decoded?.u !== undefined || decoded?.d !== undefined
+    || decoded?.tc !== undefined || decoded?.rel !== undefined;
   if (options.windUnit) setSetting('windUnit', options.windUnit);
   if (options.damageMode) setSetting('damageMode', options.damageMode);
+  if (options.trackColorBy) setSetting('trackColorBy', options.trackColorBy);
   advisoryReplayState = options.advisoryReplay;
   comparisonIds = options.comparisonIds;
   if (comparisonIds.length) {
@@ -507,6 +515,7 @@ function wireSettingsControls() {
     syncRadioGroup('[data-set-unit]', 'windUnit', 'setUnit');
     syncRadioGroup('[data-set-theme]', 'theme', 'setTheme');
     syncRadioGroup('[data-set-palette]', 'palette', 'setPalette');
+    syncRadioGroup('[data-set-track-color]', 'trackColorBy', 'setTrackColor');
     syncRadioGroup('[data-set-locale]', 'locale', 'setLocale');
     syncRadioGroup('[data-set-damage]', 'damageMode', 'setDamage');
     syncRadioGroup('[data-set-marine-horizon]', 'marineHorizon', 'setMarineHorizon');
@@ -550,6 +559,8 @@ function wireSettingsControls() {
     if (t) { setSetting('theme', t.dataset.setTheme); syncMenu(); return; }
     const p = e.target.closest('[data-set-palette]');
     if (p) { setSetting('palette', p.dataset.setPalette); syncMenu(); return; }
+    const tc = e.target.closest('[data-set-track-color]');
+    if (tc) { setSetting('trackColorBy', tc.dataset.setTrackColor); syncMenu(); return; }
     const l = e.target.closest('[data-set-locale]');
     if (l) { setSetting('locale', l.dataset.setLocale); location.reload(); return; }
     const d = e.target.closest('[data-set-damage]');
@@ -645,6 +656,14 @@ function wireSettingsControls() {
       lastTracksKey = '';
       applyFilters();
       refreshOpenStormPanel();
+    }
+    if (e.detail.key === 'trackColorBy') {
+      // Same reason the palette branch clears it: redrawTracks skips the work
+      // when the set of storms has not changed, and here the storms are the
+      // same and only their colour moved.
+      renderTrackColorLegend(getSetting('trackColorBy'));
+      lastTracksKey = '';
+      applyFilters();
     }
     if (e.detail.key === 'windUnit') {
       refreshOpenStormPanel();

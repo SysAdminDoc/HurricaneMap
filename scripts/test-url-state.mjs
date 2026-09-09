@@ -203,6 +203,7 @@ console.log('url state ok');
     comparisonIds: ['AL122005', 'EP012024'],
     windUnit: 'mph',
     damageMode: 'nominal',
+    trackColorBy: 'category',
     dataRevision: null,
     advisoryReplay: null,
   });
@@ -210,9 +211,46 @@ console.log('url state ok');
     comparisonIds: [],
     windUnit: 'kt',
     damageMode: 'real',
+    trackColorBy: 'category',
     dataRevision: null,
     advisoryReplay: null,
   });
+
+  // The track encoding is a qualifier, like the unit and the damage mode: it
+  // comes from stored settings and describes how the reader has the app set
+  // up, so it rides along only when the fragment is already carrying a view.
+  {
+    const bare = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+    assert.equal(
+      encodeHashState(bare, { trackColorBy: 'wind', yearMinDefault: 1851, yearMaxDefault: 2025 }),
+      '',
+      'an encoding on its own must not turn a cold load into a fragment',
+    );
+    const shaped = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+    shaped.showTracks = true;
+    const withView = encodeHashState(shaped, {
+      trackColorBy: 'pressure', yearMinDefault: 1851, yearMaxDefault: 2025,
+    });
+    assert.equal(withView, '#v=1&t=1&tc=pressure');
+    assert.equal(viewOptionsFromDecoded(decodeHashState(withView)).trackColorBy, 'pressure');
+    // Round trip every value the setting can hold, not just the one above.
+    for (const mode of ['category', 'wind', 'pressure', 'month']) {
+      const round = encodeHashState(shaped, {
+        trackColorBy: mode, yearMinDefault: 1851, yearMaxDefault: 2025,
+      });
+      assert.equal(
+        viewOptionsFromDecoded(decodeHashState(round)).trackColorBy,
+        mode,
+        `${mode} did not survive the round trip`,
+      );
+    }
+    // A value nobody publishes falls back rather than reaching a setter that
+    // would then paint tracks with an undefined ramp.
+    assert.equal(
+      viewOptionsFromDecoded(decodeHashState('#v=1&t=1&tc=rainfall')).trackColorBy,
+      'category',
+    );
+  }
   assert.equal(decodeHashState(`#v=1&x=${'a'.repeat(2050)}`), null);
 
   filters.categories = new Set(['3', '4', '5']);

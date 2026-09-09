@@ -2,7 +2,8 @@
 import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './data.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
-import { getPaletteColor, prefersReducedMotion } from './settings.js';
+import { getPaletteColor, getSetting, prefersReducedMotion } from './settings.js';
+import { DEFAULT_TRACK_COLOR_MODE, TRACK_COLOR_MODES, trackPointColor } from './track-ramps.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -274,7 +275,7 @@ export async function showTrack(stormId, opts = {}) {
   const added = [];
   for (const seg of segments) {
     const poly = L.polyline(seg.coords, {
-      color: color || categoryColor(seg.cat),
+      color: segmentColor(seg, color),
       weight: opts.weight || 2.75,
       opacity: 0.88,
       lineJoin: 'round',
@@ -308,12 +309,31 @@ function buildIntensitySegments(track) {
     const a = track[i - 1];
     const b = track[i];
     const cat = windToCategory(b.wind);
+    // The point itself rides along, not a copy of the two fields the category
+    // encoding happens to need. A segment is coloured by the reading at its
+    // far end under every encoding, and pulling the fields out here meant
+    // adding one each time an encoding was added.
     segs.push({
       coords: [[a.lat, a.lon], [b.lat, b.lon]],
       cat,
+      point: b,
     });
   }
   return segs;
+}
+
+/**
+ * What a segment is painted. `opts.color` still wins, because the comparison
+ * view pins each storm to its own slot colour and a per-point encoding would
+ * make its four tracks indistinguishable.
+ */
+export function segmentColor(seg, override) {
+  if (override) return override;
+  const mode = getSetting('trackColorBy');
+  const encoded = TRACK_COLOR_MODES.includes(mode) && mode !== DEFAULT_TRACK_COLOR_MODE
+    ? trackPointColor(mode, seg.point)
+    : null;
+  return encoded || categoryColor(seg.cat);
 }
 
 

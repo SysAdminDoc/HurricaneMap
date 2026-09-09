@@ -144,6 +144,34 @@
               }
             ]
           },
+          "Track colour",
+          {
+            "role": "paragraph",
+            "text": "Recolours storm tracks by the variable you pick, with a matching legend."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Track colour",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Category",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Wind"
+              },
+              {
+                "role": "radio",
+                "name": "Pressure"
+              },
+              {
+                "role": "radio",
+                "name": "Month"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "High-contrast mode Strengthens text, borders, and focus outlines."

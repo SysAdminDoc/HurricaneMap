@@ -9,6 +9,7 @@ const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
 const LAUNCHER_ACTIONS = new Set(['stats', 'compare']);
 const VALID_UNITS = new Set(['kt', 'mph', 'kmh']);
 const VALID_DAMAGE_MODES = new Set(['nominal', 'real']);
+const VALID_TRACK_COLORS = new Set(['category', 'wind', 'pressure', 'month']);
 const STORM_ID_PATTERN = /^(?:AL|EP)\d{6}$/;
 const ADVISORY_REPLAY_STATE_VERSION = '1';
 const ADVISORY_CONE_ERAS = new Set(Array.from({ length: 11 }, (_, index) => String(2015 + index)));
@@ -43,6 +44,7 @@ export function encodeHashState(filters, {
   advisoryReplay = null,
   windUnit = 'kt',
   damageMode = 'real',
+  trackColorBy = 'category',
   dataRevision = '',
   pinDataRevision = false,
   // A link shared with nothing but a unit applied that unit and then dropped it
@@ -63,6 +65,7 @@ export function encodeHashState(filters, {
     p: '',
     u: 'kt',
     d: 'real',
+    tc: 'category',
     rel: '',
   };
   const current = {
@@ -76,6 +79,7 @@ export function encodeHashState(filters, {
     p: normalizeComparisonIds(comparisonIds).join(','),
     u: VALID_UNITS.has(windUnit) ? windUnit : 'kt',
     d: VALID_DAMAGE_MODES.has(damageMode) ? damageMode : 'real',
+    tc: VALID_TRACK_COLORS.has(trackColorBy) ? trackColorBy : 'category',
     rel: normalizeDataRevision(dataRevision),
     replay: encodeAdvisoryReplayState(advisoryReplay, { stormId: openStormId }),
   };
@@ -86,7 +90,7 @@ export function encodeHashState(filters, {
   // fragment for a page nobody shaped, so they ride along only when other state
   // is already going into the URL, or when a caller is deliberately capturing a
   // link (a saved view, a citation) and wants them recorded.
-  const QUALIFIERS = new Set(['rel', 'u', 'd']);
+  const QUALIFIERS = new Set(['rel', 'u', 'd', 'tc']);
   const shaped = key => current[key] !== defaults[key] && (current[key] || key === 'c');
   const hasShapedState = Object.keys(current).some(key => !QUALIFIERS.has(key) && shaped(key));
   const emitQualifiers = pinDataRevision || hasShapedState || keepQualifiers;
@@ -158,13 +162,17 @@ export function decodeHashState(hash) {
 
 export function viewOptionsFromDecoded(decoded) {
   if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) {
-    return { comparisonIds: [], windUnit: null, damageMode: null, advisoryReplay: null, dataRevision: null };
+    return {
+      comparisonIds: [], windUnit: null, damageMode: null,
+      trackColorBy: null, advisoryReplay: null, dataRevision: null,
+    };
   }
   const versioned = decoded.v === URL_STATE_VERSION;
   return {
     comparisonIds: normalizeComparisonIds(String(decoded.p || '').split(',')),
     windUnit: VALID_UNITS.has(decoded.u) ? decoded.u : versioned ? 'kt' : null,
     damageMode: VALID_DAMAGE_MODES.has(decoded.d) ? decoded.d : versioned ? 'real' : null,
+    trackColorBy: VALID_TRACK_COLORS.has(decoded.tc) ? decoded.tc : versioned ? 'category' : null,
     dataRevision: normalizeDataRevision(decoded.rel) || null,
     advisoryReplay: versioned
       ? decodeAdvisoryReplayState(decoded.replay, { stormId: decoded.storm })

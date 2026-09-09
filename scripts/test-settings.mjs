@@ -6,6 +6,7 @@ const settings = normalizeSettings({
   windUnit: 'mph',
   theme: '<script>',
   palette: 'colorblind',
+  trackColorBy: 'rainfall',
   damageMode: 'invalid',
   nhcForecastCone: false,
   nhcOutlook: false,
@@ -22,6 +23,9 @@ const settings = normalizeSettings({
 assert.equal(settings.windUnit, 'mph');
 assert.equal(settings.theme, 'dark');
 assert.equal(settings.palette, 'colorblind');
+// An encoding nobody publishes must fall back, not reach the map as undefined.
+assert.equal(settings.trackColorBy, 'category');
+assert.equal(normalizeSettings({ trackColorBy: 'month' }).trackColorBy, 'month');
 assert.equal(settings.damageMode, 'real');
 assert.equal(settings.nhcForecastCone, false);
 assert.equal(settings.nhcOutlook, false);
@@ -43,6 +47,7 @@ const EXPECTED_DEFAULTS = {
   windUnit: 'kt',
   theme: 'dark',
   palette: 'default',
+  trackColorBy: 'category',
   damageMode: 'real',
   nhcForecastCone: true,
   nhcOutlook: true,

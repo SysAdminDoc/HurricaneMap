@@ -17,6 +17,7 @@ const DEFAULTS = {
   windUnit: 'kt',          // 'kt' | 'mph' | 'kmh'
   theme: 'dark',           // 'dark' | 'light' | 'system'
   palette: 'default',      // 'default' (Catppuccin) | 'colorblind' (ColorBrewer YlOrRd)
+  trackColorBy: 'category', // What a track segment's colour encodes
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   nhcForecastCone: true,   // Show official NHC forecast cone/track for active storms
   nhcOutlook: true,        // Show NHC Graphical Tropical Weather Outlook disturbance points
@@ -33,6 +34,7 @@ const VALID_VALUES = {
   windUnit: new Set(['kt', 'mph', 'kmh']),
   theme: new Set(['dark', 'light', 'system']),
   palette: new Set(['default', 'colorblind']),
+  trackColorBy: new Set(['category', 'wind', 'pressure', 'month']),
   damageMode: new Set(['nominal', 'real']),
   locale: new Set(['en', 'es', 'ht']),
   marineHorizon: new Set(['00to24', '24to48']),

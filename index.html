@@ -77,6 +77,7 @@
   <link rel="modulepreload" href="src/perf.js" />
   <link rel="modulepreload" href="src/sw-updates.js" />
   <link rel="modulepreload" href="src/html-utils.js" />
+  <link rel="modulepreload" href="src/track-ramps.js" />
   <link rel="modulepreload" href="src/url-state.js" />
   <link rel="modulepreload" href="src/citation-ui.js" />
   <link rel="modulepreload" href="src/filter-state.js" />
@@ -259,6 +260,18 @@
           </div>
         </div>
         <div class="settings-row">
+          <div class="settings-label-stack">
+            <div class="settings-label" data-i18n="settings.trackColorGroup">Track colour</div>
+            <p class="settings-help" data-i18n="settings.trackColorHelp">Recolours storm tracks by the variable you pick, with a matching legend.</p>
+          </div>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Track colour" data-i18n-aria-label="settings.trackColorGroup">
+            <button class="settings-pill" data-set-track-color="category" role="radio" data-i18n="settings.trackColorCategory">Category</button>
+            <button class="settings-pill" data-set-track-color="wind" role="radio" data-i18n="settings.trackColorWind">Wind</button>
+            <button class="settings-pill" data-set-track-color="pressure" role="radio" data-i18n="settings.trackColorPressure">Pressure</button>
+            <button class="settings-pill" data-set-track-color="month" role="radio" data-i18n="settings.trackColorMonth">Month</button>
+          </div>
+        </div>
+        <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-high-contrast" />
             <span class="settings-toggle-copy"><span data-i18n="settings.highContrast">High-contrast mode</span><small data-i18n="settings.highContrastHelp">Strengthens text, borders, and focus outlines.</small></span>
@@ -429,6 +442,10 @@
         <li><span class="dot cat-4 dot-dotted" title="Dotted border = Cat 3-4 major" data-i18n-title="filters.legend34Border"></span><span>4 · 113-136 kt</span></li>
         <li><span class="dot cat-5 dot-mixed" title="Mixed dash = Cat 5" data-i18n-title="filters.legend5Border"></span><span>5 · 137+ kt</span></li>
       </ul>
+    </div>
+    <div class="filter-legend track-color-legend" id="track-color-legend" hidden>
+      <h2 class="legend-heading" id="track-color-legend-title"></h2>
+      <ul class="filter-legend-list" id="track-color-legend-list"></ul>
     </div>
   </aside>
 

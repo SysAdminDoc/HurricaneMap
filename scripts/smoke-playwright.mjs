@@ -3445,7 +3445,7 @@ async function assertSettingsSurface(page, label) {
   assert(layout.storageScopes === 5, `${label}: expected five storage scopes`);
   assert(layout.storageClearActions === 3, `${label}: only optional storage scopes should be clearable`);
   assert(layout.sourceBundleActions === 1, `${label}: source bundle must be user-initiated`);
-  assert(layout.radioGroups.length === 6, `${label}: expected six settings radio groups`);
+  assert(layout.radioGroups.length === 7, `${label}: expected seven settings radio groups`);
   assert(layout.radioGroups.every(group => group.checked === 1 && group.tabbable === 1), `${label}: settings radios do not use one checked/tabbable item per group`);
   const cramped = layout.focusables.filter(item => item.height < 34);
   assert(!cramped.length, `${label}: settings controls are too small: ${cramped.map(item => `${item.text}:${item.height}`).join(', ')}`);
@@ -5068,6 +5068,87 @@ try {
   assert(operationalLayers.grayX === 'rgb(147, 153, 178)', `near-zero outlook X was not gray: ${operationalLayers.grayX}`);
   assert(operationalLayers.marineResult.status === 'rendered' && operationalLayers.marineResult.polygonCount === 2, `marine warning overlay did not render: ${JSON.stringify(operationalLayers)}`);
   assert(operationalLayers.marinePaths >= 2 && /High/.test(operationalLayers.marineLegend), `marine warning rendering incomplete: ${JSON.stringify(operationalLayers)}`);
+
+  // Track recolouring. Driven through setSetting so the whole path is under
+  // test: the stored setting, the redraw that clears lastTracksKey, the colour
+  // Leaflet actually paints on the polyline, and the legend that says what it
+  // means. Reading the ramp module directly would have proved only that the
+  // ramp exists.
+  const trackColors = await page.evaluate(async () => {
+    const { setSetting } = await import('/src/settings.js');
+    const { showTrack, clearTracks } = await import('/src/map.js');
+    const { WIND_RAMP, MONTH_RAMP, NO_DATA_COLOR } = await import('/src/track-ramps.js');
+
+    const read = async (mode) => {
+      setSetting('trackColorBy', mode);
+      clearTracks();
+      // Katrina: a 2005 storm with wind and pressure throughout, so every
+      // encoding has something to say about it.
+      await showTrack('AL122005', { focus: true });
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      const strokes = [...document.querySelectorAll('#map path.track-line')]
+        .map(node => (node.getAttribute('stroke') || '').toLowerCase())
+        .filter(Boolean);
+      const legend = document.querySelector('#track-color-legend');
+      return {
+        mode,
+        strokes,
+        unique: [...new Set(strokes)].sort(),
+        legendHidden: legend ? legend.hidden : null,
+        legendTitle: document.querySelector('#track-color-legend-title')?.textContent || '',
+        legendRows: document.querySelectorAll('#track-color-legend-list li').length,
+        legendSwatches: [...document.querySelectorAll('#track-color-legend-list .track-color-swatch')]
+          .map(node => node.style.background),
+      };
+    };
+
+    const out = {};
+    for (const mode of ['category', 'wind', 'pressure', 'month']) out[mode] = await read(mode);
+    out.ramps = { wind: [...WIND_RAMP], month: [...MONTH_RAMP], noData: NO_DATA_COLOR };
+    setSetting('trackColorBy', 'category');
+    clearTracks();
+    return out;
+  });
+
+  for (const mode of ['category', 'wind', 'pressure', 'month']) {
+    assert(
+      trackColors[mode].strokes.length > 0,
+      `${mode} drew no track segments, so nothing about its colours was measured`,
+    );
+  }
+  // The whole point: switching the encoding has to change what is painted.
+  assert(
+    trackColors.category.unique.join() !== trackColors.wind.unique.join(),
+    `colouring by wind painted the same strokes as category: ${trackColors.wind.unique.join(' ')}`,
+  );
+  assert(
+    trackColors.wind.unique.join() !== trackColors.month.unique.join(),
+    `colouring by month painted the same strokes as wind: ${trackColors.month.unique.join(' ')}`,
+  );
+  // And every stroke has to come from the ramp that encoding owns, not from a
+  // stale palette left over from the previous redraw.
+  const windPalette = new Set([...trackColors.ramps.wind, trackColors.ramps.noData].map(value => value.toLowerCase()));
+  const strayWind = trackColors.wind.strokes.filter(stroke => !windPalette.has(stroke));
+  assert(!strayWind.length, `wind mode painted colours outside its ramp: ${[...new Set(strayWind)].join(' ')}`);
+  const monthPalette = new Set([...trackColors.ramps.month, trackColors.ramps.noData].map(value => value.toLowerCase()));
+  const strayMonth = trackColors.month.strokes.filter(stroke => !monthPalette.has(stroke));
+  assert(!strayMonth.length, `month mode painted colours outside its ramp: ${[...new Set(strayMonth)].join(' ')}`);
+
+  // The legend follows, and says which variable it is showing.
+  assert(
+    trackColors.category.legendHidden === true && trackColors.category.legendRows === 0,
+    'the category encoding must not add a second legend beside the Saffir-Simpson one',
+  );
+  for (const mode of ['wind', 'pressure', 'month']) {
+    const seen = trackColors[mode];
+    assert(seen.legendHidden === false, `${mode} left its legend hidden`);
+    assert(seen.legendRows === seen.legendSwatches.length && seen.legendRows > 1, `${mode} legend rendered ${seen.legendRows} rows`);
+    assert(seen.legendTitle.trim().length > 0, `${mode} legend has no heading`);
+  }
+  assert(
+    new Set(['wind', 'pressure', 'month'].map(mode => trackColors[mode].legendTitle)).size === 3,
+    'two encodings share a legend heading, so the legend does not say which one is showing',
+  );
 
   // The marine layer draws one of NHC's two forecast bands, and the band is
   // stated nowhere in the KML: both files call themselves GMWW24Hr.kml, and

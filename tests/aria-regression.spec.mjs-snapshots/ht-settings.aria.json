@@ -144,6 +144,34 @@
               }
             ]
           },
+          "Koulè tras la",
+          {
+            "role": "paragraph",
+            "text": "Chanje koulè tras yo daprè varyab ou chwazi a, ak yon lejand ki matche."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Koulè tras la",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Kategori",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Van"
+              },
+              {
+                "role": "radio",
+                "name": "Presyon"
+              },
+              {
+                "role": "radio",
+                "name": "Mwa"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "Gwo kontrast Fè tèks, bòdi, ak konsantrasyon pi fò."

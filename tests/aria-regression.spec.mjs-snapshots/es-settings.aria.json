@@ -144,6 +144,34 @@
               }
             ]
           },
+          "Color de la trayectoria",
+          {
+            "role": "paragraph",
+            "text": "Recolorea las trayectorias segun la variable que elijas, con su leyenda."
+          },
+          {
+            "role": "radiogroup",
+            "name": "Color de la trayectoria",
+            "children": [
+              {
+                "role": "radio",
+                "name": "Categoría",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "Viento"
+              },
+              {
+                "role": "radio",
+                "name": "Presión"
+              },
+              {
+                "role": "radio",
+                "name": "Mes"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "Modo de alto contraste Refuerza texto, bordes y enfoques."

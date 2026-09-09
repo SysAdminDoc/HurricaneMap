@@ -385,6 +385,12 @@ label > input[type="checkbox"] {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
+/* The ramp swatch takes its colour inline from src/track-ramps.js, because the
+   ramp is generated there and duplicating twenty hexes into CSS would give the
+   contrast gate two sources to disagree about. The dot's own shadow ring is
+   what separates a dark stop from a dark panel. */
+.track-color-swatch { box-shadow: 0 0 0 1px rgba(205, 214, 244, 0.45); }
+
 .dot.cat-ts { background: var(--cat-ts); }
 
 .dot.cat-1  { background: var(--cat-1); }
