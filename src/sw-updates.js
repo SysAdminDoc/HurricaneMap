@@ -3,6 +3,24 @@ import { t } from './i18n.js';
 const UPDATE_PROMPT_ID = 'hm-update-prompt';
 // Module first: it is what the file is authored as and what every current
 // engine takes. Classic is the fallback for the engines that refuse it.
+//
+// Retirement, written down 2026-09-09 and not performed. This whole path exists
+// for the Firefox ESR 140 line, which predates the Firefox 147 that brought
+// module service workers to Baseline; the replacement line, ESR 153, is past
+// it, and product-details.mozilla.org listed both as shipping on that date.
+// Keeping it costs an extra full offline run on every `npm test`, because
+// test:offline-smoke:classic replays the suite with module registration
+// refused.
+//
+// The removal is one reviewable change: drop 'classic' below, drop the
+// workerType diagnostic that reports which registration took, drop
+// test:offline-smoke:classic and its gate entry, and release sw.js from the
+// constraint that it carry no import or import.meta. Do not do it before the
+// pinned-enterprise tail has rolled: an install that stopped updating does not
+// stop existing when upstream stops shipping for it. Revisit no earlier than
+// 2027-01-01. scripts/baseline-contract.mjs carries the same plan in a form the
+// gate can check, and check:baseline fails if this file and that record ever
+// disagree about whether the fallback is still here.
 export const WORKER_TYPES = Object.freeze(['module', 'classic']);
 const TOAST_HOST_ID = 'hm-toast-host';
 let lastRegistrationOptions = null;

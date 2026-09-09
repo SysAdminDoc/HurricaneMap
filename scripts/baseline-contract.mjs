@@ -111,6 +111,43 @@ export const BASELINE_FEATURES = Object.freeze([
 ]);
 
 /**
+ * Fallbacks kept for one browser line, and the terms on which they go.
+ *
+ * A fallback with no stated end is a fallback nobody ever removes. Each entry
+ * names the line it exists for, what it costs to keep, what removing it would
+ * delete, and the earliest date that removal should be considered. Nothing here
+ * removes anything on a date: `retained` is a decision a person makes, and the
+ * check refuses to let the code and this record disagree about it.
+ */
+export const RETIREMENT_PLANS = Object.freeze([
+  Object.freeze({
+    id: 'classic-service-worker',
+    feature: 'js-modules-service-workers',
+    retained: true,
+    // Read from product-details.mozilla.org on 2026-09-09: FIREFOX_ESR is
+    // 140.15.0esr and FIREFOX_ESR_NEXT is 153.2.0esr, so the two lines overlap
+    // right now and the older one is still what a pinned enterprise install
+    // gets. Module service workers reached Baseline with Firefox 147, so 140
+    // needs the classic path and 153 does not.
+    servesEsrLine: '140',
+    replacementEsrLine: '153',
+    checkedOn: '2026-09-09',
+    // Not a trigger. The item that asked for this plan set the date, and the
+    // reason is the pinned-enterprise tail rather than the end-of-life date
+    // itself: an install that stopped updating does not stop existing when
+    // upstream stops shipping it.
+    revisitNoEarlierThan: '2027-01-01',
+    costs: 'test:offline-smoke:classic runs the entire offline suite a second time with module registration refused',
+    removes: [
+      "the 'classic' entry in WORKER_TYPES in src/sw-updates.js, leaving a single registration attempt",
+      'the workerType diagnostic that reports which registration actually took',
+      'the test:offline-smoke:classic script in package.json and its gate entry',
+      "the constraint that sw.js stay free of import and import.meta, which is what keeps it a valid classic script",
+    ],
+  }),
+]);
+
+/**
  * The date the app's floor sits at: the latest date among the features it
  * cannot run without. Stating a date earlier than this would understate what
  * the app needs.

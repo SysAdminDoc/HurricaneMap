@@ -14,7 +14,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { BASELINE_FEATURES, contractFloor, readmeClaim } from './baseline-contract.mjs';
+import { BASELINE_FEATURES,
+  RETIREMENT_PLANS, contractFloor, readmeClaim } from './baseline-contract.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const failures = [];
@@ -113,6 +114,40 @@ if (versionMention) {
   );
 }
 
+// A retirement plan that does not match the code is worse than none: it says a
+// fallback is still carried when it has gone, or that it has gone when it is
+// still being paid for on every test run.
+const swUpdates = await readFile(new URL('../src/sw-updates.js', import.meta.url), 'utf8');
+const packageJson = await readFile(new URL('../package.json', import.meta.url), 'utf8');
+for (const plan of RETIREMENT_PLANS) {
+  if (!BASELINE_FEATURES.some(feature => feature.id === plan.feature)) {
+    fail(`retirement plan ${plan.id} names a feature the contract does not carry: ${plan.feature}`);
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(plan.revisitNoEarlierThan) || !/^\d{4}-\d{2}-\d{2}$/.test(plan.checkedOn)) {
+    fail(`retirement plan ${plan.id} must carry absolute dates`);
+  }
+  if (!plan.removes.length) fail(`retirement plan ${plan.id} does not say what removing it would delete`);
+  if (plan.id !== 'classic-service-worker') continue;
+  const carriesClassic = /WORKER_TYPES = Object\.freeze\(\['module', 'classic'\]\)/.test(swUpdates);
+  const carriesClassicSuite = packageJson.includes('"test:offline-smoke:classic"');
+  if (plan.retained !== carriesClassic) {
+    fail(
+      `retirement plan ${plan.id} says retained:${plan.retained} but src/sw-updates.js `
+      + `${carriesClassic ? 'still registers' : 'no longer registers'} a classic worker`,
+    );
+  }
+  if (plan.retained !== carriesClassicSuite) {
+    fail(
+      `retirement plan ${plan.id} says retained:${plan.retained} but package.json `
+      + `${carriesClassicSuite ? 'still runs' : 'no longer runs'} test:offline-smoke:classic`,
+    );
+  }
+  const claim = `classic service worker for the Firefox ESR ${plan.servesEsrLine} line`;
+  if (!readme.includes(claim)) {
+    fail(`README.md does not say who the classic fallback is for; it must contain "${claim}"`);
+  }
+}
+
 if (failures.length) {
   for (const message of failures) console.error(`  - ${message}`);
   console.error(`baseline contract FAILED (${failures.length} problem${failures.length === 1 ? '' : 's'})`);
@@ -122,5 +157,6 @@ if (failures.length) {
 const required = BASELINE_FEATURES.filter(feature => feature.requirement === 'required').length;
 console.log(
   `baseline contract ok (${BASELINE_FEATURES.length} features, ${required} with no fallback, `
-  + `floor ${floor}, README states every date and no version number)`,
+  + `floor ${floor}, ${RETIREMENT_PLANS.length} retirement plan${RETIREMENT_PLANS.length === 1 ? '' : 's'}, `
+  + `README states every date and no version number)`,
 );
