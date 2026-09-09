@@ -27,8 +27,8 @@ import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-sur
 import { getSetting } from './settings.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
-import { clearTropicalOutlook, renderTropicalOutlook } from './outlook.js';
-import { clearMarineWarnings, renderMarineWarnings } from './marine-warnings.js';
+import { renderTropicalOutlook } from './outlook.js';
+import { renderMarineWarnings } from './marine-warnings.js';
 import {
   beginOptionalFeed,
   completeOptionalFeed,

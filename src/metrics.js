@@ -2,7 +2,7 @@ import {
   getFatalityCount,
   getNominalDamageUsd,
 } from './impact-utils.js';
-import { windToCategory, categoryLabel } from './data.js';
+import { windToCategory } from './data.js';
 import { csvEscape } from './csv.js';
 import { presentNumber, MISSING_METRIC } from './metric-presenters.js';
 import { buildCitation, citationCommentLines } from './citation.js';

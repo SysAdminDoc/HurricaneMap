@@ -3,7 +3,7 @@
 // modeled SLOSH MOM overlay. Preprocessed by scripts/build_hwm.py into
 // data/surge-obs/<STORMID>.json ([[lat, lon, elev_ft, env], ...]).
 import { getMap } from './map.js';
-import { t, tHtml } from './i18n.js';
+import { tHtml } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { disposeMapLayer, registerMapLayer } from './layer-registry.js';
 import {

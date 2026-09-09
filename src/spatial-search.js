@@ -1,5 +1,5 @@
 import { ensureStormsLoaded, getStorm, getLandfalls, categoryLabel, categoryStrength } from './data.js';
-import { bearingDeg, closestApproach, compassLabel, kmToMi } from './metrics.js';
+import { bearingDeg, closestApproach, compassLabel } from './metrics.js';
 import { getMap } from './map.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { showPanel, hidePanel } from './panels.js';

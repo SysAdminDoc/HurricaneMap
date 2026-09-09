@@ -14,7 +14,7 @@ import { hidePanel, minimizePanel, restorePanel, showPanel } from './panels.js';
 import {
   computeACE, findRapidIntensification, closestApproach,
   COASTAL_CITIES, formatNumber,
-  findPressureFall, computeTranslationStats, kmhToMph, daysAtIntensity,
+  findPressureFall, computeTranslationStats, kmhToMph,
   findSimilarStorms, computeRIRiskScore, generateStormBiography,
 } from './metrics.js';
 import { formatWind, getSetting } from './settings.js';
@@ -42,7 +42,7 @@ import { clearAdvisoryReplay } from './advisory-replay.js';
 import { clearRiskTrajectories } from './art-mode.js';
 import { presentPressure, MISSING_METRIC } from './metric-presenters.js';
 import { renderForecastSkill } from './forecast-skill.js';
-import { formatClosest, showToast, wirePanelControls } from './panel-controls.js';
+import { formatClosest, wirePanelControls } from './panel-controls.js';
 import { renderDaysAtIntensity, renderSimilarStorms } from './panel-analysis.js';
 import { renderTrackTimeline } from './table-view.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';

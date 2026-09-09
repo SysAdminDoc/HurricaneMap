@@ -1,6 +1,6 @@
 // Statistics panel: state hot/cold spots, decade trends, category mix.
 import { t } from './i18n.js';
-import { getStats, getLandfalls, getAllStorms, getImpactsFor, ensureStormsLoaded } from './data.js';
+import { getStats, getAllStorms, getImpactsFor, ensureStormsLoaded } from './data.js';
 import { hidePanel, showPanel } from './panels.js';
 import { renderClimatologyChart } from './climatology.js';
 import { renderDecadeTrends } from './decade-trends.js';

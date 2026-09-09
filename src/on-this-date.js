@@ -1,7 +1,7 @@
 // "On this date in history" sidebar — show storms that made US landfalls
 // within ±7 days of today's calendar date across the entire historical record.
 
-import { ensureStormsLoaded, getLandfalls, formatTime, categoryLabel, categoryClass, ktToMph } from './data.js';
+import { ensureStormsLoaded, getLandfalls, formatTime, categoryLabel, categoryClass } from './data.js';
 import { showStorm } from './panel.js';
 import { hidePanel, showPanel } from './panels.js';
 import { formatWind } from './settings.js';
