@@ -203,6 +203,12 @@ try {
     pageErrors.push(error.message);
   });
 
+  // The globe panel is hidden at load, and a hidden iframe still fetches its
+  // src unless it is lazy. Every request is recorded so a cold load can be
+  // shown to pay nothing for a globe nobody opened.
+  const requested = [];
+  page.on('request', request => requested.push(new URL(request.url()).pathname));
+
   await page.goto(`${baseUrl}/#storm=AL122005`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => {
     const loading = document.querySelector('#loading');
@@ -211,12 +217,27 @@ try {
   }, null, { timeout: 20000 });
   await page.waitForFunction(() => !document.querySelector('#storm-panel')?.hidden, null, { timeout: 10000 });
 
+  // Settled: the app has finished booting and nothing else is in flight.
+  const beforeOpening = requested.filter(pathname => /\/globe(\.html|-host\.(js|css))$/.test(pathname));
+  assert(
+    beforeOpening.length === 0,
+    `a cold load fetched the globe shell nobody asked for: ${JSON.stringify(beforeOpening)}`,
+  );
+
   await page.click('#toggle-globe3d');
   await page.waitForSelector('#globe3d-panel:not([hidden])', { timeout: 5000 });
   assert(await page.evaluate(() => document.activeElement?.id === 'close-globe3d'), '3D globe dialog did not focus its close button');
   const globeFrame = page.frameLocator('#globe3d-frame');
   await globeFrame.locator('#globe-host canvas').waitFor({ timeout: 90000 });
   await page.waitForFunction(() => document.querySelector('#globe3d-panel')?.dataset.ready === 'true', null, { timeout: 90000 });
+
+  // And opening it does fetch the shell, so the deferral is a deferral rather
+  // than a load that never happens.
+  const afterOpening = requested.filter(pathname => pathname.endsWith('/globe.html'));
+  assert(
+    afterOpening.length > 0,
+    'opening the globe never fetched globe.html, so the panel is being served from somewhere else',
+  );
 
   const isolation = await page.evaluate(() => ({
     csp: document.querySelector('meta[http-equiv="Content-Security-Policy"]')?.content || '',

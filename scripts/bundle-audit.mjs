@@ -25,6 +25,19 @@ function normalizeAssetPath(value) {
   return value.replace(/^\.\//, '');
 }
 
+// The globe panel is hidden at load, but a hidden iframe still fetches its src
+// unless it is lazy. Measured rather than asserted away: what a cold load no
+// longer pays for is a number worth printing beside the bundle sizes, and it is
+// the whole point of the attribute.
+const iframeTags = [...indexHtml.matchAll(/<iframe\b[^>]*>/gi)].map(match => match[0]);
+const eagerIframes = iframeTags.filter(tag => attribute(tag, 'loading').toLowerCase() !== 'lazy');
+if (eagerIframes.length) {
+  console.error(`Iframes fetch their src on a cold load: ${eagerIframes.map(tag => attribute(tag, 'id') || attribute(tag, 'src')).join(', ')}`);
+  console.error('Add loading="lazy" so a panel nobody opens costs nothing.');
+  process.exit(1);
+}
+const lazyFrameBytes = await lazyIframePayload(iframeTags);
+
 const modulePreloadTags = linkTags.filter(tag => attribute(tag, 'rel').toLowerCase() === 'modulepreload');
 const modulePreloadHrefs = new Set(modulePreloadTags.map(tag => normalizeAssetPath(attribute(tag, 'href'))));
 const bootImportPaths = [...mainSource.matchAll(/\bfrom\s+['"](\.\/[^'"]+\.js)['"]/g)]
@@ -159,7 +172,40 @@ if (initialGzip > INITIAL_GZIP_BUDGET) {
 const largestLazy = lazyChunks.slice(0, 5)
   .map(chunk => `${path.basename(chunk.file)} ${formatBytes(chunk.raw)} raw`)
   .join(', ');
-console.log(`bundle audit ok (initial ${formatBytes(initialGzip)} gzip across ${initialFiles.size} file${initialFiles.size === 1 ? '' : 's'}; ${lazyChunks.length} lazy chunks${largestLazy ? `; largest: ${largestLazy}` : ''}; first-paint waterfall depth ${firstPaintWaterfallDepth}/${FIRST_PAINT_WATERFALL_DEPTH_BUDGET}; boot data ${formatBytes(bootDataGzip)}/${formatBytes(BOOT_DATA_GZIP_BUDGET)} gzip across ${bootDatasets.length}, ${formatBytes(deferredDataGzip)} deferred across ${deferredDatasets.length})`);
+console.log(`bundle audit ok (initial ${formatBytes(initialGzip)} gzip across ${initialFiles.size} file${initialFiles.size === 1 ? '' : 's'}; ${lazyChunks.length} lazy chunks${largestLazy ? `; largest: ${largestLazy}` : ''}; first-paint waterfall depth ${firstPaintWaterfallDepth}/${FIRST_PAINT_WATERFALL_DEPTH_BUDGET}; boot data ${formatBytes(bootDataGzip)}/${formatBytes(BOOT_DATA_GZIP_BUDGET)} gzip across ${bootDatasets.length}, ${formatBytes(deferredDataGzip)} deferred across ${deferredDatasets.length}; ${formatBytes(lazyFrameBytes.bytes)} across ${lazyFrameBytes.files} files deferred by lazy iframes)`);
+
+// The document a lazy iframe points at, plus the stylesheets and scripts that
+// document loads itself. Cesium is not counted: globe-host.js already defers it
+// behind loadCesium(), so it was never part of a cold load.
+async function lazyIframePayload(tags) {
+  let total = 0;
+  const counted = new Set();
+  const add = async relative => {
+    const clean = normalizeAssetPath(relative.split('?')[0].split('#')[0]);
+    if (!clean || /^https?:/i.test(clean) || counted.has(clean)) return null;
+    counted.add(clean);
+    try {
+      const body = await readFile(path.join(root, clean), 'utf8');
+      total += Buffer.byteLength(body, 'utf8');
+      return body;
+    } catch {
+      return null;
+    }
+  };
+  for (const tag of tags) {
+    const src = attribute(tag, 'src');
+    if (!src) continue;
+    const document = await add(src);
+    if (!document) continue;
+    for (const link of document.matchAll(/<link\b[^>]*>/gi)) {
+      if (attribute(link[0], 'rel').toLowerCase() === 'stylesheet') await add(attribute(link[0], 'href'));
+    }
+    for (const script of document.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi)) {
+      await add(script[1]);
+    }
+  }
+  return { bytes: total, files: counted.size };
+}
 
 function collectStaticImports(entryFile, outputs, seen = new Set()) {
   if (seen.has(entryFile)) return seen;

@@ -27,6 +27,7 @@ const WIND_CONE_QUADRANTS = [
 
 let currentDataset = null;
 let releaseGlobeFocus = null;
+let frameLoads = 0;
 let hostReady = false;
 let resolveHostReady = null;
 let hostReadyPromise = new Promise(resolve => { resolveHostReady = resolve; });
@@ -64,6 +65,15 @@ export function initGlobe3D() {
   });
   window.addEventListener('message', onHostMessage);
   els.frame?.addEventListener('load', () => {
+    frameLoads += 1;
+    // Nothing navigates this frame, so its first load is its only load, and the
+    // host announces itself from a deferred script that runs before the load
+    // event fires. Resetting on that first load threw away a handshake that had
+    // already completed and left the panel waiting for a READY that would never
+    // come again. It never showed while the iframe loaded eagerly at page boot,
+    // because that happened long before this listener existed; loading="lazy"
+    // moved the load to the moment the panel opens, which is after it.
+    if (frameLoads === 1) return;
     hostReady = false;
     hostReadyPromise = new Promise(resolve => { resolveHostReady = resolve; });
   });

@@ -160,7 +160,7 @@ export function findConnectorDashes(text, { code = false } = {}) {
       const strings = [];
       subject = subject.replace(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g, match => {
         strings.push(match);
-        return ` ${strings.length - 1} `;
+        return `\uE000${strings.length - 1}\uE000`;
       });
       subject = subject.replace(/\/\*[\s\S]*?\*\//g, '');
       if (/\/\*/.test(subject)) {
@@ -168,7 +168,7 @@ export function findConnectorDashes(text, { code = false } = {}) {
         subject = subject.slice(0, subject.indexOf('/*'));
       }
       subject = subject.replace(/\/\/.*$/, '');
-      subject = subject.replace(/ (\d+) /g, (_, index) => strings[Number(index)]);
+      subject = subject.replace(/\uE000(\d+)\uE000/g, (_, index) => strings[Number(index)]);
     }
     if (CONNECTOR.test(subject)) hits.push({ line: index + 1, text: line.trim() });
   });
