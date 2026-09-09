@@ -24,6 +24,7 @@ import { COASTAL_CITIES } from '../src/metrics.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const SITE = 'https://sysadmindoc.github.io/HurricaneMap/';
 const OUT_DIR = path.join(root, 'storms');
+const INDEX_DIRS = ['seasons', 'decades', 'states'].map(name => path.join(root, name));
 
 const STATUS_LABELS = new Map([
   ['HU', 'Hurricane'],
@@ -177,7 +178,9 @@ th{font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;color:var(--mu
 pre{overflow-x:auto;background:rgba(127,127,127,.12);border:1px solid var(--line);border-radius:.5rem;padding:.75rem;font-size:.8rem;white-space:pre-wrap;word-break:break-word}
 footer{max-width:64rem;margin:2.5rem auto 0;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
 ul.storm-index{columns:3 14rem;list-style:none;padding:0}
-ul.storm-index li{break-inside:avoid;padding:.1rem 0}`;
+ul.storm-index li{break-inside:avoid;padding:.1rem 0}
+nav.index-links{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin:1.5rem 0 0;padding-top:.75rem;border-top:1px solid var(--line)}
+.index-note{color:var(--muted);font-size:.85em}`;
 
 function renderStormPage(storm, landfalls, context) {
   const { revisionDate, accessDate, appVersion } = context;
@@ -280,6 +283,13 @@ ${trackTable(storm)}
   <p>RIS</p>
   <pre>${escapeHtml(citation.ris)}</pre>
 
+  <nav class="index-links" aria-label="This storm belongs to">
+    <a href="../../seasons/${escapeHtml(seasonSlug(storm.year))}/">${escapeHtml(storm.year)} season</a>
+    <a href="../../decades/${escapeHtml(decadeSlug(storm.year))}/">The ${escapeHtml(decadeSlug(storm.year))}</a>
+${[...new Set(landfalls.map(row => row.state).filter(Boolean))].sort()
+  .map(state => `    <a href="../../states/${escapeHtml(stateSlug(state))}/">${escapeHtml(state)}</a>`).join('\n')}
+  </nav>
+
   <p><a href="../../#v=1&amp;storm=${escapeHtml(storm.id)}">Open ${escapeHtml(displayName(storm))} on the interactive map</a></p>
 </main>
 <footer>
@@ -315,6 +325,12 @@ function renderIndexPage(entries, context) {
 <main>
   <h1>All storms</h1>
   <p>${escapeHtml(description)}</p>
+  <nav class="index-links" aria-label="Other ways in">
+    <a href="../seasons/">By season</a>
+    <a href="../decades/">By decade</a>
+    <a href="../states/">By state</a>
+    <a href="../cities/">By city</a>
+  </nav>
   <ul class="storm-index">
 ${items}
   </ul>
@@ -325,11 +341,17 @@ ${items}
 `;
 }
 
-function renderSitemap(entries, revisionDate) {
+function renderSitemap(entries, revisionDate, indexes) {
   const urls = [
     { loc: SITE, changefreq: 'monthly', priority: '1.0' },
     { loc: `${SITE}storms/`, changefreq: 'monthly', priority: '0.7' },
     { loc: `${SITE}cities/`, changefreq: 'monthly', priority: '0.7' },
+    { loc: `${SITE}seasons/`, changefreq: 'monthly', priority: '0.7' },
+    { loc: `${SITE}decades/`, changefreq: 'monthly', priority: '0.7' },
+    { loc: `${SITE}states/`, changefreq: 'monthly', priority: '0.7' },
+    ...indexes.years.map(year => ({ loc: `${SITE}seasons/${seasonSlug(year)}/`, changefreq: 'yearly', priority: '0.6' })),
+    ...indexes.decades.map(decade => ({ loc: `${SITE}decades/${decade}/`, changefreq: 'yearly', priority: '0.6' })),
+    ...indexes.states.map(state => ({ loc: `${SITE}states/${stateSlug(state)}/`, changefreq: 'yearly', priority: '0.6' })),
     { loc: `${SITE}data/stac/catalog.json`, changefreq: 'yearly', priority: '0.5' },
     // Derived from COASTAL_CITIES rather than from a build result, so the
     // sitemap does not depend on the order the two page builders run in.
@@ -347,6 +369,238 @@ function renderSitemap(entries, revisionDate) {
 ${body}
 </urlset>
 `;
+}
+
+// ---------------------------------------------------------------- index pages
+//
+// storms/index.html was the only index, so there was no page to rank for
+// "hurricanes in 1935" or "hurricanes that hit Louisiana", and no crawl path
+// from a year or a state down to the storms in it. A season, a decade and a
+// state are the three ways people actually ask, so each gets a page, each links
+// to the storms it contains, and each storm links back to all three.
+
+export function seasonSlug(year) {
+  return String(year);
+}
+
+export function decadeSlug(year) {
+  return `${Math.floor(Number(year) / 10) * 10}s`;
+}
+
+export function stateSlug(state) {
+  return String(state || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function stormList(rows, depth) {
+  // A listing of listings carries no storms of its own.
+  if (!rows.length) return '';
+  const up = '../'.repeat(depth);
+  const items = rows.map(row => `    <li><a href="${up}storms/${escapeHtml(row.slug)}/">${escapeHtml(row.title)}</a>${
+    row.note ? ` <span class="index-note">${escapeHtml(row.note)}</span>` : ''
+  }</li>`).join('\n');
+  return `  <ul class="storm-index">\n${items}\n  </ul>`;
+}
+
+function indexJsonLd({ url, title, summary, rows, revisionDate, depth }) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        name: title,
+        description: summary,
+        url,
+        datePublished: revisionDate,
+        isPartOf: { '@type': 'WebSite', name: 'HurricaneMap', url: SITE },
+        mainEntity: {
+          '@type': 'ItemList',
+          numberOfItems: rows.length,
+          itemListElement: rows.map((row, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: row.title,
+            url: `${SITE}storms/${row.slug}/`,
+          })),
+        },
+      },
+    ],
+  };
+}
+
+function renderCollectionPage({ url, title, summary, intro, rows, links, revisionDate, appVersion, depth }) {
+  const up = '../'.repeat(depth);
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${escapeHtml(title)} | HurricaneMap</title>
+<meta name="description" content="${escapeHtml(summary)}">
+<link rel="canonical" href="${escapeHtml(url)}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(summary)}">
+<meta property="og:url" content="${escapeHtml(url)}">
+<script type="application/ld+json">${escapeJsonLd(indexJsonLd({ url, title, summary, rows, revisionDate, depth }))}</script>
+<style>${PAGE_CSS}</style>
+</head>
+<body>
+<header><a href="${up}">HurricaneMap</a> <span aria-hidden="true">·</span> <a href="${up}storms/">All storms</a> <span aria-hidden="true">·</span> <a href="${up}cities/">By city</a></header>
+<main>
+  <h1>${escapeHtml(title)}</h1>
+  <p>${escapeHtml(intro)}</p>
+${stormList(rows, depth)}
+${links.length ? `  <nav class="index-links" aria-label="Related indexes">\n${links.map(link => `    <a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join('\n')}\n  </nav>` : ''}
+</main>
+<footer><p>Source: NOAA HURDAT2 best track, revision ${escapeHtml(revisionDate)}. Generated for HurricaneMap ${escapeHtml(appVersion)}.</p></footer>
+</body>
+</html>
+`;
+}
+
+/**
+ * Season, decade and state indexes, built from the same entries the storm pages
+ * were, so a storm cannot appear on a page its own page does not link back to.
+ */
+export function buildIndexPages(entries, context) {
+  const { revisionDate, appVersion } = context;
+  const files = [];
+  const byYear = new Map();
+  const byDecade = new Map();
+  const byState = new Map();
+
+  for (const entry of entries) {
+    if (!byYear.has(entry.year)) byYear.set(entry.year, []);
+    byYear.get(entry.year).push(entry);
+    const decade = decadeSlug(entry.year);
+    if (!byDecade.has(decade)) byDecade.set(decade, []);
+    byDecade.get(decade).push(entry);
+    for (const state of entry.states) {
+      if (!byState.has(state)) byState.set(state, []);
+      byState.get(state).push(entry);
+    }
+  }
+
+  const years = [...byYear.keys()].sort((a, b) => a - b);
+  const decades = [...byDecade.keys()].sort();
+  const states = [...byState.keys()].sort();
+  const order = (rows) => rows.slice().sort((a, b) => a.year - b.year || a.title.localeCompare(b.title));
+
+  for (const year of years) {
+    const rows = order(byYear.get(year));
+    const index = years.indexOf(year);
+    const links = [
+      { href: `../../decades/${decadeSlug(year)}/`, label: `The ${decadeSlug(year)}` },
+      ...(index > 0 ? [{ href: `../${years[index - 1]}/`, label: `${years[index - 1]} season` }] : []),
+      ...(index < years.length - 1 ? [{ href: `../${years[index + 1]}/`, label: `${years[index + 1]} season` }] : []),
+    ];
+    files.push({
+      path: path.join('seasons', seasonSlug(year), 'index.html'),
+      body: renderCollectionPage({
+        url: `${SITE}seasons/${seasonSlug(year)}/`,
+        title: `Hurricanes and tropical storms of the ${year} season`,
+        summary: `${rows.length} storm${rows.length === 1 ? '' : 's'} in the ${year} season made a recorded U.S. landfall.`,
+        intro: `Every storm the HurricaneMap archive records making a U.S. landfall in ${year}, oldest first, with its full track and its landfalls.`,
+        rows,
+        links,
+        revisionDate,
+        appVersion,
+        depth: 2,
+      }),
+    });
+  }
+
+  for (const decade of decades) {
+    const rows = order(byDecade.get(decade));
+    const decadeYears = [...new Set(rows.map(row => row.year))].sort((a, b) => a - b);
+    const index = decades.indexOf(decade);
+    const links = [
+      ...decadeYears.map(year => ({ href: `../../seasons/${year}/`, label: `${year} season` })),
+      ...(index > 0 ? [{ href: `../${decades[index - 1]}/`, label: `The ${decades[index - 1]}` }] : []),
+      ...(index < decades.length - 1 ? [{ href: `../${decades[index + 1]}/`, label: `The ${decades[index + 1]}` }] : []),
+    ];
+    files.push({
+      path: path.join('decades', decade, 'index.html'),
+      body: renderCollectionPage({
+        url: `${SITE}decades/${decade}/`,
+        title: `Hurricanes and tropical storms of the ${decade}`,
+        summary: `${rows.length} storm${rows.length === 1 ? '' : 's'} in the ${decade} made a recorded U.S. landfall, across ${decadeYears.length} season${decadeYears.length === 1 ? '' : 's'}.`,
+        intro: `Every storm the HurricaneMap archive records making a U.S. landfall in the ${decade}, oldest first. A decade is a convenient window and not a meteorological one: the observing record improves through it, so a later decade holding more storms is partly a record of better observation.`,
+        rows,
+        links,
+        revisionDate,
+        appVersion,
+        depth: 2,
+      }),
+    });
+  }
+
+  for (const state of states) {
+    const rows = order(byState.get(state));
+    const slug = stateSlug(state);
+    files.push({
+      path: path.join('states', slug, 'index.html'),
+      body: renderCollectionPage({
+        url: `${SITE}states/${slug}/`,
+        title: `Hurricanes that have hit ${state}`,
+        summary: `${rows.length} storm${rows.length === 1 ? '' : 's'} in the HurricaneMap archive made a recorded landfall in ${state}, between ${rows[0].year} and ${rows[rows.length - 1].year}.`,
+        intro: `Every storm the archive records making a landfall in ${state}, oldest first. A storm that passed close without a landfall of its own is not here; the city pages measure closest approach instead.`,
+        rows,
+        links: [
+          { href: '../', label: 'Every state' },
+          { href: '../../cities/', label: 'By city' },
+        ],
+        revisionDate,
+        appVersion,
+        depth: 2,
+      }),
+    });
+  }
+
+  const listing = (title, description, url, items, depth) => renderCollectionPage({
+    url,
+    title,
+    summary: description,
+    intro: description,
+    rows: [],
+    links: items,
+    revisionDate,
+    appVersion,
+    depth,
+  });
+
+  files.push({
+    path: path.join('seasons', 'index.html'),
+    body: listing(
+      'Hurricane seasons',
+      `Every one of the ${years.length} seasons the HurricaneMap archive records a U.S. landfall in.`,
+      `${SITE}seasons/`,
+      years.map(year => ({ href: `${year}/`, label: `${year} (${byYear.get(year).length})` })),
+      1,
+    ),
+  });
+  files.push({
+    path: path.join('decades', 'index.html'),
+    body: listing(
+      'Hurricanes by decade',
+      `Every one of the ${decades.length} decades the HurricaneMap archive records a U.S. landfall in.`,
+      `${SITE}decades/`,
+      decades.map(decade => ({ href: `${decade}/`, label: `The ${decade} (${byDecade.get(decade).length})` })),
+      1,
+    ),
+  });
+  files.push({
+    path: path.join('states', 'index.html'),
+    body: listing(
+      'Hurricanes by state',
+      `Every one of the ${states.length} states and territories the HurricaneMap archive records a landfall in.`,
+      `${SITE}states/`,
+      states.map(state => ({ href: `${stateSlug(state)}/`, label: `${state} (${byState.get(state).length})` })),
+      1,
+    ),
+  });
+
+  return { files, years, decades, states };
 }
 
 export async function buildStormPages({ write = true } = {}) {
@@ -386,16 +640,26 @@ export async function buildStormPages({ write = true } = {}) {
     }
     seen.set(slug, storm.id);
     const stormLandfalls = (landfallsByStorm.get(storm.id) || []).slice().sort((a, b) => String(a.t).localeCompare(String(b.t)));
-    entries.push({ slug, title: `${headline(storm)}`, year: storm.year, id: storm.id });
+    entries.push({
+      slug,
+      title: `${headline(storm)}`,
+      year: storm.year,
+      id: storm.id,
+      states: [...new Set(stormLandfalls.map(row => row.state).filter(Boolean))].sort(),
+    });
     files.push({ path: path.join('storms', slug, 'index.html'), body: renderStormPage(storm, stormLandfalls, context) });
   }
 
   entries.sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
   files.push({ path: path.join('storms', 'index.html'), body: renderIndexPage(entries, context) });
-  files.push({ path: 'sitemap.xml', body: renderSitemap(entries, revisionDate) });
+  const indexes = buildIndexPages(entries, context);
+  files.push(...indexes.files);
+  files.push({ path: 'sitemap.xml', body: renderSitemap(entries, revisionDate, indexes) });
 
   if (write) {
-    await rm(OUT_DIR, { recursive: true, force: true });
+    for (const directory of [OUT_DIR, ...INDEX_DIRS]) {
+      await rm(directory, { recursive: true, force: true });
+    }
     for (const file of files) {
       const target = path.join(root, file.path);
       await mkdir(path.dirname(target), { recursive: true });

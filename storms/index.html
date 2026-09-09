@@ -31,13 +31,21 @@ th{font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;color:var(--mu
 pre{overflow-x:auto;background:rgba(127,127,127,.12);border:1px solid var(--line);border-radius:.5rem;padding:.75rem;font-size:.8rem;white-space:pre-wrap;word-break:break-word}
 footer{max-width:64rem;margin:2.5rem auto 0;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
 ul.storm-index{columns:3 14rem;list-style:none;padding:0}
-ul.storm-index li{break-inside:avoid;padding:.1rem 0}</style>
+ul.storm-index li{break-inside:avoid;padding:.1rem 0}
+nav.index-links{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin:1.5rem 0 0;padding-top:.75rem;border-top:1px solid var(--line)}
+.index-note{color:var(--muted);font-size:.85em}</style>
 </head>
 <body>
 <header><a href="../">HurricaneMap</a> <span aria-hidden="true">·</span> <a href="../cities/">Hurricane history by city</a></header>
 <main>
   <h1>All storms</h1>
   <p>Every one of the 595 U.S.-landfalling storms in the HurricaneMap archive, each with its track, its landfalls and a citation.</p>
+  <nav class="index-links" aria-label="Other ways in">
+    <a href="../seasons/">By season</a>
+    <a href="../decades/">By decade</a>
+    <a href="../states/">By state</a>
+    <a href="../cities/">By city</a>
+  </nav>
   <ul class="storm-index">
     <li><a href="chantal-2025/">Storm Chantal (2025)</a></li>
     <li><a href="beryl-2024/">Hurricane Beryl (2024)</a></li>

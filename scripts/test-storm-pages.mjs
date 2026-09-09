@@ -10,7 +10,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
-import { buildStormPages, citySlug, stormSlug, categoryLabel } from './build-storm-pages.mjs';
+import {
+  buildStormPages,
+  categoryLabel,
+  citySlug,
+  decadeSlug,
+  stateSlug,
+  stormSlug,
+} from './build-storm-pages.mjs';
 import { buildCityPages } from './build-city-pages.mjs';
 import { buildSocialImages } from './build-social-images.mjs';
 import { COASTAL_CITIES } from '../src/metrics.js';
@@ -28,7 +35,7 @@ assert.equal(first.checksum, second.checksum, 'storm page generation is not repr
 assert.equal(first.files.length, second.files.length);
 
 assert.equal(first.entries.length, storms.length, `expected one page per storm (${storms.length})`);
-assert.equal(first.files.length, storms.length + 2, 'expected one page per storm plus the index and the sitemap');
+assert.ok(first.files.length > storms.length + 2, 'expected the storm pages, the index, the sitemap and the season, decade and state indexes');
 assert.equal(new Set(first.entries.map(entry => entry.slug)).size, storms.length, 'storm slugs are not unique');
 
 // What is on disk has to be what the generator produces, or the published
@@ -91,10 +98,17 @@ assert.equal(scriptless, storms.length + 1, 'every storm page and the index must
 // The sitemap has to list them, or nothing can find them.
 const sitemap = bySlug.get('sitemap.xml');
 const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+const seasonCount = new Set(storms.map(storm => storm.year)).size;
+const decadeCount = new Set(storms.map(storm => decadeSlug(storm.year))).size;
+const stateCount = new Set(
+  JSON.parse(await readFile(path.join(root, 'data', 'landfalls.json'), 'utf8'))
+    .map(row => row.state)
+    .filter(Boolean),
+).size;
 assert.equal(
   locations.length,
-  storms.length + COASTAL_CITIES.length + 4,
-  'sitemap must list the site, both indexes, the catalog, every storm and every city',
+  storms.length + COASTAL_CITIES.length + seasonCount + decadeCount + stateCount + 7,
+  'sitemap must list the site, the four listings, the catalog, every storm, city, season, decade and state',
 );
 assert.ok(locations.includes('https://sysadmindoc.github.io/HurricaneMap/storms/katrina-2005/'));
 assert.equal(new Set(locations).size, locations.length, 'sitemap contains duplicate URLs');
@@ -106,6 +120,97 @@ assert.equal(categoryLabel(-1), 'Tropical storm');
 
 const megabytes = first.bytes / 1024 / 1024;
 assert.ok(megabytes < 40, `storm pages grew to ${megabytes.toFixed(1)} MB, which needs a deliberate decision`);
+
+// --------------------------------------------------- season, decade and state
+//
+// storms/index.html was the only index, so nothing could rank for "hurricanes
+// in 1935" and there was no crawl path from a year or a state down to the
+// storms in it. What matters is that the three sets cover every storm exactly,
+// that a storm and the pages listing it agree, and that a crawler can walk both
+// directions.
+const indexPages = new Map(
+  first.files
+    .map(file => [file.path.replace(/\\/g, '/'), file.body])
+    .filter(([relative]) => /^(seasons|decades|states)\//.test(relative)),
+);
+const seasonYears = [...new Set(storms.map(storm => storm.year))].sort((a, b) => a - b);
+const stormStates = new Map(storms.map(storm => [storm.id, new Set()]));
+for (const row of JSON.parse(await readFile(path.join(root, 'data', 'landfalls.json'), 'utf8'))) {
+  if (row.state) stormStates.get(row.storm_id)?.add(row.state);
+}
+const allStates = [...new Set([...stormStates.values()].flatMap(set => [...set]))].sort();
+const allDecades = [...new Set(seasonYears.map(decadeSlug))].sort();
+
+assert.equal(
+  indexPages.size,
+  seasonYears.length + allDecades.length + allStates.length + 3,
+  'expected one page per season, decade and state, plus the three listings',
+);
+
+// Every storm is listed by its own season, its own decade and each state it hit
+// and by nothing else, and every one of those pages is linked back from it.
+const listedBy = new Map(storms.map(storm => [stormSlug(storm), new Set()]));
+for (const [relative, body] of indexPages) {
+  for (const match of body.matchAll(/href="\.\.\/\.\.\/storms\/([^/"]+)\//g)) {
+    const set = listedBy.get(match[1]);
+    assert.ok(set, `${relative} links a storm page that does not exist: ${match[1]}`);
+    set.add(relative);
+  }
+  assert.match(body, /<link rel="canonical" href="https:\/\/sysadmindoc\.github\.io\/HurricaneMap\//, `${relative} has no canonical URL`);
+  const url = /<link rel="canonical" href="([^"]+)">/.exec(body)?.[1];
+  assert.equal(url, `https://sysadmindoc.github.io/HurricaneMap/${relative.replace(/index\.html$/, '')}`, `${relative}: canonical is not its own address`);
+  assert.equal((body.match(/<script(?! type="application\/ld\+json")/g) || []).length, 0, `${relative} must not depend on JavaScript`);
+  const structured = JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(body)[1]);
+  const collection = structured['@graph'].find(node => node['@type'] === 'CollectionPage');
+  assert.ok(collection, `${relative} must carry CollectionPage structured data`);
+  assert.equal(collection.url, url, `${relative}: structured data and canonical disagree`);
+  assert.equal(
+    collection.mainEntity.numberOfItems,
+    collection.mainEntity.itemListElement.length,
+    `${relative}: the item list says a different length than it holds`,
+  );
+  assert.ok(locations.includes(url), `${relative} is missing from the sitemap`);
+}
+
+for (const storm of storms) {
+  const slug = stormSlug(storm);
+  const expected = new Set([
+    `seasons/${storm.year}/index.html`,
+    `decades/${decadeSlug(storm.year)}/index.html`,
+    ...[...stormStates.get(storm.id)].map(state => `states/${stateSlug(state)}/index.html`),
+  ]);
+  assert.deepEqual(
+    [...listedBy.get(slug)].sort(),
+    [...expected].sort(),
+    `${slug} is listed by the wrong set of index pages`,
+  );
+
+  // And back the other way, so a crawler that lands on a storm can walk up.
+  const page = bySlug.get(`storms/${slug}/index.html`);
+  for (const target of expected) {
+    const href = `../../${target.replace(/index\.html$/, '')}`;
+    assert.ok(page.includes(`href="${href}"`), `${slug} does not link back to ${target}`);
+  }
+}
+
+// The listings are a crawl path in their own right: three pages that link to
+// every season, decade and state, reachable from the all-storms index.
+for (const [listing, count] of [['seasons', seasonYears.length], ['decades', allDecades.length], ['states', allStates.length]]) {
+  const body = indexPages.get(`${listing}/index.html`);
+  const links = [...body.matchAll(/<a href="([^"./][^"]*)\/">/g)].map(match => match[1]);
+  assert.equal(links.length, count, `${listing}/index.html links ${links.length} of ${count} pages`);
+  assert.ok(
+    bySlug.get('storms/index.html').includes(`href="../${listing}/"`),
+    `the all-storms index does not link ${listing}/`,
+  );
+}
+
+// A sampled season whose facts are well known. 1935 is the Labor Day hurricane.
+const season1935 = indexPages.get('seasons/1935/index.html');
+assert.match(season1935, /<h1>Hurricanes and tropical storms of the 1935 season<\/h1>/);
+assert.match(season1935, /href="\.\.\/\.\.\/decades\/1930s\/"/, 'a season must link its decade');
+assert.match(season1935, /href="\.\.\/1934\/"/, 'a season must link the one before it');
+assert.match(indexPages.get('states/florida/index.html'), /<h1>Hurricanes that have hit Florida<\/h1>/);
 
 // ---------------------------------------------------------- social images
 //
