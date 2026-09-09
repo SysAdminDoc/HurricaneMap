@@ -241,7 +241,9 @@ export function redraw(landfalls) {
     const bar = document.createElement('div');
     bar.className = 'tl-bar';
     bar.dataset.year = y;
-    bar.title = v ? `${y} — ${v.count} landfall${v.count > 1 ? 's' : ''}` : `${y} — none`;
+    bar.title = v
+      ? t(v.count === 1 ? 'timeline.barLandfallOne' : 'timeline.barLandfalls', y, v.count)
+      : t('timeline.barNone', y);
     bar.setAttribute('aria-hidden', 'true');
     if (v) {
       const h = Math.max(8, (v.count / maxCount) * 100);

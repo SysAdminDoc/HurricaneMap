@@ -436,6 +436,14 @@ export default {
   'poster.stormCount': '{0} tormentas',
 
   // Filters panel
+  'cone.activeStorm': 'Tormenta activa',
+  'cone.forecastCone': 'Cono de pronóstico del NHC',
+  'cone.observedTrack': 'Trayectoria observada del NHC',
+  'cone.forecastTrack': 'Trayectoria pronosticada del NHC',
+  'cone.advisory': 'Aviso {0}',
+  'timeline.barLandfalls': '{0} — {1} impactos',
+  'timeline.barLandfallOne': '{0} — 1 impacto',
+  'timeline.barNone': '{0} — ninguno',
   'filters.resetTitleActive': 'Restablecer todos los filtros y las capas del mapa',
   'filters.resetTitleIdle': 'No hay filtros activos',
   'filters.clearYearTitle': 'Volver al rango completo {0}-{1}',

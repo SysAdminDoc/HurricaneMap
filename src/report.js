@@ -144,6 +144,12 @@ Historical hurricane landfall data sourced from **NOAA's National Hurricane Cent
 ${citation.bibtex}
 \`\`\`
 
+**RIS:**
+
+\`\`\`
+${citation.ris}
+\`\`\`
+
 ### Methodology Notes
 
 - **Landfalls** are identified as points where the cyclone center crosses a U.S. state boundary or coastline (HURDAT2 \`L\` marker or inferred via point-in-polygon).

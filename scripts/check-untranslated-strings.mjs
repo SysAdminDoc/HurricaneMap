@@ -62,6 +62,7 @@ const ALLOWED = new Map([
   ['Wind:', 'placemark label in the KML export'],
   ['APA citation:', 'label in the KML and text exports'],
   ['BibTeX citation:', 'label in the KML and text exports'],
+  ['RIS citation:', 'label in the KML and text exports'],
 ]);
 
 export { blankCommentsAndRegexes as stripComments } from './js-source.mjs';
@@ -310,7 +311,7 @@ export function findCatalogEchoes(file, rawSource, catalogValues) {
   // visible as a heading: `bindTooltip('Genesis')` slipped past a list that
   // knew only about DOM properties, which is how the map's own labels stayed
   // outside a check written to find exactly that.
-  const UI_SINK = /\.(?:title|textContent|innerText|innerHTML|placeholder|ariaLabel)\s*=|setAttribute\(\s*['"](?:title|aria-label|placeholder|alt)['"]|\b(?:bindTooltip|bindPopup|setTooltipContent|setPopupContent|announceToLiveRegion)\s*\(/;
+  const UI_SINK = /\.(?:title|textContent|innerText|innerHTML|placeholder|ariaLabel|alt)\s*=|setAttribute\(\s*['"](?:title|aria-label|aria-description|placeholder|alt)['"]|\b(?:bindTooltip|bindPopup|setContent|setTooltipContent|setPopupContent|announceToLiveRegion)\s*\(/;
   for (const [key, value] of catalogValues) {
     // Placeholders split a value into fragments; the longest carries the most
     // sentence. A long fragment is unmistakable wherever it turns up, so a
@@ -477,6 +478,65 @@ function staticStrings(node, depth = 0) {
   return [];
 }
 
+/**
+ * What a same-file function returns, as static strings.
+ *
+ * A sink is often handed a helper rather than a literal:
+ * `layer.bindTooltip(featureTooltip(feature, kind))`, where featureTooltip
+ * builds `'NHC forecast cone'` and three siblings out of literals. Matching
+ * only at the call site sees a CallExpression and reports nothing, which is how
+ * four English tooltips survived the pass that exists to catch them.
+ *
+ * One level, same file, on purpose. Following further would need a real call
+ * graph and would have to be right about re-exports; one hop covers the shape
+ * that actually occurs here.
+ */
+function returnedStrings(tree, name, depth = 0) {
+  if (!name || depth > 0) return [];
+  const strings = [];
+  walk(tree, node => {
+    const isFunction = node.type === 'FunctionDeclaration'
+      || node.type === 'VariableDeclarator'
+      || node.type === 'MethodDefinition'
+      || node.type === 'Property';
+    if (!isFunction) return;
+    const declared = node.type === 'FunctionDeclaration' ? node.id?.name
+      : node.type === 'VariableDeclarator' ? node.id?.name
+        : node.key?.name;
+    if (declared !== name) return;
+    const body = node.type === 'FunctionDeclaration' ? node.body
+      : node.type === 'VariableDeclarator' ? node.init?.body
+        : node.value?.body;
+    if (!body) return;
+    // Every string in the body, not just the ones in a return. cone.js builds
+    // its four tooltip labels into a local const and interpolates that into
+    // the returned template, so reading returns alone saw nothing. A function
+    // whose result reaches a text sink is a text-producing function, and
+    // looksLikeProse keeps its class names and keys out.
+    //
+    // Except a thrown message or a log line: nobody choosing a locale reads
+    // those, which is the rule the rest of this file already follows. They are
+    // excluded by position, because the walker has no parent to ask.
+    const excluded = [];
+    walk(body, inner => {
+      const isError = inner.type === 'NewExpression' && inner.callee?.name === 'Error';
+      const isConsole = inner.type === 'CallExpression'
+        && inner.callee?.type === 'MemberExpression'
+        && inner.callee.object?.name === 'console';
+      if (inner.type === 'ThrowStatement' || isError || isConsole) {
+        excluded.push([inner.start, inner.end]);
+      }
+    });
+    const insideExcluded = node => excluded.some(([from, to]) => node.start >= from && node.end <= to);
+    walk(body, inner => {
+      if (inner.type !== 'Literal' && inner.type !== 'TemplateLiteral') return;
+      if (insideExcluded(inner)) return;
+      strings.push(...staticStrings(inner));
+    });
+  });
+  return strings;
+}
+
 export function findTextSinkLiterals(file, source) {
   let tree;
   try {
@@ -518,12 +578,18 @@ export function findTextSinkLiterals(file, source) {
     }
     // Leaflet builds these itself, so no markup scan can see them.
     if (LEAFLET_TEXT_BINDERS.has(name)) {
-      for (const text of staticStrings(node.arguments[0])) report(node, text);
+      const [content] = node.arguments;
+      for (const text of staticStrings(content)) report(node, text);
+      if (content?.type === 'CallExpression' && content.callee?.type === 'Identifier') {
+        for (const text of returnedStrings(tree, content.callee.name)) report(node, text);
+      }
       return;
     }
     if (!sinks.has(name)) return;
     for (const argument of node.arguments) {
-      for (const value of staticStrings(argument)) report(node, value);
+      // A named sink can be either kind, so keep the markup allowance: a helper
+      // that writes innerHTML is handed markup on purpose.
+      for (const value of staticStrings(argument)) report(node, value, { markup: true });
     }
   });
   return found;

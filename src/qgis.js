@@ -114,6 +114,7 @@ export function buildQGISGeoJSON({
       citation: {
         apa: citation.apa,
         bibtex: citation.bibtex,
+        ris: citation.ris,
         url: citation.url,
       },
       filters: {

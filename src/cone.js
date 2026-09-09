@@ -1,5 +1,6 @@
 import { escapeHtml as escapeText } from './html-utils.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
+import { t } from './i18n.js';
 
 // Official NHC forecast context for active storms.
 //
@@ -277,16 +278,16 @@ function layerStyle(kind) {
 
 function featureTooltip(feature, kind) {
   const props = feature?.properties || {};
-  const storm = props.STORMNAME || props.stormname || 'Active storm';
+  const storm = props.STORMNAME || props.stormname || t('cone.activeStorm');
   const advisory = props.ADVISNUM || props.advisnum;
   const period = props.FCSTPRD ?? props.fcstprd;
   const label = kind === 'cone'
-    ? 'NHC forecast cone'
+    ? t('cone.forecastCone')
     : kind === 'observedTrack'
-      ? 'NHC observed track'
-      : 'NHC forecast track';
+      ? t('cone.observedTrack')
+      : t('cone.forecastTrack');
   const details = [
-    advisory ? `Advisory ${escapeText(advisory)}` : '',
+    advisory ? t('cone.advisory', escapeText(advisory)) : '',
     Number.isFinite(Number(period)) ? `${Number(period)}h` : '',
   ].filter(Boolean).join(' · ');
   return `${label}: ${escapeText(storm)}${details ? ` (${details})` : ''}`;

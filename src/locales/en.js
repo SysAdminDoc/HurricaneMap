@@ -436,6 +436,14 @@ export default {
   'poster.stormCount': '{0} storms',
 
   // Filters panel
+  'cone.activeStorm': 'Active storm',
+  'cone.forecastCone': 'NHC forecast cone',
+  'cone.observedTrack': 'NHC observed track',
+  'cone.forecastTrack': 'NHC forecast track',
+  'cone.advisory': 'Advisory {0}',
+  'timeline.barLandfalls': '{0} — {1} landfalls',
+  'timeline.barLandfallOne': '{0} — 1 landfall',
+  'timeline.barNone': '{0} — none',
   'filters.resetTitleActive': 'Reset all filters and map layers',
   'filters.resetTitleIdle': 'No active filters',
   'filters.clearYearTitle': 'Reset to the full {0}-{1} range',

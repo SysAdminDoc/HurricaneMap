@@ -192,4 +192,34 @@ if (releaseHeading) {
   assert.ok(lines.some(line => line.includes('RIS citation:')), 'export comments never gained RIS');
 }
 
+// ------------------------------------------------- RIS on every surface
+//
+// "Everywhere APA and BibTeX appear" was claimed once and was true of three
+// surfaces out of eight. The KML description, the markdown report, the QGIS
+// GeoJSON metadata and the track SVG each inline their own citation block
+// rather than going through citationCommentLines, so none of them picked RIS
+// up when it was added to the shared helper.
+//
+// Named one by one rather than counted, so a surface that stops carrying a
+// citation is a failure that says which one, instead of a total that quietly
+// drops by one. These reuse the fixtures built above, so they exercise the same
+// objects the assertions above already trust.
+{
+  const named = [
+    ['publication csv', publication.csv],
+    ['report markdown', report.markdown],
+    ['qgis geojson', JSON.stringify(qgis)],
+    ['track svg', svg],
+    ...Object.entries(stormExports).map(([kind, result]) => [`export:${kind}`, result.body]),
+  ];
+  for (const [name, text] of named) {
+    const body = String(text || '');
+    assert.ok(body.length > 0, `${name} produced nothing, so this assertion proves nothing`);
+    assert.match(body, /(APA|"apa")/i, `${name} lost its APA citation`);
+    assert.match(body, /(bibtex|@software)/i, `${name} lost its BibTeX citation`);
+    assert.match(body, /(TY {2}- DATA|"ris")/, `${name} carries APA and BibTeX but not the RIS record`);
+  }
+  assert.ok(named.length >= 7, `only ${named.length} export surfaces were checked`);
+}
+
 console.log('citation contracts ok (APA, BibTeX, exports, notebook, pinned URLs, and CITATION.cff)');

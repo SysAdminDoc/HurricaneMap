@@ -468,7 +468,8 @@ function exportKML(storm, citation = buildCitation()) {
   <name>${xml(heading)} — track</name>
   <description>HurricaneMap export. Source: NOAA HURDAT2.
 APA citation: ${xml(citation.apa)}
-BibTeX citation: ${xml(citation.bibtex)}</description>
+BibTeX citation: ${xml(citation.bibtex)}
+RIS citation: ${xml(citation.ris)}</description>
   <Style id="trackStyle">
     <LineStyle><color>ff58c4f3</color><width>3</width></LineStyle>
   </Style>

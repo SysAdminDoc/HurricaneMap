@@ -98,7 +98,7 @@ export function buildTrackSVG(storm, { exportedAt = new Date().toISOString() } =
   });
   const citation = buildCitation({ accessDate: exportedAt });
   const provenanceJson = JSON.stringify(provenance).replaceAll(']]>', ']]]]><![CDATA[>');
-  const citationJson = JSON.stringify({ apa: citation.apa, bibtex: citation.bibtex, url: citation.url })
+  const citationJson = JSON.stringify({ apa: citation.apa, bibtex: citation.bibtex, ris: citation.ris, url: citation.url })
     .replaceAll(']]>', ']]]]><![CDATA[>');
 
   const trackLines = segs.map(s =>
