@@ -159,6 +159,11 @@ function render(landfalls) {
     ? t('table.countOne')
     : t('table.countMany', landfalls.length.toLocaleString(getDateLocale()));
 
+  if (!sorted.length) {
+    body.innerHTML = `<p class="table-view-empty" role="status">${escapeHtml(t('table.empty'))}</p>`;
+    return;
+  }
+
   body.innerHTML = `
     <div class="table-view-scroll">
       <table class="table-view-table" role="table" aria-label="${escapeHtml(t('table.filteredLabel'))}">

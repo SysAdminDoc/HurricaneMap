@@ -1,4 +1,6 @@
+import { getDateLocale, t } from './i18n.js';
 import {
+  excludingFilterNames,
   hasActiveFilters,
   isYearFiltered,
   resetPrimaryFilters,
@@ -6,6 +8,40 @@ import {
   setYearRange,
   toggleCategory,
 } from './filter-state.js';
+
+/** "year range and state", in the reader's language. */
+function listFormat(items) {
+  if (typeof Intl?.ListFormat === 'function') {
+    return new Intl.ListFormat(getDateLocale(), { style: 'long', type: 'conjunction' }).format(items);
+  }
+  return items.join(', ');
+}
+
+/**
+ * What to say when the filters exclude everything. A blank map under "0 of 759"
+ * reads as a broken app, and every other surface in here already had an empty
+ * state; this was the one that did not.
+ *
+ * The filters responsible are named rather than summarised, because the reader
+ * has to know which control to undo.
+ */
+export function renderEmptyFilterState(isEmpty, filters, defaults) {
+  const host = document.getElementById('filter-empty');
+  const message = document.getElementById('filter-empty-message');
+  if (!host || !message) return;
+  if (!isEmpty) {
+    host.hidden = true;
+    message.textContent = '';
+    return;
+  }
+  const labels = excludingFilterNames(filters, defaults).map(name => t(`filters.emptyName.${name}`));
+  message.textContent = labels.length
+    ? t('filters.emptyWithFilters', listFormat(labels))
+    : t('filters.emptyNoFilters');
+  const reset = host.querySelector('#filter-empty-reset');
+  if (reset) reset.hidden = labels.length === 0;
+  host.hidden = false;
+}
 
 export function createFilterController({
   filters,
@@ -121,6 +157,16 @@ export function createFilterController({
       const { setSSTVisible } = await loadSST();
       setSSTVisible(elements.showSST.checked);
       updateResetState();
+    });
+    // The empty state's own control. It clears only the filters that can
+    // exclude a landfall and leaves the map layers alone, which is what its
+    // message promises.
+    document.getElementById('filter-empty-reset')?.addEventListener('click', () => {
+      resetPrimaryFilters(filters, yearDefaults());
+      sync();
+      resetTrackCache();
+      applyFilters();
+      document.getElementById('toggle-filters')?.focus({ preventScroll: true });
     });
     elements.resetFilters?.addEventListener('click', async () => {
       resetPrimaryFilters(filters, yearDefaults());

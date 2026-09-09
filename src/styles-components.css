@@ -3557,6 +3557,31 @@ select {
   border-top: 1px solid rgba(205, 214, 244, 0.10);
 }
 
+/* The one surface that had no empty state. It sits in the filter sidebar next
+   to the controls that caused it, so the fix is beside the cause. */
+.filter-empty {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--surface1);
+  border-radius: 10px;
+  background: var(--mantle);
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.filter-empty p {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.table-view-empty {
+  margin: 16px 4px;
+  color: var(--text);
+}
+
 .filter-legend-list {
   display: grid;
   grid-template-columns: 1fr;

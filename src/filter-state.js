@@ -81,6 +81,24 @@ export function hasActivePrimaryFilters(filters, {
     !CATEGORY_DEFAULTS.every(category => filters.categories.has(category));
 }
 
+/**
+ * Which active filters could have excluded every landfall, so the empty state
+ * can name what to undo rather than shrugging.
+ *
+ * showTracks and showHeatmap are deliberately absent: they change what is drawn
+ * over the surviving landfalls, not which ones survive, so naming them would
+ * send a reader to switch off something that is not the cause.
+ */
+export function excludingFilterNames(filters, { yearMinDefault, yearMaxDefault } = {}) {
+  const names = [];
+  if (filters.yearMin !== yearMinDefault || filters.yearMax !== yearMaxDefault) names.push('years');
+  if (filters.categories.size !== CATEGORY_DEFAULTS.length
+    || !CATEGORY_DEFAULTS.every(category => filters.categories.has(category))) names.push('categories');
+  if (filters.state !== '') names.push('state');
+  if (filters.retiredOnly) names.push('retired');
+  return names;
+}
+
 export function hasActiveFilters(filters, defaults, {
   surgeCategory = '',
   showPopulation = false,

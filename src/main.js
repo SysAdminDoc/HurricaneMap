@@ -21,7 +21,7 @@ import {
 import { initCitationUI, mountCitationHost } from './citation-ui.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
-import { createFilterController } from './filter-controller.js';
+import { createFilterController, renderEmptyFilterState } from './filter-controller.js';
 import { wireApplicationShell } from './shell-ui.js';
 import { initSavedViewsUI } from './saved-views-ui.js';
 import { purgeLegacyUserPoint } from './user-point.js';
@@ -713,6 +713,7 @@ function applyFilters() {
     ? t('status.landfalls', visible.length.toLocaleString(getDateLocale()))
     : t('status.landfallsOf', visible.length.toLocaleString(getDateLocale()), totalLandfalls.toLocaleString(getDateLocale()));
   els.visibleCount.textContent = countText;
+  renderEmptyFilterState(visible.length === 0, filters, yearDefaults());
   announceToLiveRegion(t('status.showing', countText));
   filterController.updateResetState();
   if (filters.showTracks) {

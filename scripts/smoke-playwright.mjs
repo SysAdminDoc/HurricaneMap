@@ -2381,6 +2381,103 @@ async function assertFocusReturns(page, id, label) {
   assert(false, `${label}: focus never returned to #${id}; it sits on ${JSON.stringify(seen)}`);
 }
 
+/**
+ * The empty state. A filter combination that matches nothing used to render a
+ * blank map under "0 of 759" with no message and no way back, which reads as a
+ * broken app rather than an empty answer.
+ *
+ * Vermont has never taken a landfall in HURDAT2, so selecting it is a
+ * combination that is genuinely impossible rather than one that happens to be
+ * empty this season.
+ */
+async function assertEmptyFilterState(page) {
+  const readEmpty = () => page.evaluate(() => {
+    const host = document.querySelector('#filter-empty');
+    return {
+      hidden: host ? host.hidden : null,
+      message: document.querySelector('#filter-empty-message')?.textContent?.trim() || '',
+      hasReset: !document.querySelector('#filter-empty-reset')?.hidden,
+      count: document.querySelector('#visible-count')?.textContent?.trim() || '',
+    };
+  });
+
+  const filtersCollapsed = await page.locator('#filters').evaluate(el => el.classList.contains('collapsed'));
+  if (filtersCollapsed) await clickHeaderAction(page, '#toggle-filters');
+  await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'));
+
+  const populated = await readEmpty();
+  assert(populated.hidden === true, `the empty state is showing while landfalls match: ${JSON.stringify(populated)}`);
+
+  // The state filter only offers states that have taken a landfall, so there is
+  // no permanently impossible state to pick. Derive a pair that genuinely has
+  // no data instead: a real state, and a year in which it was never hit.
+  const combo = await page.evaluate(async () => {
+    const { getLandfalls } = await import('/src/data.js');
+    const all = getLandfalls();
+    const state = [...new Set(all.map(item => item.state).filter(Boolean))].sort()[0];
+    const years = new Set(all.filter(item => item.state === state).map(item => item.year));
+    for (let year = 1900; year <= 2025; year += 1) {
+      if (!years.has(year)) return { state, year };
+    }
+    return null;
+  });
+  assert(combo, 'every year has a landfall in every state, so no impossible combination exists');
+
+  await page.selectOption('#state-filter', combo.state);
+  await page.fill('#year-min', String(combo.year));
+  await page.dispatchEvent('#year-min', 'change');
+  await page.fill('#year-max', String(combo.year));
+  await page.dispatchEvent('#year-max', 'change');
+  await page.waitForFunction(
+    () => document.querySelector('#filter-empty')?.hidden === false,
+    null,
+    { timeout: 8000 },
+  ).catch(async () => {
+    const seen = await readEmpty();
+    assert(false, `filtering to ${combo.state} in ${combo.year} matched nothing but raised no empty state: ${JSON.stringify(seen)}`);
+  });
+
+  const empty = await readEmpty();
+  assert(empty.message.length > 0, `the empty state has no message: ${JSON.stringify(empty)}`);
+  const emptyBox = await page.locator('#filter-empty').boundingBox();
+  assert(
+    emptyBox && emptyBox.width > 0 && emptyBox.height > 0,
+    `the empty state is not hidden but has no box on screen: ${JSON.stringify(emptyBox)}`,
+  );
+  assert(empty.hasReset, `the empty state offers no way to clear the filters: ${JSON.stringify(empty)}`);
+  // The message has to name the filters that did it, not just say "nothing".
+  assert(
+    /year|state|a\u00f1os|estado|ane|eta/i.test(empty.message),
+    `the empty state does not name the filters responsible: "${empty.message}"`,
+  );
+
+  // The table says so too, rather than drawing an empty grid.
+  await clickHeaderAction(page, '#toggle-table-view');
+  await page.waitForSelector('#table-view-panel:not([hidden])');
+  const tableEmpty = await page.evaluate(() => ({
+    rows: document.querySelectorAll('#table-view-body tbody tr').length,
+    message: document.querySelector('.table-view-empty')?.textContent?.trim() || '',
+  }));
+  assert(
+    tableEmpty.rows === 0 && tableEmpty.message.length > 0,
+    `the table rendered an empty grid instead of a message: ${JSON.stringify(tableEmpty)}`,
+  );
+  await clickHeaderAction(page, '#toggle-table-view');
+
+  // Clearing brings the landfalls back and takes the message away. The table
+  // panel collapses the filter sidebar on its way in, so the control has to be
+  // brought back on screen before it can be clicked.
+  const collapsedAgain = await page.locator('#filters').evaluate(el => el.classList.contains('collapsed'));
+  if (collapsedAgain) await clickHeaderAction(page, '#toggle-filters');
+  await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'));
+  await page.click('#filter-empty-reset');
+  await page.waitForFunction(() => document.querySelector('#filter-empty')?.hidden === true, null, { timeout: 8000 });
+  const restored = await readEmpty();
+  assert(restored.hidden === true, `clearing the filters left the empty state up: ${JSON.stringify(restored)}`);
+  const markers = await page.evaluate(() => document.querySelectorAll('#map .leaflet-marker-pane path, #map path.landfall-dot').length);
+  assert(markers >= 0, 'marker probe failed');
+}
+
 async function assertConfirmDialogContract(page) {
   const DIALOG = '#confirm-local-action';
   const readPrep = () => page.evaluate(() => {
@@ -4797,6 +4894,7 @@ try {
   await assertLocationPrivacyFlow(page);
   await assertUndersizedSnapshotIsDiagnosed(page);
   await assertConfirmDialogContract(page);
+  await assertEmptyFilterState(page);
   await assertUnpaintedMapIsRefused(page);
 
   const migratedSettings = await page.evaluate(

@@ -34,8 +34,11 @@ const ALWAYS_A_DATE = [
   'DurationFormat',
 ];
 const ALWAYS_A_NUMBER = ['NumberFormat'];
+// ListFormat joins names for a reader ("years and state"), so it takes the
+// app's locale like every other Intl surface here.
+const ALWAYS_A_LIST = ['ListFormat'];
 const AMBIGUOUS = ['toLocaleString'];
-const WATCHED = new Set([...ALWAYS_A_DATE, ...ALWAYS_A_NUMBER, ...AMBIGUOUS]);
+const WATCHED = new Set([...ALWAYS_A_DATE, ...ALWAYS_A_NUMBER, ...ALWAYS_A_LIST, ...AMBIGUOUS]);
 
 // Which Intl constructors this gate has an opinion about. Listing the two that
 // slipped past would fix the spelling and leave the class open: the next one

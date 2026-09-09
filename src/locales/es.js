@@ -426,6 +426,14 @@ export default {
   'poster.stormCount': '{0} tormentas',
 
   // Filters panel
+  'filters.emptyWithFilters': 'Ningún impacto coincide. Tus filtros de {0} excluyen todas las tormentas.',
+  'filters.emptyNoFilters': 'Ningún impacto coincide con la vista actual.',
+  'filters.emptyClear': 'Quitar esos filtros',
+  'filters.emptyName.years': 'rango de años',
+  'filters.emptyName.categories': 'categoría',
+  'filters.emptyName.state': 'estado',
+  'filters.emptyName.retired': 'nombres retirados',
+  'table.empty': 'Ningún impacto coincide con los filtros actuales.',
   'filters.title': 'Filtros',
   'filters.yearRange': 'Rango de años',
   'filters.category': 'Categoría',

@@ -426,6 +426,14 @@ export default {
   'poster.stormCount': '{0} storms',
 
   // Filters panel
+  'filters.emptyWithFilters': 'No landfalls match. Your {0} filters exclude every storm.',
+  'filters.emptyNoFilters': 'No landfalls match the current view.',
+  'filters.emptyClear': 'Clear those filters',
+  'filters.emptyName.years': 'year range',
+  'filters.emptyName.categories': 'category',
+  'filters.emptyName.state': 'state',
+  'filters.emptyName.retired': 'retired-names',
+  'table.empty': 'No landfalls match the current filters.',
   'filters.title': 'Filters',
   'filters.yearRange': 'Year range',
   'filters.category': 'Category',
