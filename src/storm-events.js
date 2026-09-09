@@ -107,7 +107,7 @@ export async function renderStormEventsSummary(host, storm) {
   if (!host) return;
   host.innerHTML = `
     <div class="storm-events-block storm-events-block--loading" role="status">
-      Loading NOAA Storm Events summary...
+      ${t('stormEvents.loading')}
     </div>
   `;
   const data = await loadStormEvents();

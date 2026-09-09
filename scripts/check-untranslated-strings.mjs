@@ -6,11 +6,29 @@
 // whatever the reader chose, which is how the whole state panel, the storm
 // panel's section headings and the About provenance grid stayed English.
 //
-// This reads what a person sees: the text between tags in an HTML template
-// literal, and the value of an attribute a screen reader or a tooltip reads
-// out. Anything interpolated is skipped, because t() calls arrive that way.
+// Three passes, in three directions, because no one of them sees everything.
+//
+// 1. Source to reader. The text between tags in an HTML template literal, the
+//    value of an attribute a screen reader or a tooltip reads out, a quoted
+//    branch of a ternary, a run that fills a whole line with its boundaries on
+//    the lines above and below, and a lone lowercase word between two real
+//    tags. Anything interpolated is skipped, because t() calls arrive that way.
+//    This pass is a heuristic and says so; every filter that keeps a code
+//    fragment out also keeps some real label out.
+// 2. Catalog to source, which is exact: a value that already has a key must
+//    not also be spelled out in a module.
+// 3. Literals that reach a text sink without ever sitting in markup, found by
+//    parsing. `this.setStatus('Loading…')` is invisible to pass 1 because
+//    there is no markup anywhere near it, and eleven of the radar panel's
+//    status strings lived there.
+//
+// What is deliberately NOT reported: prose inside a region marked with a `lang`
+// attribute. `src/panel.js` renders the generated storm biography in a
+// `<div lang="en">`, which is WCAG 3.1.2 done properly rather than a missing
+// translation, so `src/metrics.js` builds that sentence in English on purpose.
 import { readdir, readFile } from 'node:fs/promises';
 import { blankCommentsAndRegexes as stripComments, findControlBytes } from './js-source.mjs';
+import { lineAt, parseModule, patternNames, walk } from './js-ast.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -35,6 +53,8 @@ const ALLOWED = new Map([
   // dictionary and the Markdown report, so that a file which outlives the
   // session that made it says where it came from in one fixed language.
   ['HurricaneMap export. Source: NOAA HURDAT2.', 'provenance line in the KML export'],
+  ['Landfall:', 'placemark label in the KML export'],
+  ['Wind:', 'placemark label in the KML export'],
   ['APA citation:', 'label in the KML and text exports'],
   ['BibTeX citation:', 'label in the KML and text exports'],
 ]);
@@ -59,11 +79,25 @@ const TEXT_NODE = new RegExp(`${OPEN}${RUN}${CLOSE}`, 'g');
 // on the previous line's `</span>` and was invisible without this.
 const LINE_START = new RegExp(`^${RUN}${CLOSE}`);
 const LINE_END = new RegExp(`${OPEN}([^<>{}\`$]*)$`);
+// A run can also fill a whole line, with its boundaries on the lines above and
+// below it. `Loading NOAA Storm Events summary...` sits alone between a `<div>`
+// on the previous line and a `</div>` on the next, so neither edge pattern nor
+// TEXT_NODE could see it: all three need a boundary on the line itself.
+// A JS operator rules the line out: `? lf.name` and `: t(...)` are branches of
+// a ternary that happen to carry no boundary, and they read as prose to
+// looksLikeProse because "name" is an ordinary lowercase word. Commas stay
+// allowed, since real sentences use them.
+const LINE_WHOLE = new RegExp(`^([^<>{}\`$?:()=;]+)$`);
 const ATTRIBUTE = /\b(title|aria-label|placeholder|alt)="([^"`$<>]*)"/g;
 // A label chosen by a ternary never touches a tag boundary, so nothing
 // positional can see it. The storm panel picked between 'High', 'Medium' and
 // 'Low' this way for its rapid-intensification risk.
 const TERNARY_LABEL = /[?:]\s*'([^'\n]{3,80})'/g;
+// looksLikeProse asks a lone token to be a capitalised word, because `}` opens
+// a run and most single tokens arriving that way are code. Between two real
+// angle brackets there is no such doubt: `>resolving…<` is text a reader sees,
+// whatever its case. Four letters minimum keeps `kt`, `mph` and `mb` out.
+const LONE_WORD_NODE = /(?<![=\-!])>\s*([a-z][a-z'-]{3,})[.…!?]*\s*</g;
 
 // `<!-- US landfalls -->` labels the path below it for whoever reads the source.
 // Nobody sees it, and reporting it sends someone to translate a comment.
@@ -92,7 +126,11 @@ export function looksLikeProse(value) {
   // One capitalised word is a label: the About provenance grid labels its cells
   // "Coverage", "Records" and "Generated", one word each. Any other lone token
   // is an id, a hex digest or a variable.
-  if (!/\s/.test(trimmed)) return CAPITALISED.test(trimmed);
+  // Trailing punctuation does not stop a label being a label. `Coverage:` in
+  // the statistics summary read as code because the colon failed CAPITALISED,
+  // and it rendered in English inside an otherwise Spanish panel.
+  const bare = trimmed.replace(/[.:;,!?…]+$/, "");
+  if (!/\s/.test(trimmed)) return CAPITALISED.test(bare);
   if (words.length === 1) return CAPITALISED.test(words[0]);
   // Otherwise two words, at least one of them an ordinary lowercase word, which
   // is what separates "Avg forward speed" and "at landfall" from "ACE" sitting
@@ -142,12 +180,17 @@ export function findUntranslated(file, text) {
       [ATTRIBUTE, 'attribute', 2],
       [TERNARY_LABEL, 'label', 1],
     ];
-    if (rendered.has(index + 1)) patterns.push([LINE_START, 'text', 1], [LINE_END, 'text', 1]);
+    if (rendered.has(index + 1)) {
+      patterns.push([LINE_START, 'text', 1], [LINE_END, 'text', 1], [LINE_WHOLE, 'text', 1]);
+    }
+    patterns.push([LONE_WORD_NODE, 'word', 1]);
     for (const [pattern, kind, group] of patterns) {
       // Only lines that render markup. An error message or a log line is not
       // read by anyone choosing a locale, and `}` opening a run means a line of
       // plain code otherwise looks like a text node.
       if (kind !== 'attribute' && !line.includes('<') && !rendered.has(index + 1)) continue;
+      // A lone word only counts between two real tags, which is what its own
+      // pattern already requires, so it needs no line-level gate beyond that.
       // A ternary label only counts inside something being rendered.
       if (kind === 'label' && !line.includes('${')) continue;
       // A non-global regex does not advance lastIndex, so `exec` in a loop
@@ -182,7 +225,9 @@ export function findUntranslated(file, text) {
             && /[A-Za-z]{3,}/.test(value)
             && !NOT_PROSE.test(value)
             && !IDENTIFIER.test(value)
-          : looksLikeProse(value);
+          : kind === 'word'
+            ? !NOT_PROSE.test(value) && !IDENTIFIER.test(value)
+            : looksLikeProse(value);
         if (!isProse) continue;
         if (ALLOWED.has(value)) continue;
         found.push({ file, line: index + 1, kind, value });
@@ -278,6 +323,102 @@ export function findCatalogEchoes(file, rawSource, catalogValues) {
   return found;
 }
 
+// The third direction: a literal that reaches a text sink without ever sitting
+// in markup.
+//
+// The scan above reads runs of text between tags, so it cannot see
+// `this.setStatus('Loading…')`. Six of the radar panel's status strings lived
+// there. Naming `setStatus` would be a gate that can be renamed around, so this
+// finds the sinks by what they do: a function in this file that writes one of
+// its own parameters to `.textContent` or `.innerHTML` IS a text sink, whatever
+// it is called, and a prose literal handed to one is a string a reader sees.
+//
+// Single-file on purpose. A cross-module call graph would catch more and would
+// also have to be right about re-exports and aliasing; every sink found so far
+// is defined beside its callers.
+const TEXT_PROPERTIES = new Set(['textContent', 'innerHTML', 'innerText']);
+
+function writesToTextSink(node) {
+  return node?.type === 'MemberExpression'
+    && !node.computed
+    && TEXT_PROPERTIES.has(node.property?.name);
+}
+
+/** Names in this module whose body writes a parameter straight to a text sink. */
+export function textSinkNames(tree) {
+  const sinks = new Set();
+  walk(tree, node => {
+    const isFunction = node.type === 'FunctionDeclaration'
+      || node.type === 'FunctionExpression'
+      || node.type === 'ArrowFunctionExpression'
+      || node.type === 'MethodDefinition'
+      || node.type === 'Property';
+    if (!isFunction) return;
+    const fn = node.type === 'MethodDefinition' || node.type === 'Property' ? node.value : node;
+    if (!fn || !Array.isArray(fn.params)) return;
+    const parameters = new Set();
+    for (const parameter of fn.params) patternNames(parameter, []).forEach(name => parameters.add(name));
+    if (!parameters.size) return;
+    let writes = false;
+    walk(fn.body, inner => {
+      if (inner.type !== 'AssignmentExpression') return;
+      if (!writesToTextSink(inner.left)) return;
+      if (inner.right?.type === 'Identifier' && parameters.has(inner.right.name)) writes = true;
+    });
+    if (!writes) return;
+    const name = node.type === 'FunctionDeclaration' ? node.id?.name
+      : node.type === 'MethodDefinition' || node.type === 'Property' ? node.key?.name
+        : null;
+    if (name) sinks.add(name);
+  });
+  return sinks;
+}
+
+/** Every static string a node contributes, so a template's literal halves count. */
+function staticStrings(node) {
+  if (!node) return [];
+  if (node.type === 'Literal') return typeof node.value === 'string' ? [node.value] : [];
+  if (node.type === 'TemplateLiteral') return node.quasis.map(quasi => quasi.value.cooked || '');
+  return [];
+}
+
+export function findTextSinkLiterals(file, source) {
+  let tree;
+  try {
+    tree = parseModule(source);
+  } catch {
+    // A file this gate cannot parse is reported by check:syntax, not here.
+    return [];
+  }
+  const sinks = textSinkNames(tree);
+  const found = [];
+  const report = (node, value) => {
+    const text = String(value).trim();
+    // A static half of a markup template is markup, and the text-node scan
+    // above already reads those. Reporting them here restated every heading in
+    // the app as an untranslated string.
+    if (text.includes("<") || text.includes(">")) return;
+    if (!text || !looksLikeProse(text) || ALLOWED.has(text)) return;
+    found.push({ file, line: lineAt(source, node.start), kind: 'sink', value: text });
+  };
+  walk(tree, node => {
+    if (node.type === 'AssignmentExpression' && writesToTextSink(node.left)) {
+      for (const value of staticStrings(node.right)) report(node, value);
+      return;
+    }
+    if (node.type !== 'CallExpression') return;
+    const callee = node.callee;
+    const name = callee?.type === 'Identifier' ? callee.name
+      : callee?.type === 'MemberExpression' && !callee.computed ? callee.property?.name
+        : null;
+    if (!name || !sinks.has(name)) return;
+    for (const argument of node.arguments) {
+      for (const value of staticStrings(argument)) report(node, value);
+    }
+  });
+  return found;
+}
+
 async function main() {
   const files = (await readdir(sourceDir)).filter(name => name.endsWith('.js') && !SKIP_FILES.has(name)).sort();
   // Read the catalog first: the echo check needs its English values, and the
@@ -290,6 +431,7 @@ async function main() {
     process.exit(1);
   }
   const found = [];
+  const seen = new Set();
   for (const file of files) {
     const source = await readFile(path.join(sourceDir, file), 'utf8');
     found.push(...findUntranslated(file, source));
@@ -302,6 +444,7 @@ async function main() {
       });
     }
     found.push(...findCatalogEchoes(file, stripComments(source), catalogValues));
+    found.push(...findTextSinkLiterals(file, source));
   }
 
   // An allowlist entry that no longer matches anything is a rule about code
@@ -312,10 +455,21 @@ async function main() {
   const sources = await Promise.all(files.map(file => readFile(path.join(sourceDir, file), 'utf8')));
   const stale = [...ALLOWED.keys()].filter(value => !sources.some(source => source.includes(value)));
 
-  if (found.length || stale.length) {
-    for (const entry of found) {
+  const unique = found.filter((entry) => {
+    const key = `${entry.file}:${entry.line}:${entry.kind}:${entry.value}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (unique.length || stale.length) {
+    for (const entry of unique) {
       if (entry.kind === 'control') {
         console.error(`untranslated: ${entry.file}:${entry.line} contains ${entry.value}; delete the character`);
+        continue;
+      }
+      if (entry.kind === 'sink') {
+        console.error(`untranslated: ${entry.file}:${entry.line} hands "${entry.value}" to something that writes it into the page; move it into src/i18n.js and call t()`);
         continue;
       }
       console.error(`untranslated: ${entry.file}:${entry.line} renders "${entry.value}" as a literal; move it into src/i18n.js and call t()`);

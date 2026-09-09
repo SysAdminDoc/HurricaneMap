@@ -2,7 +2,7 @@
   - button "Minimize estatistik"
   - button "Fèmen estatistik": ×
   - heading "Estatistik" [level=2]
-  - paragraph: "/\\d+ tanpèt ki rive atè Ozetazini · \\d+ evènman rive atè · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
+  - paragraph: "/\\d+ tanpèt ki rive atè Ozetazini · \\d+ evènman rive atè · \\d+ nan yo te gen fos siklon\\. Kouvti: \\d+–\\d+\\./"
   - text: 📊 PÈSPEKTIV SEZON NOAA CPC
   - status:
     - strong: Pèspektiv sezon an

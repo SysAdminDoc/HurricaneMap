@@ -2,7 +2,7 @@
   - button "Minimizar estadísticas"
   - button "Cerrar estadísticas": ×
   - heading "Estadísticas" [level=2]
-  - paragraph: "/\\d+ tormentas con tocamiento de tierra en EE\\. UU\\. · \\d+ eventos de tocamiento de tierra · \\d+ of those at hurricane strength\\. Coverage: \\d+–\\d+\\./"
+  - paragraph: "/\\d+ tormentas con tocamiento de tierra en EE\\. UU\\. · \\d+ eventos de tocamiento de tierra · \\d+ de ellos con fuerza de huracán\\. Cobertura: \\d+–\\d+\\./"
   - text: 📊 PERSPECTIVA ESTACIONAL NOAA CPC
   - status:
     - strong: Perspectiva estacional

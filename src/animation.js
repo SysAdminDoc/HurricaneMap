@@ -440,7 +440,7 @@ export class TrackAnimator {
   markEnded() {
     const btn = this.controls?.querySelector('[data-act="toggle"]');
     if (btn) {
-      btn.textContent = 'Replay';
+      btn.textContent = t('anim.replay');
       btn.title = t('anim.replayTitle');
       btn.setAttribute('aria-label', btn.title);
     }

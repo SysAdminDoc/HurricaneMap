@@ -291,7 +291,7 @@ export class RadarOverlay {
     }
 
     this.buildControls(this.landfall);
-    this.setStatus('Locating radar frame…');
+    this.setStatus(t('radar.locating'));
 
     // Pick the local frame at this landfall's timestamp if we have one.
     let landfallTs = stormEntry?.landfalls?.[String(lfIdx)];
@@ -312,7 +312,7 @@ export class RadarOverlay {
             cacheOrigin: 'network',
             requestId: request.requestId,
           });
-          this.setStatus('Radar archive could not be reached.');
+          this.setStatus(t('radar.unreachable'));
         } else {
           completeOptionalFeed('radar', {
             empty: true,
@@ -320,7 +320,7 @@ export class RadarOverlay {
             cacheOrigin: 'network',
             requestId: request.requestId,
           });
-          this.setStatus('No archived radar found within ±1 hour of landfall.');
+          this.setStatus(t('radar.noneNearLandfall'));
         }
         return;
       }
@@ -421,14 +421,14 @@ export class RadarOverlay {
   async saveOfflinePack(button) {
     if (!this.stormId || !this.localFrames?.length || !button) return;
     button.disabled = true;
-    this.setStatus('Saving radar pack…');
+    this.setStatus(t('radar.savingPack'));
     try {
       const result = await cacheRadarPack(this.stormId, this.localFrames, {
-        onProgress: ({ saved, total }) => this.setStatus(`Saving radar pack ${saved}/${total}…`),
+        onProgress: ({ saved, total }) => this.setStatus(t('radar.savingPackProgress', saved, total)),
       });
       const evictionNote = result.persisted ? '' : ` ${t('storage.evictionRisk')}`;
       this.setStatus(`${t('radar.savedFrames', result.saved)}${evictionNote}`);
-      button.textContent = 'Saved';
+      button.textContent = t('radar.savedButton');
     } catch (error) {
       this.setStatus(isQuotaExceededError(error)
         ? 'Not enough storage. Clear optional radar or tile data in Settings.'
@@ -467,7 +467,7 @@ export class RadarOverlay {
     const session = this.session;
     const next = new Date(this.currentDate.getTime() + direction * 5 * 60 * 1000);
     const frame = buildRemoteFrame(this.region, next);
-    this.setStatus('Loading…');
+    this.setStatus(t('radar.loading'));
     const request = beginOptionalFeed('radar');
     this.feedRequestId = request.requestId;
     try {
@@ -475,13 +475,13 @@ export class RadarOverlay {
       if (session !== this.session) return;
       if (!isRadarFrameResponseAvailable(r)) {
         failOptionalFeed('radar', { responseStatus: r.status, requestId: request.requestId });
-        this.setStatus(`No frame at ${formatTime(next.toISOString())}`);
+        this.setStatus(t('radar.noFrameAt', formatTime(next.toISOString())));
         return;
       }
     } catch (error) {
       if (session !== this.session) return;
       failOptionalFeed('radar', { error, requestId: request.requestId });
-      this.setStatus(`Failed to load ${formatTime(next.toISOString())}`);
+      this.setStatus(t('radar.failedToLoad', formatTime(next.toISOString())));
       return;
     }
     this.currentDate = next;
@@ -528,7 +528,7 @@ export class RadarOverlay {
     } else {
       // Online mode: probe ±30 min around the landfall in 5-min steps.
       this.loopPending = true;
-      this.setStatus('Building loop (probing IEM)…');
+      this.setStatus(t('radar.buildingLoop'));
       const t0 = new Date(this.landfall.t);
       const start = new Date(t0.getTime() - 30 * 60 * 1000);
       for (let m = 0; m <= 60; m += 5) {
@@ -545,7 +545,7 @@ export class RadarOverlay {
     }
 
     if (!frames.length) {
-      this.setStatus('No frames available for loop.');
+      this.setStatus(t('radar.noLoopFrames'));
       return;
     }
     if (btn) btn.textContent = '⏸';

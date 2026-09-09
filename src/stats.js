@@ -73,8 +73,8 @@ function render() {
     <h2 id="stats-panel-title">${t('stats.title')}</h2>
     <p class="stats-summary">
       ${t('stats.summaryLine', stats.total_storms, stats.total_landfall_events)}
-      ${stats.total_hurricane_landfalls} of those at hurricane strength.
-      Coverage: ${stats.year_range[0]}–${stats.year_range[1]}.
+      ${t('stats.hurricaneStrengthSuffix', stats.total_hurricane_landfalls)}
+      ${t('stats.coverageRange', stats.year_range[0], stats.year_range[1])}
     </p>
 
     <div id="seasonal-outlook-host"></div>
@@ -93,7 +93,7 @@ function render() {
 
         <section class="stats-section stats-section--cold">
           <h3>${t('stats.noHitStates')}</h3>
-          <div class="cold-list">${cold || '<span class="cold-tag">none</span>'}</div>
+          <div class="cold-list">${cold || `<span class="cold-tag">${t('stats.noColdStates')}</span>`}</div>
           <p class="stats-note">
             Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
             HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.

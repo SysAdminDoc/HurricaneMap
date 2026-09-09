@@ -153,11 +153,11 @@ export async function refreshSeasonSummary({ yearMin, yearMax }) {
       </div>
       <div data-role="deadliest">
         <dt>${t('stats.deadliest')}</dt>
-        <dd class="ss-loading">resolving…</dd>
+        <dd class="ss-loading">${t('season.resolving')}</dd>
       </div>
       <div data-role="costliest">
         <dt>${t('stats.costliest')}</dt>
-        <dd class="ss-loading">resolving…</dd>
+        <dd class="ss-loading">${t('season.resolving')}</dd>
       </div>
     </dl>
   `;
