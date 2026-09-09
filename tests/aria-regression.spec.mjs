@@ -238,6 +238,38 @@ for (const locale of locales) {
     }));
     expect(searchState.expanded).toBe('true');
     expect(searchState.label).toBe(searchState.expectedLabel);
+
+    // Search matches are painted through CSS.highlights rather than wrapped in
+    // an element. Both halves of that claim are checked here, because the
+    // <mark> implementation this replaced would pass neither: highlighting
+    // must leave the markup identical, and it must leave the accessibility
+    // tree identical. Taking the highlight down and re-reading both is the
+    // comparison, so a future change that starts inserting nodes fails on the
+    // difference rather than on a snapshot somebody re-approved.
+    const highlighted = await page.evaluate(() => {
+      const list = document.querySelector('#search-results');
+      return {
+        supported: typeof Highlight === 'function' && typeof CSS?.highlights?.set === 'function',
+        ranges: CSS?.highlights?.get('hm-search-match')?.size ?? 0,
+        markup: list.innerHTML,
+        marks: list.querySelectorAll('mark').length,
+      };
+    });
+    // Not conditional on support: an engine without the API renders plain text,
+    // and plain text has no <mark> in it either.
+    expect(highlighted.marks, 'match highlighting must not wrap text in elements').toBe(0);
+    if (highlighted.supported) {
+      expect(highlighted.ranges, 'searching Katrina must paint at least one range').toBeGreaterThan(0);
+    }
+    const treeWithHighlight = await page.locator('#search-results').ariaSnapshotJSON();
+    const markupWithoutHighlight = await page.evaluate(async () => {
+      const { clearSearchHighlights } = await import('/src/search-highlight.js');
+      clearSearchHighlights();
+      return document.querySelector('#search-results').innerHTML;
+    });
+    const treeWithoutHighlight = await page.locator('#search-results').ariaSnapshotJSON();
+    expect(markupWithoutHighlight).toBe(highlighted.markup);
+    expect(treeWithoutHighlight).toEqual(treeWithHighlight);
     await dispatchDomKey(page, '#search-input', 'ArrowDown');
     await page.waitForFunction(() => Boolean(document.querySelector('#search-input')?.getAttribute('aria-activedescendant')));
     await dispatchDomKey(page, '#search-input', 'Enter');

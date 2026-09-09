@@ -8,6 +8,7 @@ import {
 import { fuzzyAugment } from './fuzzy.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
+import { clearSearchHighlights, highlightSearchMatches } from './search-highlight.js';
 import { getHistory } from './search-history.js';
 import { buildSparkline } from './sparkline.js';
 
@@ -19,6 +20,7 @@ export function initSearchController({ input, results, onSelect }) {
     results.hidden = !open;
     input.setAttribute('aria-expanded', String(open));
     if (!open) {
+      clearSearchHighlights();
       activeIndex = -1;
       results.classList.remove('search-results--empty');
       input.removeAttribute('aria-activedescendant');
@@ -87,6 +89,9 @@ export function initSearchController({ input, results, onSelect }) {
     if (!history.length) return false;
     results.classList.remove('search-results--empty');
     results.innerHTML = `<li class="search-section-label" aria-hidden="true">${t('search.recent')}</li>${history.map(renderRow).join('')}`;
+    // Recents are not a match for anything the reader typed, so nothing is
+    // highlighted; the previous query's ranges point at nodes that are gone.
+    clearSearchHighlights();
     setOpen(true);
     backfillSparklines();
     wireResultClicks();
@@ -100,6 +105,7 @@ export function initSearchController({ input, results, onSelect }) {
         <strong>${t('search.noMatch', escapeHtml(query.trim()))}</strong>
         <span>${t('search.help')}</span>
       </li>`;
+    clearSearchHighlights();
     setOpen(true);
   };
 
@@ -151,6 +157,7 @@ export function initSearchController({ input, results, onSelect }) {
       (fuzzy.length
         ? `<li class="search-section-label" aria-hidden="true">${t('search.suggest')}</li>${fuzzy.map(renderRow).join('')}`
         : '');
+    highlightSearchMatches(results, query);
     updateActiveOption(0);
     backfillSparklines();
     wireResultClicks();

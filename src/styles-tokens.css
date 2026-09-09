@@ -43,6 +43,14 @@
   --sky:     #89dcfe;
   --peach:   #fab387;
   --yellow:  #f9e2af;
+
+  /* Search match highlighting, painted through ::highlight(). One pair for
+     both themes on purpose: a highlighter pen reads as a highlighter pen on
+     either ground, and #11111b on #f9e2af is 15.6:1, so neither theme needs
+     its own measurement. Only background-color and color are set, because
+     ::highlight() accepts almost nothing else. */
+  --search-match-bg:  #f9e2af;
+  --search-match-ink: #11111b;
   --red:     #f38ba8;
   --green:   #a6e3a1;
 

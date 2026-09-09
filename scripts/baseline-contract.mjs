@@ -77,6 +77,22 @@ export const BASELINE_FEATURES = Object.freeze([
     probe: 'module-worker',
   },
   {
+    id: 'custom-highlight-api',
+    name: 'Custom highlights',
+    baseline: 'newly',
+    // Read from https://api.webstatus.dev/v1/features?q=highlight on
+    // 2026-09-09: feature "highlight", status newly, low_date 2026-03-24. The
+    // roadmap item that asked for this said June 2025, which is wrong; the
+    // dataset is the authority and the date is recent enough that the fallback
+    // is the path most readers will take for a while yet.
+    newlyAvailable: '2026-03-24',
+    widelyAvailable: '2028-09-24',
+    requirement: 'progressive',
+    used: 'src/search-highlight.js paints search matches through CSS.highlights',
+    fallback: 'renders the result list with no highlighting, as it did before',
+    detect: { kind: 'global', name: 'Highlight' },
+  },
+  {
     id: 'js-modules-service-workers',
     name: 'JavaScript modules in service workers',
     baseline: 'newly',

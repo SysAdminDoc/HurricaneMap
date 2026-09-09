@@ -197,10 +197,11 @@ The floor is 2025-01-27. Two platform features have no fallback in this app, and
 - Cascade layers, Baseline Widely available as of 2024-09-14. `src/styles.css` declares its layer order on the first line, so a browser that skips the at-rule drops the whole stylesheet.
 - Popover, Baseline Newly available as of 2025-01-27. The settings menu is a popover, and several modules test `:popover-open`, which throws as an unknown selector instead of returning false.
 
-Three more are used where they exist and worked around where they don't:
+Four more are used where they exist and worked around where they don't:
 
 - Compression streams, Baseline Widely available as of 2025-11-09. Track data comes from `data/storms.json.gz`, and without it the app fetches the uncompressed JSON.
 - JavaScript modules in workers, Baseline Widely available as of 2025-12-06. Track parsing moves off the main thread, and any worker error puts it back.
+- Custom highlights, Baseline Newly available as of 2026-03-24. Search matches are painted with `CSS.highlights` and `::highlight()`, which colours the text that is already on the page instead of wrapping part of a result in a `<mark>`. Wrapping would split an option's accessible name into pieces at boundaries the reader's own typing decides. Without the API the list renders unhighlighted.
 - JavaScript modules in service workers, Baseline Newly available as of 2026-01-13. `sw.js` carries no imports and no `import.meta`, so it registers with the module type first and retries as a classic script. `npm run test:offline-smoke:classic` runs the whole offline suite with the module registration refused.
 
 `scripts/baseline-contract.mjs` is the one place those dates live. `npm run check:baseline` fails if this section drifts from it, if a feature with no fallback is claimed at a Baseline tier it has not reached, or if a browser version number turns up here. `npm run test:browser-matrix` then detects every one of these features in the Chromium, Firefox, and WebKit builds Playwright ships, and fails when an engine is missing one the app cannot work around.

@@ -60,6 +60,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'test:filter-state',
   'test:settings',
   'test:fuzzy',
+  'test:search-highlight',
   'test:glossary',
   'test:climatology',
   'test:decade-trends',

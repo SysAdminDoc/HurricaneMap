@@ -4053,6 +4053,15 @@ select {
   min-width: 0;
 }
 
+/* Painted over the text that is already in the DOM, so there is no element
+   here to style and nothing for the accessibility tree to notice. An engine
+   without the Custom Highlight API ignores the whole rule and the reader gets
+   the same list unhighlighted. */
+::highlight(hm-search-match) {
+  background-color: var(--search-match-bg);
+  color: var(--search-match-ink);
+}
+
 .search-result-meta {
   color: var(--subtext);
 }

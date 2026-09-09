@@ -23,6 +23,11 @@ html.high-contrast {
   --ink-accent:   #d0bfff;
   --ink-link:     #9fdcff;
   --ink-link-alt: #a8c7ff;
+  /* Pure yellow on pure black is 19.6:1, and the same pair is 19.6:1 the other
+     way up, so the light high-contrast theme inherits this rather than
+     restating it. */
+  --search-match-bg:  #ffff00;
+  --search-match-ink: #000000;
   --brand-title-start: #ffffff;
   --brand-title-end: #7dd3fc;
 
@@ -491,6 +496,13 @@ html.high-contrast #map .leaflet-tile-pane {
   body {
     background: Canvas;
     color: CanvasText;
+  }
+
+  /* forced-colors overrides the author pair above. Mark/MarkText is the
+     system's own highlight, which is what the user asked their OS for. */
+  ::highlight(hm-search-match) {
+    background-color: Mark;
+    color: MarkText;
   }
 
   #map {
