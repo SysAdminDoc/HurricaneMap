@@ -248,7 +248,7 @@ export default {
   'coneRetro.show': 'Show educational cone',
   'coneRetro.era': 'Error-statistics era',
   'coneRetro.ellipseToggle': 'Illustrative 2026 ellipse method',
-  'coneRetro.explainer': 'Applies published NHC error radii to the observed centerline for comparison. It is not a historical forecast, and storm impacts can occur far outside any cone.',
+  'coneRetro.explainer': 'Applies published NHC error radii to the observed centerline for comparison. It is not a historical forecast. A cone shows where a centre might go and says nothing about the risk of strong winds, which reach well outside it. This one is drawn around a track that is already known, so it carries no probability at all.',
   'coneRetro.loading': 'Drawing retrospective cone…',
   'coneRetro.ready': 'Cone drawn from {0} lead-time points.',
   'coneRetro.error': 'This track is too short to draw the selected cone.',

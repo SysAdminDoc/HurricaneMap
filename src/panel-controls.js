@@ -16,7 +16,11 @@ import { formatWind } from './settings.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { getDateLocale, t } from './i18n.js';
-import { clearRetrospectiveCone, renderRetrospectiveCone } from './cone-retro.js';
+import {
+  clearRetrospectiveCone,
+  isEllipseMethodOfficial,
+  renderRetrospectiveCone,
+} from './cone-retro.js';
 import {
   clearAdvisoryReplay,
   getAdvisoryReplayPosition,
@@ -438,6 +442,17 @@ export function wirePanelControls({
     coneEnabled.addEventListener('change', syncCone);
     coneEra.addEventListener('change', syncCone);
     coneEllipse.addEventListener('change', syncCone);
+    // The ellipse method is a reconstruction with scale factors this repository
+    // chose, because NHC has published the experimental cone as a graphic and
+    // not its 90th-percentile axes. Offering it beside the circle method asks a
+    // reader to compare a published statistic against an invention, so the
+    // control is removed rather than disabled: a disabled control still says
+    // the feature exists and is coming.
+    isEllipseMethodOfficial().then(official => {
+      if (official) return;
+      coneEllipse.checked = false;
+      coneEllipse.closest('label')?.remove();
+    });
     syncCone();
   }
 

@@ -5067,16 +5067,46 @@ try {
   await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--circle') && /Cone drawn/.test(document.querySelector('#cone-retro-status')?.textContent || ''), null, { timeout: 10000 });
   const circleConePath = await page.getAttribute('path.cone-retro-shape--circle', 'd');
   await page.selectOption('#cone-retro-era', '2026');
-  await page.check('#cone-retro-ellipse');
-  await page.waitForFunction(() => document.querySelector('path.cone-retro-shape--ellipse') && /2026/.test(document.querySelector('#cone-retro-legend')?.textContent || ''), null, { timeout: 10000 });
-  const ellipseCone = await page.evaluate(() => ({
-    path: document.querySelector('path.cone-retro-shape--ellipse')?.getAttribute('d') || '',
-    legend: document.querySelector('#cone-retro-legend')?.textContent || '',
-    explainer: document.querySelector('.cone-retro-control p')?.textContent || '',
-  }));
+
+  // The ellipse control is not in the panel. NHC has published the experimental
+  // cone as graphics and not the 90th-percentile axes it draws, so the scale
+  // factors this repository uses are its own and are withheld from readers
+  // until the real axes exist. The renderer still supports the method, and this
+  // drives it directly so that path keeps its coverage: a capability that is
+  // not offered is not the same as one that has stopped working.
+  const ellipseControl = await page.$('#cone-retro-ellipse');
+  assert(
+    ellipseControl === null,
+    'the illustrative ellipse toggle must not be offered while data/cone-radii.json says the axes are unofficial',
+  );
+
+  const ellipseCone = await page.evaluate(async () => {
+    const cone = await import('/src/cone-retro.js');
+    const map = (await import('/src/map.js')).getMap();
+    const storms = await import('/src/data.js');
+    await storms.ensureStormsLoaded();
+    const storm = storms.getStorm('AL122005');
+    const result = await cone.renderRetrospectiveCone(storm, { map, era: '2026', ellipse: true });
+    return {
+      status: result.status,
+      path: document.querySelector('path.cone-retro-shape--ellipse')?.getAttribute('d') || '',
+      legend: document.querySelector('#cone-retro-legend')?.textContent || '',
+      explainer: document.querySelector('.cone-retro-control p')?.textContent || '',
+    };
+  });
+  assert(ellipseCone.status === 'rendered', `the ellipse method did not draw: ${JSON.stringify(ellipseCone)}`);
   assert(circleConePath && ellipseCone.path && circleConePath !== ellipseCone.path, 'ellipse mode did not redraw the retrospective cone geometry');
   assert(/illustrative ellipse/.test(ellipseCone.legend), `retrospective cone legend did not identify ellipse mode: ${ellipseCone.legend}`);
-  assert(/not a historical forecast/i.test(ellipseCone.explainer) && /outside any cone/i.test(ellipseCone.explainer), `retrospective cone explainer is incomplete: ${ellipseCone.explainer}`);
+  assert(/not a historical forecast/i.test(ellipseCone.explainer), `retrospective cone explainer is incomplete: ${ellipseCone.explainer}`);
+  // What NHC says about every cone, and what is true of this one in particular.
+  assert(
+    /says nothing about the risk of strong winds/i.test(ellipseCone.explainer),
+    `the explainer must carry the wind-risk caveat: ${ellipseCone.explainer}`,
+  );
+  assert(
+    /carries no probability/i.test(ellipseCone.explainer),
+    `the explainer must say a circle around a known track carries no probability: ${ellipseCone.explainer}`,
+  );
   await page.uncheck('#cone-retro-enabled');
   await page.waitForFunction(() => !document.querySelector('path.cone-retro-shape'), null, { timeout: 5000 });
 

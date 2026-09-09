@@ -245,7 +245,7 @@ export default {
   'coneRetro.show': 'Montre kòn edikatif',
   'coneRetro.era': 'Epòk estatistik erè',
   'coneRetro.ellipseToggle': 'Metòd elips 2026 pou ilistrasyon',
-  'coneRetro.explainer': 'Aplike reyon erè NHC pibliye yo sou chemen sant obsève a pou konparezon. Li pa yon previzyon istorik, epi konsekans yo ka rive lwen deyò nenpòt kòn.',
+  'coneRetro.explainer': 'Aplike reyon erè NHC pibliye yo sou chemen sant obsève a pou konparezon. Li pa yon previzyon istorik. Yon kòn montre kote sant lan ka pase, li pa di anyen sou risk gwo van, ki rive byen lwen deyò l. Yo trase sa a otou yon chemen yo deja konnen, kidonk li pa bay okenn pwobabilite.',
   'coneRetro.loading': 'Ap trase kòn retwospektiv la…',
   'coneRetro.ready': 'Kòn trase ak {0} pwen delè.',
   'coneRetro.error': 'Chemen sa a twò kout pou trase kòn chwazi a.',

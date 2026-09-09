@@ -57,8 +57,8 @@
     },
     {
       "path": "data/cone-radii.json",
-      "bytes": 2777,
-      "sha256": "402882ed84b6533229ece48775bfd27613e8fbddfe643ffca948dcbc55f5db1f",
+      "bytes": 4011,
+      "sha256": "5e36cd0da0e33a75cf0c9c6286a0d311cd64f875d6accf7371d93d754a463dff",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-09-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "be200e5a798bbdc66819b64b07cf1a3752d74330ed859d3483df7222dd1a40b3",
+      "sha256": "deb49ec51345129856b9ebe2070db743fc37fac10bed72aa87c1d80323ebf0be",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

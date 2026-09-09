@@ -248,7 +248,7 @@ export default {
   'coneRetro.show': 'Mostrar cono educativo',
   'coneRetro.era': 'Época de estadísticas de error',
   'coneRetro.ellipseToggle': 'Método ilustrativo de elipses de 2026',
-  'coneRetro.explainer': 'Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico y los impactos pueden ocurrir mucho más allá del cono.',
+  'coneRetro.explainer': 'Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico. Un cono muestra por dónde puede pasar el centro y no dice nada sobre el riesgo de vientos fuertes, que llegan mucho más allá de él. Este se dibuja alrededor de una trayectoria que ya se conoce, así que no expresa ninguna probabilidad.',
   'coneRetro.loading': 'Dibujando cono retrospectivo…',
   'coneRetro.ready': 'Cono dibujado con {0} puntos de plazo.',
   'coneRetro.error': 'La trayectoria es demasiado corta para el cono seleccionado.',

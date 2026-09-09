@@ -221,9 +221,7 @@
         - option /\d+/ [selected]
         - option /\d+/
         - option /\d+/
-      - checkbox /Metòd elips \d+ pou ilistrasyon/ [disabled]
-      - text: /Metòd elips \d+ pou ilistrasyon/
-      - paragraph: Aplike reyon erè NHC pibliye yo sou chemen sant obsève a pou konparezon. Li pa yon previzyon istorik, epi konsekans yo ka rive lwen deyò nenpòt kòn.
+      - paragraph: Aplike reyon erè NHC pibliye yo sou chemen sant obsève a pou konparezon. Li pa yon previzyon istorik. Yon kòn montre kote sant lan ka pase, li pa di anyen sou risk gwo van, ki rive byen lwen deyò l. Yo trase sa a otou yon chemen yo deja konnen, kidonk li pa bay okenn pwobabilite.
       - status
     - region "Chemen risk anime":
       - heading "Chemen risk anime" [level=3]

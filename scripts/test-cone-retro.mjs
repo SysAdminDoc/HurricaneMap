@@ -1,11 +1,17 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   buildConeEnvelope,
   buildConeSamples,
   destinationPoint,
   interpolateTrackPoint,
+  ellipseMethodIsOfficial,
+  isEllipseMethodOfficial,
 } from '../src/cone-retro.js';
+import en from '../src/locales/en.js';
+import es from '../src/locales/es.js';
+import ht from '../src/locales/ht.js';
 
 const start = Date.UTC(2026, 7, 20, 0, 0);
 const track = Array.from({ length: 9 }, (_, index) => ({
@@ -40,4 +46,82 @@ const north = destinationPoint(20, -80, 0, 60);
 assert(Math.abs(north[0] - 21) < 0.02, '60 n mi north should be approximately one latitude degree');
 assert(Math.abs(north[1] + 80) < 0.01);
 
-console.log('retrospective cone utilities ok');
+// What the explainer has to say, in every language the panel speaks.
+//
+// A cone is a statement about where a centre might go. NHC says plainly that it
+// carries no information about wind risk, and the winds reach well outside it.
+// This one has a second problem the real product does not: it is drawn around a
+// track that already happened, so there is no probability in it at all. Both
+// sentences have to be there or the drawing is more confident than the data.
+{
+  const claims = {
+    en: [/says nothing about the risk of strong winds/i, /carries no probability/i],
+    es: [/no dice nada sobre el riesgo de vientos fuertes/i, /no expresa ninguna probabilidad/i],
+    ht: [/pa di anyen sou risk gwo van/i, /pa bay okenn pwobabilite/i],
+  };
+  for (const [locale, catalog] of Object.entries({ en, es, ht })) {
+    const explainer = catalog['coneRetro.explainer'];
+    assert(explainer, `${locale} has no coneRetro.explainer`);
+    for (const claim of claims[locale]) {
+      assert(
+        claim.test(explainer),
+        `${locale} explainer does not carry ${claim}: ${explainer}`,
+      );
+    }
+  }
+}
+
+// The ellipse method is withheld until the axes it claims to draw are real.
+{
+  const radii = JSON.parse(await readFile(new URL('../data/cone-radii.json', import.meta.url), 'utf8'));
+  const experimental = radii.experimentalEllipse;
+  assert.equal(typeof experimental.official, 'boolean', 'the ellipse method must declare whether it is official');
+  assert(experimental.recheckOn, 'an unofficial method must carry the date to look again');
+  assert.equal(
+    experimental.recheckOn,
+    '2026-11-30',
+    'the re-check date is the close of NHC comments on the experimental cone',
+  );
+  assert.equal(
+    experimental.official,
+    false,
+    'NHC has published the experimental cone as graphics and not its axes, so this stays false until they exist',
+  );
+  // Both directions, against the predicate rather than the fetch. Node cannot
+  // fetch a file: URL, so `isEllipseMethodOfficial()` answers false from its
+  // catch here whatever the data says, and asserting on it would have proved
+  // only that the two happened to agree.
+  assert.equal(ellipseMethodIsOfficial(radii), false, 'the shipped data withholds the method');
+  assert.equal(
+    ellipseMethodIsOfficial({ experimentalEllipse: { official: true } }),
+    true,
+    'the predicate must be able to answer true, or the withholding is permanent by accident',
+  );
+  assert.equal(ellipseMethodIsOfficial({ experimentalEllipse: { official: 'true' } }), false, 'only the boolean counts');
+  assert.equal(ellipseMethodIsOfficial({}), false, 'missing data withholds');
+  assert.equal(ellipseMethodIsOfficial(null), false, 'no data withholds');
+  assert.equal(
+    await isEllipseMethodOfficial(),
+    false,
+    'and the async wrapper answers false rather than throwing when the radii cannot be read',
+  );
+
+  // And the other state, since a flag nothing reads differently is not a flag.
+  // The panel removes the control when this answers false; it has to be capable
+  // of answering true, or the withholding is permanent by accident.
+  const wired = /isEllipseMethodOfficial\(\)[\s\S]{0,220}?coneEllipse\.closest\('label'\)\?\.remove\(\)/;
+  const controls = await readFile(new URL('../src/panel-controls.js', import.meta.url), 'utf8');
+  assert(
+    wired.test(controls),
+    'the panel must remove the ellipse control when the method is not official',
+  );
+  assert(
+    /if \(official\) return;/.test(controls),
+    'and must leave it in place when it is',
+  );
+}
+
+console.log(
+  'retrospective cone utilities ok (explainer carries the wind-risk and no-probability caveats in three '
+  + 'locales; the ellipse method is withheld until its axes are published, re-check 2026-11-30)',
+);

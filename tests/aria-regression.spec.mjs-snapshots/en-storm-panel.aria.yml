@@ -221,9 +221,7 @@
         - option /\d+/ [selected]
         - option /\d+/
         - option /\d+/
-      - checkbox /Illustrative \d+ ellipse method/ [disabled]
-      - text: /Illustrative \d+ ellipse method/
-      - paragraph: Applies published NHC error radii to the observed centerline for comparison. It is not a historical forecast, and storm impacts can occur far outside any cone.
+      - paragraph: Applies published NHC error radii to the observed centerline for comparison. It is not a historical forecast. A cone shows where a centre might go and says nothing about the risk of strong winds, which reach well outside it. This one is drawn around a track that is already known, so it carries no probability at all.
       - status
     - region "Animated risk trajectories":
       - heading "Animated risk trajectories" [level=3]

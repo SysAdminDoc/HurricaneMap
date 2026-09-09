@@ -33,6 +33,32 @@ export async function loadConeRadii() {
   return radiiPromise;
 }
 
+/**
+ * Whether the 2026 ellipse method may be offered to a reader.
+ *
+ * NHC's experimental cone is a real 90th-percentile ellipse and the axes are
+ * not published yet, so what this module draws is a reconstruction using scale
+ * factors it chose itself. Offering that beside the circle method invites a
+ * comparison between one published statistic and one invention. The toggle
+ * stays out of the panel until `official` is true in data/cone-radii.json,
+ * which is also where the date to re-check is written down.
+ */
+export function ellipseMethodIsOfficial(radii) {
+  return radii?.experimentalEllipse?.official === true;
+}
+
+export async function isEllipseMethodOfficial() {
+  try {
+    return ellipseMethodIsOfficial(await loadConeRadii());
+  } catch {
+    // No data means no cone at all, and certainly no unofficial method. The
+    // decision is a separate pure function because this arm answers false for
+    // a second reason, and a test that only ever reaches this one proves
+    // nothing about the data it claims to read.
+    return false;
+  }
+}
+
 export function destinationPoint(lat, lon, bearing, distanceNmi) {
   return destinationPointNmi(lat, lon, bearing, distanceNmi);
 }

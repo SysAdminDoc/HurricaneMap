@@ -221,9 +221,7 @@
         - option /\d+/ [selected]
         - option /\d+/
         - option /\d+/
-      - checkbox /Método ilustrativo de elipses de \d+/ [disabled]
-      - text: /Método ilustrativo de elipses de \d+/
-      - paragraph: Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico y los impactos pueden ocurrir mucho más allá del cono.
+      - paragraph: Aplica radios de error publicados por el NHC a la trayectoria observada para compararlos. No es un pronóstico histórico. Un cono muestra por dónde puede pasar el centro y no dice nada sobre el riesgo de vientos fuertes, que llegan mucho más allá de él. Este se dibuja alrededor de una trayectoria que ya se conoce, así que no expresa ninguna probabilidad.
       - status
     - region "Trayectorias de riesgo animadas":
       - heading "Trayectorias de riesgo animadas" [level=3]
