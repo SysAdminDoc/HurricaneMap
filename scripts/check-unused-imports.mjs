@@ -70,7 +70,11 @@ export function findUnusedImports(source) {
 }
 
 async function main() {
-  const files = (await readdir(srcDir)).filter(file => file.endsWith('.js'));
+  // Recursive, because src/locales/ is three modules this used to skip: it
+  // reported 110 where the dead-export check reports 113.
+  const files = (await readdir(srcDir, { recursive: true }))
+    .map(file => String(file).split(path.sep).join('/'))
+    .filter(file => file.endsWith('.js'));
   const offenders = [];
   let scanned = 0;
 

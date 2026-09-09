@@ -33,7 +33,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lineAt, parseModule, patternNames, walk } from './js-ast.mjs';
+import { lineAt, parseModule, patternNames, referencesModuleBinding, walk } from './js-ast.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceDir = path.join(root, 'src');
@@ -114,15 +114,28 @@ export function findImports(source, fromFile) {
     // as real a consumer as a relative one. The smoke suite reaches modules
     // that way from inside page.evaluate, where there is no file to be relative
     // to: `await import('/src/nhc-proxy.js')`.
-    const resolved = specifier.startsWith('/')
-      ? specifier.slice(1)
-      : specifier.startsWith('.')
-        ? path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier))
+    // A browser accepts a cache-busting suffix and this repository might one
+    // day write one, at which point a used export would be called dead and the
+    // build would fail on correct code.
+    const bare = specifier.split('?')[0].split('#')[0];
+    const resolved = bare.startsWith('/')
+      ? bare.slice(1)
+      : bare.startsWith('.')
+        ? path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), bare))
         : null;
     if (!resolved) return;
+    // An extensionless specifier names the same module; credit both spellings
+    // rather than neither.
+    if (!/\.[a-z]+$/i.test(resolved)) {
+      addResolved(`${resolved}.js`, name);
+      addResolved(`${resolved}/index.js`, name);
+    }
+    addResolved(resolved, name);
+  };
+  function addResolved(resolved, name) {
     if (!imports.has(resolved)) imports.set(resolved, new Set());
     imports.get(resolved).add(name);
-  };
+  }
 
   // A binding that holds a whole module namespace, and the module it holds.
   // Reading one member off it consumes that name and nothing else, which is
@@ -264,21 +277,16 @@ export function findImports(source, fromFile) {
   return imports;
 }
 
-/** The bodies of a page's inline module scripts, plus the modules it loads. */
+/** The bodies of a page's inline module scripts. */
 function htmlScripts(html) {
   const inline = [];
-  const loaded = [];
   for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     const attributes = match[1];
-    const src = /\ssrc\s*=\s*["']([^"']+)["']/i.exec(attributes);
-    if (src) {
-      loaded.push(src[1]);
-      continue;
-    }
+    if (/\ssrc\s*=\s*["']/i.test(attributes)) continue;
     if (/\stype\s*=\s*["']application\/(?:ld\+)?json["']/i.test(attributes)) continue;
     inline.push(match[2]);
   }
-  return { inline, loaded };
+  return inline;
 }
 
 async function readAll(dir, results = new Map(), prefix = '') {
@@ -317,16 +325,16 @@ async function main() {
   for (const file of HTML_ENTRY_POINTS) {
     const html = await readFile(path.join(root, file), 'utf8').catch(() => null);
     if (html === null) continue;
-    const { inline, loaded } = htmlScripts(html);
-    inline.forEach((body, index) => importers.set(`${file}#script-${index}`, body));
-    // A page that loads a module by src consumes its default entry point, not
-    // any particular name, so this only keeps the module itself reachable.
-    if (loaded.length) {
-      importers.set(
-        `${file}#src`,
-        loaded.filter(url => url.startsWith('./') || url.startsWith('../'))
-          .map(url => `import '${url}';`).join('\n'),
-      );
+    // Only the inline module scripts. A page that loads a module with src=
+    // makes it an entry point, and an entry point's own exports are held to
+    // exactly the same rule as any other module's, so there is nothing to
+    // credit: src/main.js exports nothing at all. An earlier version built a
+    // synthetic importer here that filtered for './' and so matched neither
+    // entry point, and would have credited nothing even if it had, since a
+    // side-effect import names no specifiers. It read as protection and was
+    // not any.
+    for (const [index, body] of htmlScripts(html).entries()) {
+      importers.set(`${file}#script-${index}`, body);
     }
   }
 
@@ -375,8 +383,11 @@ async function main() {
       const external = bindings && [...bindings].some(entry => entry.target === target && entry.from !== file);
       if (external) continue;
 
-      // Used inside its own file, or used nowhere at all. Asking the tree
-      // rather than the text, and not counting the declaration itself.
+      // Used inside its own file, or used nowhere at all. Scope aware, because
+      // asking only whether the name appears is the same word match this file
+      // set out to remove: a module exporting `state` with an unrelated
+      // `let state` in some other function looked like it used the export, and
+      // the finding was demoted from a failure to a line in the success text.
       const usedInternally = usesNameOutsideItsExport(source, name);
       (usedInternally ? internalOnly : dead).push({ file, line, name });
     }
@@ -429,22 +440,7 @@ export function usesNameOutsideItsExport(source, name) {
     }
   }
 
-  const notAReference = new Set(declared);
-  walk(tree, node => {
-    if (node.type === 'Property' && !node.computed && !node.shorthand && node.key?.type === 'Identifier') {
-      notAReference.add(node.key);
-    }
-    if (node.type === 'MemberExpression' && !node.computed && node.property?.type === 'Identifier') {
-      notAReference.add(node.property);
-    }
-  });
-
-  let used = false;
-  walk(tree, node => {
-    if (used || node.type !== 'Identifier') return;
-    if (node.name === name && !notAReference.has(node)) used = true;
-  });
-  return used;
+  return referencesModuleBinding(tree, name, declared);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
