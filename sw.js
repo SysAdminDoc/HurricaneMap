@@ -230,7 +230,8 @@ self.addEventListener('activate', (event) => {
       recordFailure(error);
     }
 
-    await withReleaseLock(async () => {
+    try {
+      await withReleaseLock(async () => {
       // Validation must not be able to skip the cleanup either. It was the
       // first await in one straight-line handler, so a throw there abandoned
       // the cache deletion, the navigation preload and the pruning alike.
@@ -256,7 +257,14 @@ self.addEventListener('activate', (event) => {
       } catch (error) {
         recordFailure(error);
       }
-    });
+      });
+    } catch (error) {
+      // Both blocks inside catch, so the task cannot throw. Acquiring the lock
+      // can: storage denied, or an origin with no access to it. Unwrapped, that
+      // left failures empty and reported exactly the "nothing was wrong" signal
+      // this is here to distinguish from silence.
+      recordFailure(error);
+    }
   })());
 });
 

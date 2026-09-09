@@ -256,6 +256,11 @@ assert.deepEqual(integrityResult, {
   swVersion: 'hm-v1.9.3',
   shellCache: 'hm-shell-hm-v1.9.3',
   dataCache: 'hm-data-hm-v1.9.3',
+  // This worker reported no last_activate, and null is the honest answer: it
+  // means the instance answering has not run activate, which a worker
+  // terminated for idleness and respawned to handle this very message has not.
+  // It is not the same as an activate that found nothing wrong.
+  lastActivate: null,
 });
 const publishedNames = getServiceWorkerDiagnostics();
 assert.equal(publishedNames.activeShellCache, 'hm-shell-hm-v1.9.3');

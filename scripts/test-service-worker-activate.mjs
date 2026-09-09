@@ -19,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
-import { initServiceWorkerUpdates } from '../src/sw-updates.js';
+import { initServiceWorkerUpdates, requestOfflineIntegrityCheck } from '../src/sw-updates.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const source = await readFile(path.join(root, 'sw.js'), 'utf8');
@@ -65,6 +65,12 @@ async function loadServiceWorker({ validatorThrows = false, cleanupThrows = fals
     ['hm-shell-hm-v0.0.1-stale', makeCache()],
     ['hm-data-hm-v0.0.1-stale', makeCache()],
   ]);
+  // pruneSourceBundle returns immediately unless the source bundle cache
+  // exists, and deleteLegacyDataDbs returns immediately unless the worker has
+  // indexedDB. With neither present both were called and did nothing, so a
+  // defect anywhere in their bodies would still have shipped.
+  const sourceBundleName = `hm-source-bundle-${'hm-v0.0.1-stale'}`;
+  const deletedDatabases = [];
 
   const self = {
     addEventListener(type, handler) {
@@ -81,6 +87,17 @@ async function loadServiceWorker({ validatorThrows = false, cleanupThrows = fals
     },
     location: new URL(WORKER_URL),
     navigator: locks ? { locks } : undefined,
+  };
+  const indexedDB = {
+    // The name has to carry the prefix the worker looks for, or the discovery
+    // half of the sweep is exercised only to reject it.
+    async databases() { return [{ name: 'hm-offline-data-hm-v0.0.1-stale' }]; },
+    deleteDatabase(name) {
+      deletedDatabases.push(name);
+      const request = {};
+      queueMicrotask(() => request.onsuccess?.());
+      return request;
+    },
   };
 
   const caches = {
@@ -121,7 +138,7 @@ async function loadServiceWorker({ validatorThrows = false, cleanupThrows = fals
     console: { log() {}, warn() {}, error() {} },
     setTimeout,
     clearTimeout,
-    indexedDB: undefined,
+    indexedDB,
     CompressionStream: undefined,
     DecompressionStream: undefined,
     TextEncoder,
@@ -130,6 +147,7 @@ async function loadServiceWorker({ validatorThrows = false, cleanupThrows = fals
     Date,
     Promise,
   });
+  context.self.indexedDB = indexedDB;
   context.globalThis = context;
   context.self.global = context;
 
@@ -145,7 +163,7 @@ async function loadServiceWorker({ validatorThrows = false, cleanupThrows = fals
     { filename: 'sw-stub.js' },
   );
 
-  return { listeners, calls, cacheStore, context };
+  return { listeners, calls, cacheStore, context, deletedDatabases, sourceBundleName };
 }
 
 function activateHandler(loaded) {
@@ -236,6 +254,17 @@ async function runActivate(options = {}) {
     typeof clean.lastActivate?.at === 'string',
     'a clean activate must still record that it ran, because null means this worker instance never activated',
   );
+  // Reaching these two is not the same as running them. Both early-return on a
+  // condition the stub used to fail, so they were called and did nothing while
+  // the comments here claimed they were covered.
+  assert(
+    clean.deletedDatabases.includes('hm-offline-data-hm-v0.0.1-stale'),
+    `the legacy database sweep must actually delete, got ${JSON.stringify(clean.deletedDatabases)}`,
+  );
+  assert(
+    !clean.cacheStore.has(clean.sourceBundleName),
+    'the superseded source bundle cache must be gone',
+  );
 }
 
 // The claim must not queue behind the release lock. withReleaseLock takes an
@@ -270,6 +299,27 @@ async function runActivate(options = {}) {
   releaseHolder();
   await waited;
   assert(loaded.calls.deleted.length > 0, 'once the lock is free the housekeeping must run');
+}
+
+// Acquiring the lock can fail on its own, without the work inside it ever
+// running: storage denied, or an origin with no access to the Web Locks API.
+// Both inner blocks catch, so the task cannot throw and the await around it was
+// left bare, which meant the whole handler rejected with an empty failure list
+// and reported exactly the "activate found nothing wrong" signal this is here
+// to tell apart from silence.
+{
+  const rejecting = { request() { return Promise.reject(new Error('lock storage denied')); } };
+  const loaded = await loadServiceWorker({ locks: rejecting });
+  let waited = null;
+  activateHandler(loaded)({ waitUntil(promise) { waited = promise; } });
+  const rejection = await waited.then(() => null, error => error);
+  const lastActivate = vm.runInContext('lastActivate', loaded.context);
+  assert.equal(rejection, null, `a lock that cannot be taken must not reject the activate: ${rejection}`);
+  assert.equal(loaded.calls.claimed, 1, 'a lock that cannot be taken must still leave the clients claimed');
+  assert(
+    lastActivate?.failures?.some(message => message.includes('lock storage denied')),
+    `a lock that cannot be taken must be reported, got ${JSON.stringify(lastActivate)}`,
+  );
 }
 
 // The other tabs. Accepting an update in one tab swaps the controller for every
@@ -469,7 +519,70 @@ async function runActivate(options = {}) {
   assert.equal(fresh.state.reloads, 0, 'a page acquiring its first controller must not reload itself');
 }
 
+// The worker reporting a failure is worth nothing if the client drops it. The
+// first attempt at this extended the message handler's whitelist and stopped
+// there, and publishIntegrity destructures its own six fields one hop later, so
+// the value was thrown away on arrival and the gate could not see it: it read
+// lastActivate straight out of the vm context rather than through the path the
+// panel actually uses.
+{
+  const published = [];
+  const documentRef = {
+    documentElement: {},
+    getElementById: () => null,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    body: { appendChild: node => node },
+    addEventListener() {},
+    dispatchEvent(event) { published.push(event?.detail ?? null); return true; },
+  };
+  const messageListeners = [];
+  const controller = {
+    postMessage(message) {
+      if (message?.type !== 'CHECK_OFFLINE_INTEGRITY') return;
+      for (const handler of messageListeners) {
+        handler({
+          data: {
+            type: 'OFFLINE_INTEGRITY_RESULT',
+            state: 'intact',
+            checked_at_utc: '2026-09-08T00:00:00Z',
+            sw_version: 'hm-v1.9.3',
+            shell_cache: 'hm-shell-hm-v1.9.3',
+            data_cache: 'hm-data-hm-v1.9.3',
+            last_activate: { at: '2026-09-08T00:00:00Z', failures: ['release tuple mismatch'] },
+          },
+        });
+      }
+    },
+  };
+
+  const result = await requestOfflineIntegrityCheck({
+    navigatorRef: {
+      serviceWorker: {
+        controller,
+        addEventListener(type, handler) { if (type === 'message') messageListeners.push(handler); },
+        removeEventListener() {},
+        ready: Promise.resolve({ active: controller }),
+      },
+    },
+    documentRef,
+    timeoutMs: 500,
+  });
+
+  assert.deepEqual(
+    result?.lastActivate?.failures,
+    ['release tuple mismatch'],
+    `the activate failure must survive the integrity check, got ${JSON.stringify(result?.lastActivate)}`,
+  );
+  const diagnostics = published.filter(Boolean).at(-1);
+  assert.deepEqual(
+    diagnostics?.activateFailures,
+    ['release tuple mismatch'],
+    `the activate failure must reach the published diagnostics, got ${JSON.stringify(Object.keys(diagnostics || {}))}`,
+  );
+}
+
 console.log(
   'service worker activate ok (clients claimed through a failing validator, a failing cleanup and a held '
-  + 'release lock; every failure reported; the other tabs get a prompt whose Reload button works)',
+  + 'release lock; every failure reported all the way to the panel; the other tabs get a prompt whose Reload button works)',
 );

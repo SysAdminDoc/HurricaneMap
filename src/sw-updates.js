@@ -189,6 +189,7 @@ function publishIntegrity({
   swVersion = null,
   shellCache = null,
   dataCache = null,
+  lastActivate = null,
 } = {}, documentRef) {
   publishDiagnostics({
     offlineIntegrity: state,
@@ -199,6 +200,13 @@ function publishIntegrity({
     ...(swVersion ? { activeSwVersion: swVersion } : {}),
     ...(shellCache ? { activeShellCache: shellCache } : {}),
     ...(dataCache ? { activeDataCache: dataCache } : {}),
+    // Null here is not "the activate was fine". It is "this worker instance
+    // has not run activate", which is what a worker terminated for idleness
+    // and respawned to answer this very message reports. Only overwrite when
+    // the worker actually said something, for the same reason as the names
+    // above. Adding a field to the message handler and stopping there is how
+    // this arrived and was dropped one hop later.
+    ...(lastActivate ? { activateFailures: lastActivate.failures, activateAt: lastActivate.at } : {}),
   }, documentRef);
   return {
     state,
@@ -207,6 +215,7 @@ function publishIntegrity({
     swVersion,
     shellCache,
     dataCache,
+    lastActivate,
   };
 }
 
