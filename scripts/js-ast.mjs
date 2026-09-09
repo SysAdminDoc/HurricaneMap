@@ -74,16 +74,43 @@ function declaredBy(node, { includeVar }) {
   return names;
 }
 
-/** Every `var` and function declaration anywhere inside a function body. */
+/**
+ * Every `var` and function declaration in this function body, and not in the
+ * bodies of functions nested inside it.
+ *
+ * This recurses by hand because `walk` visits and then descends regardless of
+ * what the callback does: returning from the callback skips the rest of that
+ * callback, not the subtree. A nested `function () { var m = 1; }` therefore
+ * used to put `m` in the enclosing function's hoisted names, which made
+ * scopeBinds claim a shadow that does not exist and suppressed every real read
+ * of `m` in the function around it.
+ */
 function hoistedNames(body) {
   const names = [];
-  walk(body, node => {
-    if (FUNCTION_TYPES.has(node.type) && node !== body) return;
+  const visit = node => {
+    if (!node || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      for (const child of node) visit(child);
+      return;
+    }
+    if (typeof node.type !== 'string') return;
+    // A nested function has its own `var` scope. Its name, though, is declared
+    // out here.
+    if (FUNCTION_TYPES.has(node.type) && node !== body) {
+      if (node.type === 'FunctionDeclaration' && node.id?.name) names.push(node.id.name);
+      return;
+    }
     if (node.type === 'VariableDeclaration' && node.kind === 'var') {
       for (const declarator of node.declarations) patternNames(declarator.id, names);
     }
     if (node.type === 'FunctionDeclaration' && node.id?.name) names.push(node.id.name);
-  });
+    if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') return;
+    for (const key of Object.keys(node)) {
+      if (POSITION_KEYS.has(key)) continue;
+      visit(node[key]);
+    }
+  };
+  visit(body);
   return names;
 }
 
@@ -110,6 +137,25 @@ export function scopeBinds(node, name) {
   }
   if (node.type === 'CatchClause' && node.param) return patternNames(node.param).includes(name);
   if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') return node.id?.name === name;
+  // A loop head binds for the whole loop. `for (const m of list)` beside a
+  // module-level `m` is a different variable, and both directions matter: a
+  // read of the loop variable must not count as a read of the outer binding,
+  // and a genuinely dead export must not be rescued by one.
+  if (node.type === 'ForStatement') {
+    return node.init?.type === 'VariableDeclaration'
+      && node.init.kind !== 'var'
+      && node.init.declarations.some(d => patternNames(d.id).includes(name));
+  }
+  if (node.type === 'ForOfStatement' || node.type === 'ForInStatement') {
+    return node.left?.type === 'VariableDeclaration'
+      && node.left.kind !== 'var'
+      && node.left.declarations.some(d => patternNames(d.id).includes(name));
+  }
+  // A switch body is one block, and its cases share it.
+  if (node.type === 'SwitchStatement') {
+    return (node.cases || []).some(kase => (kase.consequent || [])
+      .some(statement => declaredBy(statement, { includeVar: false }).includes(name)));
+  }
   return false;
 }
 
@@ -156,8 +202,12 @@ export function nonReferenceIdentifiers(tree, into = new Set()) {
       if (node.imported) into.add(node.imported);
     }
     if (node.type === 'ExportSpecifier') {
-      if (node.local) into.add(node.local);
-      if (node.exported) into.add(node.exported);
+      // Only the name being published, and only when it is a node of its own.
+      // `export { m }` READS the local binding, and acorn gives the shorthand
+      // form one Identifier for both halves, so excluding the published name
+      // excluded the read as well and a namespace handed out of the module
+      // never widened. `export { m as n }` has two nodes and only n is a name.
+      if (node.exported && node.exported !== node.local) into.add(node.exported);
     }
   });
   return into;

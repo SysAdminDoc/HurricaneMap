@@ -106,18 +106,28 @@ assert(Math.abs(north[1] + 80) < 0.01);
     'and the async wrapper answers false rather than throwing when the radii cannot be read',
   );
 
-  // And the other state, since a flag nothing reads differently is not a flag.
-  // The panel removes the control when this answers false; it has to be capable
-  // of answering true, or the withholding is permanent by accident.
-  const wired = /isEllipseMethodOfficial\(\)[\s\S]{0,220}?coneEllipse\.closest\('label'\)\?\.remove\(\)/;
+  // The control has to start hidden rather than be taken away afterwards.
+  // Rendering it and removing it once the radii arrive leaves a window, as long
+  // as that fetch takes, in which a reader can tick it and draw the invented
+  // ellipse; the control is then removed with the ellipse still on the map.
+  const panel = await readFile(new URL('../src/panel.js', import.meta.url), 'utf8');
+  const toggleMarkup = /<label[^>]*id="cone-retro-ellipse-toggle"[^>]*>/.exec(panel);
+  assert(toggleMarkup, 'the ellipse toggle must be identifiable in the panel markup');
+  assert(
+    /\bhidden\b/.test(toggleMarkup[0]),
+    `the ellipse toggle must render hidden: ${toggleMarkup[0]}`,
+  );
+
+  // And the flag has to be readable in both directions, or the withholding is
+  // permanent by accident rather than by the data.
   const controls = await readFile(new URL('../src/panel-controls.js', import.meta.url), 'utf8');
   assert(
-    wired.test(controls),
-    'the panel must remove the ellipse control when the method is not official',
+    /isEllipseMethodOfficial\(\)\.then\(official => \{[\s\S]{0,400}?hidden = false;/.test(controls),
+    'the panel must reveal the ellipse control when the method is official',
   );
   assert(
-    /if \(official\) return;/.test(controls),
-    'and must leave it in place when it is',
+    /\?\.remove\(\);/.test(controls),
+    'and must take it out of the page when it is not',
   );
 }
 

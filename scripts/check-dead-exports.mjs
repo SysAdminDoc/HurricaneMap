@@ -190,7 +190,18 @@ export function findImports(source, fromFile) {
   };
 
   // The block a declaration belongs to, so a namespace is resolved where it
-  // exists rather than across the whole file.
+  // exists rather than across the whole file. Loop heads and switch bodies are
+  // scopes as much as a block is, and attributing a declaration in one of them
+  // to the block outside resolves it against code it cannot see.
+  const SCOPE_NODES = new Set([
+    'Program',
+    'BlockStatement',
+    'StaticBlock',
+    'SwitchStatement',
+    'ForStatement',
+    'ForOfStatement',
+    'ForInStatement',
+  ]);
   const blockOf = new Map();
   const trackBlocks = (node, block) => {
     if (!node || typeof node !== 'object') return;
@@ -199,9 +210,7 @@ export function findImports(source, fromFile) {
       return;
     }
     if (typeof node.type !== 'string') return;
-    const next = node.type === 'Program' || node.type === 'BlockStatement' || node.type === 'StaticBlock'
-      ? node
-      : block;
+    const next = SCOPE_NODES.has(node.type) ? node : block;
     if (node.type === 'VariableDeclarator') blockOf.set(node, next);
     for (const key of Object.keys(node)) {
       if (POSITION_KEYS.has(key)) continue;

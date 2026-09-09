@@ -445,13 +445,23 @@ export function wirePanelControls({
     // The ellipse method is a reconstruction with scale factors this repository
     // chose, because NHC has published the experimental cone as a graphic and
     // not its 90th-percentile axes. Offering it beside the circle method asks a
-    // reader to compare a published statistic against an invention, so the
-    // control is removed rather than disabled: a disabled control still says
-    // the feature exists and is coming.
+    // reader to compare a published statistic against an invention.
+    //
+    // The control ships hidden and is revealed only once the data says the axes
+    // are real, rather than rendered and then removed. Removing it after an
+    // await left a window on the first panel open of a cold load, as long as
+    // the fetch for data/cone-radii.json takes, in which the toggle was in the
+    // page and in the accessibility tree: a reader could tick it, draw the
+    // invented ellipse, and then have the control taken away with the ellipse
+    // still on the map and nothing left to clear it.
+    const ellipseToggle = document.getElementById('cone-retro-ellipse-toggle');
     isEllipseMethodOfficial().then(official => {
-      if (official) return;
+      if (official) {
+        if (ellipseToggle) ellipseToggle.hidden = false;
+        return;
+      }
       coneEllipse.checked = false;
-      coneEllipse.closest('label')?.remove();
+      (ellipseToggle || coneEllipse.closest('label'))?.remove();
     });
     syncCone();
   }

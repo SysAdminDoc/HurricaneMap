@@ -437,7 +437,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
               <option value="2025"${storm.year >= 2020 && storm.year < 2026 ? ' selected' : ''}>2025</option>
               <option value="2026"${storm.year >= 2026 ? ' selected' : ''}>2026</option>
             </select>
-            <label class="wf-toggle">
+            <label class="wf-toggle" id="cone-retro-ellipse-toggle" hidden>
               <input type="checkbox" id="cone-retro-ellipse">
               <span>${t('coneRetro.ellipseToggle')}</span>
             </label>
