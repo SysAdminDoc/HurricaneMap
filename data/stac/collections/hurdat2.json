@@ -61,7 +61,7 @@
   "links": [
     {
       "rel": "self",
-      "href": "hurdat2.json",
+      "href": "https://sysadmindoc.github.io/HurricaneMap/data/stac/collections/hurdat2.json",
       "type": "application/json"
     },
     {

@@ -64,7 +64,7 @@
   "links": [
     {
       "rel": "self",
-      "href": "radar.json",
+      "href": "https://sysadmindoc.github.io/HurricaneMap/data/stac/collections/radar.json",
       "type": "application/json"
     },
     {

@@ -18,6 +18,17 @@ export const RADAR_REGIONS = {
   prcomp: { bounds: [[13.1, -71.07], [23.1, -61.07]], product: 'n0q' },
 };
 
+// Where the catalog is published. STAC says `self` is the absolute location
+// the document can be found online, and a viewer pointed at an external catalog
+// resolves the rest of the tree from it: a relative `self` left STAC Browser
+// resolving siblings against its own host. Every other link stays relative, so
+// the catalog still navigates from a checked-out repository or an unpacked
+// release with no server.
+export const PUBLIC_BASE = 'https://sysadmindoc.github.io/HurricaneMap/';
+export const STAC_BROWSER_URL = `https://browser.moregeo.it/external/${PUBLIC_BASE.replace(/^https:\/\//, '')}data/stac/catalog.json`;
+
+const selfLink = (relative, type) => ({ rel: 'self', href: `${PUBLIC_BASE}${relative}`, type });
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CATALOG_PATH = 'data/stac/catalog.json';
 const HURDAT2_COLLECTION_PATH = 'data/stac/collections/hurdat2.json';
@@ -118,7 +129,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
           'hurricanemap:distribution': DISTRIBUTIONS,
         },
         links: [
-          { rel: 'self', href: relativeHref(itemPath, itemPath), type: 'application/geo+json' },
+          selfLink(itemPath, 'application/geo+json'),
           { rel: 'parent', href: relativeHref(itemPath, RADAR_COLLECTION_PATH), type: 'application/json' },
           { rel: 'collection', href: relativeHref(itemPath, RADAR_COLLECTION_PATH), type: 'application/json' },
           { rel: 'root', href: relativeHref(itemPath, CATALOG_PATH), type: 'application/json' },
@@ -156,7 +167,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
       'hurricanemap:distribution': DISTRIBUTIONS,
     },
     links: [
-      { rel: 'self', href: relativeHref(HURDAT2_ITEM_PATH, HURDAT2_ITEM_PATH), type: 'application/geo+json' },
+      selfLink(HURDAT2_ITEM_PATH, 'application/geo+json'),
       { rel: 'parent', href: relativeHref(HURDAT2_ITEM_PATH, HURDAT2_COLLECTION_PATH), type: 'application/json' },
       { rel: 'collection', href: relativeHref(HURDAT2_ITEM_PATH, HURDAT2_COLLECTION_PATH), type: 'application/json' },
       { rel: 'root', href: relativeHref(HURDAT2_ITEM_PATH, CATALOG_PATH), type: 'application/json' },
@@ -265,7 +276,7 @@ export async function buildStacFiles({ root = ROOT } = {}) {
     'hurricanemap:generated_at_utc': generatedAt,
     'hurricanemap:distribution': DISTRIBUTIONS,
     links: [
-      { rel: 'self', href: relativeHref(CATALOG_PATH, CATALOG_PATH), type: 'application/json' },
+      selfLink(CATALOG_PATH, 'application/json'),
       { rel: 'child', href: relativeHref(CATALOG_PATH, HURDAT2_COLLECTION_PATH), type: 'application/json' },
       { rel: 'child', href: relativeHref(CATALOG_PATH, RADAR_COLLECTION_PATH), type: 'application/json' },
       { rel: 'describedby', href: relativeHref(CATALOG_PATH, 'data/release-manifest.json'), type: 'application/json', title: 'Release checksum manifest' },
@@ -290,7 +301,7 @@ export async function writeStacCatalog({ root = ROOT } = {}) {
 
 function collectionLinks(collectionPath, catalogPath, itemLinks) {
   return [
-    { rel: 'self', href: relativeHref(collectionPath, collectionPath), type: 'application/json' },
+    selfLink(collectionPath, 'application/json'),
     { rel: 'parent', href: relativeHref(collectionPath, catalogPath), type: 'application/json' },
     { rel: 'root', href: relativeHref(collectionPath, catalogPath), type: 'application/json' },
     ...itemLinks,

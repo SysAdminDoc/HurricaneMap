@@ -3,7 +3,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { STAC_FILE_EXTENSION, STAC_VERSION } from './generate-stac-catalog.mjs';
+import { PUBLIC_BASE, STAC_FILE_EXTENSION, STAC_VERSION } from './generate-stac-catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const INDEX_PATH = 'index.html';
@@ -201,10 +201,24 @@ async function validateItem(item, collectionId, itemPath, root) {
 }
 
 function validateLinks(document, documentPath, root) {
+  let selfLinks = 0;
   for (const link of document.links || []) {
     if (!link.rel || !link.href) throw new Error(`STAC ${documentPath} contains an incomplete link`);
+    // `self` is the one link the spec defines as absolute: it is where the
+    // document can be found online, and a viewer pointed at an external catalog
+    // resolves the rest of the tree from it. Everything else stays a local
+    // relative path so the catalog navigates from an unpacked release with no
+    // server, which is what the check below is for.
+    if (link.rel === 'self') {
+      selfLinks += 1;
+      if (link.href !== `${PUBLIC_BASE}${documentPath}`) {
+        throw new Error(`STAC ${documentPath} self link is not its published address: ${link.href}`);
+      }
+      continue;
+    }
     resolveHref(documentPath, link.href, root);
   }
+  if (selfLinks !== 1) throw new Error(`STAC ${documentPath} must carry exactly one self link`);
 }
 
 async function validateAsset(asset, label, fromPath, root) {

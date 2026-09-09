@@ -59,7 +59,7 @@
   "links": [
     {
       "rel": "self",
-      "href": "AL062024-202409110000.json",
+      "href": "https://sysadmindoc.github.io/HurricaneMap/data/stac/items/radar/AL062024-202409110000.json",
       "type": "application/geo+json"
     },
     {

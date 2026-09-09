@@ -3,7 +3,7 @@ import { readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildStacFiles } from './generate-stac-catalog.mjs';
+import { buildStacFiles, STAC_BROWSER_URL } from './generate-stac-catalog.mjs';
 import { validateStac } from './check-stac.mjs';
 import { stageDistribution } from './build-distribution.mjs';
 
@@ -25,6 +25,77 @@ assert.equal(hurdat2Collection.summaries['hurricanemap:inferred_landfall_count']
 assert.deepEqual(radarCollection.summaries['hurricanemap:year_range'], radarCoverage.year_range);
 assert.equal(radarCollection.summaries['hurricanemap:storm_count'][0], 139);
 
+// ------------------------------------------------------------- self links
+//
+// STAC says `self` is the absolute location a document can be found online, and
+// a viewer pointed at an external catalog resolves the rest of the tree from
+// it. A relative `self` left STAC Browser resolving siblings against its own
+// host. Checked on every document, not just the catalog, because the browser
+// walks into collections and items from there.
+const PUBLIC_BASE = 'https://sysadmindoc.github.io/HurricaneMap/';
+let selfLinks = 0;
+for (const [relative, body] of generated) {
+  const document = JSON.parse(body);
+  const self = (document.links || []).filter(link => link.rel === 'self');
+  assert.equal(self.length, 1, `${relative} must carry exactly one self link`);
+  assert.equal(
+    self[0].href,
+    `${PUBLIC_BASE}${relative}`,
+    `${relative}: self must be this document's own published address`,
+  );
+  selfLinks += 1;
+
+  // Every other link stays relative, so the catalog still navigates from a
+  // checked-out repository or an unpacked release with no server. Absolute
+  // links there would send a reader offline to read a file they already have.
+  for (const link of document.links || []) {
+    if (link.rel === 'self' || link.rel === 'describedby') continue;
+    assert.ok(
+      !/^https?:\/\//.test(link.href),
+      `${relative}: ${link.rel} must stay relative so the catalog works offline (${link.href})`,
+    );
+  }
+}
+assert.equal(selfLinks, generated.size, 'every STAC document must declare where it lives');
+
+// The link the About dialog and the README both hand a reader. Pinned here so
+// the three cannot drift apart, and pinned to browser.moregeo.it because
+// radiantearth.github.io/stac-browser now redirects there.
+assert.equal(
+  STAC_BROWSER_URL,
+  'https://browser.moregeo.it/external/sysadmindoc.github.io/HurricaneMap/data/stac/catalog.json',
+);
+const indexHtml = await readFile(path.join(root, 'index.html'), 'utf8');
+const readme = await readFile(path.join(root, 'README.md'), 'utf8');
+assert.ok(indexHtml.includes(STAC_BROWSER_URL), 'the About dialog must link the catalog browser');
+assert.ok(readme.includes(STAC_BROWSER_URL), 'the README must link the catalog browser');
+assert.ok(
+  !indexHtml.includes('radiantearth.github.io/stac-browser')
+  && !readme.includes('radiantearth.github.io/stac-browser'),
+  'the retired STAC Browser host must not be linked; it redirects',
+);
+
+// ------------------------------------------------------------------- Monty
+//
+// The catalog deliberately declares no Monty field. Checked on 2026-09-09
+// against the released v1.3.0 schema rather than assumed: declaring the
+// extension makes monty:country_codes, monty:hazard_codes, monty:corr_id and a
+// role from event/hazard/impact/response required on the item's properties, and
+// the schema sets additionalProperties:false over the monty: namespace. Nothing
+// here can satisfy that honestly. A radar reflectivity frame is not an event, a
+// hazard, an impact or a response; the HURDAT2 item covers 595 storms and so
+// has no single country or correlation; and monty:corr_id is defined as "the
+// unique identifier assigned by the Monty system", which a HURDAT2 storm id is
+// not. So no hurricanemap: field has a Monty equivalent that can be emitted
+// under both names, and this guard exists to stop one being added by halves.
+for (const [relative, body] of generated) {
+  assert.ok(!body.includes('monty:'), `${relative} declares a Monty field; see the note above`);
+  assert.ok(
+    !body.includes('monty-stac-extension'),
+    `${relative} declares the Monty extension, whose required fields this catalog cannot honestly supply`,
+  );
+}
+
 const full = await validateStac({ root, profile: 'full' });
 assert.equal(full.collections, 2);
 assert(full.radarItems >= 1600);
@@ -40,4 +111,4 @@ try {
   await rm(output, { recursive: true, force: true });
 }
 
-console.log(`STAC tests ok (${full.radarItems} deterministic radar items, full/core validation)`);
+console.log(`STAC tests ok (${full.radarItems} deterministic radar items, ${selfLinks} self links, full/core validation)`);
