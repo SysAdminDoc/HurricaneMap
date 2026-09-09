@@ -153,7 +153,12 @@
             "name": "Impactos",
             "level": 3
           },
-          "Víctimas mortales 1,392 Daños $200.8B (2024 USD · $125.0B nominal) Desastre de mil millones $201.3B (2024 USD · 1833 muertes)",
+          "Víctimas mortales 1,392 Daños $200.8B (2024 USD · $125.0B nominal) Desastre de mil millones $201.3B (2024 USD · 1833 muertes) Entre 1963 y 2024, las inundaciones de agua dulce mataron a más personas en estas tormentas que la marejada, el viento, los tornados o el oleaje. El estudio es de lectura libre, pero su licencia no permite que este atlas incluya las cifras.",
+          {
+            "role": "link",
+            "name": "Muller et al. 2026, npj Natural Hazards",
+            "url": "https://doi.org/10.1038/s44304-026-00178-8"
+          },
           {
             "role": "link",
             "name": "Fuente: Wikipedia",

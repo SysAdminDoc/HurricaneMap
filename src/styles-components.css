@@ -1229,6 +1229,15 @@ label > input[type="checkbox"] {
   max-width: 65%;
 }
 
+.im-study {
+  margin-top: 6px;
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--subtext);
+}
+
+.im-study a { color: var(--ink-link); }
+
 .im-source {
   margin-top: 6px;
   padding-top: 6px;

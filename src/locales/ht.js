@@ -763,6 +763,8 @@ export default {
   'impacts.confidence.low': 'ba',
   'impacts.confidence.unknown': 'enkoni',
   'impacts.missingRecord': 'Pa gen dosye enpak Wikipedya nan app la pou siklòn sa a. Sa ki manke pa vle di zewo.',
+  'impacts.fatalityStudy': "Ant 1963 ak 2024, inondasyon dlo dous touye plis moun nan tanpèt sa yo pase gwo lanmè, van, tònad oswa vag. Etid la gratis pou li, men lisans li pa pèmèt atlas sa a pote chif yo.",
+  'impacts.fatalityStudyLink': "Muller et al. 2026, npj Natural Hazards",
   'impacts.coverageTitle': 'Kouvèti done enpak',
   'impacts.coverageSummary': '{0} sou {1} siklòn nan katalòg la gen dosye enpak ({2}%).',
   'impacts.missingMeaning': 'Dosye ki manke vle di done kominotè yo pa disponib, pa zewo lanmò oswa dega.',

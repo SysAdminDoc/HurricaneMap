@@ -788,6 +788,8 @@ export default {
   'impacts.confidence.low': 'low',
   'impacts.confidence.unknown': 'unknown',
   'impacts.missingRecord': 'No Wikipedia impact record is bundled for this storm. Missing means unavailable, not zero.',
+  'impacts.fatalityStudy': "Across 1963 to 2024, freshwater flooding killed more people in these storms than surge, wind, tornadoes or surf. The study is free to read, but its licence does not let this atlas carry the figures.",
+  'impacts.fatalityStudyLink': "Muller et al. 2026, npj Natural Hazards",
   'impacts.coverageTitle': 'Impact data coverage',
   'impacts.coverageSummary': '{0} of {1} catalog storms have bundled impact records ({2}%).',
   'impacts.missingMeaning': 'Missing records mean unavailable community-source data, not zero deaths or damage.',

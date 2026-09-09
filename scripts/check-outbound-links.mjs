@@ -26,7 +26,10 @@ const MAX_PARALLEL = 6;
 
 // A redirect that lands on another host is normally rot. These are the ones
 // that are not, each with the reason, so a genuine move still fails.
+// A `host->*` entry means the host is a resolver: where it lands is not
+// this repository's business, only that it still resolves.
 export const ALLOWED_HOST_CHANGES = new Map([
+  ['doi.org->*', 'a DOI is a redirector by definition. It resolves to whichever host the publisher currently serves the article from, and that changes when a journal moves or puts an access interstitial in front. A DOI that has rotted still fails this gate, because doi.org answers 404 for one that does not exist.'],
   ['www.nhc.noaa.gov->www.weather.gov', 'NHC serves some static pages from the NWS host'],
   ['github.com->www.github.com', 'GitHub canonicalises to www for some paths'],
   ['en.wikipedia.org->en.m.wikipedia.org', 'Wikipedia redirects to its mobile host for some clients'],
@@ -202,7 +205,7 @@ async function main() {
     }
     if (result.finalHost !== result.codedHost) {
       const move = `${result.codedHost}->${result.finalHost}`;
-      if (!ALLOWED_HOST_CHANGES.has(move)) {
+      if (!ALLOWED_HOST_CHANGES.has(move) && !ALLOWED_HOST_CHANGES.has(`${result.codedHost}->*`)) {
         failures.push(`${result.url} (${where}) redirects to another host: ${result.finalUrl}`);
       }
     }

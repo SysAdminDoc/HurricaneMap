@@ -785,6 +785,8 @@ export default {
   'impacts.confidence.low': 'baja',
   'impacts.confidence.unknown': 'desconocida',
   'impacts.missingRecord': 'No se incluye un registro de impactos de Wikipedia para este huracán. Que falte no significa cero.',
+  'impacts.fatalityStudy': "Entre 1963 y 2024, las inundaciones de agua dulce mataron a más personas en estas tormentas que la marejada, el viento, los tornados o el oleaje. El estudio es de lectura libre, pero su licencia no permite que este atlas incluya las cifras.",
+  'impacts.fatalityStudyLink': "Muller et al. 2026, npj Natural Hazards",
   'impacts.coverageTitle': 'Cobertura de datos de impactos',
   'impacts.coverageSummary': '{0} de {1} huracanes del catálogo tienen registros de impactos ({2}%).',
   'impacts.missingMeaning': 'Los registros faltantes indican datos comunitarios no disponibles, no cero muertes o daños.',

@@ -415,6 +415,7 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Official forecast skill (2021-2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml). Regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
 | Archived NHC advisories (2015-2024 U.S.-landfalling Atlantic storms) | [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/). Regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
+| Who these storms kill, 1963-2024 (linked, not bundled) | [Muller et al., *Continental United States direct Atlantic tropical cyclone fatalities: 1963-2024*, npj Natural Hazards 2026](https://doi.org/10.1038/s44304-026-00178-8). CC BY-NC-ND 4.0, so the atlas links it and carries none of its figures |
 | Format spec | [Landsea, C. W., *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
 | Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/), fetched live (CORS-enabled), no preprocessing |
 | State boundaries | [PublicaMundi MappingAPI](https://github.com/PublicaMundi/MappingAPI) (US Census Bureau TIGER) |

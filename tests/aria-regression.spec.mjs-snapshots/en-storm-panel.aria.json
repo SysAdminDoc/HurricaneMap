@@ -153,7 +153,12 @@
             "name": "Impacts",
             "level": 3
           },
-          "Fatalities 1,392 Damage $200.8B (2024 USD · $125.0B nominal) Billion-dollar disaster $201.3B (2024 USD · 1,833 deaths)",
+          "Fatalities 1,392 Damage $200.8B (2024 USD · $125.0B nominal) Billion-dollar disaster $201.3B (2024 USD · 1,833 deaths) Across 1963 to 2024, freshwater flooding killed more people in these storms than surge, wind, tornadoes or surf. The study is free to read, but its licence does not let this atlas carry the figures.",
+          {
+            "role": "link",
+            "name": "Muller et al. 2026, npj Natural Hazards",
+            "url": "https://doi.org/10.1038/s44304-026-00178-8"
+          },
           {
             "role": "link",
             "name": "Source: Wikipedia",

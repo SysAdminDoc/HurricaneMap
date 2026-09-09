@@ -109,10 +109,16 @@ export function renderImpactsBlock(storm, im = getImpactsFor(storm.id)) {
     rows.push(`<div class="im-row im-row--missing"><span class="im-value">${t('impacts.missingRecord')}</span></div>`);
   }
   if (!rows.length) return '';
+  // A death toll for one storm says nothing about how these storms kill, and
+  // the best current answer to that is a paper this atlas is not allowed to
+  // bundle: CC BY-NC-ND forbids redistributing its figures. So the panel
+  // points at it and says why the numbers are not here.
+  const study = `<div class="im-study">${t('impacts.fatalityStudy')} <a href="https://doi.org/10.1038/s44304-026-00178-8" target="_blank" rel="noopener">${t('impacts.fatalityStudyLink')}</a></div>`;
   return `
     <h3 class="panel-section-h3">${t('panel.impacts')}</h3>
     <div class="impacts-block">
       ${rows.join('')}
+      ${study}
       <div class="im-source">${sources.join(' · ')}</div>
     </div>
   `;
