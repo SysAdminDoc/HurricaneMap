@@ -92,6 +92,7 @@
     "test:report-export": "node scripts/test-report-export.mjs",
     "generate:storm-pages": "node scripts/build-storm-pages.mjs",
     "generate:city-pages": "node scripts/build-city-pages.mjs",
+    "generate:social-images": "node scripts/build-social-images.mjs",
     "test:storm-pages": "node scripts/test-storm-pages.mjs",
     "test:citation": "node scripts/test-citation.mjs",
     "test:export-provenance": "node scripts/test-export-provenance.mjs",

@@ -4,13 +4,14 @@
 // regenerating produces the same bytes.
 
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { open, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
 import { buildStormPages, citySlug, stormSlug, categoryLabel } from './build-storm-pages.mjs';
 import { buildCityPages } from './build-city-pages.mjs';
+import { buildSocialImages } from './build-social-images.mjs';
 import { COASTAL_CITIES } from '../src/metrics.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -104,6 +105,80 @@ assert.equal(categoryLabel(-1), 'Tropical storm');
 
 const megabytes = first.bytes / 1024 / 1024;
 assert.ok(megabytes < 40, `storm pages grew to ${megabytes.toFixed(1)} MB, which needs a deliberate decision`);
+
+// ---------------------------------------------------------- social images
+//
+// Every storm page shared one og:image, so a share of any storm showed the same
+// generic screenshot. What matters is that no two pages point at the same card
+// and that the card each one names is really there at the aspect the crawlers
+// lay out for.
+const stormPageFiles = first.files.filter(file => /^storms\/[^/]+\/index\.html$/.test(file.path.replace(/\\/g, '/')));
+assert.equal(stormPageFiles.length, storms.length, 'expected to find every storm page');
+
+const ogImages = new Set();
+for (const file of stormPageFiles) {
+  const slug = file.path.replace(/\\/g, '/').split('/')[1];
+  const og = /<meta property="og:image" content="([^"]+)">/.exec(file.body)?.[1];
+  const twitter = /<meta name="twitter:image" content="([^"]+)">/.exec(file.body)?.[1];
+  assert.ok(og, `${file.path} has no og:image`);
+  assert.equal(twitter, og, `${file.path}: twitter:image and og:image disagree`);
+  assert.equal(
+    og,
+    `https://sysadmindoc.github.io/HurricaneMap/social/${slug}.png`,
+    `${file.path} points at another storm's card`,
+  );
+  ogImages.add(og);
+
+  // The card has to exist, and be the size the meta tags claim. A PNG's width
+  // and height are two big-endian 32-bit fields in IHDR, at bytes 16 and 20.
+  const header = Buffer.alloc(24);
+  const handle = await open(path.join(root, 'social', `${slug}.png`), 'r');
+  try {
+    await handle.read(header, 0, 24, 0);
+  } finally {
+    await handle.close();
+  }
+  assert.equal(header.readUInt32BE(0), 0x89504e47, `social/${slug}.png is not a PNG`);
+  assert.equal(header.readUInt32BE(16), 1200, `social/${slug}.png is not 1200 wide`);
+  assert.equal(header.readUInt32BE(20), 630, `social/${slug}.png is not 630 tall`);
+}
+assert.equal(
+  ogImages.size,
+  storms.length,
+  `expected one distinct og:image per storm page, found ${ogImages.size} across ${storms.length} pages`,
+);
+
+// The card is drawn from the storm's own track, so two storms that differ have
+// to produce different pictures. Byte equality is the wrong test for a
+// rasteriser; the SVG the card is rasterised from is the artifact to compare,
+// and it is generated without a browser.
+const cardSvgs = (await buildSocialImages({ write: false })).cards;
+assert.equal(cardSvgs.length, storms.length, 'expected one card per storm');
+assert.equal(new Set(cardSvgs.map(card => card.svg)).size, storms.length, 'two storms produced identical cards');
+const katrinaCard = cardSvgs.find(card => card.storm.id === 'AL122005');
+assert.match(katrinaCard.svg, /Hurricane Katrina/, "Katrina's card must name her");
+assert.match(katrinaCard.svg, /Peak 150 kt/, "Katrina's card must carry her peak wind");
+assert.match(katrinaCard.svg, /Category 5/, "Katrina's card must state her peak category");
+assert.equal(katrinaCard.file, 'social/katrina-2005.png');
+// windToCategory codes a depression 0 and a tropical storm -1, so the codes do
+// not sort by intensity and a plain max over them picks the depression. Driven
+// on a storm whose whole track sits in the tropical-storm band, whose badge
+// therefore has exactly one right answer.
+// It has to carry a depression-strength observation too, or every code on the
+// track is -1 and the buggy maximum lands on the right answer by accident.
+const tropicalStormOnly = storms.find(storm => {
+  const winds = storm.track.map(point => point.wind).filter(Number.isFinite);
+  if (!winds.length) return false;
+  const peak = Math.max(...winds);
+  return peak >= 34 && peak < 64 && Math.min(...winds) < 34;
+});
+assert.ok(tropicalStormOnly, 'no storm peaks in the tropical-storm band after a depression, which cannot be right');
+const tropicalStormCard = cardSvgs.find(card => card.storm.id === tropicalStormOnly.id);
+assert.match(
+  tropicalStormCard.svg,
+  />Tropical storm</,
+  `${tropicalStormOnly.id} peaks at tropical-storm strength but its card does not say so`,
+);
 
 // ------------------------------------------------------------- city pages
 //

@@ -191,6 +191,10 @@ function renderStormPage(storm, landfalls, context) {
     storm: { id: storm.id, name: displayName(storm), year: storm.year },
   });
   const basin = storm.basin === 'EP' ? 'Eastern Pacific' : 'Atlantic';
+  // One card per storm, drawn by scripts/build-social-images.mjs. Every page
+  // used to share a single generic screenshot, so a share of any storm showed
+  // the same picture and none of them showed the storm.
+  const socialImage = `${SITE}social/${slug}.png`;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -233,8 +237,12 @@ function renderStormPage(storm, landfalls, context) {
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(summary)}">
 <meta property="og:url" content="${escapeHtml(url)}">
-<meta property="og:image" content="${escapeHtml(`${SITE}example.png`)}">
+<meta property="og:image" content="${escapeHtml(socialImage)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${escapeHtml(`The best track of ${headline(storm)}`)}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${escapeHtml(socialImage)}">
 <script type="application/ld+json">${escapeJsonLd(jsonLd)}</script>
 <style>${PAGE_CSS}</style>
 </head>
