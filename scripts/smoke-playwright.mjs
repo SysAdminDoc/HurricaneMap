@@ -4660,7 +4660,34 @@ async function assertForcedColorsContract(browser, baseUrl) {
     assert(!/transparent|rgba\(0,\s*0,\s*0,\s*0\)/i.test(`${legend.color} ${legend.background} ${legend.border}`),
       `forced-colors legend has transparent system chrome: ${JSON.stringify(legend)}`);
     assert(legend.forcedColorAdjust === 'auto', `forced-colors legend did not use system colors: ${JSON.stringify(legend)}`);
-    await assertNoAxeViolations(page, 'forced-colors main view (WCAG 2.2 AA)');
+
+    // axe reads colours, and the high-contrast class was toggled off and back
+    // on three lines above, which starts every colour transition in the page
+    // again. Reading through those reported a contrast violation whose node
+    // count moved run to run: 7 to 9 nodes on 2026-09-08, 23 on 2026-09-09,
+    // with a different first node each time, and the same tree passed on a
+    // re-run. A count that changes without the tree changing is a timing
+    // dependency, not a contrast defect.
+    //
+    // Same treatment assertThemeContrastMatrix already uses for the same
+    // reason: contrast is a property of the settled colours, so measure with
+    // no animation at all. Scoped to this measurement and removed afterwards,
+    // because leaving it in collapses the animations that give the mobile
+    // filter checkboxes their 44px touch targets.
+    const forcedStillness = await page.addStyleTag({
+      content: `*, *::before, *::after {
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+      }`,
+    });
+    await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
+    try {
+      await assertNoAxeViolations(page, 'forced-colors main view (WCAG 2.2 AA)');
+    } finally {
+      await forcedStillness.evaluate(node => node.remove());
+    }
 
     await openKatrinaPanel(page);
     const panel = await page.evaluate(() => {
