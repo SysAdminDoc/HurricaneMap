@@ -60,7 +60,28 @@ function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}) {
   // An unsupported feed is reported in the diagnostics panel, not as a card
   // over the map: there is no action a reader could take about it.
   host.hidden = feed.state === 'idle' || feed.state === 'unsupported';
+  markRegionBusy(host);
   return host.innerHTML;
+}
+
+/**
+ * Tell assistive technology when the region around a feed is being replaced.
+ *
+ * Without this a screen reader is handed a region that still reads as its old
+ * contents while a fetch is in flight, with nothing to say it is being
+ * replaced. Recomputed from every feed host inside the region rather than from
+ * this one, because a panel can carry several: clearing the flag when one
+ * settles would announce a region as ready while another was still loading.
+ * Any state that is not `loading` clears it, so a failure cannot leave a region
+ * busy forever.
+ */
+function markRegionBusy(host) {
+  const region = host.parentElement?.closest('[role="region"]');
+  if (!region) return;
+  const busy = [...region.querySelectorAll('[data-feed][data-state]')]
+    .some(node => node.dataset.state === 'loading');
+  if (busy) region.setAttribute('aria-busy', 'true');
+  else region.removeAttribute('aria-busy');
 }
 
 export function mountOptionalFeedStatus(host, feedId, { onRetry = null, now = Date.now } = {}) {

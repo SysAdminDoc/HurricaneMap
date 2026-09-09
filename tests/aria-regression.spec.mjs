@@ -712,3 +712,71 @@ test('the recents list can be cleared, and stays cleared across a reload', async
   await expect(page.locator('#search-results')).toBeHidden();
   await expect(page.locator('#clear-search-history')).toBeHidden();
 });
+
+test('a region fetching a feed is announced busy, and never left busy', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+  await openStorm(page, 'AL122005');
+  const panel = page.locator('#storm-panel');
+  await expect(panel).toBeVisible();
+  // The tides block mounts its status host before it fetches, so a loading
+  // state has somewhere inside the region to render.
+  await expect(page.locator('#storm-panel #tides-feed-status')).toHaveCount(1);
+  await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+
+  const drive = (call, args = {}) => page.evaluate(async ({ name, options }) => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds[name]('tides', options);
+  }, { name: call, options: args });
+
+  // Fetching: the region says so, so a screen reader is not handed stale
+  // contents with nothing to indicate they are being replaced.
+  await drive('beginOptionalFeed');
+  await expect(panel).toHaveAttribute('aria-busy', 'true');
+
+  // Settled: cleared.
+  await drive('completeOptionalFeed', { itemCount: 3 });
+  await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+
+  // Failed: also cleared. A region left busy after an error is worse than one
+  // that was never marked, because it never resolves for the reader.
+  await drive('beginOptionalFeed');
+  await expect(panel).toHaveAttribute('aria-busy', 'true');
+  await drive('failOptionalFeed', { responseStatus: 503 });
+  await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+
+  // A second feed in the same region holds it busy while the first settles.
+  // Clearing on the first to finish would announce the panel as ready while
+  // something in it was still loading.
+  const bothFeeds = await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    const hosts = [...document.querySelectorAll('#storm-panel [data-feed][data-state]')]
+      .map(node => node.dataset.feed);
+    return hosts;
+  });
+  // Asserted rather than guarded: a conditional here would go quiet the day the
+  // panel stops carrying two feeds, and the multi-feed case is the one the
+  // recompute exists for.
+  expect(bothFeeds, 'the storm panel must carry more than one feed for this to mean anything')
+    .toEqual(['tides', 'fema']);
+  {
+    const [first, second] = bothFeeds;
+    await page.evaluate(async ({ a, b }) => {
+      const feeds = await import('/src/optional-feeds.js');
+      feeds.beginOptionalFeed(a);
+      feeds.beginOptionalFeed(b);
+    }, { a: first, b: second });
+    await expect(panel).toHaveAttribute('aria-busy', 'true');
+    await page.evaluate(async ({ a }) => {
+      const feeds = await import('/src/optional-feeds.js');
+      feeds.completeOptionalFeed(a, { itemCount: 1 });
+    }, { a: first });
+    await expect(panel).toHaveAttribute('aria-busy', 'true');
+    await page.evaluate(async ({ b }) => {
+      const feeds = await import('/src/optional-feeds.js');
+      feeds.completeOptionalFeed(b, { itemCount: 1 });
+    }, { b: second });
+    await expect(panel).not.toHaveAttribute('aria-busy', 'true');
+  }
+
+  await assertNoAxeViolations(page, 'storm panel with a busy region', '#storm-panel');
+});
