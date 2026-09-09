@@ -4618,6 +4618,71 @@ async function assertPanelIsAddressable(browser, baseUrl) {
       `a panel re-render undid the hash the reader had just pasted: ${pasted}`,
     );
 
+    // The same window, but the incoming link names a panel that is not the one
+    // on screen, which is the case this feature exists to serve. Guarding only
+    // the already-in-sync case left the shared statistics link unprotected.
+    await page.goto(`${baseUrl}#storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel:not([hidden])', { timeout: 15_000 });
+    const shared = await page.evaluate(() => {
+      location.hash = '#v=1&t=1&panel=stats';
+      document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id: 'storm-panel' } }));
+      return location.hash;
+    });
+    assert(
+      shared.includes('panel=stats') && shared.includes('t=1'),
+      `a panel re-render undid a shared link before it could be applied: ${shared}`,
+    );
+    await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 }).catch(() => {
+      throw new Error('the shared statistics link never opened its panel');
+    });
+
+    // A versioned hash is a complete view: omitting a field means the contract
+    // default, not whatever this tab happens to be showing. The panel has to
+    // follow that rule too, or the reader does not get the view the link
+    // describes and the next filter write puts the panel back in their address
+    // bar.
+    await page.evaluate(() => { location.hash = '#v=1&y=2005-2005'; });
+    await page.waitForFunction(
+      () => document.getElementById('stats-panel')?.hidden === true,
+      null,
+      { timeout: 8000 },
+    ).catch(() => {
+      throw new Error('a versioned link naming no panel left the statistics panel open');
+    });
+    await page.waitForFunction(() => !location.hash.includes('panel='), null, { timeout: 8000 })
+      .catch(async () => {
+        const hash = await page.evaluate(() => location.hash);
+        throw new Error(`a closed panel was written back into a link that did not name it: ${hash}`);
+      });
+
+    // An unversioned hash is a partial edit, not a complete view: that is how
+    // restoreFiltersFromHash already treats it, keeping whatever this tab has
+    // for the fields it does not name. It says nothing about panels and must
+    // leave an open one alone. Driven with a hash that opens no panel of its
+    // own, because a hash that opens one would close the statistics panel
+    // through the panel lane and prove nothing about this rule.
+    await clickHeaderAction(page, '#toggle-stats');
+    await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 });
+    await page.evaluate(() => { location.hash = '#t=1'; });
+    await page.waitForFunction(
+      () => document.getElementById('show-tracks')?.checked === true,
+      null,
+      { timeout: 8000 },
+    );
+    // Held across a window long enough for the deferred close to have run.
+    assert(
+      await page.evaluate(async () => {
+        const deadline = Date.now() + 700;
+        while (Date.now() < deadline) {
+          if (document.getElementById('stats-panel')?.hidden !== false) return false;
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        return true;
+      }),
+      'an unversioned hash closed a panel it never mentioned',
+    );
+
     // An id this build does not know falls back to no panel rather than
     // throwing, and does not survive into the address bar.
     const errors = [];

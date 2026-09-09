@@ -11,6 +11,7 @@ import {
   launcherActionFromHash,
   normalizeAdvisoryReplayState,
   normalizeLauncherPanel,
+  panelIntentFromHash,
   restoreFiltersFromHash,
   viewOptionsFromDecoded,
 } from '../src/url-state.js';
@@ -56,6 +57,22 @@ for (const unknown of ['nope', 'spatial-search', 'storm', 'constructor', '__prot
 }
 assert.equal(launcherActionFromHash(undefined), null);
 assert.equal(launcherActionFromHash('#v=2&panel=stats'), null, 'a future view version must not open a v1 panel');
+
+// A versioned hash is a complete view, so it speaks for the panel even when it
+// names none: '' means "no panel". Every other form says nothing, which is
+// null, and leaves whatever is open alone.
+for (const panel of LAUNCHER_PANELS) {
+  assert.equal(panelIntentFromHash(`#v=1&panel=${panel}`), panel);
+  assert.equal(panelIntentFromHash(`#${panel}`), panel, 'the manifest shortcut still names its panel');
+}
+assert.equal(panelIntentFromHash('#v=1&y=2005-2005'), '', 'a versioned view naming no panel means no panel');
+assert.equal(panelIntentFromHash('#v=1'), '');
+assert.equal(panelIntentFromHash('#v=1&panel=nope'), '', 'an unknown id is no panel, not a crash');
+assert.equal(panelIntentFromHash('#t=1'), null, 'an unversioned filter says nothing about panels');
+assert.equal(panelIntentFromHash('#storm=AL122005'), null, 'a storm link says nothing about panels');
+assert.equal(panelIntentFromHash('#v=2&panel=stats'), null, 'a future view version speaks for nothing here');
+assert.equal(panelIntentFromHash(''), null);
+assert.equal(panelIntentFromHash(undefined), null);
 
 // An unknown id must not be written back out either: a saved view captured from
 // a build that knows a panel this one does not would otherwise be re-emitted.

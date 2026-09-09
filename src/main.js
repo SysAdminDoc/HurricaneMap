@@ -14,11 +14,11 @@ import { initServiceWorkerUpdates } from './sw-updates.js';
 import { escapeHtml } from './html-utils.js';
 import {
   YEAR_FALLBACK_MIN, YEAR_FALLBACK_MAX,
-  applyHashToFilters, createDefaultFilters, encodeHashState, launcherActionFromHash,
+  applyHashToFilters, createDefaultFilters, encodeHashState, panelIntentFromHash,
   normalizeAdvisoryReplayState,
   viewOptionsFromDecoded, currentDataRevision,
 } from './url-state.js';
-import { openLauncherPanel, openLauncherPanelId, wireLauncherPanelUrl } from './shell-navigation.js';
+import { applyLauncherPanel, openLauncherPanelId, wireLauncherPanelUrl } from './shell-navigation.js';
 import { initCitationUI, mountCitationHost } from './citation-ui.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
@@ -290,7 +290,7 @@ async function boot() {
   syncYearBoundsFromData();
   filterController.populateStateFilter(getStats()?.by_state);
   // Capture PWA launcher tokens before applyFilters() canonicalizes the hash.
-  const startupLauncherAction = launcherActionFromHash(location.hash);
+  const startupLauncherAction = panelIntentFromHash(location.hash);
   // Restore filters from URL hash BEFORE first render so the user's
   // permalink reproduces what they shared.
   const restored = applyHashToFilters(filters, location.hash, {
@@ -424,13 +424,13 @@ async function boot() {
     setTimeout(() => openStateLazy(restored.s), 80);
   }
   // PWA launcher shortcuts use bare hash tokens (manifest.webmanifest).
-  openLauncherPanel(startupLauncherAction);
+  applyLauncherPanel(startupLauncherAction);
   // Live permalink navigation: pasting a new hash into this open tab (or
   // back/forward across hash entries) re-applies the shared view. Our own
   // hash writes use history.replaceState, which never fires hashchange, so
   // this only reacts to real navigation.
   window.addEventListener('hashchange', () => {
-    const launcherAction = launcherActionFromHash(location.hash);
+    const launcherAction = panelIntentFromHash(location.hash);
     const nav = applyHashToFilters(filters, location.hash, {
       yearMinDefault: YEAR_MIN_DEFAULT,
       yearMaxDefault: YEAR_MAX_DEFAULT,
@@ -447,7 +447,7 @@ async function boot() {
     if (nav?.s && filters.state === nav.s) {
       setTimeout(() => openStateLazy(nav.s), 80);
     }
-    openLauncherPanel(launcherAction, 60);
+    applyLauncherPanel(launcherAction, 60);
   });
 
   // First-run tour is delayed until the map, filters, and timeline are stable.

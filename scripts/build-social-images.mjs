@@ -16,17 +16,19 @@
 // Nothing rebuilds them as part of the gates; the gate checks that every page
 // points at a distinct card and that the card is on disk at the right size.
 
+import { createHash } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { categoryColor, windToCategory } from '../src/data.js';
-import { categoryLabel, escapeHtml, stormSlug } from './build-storm-pages.mjs';
-import { formatStormName } from '../src/html-utils.js';
+import { categoryLabel, escapeHtml, headline, stormSlug } from './build-storm-pages.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(root, 'social');
+
+const sha256 = value => createHash('sha256').update(value).digest('hex');
 
 export const CARD_WIDTH = 1200;
 export const CARD_HEIGHT = 630;
@@ -88,7 +90,9 @@ function peakCategory(storm) {
 }
 
 function subtitle(storm, landfalls) {
-  const parts = [String(storm.year)];
+  // The year moved into the headline when the card started using it, so the
+  // subtitle carries only what the headline does not.
+  const parts = [];
   if (Number.isFinite(storm.peak_wind_kt)) parts.push(`Peak ${storm.peak_wind_kt} kt`);
   if (Number.isFinite(storm.min_pres_mb)) parts.push(`${storm.min_pres_mb} mb`);
   if (landfalls.length) {
@@ -98,17 +102,14 @@ function subtitle(storm, landfalls) {
   return parts.join('  ·  ');
 }
 
-function displayTitle(storm) {
-  const name = String(storm.name || '').trim();
-  if (!name || name.toUpperCase() === 'UNNAMED') return `Unnamed storm ${storm.id}`;
-  const peak = peakCategory(storm);
-  return `${peak !== null && peak >= 1 ? 'Hurricane' : 'Tropical Storm'} ${formatStormName(name)}`;
-}
-
 export function buildSocialCardSvg(storm, landfalls) {
   const track = (storm.track || []).filter(point => Number.isFinite(point.lat) && Number.isFinite(point.lon));
   const project = projector(track);
-  const title = displayTitle(storm);
+  // The page's own headline, not a second rule for the same question. The page
+  // calls a storm a hurricane by its strongest U.S. landfall and this had been
+  // calling it one by its peak anywhere, so 35 pages said "Storm Love (1950)"
+  // in the title and og:image:alt above a card that read "Hurricane Love".
+  const title = headline(storm);
   const peak = peakCategory(storm);
 
   const segments = [];
@@ -190,6 +191,7 @@ export async function buildSocialImages({ write = true } = {}) {
   const browser = await chromium.launch(launchOptions);
   await rm(OUT_DIR, { recursive: true, force: true });
   await mkdir(OUT_DIR, { recursive: true });
+  const manifest = {};
   let written = 0;
   let bytes = 0;
   try {
@@ -204,13 +206,28 @@ export async function buildSocialImages({ write = true } = {}) {
       await page.evaluate(() => document.fonts.ready);
       const png = await page.screenshot({ type: 'png' });
       await writeFile(path.join(root, card.file), png);
+      manifest[`${stormSlug(card.storm)}.png`] = {
+        storm_id: card.storm.id,
+        svg_sha256: sha256(card.svg),
+        png_sha256: sha256(png),
+      };
       written += 1;
       bytes += png.length;
     }
   } finally {
     await browser.close();
   }
-  return { cards, written, bytes };
+  // The rasteriser is not reproducible, so nothing can rebuild these and
+  // compare. This is what ties each committed card to the storm it was drawn
+  // from: the SVG hash catches a card left behind by a track revision, and the
+  // PNG hash catches one that was swapped, truncated or edited afterwards.
+  await writeFile(
+    path.join(OUT_DIR, 'manifest.json'),
+    `${JSON.stringify({ schema_version: 1, width: CARD_WIDTH, height: CARD_HEIGHT, cards: manifest }, null, 2)}
+`,
+    'utf8',
+  );
+  return { cards, written, bytes, manifest };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -214,13 +214,19 @@ export function showPanel(id) {
   });
 }
 
-/** Hide one side panel without reopening any previous surface. */
-export function hidePanel(id) {
+/**
+ * Hide one side panel without reopening any previous surface.
+ *
+ * restoreFocus:false is for a close nobody asked for from the page: a link
+ * whose view carries no panel closes one on arrival, and moving focus then
+ * takes it away from wherever the reader actually is.
+ */
+export function hidePanel(id, { restoreFocus = true } = {}) {
   let focusTarget = null;
   withTransition(() => {
     const el = getPanel(id);
     if (el && !el.hidden) {
-      focusTarget = restorePanelInvoker(el);
+      focusTarget = restoreFocus ? restorePanelInvoker(el) : null;
       el.hidden = true;
       el.classList.remove('minimized');
       document.dispatchEvent(new CustomEvent('hm-panel:hidden', { detail: { id } }));

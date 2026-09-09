@@ -42,6 +42,23 @@ export function launcherActionFromHash(hash) {
   return normalizeLauncherPanel(decoded.panel) || null;
 }
 
+/**
+ * What a hash says about panels: an id, '' for "none", or null for "nothing".
+ *
+ * A versioned hash is a complete view, so an omitted field means the contract
+ * default rather than whatever this tab happens to be showing. That is already
+ * how restoreFiltersFromHash treats the filters, and the panel has to follow it
+ * or the reader does not get the view the link describes. Every other form,
+ * including `#storm=AL122005` and the bare manifest shortcut, says nothing
+ * about panels and must leave an open one alone.
+ */
+export function panelIntentFromHash(hash) {
+  const action = launcherActionFromHash(hash);
+  if (action) return action;
+  const decoded = decodeHashState(hash);
+  return decoded?.v === URL_STATE_VERSION ? '' : null;
+}
+
 function categoryHashDefault() {
   return [...CATEGORY_DEFAULTS].sort().join(',');
 }

@@ -4,7 +4,8 @@
 // regenerating produces the same bytes.
 
 import assert from 'node:assert/strict';
-import { open, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
@@ -109,17 +110,31 @@ assert.ok(megabytes < 40, `storm pages grew to ${megabytes.toFixed(1)} MB, which
 // ---------------------------------------------------------- social images
 //
 // Every storm page shared one og:image, so a share of any storm showed the same
-// generic screenshot. What matters is that no two pages point at the same card
-// and that the card each one names is really there at the aspect the crawlers
-// lay out for.
+// generic screenshot. What matters is that each page points at a card of its
+// own storm, that the card on disk is the one the current data produces, and
+// that the card was drawn from that storm's track rather than from a template.
 const stormPageFiles = first.files.filter(file => /^storms\/[^/]+\/index\.html$/.test(file.path.replace(/\\/g, '/')));
 assert.equal(stormPageFiles.length, storms.length, 'expected to find every storm page');
 
+const cardBuild = await buildSocialImages({ write: false });
+assert.equal(cardBuild.cards.length, storms.length, 'expected one card per storm');
+const cardsBySlug = new Map(cardBuild.cards.map(card => [stormSlug(card.storm), card]));
+const cardManifest = JSON.parse(await readFile(path.join(root, 'social', 'manifest.json'), 'utf8'));
+assert.equal(cardManifest.width, 1200);
+assert.equal(cardManifest.height, 630);
+assert.equal(
+  Object.keys(cardManifest.cards).length,
+  storms.length,
+  'the card manifest and the storm list disagree; run npm run generate:social-images',
+);
+
 const ogImages = new Set();
+const geometries = new Map();
 for (const file of stormPageFiles) {
   const slug = file.path.replace(/\\/g, '/').split('/')[1];
   const og = /<meta property="og:image" content="([^"]+)">/.exec(file.body)?.[1];
   const twitter = /<meta name="twitter:image" content="([^"]+)">/.exec(file.body)?.[1];
+  const alt = /<meta property="og:image:alt" content="([^"]+)">/.exec(file.body)?.[1] || '';
   assert.ok(og, `${file.path} has no og:image`);
   assert.equal(twitter, og, `${file.path}: twitter:image and og:image disagree`);
   assert.equal(
@@ -129,43 +144,80 @@ for (const file of stormPageFiles) {
   );
   ogImages.add(og);
 
-  // The card has to exist, and be the size the meta tags claim. A PNG's width
-  // and height are two big-endian 32-bit fields in IHDR, at bytes 16 and 20.
-  const header = Buffer.alloc(24);
-  const handle = await open(path.join(root, 'social', `${slug}.png`), 'r');
-  try {
-    await handle.read(header, 0, 24, 0);
-  } finally {
-    await handle.close();
+  const card = cardsBySlug.get(slug);
+  assert.ok(card, `${slug} has a page but no card`);
+
+  // The alt text describes the picture, so the picture has to agree with it.
+  // The page called a storm a hurricane by its strongest U.S. landfall while
+  // the card called it one by its peak anywhere, and 35 pages carried an alt
+  // reading "Storm Love (1950)" over a card reading "Hurricane Love".
+  const cardTitle = /<text[^>]*font-size="52"[^>]*>([^<]*)</.exec(card.svg)?.[1] || '';
+  assert.ok(cardTitle, `${slug}: the card has no title`);
+  assert.equal(
+    alt,
+    `The best track of ${cardTitle}`,
+    `${slug}: the page's og:image:alt and the card it labels name the storm differently`,
+  );
+
+  // Drawn from this storm's own track: one segment per gap between usable
+  // positions, or a single dot for a storm with only one. A card that drew
+  // nothing, or drew a fixed shape, fails here.
+  const positions = card.storm.track.filter(point => Number.isFinite(point.lat) && Number.isFinite(point.lon)).length;
+  const segments = (card.svg.match(/<line /g) || []).length;
+  const dots = (card.svg.match(/<circle /g) || []).length;
+  if (positions >= 2) {
+    assert.equal(segments, positions - 1, `${slug}: ${segments} track segments for ${positions} positions`);
+    // Two storms that differ have to look different. Compared without the text,
+    // which carries the unique storm id and would make any two cards distinct
+    // even if neither drew a track.
+    const geometry = card.svg.replace(/<text[\s\S]*?<\/text>/g, '');
+    assert.ok(!geometries.has(geometry), `${slug} and ${geometries.get(geometry)} were drawn identically`);
+    geometries.set(geometry, slug);
+  } else {
+    assert.equal(segments, 0, `${slug}: a storm with ${positions} positions cannot have segments`);
+    assert.ok(dots >= 1, `${slug}: a single-position storm must still be drawn`);
   }
-  assert.equal(header.readUInt32BE(0), 0x89504e47, `social/${slug}.png is not a PNG`);
-  assert.equal(header.readUInt32BE(16), 1200, `social/${slug}.png is not 1200 wide`);
-  assert.equal(header.readUInt32BE(20), 630, `social/${slug}.png is not 630 tall`);
+
+  // The card on disk is the one this data produces, and it has not been
+  // swapped, truncated or edited since. The rasteriser is not reproducible, so
+  // this is the only thing that can tie a committed PNG to a storm.
+  const entry = cardManifest.cards[`${slug}.png`];
+  assert.ok(entry, `${slug} is missing from the card manifest`);
+  assert.equal(entry.storm_id, card.storm.id, `${slug}: the manifest names a different storm`);
+  assert.equal(
+    entry.svg_sha256,
+    createHash('sha256').update(card.svg).digest('hex'),
+    `${slug}: the committed card predates a change to this storm's data; run npm run generate:social-images`,
+  );
+  const png = await readFile(path.join(root, 'social', `${slug}.png`));
+  assert.equal(
+    createHash('sha256').update(png).digest('hex'),
+    entry.png_sha256,
+    `social/${slug}.png is not the file that was generated for it`,
+  );
+  // The size the meta tags claim, read out of IHDR rather than trusted.
+  assert.equal(png.readUInt32BE(0), 0x89504e47, `social/${slug}.png is not a PNG`);
+  assert.equal(png.readUInt32BE(16), 1200, `social/${slug}.png is not 1200 wide`);
+  assert.equal(png.readUInt32BE(20), 630, `social/${slug}.png is not 630 tall`);
 }
+// Restating the acceptance directly. It follows from the per-page equality
+// above, and is cheap enough to say out loud.
 assert.equal(
   ogImages.size,
   storms.length,
   `expected one distinct og:image per storm page, found ${ogImages.size} across ${storms.length} pages`,
 );
 
-// The card is drawn from the storm's own track, so two storms that differ have
-// to produce different pictures. Byte equality is the wrong test for a
-// rasteriser; the SVG the card is rasterised from is the artifact to compare,
-// and it is generated without a browser.
-const cardSvgs = (await buildSocialImages({ write: false })).cards;
-assert.equal(cardSvgs.length, storms.length, 'expected one card per storm');
-assert.equal(new Set(cardSvgs.map(card => card.svg)).size, storms.length, 'two storms produced identical cards');
-const katrinaCard = cardSvgs.find(card => card.storm.id === 'AL122005');
-assert.match(katrinaCard.svg, /Hurricane Katrina/, "Katrina's card must name her");
+const katrinaCard = cardsBySlug.get('katrina-2005');
+assert.match(katrinaCard.svg, /Hurricane Katrina \(2005\)/, "Katrina's card must name her");
 assert.match(katrinaCard.svg, /Peak 150 kt/, "Katrina's card must carry her peak wind");
 assert.match(katrinaCard.svg, /Category 5/, "Katrina's card must state her peak category");
-assert.equal(katrinaCard.file, 'social/katrina-2005.png');
+
 // windToCategory codes a depression 0 and a tropical storm -1, so the codes do
 // not sort by intensity and a plain max over them picks the depression. Driven
-// on a storm whose whole track sits in the tropical-storm band, whose badge
-// therefore has exactly one right answer.
-// It has to carry a depression-strength observation too, or every code on the
-// track is -1 and the buggy maximum lands on the right answer by accident.
+// on a storm that carries both, because a storm whose every observation is
+// already tropical-storm strength gets the right answer from the buggy
+// comparison by accident.
 const tropicalStormOnly = storms.find(storm => {
   const winds = storm.track.map(point => point.wind).filter(Number.isFinite);
   if (!winds.length) return false;
@@ -173,9 +225,8 @@ const tropicalStormOnly = storms.find(storm => {
   return peak >= 34 && peak < 64 && Math.min(...winds) < 34;
 });
 assert.ok(tropicalStormOnly, 'no storm peaks in the tropical-storm band after a depression, which cannot be right');
-const tropicalStormCard = cardSvgs.find(card => card.storm.id === tropicalStormOnly.id);
 assert.match(
-  tropicalStormCard.svg,
+  cardsBySlug.get(stormSlug(tropicalStormOnly)).svg,
   />Tropical storm</,
   `${tropicalStormOnly.id} peaks at tropical-storm strength but its card does not say so`,
 );
@@ -188,9 +239,15 @@ assert.match(
 const cityFirst = await buildCityPages({ write: false });
 const citySecond = await buildCityPages({ write: false });
 assert.equal(cityFirst.checksum, citySecond.checksum, 'city page generation is not reproducible');
-assert.equal(cityFirst.entries.length, COASTAL_CITIES.length, `expected one page per coastal city (${COASTAL_CITIES.length})`);
-assert.equal(cityFirst.files.length, COASTAL_CITIES.length + 1, 'expected one page per city plus the index');
-assert.equal(new Set(cityFirst.entries.map(entry => entry.slug)).size, COASTAL_CITIES.length, 'city slugs are not unique');
+// The builder pushes one entry per unfiltered loop iteration and throws on a
+// duplicate slug, so counting its own output back proves nothing. What can be
+// wrong is the disk: a city removed from the list leaving its page behind, or a
+// page never written. That check is at the end of this block.
+const archiveStates = new Set(
+  JSON.parse(await readFile(path.join(root, 'data', 'landfalls.json'), 'utf8'))
+    .map(row => row.state)
+    .filter(Boolean),
+);
 
 for (const file of cityFirst.files) {
   const onDisk = await readFile(path.join(root, file.path), 'utf8');
@@ -227,10 +284,15 @@ for (const city of COASTAL_CITIES) {
   );
   descriptions.set(description, city.name);
 
-  assert.match(
-    page,
-    /<link rel="canonical" href="https:\/\/sysadmindoc\.github\.io\/HurricaneMap\/cities\//,
-    `${city.name} has no canonical URL`,
+  assert.equal(
+    /<link rel="canonical" href="([^"]+)">/.exec(page)?.[1],
+    `https://sysadmindoc.github.io/HurricaneMap/cities/${slug}/`,
+    `${city.name}: the canonical URL is not this page's own address`,
+  );
+  assert.equal(
+    /<meta property="og:url" content="([^"]+)">/.exec(page)?.[1],
+    `https://sysadmindoc.github.io/HurricaneMap/cities/${slug}/`,
+    `${city.name}: og:url is not this page's own address`,
   );
   assert.equal(
     (page.match(/<script(?! type="application\/ld\+json")/g) || []).length,
@@ -247,11 +309,62 @@ for (const city of COASTAL_CITIES) {
     `${city.name}: structured data must carry the city's own coordinates`,
   );
 
+  // The deep link, on every page rather than on the sampled one. It is scoped
+  // to the record this page shows, so the years in it have to be the years in
+  // the page's own table, and any state in it has to be one the app's filter
+  // will accept — a state the archive does not name opens an empty panel.
+  const link = /<a href="([^"]*)">Open the interactive map/.exec(page)?.[1];
+  assert.ok(link, `${city.name} has no link into the app`);
+  const rows = [...(/<caption>Every archived storm[\s\S]*?<tbody>([\s\S]*?)<\/tbody>/.exec(page)?.[1] || '')
+    .matchAll(/<tr>\s*<td>(\d{4})<\/td>/g)].map(match => match[1]);
+  const years = /y=(\d{4})-(\d{4})/.exec(link);
+  if (rows.length) {
+    assert.ok(years, `${city.name} has ${rows.length} storms but its link carries no year range`);
+    assert.equal(years[1], rows[0], `${city.name}: the link starts before or after its own first storm`);
+    assert.equal(years[2], rows[rows.length - 1], `${city.name}: the link ends before or after its own last storm`);
+  } else {
+    assert.equal(years, null, `${city.name} has no storms but its link claims a year range`);
+  }
+  const state = /s=([^&"]+)/.exec(link);
+  if (state) {
+    const decoded = decodeURIComponent(state[1]);
+    assert.ok(
+      archiveStates.has(decoded),
+      `${city.name} links a state the archive does not name, which opens an empty panel: ${decoded}`,
+    );
+  }
+
   assert.ok(
     locations.includes(`https://sysadmindoc.github.io/HurricaneMap/cities/${slug}/`),
     `${city.name} is missing from the sitemap`,
   );
 }
+
+// The three shapes the link can take, pinned on the cities that produce them.
+const linkOf = slug => /<a href="([^"]*)">Open the interactive map([^<]*)/.exec(cityPages.get(`cities/${slug}/index.html`));
+const miamiLink = linkOf('miami-fl');
+assert.match(miamiLink[1], /^\.\.\/\.\.\/#v=1&amp;y=\d{4}-\d{4}&amp;s=Florida$/, 'Miami must link to its state and its years');
+assert.match(miamiLink[2], /filtered to Florida, \d{4} to \d{4}/, "Miami's link must say what it does");
+// A city the archive knows a state for but has no pass within 50 km of: the
+// state is where its storms are, so the link still goes somewhere useful.
+const honoluluLink = linkOf('honolulu-hi');
+assert.equal(honoluluLink[1], '../../#v=1&amp;s=Hawaii');
+// A city with neither. Nothing to filter to, so it must not pretend otherwise.
+const sanDiegoLink = linkOf('san-diego-ca');
+assert.equal(sanDiegoLink[1], '../../');
+assert.equal(sanDiegoLink[2].trim(), '');
+
+// What is on disk is exactly the set of cities, with nothing left behind from a
+// city that used to be in the list.
+const cityDirs = (await readdir(path.join(root, 'cities'), { withFileTypes: true }))
+  .filter(entry => entry.isDirectory())
+  .map(entry => entry.name)
+  .sort();
+assert.deepEqual(
+  cityDirs,
+  COASTAL_CITIES.map(citySlug).sort(),
+  'the cities/ directory does not match COASTAL_CITIES; run npm run generate:city-pages',
+);
 
 // A sampled city whose record is well known, so the page is checked against
 // facts rather than only against its own shape.
