@@ -20,6 +20,25 @@ export function supportsCustomHighlights(scope = globalThis) {
 }
 
 /**
+ * Lowercase a string without ever changing its length.
+ *
+ * `String.prototype.toLowerCase` is not length-preserving: U+0130, the Turkish
+ * dotted capital I, becomes two code units. Folding the whole string and then
+ * scanning it would shift every offset after such a character and paint the
+ * wrong text. Folding one code unit at a time and keeping any that refuses to
+ * fold cleanly costs the case-insensitivity of that one character rather than
+ * of the entire string, which is what an all-or-nothing guard here used to do.
+ */
+function foldCase(text) {
+  let folded = '';
+  for (let index = 0; index < text.length; index += 1) {
+    const lower = text[index].toLowerCase();
+    folded += lower.length === 1 ? lower : text[index];
+  }
+  return folded;
+}
+
+/**
  * Every case-insensitive occurrence of `query` in `text`, as [start, end)
  * offsets. Non-overlapping and left to right, so "aa" in "aaaa" is two matches
  * rather than three, which is what a reader counts.
@@ -31,16 +50,8 @@ export function matchRanges(text, query) {
   const haystack = String(text ?? '');
   const needle = String(query ?? '').trim();
   if (!needle) return [];
-  const lowerHaystack = haystack.toLowerCase();
-  const lowerNeedle = needle.toLowerCase();
-  // toLowerCase can change a string's length (the Turkish dotted capital I
-  // becomes two code units), which would put every offset after it in the
-  // wrong place. Fall back to a case-sensitive scan rather than paint the
-  // wrong characters.
-  const scanHaystack = lowerHaystack.length === haystack.length ? lowerHaystack : haystack;
-  const scanNeedle = lowerNeedle.length === needle.length && scanHaystack === lowerHaystack
-    ? lowerNeedle
-    : needle;
+  const scanHaystack = foldCase(haystack);
+  const scanNeedle = foldCase(needle);
   const found = [];
   let from = 0;
   for (;;) {
@@ -52,7 +63,27 @@ export function matchRanges(text, query) {
 }
 
 /**
- * Paint every occurrence of `query` inside the `.search-result-text` spans of
+ * The terms to paint for a query.
+ *
+ * searchStorms matches the raw query against "name year state" joined into one
+ * string, but a result row renders those three fields in a different order and
+ * in separate text nodes. So "katrina 2005" matches the storm and appears
+ * nowhere in the row as a contiguous run: scanning for the whole query painted
+ * nothing at all for any query that spanned two fields.
+ *
+ * A one-character word is dropped, because it would paint a letter in every
+ * row and tell the reader nothing. If that leaves no terms the whole query is
+ * the term, which is what a short single-word query needs.
+ */
+export function highlightTerms(query) {
+  const trimmed = String(query ?? '').trim();
+  if (!trimmed) return [];
+  const words = [...new Set(trimmed.split(/\s+/).filter(word => word.length > 1))];
+  return words.length ? words : [trimmed];
+}
+
+/**
+ * Paint every term of `query` inside the `.search-result-text` spans of
  * `container`. Returns the number of ranges registered, which is 0 both when
  * the engine has no Custom Highlight API and when nothing matched.
  *
@@ -63,19 +94,27 @@ export function highlightSearchMatches(container, query, scope = globalThis) {
   if (!supportsCustomHighlights(scope)) return 0;
   const registry = scope.CSS.highlights;
   registry.delete(SEARCH_HIGHLIGHT_NAME);
-  const needle = String(query ?? '').trim();
-  if (!container || !needle) return 0;
+  const terms = highlightTerms(query);
+  if (!container || !terms.length) return 0;
   const doc = container.ownerDocument;
   if (!doc) return 0;
   const ranges = [];
   for (const host of container.querySelectorAll('.search-result-text')) {
     const walker = doc.createTreeWalker(host, 4 /* NodeFilter.SHOW_TEXT */);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      for (const [start, end] of matchRanges(node.data, needle)) {
-        const range = doc.createRange();
-        range.setStart(node, start);
-        range.setEnd(node, end);
-        ranges.push(range);
+      // Two terms can land on the same characters ("kat katrina"), and one
+      // Range per pair of offsets is enough to paint them.
+      const claimed = new Set();
+      for (const term of terms) {
+        for (const [start, end] of matchRanges(node.data, term)) {
+          const key = `${start}:${end}`;
+          if (claimed.has(key)) continue;
+          claimed.add(key);
+          const range = doc.createRange();
+          range.setStart(node, start);
+          range.setEnd(node, end);
+          ranges.push(range);
+        }
       }
     }
   }

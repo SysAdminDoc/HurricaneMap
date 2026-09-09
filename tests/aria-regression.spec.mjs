@@ -251,25 +251,50 @@ for (const locale of locales) {
       return {
         supported: typeof Highlight === 'function' && typeof CSS?.highlights?.set === 'function',
         ranges: CSS?.highlights?.get('hm-search-match')?.size ?? 0,
-        markup: list.innerHTML,
+        // Only the region highlighting works in. The whole list cannot be
+        // compared across two reads: backfillSparklines injects an SVG into
+        // .search-result-spark-host asynchronously once storms.json has
+        // loaded, and it landed between the two reads in 1 of 14 runs, failing
+        // both the en and es journeys with a diff made entirely of sparkline
+        // path data. The spark host is a sibling of .search-result-text and is
+        // aria-hidden, so nothing about highlighting can reach it.
+        markup: [...list.querySelectorAll('.search-result-text')].map(node => node.outerHTML).join(''),
         marks: list.querySelectorAll('mark').length,
       };
     });
+    // Comparing two empty strings would pass for the wrong reason.
+    expect(highlighted.markup.length, 'the result rows must have rendered').toBeGreaterThan(0);
     // Not conditional on support: an engine without the API renders plain text,
     // and plain text has no <mark> in it either.
     expect(highlighted.marks, 'match highlighting must not wrap text in elements').toBe(0);
     if (highlighted.supported) {
       expect(highlighted.ranges, 'searching Katrina must paint at least one range').toBeGreaterThan(0);
     }
-    const treeWithHighlight = await page.locator('#search-results').ariaSnapshotJSON();
+    // A screen reader must still be given the whole row while the highlight is
+    // up. This is an auto-retrying assertion on purpose. Chromium builds an
+    // option's accessibility subtree in stages: it arrives with no name, then
+    // with a partial one, then with its children. An earlier version of this
+    // compared two ariaSnapshotJSON() reads taken either side of clearing the
+    // highlight, which raced that build rather than measuring anything about
+    // highlighting: 8 of 12 consecutive runs failed with the first read
+    // holding a bare {role, selected}, and waiting only for a non-empty name
+    // still left 1 in 12 failing on the partial name "Katrina". A retrying
+    // assertion on the settled name is the same claim without the race.
+    await expect(page.locator('#search-results li[data-storm-id]').first())
+      .toHaveAccessibleName(/2005.*Katrina/);
+
+    // And this is the comparison that would catch a <mark> implementation:
+    // exact, taken from the DOM rather than from a tree derived from it, and
+    // not a stored snapshot anybody can re-approve. The accessibility tree is
+    // a function of this markup, so proving the markup is untouched is the
+    // stronger half of "highlighting changes nothing a reader can see".
     const markupWithoutHighlight = await page.evaluate(async () => {
       const { clearSearchHighlights } = await import('/src/search-highlight.js');
       clearSearchHighlights();
-      return document.querySelector('#search-results').innerHTML;
+      const list = document.querySelector('#search-results');
+      return [...list.querySelectorAll('.search-result-text')].map(node => node.outerHTML).join('');
     });
-    const treeWithoutHighlight = await page.locator('#search-results').ariaSnapshotJSON();
     expect(markupWithoutHighlight).toBe(highlighted.markup);
-    expect(treeWithoutHighlight).toEqual(treeWithHighlight);
     await dispatchDomKey(page, '#search-input', 'ArrowDown');
     await page.waitForFunction(() => Boolean(document.querySelector('#search-input')?.getAttribute('aria-activedescendant')));
     await dispatchDomKey(page, '#search-input', 'Enter');

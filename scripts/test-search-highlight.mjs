@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   clearSearchHighlights,
   highlightSearchMatches,
+  highlightTerms,
   matchRanges,
   SEARCH_HIGHLIGHT_NAME,
   supportsCustomHighlights,
@@ -42,6 +43,33 @@ assert.deepEqual(slices('2005 Katrina', '  katrina '), ['Katrina']);
 const dotted = 'AİB Katrina';
 assert.equal(dotted.toLowerCase().length, dotted.length + 1, 'this fixture must actually grow when lowercased');
 assert.deepEqual(slices(dotted, 'Katrina'), ['Katrina'], 'an offset must index the original string');
+// The first version of this guard gave up on case-insensitivity for the WHOLE
+// string as soon as one character refused to fold cleanly, so a lowercase
+// query stopped matching anything in a row that happened to contain U+0130.
+// Folding one code unit at a time costs only that character.
+assert.deepEqual(
+  slices(dotted, 'katrina'),
+  ['Katrina'],
+  'one unfoldable character must not switch the whole scan to case-sensitive',
+);
+assert.deepEqual(slices('İstanbul KATRINA', 'katrina'), ['KATRINA']);
+
+// ---------------------------------------------------------------- terms
+//
+// searchStorms matches the query against "name year state" as one string, but
+// the row prints year, name and state in a different order and in separate
+// text nodes. "katrina 2005" therefore matches the storm and appears nowhere
+// in the row as a contiguous run, so the query is painted term by term.
+assert.deepEqual(highlightTerms('katrina'), ['katrina']);
+assert.deepEqual(highlightTerms('  katrina  2005 '), ['katrina', '2005']);
+assert.deepEqual(highlightTerms('katrina katrina'), ['katrina'], 'a repeated word is one term');
+assert.deepEqual(highlightTerms(''), []);
+assert.deepEqual(highlightTerms('   '), []);
+// A single letter would paint one character in every row and say nothing, but
+// dropping every word must not leave a query with no terms at all.
+assert.deepEqual(highlightTerms('katrina a'), ['katrina']);
+assert.deepEqual(highlightTerms('a'), ['a']);
+assert.deepEqual(highlightTerms('a b'), ['a b'], 'when every word is dropped the query itself is the term');
 
 // ---------------------------------------------------------------- detection
 assert.equal(supportsCustomHighlights({}), false);
@@ -103,6 +131,19 @@ function fakeScope() {
   // than leave the last keystroke's ranges painted over a rebuilt list.
   assert.equal(highlightSearchMatches(container, 'zzz', scope), 0);
   assert.equal(scope.CSS.highlights.has(SEARCH_HIGHLIGHT_NAME), false);
+
+  // The regression this file exists to pin: a query spanning two of the three
+  // fields searchStorms matches on. Before terms, this painted nothing.
+  assert.equal(highlightSearchMatches(container, 'katrina 2005', scope), 2);
+  const both = scope.CSS.highlights.get(SEARCH_HIGHLIGHT_NAME).ranges;
+  assert.deepEqual(
+    both.map(range => node.data.slice(range.start[1], range.end[1])).sort(),
+    ['2005', 'Katrina'],
+    'both fields that earned the match must be painted',
+  );
+
+  // Overlapping terms must not register the same offsets twice.
+  assert.equal(highlightSearchMatches(container, 'katrina katrina', scope), 1);
 
   highlightSearchMatches(container, 'katrina', scope);
   clearSearchHighlights(scope);

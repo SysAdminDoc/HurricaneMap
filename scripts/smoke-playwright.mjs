@@ -5093,10 +5093,12 @@ try {
 
     const realFetch = window.fetch;
     const requested = [];
+    let refuse = false;
     window.fetch = async (url, init) => {
       const href = String(url);
       if (!href.includes('/nhc/marine/')) return realFetch(url, init);
       requested.push(href);
+      if (refuse) return new Response('', { status: 503 });
       const band = href.includes('24to48') ? '24to48' : '00to24';
       return new Response(bodies[band], { status: 200 });
     };
@@ -5118,7 +5120,17 @@ try {
       const far = await draw('24to48', true);
       // No force: a shared cache slot would hand back the far band's polygons.
       const nearAgain = await draw('00to24', false);
-      return { near, far, nearAgain };
+      // Switching to a band whose feeds are down must not leave the previous
+      // band's ocean on the map under a legend and a settings pill that both
+      // name the new one. Keeping the last good polygons is right only while
+      // the band has not changed, and nothing on screen says which it is.
+      refuse = true;
+      const failedSwitch = await draw('24to48', true);
+      // And a failure on the band already drawn keeps it, which is the whole
+      // point of not clearing on every error.
+      const failedSame = await draw('00to24', true);
+      refuse = false;
+      return { near, far, nearAgain, failedSwitch, failedSame };
     } finally {
       marine.clearMarineWarnings();
       window.fetch = realFetch;
@@ -5154,6 +5166,19 @@ try {
       && marineHorizons.nearAgain.result.cacheOrigin === 'memory'
       && marineHorizons.nearAgain.urls.length === 0,
     `switching back to 0-24 h did not come from its own cache slot: ${JSON.stringify(marineHorizons.nearAgain)}`,
+  );
+  assert(
+    marineHorizons.failedSwitch.result.status === 'error'
+      && marineHorizons.failedSwitch.result.droppedStaleBand === true
+      && marineHorizons.failedSwitch.paths === 0
+      && marineHorizons.failedSwitch.legend === '',
+    'a failed switch left the other band on the map: '
+    + `${JSON.stringify([marineHorizons.failedSwitch.result, marineHorizons.failedSwitch.paths, marineHorizons.failedSwitch.legend])}`,
+  );
+  assert(
+    marineHorizons.failedSame.result.status === 'error'
+      && marineHorizons.failedSame.result.droppedStaleBand === false,
+    `a failure on the drawn band must keep it: ${JSON.stringify(marineHorizons.failedSame.result)}`,
   );
   // Synthetic ErrorEvent exercises the listener + toast without registering
   // as a real uncaught error (which would trip the pageerror assertions).

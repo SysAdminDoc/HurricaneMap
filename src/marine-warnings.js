@@ -59,6 +59,11 @@ const STYLE = {
 // polygons for up to six hours after switching, which is the exact failure
 // this layer's whole point is to avoid.
 const cache = new Map();
+// Which band's polygons are currently on the map, or null when none are. A
+// failed fetch keeps the last good polygons, which is right while the band has
+// not changed and wrong the moment it has: the reader would be looking at the
+// 0-24 h ocean under a legend and a settings pill that both say 24-48 h.
+let drawnHorizon = null;
 let layerGroup = null;
 let layerMap = null;
 let legendEl = null;
@@ -223,6 +228,7 @@ export async function renderMarineWarnings({
     });
     layerGroup.addLayer(layer);
     updateLegend(risks, band);
+    drawnHorizon = band;
     const result = { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, horizon: band, cacheOrigin };
     completeOptionalFeed('marine', {
       empty: result.status === 'empty',
@@ -233,10 +239,20 @@ export async function renderMarineWarnings({
     return result;
   } catch (error) {
     if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0, horizon: band };
+    // Keeping the last good polygons through a transient failure is worth
+    // doing, but only for the band they belong to. Showing another band's
+    // ocean is worse than showing none, because nothing on screen says so.
+    const droppedStaleBand = drawnHorizon !== null && drawnHorizon !== band;
+    if (droppedStaleBand) {
+      layerGroup.clearLayers();
+      if (legendEl) legendEl.hidden = true;
+      drawnHorizon = null;
+    }
     const result = {
       status: 'error',
       polygonCount: 0,
       horizon: band,
+      droppedStaleBand,
       error,
       responseStatus: error.responseStatus || 0,
     };
@@ -247,6 +263,7 @@ export async function renderMarineWarnings({
 
 export function clearMarineWarnings() {
   renderGeneration += 1;
+  drawnHorizon = null;
   if (layerGroup) layerGroup.clearLayers();
   if (legendEl) legendEl.hidden = true;
   if (statusEl) statusEl.hidden = true;
