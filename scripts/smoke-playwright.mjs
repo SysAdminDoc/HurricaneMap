@@ -2340,6 +2340,161 @@ async function describeUndersizedSnapshot(page, name, buffer, paint, pngPath) {
  * a blank frame compresses to, and it must trip the guard and leave both the
  * PNG and the state dump behind.
  */
+/**
+ * The shared destructive-action dialog and the focus trap under it.
+ *
+ * confirm-action.js is the only thing between three call sites and an
+ * irreversible delete, and dialog-focus.js is the trap every modal leans on.
+ * Neither had a test. The ARIA snapshots cannot cover them: they record the
+ * accessibility tree, and every claim here is about which element holds focus
+ * and whether a rejected confirmation left the store alone. Neither is visible
+ * in a tree.
+ *
+ * Driven in a real engine on purpose. showModal(), the top layer and
+ * :popover-open have no faithful stand-in, and a hand-built DOM would prove the
+ * fake behaves rather than that the dialog does.
+ */
+// A closed <dialog> is hidden, and waitForSelector waits for visibility, so
+// ':not([open])' never resolves. Ask about the attribute directly.
+async function waitForDialogClosed(page) {
+  await page.waitForFunction(
+    () => !document.querySelector('#confirm-local-action')?.hasAttribute('open'),
+    null,
+    { timeout: 10_000 },
+  );
+}
+
+/** Poll for focus to land on `id`, and report what actually holds it if it
+ *  never does. A bare waitForFunction fails with a timeout and no evidence. */
+async function assertFocusReturns(page, id, label) {
+  const deadline = Date.now() + 8000;
+  let seen = null;
+  while (Date.now() < deadline) {
+    seen = await page.evaluate(() => ({
+      id: document.activeElement?.id || '',
+      cls: document.activeElement?.className || '',
+      tag: document.activeElement?.tagName || '',
+    }));
+    if (seen.id === id) return;
+    await page.waitForTimeout(100);
+  }
+  assert(false, `${label}: focus never returned to #${id}; it sits on ${JSON.stringify(seen)}`);
+}
+
+async function assertConfirmDialogContract(page) {
+  const DIALOG = '#confirm-local-action';
+  const readPrep = () => page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem('hm-prep-v1') || 'null');
+    return (raw?.state?.checked || raw?.checked || []).slice().sort();
+  });
+
+  await clickHeaderAction(page, '#toggle-prep');
+  await page.waitForSelector('#prep-panel:not([hidden]) #prep-reset');
+  await page.check('[data-prep-item="water"]');
+  await page.check('[data-prep-item="food"]');
+  await page.waitForFunction(() => {
+    const raw = JSON.parse(localStorage.getItem('hm-prep-v1') || 'null');
+    return (raw?.state?.checked || raw?.checked || []).length >= 2;
+  });
+  const before = await readPrep();
+  assert(before.length >= 2, `nothing to destroy, so a cancelled reset would prove nothing: ${JSON.stringify(before)}`);
+
+  // --- Cancel is the control focus lands on -------------------------------
+  await page.click('#prep-reset');
+  await page.waitForSelector(`${DIALOG}[open]`);
+  const opened = await page.evaluate(() => ({
+    focused: document.activeElement?.className || '',
+    cancelText: document.querySelector('.confirm-action-cancel')?.textContent || '',
+    confirmText: document.querySelector('.confirm-action-submit')?.textContent || '',
+  }));
+  assert(
+    opened.focused.includes('confirm-action-cancel'),
+    `focus must start on Cancel, not on the destructive button: ${JSON.stringify(opened)}`,
+  );
+  assert(opened.cancelText.trim() && opened.confirmText.trim(), `dialog buttons have no labels: ${JSON.stringify(opened)}`);
+
+  // --- Tab cycles inside the dialog ---------------------------------------
+  await page.evaluate(() => document.querySelector('.confirm-action-submit')?.focus());
+  await page.keyboard.press('Tab');
+  const wrapped = await page.evaluate(() => document.activeElement?.className || '');
+  assert(
+    wrapped.includes('confirm-action-cancel'),
+    `Tab from the last control must wrap to the first, landed on "${wrapped}"`,
+  );
+  await page.keyboard.press('Shift+Tab');
+  const wrappedBack = await page.evaluate(() => document.activeElement?.className || '');
+  assert(
+    wrappedBack.includes('confirm-action-submit'),
+    `Shift+Tab from the first control must wrap to the last, landed on "${wrappedBack}"`,
+  );
+
+  // --- Escape cancels, changes nothing, and hands focus back --------------
+  await page.keyboard.press('Escape');
+  await waitForDialogClosed(page);
+  // Focus comes back in the same callback that resolves the promise, so this
+  // is the ordering barrier: once focus is home, the caller has had its answer.
+  await assertFocusReturns(page, 'prep-reset', 'after cancelling the reset');
+  // A negative claim needs a window, not an instant. Watch the store for half
+  // a second and fail if it ever empties.
+  for (let tick = 0; tick < 5; tick += 1) {
+    const still = await readPrep();
+    assert(
+      JSON.stringify(still) === JSON.stringify(before),
+      `a cancelled confirmation mutated the checklist: ${JSON.stringify(before)} became ${JSON.stringify(still)}`,
+    );
+    await page.waitForTimeout(100);
+  }
+
+  // --- Confirming does the work and hands focus back ----------------------
+  await page.click('#prep-reset');
+  await page.waitForSelector(`${DIALOG}[open]`);
+  await page.click('.confirm-action-submit');
+  await waitForDialogClosed(page);
+  await page.waitForFunction(() => {
+    const raw = JSON.parse(localStorage.getItem('hm-prep-v1') || 'null');
+    return (raw?.state?.checked || raw?.checked || []).length === 0;
+  }, null, { timeout: 8000 }).catch(() => {});
+  const afterConfirm = await readPrep();
+  assert(
+    afterConfirm.length === 0,
+    `confirming the reset left items checked: ${JSON.stringify(afterConfirm)}`,
+  );
+  await assertFocusReturns(page, 'prep-reset', 'after confirming the reset');
+  await clickHeaderAction(page, '#toggle-prep');
+
+  // --- An invoker inside a popover gets its popover back ------------------
+  // Saved views live in the settings popover, and showModal() light-dismisses
+  // it, so without the reopen the reader is returned to a control on a surface
+  // that is no longer on screen.
+  await page.evaluate(() => localStorage.removeItem('hm-saved-views-v1'));
+  await clickHeaderAction(page, '#toggle-settings');
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'));
+  await page.fill('#saved-view-name', 'Confirm contract');
+  await page.click('#saved-views-manager [data-action="save"]');
+  await page.waitForSelector('#saved-views-manager [data-action="delete"]');
+  await page.click('#saved-views-manager [data-action="delete"]');
+  await page.waitForSelector(`${DIALOG}[open]`);
+  await page.keyboard.press('Escape');
+  await waitForDialogClosed(page);
+  await page.waitForTimeout(300);
+  const popoverBack = await page.evaluate(() => ({
+    open: Boolean(document.querySelector('#settings-menu')?.matches(':popover-open')),
+    views: (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || []).length,
+  }));
+  assert(
+    popoverBack.open,
+    'cancelling a confirmation opened from the settings popover left the popover closed',
+  );
+  assert(
+    popoverBack.views === 1,
+    `a cancelled delete removed the saved view anyway: ${popoverBack.views} left`,
+  );
+  await page.evaluate(() => {
+    localStorage.removeItem('hm-saved-views-v1');
+    document.querySelector('#settings-menu')?.hidePopover?.();
+  });
+}
+
 async function assertUndersizedSnapshotIsDiagnosed(page) {
   const name = 'diagnostic-blank-viewport';
 
@@ -4641,6 +4796,7 @@ try {
   await assertAdvisoryTooltipDomSafety(page);
   await assertLocationPrivacyFlow(page);
   await assertUndersizedSnapshotIsDiagnosed(page);
+  await assertConfirmDialogContract(page);
   await assertUnpaintedMapIsRefused(page);
 
   const migratedSettings = await page.evaluate(

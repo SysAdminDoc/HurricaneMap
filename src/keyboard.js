@@ -125,6 +125,12 @@ function isBlockingSurfaceOpen() {
   // so it must be tested with :popover-open (the old :not([hidden]) check
   // matched permanently and blocked Escape from ever closing panels).
   return Boolean(
+    // The shared destructive-action dialog. A native modal still carries
+    // [open] while the document-level keydown runs, because the browser closes
+    // it as a default action after dispatch. Without this, Escape cancelled the
+    // confirmation AND ran closeAllPanels(), so a reader who backed out of a
+    // delete lost the panel they were working in and focus went to the map.
+    document.querySelector('#confirm-local-action[open]') ||
     document.querySelector('#settings-menu:popover-open') ||
     document.querySelector('#info-modal:not([hidden])') ||
     document.querySelector('#glossary-modal:not([hidden])') ||
