@@ -116,7 +116,10 @@ function formatCreoleRelativeTime(value, unit, numeric) {
   if (!word) return null;
   const count = Math.abs(value);
   if (numeric === 'auto' && count === 0) return unit === 'day' ? 'jodi a' : null;
-  return value < 0 ? `sa gen ${count} ${word}` : `nan ${count} ${word}`;
+  // <= rather than <, because -0 < 0 is false and formatDiagnosticAge hands
+  // this -0 for anything under half a minute: a freshly checked feed read
+  // "nan 0 min", which is "in 0 minutes", where English says "0 min. ago".
+  return value <= 0 ? `sa gen ${count} ${word}` : `nan ${count} ${word}`;
 }
 
 export function formatRelativeTime(value, unit, { numeric = 'always' } = {}) {
