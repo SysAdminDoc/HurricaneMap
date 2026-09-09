@@ -59,7 +59,7 @@ export default {
     const originUrl = originUrlFor(requestUrl, env);
     const policy = cachePolicyFor(requestUrl.pathname);
     const isHead = request.method === 'HEAD';
-    const cacheKey = getCacheKey(originUrl.href, request);
+    const cacheKey = getCacheKey(staticCacheKeyUrl(originUrl));
     const cache = caches.default;
 
     const cached = await cache.match(cacheKey);
@@ -68,7 +68,7 @@ export default {
       return toRequestMethod(tagCacheStatus(cachedWithHeaders, 'HIT'), request.method);
     }
 
-    const originRequest = new Request(originUrl.href, request);
+    const originRequest = new Request(originUrl.href, withoutCredentials(request));
     const response = await fetch(originRequest, {
       cf: cloudflareFetchOptions(requestUrl.pathname, policy),
     });
@@ -84,7 +84,7 @@ export default {
 async function handleNhcProxy(targetUrl, request, ctx) {
   const cache = caches.default;
   const isHead = request.method === 'HEAD';
-  const cacheKey = getCacheKey(targetUrl, request);
+  const cacheKey = getCacheKey(targetUrl);
 
   const cached = await cache.match(cacheKey);
   if (cached) return toRequestMethod(addCorsHeaders(tagCacheStatus(cached, 'HIT')), request.method);
@@ -170,10 +170,50 @@ export function applyResponseHeaders(response, policy, pathname = null) {
   });
 }
 
-function getCacheKey(url, request) {
+export function getCacheKey(url) {
   // Cache API keys must be GET requests. HEAD reuses a matching GET entry but
   // never writes its bodyless origin response into the cache.
-  return new Request(url, { method: 'GET', headers: request.headers });
+  //
+  // No client headers. They were copied in from the incoming request, which
+  // coupled the key to whatever the caller happened to send and put a Cookie
+  // into an object whose only job is to name a cache entry.
+  return new Request(url, { method: 'GET' });
+}
+
+/**
+ * The cache key for a static asset, which is its path.
+ *
+ * The origin is GitHub Pages. It serves files and ignores query strings, so
+ * every distinct `?x=` was minting a separate edge entry holding identical
+ * bytes: a crawler carrying tracking parameters, or anyone who felt like it,
+ * could evict the entries that matter. The origin request keeps the query it
+ * was given, because that costs nothing and preserves the existing contract.
+ *
+ * The `/nhc/` proxy does not come through here. Its query is the request.
+ */
+export function staticCacheKeyUrl(originUrl) {
+  const keyed = new URL(originUrl.href);
+  keyed.search = '';
+  return keyed.href;
+}
+
+// Credentials belong to this origin and have no business reaching the host
+// behind it. The static origin is a public file server that never reads either
+// header, and forwarding them sends a visitor's cookies to a third party.
+const CREDENTIAL_HEADERS = ['cookie', 'authorization'];
+
+export function withoutCredentials(request) {
+  const headers = new Headers(request.headers);
+  let carried = false;
+  for (const name of CREDENTIAL_HEADERS) {
+    if (headers.has(name)) {
+      headers.delete(name);
+      carried = true;
+    }
+  }
+  // Everything else is kept: Range, If-None-Match and Accept-Encoding all
+  // change what the origin should send back.
+  return carried ? new Request(request, { headers }) : request;
 }
 
 function toRequestMethod(response, method) {

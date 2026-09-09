@@ -6,9 +6,12 @@ import {
   cachePolicyFor,
   classifyAsset,
   cloudflareFetchOptions,
+  getCacheKey,
   MAIN_CONTENT_SECURITY_POLICY,
   nhcProxyTargetFor,
   originUrlFor,
+  staticCacheKeyUrl,
+  withoutCredentials,
 } from '../cloudflare/worker.js';
 import { MARINE_FEEDS } from '../src/marine-warnings.js';
 
@@ -39,6 +42,81 @@ const origin = originUrlFor(new URL('https://map.example.com/data/storms.json?x=
   ORIGIN_BASE_URL: 'https://sysadmindoc.github.io/HurricaneMap',
 });
 assert.equal(origin.href, 'https://sysadmindoc.github.io/HurricaneMap/data/storms.json?x=1', 'origin URL should preserve the GitHub Pages base path and query');
+
+// The origin is a file server that ignores query strings and returns the same
+// bytes for every one of them, so keying the edge cache on the query minted a
+// fresh entry per `?x=` and let anyone push the useful entries out.
+{
+  const base = new URL('https://sysadmindoc.github.io/HurricaneMap/data/storms.json');
+  const withQuery = new URL(`${base.href}?utm_source=anything`);
+  const withOther = new URL(`${base.href}?utm_source=something-else`);
+  assert.equal(
+    staticCacheKeyUrl(withQuery),
+    staticCacheKeyUrl(withOther),
+    'two requests for one static path must share a cache key however they are decorated',
+  );
+  assert.equal(
+    staticCacheKeyUrl(withQuery),
+    base.href,
+    'the shared key is the path itself',
+  );
+  // The origin request is a separate thing and keeps what it was given.
+  assert.equal(
+    originUrlFor(new URL('https://map.example.com/data/storms.json?x=1'), {
+      ORIGIN_BASE_URL: 'https://sysadmindoc.github.io/HurricaneMap',
+    }).search,
+    '?x=1',
+    'narrowing the cache key must not change what is asked of the origin',
+  );
+}
+
+// The /nhc/ proxy is the other direction. Its allowlisted targets carry no
+// query today, so nothing would break if one were dropped, which is exactly why
+// the stripping lives in the static branch rather than in getCacheKey: the day
+// a target does carry one, collapsing it would serve one query's answer for
+// another's.
+{
+  const target = nhcProxyTargetFor('/nhc/outlook/atl.kmz');
+  assert.equal(target, 'https://www.nhc.noaa.gov/xgtwo/gtwo_atl.kmz', 'the proxy should resolve a known NHC path');
+  const keyed = getCacheKey(target);
+  assert.equal(keyed.url, target, 'the proxy must key on its full upstream URL');
+  assert.equal(keyed.method, 'GET', 'a Cache API key has to be a GET');
+  assert.equal(
+    getCacheKey('https://www.nhc.noaa.gov/x.json?basin=atl').url,
+    'https://www.nhc.noaa.gov/x.json?basin=atl',
+    'getCacheKey itself must never drop a query; only the static path does',
+  );
+}
+
+// A cache key names an entry. It has no business carrying the caller's cookie.
+{
+  const keyed = getCacheKey('https://sysadmindoc.github.io/HurricaneMap/index.html');
+  assert.equal(keyed.headers.get('cookie'), null, 'a cache key must not carry credentials');
+  assert.equal(keyed.headers.get('authorization'), null, 'a cache key must not carry credentials');
+}
+
+// Credentials belong to this origin, not to the public file server behind it.
+{
+  const incoming = new Request('https://map.example.com/index.html', {
+    headers: {
+      cookie: 'session=secret',
+      authorization: 'Bearer secret',
+      range: 'bytes=0-99',
+      'if-none-match': '"abc"',
+      'accept-encoding': 'gzip',
+    },
+  });
+  const forwarded = withoutCredentials(incoming);
+  assert.equal(forwarded.headers.get('cookie'), null, 'the origin request must not carry a cookie');
+  assert.equal(forwarded.headers.get('authorization'), null, 'the origin request must not carry authorization');
+  // Everything that changes what the origin should send back is kept.
+  assert.equal(forwarded.headers.get('range'), 'bytes=0-99', 'Range must survive');
+  assert.equal(forwarded.headers.get('if-none-match'), '"abc"', 'If-None-Match must survive');
+  assert.equal(forwarded.headers.get('accept-encoding'), 'gzip', 'Accept-Encoding must survive');
+
+  const clean = new Request('https://map.example.com/index.html', { headers: { range: 'bytes=0-9' } });
+  assert.equal(withoutCredentials(clean), clean, 'a request with nothing to strip is passed through as it is');
+}
 
 const response = applyResponseHeaders(new Response('ok', {
   headers: {
@@ -115,4 +193,4 @@ try {
   globalThis.fetch = originalFetch;
 }
 
-console.log('cloudflare worker policy ok');
+console.log('cloudflare worker policy ok (one cache key per static path, the proxy keeps its query, credentials reach neither the key nor the origin)');
