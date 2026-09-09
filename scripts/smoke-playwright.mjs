@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1834,6 +1834,10 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const { port } = server.address();
 const baseUrl = `http://127.0.0.1:${port}`;
 const visualSnapshotDir = path.join(root, 'test-results', 'visual');
+// Captures that got all the way through. The run used to end by printing a
+// figure typed into the format string, so adding or removing a capture left
+// the line claiming a number that was true whenever somebody last edited it.
+let visualSnapshotCount = 0;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -2273,6 +2277,7 @@ async function captureVisualSnapshot(page, name) {
       `${name}: snapshot is unexpectedly small (${buffer.length} bytes); page state written to ${dumpPath}`,
     );
   }
+  visualSnapshotCount += 1;
 }
 
 /**
@@ -4527,6 +4532,9 @@ try {
   if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
     launchOptions.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
   }
+  // A stale PNG from a previous run would make the count below agree with
+  // the wrong thing, so the run owns this directory.
+  await rm(visualSnapshotDir, { recursive: true, force: true });
   const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
@@ -5838,7 +5846,14 @@ try {
 
   await browser.close();
 
-  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, keyboard/focus contracts ok, 21 visual snapshots, panel layout/playback matrix ok)`);
+  // The count and the files have to agree. One is what the code did, the other
+  // is what survived, and a capture that wrote nothing is worth hearing about.
+  const writtenSnapshots = (await readdir(visualSnapshotDir)).filter(file => file.endsWith('.png'));
+  assert(
+    writtenSnapshots.length === visualSnapshotCount,
+    `the run took ${visualSnapshotCount} visual snapshots but ${writtenSnapshots.length} PNG${writtenSnapshots.length === 1 ? '' : 's'} are on disk: ${writtenSnapshots.join(', ')}`,
+  );
+  console.log(`smoke ok (${restored.visible}, 2005 ACE ${seasonAce}, decade ACE max ${stats.maxDecadeAce}, keyboard/focus contracts ok, ${visualSnapshotCount} visual snapshots, panel layout/playback matrix ok)`);
 } finally {
   await new Promise(resolve => server.close(resolve));
 }
