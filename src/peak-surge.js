@@ -1,4 +1,5 @@
 import { escapeHtml as escapeText } from './html-utils.js';
+import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
 // NHC Peak Storm Surge forecast layer for active storms.
@@ -96,8 +97,8 @@ export async function renderPeakSurge(activeStorms, { map, enabled = true } = {}
         {
           style: feature => surgeStyle(parseSurgeFeet(feature?.properties?.name)),
           onEachFeature: (feature, layer) => {
-            const label = feature?.properties?.name || 'Peak storm surge';
-            layer.bindTooltip(`NHC peak surge: ${escapeText(label)}`, { direction: 'top', sticky: true });
+            const label = feature?.properties?.name || t('surge.peakFallback');
+            layer.bindTooltip(t('surge.peakTooltip', escapeText(label)), { direction: 'top', sticky: true });
           },
         },
       );

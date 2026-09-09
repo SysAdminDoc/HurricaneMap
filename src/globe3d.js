@@ -394,8 +394,8 @@ function configureWindConeControl(dataset) {
   els.windCones.closest('.globe3d-toggle')?.setAttribute(
     'title',
     count > 0
-      ? `${count.toLocaleString(getDateLocale())} wind-radii cone layers available for this storm`
-      : 'Wind-radii cones are available when a focused or single selected storm has 2004+ radii data',
+      ? t('globe.coneCountTitle', count.toLocaleString(getDateLocale()))
+      : t('globe.coneNoneTitle'),
   );
 }
 

@@ -22,8 +22,10 @@
 //    there is no markup anywhere near it, and thirteen of the radar panel's
 //    status strings lived there. It reads literals, templates, ternaries and
 //    `+` concatenations, and finds the sinks by what they do rather than by
-//    name. It does NOT yet cover `.title =`, `setAttribute('title', …)` or
-//    Leaflet's bindTooltip/bindPopup.
+//    name. It covers `.textContent`, `.innerHTML`, `.innerText`, `.title`,
+//    `.placeholder`, `.ariaLabel`, `.alt`, the same names through
+//    `setAttribute`, and Leaflet's bindTooltip/bindPopup, which Leaflet renders
+//    itself where no markup scan can reach.
 //
 // What is deliberately NOT reported: prose inside a region marked with a `lang`
 // attribute. `src/panel.js` renders the generated storm biography in a
@@ -359,11 +361,20 @@ export function findCatalogEchoes(file, rawSource, catalogValues) {
 // also have to be right about re-exports and aliasing; every sink found so far
 // is defined beside its callers.
 const TEXT_PROPERTIES = new Set(['textContent', 'innerHTML', 'innerText']);
+// A tooltip, a placeholder and an accessible name are read out loud or shown on
+// hover, so they are user-facing text as much as a text node is. They are kept
+// apart from TEXT_PROPERTIES because these never carry markup, so a value with
+// a tag in it is a mistake here rather than something the text-node scan owns.
+const ATTRIBUTE_PROPERTIES = new Set(['title', 'placeholder', 'ariaLabel', 'alt', 'ariaDescription']);
+// The same three, spelled the way setAttribute takes them.
+const ATTRIBUTE_NAMES = new Set(['title', 'placeholder', 'aria-label', 'alt', 'aria-description']);
+// Leaflet renders these itself, so nothing in the markup scan can see them.
+const LEAFLET_TEXT_BINDERS = new Set(['bindTooltip', 'bindPopup', 'setTooltipContent', 'setPopupContent']);
 
 function writesToTextSink(node) {
   return node?.type === 'MemberExpression'
     && !node.computed
-    && TEXT_PROPERTIES.has(node.property?.name);
+    && (TEXT_PROPERTIES.has(node.property?.name) || ATTRIBUTE_PROPERTIES.has(node.property?.name));
 }
 
 /** Names in this module whose body writes a parameter straight to a text sink. */
@@ -495,7 +506,22 @@ export function findTextSinkLiterals(file, source) {
     const name = callee?.type === 'Identifier' ? callee.name
       : callee?.type === 'MemberExpression' && !callee.computed ? callee.property?.name
         : null;
-    if (!name || !sinks.has(name)) return;
+    if (!name) return;
+    // setAttribute('title', …) reaches the same place as element.title, and the
+    // globe's cone-layer count arrived that way.
+    if (name === 'setAttribute') {
+      const [attribute, value] = node.arguments;
+      if (attribute?.type === 'Literal' && ATTRIBUTE_NAMES.has(String(attribute.value))) {
+        for (const text of staticStrings(value)) report(node, text);
+      }
+      return;
+    }
+    // Leaflet builds these itself, so no markup scan can see them.
+    if (LEAFLET_TEXT_BINDERS.has(name)) {
+      for (const text of staticStrings(node.arguments[0])) report(node, text);
+      return;
+    }
+    if (!sinks.has(name)) return;
     for (const argument of node.arguments) {
       for (const value of staticStrings(argument)) report(node, value);
     }

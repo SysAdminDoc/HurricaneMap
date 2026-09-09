@@ -83,7 +83,7 @@ export function createFilterController({
       showSST: elements.showSST?.checked,
     });
     elements.resetFilters.disabled = !active;
-    elements.resetFilters.title = active ? 'Reset all filters and map layers' : 'No active filters';
+    elements.resetFilters.title = t(active ? 'filters.resetTitleActive' : 'filters.resetTitleIdle');
   };
 
   const populateStateFilter = (byState = {}) => {

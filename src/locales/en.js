@@ -436,6 +436,13 @@ export default {
   'poster.stormCount': '{0} storms',
 
   // Filters panel
+  'filters.resetTitleActive': 'Reset all filters and map layers',
+  'filters.resetTitleIdle': 'No active filters',
+  'filters.clearYearTitle': 'Reset to the full {0}-{1} range',
+  'globe.coneCountTitle': '{0} wind-radii cone layers available for this storm',
+  'globe.coneNoneTitle': 'Wind-radii cones are available when a focused or single selected storm has 2004+ radii data',
+  'surge.peakTooltip': 'NHC peak surge: {0}',
+  'surge.peakFallback': 'Peak storm surge',
   'filters.emptyWithFilters': 'No landfalls match. Your {0} filters exclude every storm.',
   'filters.emptyNoFilters': 'No landfalls match the current view.',
   'filters.emptyClear': 'Clear those filters',

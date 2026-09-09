@@ -242,7 +242,7 @@ function updateYearControlBounds() {
     els.yearMax.max = String(YEAR_MAX_DEFAULT);
   }
   if (els.clearYearFilter) {
-    els.clearYearFilter.title = `Reset to the full ${YEAR_MIN_DEFAULT}-${YEAR_MAX_DEFAULT} range`;
+    els.clearYearFilter.title = t('filters.clearYearTitle', YEAR_MIN_DEFAULT, YEAR_MAX_DEFAULT);
   }
 }
 

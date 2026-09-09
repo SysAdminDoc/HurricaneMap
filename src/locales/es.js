@@ -436,6 +436,13 @@ export default {
   'poster.stormCount': '{0} tormentas',
 
   // Filters panel
+  'filters.resetTitleActive': 'Restablecer todos los filtros y las capas del mapa',
+  'filters.resetTitleIdle': 'No hay filtros activos',
+  'filters.clearYearTitle': 'Volver al rango completo {0}-{1}',
+  'globe.coneCountTitle': '{0} capas de conos de radio de viento disponibles para esta tormenta',
+  'globe.coneNoneTitle': 'Los conos de radio de viento están disponibles cuando la tormenta enfocada o seleccionada tiene datos de radios de 2004 en adelante',
+  'surge.peakTooltip': 'Marejada máxima del NHC: {0}',
+  'surge.peakFallback': 'Marejada ciclónica máxima',
   'filters.emptyWithFilters': 'Ningún impacto coincide. Tus filtros de {0} excluyen todas las tormentas.',
   'filters.emptyNoFilters': 'Ningún impacto coincide con la vista actual.',
   'filters.emptyClear': 'Quitar esos filtros',
