@@ -38,6 +38,23 @@ export function resetPrimaryFilters(filters, {
   filters.retiredOnly = defaults.retiredOnly;
 }
 
+/**
+ * Reset exactly the filters excludingFilterNames can name, and nothing else.
+ *
+ * resetPrimaryFilters is the whole-sidebar reset and also clears showTracks and
+ * showHeatmap. Those draw over the surviving landfalls rather than deciding
+ * which survive, so a button whose message names only the year range and the
+ * state must not switch them off.
+ */
+export function resetExcludingFilters(filters, { yearMinDefault, yearMaxDefault } = {}) {
+  const defaults = createDefaultFilters({ yearMin: yearMinDefault, yearMax: yearMaxDefault });
+  filters.yearMin = defaults.yearMin;
+  filters.yearMax = defaults.yearMax;
+  filters.categories = defaults.categories;
+  filters.state = defaults.state;
+  filters.retiredOnly = defaults.retiredOnly;
+}
+
 export function filterByMacro(filters, mode) {
   if (mode === 'major') {
     filters.categories = new Set(['3', '4', '5']);

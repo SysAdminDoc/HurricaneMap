@@ -2386,9 +2386,9 @@ async function assertFocusReturns(page, id, label) {
  * blank map under "0 of 759" with no message and no way back, which reads as a
  * broken app rather than an empty answer.
  *
- * Vermont has never taken a landfall in HURDAT2, so selecting it is a
- * combination that is genuinely impossible rather than one that happens to be
- * empty this season.
+ * The combination is derived from the data rather than assumed: the state
+ * filter only offers states that have taken a landfall, so there is no
+ * permanently impossible state to pick.
  */
 async function assertEmptyFilterState(page) {
   const readEmpty = () => page.evaluate(() => {
@@ -2401,12 +2401,27 @@ async function assertEmptyFilterState(page) {
     };
   });
 
+  const countMarkers = () => page.evaluate(
+    () => document.querySelectorAll('#map path.landfall-marker').length,
+  );
+
   const filtersCollapsed = await page.locator('#filters').evaluate(el => el.classList.contains('collapsed'));
   if (filtersCollapsed) await clickHeaderAction(page, '#toggle-filters');
   await page.waitForFunction(() => !document.querySelector('#filters')?.classList.contains('collapsed'));
 
   const populated = await readEmpty();
   assert(populated.hidden === true, `the empty state is showing while landfalls match: ${JSON.stringify(populated)}`);
+  const markersBefore = await countMarkers();
+  assert(markersBefore > 0, `no landfall markers to lose, so this proves nothing: ${markersBefore}`);
+
+  // The layers the message does NOT name must survive the clear. Turning tracks
+  // on here is what catches a reset that quietly switches them off.
+  const tracksWereOn = await page.evaluate(() => document.querySelector('#show-tracks')?.checked === true);
+  await page.evaluate(() => {
+    const tracks = document.querySelector('#show-tracks');
+    if (tracks && !tracks.checked) { tracks.checked = true; tracks.dispatchEvent(new Event('change', { bubbles: true })); }
+  });
+  await page.waitForFunction(() => document.querySelector('#show-tracks')?.checked === true);
 
   // The state filter only offers states that have taken a landfall, so there is
   // no permanently impossible state to pick. Derive a pair that genuinely has
@@ -2474,8 +2489,26 @@ async function assertEmptyFilterState(page) {
   await page.waitForFunction(() => document.querySelector('#filter-empty')?.hidden === true, null, { timeout: 8000 });
   const restored = await readEmpty();
   assert(restored.hidden === true, `clearing the filters left the empty state up: ${JSON.stringify(restored)}`);
-  const markers = await page.evaluate(() => document.querySelectorAll('#map .leaflet-marker-pane path, #map path.landfall-dot').length);
-  assert(markers >= 0, 'marker probe failed');
+  const markersAfter = await countMarkers();
+  assert(
+    markersAfter === markersBefore,
+    `clearing the filters did not bring the landfalls back: ${markersBefore} before, ${markersAfter} after`,
+  );
+  // And it must not have switched off a layer its message never mentioned.
+  const tracksStillOn = await page.evaluate(() => document.querySelector('#show-tracks')?.checked === true);
+  assert(
+    tracksStillOn,
+    'clearing the filters switched off the track layer, which its message does not name',
+  );
+  // Hand the suite back the state it lent us: t=1 in the fragment fails a later
+  // assertion about a default view.
+  if (!tracksWereOn) {
+    await page.evaluate(() => {
+      const tracks = document.querySelector('#show-tracks');
+      if (tracks?.checked) { tracks.checked = false; tracks.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    await page.waitForFunction(() => document.querySelector('#show-tracks')?.checked === false);
+  }
 }
 
 async function assertConfirmDialogContract(page) {
@@ -2556,8 +2589,48 @@ async function assertConfirmDialogContract(page) {
     afterConfirm.length === 0,
     `confirming the reset left items checked: ${JSON.stringify(afterConfirm)}`,
   );
-  await assertFocusReturns(page, 'prep-reset', 'after confirming the reset');
+  // NOT asserting focus return here: prep.js focuses #prep-reset itself after a
+  // confirmed reset (src/prep.js:192), so this path is satisfied by the caller
+  // whether or not confirm-action.js restores anything.
   await clickHeaderAction(page, '#toggle-prep');
+
+  // --- focus lands on the invoker, with an invoker nothing else touches ---
+  // Two honest caveats, both measured. Every call site that confirms also moves
+  // focus itself (src/prep.js:192, src/saved-views-ui.js:93), so no call site
+  // can isolate the module. And a native <dialog> returns focus to whatever was
+  // focused before showModal() on its own, so deleting confirm-action.js's
+  // opener.focus() does NOT fail this: the browser covers the plain case. What
+  // this asserts is the requirement, that focus ends up on the invoker, not the
+  // implementation. The popover case below is the one the platform cannot do
+  // alone, and removing reopenPopover does fail it.
+  const isolated = await page.evaluate(async () => {
+    const { confirmLocalAction } = await import('/src/confirm-action.js');
+    const probe = document.createElement('button');
+    probe.id = 'hm-confirm-focus-probe';
+    probe.textContent = 'probe';
+    document.body.appendChild(probe);
+    probe.focus();
+    window.__hmConfirm = confirmLocalAction({
+      title: 'Focus probe',
+      message: 'Does focus come back to the invoker?',
+      confirmLabel: 'Confirm',
+      invoker: probe,
+    });
+    return document.activeElement?.className || '';
+  });
+  assert(
+    isolated.includes('confirm-action-cancel'),
+    `the isolated confirmation did not take focus into the dialog: "${isolated}"`,
+  );
+  await page.click('.confirm-action-submit');
+  await waitForDialogClosed(page);
+  const confirmedValue = await page.evaluate(() => window.__hmConfirm);
+  assert(confirmedValue === true, `confirming resolved ${JSON.stringify(confirmedValue)} rather than true`);
+  await assertFocusReturns(page, 'hm-confirm-focus-probe', 'after confirming, with an invoker that refocuses nothing');
+  await page.evaluate(() => {
+    document.getElementById('hm-confirm-focus-probe')?.remove();
+    delete window.__hmConfirm;
+  });
 
   // --- An invoker inside a popover gets its popover back ------------------
   // Saved views live in the settings popover, and showModal() light-dismisses

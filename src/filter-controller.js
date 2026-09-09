@@ -3,6 +3,7 @@ import {
   excludingFilterNames,
   hasActiveFilters,
   isYearFiltered,
+  resetExcludingFilters,
   resetPrimaryFilters,
   resetYearRange,
   setYearRange,
@@ -162,7 +163,7 @@ export function createFilterController({
     // exclude a landfall and leaves the map layers alone, which is what its
     // message promises.
     document.getElementById('filter-empty-reset')?.addEventListener('click', () => {
-      resetPrimaryFilters(filters, yearDefaults());
+      resetExcludingFilters(filters, yearDefaults());
       sync();
       resetTrackCache();
       applyFilters();
