@@ -2511,6 +2511,120 @@ async function assertEmptyFilterState(page) {
   }
 }
 
+/**
+ * Importing saved views in replace mode destroys every view on the device, so
+ * it is confirmed the way deleting a single one already was. The guard used to
+ * be inverted: the small destructive action asked, the total one did not.
+ *
+ * The import fixture is produced by the app's own exportSavedViews() rather
+ * than typed here, so the file under test is one the app would actually write.
+ */
+async function assertSavedViewReplaceIsConfirmed(page) {
+  const DIALOG = '#confirm-local-action';
+  const names = () => page.evaluate(
+    () => (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || []).map(view => view.name).sort(),
+  );
+
+  const filtersCollapsed = await page.locator('#filters').evaluate(el => el.classList.contains('collapsed'));
+  if (filtersCollapsed) await clickHeaderAction(page, '#toggle-filters');
+
+  // Build a real export file holding one view, then leave a different view in
+  // the store so the two are told apart by name.
+  const fixture = await page.evaluate(async () => {
+    const store = await import('/src/saved-views.js');
+    localStorage.removeItem('hm-saved-views-v1');
+    store.saveCurrentView('Imported one', '#v=1&t=1');
+    const exported = store.exportSavedViews();
+    localStorage.removeItem('hm-saved-views-v1');
+    store.saveCurrentView('Keep me', '#v=1&h=1');
+    return exported;
+  });
+  assert(/Imported one/.test(fixture), `the export fixture is not what it claims: ${fixture.slice(0, 120)}`);
+
+  await clickHeaderAction(page, '#toggle-settings');
+  await page.waitForFunction(() => document.querySelector('#settings-menu')?.matches(':popover-open'));
+  await page.evaluate(async () => {
+    const { renderSavedViewsManager } = await import('/src/saved-views-ui.js');
+    if (typeof renderSavedViewsManager === 'function') renderSavedViewsManager();
+  }).catch(() => {});
+
+  const loadFixture = async () => {
+    await page.setInputFiles('[data-saved-view-file]', {
+      name: 'saved-views.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(fixture, 'utf8'),
+    });
+    await page.waitForSelector('.saved-view-import-preview');
+  };
+
+  // --- replace mode asks, and a refusal changes nothing -------------------
+  await loadFixture();
+  await page.check('input[name="saved-view-import-mode"][value="replace"]');
+  await page.click('[data-action="commit-import"]');
+  await page.waitForSelector(`${DIALOG}[open]`);
+  const asked = await page.evaluate(
+    () => document.querySelector('#confirm-local-action-message')?.textContent || '',
+  );
+  assert(/\b1\b/.test(asked), `the confirmation does not say how many views it will destroy: "${asked}"`);
+  await page.keyboard.press('Escape');
+  await waitForDialogClosed(page);
+  await page.waitForTimeout(300);
+  const afterRefusal = await names();
+  assert(
+    afterRefusal.length === 1 && afterRefusal[0] === 'Keep me',
+    `refusing the replace still changed the store: ${JSON.stringify(afterRefusal)}`,
+  );
+
+  // --- confirming does replace everything ---------------------------------
+  await page.click('[data-action="commit-import"]');
+  await page.waitForSelector(`${DIALOG}[open]`);
+  await page.click('.confirm-action-submit');
+  await waitForDialogClosed(page);
+  await page.waitForFunction(
+    () => (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || [])
+      .some(view => view.name === 'Imported one'),
+    null,
+    { timeout: 8000 },
+  );
+  const afterReplace = await names();
+  assert(
+    afterReplace.length === 1 && afterReplace[0] === 'Imported one',
+    `replace did not put the imported view in place of the old one: ${JSON.stringify(afterReplace)}`,
+  );
+
+  // --- merge mode does not ask --------------------------------------------
+  await page.evaluate(async () => {
+    const store = await import('/src/saved-views.js');
+    store.saveCurrentView('Keep me', '#v=1&h=1');
+  });
+  await loadFixture();
+  await page.check('input[name="saved-view-import-mode"][value="merge"]');
+  await page.click('[data-action="commit-import"]');
+  await page.waitForFunction(
+    () => (JSON.parse(localStorage.getItem('hm-saved-views-v1') || 'null')?.views || []).length >= 2,
+    null,
+    { timeout: 8000 },
+  );
+  const dialogOpened = await page.evaluate(
+    () => Boolean(document.querySelector('#confirm-local-action')?.hasAttribute('open')),
+  );
+  assert(!dialogOpened, 'merge mode asked for confirmation, which it has no reason to');
+  const afterMerge = await names();
+  // Merge renames duplicates rather than dropping them, so importing a view
+  // whose name is already present yields "Imported one (2)". What matters is
+  // that the view already on the device survived, which is the whole
+  // difference between merge and replace.
+  assert(
+    afterMerge.includes('Keep me') && afterMerge.length > 1,
+    `merge destroyed the view already on the device: ${JSON.stringify(afterMerge)}`,
+  );
+
+  await page.evaluate(() => {
+    localStorage.removeItem('hm-saved-views-v1');
+    document.querySelector('#settings-menu')?.hidePopover?.();
+  });
+}
+
 async function assertConfirmDialogContract(page) {
   const DIALOG = '#confirm-local-action';
   const readPrep = () => page.evaluate(() => {
@@ -4994,6 +5108,7 @@ try {
   await assertLocationPrivacyFlow(page);
   await assertUndersizedSnapshotIsDiagnosed(page);
   await assertConfirmDialogContract(page);
+  await assertSavedViewReplaceIsConfirmed(page);
   await assertEmptyFilterState(page);
   await assertUnpaintedMapIsRefused(page);
 
@@ -5278,6 +5393,12 @@ try {
     return names.includes('Existing view') && !names.includes('Existing view (2)');
   });
   await page.click('[data-action="commit-import"]');
+  // Replacing destroys every saved view on the device and is confirmed now, the
+  // way deleting a single one already was. This step was added when the guard
+  // was: the assertion below is unchanged and still describes what a completed
+  // replace leaves behind.
+  await page.waitForSelector('#confirm-local-action[open]');
+  await page.click('.confirm-action-submit');
   await page.waitForFunction(() => {
     const record = JSON.parse(localStorage.getItem('hm-saved-views-v1'));
     return record.views.length === 2 &&

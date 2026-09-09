@@ -104,6 +104,19 @@ export function initSavedViewsUI({ host, getCurrentHash, restoreHash }) {
       render();
       host.querySelector('[data-action="choose-import"]')?.focus({ preventScroll: true });
     } else if (button.dataset.action === 'commit-import') {
+      // Replacing destroys every saved view on this device, so it is confirmed
+      // the way deleting a single one already was. Without this the smaller
+      // destructive action was guarded and the total one was not.
+      const replacing = importMode === 'replace' ? loadSavedViews().length : 0;
+      if (replacing > 0) {
+        const confirmed = await confirmLocalAction({
+          title: t('savedViews.confirmReplaceTitle'),
+          message: t('savedViews.confirmReplaceBody', replacing),
+          confirmLabel: t('savedViews.confirmReplaceAction'),
+          invoker: button,
+        });
+        if (!confirmed) return;
+      }
       const result = importSavedViews(pendingImport, { mode: importMode });
       if (!result.ok) {
         importFailure = result;
