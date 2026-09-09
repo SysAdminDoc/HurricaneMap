@@ -1838,6 +1838,13 @@ const visualSnapshotDir = path.join(root, 'test-results', 'visual');
 // figure typed into the format string, so adding or removing a capture left
 // the line claiming a number that was true whenever somebody last edited it.
 let visualSnapshotCount = 0;
+// Failures go somewhere the next run will not wipe. The counter above needs
+// visual/ to hold exactly what this run captured, so the run clears it on
+// start, and that clear was destroying the evidence from the run before: a
+// size failure wrote its dump, the next run began, and the diagnosis was gone
+// before anybody read it. Stamped, so two failures of the same snapshot do not
+// overwrite each other.
+const visualFailureDir = path.join(root, 'test-results', 'visual-failures');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -2269,8 +2276,12 @@ async function captureVisualSnapshot(page, name) {
     // record what the page looked like at the moment it happened, beside the
     // PNG that shows it, instead of leaving the next occurrence to be chased
     // from the number again.
-    const dumpPath = path.join(visualSnapshotDir, `${name}.state.json`);
-    const dump = await describeUndersizedSnapshot(page, name, buffer, paint);
+    await mkdir(visualFailureDir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const keptPng = path.join(visualFailureDir, `${name}-${stamp}.png`);
+    const dumpPath = path.join(visualFailureDir, `${name}-${stamp}.state.json`);
+    const dump = await describeUndersizedSnapshot(page, name, buffer, paint, keptPng);
+    await writeFile(keptPng, buffer);
     await writeFile(dumpPath, `${JSON.stringify(dump, null, 2)}\n`);
     assert(
       false,
@@ -2286,7 +2297,7 @@ async function captureVisualSnapshot(page, name) {
  * on sight: an unpainted basemap, a loading overlay that never came down, a
  * backgrounded tab, or an animation still running.
  */
-async function describeUndersizedSnapshot(page, name, buffer, paint) {
+async function describeUndersizedSnapshot(page, name, buffer, paint, pngPath) {
   const pageState = await page.evaluate(() => {
     const pane = document.querySelector('#map .leaflet-tile-pane');
     const tiles = pane ? [...pane.querySelectorAll('img.leaflet-tile')] : [];
@@ -2315,7 +2326,7 @@ async function describeUndersizedSnapshot(page, name, buffer, paint) {
     snapshot: name,
     captured_at: new Date().toISOString(),
     bytes: buffer.length,
-    png: path.join(visualSnapshotDir, `${name}.png`),
+    png: pngPath,
     map_paint: paint,
     viewport: page.viewportSize(),
     page: pageState,
@@ -2331,10 +2342,6 @@ async function describeUndersizedSnapshot(page, name, buffer, paint) {
  */
 async function assertUndersizedSnapshotIsDiagnosed(page) {
   const name = 'diagnostic-blank-viewport';
-  const pngPath = path.join(visualSnapshotDir, `${name}.png`);
-  const dumpPath = path.join(visualSnapshotDir, `${name}.state.json`);
-  await rm(pngPath, { force: true });
-  await rm(dumpPath, { force: true });
 
   await page.evaluate(() => {
     const cover = document.createElement('div');
@@ -2357,9 +2364,15 @@ async function assertUndersizedSnapshotIsDiagnosed(page) {
     failure.message.includes('snapshot is unexpectedly small'),
     `the blanked viewport failed for some other reason: ${failure.message}`,
   );
+  const marker = 'page state written to ';
   assert(
-    failure.message.includes(dumpPath),
+    failure.message.includes(marker),
     `the size failure must name the state dump it wrote: ${failure.message}`,
+  );
+  const dumpPath = failure.message.slice(failure.message.indexOf(marker) + marker.length);
+  assert(
+    dumpPath.includes('visual-failures'),
+    `the dump must land where the next run will not clear it, got ${dumpPath}`,
   );
 
   const dump = JSON.parse(await readFile(dumpPath, 'utf8'));
@@ -2371,14 +2384,24 @@ async function assertUndersizedSnapshotIsDiagnosed(page) {
   }
   assert(dump.bytes <= 20_000, `the dump must record the size that failed, got ${dump.bytes}`);
   assert(dump.snapshot === name, `the dump must name its snapshot, got ${dump.snapshot}`);
-  const kept = await stat(pngPath);
+  const kept = await stat(dump.png);
   assert(
     kept.size === dump.bytes,
     `the failing PNG must be kept beside the dump at the size the dump reports, ${kept.size} against ${dump.bytes}`,
   );
+  assert(
+    path.dirname(dump.png) === path.dirname(dumpPath),
+    'the PNG and its dump must sit together',
+  );
 
-  await rm(pngPath, { force: true });
+  // Only this deliberate pair. A real failure's artifacts are the point and
+  // stay where they were written.
+  await rm(dump.png, { force: true });
   await rm(dumpPath, { force: true });
+  // page.screenshot writes into the counted directory before the guard runs, so
+  // this synthetic capture leaves a PNG the run never counted. A real size
+  // failure aborts before the count is taken, so only this one has to tidy up.
+  await rm(path.join(visualSnapshotDir, `${name}.png`), { force: true });
 }
 
 // Impacts, the AOML ground-truth artifact, the NCEI billion-dollar table and the
