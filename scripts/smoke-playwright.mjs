@@ -2034,6 +2034,80 @@ async function assertStormOverlaysStopWithThePanel(page) {
   });
 }
 
+// A local frame that cannot be decoded used to leave a blank overlay under a
+// status line still reporting its timestamp, so the panel claimed a frame was
+// on screen when none was. Driven by failing the frame's own request, which is
+// what a truncated or corrupt PNG in the archive looks like to the browser.
+async function assertUnreadableRadarFrameIsReported(page) {
+  // Only the frame images: blocking the manifest too would send show() down
+  // the remote walkback and never build the image overlay this is about.
+  await page.route('**/data/radar/**/*.png', route => route.abort('failed'));
+  try {
+    await page.evaluate(async () => {
+      window.__hmLocalRadarSmoke?.close();
+      window.__hmBrokenRadarSmoke?.close();
+      const { getMap } = await import('/src/map.js');
+      const { RadarOverlay } = await import('/src/radar.js');
+      const overlay = new RadarOverlay(getMap());
+      window.__hmBrokenRadarSmoke = overlay;
+      // A storm no earlier assertion has opened. Katrina's frame is already in
+      // the browser's memory cache by now, and a cache hit issues no request
+      // for page.route to fail.
+      await overlay.show({
+        id: 'AL011995',
+        name: 'ALLISON',
+        year: 1995,
+        us_landfalls: [{ t: '1995-06-05T14:00:00Z', lat: 29.9, lon: -84.4, state: 'Florida' }],
+        track: [],
+      }, 0);
+    });
+
+    // The frame that never painted must not be left on the map, and the status
+    // must stop claiming a time.
+    await page.waitForFunction(
+      () => window.__hmBrokenRadarSmoke?.overlay === null,
+      null,
+      { timeout: 15000 },
+    ).catch(() => {
+      throw new Error('a radar frame that failed to load was left on the map');
+    });
+    const reported = await page.evaluate(() => ({
+      status: document.getElementById('radar-time')?.textContent || '',
+      feed: document.querySelector('#radar-feed-status')?.textContent || '',
+      retry: Boolean(document.querySelector('#radar-feed-status button')),
+    }));
+    assert(
+      !/^\d{1,2}:\d{2}/.test(reported.status.trim()) && !/\d{1,2}:\d{2}\s*(AM|PM)?( · online)?$/i.test(reported.status.trim()),
+      `the radar status still reads as a timestamp after the frame failed: ${JSON.stringify(reported.status)}`,
+    );
+    assert(
+      /could not be displayed/i.test(reported.status),
+      `the radar status did not say the frame failed: ${JSON.stringify(reported.status)}`,
+    );
+    // Reported through the same optional-feed host every other feed uses, so it
+    // reaches the diagnostics panel and offers the retry that host already
+    // wires to reopening the storm.
+    assert(reported.retry, `the failed radar frame offered no retry: ${JSON.stringify(reported.feed)}`);
+    const feed = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      const state = feeds.getOptionalFeedState('radar');
+      return { state: state?.state, detail: state?.detail };
+    });
+    // The radar has already served frames by this point in the run, so the feed
+    // degrades to 'stale' and files the failure kind in detail rather than
+    // going to 'error' outright. Both are failures that offer a retry; what
+    // must not happen is the feed still reading as a success.
+    assert(
+      (feed.state === 'error' && feed.detail === null)
+      || (feed.state === 'stale' && feed.detail === 'error'),
+      `the radar feed did not record the frame failure: ${JSON.stringify(feed)}`,
+    );
+  } finally {
+    await page.unroute('**/data/radar/**/*.png');
+    await page.evaluate(() => { window.__hmBrokenRadarSmoke?.close(); });
+  }
+}
+
 async function assertRadarRenderModes(page) {
   await page.evaluate(async () => {
     const { getMap } = await import('/src/map.js');
@@ -6005,6 +6079,7 @@ try {
   await openKatrinaPanel(page);
   await assertVideoExport(page);
   await assertRadarRenderModes(page);
+  await assertUnreadableRadarFrameIsReported(page);
   await assertStormOverlaysStopWithThePanel(page);
   // Live permalink navigation: assigning a new hash in an open tab must
   // apply it without a reload (hashchange listener).

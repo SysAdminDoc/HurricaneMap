@@ -361,11 +361,34 @@ export class RadarOverlay {
       this.overlay.addTo(this.map);
       return;
     }
-    this.overlay = createRadarImageOverlay(L, frame.url, config.bounds, {
+    const overlay = createRadarImageOverlay(L, frame.url, config.bounds, {
       opacity: 1.0,
       className: 'radar-overlay-img',
       interactive: false,
-    }, this.colorblind).addTo(this.map);
+    }, this.colorblind);
+    // A local frame that cannot be decoded left a blank overlay under a status
+    // line still reporting its timestamp, so the panel claimed a frame was on
+    // screen when none was. The remote path is pre-probed with a HEAD before it
+    // is drawn, so its failures are already reported; this is the one that had
+    // no path to a message at all.
+    overlay.on('error', () => this.onFrameLoadFailed(frame));
+    this.overlay = overlay.addTo(this.map);
+  }
+
+  onFrameLoadFailed(frame) {
+    // Only the frame still on screen. A frame the reader has already stepped
+    // past may fail after its overlay was replaced, and reporting that would
+    // blame the frame they are looking at.
+    if (this.currentFrame !== frame || !this.overlay) return;
+    this.map.removeLayer(this.overlay);
+    this.overlay = null;
+    this.setStatus(t('radar.frameUnreadable', formatTime(frame.date.toISOString())));
+    // The status host mounted in buildControls turns this into a retry that
+    // reopens the storm at this landfall.
+    failOptionalFeed('radar', {
+      error: new Error(`radar frame did not load: ${frame.url}`),
+      cacheOrigin: frame.source === 'remote' ? 'network' : 'bundled',
+    });
   }
 
   timestampLabel(source = 'local') {

@@ -221,6 +221,7 @@ export default {
   'radar.savingPackProgress': 'Saving radar pack {0}/{1}…',
   'radar.savedButton': 'Saved',
   'radar.noFrameAt': 'No frame at {0}',
+  'radar.frameUnreadable': 'Frame for {0} could not be displayed.',
   'radar.failedToLoad': 'Failed to load {0}',
   'radar.buildingLoop': 'Building loop (probing IEM)…',
   'radar.noLoopFrames': 'No frames available for loop.',
