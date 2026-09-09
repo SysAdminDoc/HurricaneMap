@@ -2204,7 +2204,7 @@ async function waitForViewTransition(page, timeout = 5000) {
   ).then(() => true).catch(() => false);
 }
 
-async function waitForMapPaint(page, timeout = 15000) {
+async function waitForMapPaint(page, timeout = 15_000) {
   const state = await page.evaluate(() => {
     const el = document.querySelector('#map');
     if (!el) return 'absent';
@@ -2243,9 +2243,9 @@ async function waitForMapPaint(page, timeout = 15000) {
   return upstream ? `upstream:${upstream}` : 'blank';
 }
 
-async function captureVisualSnapshot(page, name) {
+async function captureVisualSnapshot(page, name, { paintTimeout } = {}) {
   await mkdir(visualSnapshotDir, { recursive: true });
-  const paint = await waitForMapPaint(page);
+  const paint = await waitForMapPaint(page, paintTimeout);
   const settled = await waitForViewTransition(page);
   // The byte guard below cannot see this. A map with every tile request
   // refused still screenshots at 283 KB, because the header, timeline, markers
@@ -2402,6 +2402,70 @@ async function assertUndersizedSnapshotIsDiagnosed(page) {
   // this synthetic capture leaves a PNG the run never counted. A real size
   // failure aborts before the count is taken, so only this one has to tidy up.
   await rm(path.join(visualSnapshotDir, `${name}.png`), { force: true });
+}
+
+/**
+ * The paint wait is the whole of the fix for `desktop-location-privacy:
+ * snapshot is unexpectedly small (6491 bytes)` on 2026-09-08: the capture used
+ * to fire as soon as the privacy panel's selector resolved, with the basemap
+ * still blank behind it. A wait nobody has watched fail is a wait nobody can
+ * tell from a sleep, so empty the tile pane and prove the capture refuses
+ * rather than photographing a map that never painted.
+ *
+ * The tiles are moved, not rebuilt. Leaflet holds the img elements it created,
+ * so re-parsing the pane's innerHTML would hand the map back a tree of
+ * strangers and every later frame in this run would be drawn on top of it.
+ */
+async function assertUnpaintedMapIsRefused(page) {
+  const name = 'diagnostic-unpainted-basemap';
+  const stashed = await page.evaluate(() => {
+    const pane = document.querySelector('#map .leaflet-tile-pane');
+    if (!pane) return 0;
+    const stash = document.createElement('div');
+    stash.id = 'hm-smoke-tile-stash';
+    stash.hidden = true;
+    document.body.appendChild(stash);
+    let moved = 0;
+    while (pane.firstChild) {
+      stash.appendChild(pane.firstChild);
+      moved += 1;
+    }
+    return moved;
+  });
+  assert(stashed > 0, 'the tile pane was already empty, so this proves nothing about the paint wait');
+
+  let failure = null;
+  try {
+    await captureVisualSnapshot(page, name, { paintTimeout: 1500 });
+  } catch (error) {
+    failure = error;
+  } finally {
+    await page.evaluate(() => {
+      const pane = document.querySelector('#map .leaflet-tile-pane');
+      const stash = document.getElementById('hm-smoke-tile-stash');
+      if (!pane || !stash) return;
+      while (stash.firstChild) pane.appendChild(stash.firstChild);
+      stash.remove();
+    });
+  }
+
+  assert(failure, 'a map with nothing painted must not be screenshotted as if it were the app');
+  assert(
+    failure.message.includes('the basemap never painted'),
+    `the unpainted map failed for some other reason: ${failure.message}`,
+  );
+  // The refusal comes before page.screenshot, so there is no PNG to clean up
+  // and visualSnapshotCount is untouched. Assert that rather than assume it.
+  const orphan = await stat(path.join(visualSnapshotDir, `${name}.png`)).catch(() => null);
+  assert(!orphan, 'the capture wrote a PNG for a map it had already judged unpainted');
+
+  // And the pane has to come back, or every later snapshot in this run is the
+  // blank frame this function exists to catch.
+  const repainted = await waitForMapPaint(page);
+  assert(
+    repainted !== 'blank',
+    `the stashed tiles did not come back: waitForMapPaint now reports ${repainted}`,
+  );
 }
 
 // Impacts, the AOML ground-truth artifact, the NCEI billion-dollar table and the
@@ -4577,6 +4641,7 @@ try {
   await assertAdvisoryTooltipDomSafety(page);
   await assertLocationPrivacyFlow(page);
   await assertUndersizedSnapshotIsDiagnosed(page);
+  await assertUnpaintedMapIsRefused(page);
 
   const migratedSettings = await page.evaluate(
     () => JSON.parse(localStorage.getItem('hm-settings-v1') || 'null'),
