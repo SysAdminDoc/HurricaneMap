@@ -1061,6 +1061,7 @@ export default {
   'about.catalogTitle': 'Machine-readable catalog',
   'about.catalogIntro': 'Every dataset here is published as a STAC 1.1.0 catalog, so another tool can find and check it without scraping this page.',
   'about.catalogJson': 'Browse the catalog as JSON',
+  'about.conformanceReport': 'Read the accessibility conformance report',
   'about.catalogBrowser': 'Open it in STAC Browser',
   'about.linksTitle': 'Each storm card links to',
   'about.linkWikipedia': 'Wikipedia article for the storm (best effort, by name and year)',

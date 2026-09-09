@@ -353,6 +353,9 @@ function renderSitemap(entries, revisionDate, indexes) {
     ...indexes.decades.map(decade => ({ loc: `${SITE}decades/${decade}/`, changefreq: 'yearly', priority: '0.6' })),
     ...indexes.states.map(state => ({ loc: `${SITE}states/${stateSlug(state)}/`, changefreq: 'yearly', priority: '0.6' })),
     { loc: `${SITE}data/stac/catalog.json`, changefreq: 'yearly', priority: '0.5' },
+    // The accessibility conformance report. No product in consumer hurricane
+    // mapping publishes one, and until this it was linked from nothing.
+    { loc: `${SITE}docs/VPAT.html`, changefreq: 'monthly', priority: '0.5' },
     // Derived from COASTAL_CITIES rather than from a build result, so the
     // sitemap does not depend on the order the two page builders run in.
     ...COASTAL_CITIES.map(city => ({ loc: `${SITE}cities/${citySlug(city)}/`, changefreq: 'yearly', priority: '0.6' })),

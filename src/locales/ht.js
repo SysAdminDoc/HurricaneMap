@@ -1036,6 +1036,7 @@ export default {
   'about.catalogTitle': 'Katalog machin ka li',
   'about.catalogIntro': 'Chak seri done isit la pibliye kòm yon katalog STAC 1.1.0, konsa yon lòt zouti ka jwenn li epi verifye li san li pa bezwen li paj sa a.',
   'about.catalogJson': 'Gade katalog la an JSON',
+  'about.conformanceReport': 'Li rapò konfòmite aksesibilite a',
   'about.catalogBrowser': 'Louvri li nan STAC Browser',
   'about.linksTitle': 'Chak fich siklòn gen lyen pou',
   'about.linkWikipedia': 'Atik Wikipedia siklòn nan (pi bon rechèch pa non ak ane)',

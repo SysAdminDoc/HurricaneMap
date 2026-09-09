@@ -23,6 +23,8 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 ## Quality plan
 
+The accessibility conformance report is [`docs/VPAT.html`](docs/VPAT.html), against WCAG 2.2 Level AA. Every row names what checks it, and says "Manual" where nothing automated does, which is eleven of the forty. `npm run check:vpat` fails when the report is older than the newest commit touching `src/styles-accessibility.css` or `tests/aria-regression.spec.mjs`, so it cannot fall behind the work.
+
 [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md) records the quality programme that followed v1.3.9: regression automation, data contracts, URL state, data provenance, service-worker update UX, accessibility coverage, visual snapshots and maintainability. Every item in it has shipped, so it is a record of what was done rather than a list of what is next.
 
 Outbound links rot quietly, so `npm run check:links` probes every `https://` URL the app renders against the live web, follows redirects, and fails on a 4xx, a 5xx, or a redirect that lands on a different host from the one in the code. It found the "Recon archive" button pointing at a site that had moved and was dropping both the path and the query on the way, sending every reader to an unrelated homepage. It needs the network, so it sits outside `npm run build`; `npm run check:links -- --write` records the run in [`security/link-probe-snapshot.json`](security/link-probe-snapshot.json), and `npm run build` fails when that snapshot is more than 60 days old. Hosts that answer an automated request with a challenge, and endpoints that need query parameters, are listed in the script with the reason each is skipped.

@@ -1058,6 +1058,7 @@ export default {
   'about.catalogTitle': 'Catálogo legible por máquina',
   'about.catalogIntro': 'Cada conjunto de datos se publica como catálogo STAC 1.1.0, para que otra herramienta pueda encontrarlo y verificarlo sin recorrer esta página.',
   'about.catalogJson': 'Ver el catálogo en JSON',
+  'about.conformanceReport': 'Leer el informe de conformidad de accesibilidad',
   'about.catalogBrowser': 'Abrirlo en STAC Browser',
   'about.linksTitle': 'Cada ficha de tormenta enlaza a',
   'about.linkWikipedia': 'Artículo de Wikipedia (mejor estimación por nombre y año)',

@@ -107,8 +107,12 @@ const stateCount = new Set(
 ).size;
 assert.equal(
   locations.length,
-  storms.length + COASTAL_CITIES.length + seasonCount + decadeCount + stateCount + 7,
-  'sitemap must list the site, the four listings, the catalog, every storm, city, season, decade and state',
+  storms.length + COASTAL_CITIES.length + seasonCount + decadeCount + stateCount + 8,
+  'sitemap must list the site, the four listings, the catalog, the conformance report, every storm, city, season, decade and state',
+);
+assert.ok(
+  locations.includes('https://sysadmindoc.github.io/HurricaneMap/docs/VPAT.html'),
+  'the accessibility conformance report must be findable from the sitemap',
 );
 assert.ok(locations.includes('https://sysadmindoc.github.io/HurricaneMap/storms/katrina-2005/'));
 assert.equal(new Set(locations).size, locations.length, 'sitemap contains duplicate URLs');

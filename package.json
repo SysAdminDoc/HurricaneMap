@@ -29,6 +29,7 @@
     "check:playwright-timeouts": "node scripts/check-playwright-timeouts.mjs",
     "check:network-timeouts": "node scripts/check-network-timeouts.mjs",
     "check:readme-links": "node scripts/check-readme-links.mjs",
+    "check:vpat": "node scripts/check-vpat.mjs",
     "check:release-truth": "node scripts/check-release-truth.mjs",
     "check:prose-dashes": "node scripts/check-prose-dashes.mjs",
     "check:enso": "node scripts/python.mjs scripts/build_enso.py --check",
