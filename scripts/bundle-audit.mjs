@@ -19,7 +19,10 @@ const indexHtml = await readFile(path.join(root, 'index.html'), 'utf8');
 const mainSource = await readFile(path.join(root, 'src/main.js'), 'utf8');
 const linkTags = [...indexHtml.matchAll(/<link\b[^>]*>/gi)].map(match => match[0]);
 function attribute(tag, name) {
-  return tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1] || '';
+  // Whitespace, not a word boundary: `-` is a word boundary, so `\bloading`
+  // matched `data-loading` and an iframe carrying `data-loading="lazy"` would
+  // have read as lazy while it fetched eagerly.
+  return tag.match(new RegExp(`\\s${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1] || '';
 }
 function normalizeAssetPath(value) {
   return value.replace(/^\.\//, '');

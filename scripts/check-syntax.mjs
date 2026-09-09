@@ -49,24 +49,43 @@ const textDirectories = ['src', 'scripts', 'tests', 'cloudflare'];
 const textExtensions = new Set(['.js', '.mjs', '.css', '.html', '.json', '.md', '.py', '.txt']);
 const controlOffenders = [];
 
-for (const directory of [...textDirectories, '.']) {
-  const absolute = path.join(root, directory);
+let scanned = 0;
+
+// Recursive, because the first version was not: readdir without recursion
+// skipped src/locales/, tests/fixtures/ and every snapshot directory, and
+// reported "no control characters" while one sat in en.js. The repository root
+// is scanned flat, because below it lie node_modules, dist and the data
+// archive, none of which this owns.
+async function scanForControlCharacters(absolute, recurse) {
   let entries;
   try {
     entries = await readdir(absolute, { withFileTypes: true });
   } catch {
-    continue;
+    return;
   }
   for (const entry of entries) {
+    const target = path.join(absolute, entry.name);
+    if (entry.isDirectory()) {
+      if (recurse && entry.name !== 'node_modules') await scanForControlCharacters(target, recurse);
+      continue;
+    }
     if (!entry.isFile() || !textExtensions.has(path.extname(entry.name))) continue;
-    const relative = path.relative(root, path.join(absolute, entry.name)).replaceAll('\\', '/');
-    const source = await readFile(path.join(absolute, entry.name), 'utf8');
+    const relative = path.relative(root, target).replaceAll('\\', '/');
+    const source = await readFile(target, 'utf8');
+    scanned += 1;
     const match = CONTROL.exec(source);
     if (!match) continue;
     const line = source.slice(0, match.index).split('\n').length;
-    controlOffenders.push(`${relative}:${line} contains U+${match[0].charCodeAt(0).toString(16).padStart(4, '0').toUpperCase()}`);
+    controlOffenders.push(
+      `${relative}:${line} contains U+${match[0].charCodeAt(0).toString(16).padStart(4, '0').toUpperCase()}`,
+    );
   }
 }
+
+for (const directory of textDirectories) {
+  await scanForControlCharacters(path.join(root, directory), true);
+}
+await scanForControlCharacters(root, false);
 
 if (controlOffenders.length) {
   console.error('Raw control characters in source, almost certainly a mangled escape:');
@@ -74,4 +93,4 @@ if (controlOffenders.length) {
   process.exit(1);
 }
 
-console.log(`syntax ok (${files.length} modules, no control characters in ${textDirectories.length + 1} source directories)`);
+console.log(`syntax ok (${files.length} modules, no control characters in ${scanned} text files)`);

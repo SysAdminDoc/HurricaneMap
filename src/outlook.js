@@ -226,6 +226,7 @@ function ensureStatus(map) {
   }
   mountOptionalFeedStatus(statusEl, 'outlook', {
     onRetry: () => renderTropicalOutlook({ map, enabled: true, force: true }),
+    busyTarget: () => document.getElementById('nhc-outlook-legend'),
   });
 }
 

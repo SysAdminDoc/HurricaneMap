@@ -116,6 +116,25 @@ export function createFilterController({
     if (elements.undoResetFilters) elements.undoResetFilters.hidden = !visible;
   };
 
+  /**
+   * The one part of a reset or an undo that needs a chunk fetched, kept last
+   * and kept off the path everything else takes.
+   *
+   * loadSST memoises its promise including a rejection, so a single failed
+   * fetch poisons it for the session. Awaiting it in the middle of the reset
+   * handler meant an unreachable chunk destroyed nine pieces of state and then
+   * threw before the undo control was ever shown: the snapshot existed and
+   * nothing could reach it. The undo handler had it worse, awaiting on every
+   * undo including one restoring "off", stranding applyFilters and leaving a
+   * visible button that had already cleared its own snapshot.
+   */
+  const applySeaSurfaceLayer = (visible) => {
+    if (!elements.showSST) return;
+    loadSST()
+      .then(({ setSSTVisible }) => setSSTVisible(visible))
+      .catch(error => console.error('Sea-surface layer unavailable:', error));
+  };
+
   const resetYears = () => {
     resetYearRange(filters, yearDefaults());
     sync();
@@ -171,10 +190,19 @@ export function createFilterController({
     elements.showPopulation?.addEventListener('change', () => {
       setPopulation(elements.showPopulation.checked);
     });
-    elements.showSST?.addEventListener('change', async () => {
-      const { setSSTVisible } = await loadSST();
-      setSSTVisible(elements.showSST.checked);
+    elements.showSST?.addEventListener('change', () => {
+      const visible = elements.showSST.checked;
       updateResetState();
+      loadSST()
+        .then(({ setSSTVisible }) => setSSTVisible(visible))
+        .catch(error => {
+          // The import is memoised including its rejection, so a box left
+          // ticked over a layer that will never arrive stays a lie for the
+          // rest of the session, and the reset button keeps counting it.
+          console.error('Sea-surface layer unavailable:', error);
+          elements.showSST.checked = false;
+          updateResetState();
+        });
     });
     // The empty state's own control. It clears only the filters that can
     // exclude a landfall and leaves the map layers alone, which is what its
@@ -186,7 +214,7 @@ export function createFilterController({
       applyFilters();
       document.getElementById('toggle-filters')?.focus({ preventScroll: true });
     });
-    elements.resetFilters?.addEventListener('click', async () => {
+    elements.resetFilters?.addEventListener('click', () => {
       // One click clears nine pieces of state and then disables the button, so
       // without this there was no way back to what the reader had built.
       undoSnapshot = captureFilterState(filters, readLayerControls());
@@ -196,17 +224,14 @@ export function createFilterController({
       elements.showPopulation.checked = false;
       setSurgeCategory(null);
       setPopulation(false);
-      if (elements.showSST?.checked) {
-        elements.showSST.checked = false;
-        const { setSSTVisible } = await loadSST();
-        setSSTVisible(false);
-      }
+      if (elements.showSST) elements.showSST.checked = false;
       resetTrackCache();
       applyFilters();
       showUndo(true);
+      applySeaSurfaceLayer(false);
     });
 
-    elements.undoResetFilters?.addEventListener('click', async () => {
+    elements.undoResetFilters?.addEventListener('click', () => {
       if (!undoSnapshot) return;
       const layers = applyFilterState(filters, undoSnapshot);
       undoSnapshot = null;
@@ -216,15 +241,12 @@ export function createFilterController({
       const surge = Number.parseInt(layers.surgeCategory, 10);
       setSurgeCategory(Number.isFinite(surge) && surge > 0 ? surge : null);
       setPopulation(layers.showPopulation);
-      if (elements.showSST) {
-        elements.showSST.checked = layers.showSST;
-        const { setSSTVisible } = await loadSST();
-        setSSTVisible(layers.showSST);
-      }
+      if (elements.showSST) elements.showSST.checked = layers.showSST;
       resetTrackCache();
       applyFilters();
       showUndo(false);
       elements.resetFilters?.focus({ preventScroll: true });
+      applySeaSurfaceLayer(layers.showSST);
     });
   };
 

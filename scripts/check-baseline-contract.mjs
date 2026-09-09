@@ -119,6 +119,7 @@ if (versionMention) {
 // still being paid for on every test run.
 const swUpdates = await readFile(new URL('../src/sw-updates.js', import.meta.url), 'utf8');
 const packageJson = await readFile(new URL('../package.json', import.meta.url), 'utf8');
+const gates = await readFile(new URL('./run-gates.mjs', import.meta.url), 'utf8');
 for (const plan of RETIREMENT_PLANS) {
   if (!BASELINE_FEATURES.some(feature => feature.id === plan.feature)) {
     fail(`retirement plan ${plan.id} names a feature the contract does not carry: ${plan.feature}`);
@@ -128,8 +129,18 @@ for (const plan of RETIREMENT_PLANS) {
   }
   if (!plan.removes.length) fail(`retirement plan ${plan.id} does not say what removing it would delete`);
   if (plan.id !== 'classic-service-worker') continue;
-  const carriesClassic = /WORKER_TYPES = Object\.freeze\(\['module', 'classic'\]\)/.test(swUpdates);
-  const carriesClassicSuite = packageJson.includes('"test:offline-smoke:classic"');
+  // The frozen array is the declaration; the loop is what actually tries both.
+  // Pinning only the declaration let the second type be declared and never
+  // reached, which is a removal the plan would not have noticed.
+  const carriesClassic = /WORKER_TYPES = Object\.freeze\(\['module', 'classic'\]\)/.test(swUpdates)
+    && /for \(const type of WORKER_TYPES\)/.test(swUpdates);
+  // Defined, invoked and gated. The definition alone was matched by the script
+  // key, so deleting the invocation from the test chain and the entry from
+  // run-gates left the gate green while the only thing that proves the classic
+  // registration path works stopped running.
+  const carriesClassicSuite = packageJson.includes('"test:offline-smoke:classic"')
+    && /npm run test:offline-smoke:classic\b/.test(packageJson)
+    && gates.includes("'test:offline-smoke:classic'");
   if (plan.retained !== carriesClassic) {
     fail(
       `retirement plan ${plan.id} says retained:${plan.retained} but src/sw-updates.js `

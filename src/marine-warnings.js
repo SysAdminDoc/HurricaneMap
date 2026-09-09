@@ -197,6 +197,7 @@ function ensureStatus(map, horizon) {
   }
   mountOptionalFeedStatus(statusEl, 'marine', {
     onRetry: () => renderMarineWarnings({ map, enabled: true, horizon, force: true }),
+    busyTarget: () => document.getElementById('marine-warning-legend'),
   });
 }
 

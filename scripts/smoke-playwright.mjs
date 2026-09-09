@@ -4661,7 +4661,10 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
     }
     await page.locator('#show-tracks').visible().waitFor({ timeout: 10_000 });
 
-    const read = () => page.evaluate(() => ({
+    const read = () => page.evaluate(async () => {
+      const { isMapLayerActive } = await import('/src/layer-registry.js');
+      return ({
+      layers: { sst: isMapLayerActive('sst'), population: isMapLayerActive('population') },
       yearMin: document.getElementById('year-min')?.value,
       yearMax: document.getElementById('year-max')?.value,
       categories: [...document.querySelectorAll('.cat-btn')]
@@ -4674,7 +4677,8 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
       surgeCategory: document.getElementById('surge-category')?.value,
       showPopulation: document.getElementById('show-population')?.checked,
       showSST: document.getElementById('show-sst')?.checked,
-    }));
+    });
+    });
 
     // Move all nine away from their defaults.
     await page.fill('#year-min', '1992');
@@ -4698,17 +4702,19 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
       await page.click('#toggle-filters');
     }
     await page.locator('#reset-filters').visible().waitFor({ timeout: 10_000 });
-    await page.waitForFunction(
-      () => document.getElementById('show-sst')?.checked === true
-        && document.getElementById('reset-filters')?.disabled === false,
-      null,
-      { timeout: 15_000 },
-    );
+    // Waited on the layers themselves: the checkbox is ticked synchronously by
+    // the click and says nothing about whether the layer arrived.
+    await page.waitForFunction(async () => {
+      const { isMapLayerActive } = await import('/src/layer-registry.js');
+      return isMapLayerActive('sst') && isMapLayerActive('population')
+        && document.getElementById('reset-filters')?.disabled === false;
+    }, null, { timeout: 30_000 });
     const before = await read();
     assert(
       before.yearMin === '1992' && before.categories.length < 6 && before.state
       && before.showTracks && before.showHeatmap && before.retiredOnly
-      && before.surgeCategory === '4' && before.showPopulation && before.showSST,
+      && before.surgeCategory === '4' && before.showPopulation && before.showSST
+      && before.layers.sst && before.layers.population,
       `the nine filters were not all moved off their defaults: ${JSON.stringify(before)}`,
     );
 
@@ -4721,6 +4727,12 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
     ).catch(() => {
       throw new Error('resetting the filters offered no way back');
     });
+    await page.waitForFunction(async () => {
+      const { isMapLayerActive } = await import('/src/layer-registry.js');
+      return !isMapLayerActive('sst') && !isMapLayerActive('population');
+    }, null, { timeout: 15_000 }).catch(() => {
+      throw new Error('resetting the filters left a map layer on the map');
+    });
     const cleared = await read();
     assert(
       JSON.stringify(cleared) !== JSON.stringify(before),
@@ -4728,12 +4740,13 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
     );
 
     await page.click('#undo-reset-filters');
-    await page.waitForFunction(
-      () => document.getElementById('show-sst')?.checked === true,
-      null,
-      { timeout: 15_000 },
-    ).catch(() => {
-      throw new Error('undo did not restore the sea-surface layer');
+    // The layer, not the checkbox: the checkbox is set synchronously and would
+    // pass with every line that actually restores a layer deleted.
+    await page.waitForFunction(async () => {
+      const { isMapLayerActive } = await import('/src/layer-registry.js');
+      return isMapLayerActive('sst') && isMapLayerActive('population');
+    }, null, { timeout: 30_000 }).catch(() => {
+      throw new Error('undo did not put the sea-surface and population layers back on the map');
     });
     const after = await read();
     assert(
@@ -4747,11 +4760,89 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
   } finally {
     await context.close();
   }
+
+  await assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl);
+}
+
+// The sea-surface layer is a lazily imported chunk, and the import is memoised
+// including its rejection, so one failed fetch poisons it for the session.
+// Awaiting it in the middle of the reset destroyed nine pieces of state and
+// then threw before the undo control was ever shown: the snapshot existed and
+// nothing could reach it.
+async function assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 960 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  await page.route('**/src/sst.js', route => route.abort('failed'));
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await page.locator('#show-sst').visible().waitFor({ timeout: 10_000 });
+
+    // A layer the reader asks for and cannot have must not leave its control
+    // ticked: the box would claim a layer that will never arrive.
+    await page.check('#show-sst');
+    await page.waitForFunction(
+      () => document.getElementById('show-sst')?.checked === false,
+      null,
+      { timeout: 15_000 },
+    ).catch(() => {
+      throw new Error('a sea-surface layer that cannot load left its checkbox ticked');
+    });
+
+    await page.check('#show-retired-only');
+    await page.waitForFunction(
+      () => document.getElementById('reset-filters')?.disabled === false,
+      null,
+      { timeout: 10_000 },
+    );
+    await page.click('#reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('undo-reset-filters')?.hidden === false,
+      null,
+      { timeout: 10_000 },
+    ).catch(() => {
+      throw new Error('a reset with an unreachable layer chunk offered no way back');
+    });
+    await page.click('#undo-reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('show-retired-only')?.checked === true
+        && document.getElementById('undo-reset-filters')?.hidden === true,
+      null,
+      { timeout: 10_000 },
+    ).catch(() => {
+      throw new Error('an undo with an unreachable layer chunk did not finish');
+    });
+    // And the map followed. A half-applied undo left the checkbox saying
+    // "retired only" over a map still showing everything.
+    const counted = await page.textContent('#visible-count');
+    assert(
+      /\b(\d[\d,]*) of /.test(counted || ''),
+      `undo restored the controls but not the map: ${JSON.stringify(counted)}`,
+    );
+  } finally {
+    await page.unroute('**/src/sst.js');
+    await context.close();
+  }
 }
 
 async function expect_hidden(page, selector, message) {
-  const hidden = await page.evaluate(target => document.querySelector(target)?.hidden !== false, selector);
-  assert(hidden, message);
+  // Present AND hidden. `?.hidden !== false` on a missing element is true, so
+  // the old form passed for a control that had been renamed out of existence.
+  const state = await page.evaluate(target => {
+    const element = document.querySelector(target);
+    return { present: Boolean(element), hidden: element?.hidden === true };
+  }, selector);
+  assert(state.present, `${message} (${selector} is not on the page at all)`);
+  assert(state.hidden, message);
 }
 
 async function assertPanelIsAddressable(browser, baseUrl) {

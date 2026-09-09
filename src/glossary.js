@@ -149,6 +149,7 @@ export async function initGlossary() {
   
   renderList();
   mountOptionalFeedStatus(statusHost, 'glossary', {
+    busyTarget: () => document.getElementById('glossary-list'),
     onRetry: async () => {
       const data = await loadGlossary();
       renderList(data);

@@ -825,3 +825,78 @@ test('a region fetching a feed is announced busy, and never left busy', async ({
   await expect(panel).not.toHaveAttribute('aria-busy', 'true');
   await page.evaluate(() => document.getElementById('hm-fake-diagnostic-row')?.remove());
 });
+
+test('a feed card that floats over the map names the surface it fills, and marks it busy', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+
+  // The radar panel is the case aria-busy could not reach: its status card is
+  // appended to the body, so there is no panel around it to mark and it had to
+  // be told which element its feed fills.
+  await page.evaluate(async () => {
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmRadarBusy = overlay;
+    await overlay.show({
+      id: 'AL011995',
+      name: 'ALLISON',
+      year: 1995,
+      us_landfalls: [{ t: '1995-06-05T14:00:00Z', lat: 29.9, lon: -84.4, state: 'Florida' }],
+      track: [],
+    }, 0);
+  });
+  const controls = page.locator('#radar-controls');
+  const card = page.locator('#radar-feed-status');
+  await expect(controls).toHaveCount(1);
+  await expect(card).toHaveCount(1);
+
+  // Named, so the card and the surface it speaks for are not two unrelated
+  // things in the accessibility tree.
+  await expect(card).toHaveAttribute('aria-controls', 'radar-controls');
+  await expect(controls).not.toHaveAttribute('aria-busy', 'true');
+
+  const drive = (call, args = {}) => page.evaluate(async ({ name, options }) => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds[name]('radar', options);
+  }, { name: call, options: args });
+
+  await drive('beginOptionalFeed');
+  await expect(controls).toHaveAttribute('aria-busy', 'true');
+  await assertNoAxeViolations(page, 'radar controls while the feed is loading', '#radar-controls');
+
+  await drive('completeOptionalFeed', { itemCount: 4 });
+  await expect(controls).not.toHaveAttribute('aria-busy', 'true');
+
+  // A failure clears it too. A surface left busy after an error never resolves
+  // for the reader, which is worse than never marking it.
+  await drive('beginOptionalFeed');
+  await expect(controls).toHaveAttribute('aria-busy', 'true');
+  await drive('failOptionalFeed', { responseStatus: 503 });
+  await expect(controls).not.toHaveAttribute('aria-busy', 'true');
+
+  // The card speaks only for the surface it names. Another feed loading must
+  // not mark the radar controls. Driven with a feed whose own card is mounted,
+  // because a feed with no card on the page changes nothing anywhere and would
+  // assert nothing here.
+  await openStorm(page, 'AL122005');
+  await expect(page.locator('#storm-panel #tides-feed-status')).toHaveCount(1);
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.beginOptionalFeed('tides');
+  });
+  await expect(page.locator('#storm-panel')).toHaveAttribute('aria-busy', 'true');
+  await expect(controls).not.toHaveAttribute('aria-busy', 'true');
+
+  // And the radar card re-rendering while another feed is loading must still
+  // report the radar. A card only re-marks its own surface when it re-renders,
+  // so the isolation is only observable at that moment: settling the radar
+  // while tides is still in flight has to leave the controls not busy.
+  await drive('completeOptionalFeed', { itemCount: 4 });
+  await expect(controls).not.toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('#storm-panel')).toHaveAttribute('aria-busy', 'true');
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.completeOptionalFeed('tides', { itemCount: 1 });
+    window.__hmRadarBusy?.close();
+  });
+});

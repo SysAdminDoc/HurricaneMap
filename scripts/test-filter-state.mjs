@@ -127,7 +127,7 @@ function cats(filters) {
   const layers = { surgeCategory: '4', showPopulation: true, showSST: true };
 
   const before = captureFilterState(filters, layers);
-  assert.deepEqual(before, {
+  assert.deepStrictEqual(before, {
     yearMin: 1992,
     yearMax: 2005,
     categories: ['3', '4', '5'],
@@ -145,11 +145,19 @@ function cats(filters) {
   assert.notDeepEqual(cleared, before, 'the reset must actually clear something');
 
   const restoredLayers = applyFilterState(filters, before);
-  assert.deepEqual(
+  assert.deepStrictEqual(
     captureFilterState(filters, restoredLayers),
     before,
     'undoing a reset must return the exact prior state',
   );
+  // Compared against the live object too, not only against another snapshot:
+  // both sides of a snapshot comparison pass through the same String() and
+  // Boolean() coercion, so a restore that wrote the year back as a string
+  // round-tripped green.
+  assert.strictEqual(filters.yearMin, 1992);
+  assert.strictEqual(filters.yearMax, 2005);
+  assert.strictEqual(filters.showTracks, true);
+  assert.strictEqual(filters.retiredOnly, true);
   // The categories go back as a Set the filter engine can use, not the array
   // the snapshot stores them in.
   assert.ok(filters.categories instanceof Set);
@@ -161,22 +169,24 @@ function cats(filters) {
   const snapshot = captureFilterState(filters, restoredLayers);
   filters.categories.add('1');
   filters.state = 'Texas';
-  assert.deepEqual(snapshot.categories, ['3', '4', '5']);
+  assert.deepStrictEqual(snapshot.categories, ['3', '4', '5']);
   assert.equal(snapshot.state, 'Florida');
   applyFilterState(filters, snapshot);
-  assert.deepEqual([...filters.categories].sort(), ['3', '4', '5']);
-  assert.equal(filters.state, 'Florida');
+  assert.deepStrictEqual([...filters.categories].sort(), ['3', '4', '5']);
+  assert.strictEqual(filters.state, 'Florida');
 
   // A default state round-trips too: undo has to be able to restore "nothing
-  // was filtered", which is what a reader gets after resetting twice.
+  // was filtered", which is what a reader gets after resetting twice. The
+  // layers are passed as the controls actually report them when nothing is on,
+  // rather than omitted: omitting them asserted captureFilterState's own
+  // parameter defaults and nothing in the subject could have made it fail.
   const plain = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
-  const plainSnapshot = captureFilterState(plain, {});
+  const off = { surgeCategory: '', showPopulation: false, showSST: false };
+  const plainSnapshot = captureFilterState(plain, off);
   plain.state = 'Georgia';
-  applyFilterState(plain, plainSnapshot);
-  assert.deepEqual(captureFilterState(plain, {}), plainSnapshot);
-  assert.equal(plainSnapshot.surgeCategory, '');
-  assert.equal(plainSnapshot.showPopulation, false);
-  assert.equal(plainSnapshot.showSST, false);
+  const plainLayers = applyFilterState(plain, plainSnapshot);
+  assert.deepStrictEqual(captureFilterState(plain, plainLayers), plainSnapshot);
+  assert.deepStrictEqual(plainLayers, off, 'a default snapshot must hand back all three layers off');
 }
 
 console.log('filter state ok');

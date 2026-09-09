@@ -438,6 +438,9 @@ export class RadarOverlay {
     this.controls = el;
     mountOptionalFeedStatus(el.querySelector('#radar-feed-status'), 'radar', {
       onRetry: () => this.storm ? this.show(this.storm, this.landfallIndex) : null,
+      // The controls are what a frame fills: the timestamp, the scrubber
+      // position and the legend all describe the frame being fetched.
+      busyTarget: () => document.getElementById('radar-controls'),
     });
     el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-1));
     el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(+1));

@@ -74,7 +74,10 @@ function ensureActiveFeedStatus() {
     activeStatusEl.className = 'optional-feed-status-overlay glass';
     document.body.appendChild(activeStatusEl);
   }
-  mountOptionalFeedStatus(activeStatusEl, 'active', { onRetry: fetchAndRender });
+  mountOptionalFeedStatus(activeStatusEl, 'active', {
+    onRetry: fetchAndRender,
+    busyTarget: () => document.getElementById('active-storm-badge'),
+  });
 }
 
 export async function startActiveStormPolling() {
