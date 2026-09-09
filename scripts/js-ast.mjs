@@ -6,7 +6,7 @@
 // spelled anywhere rather than whether anything imports it.
 import { parse } from 'acorn';
 
-const POSITION_KEYS = new Set(['type', 'start', 'end', 'loc', 'range']);
+export const POSITION_KEYS = new Set(['type', 'start', 'end', 'loc', 'range']);
 
 export function parseModule(source) {
   return parse(String(source ?? ''), {
@@ -88,6 +88,82 @@ function hoistedNames(body) {
 }
 
 /**
+ * Whether this node creates a scope that binds `name`, so a reference below it
+ * belongs to that binding rather than to one further out.
+ *
+ * Program is deliberately excluded: a module-level binding is the one being
+ * asked about, not a shadow of it.
+ */
+export function scopeBinds(node, name) {
+  if (!node || typeof node.type !== 'string') return false;
+  if (FUNCTION_TYPES.has(node.type)) {
+    const bound = [];
+    for (const parameter of node.params || []) patternNames(parameter, bound);
+    if (node.id?.name) bound.push(node.id.name);
+    bound.push(...hoistedNames(node.body));
+    return bound.includes(name);
+  }
+  if (node.type === 'BlockStatement') {
+    const bound = [];
+    for (const statement of node.body || []) bound.push(...declaredBy(statement, { includeVar: false }));
+    return bound.includes(name);
+  }
+  if (node.type === 'CatchClause' && node.param) return patternNames(node.param).includes(name);
+  if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') return node.id?.name === name;
+  return false;
+}
+
+/**
+ * Identifier positions that bind or name rather than read: a declaration, a
+ * parameter, the key of a non-shorthand property, the member of a non-computed
+ * member expression, and the parts of an import or export specifier.
+ *
+ * Every one of these would otherwise make a name look used by its own
+ * declaration, or make an unrelated `{ state: 1 }` look like a reference.
+ */
+export function nonReferenceIdentifiers(tree, into = new Set()) {
+  walk(tree, node => {
+    if (node.type === 'Property' && !node.computed && !node.shorthand && node.key?.type === 'Identifier') {
+      into.add(node.key);
+    }
+    if (node.type === 'MemberExpression' && !node.computed && node.property?.type === 'Identifier') {
+      into.add(node.property);
+    }
+    if (node.type === 'VariableDeclarator') {
+      for (const bound of patternIdentifiers(node.id)) into.add(bound);
+    }
+    if (FUNCTION_TYPES.has(node.type) || node.type === 'ClassDeclaration' || node.type === 'ClassExpression') {
+      if (node.id) into.add(node.id);
+      for (const parameter of node.params || []) {
+        for (const bound of patternIdentifiers(parameter)) into.add(bound);
+      }
+    }
+    if (node.type === 'CatchClause' && node.param) {
+      for (const bound of patternIdentifiers(node.param)) into.add(bound);
+    }
+    // The target of an assignment is written, not read. `mapModule ||= await
+    // import('./map.js')` names the binding it is filling, and counting that as
+    // a read made the module look like it had escaped somewhere unknowable.
+    // Compound arithmetic assignment (`+=`) does read its target, so only the
+    // plain and logical forms are excluded.
+    if (node.type === 'AssignmentExpression'
+      && node.left?.type === 'Identifier'
+      && ['=', '||=', '&&=', '??='].includes(node.operator)) {
+      into.add(node.left);
+    }
+    if (node.type === 'ImportSpecifier' || node.type === 'ImportDefaultSpecifier' || node.type === 'ImportNamespaceSpecifier') {
+      if (node.local) into.add(node.local);
+      if (node.imported) into.add(node.imported);
+    }
+    if (node.type === 'ExportSpecifier') {
+      if (node.local) into.add(node.local);
+      if (node.exported) into.add(node.exported);
+    }
+  });
+  return into;
+}
+
+/**
  * Whether the module-level binding `name` is read anywhere, ignoring the nodes
  * in `ignore` (its own declaration) and anywhere an inner scope has shadowed it.
  *
@@ -108,12 +184,12 @@ export function referencesModuleBinding(tree, name, ignore = new Set()) {
     }
     // A declaration binds; it does not read.
     if (node.type === 'VariableDeclarator') {
-      walk(node.id, inner => { if (inner.type === 'Identifier') notAReference.add(inner); });
+      for (const bound of patternIdentifiers(node.id)) notAReference.add(bound);
     }
     if (FUNCTION_TYPES.has(node.type) || node.type === 'ClassDeclaration' || node.type === 'ClassExpression') {
       if (node.id) notAReference.add(node.id);
       for (const parameter of node.params || []) {
-        walk(parameter, inner => { if (inner.type === 'Identifier') notAReference.add(inner); });
+        for (const bound of patternIdentifiers(parameter)) notAReference.add(bound);
       }
     }
     if (node.type === 'ImportSpecifier' || node.type === 'ImportDefaultSpecifier' || node.type === 'ImportNamespaceSpecifier') {
@@ -138,25 +214,7 @@ export function referencesModuleBinding(tree, name, ignore = new Set()) {
       return;
     }
 
-    let inner = shadowed;
-    if (!inner) {
-      if (FUNCTION_TYPES.has(node.type)) {
-        const bound = [];
-        for (const parameter of node.params || []) patternNames(parameter, bound);
-        if (node.id?.name) bound.push(node.id.name);
-        bound.push(...hoistedNames(node.body));
-        if (bound.includes(name)) inner = true;
-      } else if (node.type === 'BlockStatement' || node.type === 'Program') {
-        const bound = [];
-        for (const statement of node.body || []) bound.push(...declaredBy(statement, { includeVar: false }));
-        if (node.type !== 'Program' && bound.includes(name)) inner = true;
-      } else if (node.type === 'CatchClause' && node.param) {
-        const bound = patternNames(node.param);
-        if (bound.includes(name)) inner = true;
-      } else if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') {
-        if (node.id?.name === name) inner = true;
-      }
-    }
+    const inner = shadowed || scopeBinds(node, name);
 
     for (const key of Object.keys(node)) {
       if (key === 'type' || key === 'start' || key === 'end' || key === 'loc' || key === 'range') continue;
@@ -166,6 +224,40 @@ export function referencesModuleBinding(tree, name, ignore = new Set()) {
 
   visit(tree, false);
   return found;
+}
+
+/**
+ * The Identifier nodes a binding pattern introduces, as nodes rather than
+ * names.
+ *
+ * Walking the whole pattern instead is wrong in one specific and easy-to-miss
+ * way: `{ timeoutMs = PERSISTENCE_PROMPT_TIMEOUT_MS }` has a default value, and
+ * that default is an expression that reads a real binding. Treating it as part
+ * of the parameter marked it a non-reference, and a constant used only as a
+ * parameter default one line below its own declaration was reported as having
+ * no consumer at all.
+ */
+export function patternIdentifiers(pattern, into = []) {
+  if (!pattern || typeof pattern !== 'object') return into;
+  switch (pattern.type) {
+    case 'Identifier':
+      into.push(pattern);
+      return into;
+    case 'AssignmentPattern':
+      return patternIdentifiers(pattern.left, into);
+    case 'RestElement':
+      return patternIdentifiers(pattern.argument, into);
+    case 'ObjectPattern':
+      for (const property of pattern.properties) {
+        patternIdentifiers(property.type === 'RestElement' ? property.argument : property.value, into);
+      }
+      return into;
+    case 'ArrayPattern':
+      for (const element of pattern.elements) patternIdentifiers(element, into);
+      return into;
+    default:
+      return into;
+  }
 }
 
 /** The 1-based line a character offset falls on. */

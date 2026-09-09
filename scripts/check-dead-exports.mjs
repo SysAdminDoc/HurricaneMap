@@ -33,7 +33,16 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lineAt, parseModule, patternNames, referencesModuleBinding, walk } from './js-ast.mjs';
+import {
+  lineAt,
+  nonReferenceIdentifiers,
+  parseModule,
+  patternNames,
+  POSITION_KEYS,
+  referencesModuleBinding,
+  scopeBinds,
+  walk,
+} from './js-ast.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceDir = path.join(root, 'src');
@@ -44,6 +53,34 @@ const sourceDir = path.join(root, 'src');
 // no longer consulted about one.
 const EXTRA_MODULES = ['sw.js', 'cloudflare/worker.js'];
 const HTML_ENTRY_POINTS = ['index.html', 'globe.html'];
+
+// Modules whose namespace cannot be followed to specific names, so every export
+// they have is taken on trust. This is a declaration, not a measurement: a
+// module that becomes unfollowable has to be added here deliberately, and one
+// that stops being unfollowable has to be removed, or the check fails. Without
+// that, the exempt set grows quietly and the number in the success line is the
+// only thing that ever notices.
+//
+// Every one of them is src/main.js's lazy-loader registry: `load: { stats:
+// loadStats, ... }` is handed to wireApplicationShell and the loaders are
+// called from inside it as `load.stats()`. Following that means tracking a
+// function through an object literal into another module's parameter, which is
+// a different kind of analysis from this one.
+const NAMESPACE_ONLY = new Set([
+  'src/diagnostics.js',
+  'src/evac.js',
+  'src/export.js',
+  'src/globe3d.js',
+  'src/on-this-date.js',
+  'src/optional-feeds.js',
+  'src/poster.js',
+  'src/prep.js',
+  'src/qgis.js',
+  'src/report.js',
+  'src/sst.js',
+  'src/stats.js',
+  'src/table-view.js',
+]);
 
 // Names an export can carry for a reason other than a caller.
 const KEEP = new Map([
@@ -137,18 +174,47 @@ export function findImports(source, fromFile) {
     imports.get(resolved).add(name);
   }
 
-  // A binding that holds a whole module namespace, and the module it holds.
-  // Reading one member off it consumes that name and nothing else, which is
-  // the difference between this and the first draft: main.js lazy-loads with
-  // dynamic import(), and treating the module as consumed wholesale exempted
-  // 55 of 113 modules from the check entirely.
-  const namespaces = new Map();
+  // A binding that holds a whole module namespace, the specifier it came from,
+  // and the scope it lives in. Reading one member off it consumes that name and
+  // nothing else, which is the difference between this and the first draft:
+  // main.js lazy-loads with dynamic import(), and treating the module as
+  // consumed wholesale exempted 55 of 113 modules from the check entirely.
+  //
+  // The scope matters as much as the member reads. Without it, `const data =
+  // await import('/src/data.js')` inside one arrow function widened to the
+  // whole module because a different function in the same file bound its own
+  // `data`, and in a five-thousand-line smoke suite that is most of them.
+  const namespaces = [];
+  const declareNamespace = (name, specifier, scope) => {
+    if (name && specifier && scope) namespaces.push({ name, specifier, scope });
+  };
+
+  // The block a declaration belongs to, so a namespace is resolved where it
+  // exists rather than across the whole file.
+  const blockOf = new Map();
+  const trackBlocks = (node, block) => {
+    if (!node || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      for (const child of node) trackBlocks(child, block);
+      return;
+    }
+    if (typeof node.type !== 'string') return;
+    const next = node.type === 'Program' || node.type === 'BlockStatement' || node.type === 'StaticBlock'
+      ? node
+      : block;
+    if (node.type === 'VariableDeclarator') blockOf.set(node, next);
+    for (const key of Object.keys(node)) {
+      if (POSITION_KEYS.has(key)) continue;
+      trackBlocks(node[key], next);
+    }
+  };
+  trackBlocks(tree, tree);
 
   for (const node of tree.body) {
     if (node.type === 'ImportDeclaration') {
       for (const specifier of node.specifiers) {
         if (specifier.type === 'ImportDefaultSpecifier') add(node.source.value, 'default');
-        else if (specifier.type === 'ImportNamespaceSpecifier') namespaces.set(specifier.local.name, node.source.value);
+        else if (specifier.type === 'ImportNamespaceSpecifier') declareNamespace(specifier.local.name, node.source.value, tree);
         else add(node.source.value, specifier.imported?.name ?? specifier.imported?.value);
       }
       continue;
@@ -165,63 +231,182 @@ export function findImports(source, fromFile) {
 
   // The shapes a dynamic import is actually written in here. Anything else
   // falls through to '*', which can only call an export live, never dead.
+  // A lazy loader: `const loadPanel = once(() => import('./panel.js'))`, called
+  // later as `const { showStorm } = await loadPanel()`. src/main.js reaches most
+  // of the application this way, so without following it two thirds of src/ was
+  // exempt from this check. Two shapes appear: the import returned directly, and
+  // the import taken as the first element of a Promise.all that also warms some
+  // data.
+  const isPromiseAll = call => call?.type === 'CallExpression'
+    && call.callee?.type === 'MemberExpression'
+    && call.callee.object?.name === 'Promise'
+    && call.callee.property?.name === 'all';
+
+  const importInside = expression => {
+    if (!expression || typeof expression.type !== 'string') return null;
+    if (expression.type === 'AwaitExpression') return importInside(expression.argument);
+    if (expression.type === 'ImportExpression') {
+      return expression.source?.type === 'Literal' ? expression : null;
+    }
+    // (await Promise.all([import('./panel.js'), ensureOptionalData()]))[0]
+    if (expression.type === 'MemberExpression' && expression.computed
+      && typeof expression.property?.value === 'number') {
+      const call = expression.object?.type === 'AwaitExpression'
+        ? expression.object.argument
+        : expression.object;
+      if (!isPromiseAll(call)) return null;
+      const elements = call.arguments[0]?.elements;
+      return importInside(elements?.[expression.property.value]);
+    }
+    return null;
+  };
+
+  const returnedExpression = fn => {
+    if (fn?.type !== 'ArrowFunctionExpression' && fn?.type !== 'FunctionExpression') return null;
+    if (fn.body?.type !== 'BlockStatement') return fn.body;
+    let returned = null;
+    walk(fn.body, inner => {
+      if (returned || inner.type !== 'ReturnStatement') return;
+      returned = inner.argument;
+    });
+    return returned;
+  };
+
+  const loaderFn = value => {
+    let fn = value;
+    // once(fn), memoize(fn) and anything else that wraps the loader in a single
+    // call and hands back a function of the same shape.
+    if (fn?.type === 'CallExpression' && fn.arguments.length === 1) fn = fn.arguments[0];
+    return importInside(returnedExpression(fn));
+  };
+
+  // Name to the modules calling it reaches. Usually one. A table of loaders
+  // read with a computed key reaches every module in the table, and whatever
+  // the caller then does with the result is done to all of them, which is
+  // exactly right: src/i18n.js writes `LOCALE_LOADERS[locale]().then(module =>
+  // module.default)`, and `default` is consumed from both catalogs whichever
+  // one the key selects.
+  const loaders = new Map();
+  for (const node of tree.body) {
+    if (node.type !== 'VariableDeclaration') continue;
+    for (const declarator of node.declarations) {
+      if (declarator.id?.type !== 'Identifier') continue;
+      const single = loaderFn(declarator.init);
+      if (single) {
+        loaders.set(declarator.id.name, [single]);
+        continue;
+      }
+      if (declarator.init?.type !== 'ObjectExpression') continue;
+      const table = [];
+      for (const property of declarator.init.properties) {
+        if (property.type === 'SpreadElement') continue;
+        const imported = loaderFn(property.value);
+        if (imported) table.push(imported);
+      }
+      if (table.length) loaders.set(declarator.id.name, table);
+    }
+  }
+
+  // Return the import expression itself, not its specifier. The sweep below
+  // marks anything it did not follow as consuming the whole module, and it
+  // looks for the ImportExpression node: claiming the AwaitExpression wrapped
+  // around it left every `await import(...)` unclaimed, so every module reached
+  // that way was exempted no matter how carefully the binding was resolved.
   const dynamic = node => {
     if (node?.type === 'AwaitExpression') return dynamic(node.argument);
-    return node?.type === 'ImportExpression' && node.source?.type === 'Literal' ? node.source.value : null;
+    if (node?.type === 'ChainExpression') return dynamic(node.expression);
+    // Calling a loader is reaching for its module, so the three shapes below
+    // read it exactly as they read a bare import().
+    if (node?.type === 'CallExpression') {
+      if (node.callee?.type === 'Identifier' && loaders.has(node.callee.name)) {
+        return loaders.get(node.callee.name);
+      }
+      // LOCALE_LOADERS[locale]()
+      if (node.callee?.type === 'MemberExpression'
+        && node.callee.object?.type === 'Identifier'
+        && loaders.has(node.callee.object.name)) {
+        return loaders.get(node.callee.object.name);
+      }
+    }
+    if (node?.type === 'ImportExpression' && node.source?.type === 'Literal') return [node];
+    return null;
   };
   const claimed = new Set();
 
   walk(tree, node => {
     // const { showStats } = await import('./stats.js')
     if (node.type === 'VariableDeclarator') {
-      const target = dynamic(node.init);
-      if (!target) return;
-      claimed.add(node.init);
-      if (node.id.type === 'ObjectPattern') {
-        for (const property of node.id.properties) {
-          if (property.type === 'RestElement') { add(target, '*'); continue; }
-          const key = property.computed ? null : (property.key?.name ?? property.key?.value);
-          if (key) add(target, key);
-          else add(target, '*');
+      const imports = dynamic(node.init);
+      if (!imports) return;
+      for (const imported of imports) {
+        claimed.add(imported);
+        const target = imported.source.value;
+        if (node.id.type === 'ObjectPattern') {
+          for (const property of node.id.properties) {
+            if (property.type === 'RestElement') { add(target, '*'); continue; }
+            const key = property.computed ? null : (property.key?.name ?? property.key?.value);
+            add(target, key || '*');
+          }
+          continue;
         }
-        return;
+        if (node.id.type === 'Identifier') {
+          declareNamespace(node.id.name, target, blockOf.get(node) || tree);
+          continue;
+        }
+        add(target, '*');
       }
-      if (node.id.type === 'Identifier') {
-        namespaces.set(node.id.name, target);
-        return;
-      }
-      add(target, '*');
       return;
     }
     // (await import('./stats.js')).showStats
     if (node.type === 'MemberExpression' && !node.computed) {
-      const target = dynamic(node.object);
-      if (!target) return;
-      claimed.add(node.object);
-      if (node.property?.type === 'Identifier') add(target, node.property.name);
-      else add(target, '*');
+      const imports = dynamic(node.object);
+      if (!imports) return;
+      for (const imported of imports) {
+        claimed.add(imported);
+        const target = imported.source.value;
+        if (node.property?.type === 'Identifier') add(target, node.property.name);
+        else add(target, '*');
+      }
       return;
     }
-    // import('./stats.js').then(module => module.showStats())
+    // `let mapModule = null; ... mapModule ||= await import('./map.js')`, read
+    // later as `mapModule?.getMap?.()`. The declaration carries no import, so
+    // the assignment is where the binding learns what it holds.
+    if (node.type === 'AssignmentExpression' && node.left?.type === 'Identifier') {
+      const imports = dynamic(node.right);
+      if (imports) {
+        for (const imported of imports) {
+          claimed.add(imported);
+          declareNamespace(node.left.name, imported.source.value, tree);
+        }
+        return;
+      }
+    }
+    // import('./stats.js').then(module => module.showStats()), and the same
+    // through a loader: loadKeyboard().then(({ init }) => init(...)). Asking
+    // dynamic() rather than matching an ImportExpression is what makes the
+    // second one work; without it, src/main.js reached keyboard.js and state.js
+    // only this way and both modules' exports were reported dead.
     if (node.type === 'CallExpression'
       && node.callee?.type === 'MemberExpression'
       && !node.callee.computed
       && node.callee.property?.name === 'then'
-      && node.callee.object?.type === 'ImportExpression'
-      && node.callee.object.source?.type === 'Literal') {
-      const target = node.callee.object.source.value;
-      claimed.add(node.callee.object);
+      && dynamic(node.callee.object)) {
       const handler = node.arguments[0];
       const parameter = handler?.params?.[0];
-      if (parameter?.type === 'Identifier') namespaces.set(parameter.name, target);
-      else if (parameter?.type === 'ObjectPattern') {
-        for (const property of parameter.properties) {
-          const key = property.type === 'RestElement' || property.computed
-            ? null
-            : (property.key?.name ?? property.key?.value);
-          add(target, key || '*');
-        }
-      } else add(target, '*');
+      for (const imported of dynamic(node.callee.object)) {
+        const target = imported.source.value;
+        claimed.add(imported);
+        if (parameter?.type === 'Identifier') declareNamespace(parameter.name, target, handler);
+        else if (parameter?.type === 'ObjectPattern') {
+          for (const property of parameter.properties) {
+            const key = property.type === 'RestElement' || property.computed
+              ? null
+              : (property.key?.name ?? property.key?.value);
+            add(target, key || '*');
+          }
+        } else add(target, '*');
+      }
     }
   });
 
@@ -231,47 +416,54 @@ export function findImports(source, fromFile) {
     if (node.source?.type === 'Literal') add(node.source.value, '*');
   });
 
-  if (namespaces.size) {
-    // A namespace read as `ns.name` consumes that name. A namespace used any
-    // other way (passed on, spread, returned) could reach anything in it.
-    const asMemberObject = new Set();
-    walk(tree, node => {
-      if (node.type !== 'MemberExpression' || node.computed) return;
-      if (node.object?.type === 'Identifier' && namespaces.has(node.object.name)) {
-        asMemberObject.add(node.object);
-        if (node.property?.type === 'Identifier') add(namespaces.get(node.object.name), node.property.name);
-        else add(namespaces.get(node.object.name), '*');
+  // Resolve each namespace inside the scope that declared it, stopping at any
+  // inner scope that binds the same name, because that is a different variable.
+  const notAReference = nonReferenceIdentifiers(tree);
+  for (const binding of namespaces) {
+    let widened = false;
+    const visit = (node, shadowed) => {
+      if (!node || typeof node !== 'object') return;
+      if (Array.isArray(node)) {
+        for (const child of node) visit(child, shadowed);
+        return;
       }
-    });
-    // Positions that are not a reference to the namespace, so they must not
-    // widen it. There is no scope analysis here, so a different binding of the
-    // same name in another function still reads as one, and the answer to that
-    // is '*', which is safe. These three are the ones worth excluding because
-    // they are not bindings at all and they are everywhere: `{ state: 'x' }`,
-    // `something.state`, and a name declared by destructuring.
-    const notAReference = new Set();
-    walk(tree, node => {
-      if (node.type === 'ImportNamespaceSpecifier' && node.local) notAReference.add(node.local);
-      if (node.type === 'VariableDeclarator') {
-        walk(node.id, inner => { if (inner.type === 'Identifier') notAReference.add(inner); });
+      if (typeof node.type !== 'string') return;
+
+      // `ns.name` consumes that one export and nothing else.
+      if (!shadowed
+        && node.type === 'MemberExpression'
+        && !node.computed
+        && node.object?.type === 'Identifier'
+        && node.object.name === binding.name) {
+        if (node.property?.type === 'Identifier') add(binding.specifier, node.property.name);
+        else widened = true;
+        return;
       }
-      if (node.type === 'ArrowFunctionExpression' || node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
-        for (const parameter of node.params) {
-          walk(parameter, inner => { if (inner.type === 'Identifier') notAReference.add(inner); });
-        }
+
+      // Any other read of it could reach anything in the module.
+      if (!shadowed
+        && node.type === 'Identifier'
+        && node.name === binding.name
+        && !notAReference.has(node)) {
+        widened = true;
+        return;
       }
-      if (node.type === 'Property' && !node.computed && !node.shorthand && node.key?.type === 'Identifier') {
-        notAReference.add(node.key);
+
+      const inner = shadowed || scopeBinds(node, binding.name);
+      for (const key of Object.keys(node)) {
+        if (POSITION_KEYS.has(key)) continue;
+        visit(node[key], inner);
       }
-      if (node.type === 'MemberExpression' && !node.computed && node.property?.type === 'Identifier') {
-        notAReference.add(node.property);
-      }
-    });
-    walk(tree, node => {
-      if (node.type !== 'Identifier' || !namespaces.has(node.name)) return;
-      if (asMemberObject.has(node) || notAReference.has(node)) return;
-      add(namespaces.get(node.name), '*');
-    });
+    };
+    // Descend into the declaring scope rather than visiting it, because that
+    // scope is the one that binds this very name: testing it for a shadow
+    // would suppress the whole subtree on the first step and report every
+    // export of the module dead.
+    for (const key of Object.keys(binding.scope)) {
+      if (POSITION_KEYS.has(key)) continue;
+      visit(binding.scope[key], false);
+    }
+    if (widened) add(binding.specifier, '*');
   }
 
   return imports;
@@ -393,6 +585,11 @@ async function main() {
     }
   }
 
+  // The exempt set has to be exactly what the file declares.
+  const exemptNow = [...wholeModules].filter(target => modules.has(target)).sort();
+  const undeclared = exemptNow.filter(target => !NAMESPACE_ONLY.has(target));
+  const stale = [...NAMESPACE_ONLY].filter(target => !exemptNow.includes(target)).sort();
+
   if (unparsed.length) {
     for (const problem of unparsed) console.error(`dead exports: could not parse ${problem}`);
     process.exit(1);
@@ -406,9 +603,27 @@ async function main() {
     process.exit(1);
   }
 
+  if (undeclared.length || stale.length) {
+    for (const target of undeclared) {
+      console.error(
+        `dead exports: ${target} is imported in a way this check cannot follow to specific names, so every `
+        + 'export it has is now unchecked. Add it to NAMESPACE_ONLY with the reason, or import it in a way '
+        + 'that can be followed.',
+      );
+    }
+    for (const target of stale) {
+      console.error(
+        `dead exports: ${target} is listed in NAMESPACE_ONLY but its namespace is now followed. Remove it, `
+        + 'or the exemption outlives the reason for it.',
+      );
+    }
+    process.exit(1);
+  }
+
   console.log(
     `dead exports ok (${modules.size} modules, ${exportCount} exports, none unimported; `
-    + `${internalOnly.length} used only inside their own module)`,
+    + `${internalOnly.length} used only inside their own module; `
+    + `${exemptNow.length} whose namespace cannot be followed, all declared)`,
   );
 }
 
