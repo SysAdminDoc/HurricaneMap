@@ -467,6 +467,8 @@ export default {
   'filters.population': 'Dansite popilasyon',
   'filters.stormSurge': 'Vag tanpèt (SLOSH MOMs)',
   'filters.sst': 'Tanperati sifas lanmè (dènye)',
+  'filters.undoReset': 'Defèt',
+  'filters.undoResetTitle': 'Remete filtè ou te genyen anvan reyinisyalizasyon an',
   'filters.resetFilters': 'Remèt filtè yo',
   'panel.title': 'Detay siklòn',
   'panel.close': 'Fèmen',

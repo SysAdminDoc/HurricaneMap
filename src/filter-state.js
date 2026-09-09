@@ -55,6 +55,46 @@ export function resetExcludingFilters(filters, { yearMinDefault, yearMaxDefault 
   filters.retiredOnly = defaults.retiredOnly;
 }
 
+/**
+ * Everything one click of Reset filters destroys, in one plain object.
+ *
+ * Nine pieces of state, and three of them do not live on the filters object:
+ * the surge category, the population layer and the sea-surface layer are read
+ * from their own controls and written back through their own modules. They are
+ * passed in and handed back rather than reached for here, so this stays
+ * testable without a document.
+ */
+export function captureFilterState(filters, layers = {}) {
+  return {
+    yearMin: filters.yearMin,
+    yearMax: filters.yearMax,
+    categories: [...filters.categories].sort(),
+    state: filters.state || '',
+    showTracks: Boolean(filters.showTracks),
+    showHeatmap: Boolean(filters.showHeatmap),
+    retiredOnly: Boolean(filters.retiredOnly),
+    surgeCategory: String(layers.surgeCategory ?? ''),
+    showPopulation: Boolean(layers.showPopulation),
+    showSST: Boolean(layers.showSST),
+  };
+}
+
+/** Put a captured state back. Returns the three layers for the caller to apply. */
+export function applyFilterState(filters, snapshot) {
+  filters.yearMin = snapshot.yearMin;
+  filters.yearMax = snapshot.yearMax;
+  filters.categories = new Set(snapshot.categories);
+  filters.state = snapshot.state;
+  filters.showTracks = snapshot.showTracks;
+  filters.showHeatmap = snapshot.showHeatmap;
+  filters.retiredOnly = snapshot.retiredOnly;
+  return {
+    surgeCategory: snapshot.surgeCategory,
+    showPopulation: snapshot.showPopulation,
+    showSST: snapshot.showSST,
+  };
+}
+
 export function filterByMacro(filters, mode) {
   if (mode === 'major') {
     filters.categories = new Set(['3', '4', '5']);

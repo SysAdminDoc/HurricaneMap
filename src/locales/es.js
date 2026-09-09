@@ -472,6 +472,8 @@ export default {
   'filters.population': 'Densidad de población',
   'filters.stormSurge': 'Marea de tormenta (MOMs SLOSH)',
   'filters.sst': 'Temp. superficial del mar (más reciente)',
+  'filters.undoReset': 'Deshacer',
+  'filters.undoResetTitle': 'Restaurar los filtros que tenías antes de reiniciar',
   'filters.resetFilters': 'Restablecer filtros',
 
   // Storm panel

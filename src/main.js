@@ -165,6 +165,7 @@ const els = {
   showPopulation: document.getElementById('show-population'),
   showSST: document.getElementById('show-sst'),
   resetFilters: document.getElementById('reset-filters'),
+  undoResetFilters: document.getElementById('undo-reset-filters'),
   visibleCount: document.getElementById('visible-count'),
   stormCount: document.getElementById('storm-count'),
   toggleFiltersBtn: document.getElementById('toggle-filters'),

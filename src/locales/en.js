@@ -472,6 +472,8 @@ export default {
   'filters.population': 'Population density',
   'filters.stormSurge': 'Storm surge (SLOSH MOMs)',
   'filters.sst': 'Sea surface temp (latest)',
+  'filters.undoReset': 'Undo reset',
+  'filters.undoResetTitle': 'Restore the filters you had before the reset',
   'filters.resetFilters': 'Reset filters',
 
   // Storm panel

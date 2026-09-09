@@ -6,6 +6,8 @@ import {
   hasActiveFilters,
   hasActivePrimaryFilters,
   isYearFiltered,
+  applyFilterState,
+  captureFilterState,
   resetPrimaryFilters,
   resetYearRange,
   filterByMacro,
@@ -103,6 +105,78 @@ function cats(filters) {
   assert.equal(filters.showTracks, false);
   assert.equal(filters.showHeatmap, false);
   assert.equal(hasActivePrimaryFilters(filters, defaults), false);
+}
+
+// ------------------------------------------------- reset is recoverable
+//
+// One click of Reset filters clears nine pieces of state and then disables the
+// button, so before this there was no way back to what the reader had built.
+// The round trip has to return the exact prior state, not an approximation of
+// it, so this compares field by field against a state that differs from the
+// defaults in every one of the nine.
+{
+  const defaults = { yearMinDefault: 1851, yearMaxDefault: 2025 };
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  filters.yearMin = 1992;
+  filters.yearMax = 2005;
+  filters.categories = new Set(['3', '4', '5']);
+  filters.state = 'Florida';
+  filters.showTracks = true;
+  filters.showHeatmap = true;
+  filters.retiredOnly = true;
+  const layers = { surgeCategory: '4', showPopulation: true, showSST: true };
+
+  const before = captureFilterState(filters, layers);
+  assert.deepEqual(before, {
+    yearMin: 1992,
+    yearMax: 2005,
+    categories: ['3', '4', '5'],
+    state: 'Florida',
+    showTracks: true,
+    showHeatmap: true,
+    retiredOnly: true,
+    surgeCategory: '4',
+    showPopulation: true,
+    showSST: true,
+  }, 'the snapshot must carry all nine pieces of state');
+
+  resetPrimaryFilters(filters, defaults);
+  const cleared = captureFilterState(filters, { surgeCategory: '', showPopulation: false, showSST: false });
+  assert.notDeepEqual(cleared, before, 'the reset must actually clear something');
+
+  const restoredLayers = applyFilterState(filters, before);
+  assert.deepEqual(
+    captureFilterState(filters, restoredLayers),
+    before,
+    'undoing a reset must return the exact prior state',
+  );
+  // The categories go back as a Set the filter engine can use, not the array
+  // the snapshot stores them in.
+  assert.ok(filters.categories instanceof Set);
+  assert.deepEqual([...filters.categories].sort(), ['3', '4', '5']);
+
+  // The snapshot is a copy. Mutating the live filters after taking it must not
+  // change what undo will put back, or an undo restores the state the reader
+  // was already looking at.
+  const snapshot = captureFilterState(filters, restoredLayers);
+  filters.categories.add('1');
+  filters.state = 'Texas';
+  assert.deepEqual(snapshot.categories, ['3', '4', '5']);
+  assert.equal(snapshot.state, 'Florida');
+  applyFilterState(filters, snapshot);
+  assert.deepEqual([...filters.categories].sort(), ['3', '4', '5']);
+  assert.equal(filters.state, 'Florida');
+
+  // A default state round-trips too: undo has to be able to restore "nothing
+  // was filtered", which is what a reader gets after resetting twice.
+  const plain = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  const plainSnapshot = captureFilterState(plain, {});
+  plain.state = 'Georgia';
+  applyFilterState(plain, plainSnapshot);
+  assert.deepEqual(captureFilterState(plain, {}), plainSnapshot);
+  assert.equal(plainSnapshot.surgeCategory, '');
+  assert.equal(plainSnapshot.showPopulation, false);
+  assert.equal(plainSnapshot.showSST, false);
 }
 
 console.log('filter state ok');

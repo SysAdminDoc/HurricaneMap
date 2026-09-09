@@ -4576,6 +4576,123 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
 // exclusive with the versioned view the filters write. This drives the whole
 // round trip in a browser rather than trusting the encoder: open the panel with
 // a filter applied, reload the URL that produced, and close it again.
+// One click of Reset filters clears nine pieces of state and then disables
+// itself, so there was no way back to what the reader had built. Driven through
+// the real controls, because three of the nine (surge, population, sea-surface)
+// do not live on the filters object and are written back through their own
+// modules.
+async function assertFilterResetIsRecoverable(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 960 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    // Expanded conditionally: the panel's starting state differs by viewport and
+    // an unconditional click closes it where it starts open.
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await page.locator('#show-tracks').visible().waitFor({ timeout: 10_000 });
+
+    const read = () => page.evaluate(() => ({
+      yearMin: document.getElementById('year-min')?.value,
+      yearMax: document.getElementById('year-max')?.value,
+      categories: [...document.querySelectorAll('.cat-btn')]
+        .filter(button => button.classList.contains('on'))
+        .map(button => button.dataset.cat).sort(),
+      state: document.getElementById('state-filter')?.value,
+      showTracks: document.getElementById('show-tracks')?.checked,
+      showHeatmap: document.getElementById('show-heatmap')?.checked,
+      retiredOnly: document.getElementById('show-retired-only')?.checked,
+      surgeCategory: document.getElementById('surge-category')?.value,
+      showPopulation: document.getElementById('show-population')?.checked,
+      showSST: document.getElementById('show-sst')?.checked,
+    }));
+
+    // Move all nine away from their defaults.
+    await page.fill('#year-min', '1992');
+    await page.dispatchEvent('#year-min', 'change');
+    await page.fill('#year-max', '2005');
+    await page.dispatchEvent('#year-max', 'change');
+    await page.click('.cat-btn[data-cat="ts"]');
+    await page.click('.cat-btn[data-cat="1"]');
+    await page.check('#show-tracks');
+    await page.check('#show-heatmap');
+    await page.check('#show-retired-only');
+    await page.selectOption('#surge-category', '4');
+    await page.check('#show-population');
+    await page.check('#show-sst');
+    // Last, and then the panel is reopened: choosing a state opens the state
+    // panel, and any panel opening collapses the filter drawer, which puts
+    // every control after it out of reach.
+    await page.selectOption('#state-filter', { index: 1 });
+    await page.waitForSelector('#state-panel:not([hidden])', { timeout: 15_000 });
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await page.locator('#reset-filters').visible().waitFor({ timeout: 10_000 });
+    await page.waitForFunction(
+      () => document.getElementById('show-sst')?.checked === true
+        && document.getElementById('reset-filters')?.disabled === false,
+      null,
+      { timeout: 15_000 },
+    );
+    const before = await read();
+    assert(
+      before.yearMin === '1992' && before.categories.length < 6 && before.state
+      && before.showTracks && before.showHeatmap && before.retiredOnly
+      && before.surgeCategory === '4' && before.showPopulation && before.showSST,
+      `the nine filters were not all moved off their defaults: ${JSON.stringify(before)}`,
+    );
+
+    await expect_hidden(page, '#undo-reset-filters', 'the undo control must not appear before a reset');
+    await page.click('#reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('undo-reset-filters')?.hidden === false,
+      null,
+      { timeout: 10_000 },
+    ).catch(() => {
+      throw new Error('resetting the filters offered no way back');
+    });
+    const cleared = await read();
+    assert(
+      JSON.stringify(cleared) !== JSON.stringify(before),
+      'the reset cleared nothing, so the undo below would prove nothing',
+    );
+
+    await page.click('#undo-reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('show-sst')?.checked === true,
+      null,
+      { timeout: 15_000 },
+    ).catch(() => {
+      throw new Error('undo did not restore the sea-surface layer');
+    });
+    const after = await read();
+    assert(
+      JSON.stringify(after) === JSON.stringify(before),
+      `undo did not return the exact prior state\n  before: ${JSON.stringify(before)}\n  after:  ${JSON.stringify(after)}`,
+    );
+
+    // Used once. Leaving it on screen offers to restore a state it no longer
+    // holds, which is a lie about what the button does.
+    await expect_hidden(page, '#undo-reset-filters', 'the undo control stayed after it was used');
+  } finally {
+    await context.close();
+  }
+}
+
+async function expect_hidden(page, selector, message) {
+  const hidden = await page.evaluate(target => document.querySelector(target)?.hidden !== false, selector);
+  assert(hidden, message);
+}
+
 async function assertPanelIsAddressable(browser, baseUrl) {
   const PANELS = ['stats', 'compare', 'on-this-date', 'table-view', 'prep', 'evac'];
   const context = await browser.newContext({
@@ -6921,6 +7038,7 @@ try {
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
   await assertManagedPanelFocusContracts(browser, baseUrl);
   await assertPanelIsAddressable(browser, baseUrl);
+  await assertFilterResetIsRecoverable(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);

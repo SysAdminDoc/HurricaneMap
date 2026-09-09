@@ -4,6 +4,8 @@ import {
   hasActiveFilters,
   isYearFiltered,
   resetExcludingFilters,
+  applyFilterState,
+  captureFilterState,
   resetPrimaryFilters,
   resetYearRange,
   setYearRange,
@@ -99,6 +101,21 @@ export function createFilterController({
     elements.stateFilter.value = filters.state;
   };
 
+  // Held for the rest of the session rather than for a few seconds: the reader
+  // who realises they wanted their filters back is usually the one who has
+  // already looked at the map for a while.
+  let undoSnapshot = null;
+
+  const readLayerControls = () => ({
+    surgeCategory: elements.surgeCategory?.value ?? '',
+    showPopulation: Boolean(elements.showPopulation?.checked),
+    showSST: Boolean(elements.showSST?.checked),
+  });
+
+  const showUndo = (visible) => {
+    if (elements.undoResetFilters) elements.undoResetFilters.hidden = !visible;
+  };
+
   const resetYears = () => {
     resetYearRange(filters, yearDefaults());
     sync();
@@ -170,6 +187,9 @@ export function createFilterController({
       document.getElementById('toggle-filters')?.focus({ preventScroll: true });
     });
     elements.resetFilters?.addEventListener('click', async () => {
+      // One click clears nine pieces of state and then disables the button, so
+      // without this there was no way back to what the reader had built.
+      undoSnapshot = captureFilterState(filters, readLayerControls());
       resetPrimaryFilters(filters, yearDefaults());
       sync();
       elements.surgeCategory.value = '';
@@ -183,6 +203,28 @@ export function createFilterController({
       }
       resetTrackCache();
       applyFilters();
+      showUndo(true);
+    });
+
+    elements.undoResetFilters?.addEventListener('click', async () => {
+      if (!undoSnapshot) return;
+      const layers = applyFilterState(filters, undoSnapshot);
+      undoSnapshot = null;
+      sync();
+      elements.surgeCategory.value = layers.surgeCategory;
+      elements.showPopulation.checked = layers.showPopulation;
+      const surge = Number.parseInt(layers.surgeCategory, 10);
+      setSurgeCategory(Number.isFinite(surge) && surge > 0 ? surge : null);
+      setPopulation(layers.showPopulation);
+      if (elements.showSST) {
+        elements.showSST.checked = layers.showSST;
+        const { setSSTVisible } = await loadSST();
+        setSSTVisible(layers.showSST);
+      }
+      resetTrackCache();
+      applyFilters();
+      showUndo(false);
+      elements.resetFilters?.focus({ preventScroll: true });
     });
   };
 
