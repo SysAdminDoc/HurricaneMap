@@ -176,9 +176,9 @@ export async function renderDecadeTrends(host) {
       </table>
     </div>
     <p class="dt-note">
-      Major hurricane % reflects Category 3+ at peak intensity (≥96 kt).
-      Deadliest/costliest use normalized impact fields from Wikipedia infoboxes.
-      Hover over storm names to see details.
+      ${t('decadeTrends.noteMajor')}
+      ${t('decadeTrends.noteImpacts')}
+      ${t('decadeTrends.noteHover')}
     </p>
   `;
 }

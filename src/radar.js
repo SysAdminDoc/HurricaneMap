@@ -430,9 +430,7 @@ export class RadarOverlay {
       this.setStatus(`${t('radar.savedFrames', result.saved)}${evictionNote}`);
       button.textContent = t('radar.savedButton');
     } catch (error) {
-      this.setStatus(isQuotaExceededError(error)
-        ? 'Not enough storage. Clear optional radar or tile data in Settings.'
-        : 'Radar pack could not be saved.');
+      this.setStatus(t(isQuotaExceededError(error) ? 'radar.packQuota' : 'radar.packFailed'));
       button.disabled = false;
     }
   }

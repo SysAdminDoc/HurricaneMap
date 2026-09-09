@@ -25,7 +25,7 @@
   - text: /TS \/ sub-hurricane \d+ Category 1 \d+ Category 2 \d+ Category 3 \d+ Category 4 \d+ Category 5 5/
   - heading "Estados costeros sin toques de tierra de huracán registrados" [level=3]
   - text: Delaware District of Columbia Maryland New Hampshire Pennsylvania Virginia
-  - paragraph: /Tropical storms have hit these states; only Cat 1\+ direct landfalls are excluded here\. HURDAT2's \d+-\d+ continental-U\.S\. landfall markings have known gaps\./
+  - paragraph: /Estos estados sí han recibido tormentas tropicales; aquí solo se excluyen los impactos directos de categoría 1 o mayor\. Las marcas de impacto continental de HURDAT2 entre \d+ y \d+ tienen huecos conocidos\./
   - heading "Cobertura de datos de impactos" [level=3]
   - paragraph: /\d+ de \d+ huracanes del catálogo tienen registros de impactos \(\d+%\)\./
   - paragraph: Los registros faltantes indican datos comunitarios no disponibles, no cero muertes o daños.
@@ -47,7 +47,7 @@
   - img: Alto Bajo Toques de tierra ACE Velocidad de avance
   - paragraph:
     - strong: /Dirección de la tendencia \(media móvil de \d+ años\):/
-    - text: "Landfalls: ↑ en aumento · ACE: ↑ en aumento · Speed: ↓ en descenso"
+    - text: "Impactos: ↑ en aumento · ACE: ↑ en aumento · Velocidad: ↓ en descenso"
   - heading "Tendencias por década" [level=3]
   - region "Tendencias por década":
     - table:
@@ -186,5 +186,5 @@
           - cell /\d+/
           - cell /Colin \(\d+\)/
           - cell /Ian \(\d+\)/
-  - paragraph: /Major hurricane % reflects Category 3\+ at peak intensity \(≥\d+ kt\)\. Deadliest\/costliest use normalized impact fields from Wikipedia infoboxes\. Hover over storm names to see details\./
+  - paragraph: /El % de huracanes intensos refleja la categoría 3\+ en su punto máximo \(≥\d+ kt\)\. Los datos de víctimas y costos provienen de las fichas de Wikipedia, normalizados\. Pasa el cursor sobre los nombres para ver detalles\./
   - group: Citar esta versión

@@ -19,8 +19,11 @@
 //    not also be spelled out in a module.
 // 3. Literals that reach a text sink without ever sitting in markup, found by
 //    parsing. `this.setStatus('Loading…')` is invisible to pass 1 because
-//    there is no markup anywhere near it, and eleven of the radar panel's
-//    status strings lived there.
+//    there is no markup anywhere near it, and thirteen of the radar panel's
+//    status strings lived there. It reads literals, templates, ternaries and
+//    `+` concatenations, and finds the sinks by what they do rather than by
+//    name. It does NOT yet cover `.title =`, `setAttribute('title', …)` or
+//    Leaflet's bindTooltip/bindPopup.
 //
 // What is deliberately NOT reported: prose inside a region marked with a `lang`
 // attribute. `src/panel.js` renders the generated storm biography in a
@@ -87,7 +90,7 @@ const LINE_END = new RegExp(`${OPEN}([^<>{}\`$]*)$`);
 // a ternary that happen to carry no boundary, and they read as prose to
 // looksLikeProse because "name" is an ordinary lowercase word. Commas stay
 // allowed, since real sentences use them.
-const LINE_WHOLE = new RegExp(`^([^<>{}\`$?:()=;]+)$`);
+const LINE_WHOLE = new RegExp(`^([^<>{}\`$?:()=]+)$`);
 const ATTRIBUTE = /\b(title|aria-label|placeholder|alt)="([^"`$<>]*)"/g;
 // A label chosen by a ternary never touches a tag boundary, so nothing
 // positional can see it. The storm panel picked between 'High', 'Medium' and
@@ -111,7 +114,12 @@ const CAPITALISED = /^[A-Z][a-z]{2,}$/;
 // one of these in it is machinery that happens to sit between two tags.
 // A quote next to a bracket is a call, not a sentence: `t('stats.trend')` sits
 // between the `>` of one comparison and the `<` of the next.
-const NOT_PROSE = /[/\\=;{}#@|~^*_[\]]|\(["']|["']\)|\.(?:js|css|json|png|svg|txt)\b/;
+// A semicolon is deliberately NOT here. Prose uses one mid-sentence, and
+// excluding the character outright hid "...have hit these states; only Cat 1+
+// direct landfalls are excluded here." An HTML entity is the shape that needs
+// the exclusion, so exclude that instead, and a run ending in a semicolon is
+// rejected as a statement where it is read.
+const NOT_PROSE = /[/\\={}#@|~^*_[\]]|&[a-z]+;|&#\d+;|\(["']|["']\)|\.(?:js|css|json|png|svg|txt)\b/;
 
 // `}` opens a run as well as `>`, because an interpolation ends the text before
 // it. That also means a `}` closing a block can open a run of plain code, so
@@ -138,41 +146,46 @@ export function looksLikeProse(value) {
   return words.length >= 2 && words.some(word => /^[a-z]{3,}$/.test(word));
 }
 
-// Which lines are inside a template literal that renders markup. A single line
-// of a multi-line innerHTML often carries no angle bracket of its own -- the
-// radar panel's title line is `NEXRAD radar - ${state} landfall` -- so judging
-// each line on its own text alone skipped them. Backticks are paired in order,
-// which over-includes when one literal nests inside another's interpolation;
-// that direction is safe, since every candidate still has to read as prose.
+// Which lines sit inside a template literal that renders markup.
+//
+// This used to walk the source counting quotes by hand, and an apostrophe in
+// ordinary prose desynchronised it: `HURDAT2's` opened a quote that swallowed
+// every backtick after it, so 412 lines of real markup templates across src/
+// were invisible and 28 lines of plain code were treated as markup. Two English
+// sentences in the statistics panel shipped through the first half of that, and
+// the second half failed the gate on valid JavaScript.
+//
+// The parser already knows where every template literal starts and ends, so ask
+// it. A template counts as markup when its static halves contain a tag.
 export function markupLines(code) {
   const inside = new Set();
-  const ticks = [];
-  let quote = null;
-  let line = 1;
-  for (let index = 0; index < code.length; index += 1) {
-    const character = code[index];
-    if (character === '\n') { line += 1; continue; }
-    if (character === '\\') { index += 1; continue; }
-    if (quote) {
-      if (character === quote) quote = null;
-      continue;
-    }
-    if (character === '"' || character === "'") { quote = character; continue; }
-    if (character === '`') ticks.push({ index, line });
+  let tree;
+  try {
+    tree = parseModule(code);
+  } catch {
+    // check:syntax owns unparseable files; report nothing rather than guess.
+    return inside;
   }
-  for (let pair = 0; pair + 1 < ticks.length; pair += 2) {
-    const open = ticks[pair];
-    const close = ticks[pair + 1];
-    if (!code.slice(open.index, close.index).includes('<')) continue;
-    for (let mark = open.line; mark <= close.line; mark += 1) inside.add(mark);
-  }
+  walk(tree, node => {
+    if (node.type !== 'TemplateLiteral') return;
+    const literal = node.quasis.map(quasi => quasi.value.raw).join('');
+    if (!literal.includes('<')) return;
+    const first = lineAt(code, node.start);
+    const last = lineAt(code, node.end);
+    for (let line = first; line <= last; line += 1) inside.add(line);
+  });
   return inside;
 }
 
 export function findUntranslated(file, text) {
   const code = stripHtmlComments(stripComments(text));
   const found = [];
-  const rendered = markupLines(code);
+  // Parse the ORIGINAL source, not the blanked copy. Blanking replaces string
+  // contents with spaces, which can leave a nested template unparseable, and a
+  // parse failure here returns an empty set: every line then reads as not
+  // markup and the whole file goes unscanned. Blanking preserves line breaks,
+  // so the numbers still line up.
+  const rendered = markupLines(text);
   const lines = code.split(/\r?\n/);
   lines.forEach((line, index) => {
     const patterns = [
@@ -183,7 +196,12 @@ export function findUntranslated(file, text) {
     if (rendered.has(index + 1)) {
       patterns.push([LINE_START, 'text', 1], [LINE_END, 'text', 1], [LINE_WHOLE, 'text', 1]);
     }
-    patterns.push([LONE_WORD_NODE, 'word', 1]);
+    // Only inside a markup template. Its own pattern needs two real tags, but
+    // `<code>python</code>` in a help string is markup that is deliberately not
+    // prose, and a lone lowercase word is exactly what a code sample looks like.
+    if (rendered.has(index + 1) && !/<code[\s>]/.test(line)) {
+      patterns.push([LONE_WORD_NODE, 'word', 1]);
+    }
     for (const [pattern, kind, group] of patterns) {
       // Only lines that render markup. An error message or a log line is not
       // read by anyone choosing a locale, and `}` opening a run means a line of
@@ -220,6 +238,10 @@ export function findUntranslated(file, text) {
         // phrase: the climate summary picked between 'increasing', 'decreasing'
         // and 'stable' that way. A bare lowercase word is markup, since the
         // same shape chooses 'checked', 'disabled', 'selected' and 'ascending'.
+        // A run ending in a semicolon is a statement, not a sentence. The
+        // character itself has to stay allowed, because prose uses it in the
+        // middle: "...have hit these states; only Cat 1+ ... are excluded".
+        if (kind === 'text' && value.endsWith(';')) continue;
         const isProse = kind === 'label'
           ? (/\s/.test(value) || CAPITALISED.test(value))
             && /[A-Za-z]{3,}/.test(value)
@@ -347,6 +369,29 @@ function writesToTextSink(node) {
 /** Names in this module whose body writes a parameter straight to a text sink. */
 export function textSinkNames(tree) {
   const sinks = new Set();
+  // Hang the binding name on the function before the pass below reads it, so a
+  // function expression or arrow knows what it was called.
+  walk(tree, node => {
+    if (node.type === 'VariableDeclarator' && node.id?.type === 'Identifier' && node.init) {
+      if (node.init.type === 'ArrowFunctionExpression' || node.init.type === 'FunctionExpression') {
+        node.init.__hmAssignedName = node.id.name;
+      }
+    }
+    if (node.type === 'AssignmentExpression' && node.right) {
+      if (node.right.type === 'ArrowFunctionExpression' || node.right.type === 'FunctionExpression') {
+        const target = node.left;
+        const name = target?.type === 'Identifier' ? target.name
+          : target?.type === 'MemberExpression' && !target.computed ? target.property?.name
+            : null;
+        if (name) node.right.__hmAssignedName = name;
+      }
+    }
+    if (node.type === 'PropertyDefinition' && node.key?.name && node.value) {
+      if (node.value.type === 'ArrowFunctionExpression' || node.value.type === 'FunctionExpression') {
+        node.value.__hmAssignedName = node.key.name;
+      }
+    }
+  });
   walk(tree, node => {
     const isFunction = node.type === 'FunctionDeclaration'
       || node.type === 'FunctionExpression'
@@ -363,22 +408,61 @@ export function textSinkNames(tree) {
     walk(fn.body, inner => {
       if (inner.type !== 'AssignmentExpression') return;
       if (!writesToTextSink(inner.left)) return;
-      if (inner.right?.type === 'Identifier' && parameters.has(inner.right.name)) writes = true;
+      // `el.textContent = text` and `el.textContent = `${text}`` are the same
+      // sink; reading only the bare identifier missed the second.
+      const names = [];
+      const collect = value => {
+        if (!value) return;
+        if (value.type === 'Identifier') names.push(value.name);
+        if (value.type === 'TemplateLiteral') value.expressions.forEach(collect);
+        if (value.type === 'BinaryExpression') { collect(value.left); collect(value.right); }
+      };
+      collect(inner.right);
+      if (names.some(name => parameters.has(name))) writes = true;
     });
     if (!writes) return;
-    const name = node.type === 'FunctionDeclaration' ? node.id?.name
+    // The name can hang off the function itself, or off whatever it was
+    // assigned to. `const setStatus = text => { el.textContent = text; }` is the
+    // dominant style in this repo and used to be discovered and then discarded,
+    // because only the three declaration forms were read.
+    const named = node.type === 'FunctionDeclaration' ? node.id?.name
       : node.type === 'MethodDefinition' || node.type === 'Property' ? node.key?.name
-        : null;
-    if (name) sinks.add(name);
+        : node.__hmAssignedName || null;
+    if (named) sinks.add(named);
   });
   return sinks;
 }
 
-/** Every static string a node contributes, so a template's literal halves count. */
-function staticStrings(node) {
-  if (!node) return [];
+/**
+ * Every static string a node contributes.
+ *
+ * Descends the three shapes a status string actually arrives in: a plain
+ * literal, a template, a ternary picking between two messages, and a `+`
+ * concatenation building one. The radar panel used all four, and reading only
+ * the first two left `isQuotaExceededError(error) ? 'Not enough storage…' :
+ * 'Radar pack could not be saved.'` untranslated with the gate green.
+ */
+function staticStrings(node, depth = 0) {
+  if (!node || depth > 6) return [];
   if (node.type === 'Literal') return typeof node.value === 'string' ? [node.value] : [];
-  if (node.type === 'TemplateLiteral') return node.quasis.map(quasi => quasi.value.cooked || '');
+  if (node.type === 'TemplateLiteral') {
+    return [
+      ...node.quasis.map(quasi => quasi.value.cooked || ''),
+      ...node.expressions.flatMap(expression => staticStrings(expression, depth + 1)),
+    ];
+  }
+  if (node.type === 'ConditionalExpression') {
+    return [
+      ...staticStrings(node.consequent, depth + 1),
+      ...staticStrings(node.alternate, depth + 1),
+    ];
+  }
+  if (node.type === 'BinaryExpression' && node.operator === '+') {
+    return [...staticStrings(node.left, depth + 1), ...staticStrings(node.right, depth + 1)];
+  }
+  if (node.type === 'LogicalExpression') {
+    return [...staticStrings(node.left, depth + 1), ...staticStrings(node.right, depth + 1)];
+  }
   return [];
 }
 

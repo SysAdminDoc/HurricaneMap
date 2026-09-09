@@ -95,8 +95,8 @@ function render() {
           <h3>${t('stats.noHitStates')}</h3>
           <div class="cold-list">${cold || `<span class="cold-tag">${t('stats.noColdStates')}</span>`}</div>
           <p class="stats-note">
-            Tropical storms have hit these states; only Cat 1+ direct landfalls are excluded here.
-            HURDAT2's 1971-1990 continental-U.S. landfall markings have known gaps.
+            ${t('stats.coldNoteScope')}
+            ${t('stats.coldNoteGaps')}
           </p>
         </section>
         <section class="stats-section stats-section--impact-coverage">
@@ -306,9 +306,9 @@ function renderClimateTrendsChart(host, trends) {
   const summary = `
     <p class="trend-summary">
       <strong>${t('stats.trendDirectionLabel')}</strong><br/>
-      Landfalls: ${trendDir(trends.trends.landfalls_slope)} · 
+      ${t('stats.trendLandfalls')} ${trendDir(trends.trends.landfalls_slope)} · 
       ACE: ${trendDir(trends.trends.ace_slope)} · 
-      Speed: ${trendDir(trends.trends.speed_slope)}
+      ${t('stats.trendSpeed')} ${trendDir(trends.trends.speed_slope)}
     </p>
   `;
   host.innerHTML += summary;
