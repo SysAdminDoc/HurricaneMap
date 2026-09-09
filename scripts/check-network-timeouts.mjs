@@ -2,7 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parse } from 'acorn';
+import { parseModule, walk } from './js-ast.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const srcDir = path.join(root, 'src');
@@ -56,22 +56,6 @@ const BRACKET_FETCH = /(?:globalThis|self|window|this)\s*\[\s*['"`]fetch['"`]\s*
 const SEAM = 'fetchImpl';
 const SEAM_DEFAULT = 'fetchWithTimeout';
 const FUNCTION_TYPES = new Set(['FunctionDeclaration', 'FunctionExpression', 'ArrowFunctionExpression']);
-const POSITION_KEYS = new Set(['type', 'start', 'end', 'loc', 'range']);
-
-function walk(node, visit) {
-  if (!node || typeof node !== 'object') return;
-  if (Array.isArray(node)) {
-    for (const child of node) walk(child, visit);
-    return;
-  }
-  if (typeof node.type !== 'string') return;
-  visit(node);
-  for (const key of Object.keys(node)) {
-    if (POSITION_KEYS.has(key)) continue;
-    walk(node[key], visit);
-  }
-}
-
 // Where a seam is bound, which is only ever inside a parameter pattern. The
 // caller's key is what carries the convention, so `{ fetchImpl: transport }`
 // counts and binds the local name `transport`.
@@ -141,11 +125,7 @@ function exportedFunctions(tree) {
  * something else is held to this same rule wherever it lives.
  */
 export function seamBindings(text) {
-  const tree = parse(String(text || ''), {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    allowHashBang: true,
-  });
+  const tree = parseModule(text);
   const exported = exportedFunctions(tree);
   const found = [];
   walk(tree, node => {

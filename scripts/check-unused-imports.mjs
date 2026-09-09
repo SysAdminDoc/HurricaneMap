@@ -14,26 +14,10 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { parse } from 'acorn';
+import { parseModule, walk } from './js-ast.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const srcDir = path.join(root, 'src');
-
-const POSITION_KEYS = new Set(['type', 'start', 'end', 'loc', 'range']);
-
-function walk(node, visit) {
-  if (!node || typeof node !== 'object') return;
-  if (Array.isArray(node)) {
-    for (const child of node) walk(child, visit);
-    return;
-  }
-  if (typeof node.type !== 'string') return;
-  visit(node);
-  for (const key of Object.keys(node)) {
-    if (POSITION_KEYS.has(key)) continue;
-    walk(node[key], visit);
-  }
-}
 
 /**
  * Names this module imports and never mentions again.
@@ -46,7 +30,7 @@ function walk(node, visit) {
  * non-shorthand property, and the member of a non-computed member expression.
  */
 export function findUnusedImports(source) {
-  const tree = parse(source, { ecmaVersion: 'latest', sourceType: 'module', allowHashBang: true });
+  const tree = parseModule(source);
 
   const bound = new Map();
   // The Identifier nodes inside the import statement itself. Skipping the
