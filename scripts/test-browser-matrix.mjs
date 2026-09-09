@@ -341,7 +341,7 @@ async function runStandaloneCase(browser, baseUrl, label, { viewport, insets }) 
 // go through new Function and the page would refuse it, and writing the
 // detections out a second time inside the evaluate callback would mean two
 // definitions that can disagree.
-async function runBaselineContract(browser, baseUrl, label) {
+async function runBaselineContract(browser, baseUrl, label, serviceWorkerType) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, serviceWorkers: 'block' });
   try {
     const page = await preparePage(context, baseUrl);
@@ -366,9 +366,16 @@ async function runBaselineContract(browser, baseUrl, label) {
         done(false);
         return;
       }
-      worker.addEventListener('message', event => {
+      // Any reply at all is the answer. src/storms-worker.js opens with a
+      // top-level import, so a classic-script load throws and the error
+      // listener below returns false; getting a message back means the engine
+      // parsed and ran it as a module. Requiring event.data.ok asked a
+      // different question, because the worker posts {ok:false} whenever the
+      // storm archive fetch fails, so a data hiccup downgraded a feature
+      // assertion to a silent 'worked around'.
+      worker.addEventListener('message', () => {
         clearTimeout(timer);
-        done(Boolean(event.data?.ok));
+        done(true);
       });
       worker.addEventListener('error', () => {
         clearTimeout(timer);
@@ -381,8 +388,13 @@ async function runBaselineContract(browser, baseUrl, label) {
     for (const feature of BASELINE_FEATURES) {
       // Answered by runOfflineContract, which is the only run that registers a
       // service worker at all: it reports the type the engine accepted, and
-      // having got through the offline suite on that type is the proof.
-      if (feature.probe === 'service-worker-type') continue;
+      // having got through the offline suite on that type is the proof. The
+      // caller passes that type in so this row is reported like the others
+      // rather than being skipped and mentioned only in a summary line.
+      if (feature.probe === 'service-worker-type') {
+        if (serviceWorkerType && serviceWorkerType !== 'module') missing.push(feature.name);
+        continue;
+      }
       if (support[feature.id]) continue;
       const tier = feature.baseline === 'widely' ? feature.widelyAvailable : feature.newlyAvailable;
       assert(
@@ -473,8 +485,8 @@ try {
     try {
       await runShellContract(browser, baseUrl, engine.name);
       await runStandaloneContract(browser, baseUrl, engine.name);
-      const baseline = await runBaselineContract(browser, baseUrl, engine.name);
       const offline = await runOfflineContract(browser, baseUrl, engine.name, setOffline);
+      const baseline = await runBaselineContract(browser, baseUrl, engine.name, offline.workerType);
       if (offline.state === 'unsupported') {
         console.log(`${engine.name}: shell/manifest/search/panel/standalone passed; offline cache unsupported (${offline.reason})`);
       } else {

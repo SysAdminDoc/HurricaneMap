@@ -101,6 +101,9 @@ export const BASELINE_FEATURES = Object.freeze([
  */
 export function contractFloor(features = BASELINE_FEATURES) {
   const required = features.filter(feature => feature.requirement === 'required');
+  // No hard requirement means no floor to state, rather than a floor of
+  // 0000-00-00 that the README would then be told to contain.
+  if (!required.length) return null;
   return required.reduce((latest, feature) => {
     const date = feature.baseline === 'widely' ? feature.widelyAvailable : feature.newlyAvailable;
     return date > latest ? date : latest;

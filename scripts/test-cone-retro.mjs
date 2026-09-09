@@ -125,9 +125,14 @@ assert(Math.abs(north[1] + 80) < 0.01);
     /isEllipseMethodOfficial\(\)\.then\(official => \{[\s\S]{0,400}?hidden = false;/.test(controls),
     'the panel must reveal the ellipse control when the method is official',
   );
+  // Tied to the ellipse control, not to any optional-chained remove() in the
+  // file. The loose form this replaces was satisfied by an unrelated
+  // `node?.remove()` elsewhere in the module, so the gate that exists to
+  // prove the invented ellipse is withheld did not prove it.
   assert(
-    /\?\.remove\(\);/.test(controls),
-    'and must take it out of the page when it is not',
+    /coneEllipse\.checked = false;\s*\(ellipseToggle \|\| coneEllipse\.closest\('label'\)\)\?\.remove\(\);/
+      .test(controls),
+    'and must take the ellipse control itself out of the page when it is not',
   );
 }
 

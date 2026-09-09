@@ -85,8 +85,13 @@ function declaredBy(node, { includeVar }) {
  * scopeBinds claim a shadow that does not exist and suppressed every real read
  * of `m` in the function around it.
  */
-function hoistedNames(body) {
+function hoistedNames(fn) {
   const names = [];
+  // `body` is the node whose var scope this is. Recursion must stop at any
+  // OTHER function, and comparing against `body` is not enough on its own:
+  // for `a => b => { var m; }` the outer arrow's body IS the inner arrow, so
+  // the inner one is not `body` but is also not the root, and its vars used
+  // to be attributed outwards. Depth says it plainly.
   const visit = node => {
     if (!node || typeof node !== 'object') return;
     if (Array.isArray(node)) {
@@ -96,7 +101,7 @@ function hoistedNames(body) {
     if (typeof node.type !== 'string') return;
     // A nested function has its own `var` scope. Its name, though, is declared
     // out here.
-    if (FUNCTION_TYPES.has(node.type) && node !== body) {
+    if (FUNCTION_TYPES.has(node.type) && node !== fn) {
       if (node.type === 'FunctionDeclaration' && node.id?.name) names.push(node.id.name);
       return;
     }
@@ -110,7 +115,7 @@ function hoistedNames(body) {
       visit(node[key]);
     }
   };
-  visit(body);
+  visit(fn);
   return names;
 }
 
@@ -127,7 +132,7 @@ export function scopeBinds(node, name) {
     const bound = [];
     for (const parameter of node.params || []) patternNames(parameter, bound);
     if (node.id?.name) bound.push(node.id.name);
-    bound.push(...hoistedNames(node.body));
+    bound.push(...hoistedNames(node));
     return bound.includes(name);
   }
   if (node.type === 'BlockStatement') {
@@ -201,6 +206,19 @@ export function nonReferenceIdentifiers(tree, into = new Set()) {
       if (node.local) into.add(node.local);
       if (node.imported) into.add(node.imported);
     }
+    // A re-export declares nothing locally and reads nothing locally: both
+    // halves name things in the other module's namespace. Counting the local
+    // half as a reference let a re-exported name that happened to match a
+    // dynamic-import binding widen that namespace and exempt every export of
+    // the module behind it.
+    if (node.type === 'ExportNamedDeclaration' && node.source) {
+      for (const specifier of node.specifiers || []) {
+        if (specifier.local) into.add(specifier.local);
+        if (specifier.exported) into.add(specifier.exported);
+      }
+    }
+    // `export * as ns from './m.js'` publishes a name that is not a binding.
+    if (node.type === 'ExportAllDeclaration' && node.exported) into.add(node.exported);
     if (node.type === 'ExportSpecifier') {
       // Only the name being published, and only when it is a node of its own.
       // `export { m }` READS the local binding, and acorn gives the shorthand
@@ -246,8 +264,25 @@ export function referencesModuleBinding(tree, name, ignore = new Set()) {
       if (node.local) notAReference.add(node.local);
       if (node.imported) notAReference.add(node.imported);
     }
+    // A re-export declares nothing locally and reads nothing locally: both
+    // halves name things in the other module's namespace. Counting the local
+    // half as a reference let a re-exported name that happened to match a
+    // dynamic-import binding widen that namespace and exempt every export of
+    // the module behind it.
+    if (node.type === 'ExportNamedDeclaration' && node.source) {
+      for (const specifier of node.specifiers || []) {
+        if (specifier.local) notAReference.add(specifier.local);
+        if (specifier.exported) notAReference.add(specifier.exported);
+      }
+    }
+    // `export * as ns from './m.js'` publishes a name that is not a binding.
+    if (node.type === 'ExportAllDeclaration' && node.exported) notAReference.add(node.exported);
     if (node.type === 'ExportSpecifier') {
-      if (node.exported) notAReference.add(node.exported);
+      // acorn gives shorthand `export { m }` one Identifier for both halves,
+      // so excluding the published name would exclude the read of the binding
+      // with it and a module that only publishes `m` would look like it never
+      // used it.
+      if (node.exported && node.exported !== node.local) notAReference.add(node.exported);
     }
   });
 

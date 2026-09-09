@@ -29,7 +29,9 @@ const readme = await readFile(path.join(root, 'README.md'), 'utf8');
 // The support paragraph. Bounded so a version number somewhere else in the
 // README, where it is talking about a dependency rather than a browser, is not
 // this gate's business.
-const sectionMatch = readme.match(/\n## Browser support\n([\s\S]*?)(?=\n## )/);
+// The lookahead has to accept end-of-file, or moving this section to the end
+// of the README fails the build with a message saying it is not there.
+const sectionMatch = readme.match(/\n## Browser support\n([\s\S]*?)(?=\n## |$)/);
 if (!sectionMatch) {
   fail('README.md has no "## Browser support" section, so nothing states the contract to a reader');
 }
@@ -89,7 +91,7 @@ for (const feature of BASELINE_FEATURES) {
 // The floor the app actually sits at has to be the one the README leads with,
 // or the paragraph understates what the app needs.
 const floor = contractFloor();
-if (section && !section.includes(floor)) {
+if (section && floor && !section.includes(floor)) {
   fail(
     `README.md's browser support section does not state the contract floor ${floor}, `
     + 'the latest Baseline date among the features with no fallback',
@@ -98,8 +100,11 @@ if (section && !section.includes(floor)) {
 
 // No milestone numbers. This is the rule the contract exists to hold: a floor
 // written as a version is stale the fortnight after it is written.
+// A milestone can be written as "Chrome 120", "Chrome v120", "Chrome M120",
+// "Chrome-120" or "Chromium >= 120", and the browser need not be one of the
+// three the tests drive. All of those age the same way, so all of them fail.
 const versionMention = section.match(
-  /\b(Chrome|Chromium|Firefox|Safari|Edge|WebKit|Gecko|Blink)\s+(?:ESR\s+)?\d+(?:\.\d+)*\b/i,
+  /\b(Chrome|Chromium|Firefox|Safari|Edge|WebKit|Gecko|Blink|Opera|Samsung Internet)\b[\s\-]*(?:ESR[\s\-]*)?(?:[><]=?|≥|≤)?[\s]*[vM]?\d+(?:\.\d+)*\b/i,
 );
 if (versionMention) {
   fail(

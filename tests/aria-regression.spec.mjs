@@ -168,15 +168,23 @@ async function expectAriaJson(page, selector, name) {
   const tree = await page.locator(selector).ariaSnapshotJSON();
   const file = path.join(ariaJsonDir, `${name}.aria.json`);
   const baseline = await readFile(file, 'utf8').catch(() => null);
-  // 'missing' is the mode a plain run uses, so an absent baseline is written
-  // once and an existing one is still compared. 'all' and 'changed' rewrite.
   const mode = test.info().config.updateSnapshots;
-  if (mode === 'all' || mode === 'changed' || (baseline === null && mode === 'missing')) {
+  // Only an explicit update rewrites a baseline. A plain run uses mode
+  // 'missing', and letting that write an absent one meant deleting a baseline
+  // self-approved: the file came back and the test went green. Playwright's
+  // own toMatchAriaSnapshot, which the other snapshots in this file use,
+  // writes the actual tree and still fails, so this does the same.
+  if (mode === 'all' || mode === 'changed') {
     await mkdir(ariaJsonDir, { recursive: true });
     await writeFile(file, `${JSON.stringify(tree, null, 2)}\n`);
     return;
   }
-  expect(baseline, `${name}.aria.json is missing; rerun with --update-snapshots`).not.toBeNull();
+  if (baseline === null) {
+    await mkdir(ariaJsonDir, { recursive: true });
+    await writeFile(file, `${JSON.stringify(tree, null, 2)}\n`);
+    throw new Error(`${name}.aria.json did not exist; the actual tree has been written to ${file}. `
+      + 'Check it, then re-run to accept it.');
+  }
   expect(tree, `${name} accessibility tree changed`).toEqual(JSON.parse(baseline));
 }
 
