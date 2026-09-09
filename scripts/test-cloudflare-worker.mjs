@@ -13,7 +13,7 @@ import {
   staticCacheKeyUrl,
   withoutCredentials,
 } from '../cloudflare/worker.js';
-import { MARINE_FEEDS } from '../src/marine-warnings.js';
+import { marineFeedsFor, MARINE_HORIZONS } from '../src/marine-warnings.js';
 
 const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const metaCsp = indexHtml.match(/Content-Security-Policy" content="([^"]+)"/)?.[1] || '';
@@ -149,19 +149,34 @@ assert.equal(radarOptions.image, undefined, 'radar frames should not be transfor
 assert.equal(nhcProxyTargetFor('/nhc/outlook/atl.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_atl.kmz');
 assert.equal(nhcProxyTargetFor('/nhc/outlook/pac.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_pac.kmz');
 assert.equal(nhcProxyTargetFor('/nhc/outlook/cpac.kmz'), 'https://www.nhc.noaa.gov/xgtwo/gtwo_cpac.kmz');
-assert.equal(nhcProxyTargetFor('/nhc/marine/atlantic.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml');
-assert.equal(nhcProxyTargetFor('/nhc/marine/pacific.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml');
+assert.equal(nhcProxyTargetFor('/nhc/marine/atlantic-00to24.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml');
+assert.equal(nhcProxyTargetFor('/nhc/marine/pacific-00to24.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml');
+assert.equal(nhcProxyTargetFor('/nhc/marine/atlantic-24to48.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_24to48_Atlantic.kml');
+assert.equal(nhcProxyTargetFor('/nhc/marine/pacific-24to48.kml'), 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_24to48_Pacific.kml');
 assert.equal(nhcProxyTargetFor('/nhc/outlook/../../secrets'), null, 'proxy must reject every path outside the fixed allowlist');
 
 // src/marine-warnings.js falls back to NHC directly when the proxy path is
 // absent, so its direct URLs and the worker's allowlist must stay one product.
-for (const feed of MARINE_FEEDS) {
-  assert.equal(
-    nhcProxyTargetFor(feed.proxy),
-    feed.direct,
-    `${feed.id} marine fallback URL has drifted from the worker allowlist target`,
-  );
+const relayedMarineTargets = new Set();
+for (const horizon of MARINE_HORIZONS) {
+  for (const feed of marineFeedsFor(horizon)) {
+    assert.equal(
+      nhcProxyTargetFor(feed.proxy),
+      feed.direct,
+      `${feed.id} marine fallback URL has drifted from the worker allowlist target`,
+    );
+    // Both bands answering with one file is the failure this layer cannot
+    // survive: the two forecast periods are byte-identical whenever no warning
+    // is in force, so a route collision would show as "it works" all off-season
+    // and as the wrong ocean during a storm.
+    assert.ok(
+      !relayedMarineTargets.has(feed.direct),
+      `${feed.proxy} relays a product another marine route already claims: ${feed.direct}`,
+    );
+    relayedMarineTargets.add(feed.direct);
+  }
 }
+assert.equal(relayedMarineTargets.size, 4, 'two basins across two forecast bands is four distinct NHC products');
 
 // Verify NHC proxy route is declared
 import workerModule from '../cloudflare/worker.js';

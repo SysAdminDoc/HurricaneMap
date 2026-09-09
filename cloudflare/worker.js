@@ -33,8 +33,13 @@ const NHC_PROXY_ALLOWLIST = {
   '/nhc/outlook/atl.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_atl.kmz',
   '/nhc/outlook/pac.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_pac.kmz',
   '/nhc/outlook/cpac.kmz': 'https://www.nhc.noaa.gov/xgtwo/gtwo_cpac.kmz',
-  '/nhc/marine/atlantic.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml',
-  '/nhc/marine/pacific.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml',
+  // NHC publishes each basin's graphical marine wind warnings for two forecast
+  // bands, regenerated together four times a day. The path carries the band so
+  // a relayed 24-48 h request cannot silently be answered with the 0-24 h file.
+  '/nhc/marine/atlantic-00to24.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml',
+  '/nhc/marine/pacific-00to24.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml',
+  '/nhc/marine/atlantic-24to48.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_24to48_Atlantic.kml',
+  '/nhc/marine/pacific-24to48.kml': 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_24to48_Pacific.kml',
 };
 
 const NHC_POLICY = {

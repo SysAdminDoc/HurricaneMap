@@ -180,9 +180,24 @@
           "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.",
           {
             "role": "checkbox",
-            "name": "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–24 èdtan sou lanmè."
+            "name": "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC sou lanmè pou yon peryod prevwazyon."
           },
-          "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC pou 0–24 èdtan sou lanmè.",
+          "Pèspektiv avètisman van sou lanmè Montre zòn risk avètisman van NHC sou lanmè pou yon peryod prevwazyon.",
+          {
+            "role": "radiogroup",
+            "name": "Peryod prevwazyon sou lanmè",
+            "children": [
+              {
+                "role": "radio",
+                "name": "0–24 èdtan",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "24–48 èdtan"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "Fon satelit GOES Ajoute imaj an dirèk dèyè tanpèt aktif lè li disponib."

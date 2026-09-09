@@ -92,7 +92,7 @@ export async function startActiveStormPolling() {
         renderActive(lastStorms);
       }
     }
-    if (e.detail.key === 'nhcOutlook' || e.detail.key === 'marineWarnings') {
+    if (e.detail.key === 'nhcOutlook' || e.detail.key === 'marineWarnings' || e.detail.key === 'marineHorizon') {
       renderOperationalLayers();
     }
   });
@@ -198,9 +198,10 @@ async function renderOperationalLayers() {
   const map = getMap();
   const outlookEnabled = getSetting('nhcOutlook');
   const marineEnabled = getSetting('marineWarnings');
+  const marineHorizon = getSetting('marineHorizon');
   const [outlookResult, marineResult] = await Promise.all([
     renderTropicalOutlook({ map, enabled: outlookEnabled }),
-    renderMarineWarnings({ map, enabled: marineEnabled }),
+    renderMarineWarnings({ map, enabled: marineEnabled, horizon: marineHorizon }),
   ]);
   return { outlookResult, marineResult };
 }

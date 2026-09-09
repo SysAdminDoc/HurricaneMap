@@ -180,9 +180,24 @@
           "NHC tropical outlook Shows current official disturbance areas and formation chances.",
           {
             "role": "checkbox",
-            "name": "Marine wind-warning outlook Shows NHC 0–24 hour offshore wind-warning risk zones."
+            "name": "Marine wind-warning outlook Shows NHC offshore wind-warning risk zones for one forecast band."
           },
-          "Marine wind-warning outlook Shows NHC 0–24 hour offshore wind-warning risk zones.",
+          "Marine wind-warning outlook Shows NHC offshore wind-warning risk zones for one forecast band.",
+          {
+            "role": "radiogroup",
+            "name": "Marine forecast band",
+            "children": [
+              {
+                "role": "radio",
+                "name": "0–24 h",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "24–48 h"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "GOES satellite backdrop Adds live imagery behind active storms when tiles are reachable."

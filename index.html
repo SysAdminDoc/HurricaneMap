@@ -288,8 +288,12 @@
         <div class="settings-row">
           <label class="toggle-row">
             <input type="checkbox" id="toggle-marine-warnings" />
-            <span class="settings-toggle-copy"><span data-i18n="settings.marineWarnings">Marine wind-warning outlook</span><small data-i18n="settings.marineWarningsHelp">Shows NHC 0–24 hour offshore wind-warning risk zones.</small></span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.marineWarnings">Marine wind-warning outlook</span><small data-i18n="settings.marineWarningsHelp">Shows NHC offshore wind-warning risk zones for one forecast band.</small></span>
           </label>
+          <div class="settings-pillgroup" role="radiogroup" aria-label="Marine forecast band" data-i18n-aria-label="settings.marineHorizonGroup">
+            <button class="settings-pill" data-set-marine-horizon="00to24" role="radio" data-i18n="settings.marineHorizon00to24">0–24 h</button>
+            <button class="settings-pill" data-set-marine-horizon="24to48" role="radio" data-i18n="settings.marineHorizon24to48">24–48 h</button>
+          </div>
         </div>
         <div class="settings-row">
           <label class="toggle-row">

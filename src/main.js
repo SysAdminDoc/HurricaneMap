@@ -509,6 +509,7 @@ function wireSettingsControls() {
     syncRadioGroup('[data-set-palette]', 'palette', 'setPalette');
     syncRadioGroup('[data-set-locale]', 'locale', 'setLocale');
     syncRadioGroup('[data-set-damage]', 'damageMode', 'setDamage');
+    syncRadioGroup('[data-set-marine-horizon]', 'marineHorizon', 'setMarineHorizon');
     const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
     if (coneToggle) {
       coneToggle.checked = getSetting('nhcForecastCone');
@@ -553,6 +554,8 @@ function wireSettingsControls() {
     if (l) { setSetting('locale', l.dataset.setLocale); location.reload(); return; }
     const d = e.target.closest('[data-set-damage]');
     if (d) { setSetting('damageMode', d.dataset.setDamage); syncMenu(); return; }
+    const h = e.target.closest('[data-set-marine-horizon]');
+    if (h) { setSetting('marineHorizon', h.dataset.setMarineHorizon); syncMenu(); return; }
   });
 
   menu.addEventListener('keydown', (event) => {

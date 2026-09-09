@@ -3445,7 +3445,7 @@ async function assertSettingsSurface(page, label) {
   assert(layout.storageScopes === 5, `${label}: expected five storage scopes`);
   assert(layout.storageClearActions === 3, `${label}: only optional storage scopes should be clearable`);
   assert(layout.sourceBundleActions === 1, `${label}: source bundle must be user-initiated`);
-  assert(layout.radioGroups.length === 5, `${label}: expected five settings radio groups`);
+  assert(layout.radioGroups.length === 6, `${label}: expected six settings radio groups`);
   assert(layout.radioGroups.every(group => group.checked === 1 && group.tabbable === 1), `${label}: settings radios do not use one checked/tabbable item per group`);
   const cramped = layout.focusables.filter(item => item.height < 34);
   assert(!cramped.length, `${label}: settings controls are too small: ${cramped.map(item => `${item.text}:${item.height}`).join(', ')}`);
@@ -5068,6 +5068,93 @@ try {
   assert(operationalLayers.grayX === 'rgb(147, 153, 178)', `near-zero outlook X was not gray: ${operationalLayers.grayX}`);
   assert(operationalLayers.marineResult.status === 'rendered' && operationalLayers.marineResult.polygonCount === 2, `marine warning overlay did not render: ${JSON.stringify(operationalLayers)}`);
   assert(operationalLayers.marinePaths >= 2 && /High/.test(operationalLayers.marineLegend), `marine warning rendering incomplete: ${JSON.stringify(operationalLayers)}`);
+
+  // The marine layer draws one of NHC's two forecast bands, and the band is
+  // stated nowhere in the KML: both files call themselves GMWW24Hr.kml, and
+  // whenever no warning is in force the two are byte-identical. So the only
+  // way a wrong band shows up is as the wrong ocean during a storm, which is
+  // exactly when nobody is checking. Give the two bands different polygon
+  // counts and prove the switch moves the data, not just the caption.
+  const marineHorizons = await page.evaluate(async () => {
+    const marine = await import('/src/marine-warnings.js');
+    const { getMap } = await import('/src/map.js');
+    const proxy = await import('/src/nhc-proxy.js');
+    proxy.resetNhcProxyAvailability();
+    proxy.reportNhcProxyAvailability(true);
+
+    const placemark = name => `<Placemark><name>${name}</name><styleUrl>#high</styleUrl>`
+      + '<Polygon><outerBoundaryIs><LinearRing><coordinates>-75,25 -74,25 -74,26 -75,25'
+      + '</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>';
+    // One placemark for the near band, two for the far one, per basin.
+    const bodies = {
+      '00to24': `<?xml version="1.0"?><kml><Document>${placemark('near')}</Document></kml>`,
+      '24to48': `<?xml version="1.0"?><kml><Document>${placemark('far a')}${placemark('far b')}</Document></kml>`,
+    };
+
+    const realFetch = window.fetch;
+    const requested = [];
+    window.fetch = async (url, init) => {
+      const href = String(url);
+      if (!href.includes('/nhc/marine/')) return realFetch(url, init);
+      requested.push(href);
+      const band = href.includes('24to48') ? '24to48' : '00to24';
+      return new Response(bodies[band], { status: 200 });
+    };
+
+    const draw = async (horizon, force) => {
+      const before = requested.length;
+      const result = await marine.renderMarineWarnings({ map: getMap(), enabled: true, horizon, force });
+      const legend = document.querySelector('#marine-warning-legend');
+      return {
+        result,
+        urls: requested.slice(before),
+        legend: legend && !legend.hidden ? legend.textContent : '',
+        paths: document.querySelectorAll('path.marine-warning-zone').length,
+      };
+    };
+
+    try {
+      const near = await draw('00to24', true);
+      const far = await draw('24to48', true);
+      // No force: a shared cache slot would hand back the far band's polygons.
+      const nearAgain = await draw('00to24', false);
+      return { near, far, nearAgain };
+    } finally {
+      marine.clearMarineWarnings();
+      window.fetch = realFetch;
+    }
+  });
+
+  for (const [band, seen] of [['00to24', marineHorizons.near], ['24to48', marineHorizons.far]]) {
+    assert(
+      seen.result.status === 'rendered' && seen.result.horizon === band,
+      `the ${band} marine band did not render as itself: ${JSON.stringify(seen.result)}`,
+    );
+    assert(
+      seen.urls.length > 0 && seen.urls.every(url => url.includes(band)),
+      `the ${band} marine band requested ${JSON.stringify(seen.urls)}`,
+    );
+  }
+  assert(
+    marineHorizons.near.result.polygonCount === 2 && marineHorizons.far.result.polygonCount === 4,
+    `the two marine bands drew the same features: ${JSON.stringify([marineHorizons.near.result, marineHorizons.far.result])}`,
+  );
+  assert(
+    marineHorizons.near.paths === 2 && marineHorizons.far.paths === 4,
+    `the map kept the other band's polygons: ${marineHorizons.near.paths} then ${marineHorizons.far.paths}`,
+  );
+  assert(
+    /0\u201324 hour outlook/.test(marineHorizons.near.legend)
+      && /24\u201348 hour outlook/.test(marineHorizons.far.legend),
+    `the marine legend does not say which forecast band it is showing: `
+    + `${JSON.stringify([marineHorizons.near.legend, marineHorizons.far.legend])}`,
+  );
+  assert(
+    marineHorizons.nearAgain.result.polygonCount === 2
+      && marineHorizons.nearAgain.result.cacheOrigin === 'memory'
+      && marineHorizons.nearAgain.urls.length === 0,
+    `switching back to 0-24 h did not come from its own cache slot: ${JSON.stringify(marineHorizons.nearAgain)}`,
+  );
   // Synthetic ErrorEvent exercises the listener + toast without registering
   // as a real uncaught error (which would trip the pageerror assertions).
   await page.evaluate(() => {

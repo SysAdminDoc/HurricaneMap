@@ -180,9 +180,24 @@
           "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.",
           {
             "role": "checkbox",
-            "name": "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–24 horas."
+            "name": "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para un periodo de pronóstico."
           },
-          "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para 0–24 horas.",
+          "Perspectiva de avisos de viento marino Muestra las zonas de riesgo de avisos de viento mar adentro del NHC para un periodo de pronóstico.",
+          {
+            "role": "radiogroup",
+            "name": "Periodo de pronóstico marino",
+            "children": [
+              {
+                "role": "radio",
+                "name": "0–24 h",
+                "checked": true
+              },
+              {
+                "role": "radio",
+                "name": "24–48 h"
+              }
+            ]
+          },
           {
             "role": "checkbox",
             "name": "Fondo satelital GOES Agrega imágenes en vivo detrás de tormentas activas cuando están disponibles."

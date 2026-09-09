@@ -9,7 +9,7 @@ const APP_VERSION = '1.9.3';
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
-  manifest_sha256: '4664210def5db45465cfa983a5beb0ecd55f4736081bc8f0d80bf97e1dbc48ce',
+  manifest_sha256: 'c8ebbf7f2dfcf107ad3461ab935bc6bbeebd7e5298b38d914d475225d964d1a3',
   algorithm: 'SHA-256',
 });
 

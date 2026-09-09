@@ -20,7 +20,8 @@ const DEFAULTS = {
   damageMode: 'real',      // 'nominal' | 'real' (CPI-adjusted to 2024 USD)
   nhcForecastCone: true,   // Show official NHC forecast cone/track for active storms
   nhcOutlook: true,        // Show NHC Graphical Tropical Weather Outlook disturbance points
-  marineWarnings: false,  // Opt in to broad 0-24 hour marine wind-warning polygons
+  marineWarnings: false,  // Opt in to broad marine wind-warning polygons
+  marineHorizon: '00to24', // Which NHC forecast band the marine layer draws
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   locale: 'en',            // 'en' | 'es' | 'ht'
   highContrast: false,     // WCAG AAA 7:1+ contrast, or whatever the OS asks for
@@ -34,6 +35,7 @@ const VALID_VALUES = {
   palette: new Set(['default', 'colorblind']),
   damageMode: new Set(['nominal', 'real']),
   locale: new Set(['en', 'es', 'ht']),
+  marineHorizon: new Set(['00to24', '24to48']),
 };
 
 const BOOLEAN_KEYS = new Set([

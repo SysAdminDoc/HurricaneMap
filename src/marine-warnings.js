@@ -1,6 +1,14 @@
-// NHC Graphical Marine Wind Warnings (0-24 hour outlook). The layer is opt-in
-// because the polygons span broad offshore forecast areas and can visually
-// dominate historical tracks.
+// NHC Graphical Marine Wind Warnings. The layer is opt-in because the polygons
+// span broad offshore forecast areas and can visually dominate historical
+// tracks.
+//
+// NHC publishes this experimental product for two forecast bands, 0-24 h and
+// 24-48 h, regenerated together four times a day, and the layer draws one of
+// them at a time. Do not try to tell the two apart by the KML's own
+// <name>, which reads GMWW24Hr.kml in both files: the band lives in the URL
+// and nowhere in the document. When no warning is in force anywhere, the two
+// files for a basin are byte-identical, because both are then the same grid of
+// #none placemarks that parseMarineWarningKml drops.
 //
 // Each feed is tried through the fixed Cloudflare allowlist first, then
 // straight from NHC. Unlike CurrentStorms.json and the outlook KMZs, the
@@ -20,18 +28,25 @@ import {
 import { mountOptionalFeedStatus } from './optional-feed-ui.js';
 import { nhcProxyAvailable, nhcProxyUrl } from './nhc-proxy.js';
 
-export const MARINE_FEEDS = Object.freeze([
-  Object.freeze({
-    id: 'atlantic',
-    proxy: '/nhc/marine/atlantic.kml',
-    direct: 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Atlantic.kml',
-  }),
-  Object.freeze({
-    id: 'pacific',
-    proxy: '/nhc/marine/pacific.kml',
-    direct: 'https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_00to24_Pacific.kml',
-  }),
+export const MARINE_HORIZONS = Object.freeze(['00to24', '24to48']);
+export const DEFAULT_MARINE_HORIZON = '00to24';
+
+const BASINS = Object.freeze([
+  Object.freeze({ id: 'atlantic', file: 'Atlantic' }),
+  Object.freeze({ id: 'pacific', file: 'Pacific' }),
 ]);
+
+/** The two basin feeds for one forecast band. An unknown band falls back to
+ *  0-24 h rather than building a URL NHC does not publish. */
+export function marineFeedsFor(horizon = DEFAULT_MARINE_HORIZON) {
+  const band = MARINE_HORIZONS.includes(horizon) ? horizon : DEFAULT_MARINE_HORIZON;
+  return BASINS.map(basin => Object.freeze({
+    id: `${basin.id}-${band}`,
+    horizon: band,
+    proxy: `/nhc/marine/${basin.id}-${band}.kml`,
+    direct: `https://www.nhc.noaa.gov/gis/marine/warnings/GMWW_${band}_${basin.file}.kml`,
+  }));
+}
 const CACHE_MS = 6 * 60 * 60 * 1000;
 const STYLE = {
   low: { color: '#b45f9d', fillColor: '#dda0dd', fillOpacity: 0.20 },
@@ -40,7 +55,10 @@ const STYLE = {
   extreme: { color: '#7a007a', fillColor: '#cc00cc', fillOpacity: 0.32 },
 };
 
-let cache = null;
+// One entry per band. A shared slot would hand a reader the other band's
+// polygons for up to six hours after switching, which is the exact failure
+// this layer's whole point is to avoid.
+const cache = new Map();
 let layerGroup = null;
 let layerMap = null;
 let legendEl = null;
@@ -117,13 +135,22 @@ export async function fetchMarineFeed(feed, { fetchImpl, signal, useProxy = true
   throw lastError || new Error(`${feed.id} marine warning feed unavailable`);
 }
 
-async function fetchWarnings(force) {
-  if (!force && cache && Date.now() - cache.fetchedAt < CACHE_MS) return cache.features;
+function cachedFeatures(horizon) {
+  const entry = cache.get(horizon);
+  return entry && Date.now() - entry.fetchedAt < CACHE_MS ? entry.features : null;
+}
+
+async function fetchWarnings(horizon, force) {
+  if (!force) {
+    const fresh = cachedFeatures(horizon);
+    if (fresh) return fresh;
+  }
   const useProxy = await nhcProxyAvailable();
-  const results = await Promise.allSettled(MARINE_FEEDS.map(feed => fetchMarineFeed(feed, { useProxy })));
+  const feeds = marineFeedsFor(horizon);
+  const results = await Promise.allSettled(feeds.map(feed => fetchMarineFeed(feed, { useProxy })));
   const features = results.flatMap(result => result.status === 'fulfilled' ? result.value : []);
   if (!features.length && results.every(result => result.status === 'rejected')) throw new Error('NHC marine warning feeds unavailable');
-  cache = { fetchedAt: Date.now(), features };
+  cache.set(horizon, { fetchedAt: Date.now(), features });
   return features;
 }
 
@@ -134,7 +161,7 @@ function ensureLayer(map) {
   layerGroup = window.L.layerGroup().addTo(map);
 }
 
-function updateLegend(risks) {
+function updateLegend(risks, horizon) {
   if (!risks.size) {
     if (legendEl) legendEl.hidden = true;
     return;
@@ -147,11 +174,16 @@ function updateLegend(risks) {
     document.body.appendChild(legendEl);
   }
   legendEl.setAttribute('aria-label', t('marine.legendTitle'));
-  legendEl.innerHTML = `<strong>${t('marine.legendTitle')}</strong>${Object.keys(STYLE).filter(risk => risks.has(risk)).map(risk => `<span><b class="marine-risk-swatch marine-risk-swatch--${risk}"></b>${escapeHtml(t(`marine.${risk}`))}</span>`).join('')}`;
+  // The band is named in the legend, not only in the settings menu. Two
+  // forecast periods drawn in the same four colours are otherwise
+  // indistinguishable once the menu is closed.
+  legendEl.innerHTML = `<strong>${t('marine.legendTitle')}</strong>`
+    + `<span class="marine-warning-horizon">${escapeHtml(t(`marine.window.${horizon}`))}</span>`
+    + Object.keys(STYLE).filter(risk => risks.has(risk)).map(risk => `<span><b class="marine-risk-swatch marine-risk-swatch--${risk}"></b>${escapeHtml(t(`marine.${risk}`))}</span>`).join('');
   legendEl.hidden = false;
 }
 
-function ensureStatus(map) {
+function ensureStatus(map, horizon) {
   if (!statusEl || !document.body.contains(statusEl)) {
     statusEl = document.createElement('div');
     statusEl.id = 'marine-warning-status';
@@ -159,35 +191,39 @@ function ensureStatus(map) {
     document.body.appendChild(statusEl);
   }
   mountOptionalFeedStatus(statusEl, 'marine', {
-    onRetry: () => renderMarineWarnings({ map, enabled: true, force: true }),
+    onRetry: () => renderMarineWarnings({ map, enabled: true, horizon, force: true }),
   });
 }
 
-export async function renderMarineWarnings({ map, enabled = false, force = false } = {}) {
+export async function renderMarineWarnings({
+  map,
+  enabled = false,
+  horizon = DEFAULT_MARINE_HORIZON,
+  force = false,
+} = {}) {
   if (!map || !enabled) {
     clearMarineWarnings();
     idleOptionalFeed('marine');
-    return { status: 'idle', polygonCount: 0 };
+    return { status: 'idle', polygonCount: 0, horizon: null };
   }
+  const band = MARINE_HORIZONS.includes(horizon) ? horizon : DEFAULT_MARINE_HORIZON;
   const generation = ++renderGeneration;
   const request = beginOptionalFeed('marine', { cacheOrigin: 'network' });
   ensureLayer(map);
-  ensureStatus(map);
+  ensureStatus(map, band);
   try {
-    const cacheOrigin = !force && cache && Date.now() - cache.fetchedAt < CACHE_MS
-      ? 'memory'
-      : 'network';
-    const features = await fetchWarnings(force);
-    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0, requestId: request.requestId };
+    const cacheOrigin = !force && cachedFeatures(band) ? 'memory' : 'network';
+    const features = await fetchWarnings(band, force);
+    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0, horizon: band, requestId: request.requestId };
     layerGroup.clearLayers();
     const risks = new Set(features.map(feature => feature.properties.risk));
     const layer = window.L.geoJSON({ type: 'FeatureCollection', features }, {
       style: feature => ({ ...STYLE[feature.properties.risk], weight: 1, opacity: 0.85, className: 'marine-warning-zone' }),
-      onEachFeature: (feature, polygon) => polygon.bindTooltip(escapeHtml(`${feature.properties.name} · ${t('marine.window')}`), { sticky: true }),
+      onEachFeature: (feature, polygon) => polygon.bindTooltip(escapeHtml(`${feature.properties.name} · ${t(`marine.window.${band}`)}`), { sticky: true }),
     });
     layerGroup.addLayer(layer);
-    updateLegend(risks);
-    const result = { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, cacheOrigin };
+    updateLegend(risks, band);
+    const result = { status: features.length ? 'rendered' : 'empty', polygonCount: features.length, horizon: band, cacheOrigin };
     completeOptionalFeed('marine', {
       empty: result.status === 'empty',
       itemCount: features.length,
@@ -196,10 +232,11 @@ export async function renderMarineWarnings({ map, enabled = false, force = false
     });
     return result;
   } catch (error) {
-    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0 };
+    if (generation !== renderGeneration) return { status: 'stale', polygonCount: 0, horizon: band };
     const result = {
       status: 'error',
       polygonCount: 0,
+      horizon: band,
       error,
       responseStatus: error.responseStatus || 0,
     };

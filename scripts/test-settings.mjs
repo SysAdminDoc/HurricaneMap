@@ -10,6 +10,7 @@ const settings = normalizeSettings({
   nhcForecastCone: false,
   nhcOutlook: false,
   marineWarnings: true,
+  marineHorizon: 'next week',
   goesRealtime: true,
   highContrast: true,
   reducedMotion: true,
@@ -25,6 +26,9 @@ assert.equal(settings.damageMode, 'real');
 assert.equal(settings.nhcForecastCone, false);
 assert.equal(settings.nhcOutlook, false);
 assert.equal(settings.marineWarnings, true);
+// A band nobody publishes must fall back, not build an NHC URL that 404s.
+assert.equal(settings.marineHorizon, '00to24');
+assert.equal(normalizeSettings({ marineHorizon: '24to48' }).marineHorizon, '24to48');
 assert.equal(settings.goesRealtime, true);
 assert.equal(settings.highContrast, true);
 assert.equal(settings.reducedMotion, true);
@@ -43,6 +47,7 @@ const EXPECTED_DEFAULTS = {
   nhcForecastCone: true,
   nhcOutlook: true,
   marineWarnings: false,
+  marineHorizon: '00to24',
   goesRealtime: false,
   locale: 'en',
   highContrast: false,

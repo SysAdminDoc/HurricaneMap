@@ -57,6 +57,14 @@
   font-size: 21px;
 }
 
+/* The forecast band, not a risk row: no swatch, so give it the weight that
+   says so. No colour of its own, because the legend's contrast is already
+   measured against var(--text) in all four themes. */
+.marine-warning-horizon {
+  margin-block-end: 2px;
+  font-weight: 600;
+}
+
 .marine-risk-swatch {
   width: 13px;
   height: 13px;

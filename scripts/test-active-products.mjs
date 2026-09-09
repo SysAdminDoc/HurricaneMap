@@ -2,7 +2,14 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 import { extractKmlFromKmz, parseOutlookKml } from '../src/outlook.js';
-import { fetchMarineFeed, looksLikeKml, MARINE_FEEDS, parseMarineWarningKml } from '../src/marine-warnings.js';
+import {
+  DEFAULT_MARINE_HORIZON,
+  fetchMarineFeed,
+  looksLikeKml,
+  marineFeedsFor,
+  MARINE_HORIZONS,
+  parseMarineWarningKml,
+} from '../src/marine-warnings.js';
 import { isMissingProxyRoute, nhcProxyUrl } from '../src/nhc-proxy.js';
 import {
   SUMMARY_LAYERS,
@@ -93,9 +100,32 @@ function recordingFetch(responder) {
 const ok = body => ({ ok: true, status: 200, text: async () => body });
 const notFound = () => ({ ok: false, status: 404, text: async () => '' });
 
-const atlantic = MARINE_FEEDS[0];
-assert.equal(atlantic.proxy, '/nhc/marine/atlantic.kml');
+const atlantic = marineFeedsFor()[0];
+assert.equal(atlantic.proxy, '/nhc/marine/atlantic-00to24.kml');
+assert.equal(atlantic.horizon, DEFAULT_MARINE_HORIZON);
 assert.match(atlantic.direct, /^https:\/\/www\.nhc\.noaa\.gov\/gis\/marine\/warnings\//);
+
+// The band has to reach both halves of the URL. NHC's KML names itself
+// GMWW24Hr.kml in the 24-48 h file too, so the request is the only place the
+// forecast period is ever stated, and a band that fails to reach it produces a
+// layer that is wrong in exactly the way nobody can see.
+for (const horizon of MARINE_HORIZONS) {
+  const feeds = marineFeedsFor(horizon);
+  assert.equal(feeds.length, 2, `${horizon} must cover both basins`);
+  for (const feed of feeds) {
+    assert.equal(feed.horizon, horizon);
+    assert.ok(feed.proxy.endsWith(`-${horizon}.kml`), `${feed.proxy} does not carry its band`);
+    assert.ok(feed.direct.includes(`GMWW_${horizon}_`), `${feed.direct} does not carry its band`);
+  }
+}
+assert.notDeepEqual(
+  marineFeedsFor('00to24').map(feed => feed.direct),
+  marineFeedsFor('24to48').map(feed => feed.direct),
+  'the two forecast bands must not resolve to the same NHC products',
+);
+// An unknown band is the 0-24 h one, never a URL NHC does not publish.
+assert.deepEqual(marineFeedsFor('72to96'), marineFeedsFor(DEFAULT_MARINE_HORIZON));
+assert.deepEqual(marineFeedsFor(undefined), marineFeedsFor(DEFAULT_MARINE_HORIZON));
 
 const proxied = recordingFetch(() => ok(marineKml));
 assert.equal((await fetchMarineFeed(atlantic, { fetchImpl: proxied.fetchImpl })).length, 1);
