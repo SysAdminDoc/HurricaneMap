@@ -1066,6 +1066,8 @@ export default {
   'shortcuts.adjustYears': 'Ajiste seri ane',
   'shortcuts.footerHtml': 'Peze <kbd>Esc</kbd> pou fèmen nenpòt panèl oswa dyalòg.',
   'search.recent': 'Gade resamman',
+  'search.clearRecent': 'Efase rechèch resan yo',
+  'search.recentCleared': 'Rechèch resan yo efase.',
   'search.noMatch': 'Pa gen siklòn ki koresponn ak "{0}"',
   'search.help': 'Chèche pa non, eta oswa ane, tankou Andrew, Florida oswa 2005.',
   'search.suggest': 'Èske ou te vle di…',

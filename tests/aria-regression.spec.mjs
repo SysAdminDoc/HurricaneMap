@@ -648,3 +648,67 @@ test('header tooltips are dismissible with Escape and survive being hovered', as
   // tooltip is dismissed by Escape is proved above, with nothing else moving.
   await page.waitForFunction(() => document.querySelector('#stats-panel')?.hidden === true, null, { timeout: 5_000 });
 });
+
+test('the recents list can be cleared, and stays cleared across a reload', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+
+  // Seeded through the module that owns the record, so the shape under test is
+  // the shape the app actually writes rather than a hand-built one.
+  await page.evaluate(async () => {
+    const history = await import('/src/search-history.js');
+    history.recordView({ storm_id: 'AL122005', name: 'KATRINA', year: 2005, category: 5, state: 'Louisiana', t: '2005-08-29T11:10:00Z', lat: 29.3, lon: -89.6 });
+    history.recordView({ storm_id: 'AL092022', name: 'IAN', year: 2022, category: 4, state: 'Florida', t: '2022-09-28T19:05:00Z', lat: 26.7, lon: -82.2 });
+  });
+
+  // The filter panel's starting state differs by viewport, so it is expanded
+  // conditionally: an unconditional click closed it here and the search field
+  // was never reachable.
+  const expandFilters = async () => {
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await expect(page.locator('#search-input')).toBeVisible();
+  };
+  await expandFilters();
+  await page.locator('#search-input').focus();
+  await expect(page.locator('#search-results')).toBeVisible();
+  await expect(page.locator('#search-results li[data-storm-id]')).toHaveCount(2);
+  const clear = page.locator('#clear-search-history');
+  await expect(clear).toBeVisible();
+
+  // The control is a button beside the listbox, not an option inside it. axe
+  // is asked about the whole row so the listbox and the button are judged
+  // together, which is where a button owned by a listbox would show up.
+  await assertNoAxeViolations(page, 'search recents with the clear control', '#search-popup');
+
+  // Reachable from the keyboard, and reaching it must not close the popup out
+  // from under the focus that just arrived.
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement?.id)).toBe('clear-search-history');
+  await page.waitForTimeout(400);
+  expect(await page.evaluate(() => document.activeElement?.id)).toBe('clear-search-history');
+  await expect(page.locator('#search-results')).toBeVisible();
+
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#search-results li[data-storm-id]')).toHaveCount(0);
+  await expect(page.locator('#search-results .search-empty')).toContainText('Recent searches cleared');
+  await expect(clear).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('hm-search-history-v1'))).toBe(null);
+
+  // A reload is the only thing that proves the device forgot rather than the
+  // open page forgetting.
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => {
+    const loading = document.querySelector('#loading');
+    return loading?.style.display === 'none' && /\d/.test(document.querySelector('#visible-count')?.textContent || '');
+  }, null, { timeout: 20_000 });
+  expect(await page.evaluate(async () => {
+    const history = await import('/src/search-history.js');
+    return history.getHistory().length;
+  })).toBe(0);
+  await expandFilters();
+  await page.locator('#search-input').focus();
+  await page.waitForTimeout(300);
+  await expect(page.locator('#search-results')).toBeHidden();
+  await expect(page.locator('#clear-search-history')).toBeHidden();
+});

@@ -338,11 +338,29 @@ label > input[type="checkbox"] {
   align-self: center;
 }
 
-.search-results {
+/* The popup owns the position so the listbox can stay a pure listbox: the
+   control that clears the recents is a button, which a listbox may not own as
+   a child, so it sits beside the list rather than inside it. */
+.search-popup {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
+  z-index: 10;
+}
+
+.search-history-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  padding: 4px 6px;
+  background: var(--crust);
+  border: 1px solid var(--surface0);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.search-results {
   margin: 4px 0 0;
   padding: 0;
   list-style: none;
@@ -351,7 +369,6 @@ label > input[type="checkbox"] {
   border-radius: 8px;
   max-height: 220px;
   overflow-y: auto;
-  z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
   animation: search-fade-in 120ms ease;
 }

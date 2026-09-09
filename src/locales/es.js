@@ -1088,6 +1088,8 @@ export default {
   'shortcuts.adjustYears': 'Ajustar rango de años',
   'shortcuts.footerHtml': 'Pulsa <kbd>Esc</kbd> para cerrar cualquier panel o diálogo.',
   'search.recent': 'Vistos recientemente',
+  'search.clearRecent': 'Borrar búsquedas recientes',
+  'search.recentCleared': 'Búsquedas recientes borradas.',
   'search.noMatch': 'Ninguna tormenta coincide con "{0}"',
   'search.help': 'Busca por nombre, estado o año, por ejemplo Andrew, Florida o 2005.',
   'search.suggest': 'Quizás quisiste decir…',

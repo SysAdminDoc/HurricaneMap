@@ -50,6 +50,19 @@ export function getHistory() {
   return load();
 }
 
+/**
+ * Forget every recently viewed storm.
+ *
+ * The record is removed rather than rewritten empty: an empty versioned record
+ * still says this device kept a search history, and load() reads a missing key
+ * and an empty record the same way.
+ */
+export function clearHistory(storage = globalThis.localStorage) {
+  try {
+    storage?.removeItem?.(KEY);
+  } catch (e) { /* storage unavailable */ }
+}
+
 export function normalizeHistoryEntry(entry) {
   if (!entry || typeof entry !== 'object') return null;
   const stormId = normalizeText(entry.storm_id, 32);

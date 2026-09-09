@@ -390,7 +390,12 @@
     <div class="filter-row">
       <label for="search-input" data-i18n="filters.searchStorm">Search storm</label>
       <input type="search" id="search-input" placeholder="Search name, year, or state" data-i18n-placeholder="filters.searchPlaceholder" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results" />
-      <ul id="search-results" class="search-results" role="listbox" aria-label="Storm search results" data-i18n-aria-label="filters.searchResults" hidden></ul>
+      <div class="search-popup" id="search-popup">
+        <ul id="search-results" class="search-results" role="listbox" aria-label="Storm search results" data-i18n-aria-label="filters.searchResults" hidden></ul>
+        <div class="search-history-actions" id="search-history-actions" hidden>
+          <button type="button" class="text-btn" id="clear-search-history" data-i18n="search.clearRecent">Clear recent searches</button>
+        </div>
+      </div>
     </div>
     <label class="toggle-row retired-toggle" title="Show only retired storm names" data-i18n-title="filters.retiredHelp">
       <input type="checkbox" id="show-retired-only" />

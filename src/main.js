@@ -156,6 +156,7 @@ const els = {
   stateFilter: document.getElementById('state-filter'),
   searchInput: document.getElementById('search-input'),
   searchResults: document.getElementById('search-results'),
+  searchHistoryActions: document.getElementById('search-history-actions'),
   filtersPanel: document.getElementById('filters'),
   showTracks: document.getElementById('show-tracks'),
   showHeatmap: document.getElementById('show-heatmap'),

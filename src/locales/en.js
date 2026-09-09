@@ -1091,6 +1091,8 @@ export default {
   'shortcuts.adjustYears': 'Adjust year range',
   'shortcuts.footerHtml': 'Press <kbd>Esc</kbd> to close any open panel or dialog.',
   'search.recent': 'Recently viewed',
+  'search.clearRecent': 'Clear recent searches',
+  'search.recentCleared': 'Recent searches cleared.',
   'search.noMatch': 'No storm matches "{0}"',
   'search.help': 'Search by storm name, state, or year, such as Andrew, Florida, or 2005.',
   'search.suggest': 'Did you mean…',

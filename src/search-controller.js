@@ -9,15 +9,24 @@ import { fuzzyAugment } from './fuzzy.js';
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
 import { clearSearchHighlights, highlightSearchMatches } from './search-highlight.js';
-import { getHistory } from './search-history.js';
+import { clearHistory, getHistory } from './search-history.js';
 import { buildSparkline } from './sparkline.js';
 
-export function initSearchController({ input, results, onSelect }) {
+export function initSearchController({ input, results, historyActions, onSelect }) {
   if (!input || !results || typeof onSelect !== 'function') return () => {};
   let activeIndex = -1;
 
+  // The control that clears the recents lives outside the listbox on purpose:
+  // a listbox owns options, and a button among them is neither an option a
+  // reader can choose nor a child the role allows.
+  const clearButton = historyActions?.querySelector('button') || null;
+  const showHistoryActions = (visible) => {
+    if (historyActions) historyActions.hidden = !visible;
+  };
+
   const setOpen = (open) => {
     results.hidden = !open;
+    if (!open) showHistoryActions(false);
     input.setAttribute('aria-expanded', String(open));
     if (!open) {
       clearSearchHighlights();
@@ -89,6 +98,7 @@ export function initSearchController({ input, results, onSelect }) {
     if (!history.length) return false;
     results.classList.remove('search-results--empty');
     results.innerHTML = `<li class="search-section-label" aria-hidden="true">${t('search.recent')}</li>${history.map(renderRow).join('')}`;
+    showHistoryActions(true);
     // Recents are not a match for anything the reader typed, so nothing is
     // highlighted; the previous query's ranges point at nodes that are gone.
     clearSearchHighlights();
@@ -99,6 +109,7 @@ export function initSearchController({ input, results, onSelect }) {
   };
 
   const showEmpty = (query) => {
+    showHistoryActions(false);
     results.classList.add('search-results--empty');
     results.innerHTML = `
       <li class="search-empty" role="status">
@@ -153,6 +164,7 @@ export function initSearchController({ input, results, onSelect }) {
     }
     results.classList.remove('search-results--empty');
     setOpen(true);
+    showHistoryActions(false);
     results.innerHTML = exact.map(renderRow).join('') +
       (fuzzy.length
         ? `<li class="search-section-label" aria-hidden="true">${t('search.suggest')}</li>${fuzzy.map(renderRow).join('')}`
@@ -162,8 +174,30 @@ export function initSearchController({ input, results, onSelect }) {
     backfillSparklines();
     wireResultClicks();
   });
+  clearButton?.addEventListener('mousedown', event => {
+    // Without this the input blurs first, and the pointer sequence races the
+    // 180 ms close below for the click that has not landed yet.
+    event.preventDefault();
+  });
+  clearButton?.addEventListener('click', () => {
+    clearHistory();
+    showHistoryActions(false);
+    // Said in the list rather than in the bar that just disappeared, so the
+    // confirmation is still on screen and still in the accessibility tree.
+    results.classList.add('search-results--empty');
+    results.innerHTML = `<li class="search-empty" role="status">${t('search.recentCleared')}</li>`;
+    clearSearchHighlights();
+    setOpen(true);
+    input.focus();
+  });
+
   input.addEventListener('blur', () => {
-    setTimeout(() => setOpen(false), 180);
+    setTimeout(() => {
+      // Tabbing to the clear button blurs the input. Closing then would take
+      // the button out from under the focus that had just reached it.
+      if (historyActions?.contains(document.activeElement)) return;
+      setOpen(false);
+    }, 180);
   });
 
   return () => setOpen(false);

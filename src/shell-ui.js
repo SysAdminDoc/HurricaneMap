@@ -31,6 +31,7 @@ export function wireApplicationShell({
   initSearchController({
     input: els.searchInput,
     results: els.searchResults,
+    historyActions: els.searchHistoryActions,
     onSelect: onLandfallClick,
   });
 
