@@ -39,6 +39,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'check:release-manifest',
   'check:stac',
   'check:manifests',
+  'check:baseline',
   'check:export-provenance',
   'check:popup-sinks',
   'check:aria-quicklinks',

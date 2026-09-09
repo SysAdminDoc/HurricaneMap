@@ -6,10 +6,15 @@ import { fileURLToPath } from 'node:url';
 
 import { chromium, firefox, webkit } from 'playwright';
 
+import { BASELINE_FEATURES, SYNCHRONOUS_DETECTIONS } from './baseline-contract.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mime = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
+  // scripts/baseline-contract.mjs is imported by the page so the detections
+  // have one definition. Without a script type the browser refuses the module.
+  ['.mjs', 'text/javascript; charset=utf-8'],
   ['.css', 'text/css; charset=utf-8'],
   ['.json', 'application/json; charset=utf-8'],
   ['.geojson', 'application/geo+json; charset=utf-8'],
@@ -320,6 +325,79 @@ async function runStandaloneCase(browser, baseUrl, label, { viewport, insets }) 
   }
 }
 
+// The Baseline contract, checked against the engine instead of a version
+// number. scripts/baseline-contract.mjs records what the app needs and when
+// each feature reached its Baseline tier, and check:baseline holds the README
+// to those dates. Whether the feature is actually present is a question only an
+// engine can answer, which is this.
+//
+// A feature with no fallback is a hard failure. A feature the app works around
+// is reported by name, the way an unsupported capability already is, so an
+// engine quietly taking the slow path forever is visible rather than invisible.
+//
+// The page imports the contract module over the test server rather than being
+// handed detection source to evaluate. The application document runs
+// script-src 'self' with no unsafe-eval, so a string of detections would have to
+// go through new Function and the page would refuse it, and writing the
+// detections out a second time inside the evaluate callback would mean two
+// definitions that can disagree.
+async function runBaselineContract(browser, baseUrl, label) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, serviceWorkers: 'block' });
+  try {
+    const page = await preparePage(context, baseUrl);
+    const support = await page.evaluate(async detections => {
+      const { detectionResult } = await import('/scripts/baseline-contract.mjs');
+      return Object.fromEntries(detections.map(({ id, detect }) => [id, Boolean(detectionResult(detect, window))]));
+    }, SYNCHRONOUS_DETECTIONS.map(({ id, detect }) => ({ id, detect })));
+
+    // Module workers cannot be answered by a property lookup, so this starts
+    // the app's own worker and waits for it to report back.
+    support['js-modules-workers'] = await page.evaluate(() => new Promise(resolve => {
+      let worker;
+      const done = value => {
+        try { worker?.terminate(); } catch { /* already gone */ }
+        resolve(value);
+      };
+      const timer = setTimeout(() => done(false), 30_000);
+      try {
+        worker = new Worker('src/storms-worker.js', { type: 'module' });
+      } catch {
+        clearTimeout(timer);
+        done(false);
+        return;
+      }
+      worker.addEventListener('message', event => {
+        clearTimeout(timer);
+        done(Boolean(event.data?.ok));
+      });
+      worker.addEventListener('error', () => {
+        clearTimeout(timer);
+        done(false);
+      });
+      worker.postMessage('load');
+    }));
+
+    const missing = [];
+    for (const feature of BASELINE_FEATURES) {
+      // Answered by runOfflineContract, which is the only run that registers a
+      // service worker at all: it reports the type the engine accepted, and
+      // having got through the offline suite on that type is the proof.
+      if (feature.probe === 'service-worker-type') continue;
+      if (support[feature.id]) continue;
+      const tier = feature.baseline === 'widely' ? feature.widelyAvailable : feature.newlyAvailable;
+      assert(
+        feature.requirement !== 'required',
+        `${label}: ${feature.name} is missing and the app has no path without it `
+        + `(Baseline ${feature.baseline} as of ${tier}; ${feature.used})`,
+      );
+      missing.push(feature.name);
+    }
+    return { missing };
+  } finally {
+    await context.close();
+  }
+}
+
 async function runOfflineContract(browser, baseUrl, label, setOffline) {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 860 },
@@ -357,7 +435,21 @@ async function runOfflineContract(browser, baseUrl, label, setOffline) {
       };
     });
     assert(offlineState.storms >= 500 && offlineState.katrina, `${label}: offline historical data contract failed`);
-    return { state: 'passed', storms: offlineState.storms };
+
+    // Which registration the engine took. Module service workers are Baseline
+    // newly available, so an engine without them is expected and fine, but it
+    // has to have come back through the classic retry rather than through no
+    // worker at all. Everything above already ran offline, so reaching here on
+    // the classic type is the fallback working end to end.
+    const workerType = await page.evaluate(async () => {
+      const updates = await import('/src/sw-updates.js');
+      return updates.getServiceWorkerDiagnostics().workerType || null;
+    });
+    assert(
+      workerType === 'module' || workerType === 'classic',
+      `${label}: the service worker is controlling the page but reported registration type ${JSON.stringify(workerType)}`,
+    );
+    return { state: 'passed', storms: offlineState.storms, workerType };
   } finally {
     setOffline(false);
     await context.close();
@@ -381,11 +473,17 @@ try {
     try {
       await runShellContract(browser, baseUrl, engine.name);
       await runStandaloneContract(browser, baseUrl, engine.name);
+      const baseline = await runBaselineContract(browser, baseUrl, engine.name);
       const offline = await runOfflineContract(browser, baseUrl, engine.name, setOffline);
       if (offline.state === 'unsupported') {
         console.log(`${engine.name}: shell/manifest/search/panel/standalone passed; offline cache unsupported (${offline.reason})`);
       } else {
-        console.log(`${engine.name}: shell/manifest/search/panel/standalone/offline passed (${offline.storms} storms)`);
+        console.log(`${engine.name}: shell/manifest/search/panel/standalone/offline passed (${offline.storms} storms, ${offline.workerType} service worker)`);
+      }
+      if (baseline.missing.length) {
+        console.log(`${engine.name}: baseline contract met with fallbacks for ${baseline.missing.join(', ')}`);
+      } else {
+        console.log(`${engine.name}: baseline contract met in full`);
       }
       results.push({ name: engine.name, state: 'passed', offline: offline.state });
     } finally {

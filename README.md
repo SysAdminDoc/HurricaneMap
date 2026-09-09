@@ -188,6 +188,23 @@ Cesium also runs under least privilege. Because its bundled Knockout needs `unsa
 
 Build and test dependencies use maintained npm release lines: esbuild 0.28.2 (MIT), Playwright and Playwright Test 1.63.0 (Apache-2.0), and axe-core Playwright 4.13.0 (MPL-2.0). `npm run check:security` runs the live `npm audit --json --audit-level=high` gate and falls back to the lockfile-bound, time-bounded snapshot in `security/npm-audit-snapshot.json` when the advisory service is unavailable; `npm run check:security:offline` exercises the deterministic snapshot path directly. Both commands also verify the reviewed Leaflet/Cesium versions, hashes, SRI values, licenses, and decision expiry. Before merging an update, run `npm outdated`, `npm run check:security`, and `npm test`; the latter includes a lockfile/vendor security and license audit, bundle budget, browser accessibility/layout checks including locale-aware ARIA snapshots, the deterministic desktop/mobile visual matrix for shell, storm, statistics, comparison, settings, advisory replay, playback, light, dark, and high-contrast states, the local Chromium/Firefox/WebKit contract matrix, offline service-worker check, and Cesium globe smoke. `npm run test:browser-matrix` reports each engine's shell/manifest/search/panel and offline-cache result separately, explicitly naming unsupported capabilities. The visual fixture aborts external requests, stubs the map renderer, masks live chrome, and uses a 0.1% maximum pixel-diff ratio. Checked-in lossless WebP baselines are intentionally Windows/Chromium-specific; `npm run test:visual` and `npm run test:visual:update` run on Windows and emit a clear successful skip on Linux/macOS to avoid false cross-platform pixel failures. `package.json` requires Node.js 22 or newer, which is the floor rather than the target: Node 24 is the Active LTS line and is what the gates are run on here. Playwright only needs Node 20, but that line reached end of life on 2026-04-30, so the floor tracks a supported release instead. Vendored library and font notices, versions, sources, and font hashes are recorded in [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt).
 
+## Browser support
+
+Support here is written as Baseline dates rather than browser versions. Chrome moved to a two-week release cadence on 2026-09-08, so a milestone number written into a README goes stale within the fortnight. A Baseline date never moves once it has been assigned.
+
+The floor is 2025-01-27. Two platform features have no fallback in this app, and that date is the later of the two:
+
+- Cascade layers, Baseline Widely available as of 2024-09-14. `src/styles.css` declares its layer order on the first line, so a browser that skips the at-rule drops the whole stylesheet.
+- Popover, Baseline Newly available as of 2025-01-27. The settings menu is a popover, and several modules test `:popover-open`, which throws as an unknown selector instead of returning false.
+
+Three more are used where they exist and worked around where they don't:
+
+- Compression streams, Baseline Widely available as of 2025-11-09. Track data comes from `data/storms.json.gz`, and without it the app fetches the uncompressed JSON.
+- JavaScript modules in workers, Baseline Widely available as of 2025-12-06. Track parsing moves off the main thread, and any worker error puts it back.
+- JavaScript modules in service workers, Baseline Newly available as of 2026-01-13. `sw.js` carries no imports and no `import.meta`, so it registers with the module type first and retries as a classic script. `npm run test:offline-smoke:classic` runs the whole offline suite with the module registration refused.
+
+`scripts/baseline-contract.mjs` is the one place those dates live. `npm run check:baseline` fails if this section drifts from it, if a feature with no fallback is claimed at a Baseline tier it has not reached, or if a browser version number turns up here. `npm run test:browser-matrix` then detects every one of these features in the Chromium, Firefox, and WebKit builds Playwright ships, and fails when an engine is missing one the app cannot work around.
+
 ## Data Export & Research
 
 **Export filtered data as publication-ready CSV:**

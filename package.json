@@ -40,6 +40,7 @@
     "check:release-manifest": "node scripts/check-release-manifest.mjs",
     "check:stac": "node scripts/check-stac.mjs",
     "check:manifests": "node scripts/check-manifests.mjs",
+    "check:baseline": "node scripts/check-baseline-contract.mjs",
     "check:export-provenance": "node scripts/check-export-provenance.mjs",
     "dist:core": "node scripts/build-distribution.mjs core",
     "dist:full": "node scripts/build-distribution.mjs full",
