@@ -1,5 +1,41 @@
 import { t } from './i18n.js';
-import { closeAllPanels } from './panels.js';
+import { closeAllPanels, openPanelId } from './panels.js';
+import { launcherActionFromHash, normalizeLauncherPanel } from './url-state.js';
+
+/** The launcher panel currently on screen as its URL token, '' when none is. */
+export function openLauncherPanelId() {
+  return normalizeLauncherPanel(openPanelId().replace(/-panel$/, ''));
+}
+
+/**
+ * Keep the URL's panel token in step with the panel on screen.
+ *
+ * Only when that token actually changed. Every re-render of the storm panel
+ * fires the same event, and rewriting the whole address from application state
+ * then can undo a hash the reader just pasted, in the window after the
+ * assignment and before the hashchange that would have applied it runs. When
+ * the panel the URL names is already the panel on screen there is nothing here
+ * to write, so the navigation is left alone.
+ */
+export function wireLauncherPanelUrl(writeHash) {
+  const inSync = () => openLauncherPanelId() === (launcherActionFromHash(location.hash) || '');
+  for (const type of ['hm-panel:shown', 'hm-panel:hidden']) {
+    document.addEventListener(type, () => { if (!inSync()) writeHash(); });
+  }
+}
+
+/**
+ * Open the launcher panel a link names, unless it is already on screen.
+ *
+ * The header controls are toggles, so clicking one for a panel that is already
+ * open closes it. That matters on a hashchange: moving between two links that
+ * both carry the statistics panel has to leave it open, not flip it shut.
+ */
+export function openLauncherPanel(action, delay = 120) {
+  const id = normalizeLauncherPanel(action);
+  if (!id || document.getElementById(`${id}-panel`)?.hidden === false) return;
+  setTimeout(() => document.getElementById(`toggle-${id}`)?.click(), delay);
+}
 
 export function wireShellNavigation({
   filtersButton,

@@ -18,6 +18,7 @@ import {
   normalizeAdvisoryReplayState,
   viewOptionsFromDecoded, currentDataRevision,
 } from './url-state.js';
+import { openLauncherPanel, openLauncherPanelId, wireLauncherPanelUrl } from './shell-navigation.js';
 import { initCitationUI, mountCitationHost } from './citation-ui.js';
 import { initGlobalErrorSurface } from './errors.js';
 import { initHeaderTooltips } from './tooltips.js';
@@ -130,6 +131,7 @@ function writeHash() {
   const newHash = encodeHashState(filters, {
     keepQualifiers: arrivedWithQualifiers,
     openStormId,
+    openPanel: openLauncherPanelId(),
     comparisonIds,
     advisoryReplay: advisoryReplayState,
     windUnit: getSetting('windUnit'),
@@ -346,6 +348,7 @@ async function boot() {
     host: document.getElementById('saved-views-manager'),
     getCurrentHash: () => encodeHashState(filters, {
       openStormId,
+      openPanel: openLauncherPanelId(),
       comparisonIds,
       advisoryReplay: advisoryReplayState,
       windUnit: getSetting('windUnit'),
@@ -420,7 +423,7 @@ async function boot() {
     setTimeout(() => openStateLazy(restored.s), 80);
   }
   // PWA launcher shortcuts use bare hash tokens (manifest.webmanifest).
-  openLauncherAction(startupLauncherAction);
+  openLauncherPanel(startupLauncherAction);
   // Live permalink navigation: pasting a new hash into this open tab (or
   // back/forward across hash entries) re-applies the shared view. Our own
   // hash writes use history.replaceState, which never fires hashchange, so
@@ -443,7 +446,7 @@ async function boot() {
     if (nav?.s && filters.state === nav.s) {
       setTimeout(() => openStateLazy(nav.s), 80);
     }
-    openLauncherAction(launcherAction, 60);
+    openLauncherPanel(launcherAction, 60);
   });
 
   // First-run tour is delayed until the map, filters, and timeline are stable.
@@ -477,6 +480,10 @@ document.addEventListener('comparison-pins:change', event => {
   writeHash();
 });
 
+// Opening or closing a panel is a change to the view, so the address bar
+// follows it the way it follows a filter.
+wireLauncherPanelUrl(writeHash);
+
 document.addEventListener('advisory-replay:change', event => {
   const detail = event.detail;
   advisoryReplayState = detail?.active && detail.stormId === openStormId
@@ -484,11 +491,6 @@ document.addEventListener('advisory-replay:change', event => {
     : null;
   writeHash();
 });
-
-function openLauncherAction(action, delay = 120) {
-  const buttonId = action === 'stats' ? 'toggle-stats' : action === 'compare' ? 'toggle-compare' : null;
-  if (buttonId) setTimeout(() => document.getElementById(buttonId)?.click(), delay);
-}
 
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
 // the header and re-renders dependent surfaces on change.

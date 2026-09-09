@@ -4497,6 +4497,161 @@ async function assertManagedPanelFocusContracts(browser, baseUrl) {
   }
 }
 
+// A filtered view of a panel used to be unshareable: only a hash that was
+// exactly "#stats" or "#compare" opened anything, and that form is mutually
+// exclusive with the versioned view the filters write. This drives the whole
+// round trip in a browser rather than trusting the encoder: open the panel with
+// a filter applied, reload the URL that produced, and close it again.
+async function assertPanelIsAddressable(browser, baseUrl) {
+  const PANELS = ['stats', 'compare', 'on-this-date', 'table-view', 'prep', 'evac'];
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    for (const panel of PANELS) {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      // A filter first, so the hash is already in its versioned form. This is
+      // the exact combination the bare-token form could not express. The filter
+      // panel starts collapsed, so it has to be opened before the checkbox is
+      // reachable.
+      await page.click('#toggle-filters');
+      await page.locator('#show-tracks').visible().waitFor({ timeout: 10_000 });
+      await page.check('#show-tracks');
+      await page.waitForFunction(() => location.hash.includes('t=1'), null, { timeout: 8000 });
+
+      await clickHeaderAction(page, `#toggle-${panel}`);
+      await page.waitForSelector(`#${panel}-panel:not([hidden])`, { timeout: 10_000 });
+      await page.waitForFunction(
+        id => location.hash.includes(`panel=${id}`),
+        panel,
+        { timeout: 8000 },
+      ).catch(() => {
+        throw new Error(`opening ${panel} did not reach the address bar`);
+      });
+      const shared = await page.evaluate(() => location.hash);
+      assert(
+        shared.includes('t=1') && shared.includes(`panel=${panel}`),
+        `${panel}: the shared URL dropped either the filter or the panel: ${shared}`,
+      );
+
+      // The cold load. This is the reader who was handed the link.
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.waitForSelector(`#${panel}-panel:not([hidden])`, { timeout: 10_000 }).catch(() => {
+        throw new Error(`${panel}: the shared URL ${shared} did not reopen the panel`);
+      });
+      const restored = await page.evaluate(() => ({
+        hash: location.hash,
+        tracks: document.getElementById('show-tracks')?.checked,
+      }));
+      assert(restored.tracks === true, `${panel}: the filter did not survive beside the panel`);
+      assert(
+        restored.hash.includes(`panel=${panel}`),
+        `${panel}: the restored view stopped advertising its panel: ${restored.hash}`,
+      );
+
+      // Closing it takes it back out, so the next link the reader copies is the
+      // view they are actually looking at.
+      // Driven from the keyboard: the panel's sticky heading overlays the close
+      // button, so a synthetic click lands on the heading instead.
+      await page.locator(`#close-${panel}`).focus();
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(id => !location.hash.includes(`panel=${id}`), panel, { timeout: 8000 })
+        .catch(async () => {
+          const hash = await page.evaluate(() => location.hash);
+          throw new Error(`${panel}: closing the panel left it in the address bar: ${hash}`);
+        });
+    }
+
+    // Moving between two links that both carry the same panel. The header
+    // controls are toggles, so re-clicking one for a panel already on screen
+    // would close it, which is the opposite of what the link asked for.
+    await page.goto(`${baseUrl}#v=1&t=1&panel=stats`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#stats-panel:not([hidden])', { timeout: 10_000 });
+    await page.evaluate(() => { location.hash = '#v=1&y=2005-2005&panel=stats'; });
+    await page.waitForFunction(
+      () => document.getElementById('year-min')?.value === '2005',
+      null,
+      { timeout: 8000 },
+    );
+    // Held open across a window long enough for a toggle to have closed it.
+    const stayedOpen = await page.evaluate(async () => {
+      const deadline = Date.now() + 800;
+      while (Date.now() < deadline) {
+        if (document.getElementById('stats-panel')?.hidden !== false) return false;
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      return document.getElementById('stats-panel')?.hidden === false;
+    });
+    assert(stayedOpen, 'navigating between two links carrying the same panel closed it');
+    // A versioned hash that names no panel does not close one that is already
+    // open, so the next check starts from a closed panel deliberately rather
+    // than passing on leftovers.
+    await page.locator('#close-stats').focus();
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => document.getElementById('stats-panel')?.hidden === true, null, { timeout: 8000 });
+
+    // A panel re-render must not rewrite the address from application state.
+    // The storm panel re-renders on its own schedule and fires the same event
+    // the launcher panels do; doing a full write then undid a hash the reader
+    // had just pasted, in the window before the hashchange that would have
+    // applied it ran, and the tab navigated back to the storm it was already
+    // showing. Dispatched synchronously right after the assignment, which is
+    // exactly that window.
+    await page.goto(`${baseUrl}#storm=AL122005`, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForSelector('#storm-panel:not([hidden])', { timeout: 15_000 });
+    const pasted = await page.evaluate(() => {
+      location.hash = '#storm=AL092022';
+      document.dispatchEvent(new CustomEvent('hm-panel:shown', { detail: { id: 'storm-panel' } }));
+      return location.hash;
+    });
+    assert(
+      pasted.includes('AL092022'),
+      `a panel re-render undid the hash the reader had just pasted: ${pasted}`,
+    );
+
+    // An id this build does not know falls back to no panel rather than
+    // throwing, and does not survive into the address bar.
+    const errors = [];
+    // The sandboxed globe iframe cannot reach navigator.serviceWorker and says
+    // so on every load. That is its own tracked noise, not something an
+    // unknown panel id caused.
+    const IGNORED = /Service worker is disabled because the context is sandboxed/;
+    page.on('pageerror', error => { if (!IGNORED.test(String(error))) errors.push(String(error)); });
+    await page.goto(`${baseUrl}#v=1&t=1&panel=nope`, { waitUntil: 'domcontentloaded' });
+    // Only the hash changed, so that was a same-document navigation. The link
+    // this is about arrives cold.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    const unknown = await page.evaluate(panels => ({
+      hash: location.hash,
+      open: panels.filter(id => document.getElementById(`${id}-panel`)?.hidden === false),
+    }), PANELS);
+    assert(errors.length === 0, `an unknown panel id threw: ${errors.join(' | ')}`);
+    assert(unknown.open.length === 0, `an unknown panel id opened something: ${JSON.stringify(unknown.open)}`);
+    assert(!unknown.hash.includes('panel='), `an unknown panel id was echoed back: ${unknown.hash}`);
+
+    // The PWA manifest's bare token still opens its panel.
+    for (const panel of ['stats', 'compare']) {
+      await page.goto(`${baseUrl}#${panel}`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.waitForSelector(`#${panel}-panel:not([hidden])`, { timeout: 10_000 }).catch(() => {
+        throw new Error(`the manifest shortcut #${panel} stopped opening its panel`);
+      });
+    }
+  } finally {
+    await context.close();
+  }
+}
+
 async function assertLocalizedWorkflowChrome(browser, baseUrl) {
   for (const locale of ['en', 'es', 'ht']) {
     const context = await browser.newContext({
@@ -6625,6 +6780,7 @@ try {
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 1440, height: 960, name: 'desktop' });
   await runVisualSnapshotMatrix(browser, baseUrl, { width: 390, height: 844, name: 'mobile' });
   await assertManagedPanelFocusContracts(browser, baseUrl);
+  await assertPanelIsAddressable(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);

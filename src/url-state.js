@@ -6,7 +6,14 @@ export const YEAR_FALLBACK_MAX = 2025;
 export const CATEGORY_DEFAULTS = Object.freeze(['ts', '1', '2', '3', '4', '5']);
 
 const VALID_CATEGORIES = new Set(CATEGORY_DEFAULTS);
-const LAUNCHER_ACTIONS = new Set(['stats', 'compare']);
+// Panels the header launcher opens directly, named by the token shared by
+// their button (`toggle-<id>`) and their element (`<id>-panel`). Spatial search
+// is deliberately absent: its button enters a map-picking mode and the results
+// panel only exists once a location has been picked, which a link cannot carry.
+export const LAUNCHER_PANELS = Object.freeze([
+  'stats', 'compare', 'on-this-date', 'table-view', 'prep', 'evac',
+]);
+const LAUNCHER_ACTIONS = new Set(LAUNCHER_PANELS);
 const VALID_UNITS = new Set(['kt', 'mph', 'kmh']);
 const VALID_DAMAGE_MODES = new Set(['nominal', 'real']);
 const VALID_TRACK_COLORS = new Set(['category', 'wind', 'pressure', 'month']);
@@ -17,9 +24,22 @@ const MAX_ADVISORY_REPLAY_INDEX = 999;
 const MAX_HASH_LENGTH = 2048;
 const DATA_RELEASE_PATTERN = /^[a-f0-9]{64}$/;
 
+export function normalizeLauncherPanel(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  return LAUNCHER_ACTIONS.has(raw) ? raw : '';
+}
+
+// Two forms reach this. The bare token (`#stats`) is what the PWA manifest
+// shortcuts use and what shipped first; it is the whole hash, so it cannot
+// coexist with any filter. The `panel=` key rides inside the versioned view, so
+// a filtered statistics view is shareable. An id this build does not know
+// yields no panel rather than throwing.
 export function launcherActionFromHash(hash) {
   const raw = String(hash || '').replace(/^#/, '').trim().toLowerCase();
-  return LAUNCHER_ACTIONS.has(raw) ? raw : null;
+  if (LAUNCHER_ACTIONS.has(raw)) return raw;
+  const decoded = decodeHashState(hash);
+  if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) return null;
+  return normalizeLauncherPanel(decoded.panel) || null;
 }
 
 function categoryHashDefault() {
@@ -40,6 +60,7 @@ export function createDefaultFilters({ yearMin = YEAR_FALLBACK_MIN, yearMax = YE
 
 export function encodeHashState(filters, {
   openStormId = '',
+  openPanel = '',
   comparisonIds = [],
   advisoryReplay = null,
   windUnit = 'kt',
@@ -62,6 +83,7 @@ export function encodeHashState(filters, {
     h: '0',
     r: '0',
     storm: '',
+    panel: '',
     p: '',
     u: 'kt',
     d: 'real',
@@ -76,6 +98,7 @@ export function encodeHashState(filters, {
     h: filters.showHeatmap ? '1' : '0',
     r: filters.retiredOnly ? '1' : '0',
     storm: openStormId || '',
+    panel: normalizeLauncherPanel(openPanel),
     p: normalizeComparisonIds(comparisonIds).join(','),
     u: VALID_UNITS.has(windUnit) ? windUnit : 'kt',
     d: VALID_DAMAGE_MODES.has(damageMode) ? damageMode : 'real',
@@ -164,12 +187,13 @@ export function viewOptionsFromDecoded(decoded) {
   if (!decoded || (decoded.v !== undefined && decoded.v !== URL_STATE_VERSION)) {
     return {
       comparisonIds: [], windUnit: null, damageMode: null,
-      trackColorBy: null, advisoryReplay: null, dataRevision: null,
+      trackColorBy: null, advisoryReplay: null, dataRevision: null, openPanel: '',
     };
   }
   const versioned = decoded.v === URL_STATE_VERSION;
   return {
     comparisonIds: normalizeComparisonIds(String(decoded.p || '').split(',')),
+    openPanel: normalizeLauncherPanel(decoded.panel),
     windUnit: VALID_UNITS.has(decoded.u) ? decoded.u : versioned ? 'kt' : null,
     damageMode: VALID_DAMAGE_MODES.has(decoded.d) ? decoded.d : versioned ? 'real' : null,
     trackColorBy: VALID_TRACK_COLORS.has(decoded.tc) ? decoded.tc : versioned ? 'category' : null,

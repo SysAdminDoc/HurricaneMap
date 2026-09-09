@@ -229,6 +229,20 @@ export function hidePanel(id) {
   }, () => focusPanelInvoker(focusTarget));
 }
 
+/**
+ * The id of the side panel currently on screen, or '' when none is.
+ *
+ * A minimized panel still counts: setPanelState treats it as closed so the map
+ * lanes reclaim the viewport, but the reader has not dismissed it, and a link
+ * that dropped it would not reproduce what they were looking at.
+ */
+export function openPanelId() {
+  return PANEL_IDS.find(id => {
+    const el = getPanel(id);
+    return Boolean(el) && !el.hidden;
+  }) || '';
+}
+
 export function closeAllPanels() {
   focusPanelInvoker(closePanelsExcept(null));
 }

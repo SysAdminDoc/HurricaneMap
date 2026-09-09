@@ -7,15 +7,66 @@ import {
   decodeHashState,
   encodeAdvisoryReplayState,
   encodeHashState,
+  LAUNCHER_PANELS,
   launcherActionFromHash,
   normalizeAdvisoryReplayState,
+  normalizeLauncherPanel,
   restoreFiltersFromHash,
   viewOptionsFromDecoded,
 } from '../src/url-state.js';
 
+// The bare token is the PWA manifest's form and the only one that shipped
+// first. It is the whole hash, so it cannot coexist with a filter.
 assert.equal(launcherActionFromHash('#stats'), 'stats');
 assert.equal(launcherActionFromHash('compare'), 'compare');
 assert.equal(launcherActionFromHash('#storm=AL122005'), null);
+
+// Every panel the header launcher opens round-trips, in both forms, beside a
+// filtered view. Driven off the exported list rather than a copy of it, so a
+// panel added to the launcher without a hash token fails here.
+assert.deepEqual(
+  [...LAUNCHER_PANELS].sort(),
+  ['compare', 'evac', 'on-this-date', 'prep', 'stats', 'table-view'],
+  'the addressable launcher panels changed; the manifest shortcuts and openLauncherPanel follow this list',
+);
+for (const panel of LAUNCHER_PANELS) {
+  assert.equal(launcherActionFromHash(`#${panel}`), panel, `bare #${panel} must open ${panel}`);
+
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  filters.state = 'FL';
+  const hash = encodeHashState(filters, {
+    openPanel: panel,
+    yearMinDefault: 1851,
+    yearMaxDefault: 2025,
+    knownStates: null,
+  });
+  assert.equal(hash, `#v=1&s=FL&panel=${panel}`, `${panel} must ride beside the filters`);
+  assert.equal(launcherActionFromHash(hash), panel, `${panel} must survive the round trip`);
+  assert.equal(viewOptionsFromDecoded(decodeHashState(hash)).openPanel, panel);
+}
+
+// A panel id this build does not know yields no panel rather than throwing, on
+// both the bare and the keyed form. `constructor` and `__proto__` are here
+// because a Set lookup is the difference between a rejection and a match on
+// Object.prototype.
+for (const unknown of ['nope', 'spatial-search', 'storm', 'constructor', '__proto__', '']) {
+  assert.equal(launcherActionFromHash(`#${unknown}`), null, `bare #${unknown} must open nothing`);
+  assert.equal(launcherActionFromHash(`#v=1&panel=${unknown}`), null, `panel=${unknown} must open nothing`);
+  assert.equal(normalizeLauncherPanel(unknown), '');
+}
+assert.equal(launcherActionFromHash(undefined), null);
+assert.equal(launcherActionFromHash('#v=2&panel=stats'), null, 'a future view version must not open a v1 panel');
+
+// An unknown id must not be written back out either: a saved view captured from
+// a build that knows a panel this one does not would otherwise be re-emitted.
+{
+  const filters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+  assert.equal(
+    encodeHashState(filters, { openPanel: 'nope', yearMinDefault: 1851, yearMaxDefault: 2025 }),
+    '',
+    'an unknown panel id must not shape a URL',
+  );
+}
 
 function cats(filters) {
   return [...filters.categories].sort();
@@ -201,6 +252,7 @@ console.log('url state ok');
   assert.equal(hash, '#v=1&p=AL122005%2CEP012024&u=mph&d=nominal');
   assert.deepEqual(viewOptionsFromDecoded(decodeHashState(hash)), {
     comparisonIds: ['AL122005', 'EP012024'],
+    openPanel: '',
     windUnit: 'mph',
     damageMode: 'nominal',
     trackColorBy: 'category',
@@ -209,6 +261,7 @@ console.log('url state ok');
   });
   assert.deepEqual(viewOptionsFromDecoded(decodeHashState('#v=1')), {
     comparisonIds: [],
+    openPanel: '',
     windUnit: 'kt',
     damageMode: 'real',
     trackColorBy: 'category',
