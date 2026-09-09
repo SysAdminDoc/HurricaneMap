@@ -11,7 +11,7 @@ function slug(name) {
 }
 
 /** Serialize an SVGElement into a standalone string with proper xmlns. */
-export function serializeSvg(svgEl) {
+function serializeSvg(svgEl) {
   const clone = svgEl.cloneNode(true);
   if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   if (!clone.getAttribute('xmlns:xlink')) clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');

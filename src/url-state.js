@@ -16,14 +16,12 @@ const MAX_ADVISORY_REPLAY_INDEX = 999;
 const MAX_HASH_LENGTH = 2048;
 const DATA_RELEASE_PATTERN = /^[a-f0-9]{64}$/;
 
-export { ADVISORY_REPLAY_STATE_VERSION };
-
 export function launcherActionFromHash(hash) {
   const raw = String(hash || '').replace(/^#/, '').trim().toLowerCase();
   return LAUNCHER_ACTIONS.has(raw) ? raw : null;
 }
 
-export function categoryHashDefault() {
+function categoryHashDefault() {
   return [...CATEGORY_DEFAULTS].sort().join(',');
 }
 
@@ -174,7 +172,7 @@ export function viewOptionsFromDecoded(decoded) {
   };
 }
 
-export function normalizeDataRevision(value) {
+function normalizeDataRevision(value) {
   const normalized = String(value || '').trim().toLowerCase();
   return DATA_RELEASE_PATTERN.test(normalized) ? normalized : '';
 }

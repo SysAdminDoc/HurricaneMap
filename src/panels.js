@@ -152,7 +152,7 @@ export function restorePanel(id) {
 }
 
 /** Close every managed side panel except the named one. Pass null to close all. */
-export function closePanelsExcept(keepId = null) {
+function closePanelsExcept(keepId = null) {
   let focusTarget = null;
   for (const id of PANEL_IDS) {
     if (id === keepId) continue;
@@ -233,7 +233,7 @@ export function closeAllPanels() {
   focusPanelInvoker(closePanelsExcept(null));
 }
 
-export function syncPanelControls() {
+function syncPanelControls() {
   for (const [panelId, buttonId] of Object.entries(PANEL_BUTTONS)) {
     const panel = getPanel(panelId);
     const button = document.getElementById(buttonId);

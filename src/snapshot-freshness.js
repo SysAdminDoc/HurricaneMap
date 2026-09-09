@@ -16,14 +16,14 @@ export function utcDateOnly(value = new Date()) {
   return new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate()));
 }
 
-export function daysSinceSnapshot(issued, now = new Date()) {
+function daysSinceSnapshot(issued, now = new Date()) {
   const issuedDate = parseSnapshotDate(issued);
   const nowDate = utcDateOnly(now);
   if (!issuedDate || !nowDate) return null;
   return Math.floor((nowDate.getTime() - issuedDate.getTime()) / DAY_MS);
 }
 
-export function isSnapshotExpired(validUntil, now = new Date()) {
+function isSnapshotExpired(validUntil, now = new Date()) {
   const expiryDate = parseSnapshotDate(validUntil);
   const nowDate = utcDateOnly(now);
   return Boolean(expiryDate && nowDate && nowDate > expiryDate);

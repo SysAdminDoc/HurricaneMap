@@ -19,7 +19,7 @@ const RETIRED_LOOKUP = Object.freeze({
   IDALIA:[2023],LEE:[2023],BERYL:[2024],HELENE:[2024],MILTON:[2024],
 });
 
-export function isRetired(name, year) {
+function isRetired(name, year) {
   const years = RETIRED_LOOKUP[(name || '').toUpperCase()];
   return Array.isArray(years) && years.includes(year);
 }

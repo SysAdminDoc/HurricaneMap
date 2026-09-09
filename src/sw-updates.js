@@ -235,7 +235,7 @@ async function resolveActiveWorker(serviceWorker, timeoutMs) {
   return worker;
 }
 
-export function canRegisterServiceWorker({
+function canRegisterServiceWorker({
   navigatorRef = globalThis.navigator,
   locationRef = globalThis.location,
 } = {}) {

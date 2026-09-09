@@ -10,9 +10,9 @@ import { completeOptionalFeed, failOptionalFeed } from './optional-feeds.js';
 
 const GOES_PANE_NAME = 'hm-goes-realtime';
 const GOES_DEFAULT_SIZE = '900x540';
-export const GOES_REFRESH_MS = 10 * 60 * 1000;
+const GOES_REFRESH_MS = 10 * 60 * 1000;
 
-export const GOES_SECTORS = Object.freeze({
+const GOES_SECTORS = Object.freeze({
   taw: {
     id: 'taw',
     satellite: 'GOES19',

@@ -99,7 +99,7 @@ export function remapRadarPixels(pixels, { colorblind = true } = {}) {
   return output;
 }
 
-export function remapRadarImageData(context) {
+function remapRadarImageData(context) {
   const { width, height } = context.canvas;
   const imageData = context.getImageData(0, 0, width, height);
   imageData.data.set(remapRadarPixels(imageData.data));
@@ -115,7 +115,7 @@ function rememberColorizedImage(url, promise) {
 }
 
 /** Colorize a same-origin archived frame, falling back to the source URL. */
-export function colorizeRadarImage(url) {
+function colorizeRadarImage(url) {
   if (typeof document === 'undefined' || typeof Image === 'undefined' || !url || url.startsWith('data:')) {
     return Promise.resolve(url);
   }

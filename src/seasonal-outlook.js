@@ -39,7 +39,7 @@ const SKILL_DATA = {
   },
 };
 
-export function getSeasonalSkillMetrics() {
+function getSeasonalSkillMetrics() {
   return SKILL_DATA;
 }
 

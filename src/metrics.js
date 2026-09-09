@@ -26,7 +26,7 @@ const RI_THRESHOLD_KT = 30;      // standard NHC RI definition
 const RI_WINDOW_HOURS = 24;
 const TS_THRESHOLD_KT = 34;      // ACE only counts obs ≥ TS-force
 export const STORM_SIMILARITY_VECTOR_LENGTH = 8;
-export const DEFAULT_STORM_VECTOR_STATS = {
+const DEFAULT_STORM_VECTOR_STATS = {
   wind_max: 185, wind_min: 35,
   landfalls_max: 7, landfalls_min: 0,
   track_km_max: 20000, track_km_min: 500,
@@ -136,7 +136,7 @@ export const COASTAL_CITIES = [
 ];
 
 /** Great-circle distance in km between two lat/lon points (haversine). */
-export function haversineKm(lat1, lon1, lat2, lon2) {
+function haversineKm(lat1, lon1, lat2, lon2) {
   return geodesicDistanceKm(lat1, lon1, lat2, lon2);
 }
 
@@ -867,7 +867,7 @@ function computeTrendSlope(points) {
 /** Compute first-24h wind gain (proxy for rate of development).
  *  Returns the wind increase within the first 24 hours of track,
  *  or 0 if track is too short. */
-export function computeFirst24hWindGain(track) {
+function computeFirst24hWindGain(track) {
   if (!Array.isArray(track) || track.length < 2) return 0;
   if (track[0].wind == null) return 0;
   

@@ -9,9 +9,9 @@ import { categoryColor, categoryLabel, formatTime, windToCategory } from './data
 import { formatStormName } from './html-utils.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
-export const VIDEO_FPS_OPTIONS = Object.freeze([24, 30, 60]);
-export const VIDEO_DURATION_OPTIONS = Object.freeze([5, 10, 15, 30]);
-export const VIDEO_DIMENSIONS = Object.freeze({ width: 1280, height: 720 });
+const VIDEO_FPS_OPTIONS = Object.freeze([24, 30, 60]);
+const VIDEO_DURATION_OPTIONS = Object.freeze([5, 10, 15, 30]);
+const VIDEO_DIMENSIONS = Object.freeze({ width: 1280, height: 720 });
 
 const VIDEO_MIME_TYPES = Object.freeze([
   'video/webm;codecs=vp9',
@@ -84,7 +84,7 @@ export function sampleTrack(track, progress) {
   };
 }
 
-export function drawVideoFrame(context, storm, progress, {
+function drawVideoFrame(context, storm, progress, {
   width = VIDEO_DIMENSIONS.width,
   height = VIDEO_DIMENSIONS.height,
 } = {}) {

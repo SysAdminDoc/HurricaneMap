@@ -357,7 +357,7 @@ function distanceFromUser([stormLat, stormLon]) {
   }
 }
 
-export function activeStormDisplayName(storm) {
+function activeStormDisplayName(storm) {
   const name = String(storm?.name || '').trim();
   if (name && name.toUpperCase() !== 'UNNAMED') return name;
   const number = String(storm?.binNumber || storm?.id || '').match(/\d{1,2}/)?.[0] || '';

@@ -2,10 +2,10 @@
 // products use geographic coordinates; a single mean-radius model keeps map,
 // tide, track, cone, and contour distances numerically consistent.
 
-export const EARTH_RADIUS_KM = 6371.0088;
+const EARTH_RADIUS_KM = 6371.0088;
 export const KM_PER_NAUTICAL_MILE = 1.852;
 
-export function toRadians(value) {
+function toRadians(value) {
   return Number(value) * Math.PI / 180;
 }
 
@@ -13,7 +13,7 @@ export function toDegrees(value) {
   return Number(value) * 180 / Math.PI;
 }
 
-export function normalizeLongitude(value) {
+function normalizeLongitude(value) {
   return ((Number(value) + 540) % 360) - 180;
 }
 
@@ -72,7 +72,7 @@ export function initialBearingDeg(lat1, lon1, lat2, lon2) {
   return (toDegrees(Math.atan2(y, x)) + 360) % 360;
 }
 
-export function destinationPointKm(lat, lon, bearing, distanceKm) {
+function destinationPointKm(lat, lon, bearing, distanceKm) {
   const angular = Number(distanceKm) / EARTH_RADIUS_KM;
   const phi1 = toRadians(lat);
   const lambda1 = toRadians(lon);

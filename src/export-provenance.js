@@ -4,12 +4,12 @@
 // the full 1,700+ artifact manifest at runtime.
 
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
-export const APP_VERSION = '1.9.3';
+const APP_VERSION = '1.9.3';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
-  manifest_sha256: 'b3f45ad3f987f9212f63be7c808d22833f8e2bd2a10970db380223fd5458bf0e',
+  manifest_sha256: 'f5129e3c0c5a2eea0c7949f2f5f592e097c70eb4a232a2921a2be5aab4a1f53d',
   algorithm: 'SHA-256',
 });
 

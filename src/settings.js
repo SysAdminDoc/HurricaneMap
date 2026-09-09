@@ -134,7 +134,7 @@ function prefersLightTheme() {
     window.matchMedia('(prefers-color-scheme: light)').matches;
 }
 
-export function getEffectiveTheme() {
+function getEffectiveTheme() {
   const theme = getSetting('theme');
   if (theme === 'system') return prefersLightTheme() ? 'light' : 'dark';
   return theme === 'light' ? 'light' : 'dark';
@@ -210,7 +210,7 @@ export function formatWind(kt, opts = {}) {
 // under deuteranopia/protanopia/tritanopia, AND ordered by intensity so the
 // color story still reads correctly without distinguishing red from green.
 
-export const PALETTES = {
+const PALETTES = {
   default: {
     '-1': '#74c7ec', 0: '#74c7ec',
     1: '#a6e3a1', 2: '#f9e2af', 3: '#fab387',

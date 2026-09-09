@@ -133,4 +133,3 @@ function isBlockingSurfaceOpen() {
   );
 }
 
-export { openPalette, closePalette };

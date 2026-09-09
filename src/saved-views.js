@@ -1,6 +1,6 @@
 import { SAVED_VIEWS_SCHEMA_VERSION, createVersionedRecord } from './schema-contract.js';
 
-export const SAVED_VIEWS_STORAGE_KEY = 'hm-saved-views-v1';
+const SAVED_VIEWS_STORAGE_KEY = 'hm-saved-views-v1';
 const MAX_VIEWS = 20;
 const MAX_NAME = 60;
 const MAX_HASH = 2048;

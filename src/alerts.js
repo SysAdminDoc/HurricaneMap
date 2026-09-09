@@ -114,7 +114,7 @@ export function classifyAlerts(features) {
   return { zoneFlags, directGeometries };
 }
 
-export function hazardLabel(hazard) {
+function hazardLabel(hazard) {
   return t(`alerts.${hazard}`);
 }
 

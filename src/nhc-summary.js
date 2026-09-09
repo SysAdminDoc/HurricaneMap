@@ -18,7 +18,7 @@
 
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
-export const SUMMARY_SERVICE_ROOT =
+const SUMMARY_SERVICE_ROOT =
   'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather_summary/MapServer';
 
 export const SUMMARY_LAYERS = Object.freeze({
@@ -32,12 +32,12 @@ export const SUMMARY_LAYERS = Object.freeze({
 // Recorded 2026-09-07 against the live service. A rename upstream would turn
 // every storm into a nameless blank at an unknown position rather than raise
 // anything, so the parsers refuse a payload that has lost one of these.
-export const SUMMARY_FORECAST_FIELDS = Object.freeze([
+const SUMMARY_FORECAST_FIELDS = Object.freeze([
   'stormname', 'stormtype', 'basin', 'stormnum', 'binnumber',
   'advisnum', 'advdate', 'maxwind', 'mslp', 'lat', 'lon', 'validtime', 'tau',
 ]);
 
-export const SUMMARY_OUTLOOK_FIELDS = Object.freeze([
+const SUMMARY_OUTLOOK_FIELDS = Object.freeze([
   'basin', 'prob2day', 'risk2day', 'prob7day', 'risk7day',
 ]);
 
@@ -119,7 +119,7 @@ function featurePosition(feature) {
 // The service publishes "Hurricane Lowell" and "Potential Tropical Cyclone
 // Four" where CurrentStorms.json publishes "Lowell" and "Four": the storm's
 // own name is the last word, and the words before it repeat stormtype.
-export function summaryStormName(value) {
+function summaryStormName(value) {
   const parts = String(value || '').trim().split(/\s+/).filter(Boolean);
   return parts.length ? parts[parts.length - 1] : '';
 }

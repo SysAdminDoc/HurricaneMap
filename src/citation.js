@@ -1,7 +1,7 @@
 // Reproducible release citations shared by panels, exports, and the notebook.
 import { getDataReleaseCitationMetadata } from './export-provenance.js';
 
-export const CITATION_SCHEMA_VERSION = 1;
+const CITATION_SCHEMA_VERSION = 1;
 export const HURRICANEMAP_URL = 'https://sysadmindoc.github.io/HurricaneMap/';
 
 function normalizeAccessDate(value) {

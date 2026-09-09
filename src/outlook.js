@@ -37,7 +37,7 @@ let legendEl = null;
 let renderGeneration = 0;
 let statusEl = null;
 
-export function decodeXml(value) {
+function decodeXml(value) {
   return String(value || '')
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))

@@ -6,10 +6,10 @@ import {
 } from './optional-feeds.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 
-export const FEMA_API_URL = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
+const FEMA_API_URL = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
 export const FEMA_SOURCE_URL = FEMA_API_URL;
 export const FEMA_QUERY_LIMIT = 5_000;
-export const FEMA_DATE_PADDING_MS = 7 * 24 * 60 * 60 * 1_000;
+const FEMA_DATE_PADDING_MS = 7 * 24 * 60 * 60 * 1_000;
 
 const FEMA_FIELDS = Object.freeze([
   'femaDeclarationString',

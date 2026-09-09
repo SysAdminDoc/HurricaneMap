@@ -7,7 +7,7 @@ import { t } from './i18n.js';
 import { cancelWindContext, renderWindContextForPoint } from './wind-context.js';
 import { clearUserPoint, loadUserPoint, saveUserPoint } from './user-point.js';
 
-export function getSavedUserPoint() {
+function getSavedUserPoint() {
   return loadUserPoint();
 }
 
@@ -51,7 +51,7 @@ export function toggleSpatialMode() {
 
 export function isSpatialActive() { return active; }
 
-export function clearSearch() {
+function clearSearch() {
   searchGeneration++;
   windContextController?.abort();
   windContextController = null;

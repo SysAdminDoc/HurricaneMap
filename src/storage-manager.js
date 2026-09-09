@@ -6,7 +6,7 @@ import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
 import { getServiceWorkerDiagnostics } from './sw-updates.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 
-export const STORAGE_SCOPES = Object.freeze([
+const STORAGE_SCOPES = Object.freeze([
   { id: 'shell', prefix: 'hm-shell-', required: true },
   { id: 'data', prefix: 'hm-data-', required: true },
   { id: 'tiles', cacheName: 'hm-tiles-v2', required: false },
@@ -18,7 +18,7 @@ export const STORAGE_SCOPES = Object.freeze([
   { id: 'source', prefix: 'hm-source-', required: false },
 ]);
 export const MAX_RADAR_PACK_FRAMES = 120;
-export const MAX_SOURCE_BUNDLE_BYTES = 13 * 1024 * 1024;
+const MAX_SOURCE_BUNDLE_BYTES = 13 * 1024 * 1024;
 export const SOURCE_BUNDLE_ASSETS = Object.freeze([
   './data/hurdat2-atlantic.txt',
   './data/hurdat2-nepac.txt',
@@ -63,7 +63,7 @@ export function summarizeStorageEstimate(estimate = {}) {
  * A refusal is never fatal — the save still proceeds, and the storage panel
  * says the data may be evicted.
  */
-export const PERSISTENCE_PROMPT_TIMEOUT_MS = 15_000;
+const PERSISTENCE_PROMPT_TIMEOUT_MS = 15_000;
 
 export async function requestStoragePersistence(storageApi = globalThis.navigator?.storage, {
   timeoutMs = PERSISTENCE_PROMPT_TIMEOUT_MS,
@@ -375,7 +375,7 @@ export function selectCacheName(cacheNames, definition, active = {}) {
   return [...candidates].sort(compareCacheNames).at(-1) || null;
 }
 
-export async function inspectReleaseTuple({
+async function inspectReleaseTuple({
   cachesApi = globalThis.caches,
   dataCacheName = null,
   shellCacheName = null,

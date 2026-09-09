@@ -41,7 +41,7 @@ export function formatClosest(approach) {
     + km.toLocaleString(getDateLocale()) + ' km) · ' + wind + ' · ' + date + '</span>';
 }
 
-export function formatReturnPeriods(returnPeriods) {
+function formatReturnPeriods(returnPeriods) {
   if (!returnPeriods) return '';
   const items = [];
   if (returnPeriods.cat5_years) items.push('Cat 5: ~' + returnPeriods.cat5_years + 'y');

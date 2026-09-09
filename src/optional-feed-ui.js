@@ -28,7 +28,7 @@ function stateText(feed) {
   return feed.detail ? `${base} · ${t(`feeds.state.${feed.detail}`)}` : base;
 }
 
-export function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}) {
+function renderOptionalFeedStatus(host, feedId, { now = Date.now() } = {}) {
   if (!host) return '';
   const feed = getOptionalFeedState(feedId);
   const definition = getOptionalFeedDefinition(feedId);

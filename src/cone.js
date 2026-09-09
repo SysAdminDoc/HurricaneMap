@@ -17,7 +17,7 @@ export const NHC_FORECAST_LAYER_IDS = {
   cone: 4,
 };
 
-export const NHC_FORECAST_POLL_MS = 6 * 60 * 60 * 1000;
+const NHC_FORECAST_POLL_MS = 6 * 60 * 60 * 1000;
 
 const OUT_FIELDS = [
   'STORMNAME',

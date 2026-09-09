@@ -14,7 +14,7 @@ import {
   getComparisonRows,
 } from './compare-rows.js';
 
-export { buildComparisonCSVText, getComparisonRows } from './compare-rows.js';
+export { buildComparisonCSVText } from './compare-rows.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -49,12 +49,12 @@ function resolveSlotColor(slot, token, fallback) {
 }
 
 // The chip, card and column colour.
-export function pinSlotColor(slot) {
+function pinSlotColor(slot) {
   return resolveSlotColor(slot, 'token', 'fallback');
 }
 
 // The map colour for the same slot. Same hue, deep enough for the basemap.
-export function pinSlotTrackColor(slot) {
+function pinSlotTrackColor(slot) {
   return resolveSlotColor(slot, 'trackToken', 'trackFallback');
 }
 
@@ -140,7 +140,7 @@ export async function togglePin(storm) {
   return true;
 }
 
-export function removePin(stormId) {
+function removePin(stormId) {
   const idx = pinned.findIndex(p => p.id === stormId);
   if (idx < 0) return;
   const pin = pinned[idx];
@@ -157,7 +157,7 @@ function notifyPinsChanged() {
   }));
 }
 
-export function clearAll() {
+function clearAll() {
   while (pinned.length) removePin(pinned[0].id);
   hidePanel('compare-panel');
 }
