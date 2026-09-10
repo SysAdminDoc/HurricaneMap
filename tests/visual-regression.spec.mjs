@@ -185,6 +185,33 @@ async function openVisualCompare(page) {
   await page.waitForSelector('#compare-panel:not([hidden]) .cp-card', { timeout: 15_000 });
 }
 
+/**
+ * The map half of the comparison. One map, two clipped panes: a baseline is
+ * the only thing that can tell a divider that landed in the right place from
+ * one that clipped the whole map away, because both are "no error".
+ */
+async function setVisualCompareMode(page, mode, position = 40) {
+  await page.check(`input[name="cp-map-mode"][value="${mode}"]`);
+  await page.waitForSelector(`input[name="cp-map-mode"][value="${mode}"]:checked`, { timeout: 5_000 });
+  // The slider is disabled while neither pane is clipped, which is the point:
+  // a divider with nothing to divide should not be draggable.
+  if (mode !== 'off') {
+    await page.fill('#cp-divider', String(position));
+    await page.dispatchEvent('#cp-divider', 'input');
+  }
+  await page.waitForFunction(expected => {
+    const pane = [...document.querySelectorAll('.leaflet-pane')].find(node => node.className.includes('hm-compare-a'));
+    if (!pane) return false;
+    if (expected === 'off') return pane.style.clipPath === '' && pane.style.opacity === '';
+    return expected === 'fade'
+      ? pane.style.opacity !== '' && pane.style.clipPath === ''
+      : pane.style.clipPath.includes('polygon');
+  }, mode, { timeout: 5_000 });
+  // The tracks are drawn into the panes, so the clip has to have been applied
+  // before the shot rather than during it.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+
 async function openVisualSettings(page) {
   await closeVisualPanels(page);
   await page.evaluate(() => document.querySelector('#settings-menu')?.showPopover());
@@ -306,6 +333,14 @@ test('critical desktop workflows remain pixel-stable across theme and panel stat
   await openVisualCompare(page);
   await expectMatrixScreenshot(page, 'matrix-desktop-compare.webp');
 
+  await setVisualCompareMode(page, 'swipe', 40);
+  await expectMatrixScreenshot(page, 'matrix-desktop-compare-split.webp');
+
+  await setVisualCompareMode(page, 'fade', 65);
+  await expectMatrixScreenshot(page, 'matrix-desktop-compare-crossfade.webp');
+
+  await setVisualCompareMode(page, 'off');
+
   await openVisualSettings(page);
   await expectMatrixScreenshot(page, 'matrix-desktop-settings.webp');
 
@@ -338,6 +373,15 @@ test.describe('critical mobile workflows', () => {
 
     await openVisualSettings(page);
     await expectMatrixScreenshot(page, 'matrix-mobile-settings.webp');
+
+    // Below the shell's breakpoint the comparison splits top and bottom rather
+    // than left and right: the same control over a map that is taller than it
+    // is wide. The baseline is what tells a stacked split from a vertical one
+    // that happens to have clipped nothing.
+    await openVisualCompare(page);
+    await setVisualCompareMode(page, 'swipe', 45);
+    await expectMatrixScreenshot(page, 'matrix-mobile-compare-stacked.webp');
+    await setVisualCompareMode(page, 'off');
   });
 
   // iOS 26 opens any Home Screen site as a web app, so this layout is reached

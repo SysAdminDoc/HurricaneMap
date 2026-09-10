@@ -4764,87 +4764,6 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
   await assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl);
 }
 
-// The sea-surface layer is a lazily imported chunk, and the import is memoised
-// including its rejection, so one failed fetch poisons it for the session.
-// Awaiting it in the middle of the reset destroyed nine pieces of state and
-// then threw before the undo control was ever shown: the snapshot existed and
-// nothing could reach it.
-async function assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl) {
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 960 },
-    serviceWorkers: 'block',
-    reducedMotion: 'reduce',
-  });
-  await seedSettings(context, { onboarded: true, locale: 'en' });
-  await stubQuietTropics(context);
-  const page = await context.newPage();
-  await page.route('**/src/sst.js', route => route.abort('failed'));
-  try {
-    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
-    await waitForAppReady(page);
-    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
-      await page.click('#toggle-filters');
-    }
-    await page.locator('#show-sst').visible().waitFor({ timeout: 10_000 });
-
-    // A layer the reader asks for and cannot have must not leave its control
-    // ticked: the box would claim a layer that will never arrive.
-    await page.check('#show-sst');
-    await page.waitForFunction(
-      () => document.getElementById('show-sst')?.checked === false,
-      null,
-      { timeout: 15_000 },
-    ).catch(() => {
-      throw new Error('a sea-surface layer that cannot load left its checkbox ticked');
-    });
-
-    await page.check('#show-retired-only');
-    await page.waitForFunction(
-      () => document.getElementById('reset-filters')?.disabled === false,
-      null,
-      { timeout: 10_000 },
-    );
-    await page.click('#reset-filters');
-    await page.waitForFunction(
-      () => document.getElementById('undo-reset-filters')?.hidden === false,
-      null,
-      { timeout: 10_000 },
-    ).catch(() => {
-      throw new Error('a reset with an unreachable layer chunk offered no way back');
-    });
-    await page.click('#undo-reset-filters');
-    await page.waitForFunction(
-      () => document.getElementById('show-retired-only')?.checked === true
-        && document.getElementById('undo-reset-filters')?.hidden === true,
-      null,
-      { timeout: 10_000 },
-    ).catch(() => {
-      throw new Error('an undo with an unreachable layer chunk did not finish');
-    });
-    // And the map followed. A half-applied undo left the checkbox saying
-    // "retired only" over a map still showing everything.
-    const counted = await page.textContent('#visible-count');
-    assert(
-      /\b(\d[\d,]*) of /.test(counted || ''),
-      `undo restored the controls but not the map: ${JSON.stringify(counted)}`,
-    );
-  } finally {
-    await page.unroute('**/src/sst.js');
-    await context.close();
-  }
-}
-
-async function expect_hidden(page, selector, message) {
-  // Present AND hidden. `?.hidden !== false` on a missing element is true, so
-  // the old form passed for a control that had been renamed out of existence.
-  const state = await page.evaluate(target => {
-    const element = document.querySelector(target);
-    return { present: Boolean(element), hidden: element?.hidden === true };
-  }, selector);
-  assert(state.present, `${message} (${selector} is not on the page at all)`);
-  assert(state.hidden, message);
-}
-
 async function assertPanelIsAddressable(browser, baseUrl) {
   const PANELS = ['stats', 'compare', 'on-this-date', 'table-view', 'prep', 'evac'];
   const context = await browser.newContext({
@@ -7191,6 +7110,7 @@ try {
   await assertManagedPanelFocusContracts(browser, baseUrl);
   await assertPanelIsAddressable(browser, baseUrl);
   await assertFilterResetIsRecoverable(browser, baseUrl);
+  await assertDualPaneComparison(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);

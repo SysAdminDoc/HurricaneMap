@@ -534,6 +534,16 @@ export default {
 
   // Comparison panel
   'compare.title': 'Compare Storms',
+  'compare.map.title': 'Compare on the map',
+  'compare.map.hint': 'Split the map between the first two pinned storms, or fade one into the other. Both halves are the same map, so they cannot drift apart.',
+  'compare.map.hintStacked': 'Split the map top and bottom between the first two pinned storms, or fade one into the other. Both halves are the same map, so they cannot drift apart.',
+  'compare.map.modeOff': 'Both tracks',
+  'compare.map.modeSwipe': 'Split',
+  'compare.map.modeFade': 'Crossfade',
+  'compare.map.divider': 'Divider position',
+  'compare.map.mix': 'Mix',
+  'compare.map.sharedTime': 'Same point in each storm',
+  'compare.map.versus': 'against',
   'compare.unpin': 'Unpin',
   'compare.card.atLandfall': 'at landfall',
   'compare.metric.peakWind': 'Peak wind',

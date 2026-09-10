@@ -17,6 +17,17 @@ import {
 export { buildComparisonCSVText } from './compare-rows.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
+import {
+  comparePaneName,
+  ensureComparePanes,
+  getComparePaneMode,
+  getComparePanePosition,
+  isComparePaneStacked,
+  setComparePaneMode,
+  setComparePanePosition,
+  trackPointAtFraction,
+} from './compare-panes.js';
+
 const L = window.L;
 
 // Each pin gets one slot in pin order, and the colour for that slot comes from
@@ -64,6 +75,11 @@ const compareBody = document.getElementById('compare-body');
 const compareCloseBtn = document.getElementById('close-compare');
 
 const pinned = [];          // [{ id, name, year, storm, slot, trackLayer }]
+// A fraction of each storm's own life, not a wall-clock time: two storms
+// decades apart share no instant, and "both halfway through" is the comparison
+// a shared axis is for.
+let timeFraction = 0;
+let timeMarkers = [];
 
 function ensureTray() {
   let el = document.getElementById('compare-tray');
@@ -146,9 +162,66 @@ function removePin(stormId) {
   const pin = pinned[idx];
   if (pin.trackLayer) getMap().removeLayer(pin.trackLayer);
   pinned.splice(idx, 1);
+  // A comparison of one storm is not a comparison, so the map goes back to
+  // showing both panes whole rather than leaving half the map clipped away
+  // with nothing on the other side of the divider.
+  if (pinned.length < 2) setComparePaneMode('off');
+  updateSharedTime(timeFraction);
   refreshTray();
   refreshComparePanelIfOpen();
   notifyPinsChanged();
+}
+
+/**
+ * Put one marker on each of the first two tracks at the same fraction of its
+ * own life, in that track's own pane so the swipe and the crossfade carry it.
+ */
+function updateSharedTime(fraction) {
+  timeFraction = Math.min(1, Math.max(0, Number(fraction) || 0));
+  const map = getMap();
+  for (const marker of timeMarkers) map.removeLayer(marker);
+  timeMarkers = [];
+  if (pinned.length < 2) return;
+  for (const pin of pinned) {
+    const pane = comparePaneName(pin.slot);
+    if (!pane) continue;
+    const point = trackPointAtFraction(pin.storm.track, timeFraction);
+    if (!point) continue;
+    const color = pinSlotTrackColor(pin.slot);
+    const marker = L.circleMarker([point.lat, point.lon], {
+      radius: 7,
+      color: 'var(--crust)',
+      fillColor: color,
+      weight: 2,
+      fillOpacity: 1,
+      className: 'compare-time-marker',
+      pane,
+    });
+    marker.bindTooltip(
+      escapeHtml(`${formatStormName(pin.name)} ${pin.year} · ${formatSharedTime(point)}`),
+      { direction: 'top' },
+    );
+    marker.addTo(map);
+    timeMarkers.push(marker);
+  }
+  refreshSharedTimeReadout();
+}
+
+function formatSharedTime(point) {
+  const value = String(point?.t || '');
+  return value ? value.replace('T', ' ').replace(':00Z', ' UTC').replace('Z', ' UTC') : '';
+}
+
+function refreshSharedTimeReadout() {
+  const host = compareBody?.querySelector('#cp-time-readout');
+  if (!host) return;
+  host.textContent = pinned
+    .filter(pin => comparePaneName(pin.slot))
+    .map(pin => {
+      const point = trackPointAtFraction(pin.storm.track, timeFraction);
+      return `${formatStormName(pin.name)} ${pin.year}: ${point ? formatSharedTime(point) : '-'}`;
+    })
+    .join('  ·  ');
 }
 
 function notifyPinsChanged() {
@@ -167,7 +240,12 @@ function clearAll() {
 function drawTrack(storm, slot) {
   const color = pinSlotTrackColor(slot);
   const map = getMap();
-  const group = L.layerGroup();
+  ensureComparePanes(map);
+  // The first two pins get a pane of their own, which is what the swipe and
+  // the crossfade act on. A third and fourth pin stay on the map's own overlay
+  // pane: comparing four things side by side is two questions, not one.
+  const pane = comparePaneName(slot);
+  const group = L.layerGroup(pane ? { pane } : {});
   const track = storm.track || [];
   for (let i = 1; i < track.length; i++) {
     const a = track[i - 1];
@@ -178,12 +256,14 @@ function drawTrack(storm, slot) {
       opacity: 0.85,
       lineJoin: 'round',
       className: 'compare-track',
+      ...(pane ? { pane } : {}),
     }).addTo(group);
   }
   // Genesis dot.
   if (track.length) {
     L.circleMarker([track[0].lat, track[0].lon], {
       radius: 3, color, fillColor: color, weight: 1, fillOpacity: 0.9,
+      ...(pane ? { pane } : {}),
     }).bindTooltip(escapeHtml(`${formatStormName(storm.name)} ${storm.year}`), { direction: 'top' }).addTo(group);
   }
   group.addTo(map);
@@ -335,6 +415,7 @@ function renderComparePanel() {
       <button class="export-btn" id="cp-export-btn" title="${t('compare.exportCsvTitle')}">📥 ${t('btn.exportCSV')}</button>
     </div>
     <div class="cp-cards">${cards}</div>
+${renderMapCompareControls()}
     <h3 class="panel-section-h3">Side-by-side</h3>
     <div class="cp-table-wrap">
       <table class="cp-table">
@@ -343,6 +424,8 @@ function renderComparePanel() {
       </table>
     </div>
   `;
+
+  wireMapCompareControls();
 
   // Wire up export button
   const exportBtn = compareBody.querySelector('#cp-export-btn');
@@ -360,6 +443,68 @@ function renderComparePanel() {
   });
 }
 
+
+/**
+ * The map half of the comparison: one map, two clipped panes, and two range
+ * inputs. Only offered once two storms are pinned, because a divider with
+ * nothing on one side of it is a control that cannot do anything.
+ */
+function renderMapCompareControls() {
+  if (pinned.length < 2) return '';
+  const mode = getComparePaneMode();
+  const modes = [
+    ['off', t('compare.map.modeOff')],
+    ['swipe', t('compare.map.modeSwipe')],
+    ['fade', t('compare.map.modeFade')],
+  ];
+  const named = pinned.filter(pin => comparePaneName(pin.slot));
+  return `
+    <fieldset class="cp-map-compare" id="cp-map-compare">
+      <legend>${escapeHtml(t('compare.map.title'))}</legend>
+      <p class="cp-hint">${escapeHtml(t(isComparePaneStacked() ? 'compare.map.hintStacked' : 'compare.map.hint'))}</p>
+      <div class="cp-map-modes" role="radiogroup" aria-label="${escapeHtml(t('compare.map.title'))}">
+        ${modes.map(([value, label]) => `
+          <label class="cp-map-mode">
+            <input type="radio" name="cp-map-mode" value="${value}"${value === mode ? ' checked' : ''}>
+            <span>${escapeHtml(label)}</span>
+          </label>`).join('')}
+      </div>
+      <div class="cp-map-slider">
+        <label for="cp-divider">${escapeHtml(t(mode === 'fade' ? 'compare.map.mix' : 'compare.map.divider'))}</label>
+        <input type="range" id="cp-divider" min="0" max="100" step="1" value="${getComparePanePosition()}"
+          ${mode === 'off' ? 'disabled' : ''}
+          aria-describedby="cp-divider-ends">
+        <span id="cp-divider-ends" class="cp-hint">${escapeHtml(
+    named.map(pin => `${formatStormName(pin.name)} ${pin.year}`).join(` ${t('compare.map.versus')} `),
+  )}</span>
+      </div>
+      <div class="cp-map-slider">
+        <label for="cp-time">${escapeHtml(t('compare.map.sharedTime'))}</label>
+        <input type="range" id="cp-time" min="0" max="100" step="1" value="${Math.round(timeFraction * 100)}">
+        <span id="cp-time-readout" class="cp-hint" role="status"></span>
+      </div>
+    </fieldset>`;
+}
+
+function wireMapCompareControls() {
+  const fieldset = compareBody.querySelector('#cp-map-compare');
+  if (!fieldset) return;
+  const divider = fieldset.querySelector('#cp-divider');
+  fieldset.querySelectorAll('input[name="cp-map-mode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      setComparePaneMode(radio.value);
+      // Re-rendered rather than patched: the slider's own label changes with
+      // the mode, from a divider position to a mix, and a control whose label
+      // is stale is worse than one that flickers.
+      renderComparePanel();
+    });
+  });
+  divider?.addEventListener('input', () => setComparePanePosition(divider.value));
+  const time = fieldset.querySelector('#cp-time');
+  time?.addEventListener('input', () => updateSharedTime(Number(time.value) / 100));
+  refreshSharedTimeReadout();
+}
 
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {

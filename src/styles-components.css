@@ -989,6 +989,73 @@ label > input[type="checkbox"] {
   margin: 0 0 14px;
 }
 
+/* One map, two clipped panes. The panes themselves need no geometry: Leaflet
+   positions their children, and the clip is a pixel polygon set from JS on
+   every map move, which is what makes drift impossible rather than unlikely. */
+.hm-compare-pane {
+  transition: opacity 120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-compare-pane { transition: none; }
+}
+
+.cp-map-compare {
+  margin: 1rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--surface0);
+  border-radius: 10px;
+}
+
+.cp-map-compare legend {
+  padding: 0 0.4rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--subtext);
+}
+
+.cp-map-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.cp-map-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cp-map-slider {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) 1fr;
+  align-items: center;
+  gap: 0.3rem 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 12px;
+}
+
+.cp-map-slider > span {
+  grid-column: 1 / -1;
+}
+
+.cp-map-slider input[type="range"] {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Below the shell's mobile breakpoint the split runs top to bottom instead of
+   left to right, which is the same control over a taller, narrower map. The
+   orientation itself is decided in compare-panes.js from the same query. */
+@media (max-width: 720px) {
+  .cp-map-slider {
+    grid-template-columns: 1fr;
+  }
+}
+
 .cp-actions {
   display: flex;
   gap: 8px;

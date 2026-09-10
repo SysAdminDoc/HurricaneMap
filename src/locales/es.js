@@ -534,6 +534,16 @@ export default {
 
   // Comparison panel
   'compare.title': 'Comparar huracanes',
+  'compare.map.title': 'Comparar en el mapa',
+  'compare.map.hint': 'Divide el mapa entre las dos primeras tormentas fijadas, o funde una en la otra. Ambas mitades son el mismo mapa, así que no pueden separarse.',
+  'compare.map.hintStacked': 'Divide el mapa arriba y abajo entre las dos primeras tormentas fijadas, o funde una en la otra. Ambas mitades son el mismo mapa, así que no pueden separarse.',
+  'compare.map.modeOff': 'Ambas trayectorias',
+  'compare.map.modeSwipe': 'Dividir',
+  'compare.map.modeFade': 'Fundido',
+  'compare.map.divider': 'Posición del divisor',
+  'compare.map.mix': 'Mezcla',
+  'compare.map.sharedTime': 'Mismo punto de cada tormenta',
+  'compare.map.versus': 'contra',
   'compare.unpin': 'Desfijar',
   'compare.card.atLandfall': 'en tierra',
   'compare.metric.peakWind': 'Viento máximo',
