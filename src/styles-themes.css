@@ -6,7 +6,12 @@ html.light-theme {
   --surface0: #ccd0dd;
   --surface1: #bcc0cc;
   --text:    #4c4f69;
-  --subtext: #6c6f85;
+  /* Not #6c6f85, the Latte token. At 9 to 11px it clears 4.5:1 only against a
+     surface at or near pure white, and this app paints its small print on
+     tinted panels, on a translucent strip over the map and on a sunken white
+     that composites to rgb(231,231,235). Three scopes had already overridden it
+     for that reason before a fourth surface turned up at 4.01:1. */
+  --subtext: #5c5f77;
   --overlay: #7c8296;
   --blue:    #1e66f5;
   --lavender:#7c3aed;
@@ -263,18 +268,6 @@ html.light-theme.high-contrast .storm-panel {
    #5c5f77 was that step, and it was not enough for the storm-events card, whose
    tint paints rgb(212,216,227): its labels measured 4.43:1 and its sample rows
    4.40:1 there, both under the floor. #575a72 reads 4.74:1 on the same pixels. */
-/* The ribbon floats over the map at about 89% opacity, so a tenth of the tiles
-   comes through it. Against the darkest thing the map can be, the default light
-   --subtext lands at 3.89:1 on the four muted elements in there. #5c5f77 reads
-   4.92:1 on the same pixels and 5.6:1 over a pale map. The two properties that
-   alias --subtext at the root are declared here for the same reason they are on
-   the panel: an alias is substituted where it is declared. */
-html.light-theme:not(.high-contrast) .timeline-ribbon {
-  --subtext: #5c5f77;
-  --foreground-muted: var(--subtext);
-  --text-secondary: var(--subtext);
-}
-
 html.light-theme:not(.high-contrast) .storm-panel {
   --subtext: #575a72;
   /* The two properties that alias --subtext at the root have to be declared
