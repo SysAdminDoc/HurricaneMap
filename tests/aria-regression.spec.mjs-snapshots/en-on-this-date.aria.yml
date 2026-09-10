@@ -153,7 +153,7 @@
       - button "DOT at Hawaii":
         - strong: DOT
         - text: ""
-      - text: /Cat 1 \d+ kt Aug 7, \d+, \d+:\d+ PM UTC yesterday/
+      - text: /Cat 1 \d+ kt Aug 7, \d+, \d+:\d+ AM UTC yesterday/
     - listitem:
       - text: /\d+/
       - button "BERTHA at Texas":
