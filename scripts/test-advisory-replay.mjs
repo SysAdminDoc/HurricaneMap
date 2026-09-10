@@ -1,5 +1,8 @@
-// Advisory replay contract: the a-deck parser, the archive-index mapping, the
-// best-track verification, and the shipped dataset's own provenance.
+// Advisory replay contract: both routes into the dataset, and the dataset's own
+// provenance. 2015-2024 comes from the a-deck parser and the product-archive
+// index; 2008-2014 comes from the GIS forecast archive, whose reader has its own
+// suite in test-gis-archive.mjs. What is checked here is that the two reach one
+// shape, and that each record says honestly which route produced it.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -10,10 +13,14 @@ import {
   REPLAY_ERAS,
   STORM_IDS,
   advisoryNumberFor,
+  conePublishedForYear,
   coneEraForYear,
   parseAdvisoryIndex,
+  parseGisArchiveIndex,
   parseIssueTime,
   parseOfficialForecasts,
+  replayRouteForYear,
+  ringContains,
   verifyAgainstBestTrack,
 } from './build-advisories.mjs';
 import {
@@ -163,6 +170,42 @@ assert.deepEqual(clipped[0], [19, -94.5]);
 
 // --- the shipped dataset --------------------------------------------------
 
+// The GIS index decides which advisories exist for a storm, and the numbering
+// is not contiguous: an intermediate carries a trailing letter and sorts between
+// two whole numbers, not after both.
+{
+  const html = `
+    <a href="/gis/forecast/archive/al092008_5day_020.zip">20</a>
+    <a href="/gis/forecast/archive/al092008_5day_019A.zip">19A</a>
+    <a href="/gis/forecast/archive/al092008_5day_019.zip">19</a>
+    <a href="/gis/forecast/archive/al092008_5day_009.zip">9</a>
+    <a href="/gis/forecast/archive/al092008_5day_009.zip">9 again</a>
+    <a href="/gis/forecast/archive/al112008_5day_003.zip">another storm</a>`;
+  assert.deepEqual(parseGisArchiveIndex(html, 'al092008'), [
+    'al092008_5day_009.zip',
+    'al092008_5day_019.zip',
+    'al092008_5day_019A.zip',
+    'al092008_5day_020.zip',
+  ], 'the index is ordered by number then letter, deduplicated, and scoped to one storm');
+  assert.deepEqual(parseGisArchiveIndex(html, 'al992099'), [], 'a storm with no files lists none');
+  // The archive pads its numbers to three digits, so a plain string sort agrees
+  // with this today. Ordering on the parsed number and letter is what keeps that
+  // a coincidence rather than a dependency, and this is the case that would
+  // separate them if the padding ever went away.
+  assert.deepEqual(
+    parseGisArchiveIndex('<a href="x_5day_9.zip">a</a><a href="x_5day_20.zip">b</a><a href="x_5day_9A.zip">c</a>', 'x'),
+    ['x_5day_9.zip', 'x_5day_9A.zip', 'x_5day_20.zip'],
+    'unpadded numbers still order numerically, with the intermediate after its own advisory',
+  );
+}
+
+{
+  const square = [[0, 0], [0, 2], [2, 2], [2, 0]];
+  assert.equal(ringContains(square, 1, 1), true);
+  assert.equal(ringContains(square, 3, 1), false);
+  assert.equal(ringContains(square, 1, 3), false);
+}
+
 const archive = JSON.parse(await readFile(path.join(root, 'data/advisories.json'), 'utf8'));
 assert.equal(archive.schema, 1);
 assert.equal(archive.model, 'OFCL');
@@ -176,13 +219,26 @@ assert.equal(archive.totals.storms, STORM_IDS.length);
 const storms = JSON.parse(await readFile(path.join(root, 'data/storms.json'), 'utf8'));
 const stormsById = new Map((Array.isArray(storms) ? storms : storms.storms).map(storm => [storm.id, storm]));
 const radii = JSON.parse(await readFile(path.join(root, 'data/cone-radii.json'), 'utf8'));
+// An era either names a radii table that exists, or publishes its cones and
+// needs none. Nothing may do neither, and nothing may claim both.
 for (const replayEra of REPLAY_ERAS) {
+  if (replayEra.publishedCone) {
+    assert.equal(replayEra.coneEra, null, `${replayEra.label}: a published-cone era must not also name a radii table`);
+    assert.ok(!replayEra.coneEraByYear, `${replayEra.label}: a published-cone era must not carry per-year radii`);
+    continue;
+  }
   for (const coneEra of Object.values(replayEra.coneEraByYear || { _: replayEra.coneEra })) {
     assert.ok(radii.eras[coneEra], `${coneEra}: declared cone era must exist in cone-radii.json`);
   }
 }
-assert.equal(coneEraForYear(2014), null, 'years before the archive should remain unavailable');
+assert.equal(coneEraForYear(2007), null, 'years before the archive remain unavailable');
+assert.equal(replayRouteForYear(2007), null);
+assert.equal(coneEraForYear(2014), null, 'the GIS era has no radii table');
+assert.equal(replayRouteForYear(2014), 'gis-archive');
+assert.equal(conePublishedForYear(2014), true);
 assert.equal(coneEraForYear(2015), '2015');
+assert.equal(replayRouteForYear(2015), 'adeck');
+assert.equal(conePublishedForYear(2015), false);
 assert.equal(coneEraForYear(2024), '2025');
 
 for (const [stormId, record] of Object.entries(archive.storms)) {
@@ -191,22 +247,74 @@ for (const [stormId, record] of Object.entries(archive.storms)) {
   assert.equal(record.name, storm.name, `${stormId}: name disagrees with HURDAT2`);
   assert.equal(record.year, storm.year, `${stormId}: year disagrees with HURDAT2`);
   assert.equal(record.coneEra, coneEraForYear(record.year), `${stormId}: record must use its published cone era`);
-  assert.ok(radii.eras[record.coneEra], `${stormId}: record cone era is absent from cone-radii.json`);
-  if (record.year <= 2019) {
-    assert.equal(radii.eras[record.coneEra].sampleYears, `${record.year - 5}-${record.year - 1}`, `${stormId}: annual cone sample must precede the replay year`);
+  const published = conePublishedForYear(record.year);
+  assert.equal(Boolean(record.publishedCone), published, `${stormId}: record disagrees with its era about where the cone comes from`);
+  if (published) {
+    assert.equal(record.coneEra, null, `${stormId}: a published-cone record must not name a radii era`);
   } else {
-    assert.equal(radii.eras[record.coneEra].sampleYears, '2020-2024', `${stormId}: initial-era cone sample must match its pooled era`);
+    assert.ok(radii.eras[record.coneEra], `${stormId}: record cone era is absent from cone-radii.json`);
+    if (record.year <= 2019) {
+      assert.equal(radii.eras[record.coneEra].sampleYears, `${record.year - 5}-${record.year - 1}`, `${stormId}: annual cone sample must precede the replay year`);
+    } else {
+      assert.equal(radii.eras[record.coneEra].sampleYears, '2020-2024', `${stormId}: initial-era cone sample must match its pooled era`);
+    }
   }
   assert.ok(storm.year >= ERA.startYear && storm.year <= ERA.endYear, `${stormId}: outside the declared era`);
   assert.equal(record.advisories.length, record.advisoryCount, `${stormId}: advisory count disagrees with its own list`);
-  assert.equal(record.advisories[0].n, 1, `${stormId}: replay must start at advisory 1`);
+  assert.equal(Number(record.advisories[0].n), 1, `${stormId}: replay must start at advisory 1`);
 
-  let previous = 0;
+  // NHC's intermediate advisories are numbered 19A, 20A and so on. Only the GIS
+  // archive carries them, so the a-deck era never produced one, and a numeric
+  // comparison turns '6A' into NaN and passes silently.
+  const rank = value => {
+    const match = /^(\d+)([A-Za-z]*)$/.exec(String(value));
+    assert.ok(match, `${stormId}: advisory number ${JSON.stringify(value)} is not a number with an optional letter`);
+    return [Number(match[1]), match[2]];
+  };
+  let previous = [0, ''];
   for (const advisory of record.advisories) {
-    assert.ok(advisory.n > previous, `${stormId}: advisory numbers must strictly increase`);
-    previous = advisory.n;
+    const rankedNow = rank(advisory.n);
+    assert.ok(
+      rankedNow[0] > previous[0] || (rankedNow[0] === previous[0] && rankedNow[1] > previous[1]),
+      `${stormId}: advisory ${advisory.n} does not come after ${previous.join('')}`,
+    );
+    previous = rankedNow;
     assert.ok(advisory.f.length, `${stormId}/${advisory.n}: an advisory with no forecast is not a replay`);
-    assert.equal(advisory.f[0][0], 0, `${stormId}/${advisory.n}: forecasts must start at the initial position`);
+    // The first entry is where the storm was when the advisory went out. That is
+    // lead 0 for an a-deck record, whose clock starts at the synoptic analysis,
+    // and lead 3 or 6 for a GIS record, whose first row is the position at
+    // issuance. Either way it is the earliest lead.
+    const leads = advisory.f.map(entry => entry[0]);
+    assert.equal(leads[0], Math.min(...leads), `${stormId}/${advisory.n}: forecasts are not ordered by lead`);
+    assert.deepEqual(leads, [...leads].sort((a, b) => a - b), `${stormId}/${advisory.n}: leads are out of order`);
+    // Leads are rounded to whole hours, so two rows could in principle collide
+    // and one would be dropped silently by the first-wins merge.
+    assert.equal(new Set(leads).size, leads.length, `${stormId}/${advisory.n}: two forecast rows share a lead`);
+    if (published) {
+      assert.ok(
+        advisory.f[0][0] > 0 && advisory.f[0][0] <= 12,
+        `${stormId}/${advisory.n}: a GIS record opens at issuance, ${advisory.f[0][0]} h after its origin`,
+      );
+      // Leads are whole hours, because that is how an advisory labels them and
+      // what the a-deck era already carries, while `issued` keeps the exact
+      // time. A special advisory can go out at a 45-minute offset, as Dolly's
+      // first did, so the two agree to within the rounding and no further.
+      const gapHours = (Date.parse(advisory.issued) - Date.parse(advisory.t)) / 3600000;
+      assert.ok(
+        Math.abs(gapHours - advisory.f[0][0]) <= 0.5,
+        `${stormId}/${advisory.n}: the first entry is ${advisory.f[0][0]} h in but the advisory went out ${gapHours} h after its origin`,
+      );
+      assert.ok(Number.isInteger(advisory.f[0][0]), `${stormId}/${advisory.n}: leads are whole hours`);
+      assert.ok(Array.isArray(advisory.c) && advisory.c.length >= 3, `${stormId}/${advisory.n}: a published-cone record must carry a polygon`);
+      assert.ok([72, 120].includes(advisory.conePeriodHours), `${stormId}/${advisory.n}: cone period ${advisory.conePeriodHours} is not one NHC draws`);
+      assert.ok(
+        ringContains(advisory.c, advisory.f[0][1], advisory.f[0][2]),
+        `${stormId}/${advisory.n}: the cone does not contain the position its own advisory reports`,
+      );
+    } else {
+      assert.equal(advisory.f[0][0], 0, `${stormId}/${advisory.n}: an a-deck record starts at its own analysis`);
+      assert.ok(!advisory.c, `${stormId}/${advisory.n}: this era has no published cone to carry`);
+    }
     if (advisory.discussion) {
       assert.ok(
         advisory.discussion.startsWith(`https://www.nhc.noaa.gov/archive/${record.year}/`),

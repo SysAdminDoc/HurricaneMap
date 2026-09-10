@@ -3,10 +3,14 @@
 //
 // Unlike cone-retro.js — which applies published error radii to the *observed*
 // centerline as a teaching device — every position, intensity and issue time
-// here is read verbatim from the archived ATCF a-deck for that storm. Nothing is
-// reconstructed. The cone is the only derived element: it is drawn around the
-// issued forecast positions using the published radii of the era the advisory
-// belongs to, which is how the operational cone was defined.
+// here is read verbatim from what NHC archived for that storm. Nothing is
+// reconstructed.
+//
+// The cone comes one of two ways, and the tooltip says which. From 2015 the
+// record carries forecast positions and the cone is drawn around them with the
+// published radii of that advisory's era, which is how the operational cone was
+// defined. Before 2015 there is no radii table, and the record instead carries
+// the polygon NHC actually drew, read out of its GIS package.
 
 import { escapeHtml } from './html-utils.js';
 import { t } from './i18n.js';
@@ -135,13 +139,19 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
   const generation = ++renderGeneration;
   const clamped = Math.max(0, Math.min(index, record.advisories.length - 1));
   const advisory = record.advisories[clamped];
+  // A polygon of at least three points is a cone NHC published; anything less
+  // is not a cone, so the radii path still runs rather than drawing a sliver.
+  const published = Array.isArray(advisory.c) && advisory.c.length >= 3;
   try {
-    const radii = await loadConeRadii();
-    if (generation !== renderGeneration) return { status: 'stale' };
-    const era = radii.eras[String(coneEra)] || radii.eras['2025'];
-    const basinRadii = storm.basin === 'EP' ? era.easternPacific : era.atlantic;
-    const samples = buildAdvisoryConeSamples(advisory, basinRadii);
-    const envelope = samples.length >= 2 ? buildConeEnvelope(samples) : [];
+    let envelope = advisory.c || [];
+    if (!published) {
+      const radii = await loadConeRadii();
+      if (generation !== renderGeneration) return { status: 'stale' };
+      const era = radii.eras[String(coneEra)] || radii.eras['2025'];
+      const basinRadii = storm.basin === 'EP' ? era.easternPacific : era.atlantic;
+      const samples = buildAdvisoryConeSamples(advisory, basinRadii);
+      envelope = samples.length >= 2 ? buildConeEnvelope(samples) : [];
+    }
 
     ensureLayer(map);
     layerGroup.clearLayers();
@@ -165,7 +175,12 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
         weight: 2,
         dashArray: '6 4',
         className: 'advisory-cone-shape',
-      }).bindTooltip(t('advisoryReplay.coneTooltip', String(coneEra)), { sticky: true }).addTo(layerGroup);
+      }).bindTooltip(
+        published
+          ? t('advisoryReplay.conePublished', String(advisory.conePeriodHours || 120))
+          : t('advisoryReplay.coneTooltip', String(coneEra)),
+        { sticky: true },
+      ).addTo(layerGroup);
     }
 
     const forecastLine = advisory.f.map(([, lat, lon]) => [lat, lon]);
@@ -180,15 +195,20 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
     }
 
     const errorByLead = new Map((advisory.e || []).map(entry => [entry[0], entry]));
-    for (const [tau, lat, lon, wind] of advisory.f) {
+    // The first entry is where the storm was when the advisory went out, and
+    // that is not always lead 0. An a-deck record opens on the synoptic
+    // analysis; a GIS record opens on the position at issuance, three or six
+    // hours later, because the forecast is initialised before it is published.
+    for (const [index, [tau, lat, lon, wind]] of advisory.f.entries()) {
+      const current = index === 0;
       const error = errorByLead.get(tau);
       const detail = error
         ? t('advisoryReplay.pointVerified', leadLabel(tau), String(wind), String(error[1]))
         : t('advisoryReplay.point', leadLabel(tau), String(wind));
       window.L.circleMarker([lat, lon], {
-        radius: tau === 0 ? 5 : 3.5,
+        radius: current ? 5 : 3.5,
         color: getMapOverlayColor('forecast'),
-        fillColor: tau === 0 ? getMapOverlayColor('forecast') : '#1e1e2e',
+        fillColor: current ? getMapOverlayColor('forecast') : '#1e1e2e',
         fillOpacity: 1,
         weight: 2,
         className: 'advisory-forecast-point',
@@ -202,6 +222,7 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
       index: clamped,
       advisory,
       conePoints: envelope.length,
+      conePublished: published,
       summary: summarizeAdvisoryErrors(advisory),
       bounds,
     };

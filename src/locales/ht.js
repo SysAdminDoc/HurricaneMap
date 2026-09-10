@@ -342,6 +342,7 @@ export default {
   'advisoryReplay.pointVerified': '{0} · previzyon {1} kt · diferans {2} mn',
   'advisoryReplay.forecastTooltip': 'Trajektò previzyon jan yo te bay li, done operasyonèl preliminè',
   'advisoryReplay.actualTooltip': 'Kote tanpèt la te pase vre (trajektò final)',
+  'advisoryReplay.conePublished': 'Kòn previzyon {0} èdtan an jan NHC te pibliye l ak avi sa a',
   'advisoryReplay.coneTooltip': 'Kòn previzyon trase ak reyon erè pibliye {0}',
   'coneRetro.mapTooltip': 'Konparezon edikatif sèlman, se pa yon avi reyèl',
   'art.title': 'Chemen risk anime',

@@ -345,6 +345,7 @@ export default {
   'advisoryReplay.pointVerified': '{0} · forecast {1} kt · off by {2} n mi',
   'advisoryReplay.forecastTooltip': 'Forecast track as issued, preliminary operational data',
   'advisoryReplay.actualTooltip': 'Where the storm actually went (final best track)',
+  'advisoryReplay.conePublished': 'The {0}-hour forecast cone as NHC published it with this advisory',
   'advisoryReplay.coneTooltip': 'Forecast cone drawn with published {0} error radii',
   'coneRetro.mapTooltip': 'Educational comparison only, not an actual advisory',
   'art.title': 'Animated risk trajectories',

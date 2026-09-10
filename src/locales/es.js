@@ -345,6 +345,7 @@ export default {
   'advisoryReplay.pointVerified': '{0} · pronóstico {1} kt · desvío de {2} mn',
   'advisoryReplay.forecastTooltip': 'Trayectoria pronosticada tal como se emitió: datos operativos preliminares',
   'advisoryReplay.actualTooltip': 'Por dónde pasó realmente la tormenta (mejor trayectoria final)',
+  'advisoryReplay.conePublished': 'El cono de pronóstico de {0} horas tal como el NHC lo publicó con este aviso',
   'advisoryReplay.coneTooltip': 'Cono de pronóstico trazado con los radios de error publicados de {0}',
   'coneRetro.mapTooltip': 'Solo comparación educativa; no es un aviso real',
   'art.title': 'Trayectorias de riesgo animadas',

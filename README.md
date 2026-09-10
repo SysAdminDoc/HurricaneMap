@@ -68,7 +68,7 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 ## Highlights
 
 - **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851-2025.
-- **Layer depth is not the same as best-track depth.** The best track reaches back to 1851. The archived radar loop covers 1995-2025 (139 storms), advisory replay 2015-2024 (33 storms), and surveyed high-water marks 2003-2024 (25 storms). The About dialog states both tiers from `data/coverage.json`, and `npm run test:coverage-claims` fails if this paragraph and that file disagree.
+- **Layer depth is not the same as best-track depth.** The best track reaches back to 1851. The archived radar loop covers 1995-2025 (139 storms), advisory replay 2008-2024 (52 storms), and surveyed high-water marks 2003-2024 (25 storms). The About dialog states both tiers from `data/coverage.json`, and `npm run test:coverage-claims` fails if this paragraph and that file disagree.
 - HURDAT2 was last revised 2026-02-27. NHC reissues it once a year in the spring, so the next revision is expected in 2027.
 - Both **Atlantic** and **Eastern North Pacific** HURDAT2 basins ingested (so storms like Iniki '92 on Kauai are included).
 - **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times, which fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
@@ -419,7 +419,7 @@ Hand-maintained seasonal snapshots are time-bounded rather than silently treated
 | Atlantic best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Eastern Pacific best-track (HURDAT2) | https://www.nhc.noaa.gov/data/ |
 | Official forecast skill (2021-2025 OFCL vs post-season best track) | [NHC verification database](https://www.nhc.noaa.gov/verification/verify7.shtml). Regenerate `data/forecast-skill.json` with `node scripts/build-forecast-skill.mjs` |
-| Archived NHC advisories (2015-2024 U.S.-landfalling Atlantic storms) | [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/). Regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
+| Archived NHC advisories (2008-2024 U.S.-landfalling Atlantic storms) | From 2015, the [NHC ATCF a-deck archive](https://ftp.nhc.noaa.gov/atcf/archive/) and the [NHC product archive](https://www.nhc.noaa.gov/archive/). Before 2015, the [NHC GIS forecast archive](https://www.nhc.noaa.gov/gis/archive_forecast.php), which carries the cone polygon NHC published with each advisory. Regenerate `data/advisories.json` with `node scripts/build-advisories.mjs` |
 | Who these storms kill, 1963-2024 (linked, not bundled) | [Muller et al., *Continental United States direct Atlantic tropical cyclone fatalities: 1963-2024*, npj Natural Hazards 2026](https://doi.org/10.1038/s44304-026-00178-8). CC BY-NC-ND 4.0, so the atlas links it and carries none of its figures |
 | Format spec | [Landsea, C. W., *Atlantic hurricane database uncertainty*, MWR 2013](https://www.aoml.noaa.gov/hrd/Landsea/landsea-franklin-mwr2013.pdf) |
 | Archived radar (NEXRAD composites) | [Iowa State IEM NEXRAD mosaic archive](https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/), fetched live (CORS-enabled), no preprocessing |

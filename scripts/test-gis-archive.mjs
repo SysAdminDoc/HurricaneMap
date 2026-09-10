@@ -154,7 +154,7 @@ const [dolly, claudette, arthur] = await Promise.all([
 // --------------------------------------------------------- a whole advisory
 {
   const record = readAdvisoryArchive(dolly, { stormId: 'AL042008', label: 'Dolly 10' });
-  assert.equal(record.n, '10');
+  assert.equal(record.n, 10, 'a full advisory number is a number, not the archive\'s text');
   // The advisory went out at 21:00 and its forecast is initialised on the 18:00
   // synoptic hour. `t` is the origin, because that is the clock the 2015-2024
   // records use; `issued` is when NHC put it out.
@@ -181,7 +181,7 @@ const [dolly, claudette, arthur] = await Promise.all([
   assert.ok(inside, 'the cone does not contain the position its own advisory reports');
 
   const intermediate = readAdvisoryArchive(claudette, { stormId: 'AL042009' });
-  assert.equal(intermediate.n, '6A', 'an intermediate advisory keeps its letter');
+  assert.equal(intermediate.n, '6A', 'an intermediate advisory keeps its letter, so it stays a string');
   assert.ok(intermediate.f.length >= 2);
   // Claudette 6A re-issues the 06:00 package with a fresh current position at
   // 12:00: TAU 0 at 12:00, then TAU 12, 24 and 36 at 18:00, 06:00 and 18:00.
@@ -204,7 +204,7 @@ const [dolly, claudette, arthur] = await Promise.all([
   }
 
   const hyphenated = readAdvisoryArchive(arthur, { stormId: 'AL012014' });
-  assert.equal(hyphenated.n, '5');
+  assert.equal(hyphenated.n, 5);
   assert.equal(hyphenated.name, 'ARTHUR');
   assert.equal(hyphenated.conePeriodHours, 120);
   // 2014 counts TAU from the synoptic hour and 2008 counted it from issuance.

@@ -6580,7 +6580,21 @@ try {
     /Layer depth is shallower than the best track/.test(coverageText),
     `About did not distinguish layer depth from best-track depth: ${coverageText.slice(0, 200)}`,
   );
-  for (const [label, range] of [['Archived NEXRAD radar', '1995-2025'], ['Advisory replay', '2015-2024']]) {
+  // Read from data/coverage.json rather than typed here. These ranges were
+  // hard-coded, so extending the advisory replay back to 2008 failed this
+  // assertion on text that had become correct.
+  const coverageRanges = await page.evaluate(async () => {
+    const response = await fetch('data/coverage.json');
+    const coverage = await response.json();
+    const datasets = coverage.datasets || coverage;
+    const rangeFor = id => {
+      const dataset = datasets.find(entry => entry.id === id);
+      return dataset?.year_range ? `${dataset.year_range[0]}-${dataset.year_range[1]}` : null;
+    };
+    return { radar: rangeFor('radar-archive'), replay: rangeFor('advisory-replay') };
+  });
+  for (const [label, range] of [['Archived NEXRAD radar', coverageRanges.radar], ['Advisory replay', coverageRanges.replay]]) {
+    assert(range, `data/coverage.json carries no year range for ${label}, so the About claim cannot be checked`);
     assert(
       coverageText.includes(range),
       `About did not state ${label} as covering ${range}: ${coverageText.slice(0, 400)}`,
@@ -7202,7 +7216,18 @@ try {
   assert(outsideEra.checked === false, 'advisory replay stayed enabled for a storm it cannot replay');
   assert(outsideEra.stepsHidden === true, 'advisory replay left its stepper visible with no advisories');
   assert(outsideEra.shapes === 0, 'advisory replay drew geometry for a storm outside the archived era');
-  assert(/2015-2024/.test(outsideEra.status), `advisory replay did not name its covered era: ${outsideEra.status}`);
+  // Read from the dataset the message is generated from. Typed here, this
+  // failed the moment the replay reached back to 2008, on text that had become
+  // correct.
+  const eraLabel = await page.evaluate(async () => {
+    const response = await fetch('data/advisories.json');
+    return (await response.json()).era?.label || '';
+  });
+  assert(/^\d{4}-\d{4}$/.test(eraLabel), `data/advisories.json carries no era label: ${JSON.stringify(eraLabel)}`);
+  assert(
+    outsideEra.status.includes(eraLabel),
+    `advisory replay did not name its covered era ${eraLabel}: ${outsideEra.status}`,
+  );
 
   for (const stormId of ['AL022024', 'AL132020', 'AL142024', 'AL092022', 'AL092017']) {
     await assertAdvisoryForecastInViewport(page, stormId);

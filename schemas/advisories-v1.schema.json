@@ -30,7 +30,8 @@
           "startYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
           "endYear": { "type": "integer", "minimum": 1990, "maximum": 2100 },
           "label": { "type": "string", "minLength": 1 },
-          "coneEra": { "type": "string", "pattern": "^\\d{4}$" },
+          "coneEra": { "type": ["string", "null"], "pattern": "^\\d{4}$" },
+          "publishedCone": { "const": true },
           "coneEraByYear": {
             "type": "object",
             "minProperties": 1,
@@ -51,24 +52,26 @@
     },
     "definitions": {
       "type": "object",
-      "required": ["forecast", "trackError", "intensityError", "coverage"],
+      "required": ["forecast", "trackError", "intensityError", "coverage", "cone"],
       "additionalProperties": false,
       "properties": {
         "forecast": { "type": "string", "minLength": 1 },
         "trackError": { "type": "string", "minLength": 1 },
         "intensityError": { "type": "string", "minLength": 1 },
-        "coverage": { "type": "string", "minLength": 1 }
+        "coverage": { "type": "string", "minLength": 1 },
+        "cone": { "type": "string", "minLength": 1 }
       }
     },
     "sources": {
       "type": "object",
-      "required": ["adeckArchive", "productArchive", "format", "coneRadii"],
+      "required": ["adeckArchive", "productArchive", "format", "coneRadii", "gisArchive"],
       "additionalProperties": false,
       "properties": {
         "adeckArchive": { "type": "string", "pattern": "^https://" },
         "productArchive": { "type": "string", "pattern": "^https://" },
         "format": { "type": "string", "pattern": "^https://" },
-        "coneRadii": { "type": "string", "pattern": "^https://" }
+        "coneRadii": { "type": "string", "pattern": "^https://" },
+        "gisArchive": { "type": "string", "pattern": "^https://" }
       }
     },
     "totals": {
@@ -98,7 +101,8 @@
           "year": { "type": "integer", "minimum": 1990, "maximum": 2100 },
           "basin": { "type": "string", "enum": ["AL", "EP"] },
           "atcfId": { "type": "string", "pattern": "^[a-z]{2}\\d{6}$" },
-          "coneEra": { "type": "string", "pattern": "^\\d{4}$" },
+          "coneEra": { "type": ["string", "null"], "pattern": "^\\d{4}$" },
+          "publishedCone": { "const": true },
           "sourceUrl": { "type": "string", "pattern": "^https://" },
           "archiveUrl": { "type": "string", "pattern": "^https://" },
           "sourceSubsetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
@@ -112,9 +116,57 @@
               "type": "object",
               "required": ["n", "t", "f", "e", "discussion"],
               "additionalProperties": false,
+              "allOf": [
+                {
+                  "$comment": "A record that carries a published cone has to carry the period it was drawn for and the moment it was issued. One without must carry neither, so an a-deck record cannot half-claim a cone it does not have.",
+                  "if": {
+                    "required": ["c"],
+                    "properties": { "c": true }
+                  },
+                  "then": {
+                    "required": ["c", "conePeriodHours", "issued"],
+                    "properties": { "c": true, "conePeriodHours": true, "issued": true }
+                  },
+                  "else": {
+                    "not": {
+                      "anyOf": [
+                        { "required": ["conePeriodHours"], "properties": { "conePeriodHours": true } },
+                        { "required": ["issued"], "properties": { "issued": true } }
+                      ]
+                    }
+                  }
+                }
+              ],
               "properties": {
-                "n": { "type": "integer", "minimum": 1 },
+                "n": {
+                  "$comment": "A full advisory is numbered. NHC's intermediate advisories are 19A, 20A and so on, and only the GIS archive carries them, so those stay text.",
+                  "oneOf": [
+                    { "type": "integer", "minimum": 1 },
+                    { "type": "string", "pattern": "^[1-9]\\d*[A-Z]$" }
+                  ]
+                },
                 "t": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+                "issued": {
+                  "$comment": "When NHC put the advisory out, which is after the synoptic hour `t` its forecast was initialised on.",
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                },
+                "conePeriodHours": { "type": "integer", "enum": [72, 120] },
+                "c": {
+                  "type": "array",
+                  "minItems": 3,
+                  "description": "The cone NHC published with this advisory, as [lat, lon] pairs.",
+                  "items": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "prefixItems": [
+                      { "type": "number", "minimum": -90, "maximum": 90 },
+                      { "type": "number", "minimum": -180, "maximum": 180 }
+                    ],
+                    "items": false
+                  }
+                },
                 "discussion": { "type": ["string", "null"], "pattern": "^https://" },
                 "f": {
                   "type": "array",
@@ -128,7 +180,7 @@
                       { "type": "integer", "minimum": 0, "maximum": 240 },
                       { "type": "number", "minimum": -90, "maximum": 90 },
                       { "type": "number", "minimum": -180, "maximum": 180 },
-                      { "type": "number", "minimum": 0, "maximum": 250 }
+                      { "type": ["number", "null"], "minimum": 0, "maximum": 250 }
                     ],
                     "items": false
                   }

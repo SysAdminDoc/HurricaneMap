@@ -339,8 +339,15 @@ export function readAdvisoryArchive(buffer, { stormId, label = 'advisory' } = {}
     }
   }
 
+  // A full advisory is a number, the way the a-deck era already records it; an
+  // intermediate keeps its letter, and only this archive has those.
+  const advisoryNumber = /^\d+$/.test(head.ADVISNUM) ? Number(head.ADVISNUM) : head.ADVISNUM;
+  if (!/^[1-9]\d*[A-Z]?$/.test(String(advisoryNumber))) {
+    throw new Error(`${label}: advisory number ${JSON.stringify(head.ADVISNUM)} is not a number with an optional letter`);
+  }
+
   return {
-    n: head.ADVISNUM,
+    n: advisoryNumber,
     // The synoptic hour the forecast is initialised on, which is what the
     // 2015-2024 records built from the a-deck are keyed on.
     t: initialIso,
