@@ -751,7 +751,7 @@
             "role": "strong",
             "text": "Archive coverage"
           },
-          "15 datasets · 1851–2025 · 590 storms",
+          "16 datasets · 1851–2025 · 587 storms",
           {
             "role": "list",
             "name": "Archive coverage",
@@ -892,6 +892,16 @@
                   {
                     "role": "strong",
                     "text": "U.S. Census state boundary polygons"
+                  },
+                  "final · no range"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Natural Earth North American coastline"
                   },
                   "final · no range"
                 ]

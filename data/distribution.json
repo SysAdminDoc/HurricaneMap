@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "profile": "full",
-  "source_commit": "744f46de1aa589a5fa70f2cf3e84a8ce6fa54128",
+  "source_commit": "3c8878bf1aeb17dbeeb72a9af6da5ace8884039a",
   "capabilities": {
     "historical_offline": true,
     "bundled_radar": true,
@@ -9,11 +9,11 @@
     "source_bundle": true
   },
   "payload": {
-    "file_count": 3615,
-    "bytes": 551472092,
-    "mandatory_bytes": 4875813,
+    "file_count": 3616,
+    "bytes": 551646838,
+    "mandatory_bytes": 4876151,
     "mandatory_file_count": 171,
-    "source_bundle_bytes": 12471255,
+    "source_bundle_bytes": 12471611,
     "source_bundle_file_count": 3,
     "source_bundle_max_bytes": 13631488,
     "radar_file_count": 1697,

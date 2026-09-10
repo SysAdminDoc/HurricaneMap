@@ -751,7 +751,7 @@
             "role": "strong",
             "text": "Cobertura del archivo"
           },
-          "15 conjuntos · 1851–2025 · 590 tormentas",
+          "16 conjuntos · 1851–2025 · 587 tormentas",
           {
             "role": "list",
             "name": "Cobertura del archivo",
@@ -892,6 +892,16 @@
                   {
                     "role": "strong",
                     "text": "U.S. Census state boundary polygons"
+                  },
+                  "final · sin rango"
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Natural Earth North American coastline"
                   },
                   "final · sin rango"
                 ]

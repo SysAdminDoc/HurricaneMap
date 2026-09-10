@@ -20,7 +20,7 @@
     - /url: https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml
   - group: Presizyon istorik previzyon yo
   - heading "Touche tè pa eta" [level=3]
-  - text: /Florida \d+ Texas \d+ Louisiana \d+ North Carolina \d+ South Carolina \d+ Mississippi \d+ Alabama \d+ New York \d+ Puerto Rico \d+ Georgia \d+ Massachusetts \d+ Rhode Island \d+ Connecticut 9 Maine 5 Hawaii 4 New Jersey 4 Virginia 4 Maryland 1/
+  - text: /Florida \d+ Louisiana \d+ Texas \d+ North Carolina \d+ South Carolina \d+ Mississippi \d+ Alabama \d+ New York \d+ Puerto Rico \d+ Georgia \d+ Massachusetts \d+ Rhode Island \d+ Connecticut 9 Maine 5 Hawaii 4 New Jersey 4 Virginia 4 Maryland 1/
   - heading "Touche tè pa kategori" [level=3]
   - text: /TS \/ sub-hurricane \d+ Category 1 \d+ Category 2 \d+ Category 3 \d+ Category 4 \d+ Category 5 5/
   - heading "Eta kotyè san okenn touche tè siklòn anrejistre" [level=3]

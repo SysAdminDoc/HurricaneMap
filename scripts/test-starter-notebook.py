@@ -14,8 +14,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 NOTEBOOK = ROOT / "notebooks" / "analysis-starter.ipynb"
 EXPECTED_COUNTS = {
-    "storm_count": 590,
-    "landfall_event_count": 753,
+    "storm_count": 587,
+    "landfall_event_count": 750,
     "hurricane_landfall_count": 370,
 }
 # ipykernel is here because nbclient needs a registered python3 kernelspec to
@@ -163,7 +163,7 @@ def execute_release_check(data_report: dict[str, Any]) -> int:
     missing = _missing_notebook_packages()
     if missing:
         # This used to return 0. The one gate that proves the published notebook
-        # still reproduces the 590/753/370 contract therefore passed on every
+        # still reproduces the 587/750/370 contract therefore passed on every
         # machine that could not run it, which was every machine without the
         # notebook packages installed. Not running is not the same as passing.
         if os.environ.get("HURRICANEMAP_NOTEBOOK") == "skip":

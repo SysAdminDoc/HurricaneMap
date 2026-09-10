@@ -4,7 +4,7 @@
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.10.0",
-    "source_commit": "744f46de1aa589a5fa70f2cf3e84a8ce6fa54128",
+    "source_commit": "3c8878bf1aeb17dbeeb72a9af6da5ace8884039a",
     "source_manifest": "data/hurdat2-sources.json",
     "runtime": "Python 3.12.10"
   },
@@ -204,6 +204,16 @@
       "retirement_citation": null
     },
     {
+      "id": "land-mask",
+      "label": "Natural Earth North American coastline",
+      "paths": [
+        "data/land-mask.json"
+      ],
+      "status": "active",
+      "end_date": null,
+      "retirement_citation": null
+    },
+    {
       "id": "glossary",
       "label": "HurricaneMap glossary",
       "paths": [
@@ -219,8 +229,8 @@
       1851,
       2025
     ],
-    "storm_count": 590,
-    "landfall_event_count": 753,
+    "storm_count": 587,
+    "landfall_event_count": 750,
     "hurricane_landfall_count": 370,
     "impact_row_count": 242,
     "basins": [
@@ -231,27 +241,27 @@
   "outputs": {
     "landfalls": {
       "path": "data/landfalls.json",
-      "size_bytes": 141563,
+      "size_bytes": 141010,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "e4d21ef815c41773f4630875c7e7d13c63ffa102350f77bc848084b3f35b68dc"
+      "sha256": "07908f4963e251a54c12ecd3b2709bcab44bbaa05875a9d1204c39175306b2ba"
     },
     "storms": {
       "path": "data/storms.json",
-      "size_bytes": 2275482,
+      "size_bytes": 2269717,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "42dca908a6ac22766ef991243b2238c560a7110050e6dba6a620bfefc0e1950c"
+      "sha256": "2db364343d9444e1535ab38dbbdc9e88adeb4baddae3ac04405b3a6c98e2a621"
     },
     "storms_gzip": {
       "path": "data/storms.json.gz",
-      "size_bytes": 232295,
+      "size_bytes": 231693,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "ec727afea5654942e1c69fe80232c1ef358ebcb7cdc2dfa81a423fa38ffe67d6"
+      "sha256": "231c864a3438e1c66f632a14927b0ef8dc307561eb5b8395474fa3eee392305f"
     },
     "stats": {
       "path": "data/stats.json",
       "size_bytes": 8364,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "05dc26339a5bb1ee7be5ae9aa078693b9094c5a862f81fa4fc50fd85ea9dbbd1"
+      "sha256": "5a429ce57a1b4dc5e57428dfe6dd2559fe7100ec355cd8c830dcac4f326b4aea"
     }
   },
   "methodology": {

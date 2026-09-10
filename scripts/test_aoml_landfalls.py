@@ -67,11 +67,64 @@ states = [{
     "bbox": (0, 0, 10, 10),
     "polys": [[[(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)]]],
 }]
+# A state sits on land, so the mask says so over the same square. Without it the
+# inference would read the whole fixture as ocean and the C guard would be the
+# only thing left standing between the track and a candidate, which is less than
+# this is meant to prove.
+mask = {"ring": [[0, 0], [10, 0], [10, 10], [0, 10]], "window": [0, 0, 10, 10]}
 track = [
     {"rec": "", "t": "2026-01-01T00:00:00Z", "lat": -1, "lon": 5, "wind": 70, "pres": 990, "status": "HU"},
     {"rec": "C", "t": "2026-01-01T06:00:00Z", "lat": 5, "lon": 5, "wind": 70, "pres": 990, "status": "HU"},
     {"rec": "", "t": "2026-01-01T12:00:00Z", "lat": -1, "lon": 5, "wind": 70, "pres": 990, "status": "HU"},
 ]
-assert infer_landfall_candidates(track, states, "AL") == []
+assert infer_landfall_candidates(track, states, "AL", mask) == []
 
-print("AOML landfall contracts ok (parser, metrics, marker filtering, and C guard)")
+# --- the crossing rule ------------------------------------------------------
+#
+# A landfall belongs to the country the storm came ashore in. Reading "not
+# inside a US state polygon" as "over water" put six landfalls in the atlas that
+# were in Tamaulipas, and three more crossed the Rio Grande hours after coming
+# ashore in Mexico. Both fixtures below are the same shape as that: a square of
+# land with the state in one corner of it, so the state has a coast on two sides
+# and an inland border on the other two.
+LAND = {"ring": [[0, 0], [20, 0], [20, 20], [0, 20]], "window": [-1, -1, 21, 21]}
+COASTAL_STATE = [{
+    "name": "Coastal",
+    "bbox": (10, 10, 20, 20),
+    "polys": [[[(10, 10), (20, 10), (20, 20), (10, 20), (10, 10)]]],
+}]
+
+
+def fix(lat, lon, hours):
+    return {
+        "rec": "", "t": "2026-01-0%dT00:00:00Z" % (hours + 1),
+        "lat": lat, "lon": lon, "wind": 70, "pres": 990, "status": "HU",
+    }
+
+
+# Ashore on the far coast, then inland across the state's land border. The
+# crossing is at 0N 5E, more than a thousand kilometres from the state, so this
+# is the Rio Grande case and it is not a landfall on this state.
+overland = [fix(-5, 5, 0), fix(5, 5, 1), fix(15, 15, 2)]
+assert infer_landfall_candidates(overland, COASTAL_STATE, "AL", LAND) == [], (
+    "a track that came ashore a continent away and crossed a land border is not a landfall"
+)
+
+# The same state, entered from the sea over its own coast. The crossing is on
+# the state boundary itself, so this one stands: without it the assertion above
+# would pass for a rule that simply refuses everything.
+from_the_sea = [fix(25, 15, 0), fix(15, 15, 1)]
+coastal = infer_landfall_candidates(from_the_sea, COASTAL_STATE, "AL", LAND)
+assert len(coastal) == 1, f"a track crossing the state's own coast is a landfall: {coastal}"
+assert coastal[0]["state"] == "Coastal"
+assert coastal[0]["inferred"] is True
+
+# With no mask coverage the rule has nothing to judge and must not refuse: the
+# window here excludes the whole fixture, which is what a track outside the
+# mask's region looks like.
+elsewhere = {"ring": LAND["ring"], "window": [100, 100, 110, 110]}
+assert len(infer_landfall_candidates(from_the_sea, COASTAL_STATE, "AL", elsewhere)) == 1, (
+    "a track the mask cannot speak to keeps the behaviour it had before the mask existed"
+)
+
+print("AOML landfall contracts ok (parser, metrics, marker filtering, C guard, and the crossing rule)")

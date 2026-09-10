@@ -28,6 +28,7 @@ EPAC_FILE = DATA / "hurdat2-nepac.txt"
 STATES_GEOJSON = DATA / "us-states.geojson"
 SOURCE_LOCK_FILE = DATA / "hurdat2-sources.json"
 AOML_LANDFALLS = DATA / "aoml-landfalls.json"
+LAND_MASK = DATA / "land-mask.json"
 
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
@@ -39,6 +40,7 @@ IMPACTS_FILE = DATA / "impacts.json"
 GENERATOR_NAME = "scripts/preprocess_hurdat2.py"
 METADATA_SCHEMA_VERSION = 1
 EARTH_R_KM = 6371.0088
+KM_PER_DEGREE = 111.1950802335329
 TS_THRESHOLD_KT = 34
 RI_THRESHOLD_KT = 30
 RI_WINDOW_HOURS = 24
@@ -186,6 +188,14 @@ DATASET_STATUSES = [
         "id": "storm-boundaries",
         "label": "U.S. Census state boundary polygons",
         "paths": ["data/us-states.geojson"],
+        "status": "active",
+        "end_date": None,
+        "retirement_citation": None,
+    },
+    {
+        "id": "land-mask",
+        "label": "Natural Earth North American coastline",
+        "paths": ["data/land-mask.json"],
         "status": "active",
         "end_date": None,
         "retirement_citation": None,
@@ -603,7 +613,7 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
     If no state is within the equivalent max_deg radius, return (None, None).
     Tries PIP first (returns 0 distance), else samples polygon edges."""
     best = None
-    best_d = max_deg * 111.1950802335329
+    best_d = max_deg * KM_PER_DEGREE
     for st in states:
         mlon, mlat, Mlon, Mlat = st["bbox"]
         if lon < mlon - max_deg or lon > Mlon + max_deg:
@@ -623,6 +633,103 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
                         best_d = d
                         best = st["name"]
     return (best, best_d) if best else (None, None)
+
+
+# How far outside the United States a water-to-land crossing may be and still
+# be that storm's US landfall. The two coastlines this build uses disagree along
+# the US shore, because Natural Earth and the Census boundaries draw barrier
+# islands, bays and deltas differently, and a HURDAT2 fix is stated to a tenth
+# of a degree on top of that. Both sides of this number are measured over the
+# whole record rather than reasoned about:
+#
+#   the largest genuine US landfall crossing that lands outside a state polygon
+#   is Francine 2024 at 15.3 km, in the Atchafalaya delta, with Babe 1977 at
+#   12.0 and the 1936 Texas storm at 10.7 behind it;
+#
+#   the nearest crossing that is really a Rio Grande entry is the 1925 storm at
+#   75.8 km, then Hermine 2010 at 68.7, Alice 1954 at 103.0 and the 1874 storm
+#   at 114.6.
+#
+# Swept over both basins, the whole atlas is identical anywhere from 20 km to
+# 75 km. At 80 the 1925 storm comes back; at 200 all three river crossings do;
+# at 10 the 1936 storm and Babe 1977 are lost. 40 sits in the middle of the
+# plateau, and it is not a distance to read meaning into beyond "further from
+# the United States than two coastlines can disagree, and nearer than
+# Tamaulipas".
+MAX_FOREIGN_CROSSING_KM = 40.0
+
+
+def load_land_mask():
+    """The North American coastline, as one ring, with the window it covers.
+
+    Built by scripts/build_land_mask.py from Natural Earth. Islands are absent
+    on purpose; see that file for why that is the right answer here.
+    """
+    with LAND_MASK.open("r", encoding="utf-8") as fh:
+        mask = json.load(fh)
+    if mask.get("schema_version") != 1:
+        raise SystemExit(f"{LAND_MASK.name} schema_version {mask.get('schema_version')!r} is not 1")
+    ring = mask["ring"]
+    if len(ring) < 1000:
+        raise SystemExit(f"{LAND_MASK.name} holds {len(ring)} vertices, which is not a coastline")
+    return {"ring": ring, "window": mask["window"]}
+
+
+def point_over_land(lon: float, lat: float, mask) -> bool:
+    """Whether a position is on the North American mainland.
+
+    Outside the mask's window this answers False. Nothing asks it to: the walk
+    below stops at the first fix over water, so it never leaves the coast the
+    storm came ashore on.
+    """
+    lon_min, lat_min, lon_max, lat_max = mask["window"]
+    if not (lon_min <= lon <= lon_max and lat_min <= lat <= lat_max):
+        return False
+    return point_in_ring(lon, lat, mask["ring"])
+
+
+def landfall_crossing(track, index, mask):
+    """Where the storm came ashore, for a fix it is still ashore from.
+
+    Walks back while the fixes read as land; the last fix over water before them
+    brackets the crossing, and bisection puts it within a few metres. Returns
+    None when the track begins on land, because then there is no crossing in the
+    record to find and nothing can be concluded from its absence.
+    """
+    if not point_over_land(track[index]["lon"], track[index]["lat"], mask):
+        return None
+    at = index
+    while at > 0 and point_over_land(track[at]["lon"], track[at]["lat"], mask):
+        at -= 1
+    if point_over_land(track[at]["lon"], track[at]["lat"], mask):
+        return None
+    wet, dry = track[at], track[at + 1]
+    low, high = 0.0, 1.0
+    for _ in range(24):
+        mid = (low + high) / 2
+        lon = wet["lon"] + (dry["lon"] - wet["lon"]) * mid
+        lat = wet["lat"] + (dry["lat"] - wet["lat"]) * mid
+        if point_over_land(lon, lat, mask):
+            high = mid
+        else:
+            low = mid
+    return {
+        "index": at + 1,
+        "fraction": high,
+        "lon": wet["lon"] + (dry["lon"] - wet["lon"]) * high,
+        "lat": wet["lat"] + (dry["lat"] - wet["lat"]) * high,
+    }
+
+
+def crossing_is_outside_the_us(lon: float, lat: float, states) -> bool:
+    """Whether a water-to-land crossing is too far from the US to be its landfall.
+
+    `nearest_state` already measures this; its `max_deg` is a kilometre cutoff
+    divided by the length of a degree, and it returns no state when nothing is
+    inside that radius.
+    """
+    name, _ = nearest_state(lon, lat, states, max_deg=MAX_FOREIGN_CROSSING_KM / KM_PER_DEGREE)
+    return name is None
 
 
 def load_mexico_first_storms():
@@ -883,7 +990,7 @@ def state_at_point(lon, lat, states):
     return None
 
 
-def infer_landfall_candidates(track, states, basin):
+def infer_landfall_candidates(track, states, basin, mask):
     """Find TS+ water-to-land candidates without promoting HURDAT2 C records.
 
     HURDAT2's ``C`` identifier means closest approach to a coast without a
@@ -903,9 +1010,31 @@ def infer_landfall_candidates(track, states, basin):
     def allowed(state):
         return state and (allowed_states is None or state in allowed_states)
 
-    def append_candidate(record, state, *, lat=None, lon=None, wind=None, pres=None, status=None):
+    def append_candidate(record, state, *, lat=None, lon=None, wind=None, pres=None, status=None,
+                         crossing=None, before=None, after=None):
         if not allowed(state):
             return
+        # A landfall belongs where the centre crossed the coast. Usually that is
+        # on the same segment the state polygon notices it on, and the record is
+        # already within one fix of it. Where the two coastlines disagree it can
+        # be a whole fix earlier: Danielle 1980 came ashore near Galveston at
+        # 00Z and the Census polygons first place it in Texas at 06Z, 140 km
+        # further west. Only that case moves, because only that case is wrong by
+        # more than the coastlines differ by.
+        if crossing is not None and before is not None and after is not None and crossing["index"] < i:
+            wet = track[crossing["index"] - 1]
+            dry = track[crossing["index"]]
+            fraction = crossing["fraction"]
+            lat = round(crossing["lat"], 2)
+            lon = round(crossing["lon"], 2)
+            w_a = wet["wind"] or 0
+            w_b = dry["wind"] or 0
+            p_a = wet["pres"] or 0
+            p_b = dry["pres"] or 0
+            wind = int(round(w_a + (w_b - w_a) * fraction)) if (w_a or w_b) else None
+            pres = int(round(p_a + (p_b - p_a) * fraction)) if (p_a or p_b) else None
+            status = wet["status"] if w_a >= w_b else dry["status"]
+            record = dry
         wind = record["wind"] if wind is None else wind
         pres = record["pres"] if pres is None else pres
         status = record["status"] if status is None else status
@@ -954,7 +1083,14 @@ def infer_landfall_candidates(track, states, basin):
 
         # Direct entry on a synoptic point.
         if here_state and not prev_state and not came_ashore_abroad and b["status"] in ("HU", "TS", "SS"):
-            append_candidate(b, here_state)
+            crossing = landfall_crossing(track, i, mask)
+            if crossing is None:
+                # The track begins on land, so the record holds no crossing to
+                # judge. Nothing can be concluded from its absence, and the
+                # candidate stands as it did before the mask existed.
+                append_candidate(b, here_state)
+            elif not crossing_is_outside_the_us(crossing["lon"], crossing["lat"], states):
+                append_candidate(b, here_state, crossing=crossing, before=a, after=b)
         # Mid-segment crossing: both endpoints offshore but segment grazes land.
         elif not here_state and not prev_state and not came_ashore_abroad and b["status"] in ("HU", "TS", "SS"):
             for k in range(1, 10):
@@ -973,6 +1109,9 @@ def infer_landfall_candidates(track, states, basin):
                 pres = int(round(p_a + (p_b - p_a) * fraction)) if (p_a or p_b) else None
                 # Pick the higher-intensity status.
                 status = a["status"] if w_a >= w_b else b["status"]
+                crossing = landfall_crossing(track, i, mask)
+                if crossing is not None and crossing_is_outside_the_us(crossing["lon"], crossing["lat"], states):
+                    break
                 append_candidate(
                     b,
                     mid_state,
@@ -1015,6 +1154,8 @@ def main():
     print("Loading state polygons...", file=sys.stderr)
     states = load_states()
     print(f"Loaded {len(states)} state/territory polygons.", file=sys.stderr)
+    land_mask = load_land_mask()
+    print(f"Land mask: {len(land_mask['ring'])} coastline vertices.", file=sys.stderr)
     mexico_first_storms = load_mexico_first_storms()
     print(f"AOML records {len(mexico_first_storms)} storms as coming ashore in Mexico before Texas.", file=sys.stderr)
 
@@ -1066,7 +1207,7 @@ def main():
                 us_landfalls = [lf for lf in us_landfalls if lf["state"] != "Texas"]
 
             if not us_landfalls:
-                us_landfalls = infer_landfall_candidates(storm["track"], states, storm["basin"])
+                us_landfalls = infer_landfall_candidates(storm["track"], states, storm["basin"], land_mask)
                 if storm["id"] in mexico_first_storms:
                     us_landfalls = [lf for lf in us_landfalls if lf["state"] != "Texas"]
 

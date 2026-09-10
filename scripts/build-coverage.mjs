@@ -6,7 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export async function buildCoverage({ root: base = root } = {}) {
   const readJson = async relative => JSON.parse(await readFile(path.join(base, relative), 'utf8'));
-  const [metadata, manifest, storms, landfalls, advisories, radar, hwm, aoml, impacts, billions, enso, outlook, forecastSkill, stormEvents, rainfall, tideStations, boundaries, glossary] = await Promise.all([
+  const [metadata, manifest, storms, landfalls, advisories, radar, hwm, aoml, impacts, billions, enso, outlook, forecastSkill, stormEvents, rainfall, tideStations, boundaries, landMask, glossary] = await Promise.all([
     readJson('data/metadata.json'),
     readJson('data/release-manifest.json'),
     readJson('data/storms.json'),
@@ -24,6 +24,7 @@ export async function buildCoverage({ root: base = root } = {}) {
     readJson('data/rainfall.json'),
     readJson('data/tide-stations.json'),
     readJson('data/us-states.geojson'),
+    readJson('data/land-mask.json'),
     readJson('data/glossary.json'),
   ]);
   const datasetById = new Map(metadata.datasets.map(dataset => [dataset.id, dataset]));
@@ -208,6 +209,11 @@ export async function buildCoverage({ root: base = root } = {}) {
         sources: [source('U.S. Census state boundary polygons', 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html', artifactByPath.get('data/us-states.geojson')?.source_date || metadata.generated_at_utc.slice(0, 10))],
         availability: availability({ records: boundaries.features.length, detail: `${boundaries.features.length} state and territory boundary features are bundled for spatial classification.` }),
         notes: ['Boundaries support inferred-landfall and spatial-search geometry; they are not storm observations.'],
+      }),
+      dataset('land-mask', {
+        sources: [source('Natural Earth 1:10m physical land', 'https://www.naturalearthdata.com/downloads/10m-physical-vectors/', artifactByPath.get('data/land-mask.json')?.source_date || metadata.generated_at_utc.slice(0, 10))],
+        availability: availability({ records: landMask.ring.length, detail: `${landMask.ring.length} coastline vertices decide whether a track fix was over water before it entered a state.` }),
+        notes: ['The North American mainland only, clipped to the window the landfall inference asks about; islands are excluded because crossing one still means the storm reached the coast over water.'],
       }),
       dataset('glossary', {
         sources: [source('HurricaneMap glossary', 'https://github.com/SysAdminDoc/HurricaneMap', artifactByPath.get('data/glossary.json')?.source_date || metadata.generated_at_utc.slice(0, 10))],

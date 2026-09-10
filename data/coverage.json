@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-08T00:00:00Z",
-  "source_commit": "744f46de1aa589a5fa70f2cf3e84a8ce6fa54128",
+  "source_commit": "3c8878bf1aeb17dbeeb72a9af6da5ace8884039a",
   "catalog": {
     "basins": [
       "AL",
@@ -11,8 +11,8 @@
       1851,
       2025
     ],
-    "storm_count": 590,
-    "landfall_event_count": 753,
+    "storm_count": 587,
+    "landfall_event_count": 750,
     "hurricane_landfall_count": 370
   },
   "datasets": [
@@ -55,12 +55,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 753,
-        "storms": 590,
+        "records": 750,
+        "storms": 587,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "590 final best-track storms; 753 landfall events, including 50 inferred events."
+        "detail": "587 final best-track storms; 750 landfall events, including 47 inferred events."
       },
       "distribution": [
         "core",
@@ -439,12 +439,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 209,
-        "storms": 209,
+        "records": 208,
+        "storms": 208,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "209 storms have bundled tropical-cyclone rainfall summaries."
+        "detail": "208 storms have bundled tropical-cyclone rainfall summaries."
       },
       "distribution": [
         "core",
@@ -603,6 +603,41 @@
       ],
       "notes": [
         "Boundaries support inferred-landfall and spatial-search geometry; they are not storm observations."
+      ]
+    },
+    {
+      "id": "land-mask",
+      "label": "Natural Earth North American coastline",
+      "paths": [
+        "data/land-mask.json"
+      ],
+      "sources": [
+        {
+          "name": "Natural Earth 1:10m physical land",
+          "url": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/",
+          "revision_date": "2026-08-08"
+        }
+      ],
+      "basins": [],
+      "year_range": null,
+      "end_date": null,
+      "lifecycle_status": "active",
+      "value_status": "final",
+      "availability": {
+        "runnable": true,
+        "records": 10517,
+        "storms": null,
+        "frames": null,
+        "advisories": null,
+        "marks": null,
+        "detail": "10517 coastline vertices decide whether a track fix was over water before it entered a state."
+      },
+      "distribution": [
+        "core",
+        "full"
+      ],
+      "notes": [
+        "The North American mainland only, clipped to the window the landfall inference asks about; islands are excluded because crossing one still means the storm reached the coast over water."
       ]
     },
     {

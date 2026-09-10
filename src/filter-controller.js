@@ -21,7 +21,7 @@ function listFormat(items) {
 }
 
 /**
- * What to say when the filters exclude everything. A blank map under "0 of 753"
+ * What to say when the filters exclude everything. A blank map under "0 of 750"
  * reads as a broken app, and every other surface in here already had an empty
  * state; this was the one that did not.
  *

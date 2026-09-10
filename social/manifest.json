@@ -278,11 +278,6 @@
       "svg_sha256": "4bf1667968097ef14250a7c235e3f4eaeedf89ff53e13ec36802f237708d418d",
       "png_sha256": "3b21bcee6cd22ba1d4403bbbfa0da7d7853bc1bb4d10185fbeb5dee99d3753e5"
     },
-    "al041874.png": {
-      "storm_id": "AL041874",
-      "svg_sha256": "ff0dcf8a96062740301bd7cc0d820caa144f2ed7f4d1425e29cb4dab0a5b2ed5",
-      "png_sha256": "36ef37bf9630b7c16e679e3ab9176846cfd97807b0545d5892d4c9cbb392b7bb"
-    },
     "al061874.png": {
       "storm_id": "AL061874",
       "svg_sha256": "f349b13139d584795080ecd1ec86d4a97d5eef6d3579dcfd5979b36cdc610bbd",
@@ -1168,11 +1163,6 @@
       "svg_sha256": "11279980cea2815ebc8a291adde0d773e43ee4562f8cfa2a0a84fddd2d545e3d",
       "png_sha256": "206fa97ec783e094a56d26bcac95872d4e986ecc83614fedbef6f4c6dcffa45e"
     },
-    "al031925.png": {
-      "storm_id": "AL031925",
-      "svg_sha256": "458b1d7a1c87be907bedef3f549472a44acef71aa0377b094a21edd7542293fc",
-      "png_sha256": "64cb7e8d9b7e7d4dd3d70b51a9912de35592227b08f39c9006638c210f23f531"
-    },
     "al041925.png": {
       "storm_id": "AL041925",
       "svg_sha256": "4079ff7bd64efa2331508d1d9abbe27a9130ff83a0b945fe87badfde1b1b195d",
@@ -1643,11 +1633,6 @@
       "svg_sha256": "39a952bab89afb4bdbf42dfd68367c0c45565e8fd969c8d3b6de8b8497374825",
       "png_sha256": "fa0cbb32b4aa9d89a2a8774fa65e0836b5272dfc5a9183239c9aac4a403f25e8"
     },
-    "alice-1954.png": {
-      "storm_id": "AL031954",
-      "svg_sha256": "c5890b4c8e26b81ee55e528e9660942d6e57bd3d1e5c74a44582b71f8d34b32f",
-      "png_sha256": "0317a9a33612aedfdc82211b31cbb181259146fd79b80c889a9f2d04363d6d0b"
-    },
     "barbara-1954.png": {
       "storm_id": "AL051954",
       "svg_sha256": "88c8bdc10fbd10e9d2e34d9310ff0588c90e09aa4714fa3e6c663423540829a2",
@@ -2060,8 +2045,8 @@
     },
     "danielle-1980.png": {
       "storm_id": "AL111980",
-      "svg_sha256": "be6a98b553b123907a337407f8489b01506676b1ed52cc3702b59daab639bbe8",
-      "png_sha256": "96496402d47f315f7435dc02cfb54c2318809bade5636ec02ee68de589ab8b88"
+      "svg_sha256": "741e6999d3053da1089d60d6f16af0557d2f34144e895f32beaabb4e5d62f867",
+      "png_sha256": "e148bfa684fd6b29f8215196ffd7143fdafeb452b367268d84f83adb5904391e"
     },
     "dennis-1981.png": {
       "storm_id": "AL101981",

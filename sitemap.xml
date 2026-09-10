@@ -2995,12 +2995,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/alice-1954/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/barbara-1954/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
@@ -3560,12 +3554,6 @@
   </url>
   <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al071926/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al031925/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
@@ -4640,12 +4628,6 @@
   </url>
   <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al011874/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al041874/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>

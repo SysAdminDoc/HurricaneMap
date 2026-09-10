@@ -21,7 +21,7 @@ const coverage = JSON.parse(await readFile(path.join(root, 'data/coverage.json')
 const hurdatCoverage = coverage.datasets.find(dataset => dataset.id === 'hurdat2');
 const radarCoverage = coverage.datasets.find(dataset => dataset.id === 'radar-archive');
 assert.deepEqual(hurdat2Collection.summaries['hurricanemap:year_range'], hurdatCoverage.year_range);
-assert.equal(hurdat2Collection.summaries['hurricanemap:inferred_landfall_count'][0], 50);
+assert.equal(hurdat2Collection.summaries['hurricanemap:inferred_landfall_count'][0], 47);
 assert.deepEqual(radarCollection.summaries['hurricanemap:year_range'], radarCoverage.year_range);
 assert.equal(radarCollection.summaries['hurricanemap:storm_count'][0], 138);
 
@@ -88,7 +88,7 @@ assert.ok(
 // event/hazard/impact/response required on an item's properties, with
 // additionalProperties:false over the monty: namespace, and nothing here can
 // supply those honestly: a radar reflectivity frame is not an event, a hazard,
-// an impact or a response, the HURDAT2 item covers 590 storms and so has no
+// an impact or a response, the HURDAT2 item covers 587 storms and so has no
 // single country, and monty:corr_id is "the unique identifier assigned by the
 // Monty system", which a HURDAT2 storm id is not and which cannot be looked up
 // because Monty's API is 401-gated. Emitting src_event_id alone would be a

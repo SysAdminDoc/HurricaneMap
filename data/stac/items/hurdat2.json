@@ -43,8 +43,8 @@
     "datetime": null,
     "start_datetime": "1851-06-25T00:00:00Z",
     "end_datetime": "2025-07-07T18:00:00Z",
-    "hurricanemap:storm_count": 590,
-    "hurricanemap:landfall_event_count": 753,
+    "hurricanemap:storm_count": 587,
+    "hurricanemap:landfall_event_count": 750,
     "hurricanemap:year_range": [
       1851,
       2025
@@ -54,7 +54,7 @@
       "EP"
     ],
     "hurricanemap:coverage_status": "final",
-    "hurricanemap:inferred_landfall_count": 50,
+    "hurricanemap:inferred_landfall_count": 47,
     "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
     "hurricanemap:source_date": "2026-02-27",
     "hurricanemap:distribution": [
@@ -92,8 +92,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 232295,
-      "file:checksum": "sha256:ec727afea5654942e1c69fe80232c1ef358ebcb7cdc2dfa81a423fa38ffe67d6",
+      "file:size": 231693,
+      "file:checksum": "sha256:231c864a3438e1c66f632a14927b0ef8dc307561eb5b8395474fa3eee392305f",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",
@@ -109,8 +109,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 141563,
-      "file:checksum": "sha256:e4d21ef815c41773f4630875c7e7d13c63ffa102350f77bc848084b3f35b68dc",
+      "file:size": 141010,
+      "file:checksum": "sha256:07908f4963e251a54c12ecd3b2709bcab44bbaa05875a9d1204c39175306b2ba",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",
@@ -160,8 +160,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 16950,
-      "file:checksum": "sha256:a81c53ec3c19085dcf0282fa17ea617e8de4feaceb34af74e2b1c7cc95e15f03",
+      "file:size": 18048,
+      "file:checksum": "sha256:3664d7cafc76f306c5b8a2a9aa2cf5e4ba51ca7fcc3d6da8a1459954fc0cb16e",
       "hurricanemap:source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",

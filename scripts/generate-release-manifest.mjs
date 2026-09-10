@@ -121,6 +121,7 @@ function sourceUrl(relative) {
   if (relative.startsWith('data/stac/')) return 'https://github.com/SysAdminDoc/HurricaneMap';
   if (relative.startsWith('data/radar/')) return 'https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/';
   if (relative === 'data/us-states.geojson') return 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
+  if (relative === 'data/land-mask.json') return 'https://www.naturalearthdata.com/downloads/10m-physical-vectors/';
   if (relative === 'data/impacts.json') return 'https://en.wikipedia.org/';
   if (relative === 'data/billions.json') return 'https://www.ncei.noaa.gov/access/billions/';
   if (relative.startsWith('data/surge-obs/')) return 'https://api.tidesandcurrents.noaa.gov/api/prod/';

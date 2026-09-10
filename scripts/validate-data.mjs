@@ -420,7 +420,8 @@ const bundledDataPaths = new Set([
   'data/hurdat2-sources.json', 'data/impacts.json', 'data/landfalls.json',
   'data/ncei-billions-1980-2024.csv', 'data/outlook.json', 'data/rainfall.json',
   'data/stats.json', 'data/storm-events.json', 'data/storms.json', 'data/storms.json.gz',
-  'data/tide-stations.json', 'data/us-states.geojson', 'data/radar/manifest.json',
+  'data/tide-stations.json', 'data/us-states.geojson', 'data/land-mask.json',
+  'data/radar/manifest.json',
   'data/surge-obs/index.json',
 ]);
 for (const error of validateDatasetStatuses(metadata.datasets, bundledDataPaths)) fail(error);

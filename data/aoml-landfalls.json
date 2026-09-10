@@ -9640,7 +9640,7 @@
       }
     ],
     "inferred": {
-      "candidate_count": 50,
+      "candidate_count": 47,
       "hurricane_strength_candidate_count": 7,
       "scoreable_candidate_count": 0,
       "unscoreable_candidate_count": 7,

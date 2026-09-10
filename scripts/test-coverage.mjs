@@ -13,11 +13,11 @@ assert.equal(coverage.source_commit, metadata.generator.source_commit);
 assert.deepEqual(coverage.catalog, {
   basins: ['AL', 'EP'],
   year_range: [1851, 2025],
-  storm_count: 590,
-  landfall_event_count: 753,
+  storm_count: 587,
+  landfall_event_count: 750,
   hurricane_landfall_count: 370,
 });
-assert.equal(coverage.datasets.length, 15);
+assert.equal(coverage.datasets.length, 16);
 for (const dataset of coverage.datasets) {
   assert(dataset.sources.length > 0, `${dataset.id} needs a source`);
   assert(dataset.sources.every(source => /^https:\/\//.test(source.url)), `${dataset.id} has a non-HTTPS source`);
@@ -25,9 +25,9 @@ for (const dataset of coverage.datasets) {
   assert(['final', 'inferred', 'operational', 'stale', 'closed', 'unavailable'].includes(dataset.value_status), `${dataset.id} value status`);
 }
 
-assert.equal(byId.get('hurdat2').availability.storms, 590);
-assert.equal(byId.get('hurdat2').availability.records, 753);
-assert.match(byId.get('hurdat2').availability.detail, /50 inferred/);
+assert.equal(byId.get('hurdat2').availability.storms, 587);
+assert.equal(byId.get('hurdat2').availability.records, 750);
+assert.match(byId.get('hurdat2').availability.detail, /47 inferred/);
 assert.equal(byId.get('aoml-landfalls').availability.records, 386);
 assert.equal(byId.get('storm-impacts').value_status, 'inferred');
 assert.equal(byId.get('storm-impacts').availability.records, 242);
@@ -48,4 +48,4 @@ assert.equal(byId.get('tide-stations').availability.records, 301);
 const regenerated = await buildCoverage();
 assert.deepEqual(regenerated, coverage, 'coverage.json must be generated from the canonical data sources');
 
-console.log('coverage contracts ok (15 datasets, lifecycle/value statuses, archive counts, and deterministic generation)');
+console.log('coverage contracts ok (16 datasets, lifecycle/value statuses, archive counts, and deterministic generation)');

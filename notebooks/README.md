@@ -32,7 +32,7 @@ The release gate runs the same notebook offline in two disposable output directo
 npm run test:notebook
 ```
 
-The command validates 590 storms, 753 landfall events, 370 hurricane-strength landfalls, and the release-manifest hashes before executing. If the notebook runtime is not installed the gate fails and names the missing packages: a check that did not run is not a check that passed. Set `HURRICANEMAP_NOTEBOOK=skip` to record a deliberate skip, which still verifies the data contract and shows up as SKIPPED in `npm run build` rather than as a pass. The pinned environment needs Python 3.12 or newer.
+The command validates 587 storms, 750 landfall events, 370 hurricane-strength landfalls, and the release-manifest hashes before executing. If the notebook runtime is not installed the gate fails and names the missing packages: a check that did not run is not a check that passed. Set `HURRICANEMAP_NOTEBOOK=skip` to record a deliberate skip, which still verifies the data contract and shows up as SKIPPED in `npm run build` rather than as a pass. The pinned environment needs Python 3.12 or newer.
 
 **What you'll learn:**
 - How to structure landfall data for analysis
@@ -43,7 +43,7 @@ The command validates 590 storms, 753 landfall events, 370 hurricane-strength la
 ## Data Files
 
 The notebooks expect HurricaneMap's data files in the `data/` directory:
-- `data/landfalls.json` — 753 landfall events (flat list)
+- `data/landfalls.json` — 750 landfall events (flat list)
 - `data/storms.json` — Full track + metadata for every storm
 - `data/metadata.json` — generator, source-lock, coverage, and output provenance
 - `data/release-manifest.json` — byte and SHA-256 identities for the shipped release

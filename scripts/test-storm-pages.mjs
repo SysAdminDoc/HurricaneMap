@@ -73,7 +73,7 @@ assert.match(katrinaPage, /#v=1&amp;storm=AL122005/, 'the page must link into th
 assert.match(katrinaPage, /NOAA HURDAT2 best track, revision \d{4}-\d{2}-\d{2}/, 'the page must state the HURDAT2 revision');
 assert.match(katrinaPage, /@software\{hurricanemap_/, 'the page must carry a BibTeX citation');
 // A storm page cites the storm, not just the release. The old form asserted
-// here, `SysAdminDoc. (YYYY). HurricaneMap`, was identical on all 590 pages,
+// here, `SysAdminDoc. (YYYY). HurricaneMap`, was identical on all 587 pages,
 // which is the defect: two storms could not sit in one bibliography and neither
 // entry recorded which storm the reader used.
 assert.match(
@@ -233,7 +233,7 @@ for (const storm of storms) {
   );
 
   // And back the other way, as an exact set. A superset check let a dangling
-  // link to a page that does not exist ride on all 590 storm pages.
+  // link to a page that does not exist ride on all 587 storm pages.
   const page = bySlug.get(`storms/${slug}/index.html`);
   const nav = /<nav class="index-links" aria-label="This storm belongs to">([\s\S]*?)<\/nav>/.exec(page)?.[1] || '';
   const linked = [...nav.matchAll(/href="\.\.\/\.\.\/([^"]+)"/g)]
