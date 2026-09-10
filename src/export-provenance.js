@@ -8,8 +8,8 @@ const APP_VERSION = '1.10.0';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
-  source_commit: 'f1c38ad1eff5e44277d546e6283d99174820db45',
-  manifest_sha256: '5fa9172b415e5d8fc165ac3dad1a96b3777cc096b8fd7a6f5755fb2b3e06a8bd',
+  source_commit: '46a493e805a9ca70179722a74c637b4218c88155',
+  manifest_sha256: '39a1154ec09d912cde65b7b5c4773678a1ab35f50aa0fb02bc9eecf79fe0773e',
   algorithm: 'SHA-256',
 });
 
@@ -25,7 +25,7 @@ const ARTIFACTS = Object.freeze({
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
     bytes: 18048,
-    sha256: '886f2a46bc29b8af17ef45efdcfd4964426dcd23cf7690e0cd133b6c3a49b3d6',
+    sha256: '43d3c0c422854ded35652fc44ed9eb8fd6cc865afa97fea6ef47bbf8b2d91e01',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -65,7 +65,7 @@ const ARTIFACTS = Object.freeze({
   'data/landfalls.json': Object.freeze({
     path: 'data/landfalls.json',
     bytes: 141010,
-    sha256: '07908f4963e251a54c12ecd3b2709bcab44bbaa05875a9d1204c39175306b2ba',
+    sha256: '7591a8b29b7791f84588c2f293e2b22755035acdc29e2c545448c0d9e5ad3f0d',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -73,7 +73,7 @@ const ARTIFACTS = Object.freeze({
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
     bytes: 8055,
-    sha256: 'c3580e526795c7f00f2aa24b3312e2746495adc7f5c179bafea524695374f55a',
+    sha256: 'f84de67ec7b50b0afaa72e383c0807c97dd9a52bb600f40eff8770b6551c96f9',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -81,15 +81,15 @@ const ARTIFACTS = Object.freeze({
   'data/storms.json': Object.freeze({
     path: 'data/storms.json',
     bytes: 2269717,
-    sha256: '2db364343d9444e1535ab38dbbdc9e88adeb4baddae3ac04405b3a6c98e2a621',
+    sha256: 'e65bbaec00757725beab173162a7ec8d359dda798aecc287c33191aa6d81443a',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
   }),
   'data/storms.json.gz': Object.freeze({
     path: 'data/storms.json.gz',
-    bytes: 231693,
-    sha256: '231c864a3438e1c66f632a14927b0ef8dc307561eb5b8395474fa3eee392305f',
+    bytes: 231709,
+    sha256: '6d5ee1b30e93e39b21e8fd0e026688741734256a784e2240a31c944a370276e0',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -99,7 +99,7 @@ const ARTIFACTS = Object.freeze({
 const COVERAGE = Object.freeze({
   schema_version: 1,
   generated_at_utc: '2026-08-08T00:00:00Z',
-  source_commit: 'f1c38ad1eff5e44277d546e6283d99174820db45',
+  source_commit: '46a493e805a9ca70179722a74c637b4218c88155',
   catalog: Object.freeze({
     basins: ['AL', 'EP'],
     year_range: [1851, 2025],
@@ -122,7 +122,7 @@ const COVERAGE = Object.freeze({
     Object.freeze({ id: 'hwm', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [2003, 2024], end_date: null, availability: Object.freeze({ runnable: true, records: null, storms: 25, frames: null, advisories: null, marks: 10741 }) }),
     Object.freeze({ id: 'tide-stations', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 301, storms: null, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'storm-boundaries', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 52, storms: null, frames: null, advisories: null, marks: null }) }),
-    Object.freeze({ id: 'land-mask', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 10517, storms: null, frames: null, advisories: null, marks: null }) }),
+    Object.freeze({ id: 'land-mask', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 10518, storms: null, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'glossary', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: null, end_date: null, availability: Object.freeze({ runnable: true, records: 20, storms: null, frames: null, advisories: null, marks: null }) }),
   ]),
 });

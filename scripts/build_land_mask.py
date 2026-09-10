@@ -73,6 +73,11 @@ PROBES = [
     ("open Gulf of Mexico", -90.0, 26.0, False),
     ("Galveston Bay", -94.9, 29.55, False),
     ("Atlantic off Hatteras", -74.0, 35.0, False),
+    # The southern clip edge, where a dropped vertex left the ring wrong by
+    # 8.76 km and no probe was looking.
+    ("Venezuela at the clip edge", -70.0, 10.002, True),
+    ("Colombia at the clip edge", -75.0, 10.008, True),
+    ("Pacific off Panama at the clip edge", -80.0, 10.002, False),
 ]
 
 
@@ -173,18 +178,27 @@ def _simplify_chain(chain, tolerance):
 
 
 def simplify_ring(ring, tolerance):
-    """Simplify a closed ring by splitting it at its two most distant vertices.
+    """Simplify a ring by splitting it at its two most distant vertices.
 
-    A closed ring cannot go through Douglas-Peucker directly: the first and last
-    points coincide, so the base segment has no length and every vertex measures
-    infinitely far from it, which returns the ring unchanged at every tolerance.
+    A ring cannot go through Douglas-Peucker in one piece: if it is closed the
+    first and last points coincide, so the base segment has no length and every
+    vertex measures infinitely far from it, and the ring comes back unchanged at
+    every tolerance. Split it instead, simplify both halves, and rejoin.
+
+    The ring is treated as open, which is what `clip_to_window` returns and what
+    this writes: the closing edge is implicit. An earlier version dropped the
+    last vertex on the way out, which left that implicit edge as a chord 22.7
+    degrees long with no simplification behind it, and the mask wrong by 8.76 km
+    across a band of the Caribbean.
     """
     if len(ring) < 8:
         return ring
+    if ring[0] == ring[-1]:
+        ring = ring[:-1]
     far = max(range(1, len(ring)), key=lambda i: math.hypot(ring[i][0] - ring[0][0], ring[i][1] - ring[0][1]))
     head = _simplify_chain(ring[: far + 1], tolerance)
     tail = _simplify_chain(ring[far:], tolerance)
-    return head + tail[1:-1]
+    return head + tail[1:]
 
 
 def main() -> int:
@@ -215,6 +229,20 @@ def main() -> int:
         for lon, lat in simplified
     ]
     print(f"clipped and simplified: {len(ring)} vertices", file=sys.stderr)
+
+    # Douglas-Peucker keeps a subsequence of what it is given and never moves a
+    # vertex, so anything else means the simplifier lost or invented one. This
+    # is the check the probe table below could not make: the vertex that went
+    # missing was in the Caribbean, where no probe looks.
+    pool = iter(clipped)
+    for vertex in simplified:
+        for candidate in pool:
+            if candidate == vertex:
+                break
+        else:
+            raise SystemExit(f"simplification produced {vertex}, which is not a vertex of the clipped ring")
+    if simplified[0] != clipped[0] or simplified[-1] != clipped[-1]:
+        raise SystemExit("simplification dropped an end of the ring, so the closing edge is unsimplified")
 
     wrong = [
         label for label, lon, lat, expected in PROBES

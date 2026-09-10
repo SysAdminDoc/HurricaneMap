@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-08T00:00:00Z",
-  "source_commit": "f1c38ad1eff5e44277d546e6283d99174820db45",
+  "source_commit": "46a493e805a9ca70179722a74c637b4218c88155",
   "catalog": {
     "basins": [
       "AL",
@@ -625,12 +625,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 10517,
+        "records": 10518,
         "storms": null,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "10517 coastline vertices decide whether a track fix was over water before it entered a state."
+        "detail": "10518 coastline vertices decide whether a track fix was over water before it entered a state."
       },
       "distribution": [
         "core",

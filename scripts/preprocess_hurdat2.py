@@ -29,6 +29,9 @@ STATES_GEOJSON = DATA / "us-states.geojson"
 SOURCE_LOCK_FILE = DATA / "hurdat2-sources.json"
 AOML_LANDFALLS = DATA / "aoml-landfalls.json"
 LAND_MASK = DATA / "land-mask.json"
+# The tolerance data/land-mask.json is built at. The crossing walk samples a
+# segment finer than this, and load_land_mask refuses a file built coarser.
+LAND_MASK_TOLERANCE_DEGREES = 0.01
 
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
@@ -614,9 +617,18 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
     Tries PIP first (returns 0 distance), else samples polygon edges."""
     best = None
     best_d = max_deg * KM_PER_DEGREE
+    # `best_d` is a distance in kilometres, so the box that rejects candidates
+    # early has to be one too. A degree of longitude is shorter than a degree of
+    # latitude everywhere but the equator, so a plain `max_deg` in longitude
+    # rejected states that were genuinely inside the radius: 36.0 km at 26N,
+    # 30.2 at 41.8N, 23.0 at 55N against a 40 km radius. Eighteen constructed
+    # points across the state set were inside the radius and thrown out by the
+    # box, one of them off the Atchafalaya delta, which is exactly where this
+    # file says the two coastlines disagree most.
+    lon_margin = max_deg / max(math.cos(math.radians(lat)), 0.1)
     for st in states:
         mlon, mlat, Mlon, Mlat = st["bbox"]
-        if lon < mlon - max_deg or lon > Mlon + max_deg:
+        if lon < mlon - lon_margin or lon > Mlon + lon_margin:
             continue
         if lat < mlat - max_deg or lat > Mlat + max_deg:
             continue
@@ -642,20 +654,25 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
 # of a degree on top of that. Both sides of this number are measured over the
 # whole record rather than reasoned about:
 #
-#   the largest genuine US landfall crossing that lands outside a state polygon
-#   is Francine 2024 at 15.3 km, in the Atchafalaya delta, with Babe 1977 at
-#   12.0 and the 1936 Texas storm at 10.7 behind it;
+# The inference runs only for a storm with no explicit US landfall record, so
+# these are the crossings it actually sees, not every landfall in the atlas.
+# Of the 35, twenty-two are inside a state polygon and score zero. The rest:
 #
-#   the nearest crossing that is really a Rio Grande entry is the 1925 storm at
-#   75.8 km, then Hermine 2010 at 68.7, Alice 1954 at 103.0 and the 1874 storm
-#   at 114.6.
+#   genuine, and kept: the 1936 Texas storm at 10.67 km, Babe 1977 at 11.81,
+#   the 1880 storm at 13.96, the 1857 storm at 15.32, Beulah 1967 at 16.64 and
+#   Danielle 1980 at 17.65, whose first crossing is on a barrier island the
+#   Census polygons leave out;
+#
+#   entered over a land border, and refused: Hermine 2010 at 68.69 km, the 1925
+#   storm at 75.78, Alice 1954 at 103.02, the 1874 storm at 114.64, and Lester
+#   1992 at 273.54 into Arizona from Sonora.
 #
 # Swept over both basins, the whole atlas is identical anywhere from 20 km to
-# 75 km. At 80 the 1925 storm comes back; at 200 all three river crossings do;
-# at 10 the 1936 storm and Babe 1977 are lost. 40 sits in the middle of the
-# plateau, and it is not a distance to read meaning into beyond "further from
-# the United States than two coastlines can disagree, and nearer than
-# Tamaulipas".
+# 75 km. At 80 the 1925 storm comes back; at 200 all three Rio Grande crossings
+# do; at 10 the 1936 storm, Babe 1977 and Danielle are lost. 40 sits in the
+# middle of the plateau, and it is not a distance to read meaning into beyond
+# "further from the United States than two coastlines can disagree, and nearer
+# than Tamaulipas".
 MAX_FOREIGN_CROSSING_KM = 40.0
 
 
@@ -672,6 +689,11 @@ def load_land_mask():
     ring = mask["ring"]
     if len(ring) < 1000:
         raise SystemExit(f"{LAND_MASK.name} holds {len(ring)} vertices, which is not a coastline")
+    if mask.get("tolerance_degrees") != LAND_MASK_TOLERANCE_DEGREES:
+        raise SystemExit(
+            f"{LAND_MASK.name} was built at {mask.get('tolerance_degrees')!r} degrees and this samples "
+            f"a segment for {LAND_MASK_TOLERANCE_DEGREES}; the walk would step coarser than the coast"
+        )
     return {"ring": ring, "window": mask["window"]}
 
 
@@ -692,9 +714,16 @@ def landfall_crossing(track, index, mask):
     """Where the storm came ashore, for a fix it is still ashore from.
 
     Walks back while the fixes read as land; the last fix over water before them
-    brackets the crossing, and bisection puts it within a few metres. Returns
-    None when the track begins on land, because then there is no crossing in the
-    record to find and nothing can be concluded from its absence.
+    brackets the crossing. Returns None when the track begins on land, because
+    then there is no crossing in the record to find and nothing can be concluded
+    from its absence.
+
+    The bracketing segment can meet the coast more than once, and the landfall
+    is the first of those, not whichever one a bisection converges on. Danielle
+    1980's segment crosses three times: ashore near Galveston, back out over the
+    bay, and ashore again on its far side 16 km further west, which is the one
+    bisection alone reported. So walk the segment at a step finer than the
+    mask's own tolerance, take the first water-to-land step, and bisect in it.
     """
     if not point_over_land(track[index]["lon"], track[index]["lat"], mask):
         return None
@@ -704,21 +733,43 @@ def landfall_crossing(track, index, mask):
     if point_over_land(track[at]["lon"], track[at]["lat"], mask):
         return None
     wet, dry = track[at], track[at + 1]
-    low, high = 0.0, 1.0
+    span = math.hypot(dry["lon"] - wet["lon"], dry["lat"] - wet["lat"])
+    steps = min(4000, max(64, int(span / (LAND_MASK_TOLERANCE_DEGREES / 2)) + 1))
+
+    def at_fraction(fraction):
+        return (
+            wet["lon"] + (dry["lon"] - wet["lon"]) * fraction,
+            wet["lat"] + (dry["lat"] - wet["lat"]) * fraction,
+        )
+
+    low, high = None, None
+    for step in range(1, steps + 1):
+        fraction = step / steps
+        lon, lat = at_fraction(fraction)
+        if point_over_land(lon, lat, mask):
+            low, high = (step - 1) / steps, fraction
+            break
+    if high is None:
+        # Every sample read as water although the far endpoint is land, so the
+        # crossing sits inside the final step.
+        low, high = (steps - 1) / steps, 1.0
     for _ in range(24):
         mid = (low + high) / 2
-        lon = wet["lon"] + (dry["lon"] - wet["lon"]) * mid
-        lat = wet["lat"] + (dry["lat"] - wet["lat"]) * mid
+        lon, lat = at_fraction(mid)
         if point_over_land(lon, lat, mask):
             high = mid
         else:
             low = mid
-    return {
-        "index": at + 1,
-        "fraction": high,
-        "lon": wet["lon"] + (dry["lon"] - wet["lon"]) * high,
-        "lat": wet["lat"] + (dry["lat"] - wet["lat"]) * high,
-    }
+    lon, lat = at_fraction(high)
+    return {"index": at + 1, "fraction": high, "lon": lon, "lat": lat}
+
+
+def interpolate_time(start_iso: str, end_iso: str, fraction: float) -> str:
+    """The moment a fraction of the way between two track fixes, to the second."""
+    start = datetime.strptime(start_iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    end = datetime.strptime(end_iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    moment = start + (end - start) * fraction
+    return moment.replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def crossing_is_outside_the_us(lon: float, lat: float, states) -> bool:
@@ -1034,7 +1085,10 @@ def infer_landfall_candidates(track, states, basin, mask):
             wind = int(round(w_a + (w_b - w_a) * fraction)) if (w_a or w_b) else None
             pres = int(round(p_a + (p_b - p_a) * fraction)) if (p_a or p_b) else None
             status = wet["status"] if w_a >= w_b else dry["status"]
-            record = dry
+            # The position is interpolated, so the moment has to be too. Copying
+            # the later fix's stamp put Danielle three minutes out, and would put
+            # a crossing at a tenth of a segment nearly six hours out.
+            record = dict(dry, t=interpolate_time(wet["t"], dry["t"], fraction))
         wind = record["wind"] if wind is None else wind
         pres = record["pres"] if pres is None else pres
         status = record["status"] if status is None else status

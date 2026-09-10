@@ -92,8 +92,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 231693,
-      "file:checksum": "sha256:231c864a3438e1c66f632a14927b0ef8dc307561eb5b8395474fa3eee392305f",
+      "file:size": 231709,
+      "file:checksum": "sha256:6d5ee1b30e93e39b21e8fd0e026688741734256a784e2240a31c944a370276e0",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",
@@ -110,7 +110,7 @@
         "data"
       ],
       "file:size": 141010,
-      "file:checksum": "sha256:07908f4963e251a54c12ecd3b2709bcab44bbaa05875a9d1204c39175306b2ba",
+      "file:checksum": "sha256:7591a8b29b7791f84588c2f293e2b22755035acdc29e2c545448c0d9e5ad3f0d",
       "hurricanemap:source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",
@@ -161,7 +161,7 @@
         "data"
       ],
       "file:size": 18048,
-      "file:checksum": "sha256:886f2a46bc29b8af17ef45efdcfd4964426dcd23cf7690e0cd133b6c3a49b3d6",
+      "file:checksum": "sha256:43d3c0c422854ded35652fc44ed9eb8fd6cc865afa97fea6ef47bbf8b2d91e01",
       "hurricanemap:source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "hurricanemap:source_date": "2026-08-08",
       "hurricanemap:license": "public-domain",

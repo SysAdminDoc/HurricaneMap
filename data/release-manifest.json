@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-08T00:00:00Z",
-  "source_commit": "f1c38ad1eff5e44277d546e6283d99174820db45",
+  "source_commit": "46a493e805a9ca70179722a74c637b4218c88155",
   "algorithm": "SHA-256",
   "hand_maintained": {
     "refreshed_utc": "2026-09-05",
@@ -67,7 +67,7 @@
     {
       "path": "data/coverage.json",
       "bytes": 18048,
-      "sha256": "886f2a46bc29b8af17ef45efdcfd4964426dcd23cf7690e0cd133b6c3a49b3d6",
+      "sha256": "43d3c0c422854ded35652fc44ed9eb8fd6cc865afa97fea6ef47bbf8b2d91e01",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "78b217c66c3737805a4013609385319c9ae97a8d07b2e90accfbbe323d8c6cbe",
+      "sha256": "f5c1661757b01a737b5b131feb52607afdbc3ccd20d40d22fb249fc54aa76dcc",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -147,8 +147,8 @@
     },
     {
       "path": "data/land-mask.json",
-      "bytes": 180748,
-      "sha256": "857cd3fdbe835706a662805beead702a3a6b2d59605fcd6a0e422088f51d0930",
+      "bytes": 180762,
+      "sha256": "38b9f1e51e2f63c2d5ffb54f41a4f62e3741cfdbaaa0d2abdc5434d1f9cc39a4",
       "source_url": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -157,7 +157,7 @@
     {
       "path": "data/landfalls.json",
       "bytes": 141010,
-      "sha256": "07908f4963e251a54c12ecd3b2709bcab44bbaa05875a9d1204c39175306b2ba",
+      "sha256": "7591a8b29b7791f84588c2f293e2b22755035acdc29e2c545448c0d9e5ad3f0d",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -166,7 +166,7 @@
     {
       "path": "data/metadata.json",
       "bytes": 8055,
-      "sha256": "c3580e526795c7f00f2aa24b3312e2746495adc7f5c179bafea524695374f55a",
+      "sha256": "f84de67ec7b50b0afaa72e383c0807c97dd9a52bb600f40eff8770b6551c96f9",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15493,7 +15493,7 @@
     {
       "path": "data/stac/catalog.json",
       "bytes": 1290,
-      "sha256": "ae0a1f0b4209d35dd1ae1a2ed5d3af99a7b9614a3e369602b04e371411721ed0",
+      "sha256": "294eedbffc686028e6c19858d0a0aed30af275ed5587bc3d0c95c070d1fde2a3",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15520,7 +15520,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4539,
-      "sha256": "f37a15badb36ac29d06876964fdc6e49ae6582cea4914960308ab3d86335a4b4",
+      "sha256": "ea31dccc306de915258b0a3eb9333a534e3edcd792ad02fb3c956b5a4696f43d",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30820,7 +30820,7 @@
     {
       "path": "data/storms.json",
       "bytes": 2269717,
-      "sha256": "2db364343d9444e1535ab38dbbdc9e88adeb4baddae3ac04405b3a6c98e2a621",
+      "sha256": "e65bbaec00757725beab173162a7ec8d359dda798aecc287c33191aa6d81443a",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30828,8 +30828,8 @@
     },
     {
       "path": "data/storms.json.gz",
-      "bytes": 231693,
-      "sha256": "231c864a3438e1c66f632a14927b0ef8dc307561eb5b8395474fa3eee392305f",
+      "bytes": 231709,
+      "sha256": "6d5ee1b30e93e39b21e8fd0e026688741734256a784e2240a31c944a370276e0",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
