@@ -104,6 +104,7 @@
     "test:animation": "node scripts/test-animation.mjs",
     "test:chart": "node scripts/test-chart.mjs",
     "test:cone-retro": "node scripts/test-cone-retro.mjs",
+    "test:gis-archive": "node scripts/test-gis-archive.mjs",
     "test:advisory-replay": "node scripts/test-advisory-replay.mjs",
     "test:forecast-skill": "node scripts/test-forecast-skill.mjs",
     "test:art-mode": "node scripts/test-art-mode.mjs",

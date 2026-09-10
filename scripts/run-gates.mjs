@@ -94,6 +94,7 @@ export const GATE_SCRIPTS = Object.freeze([
   'test:chart',
   'test:cone-retro',
   'test:advisory-replay',
+  'test:gis-archive',
   'test:forecast-skill',
   'test:art-mode',
   'test:prep',
