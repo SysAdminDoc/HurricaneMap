@@ -66,8 +66,12 @@ const watchedDates = shallow
     .filter(entry => /^\d{4}-\d{2}-\d{2}$/.test(entry.date || ''));
 
 if (stated) {
-  const today = new Date().toISOString().slice(0, 10);
-  if (stated > today) {
+  // A day of slack: the date in the report is typed by a person in their own
+  // timezone, and comparing it against UTC failed for up to fourteen hours for
+  // anyone east of it. What this is for is a date years ahead, which would
+  // disable the freshness check for as long as it stood.
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  if (stated > tomorrow) {
     fail(`${VPAT_PATH} is dated ${stated}, which is in the future and would disable this check until then`);
   }
   for (const { relative, date } of watchedDates) {

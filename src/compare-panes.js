@@ -29,9 +29,16 @@ let position = 50;
 let stacked = false;
 let mobileQuery = null;
 
-/** The pane a pinned storm's track belongs in, or null for the map's own. */
-export function comparePaneName(slot) {
-  return PANE_NAMES[slot] || null;
+/**
+ * The pane a pinned storm's track belongs in, by its POSITION among the pins.
+ *
+ * Not by its colour slot. Slots are never re-packed when a pin is removed, so
+ * pinning three storms and unpinning the first left the remaining two holding
+ * slots 1 and 2: one pane empty, one storm drawn unclipped over both halves of
+ * the split. Position is what "the first two pinned storms" means.
+ */
+export function comparePaneName(index) {
+  return PANE_NAMES[index] || null;
 }
 
 export function ensureComparePanes(map) {
@@ -47,12 +54,25 @@ export function ensureComparePanes(map) {
   if (boundMap === map) return;
   boundMap = map;
   map.on('move zoom zoomend viewreset resize', applyClip);
-  mobileQuery = mobileQuery || window.matchMedia('(max-width: 720px)');
-  stacked = mobileQuery.matches;
-  mobileQuery.addEventListener('change', event => {
-    stacked = event.matches;
-    applyClip();
-  });
+  // Guarded the way settings.js and shell-navigation.js guard the same query:
+  // ensureComparePanes runs from drawTrack, so an engine without either API
+  // would throw on pinning a storm rather than on opening the panel.
+  if (!mobileQuery && typeof window.matchMedia === 'function') {
+    mobileQuery = window.matchMedia('(max-width: 720px)');
+    const onChange = event => {
+      stacked = event.matches;
+      applyClip();
+      // The panel's own hint names the orientation, so it has to be told:
+      // crossing the breakpoint with a split active left it saying "between"
+      // over a map that was splitting top and bottom.
+      document.dispatchEvent(new CustomEvent('hm-compare-panes:orientation', {
+        detail: { stacked },
+      }));
+    };
+    if (typeof mobileQuery.addEventListener === 'function') mobileQuery.addEventListener('change', onChange);
+    else if (typeof mobileQuery.addListener === 'function') mobileQuery.addListener(onChange);
+  }
+  stacked = Boolean(mobileQuery?.matches);
 }
 
 /**
@@ -146,14 +166,26 @@ function clipBelow(y) {
  * The same instant in two different storms.
  *
  * Two storms of different lengths, decades apart, have no wall-clock instant in
- * common, so the axis is a fraction of each storm's own life. At 0.5 the reader
- * is looking at both storms halfway through, which is the comparison a shared
- * time axis is actually for.
+ * common, so the axis is a fraction of each storm's own LIFE. Not of its point
+ * count: HURDAT2 intercalates non-synoptic fixes at landfall and at peak
+ * intensity, so a track with extra points near its landfall has more of its
+ * indices there than of its hours, and index 50 percent sat up to 22 percent
+ * away from the temporal midpoint. Andrew 1992 was eighteen hours out.
+ *
+ * Falls back to the index when the timestamps cannot answer, which is a track
+ * with one point or with unparseable times.
  */
 export function trackPointAtFraction(track, fraction) {
   const points = (track || []).filter(point => Number.isFinite(point.lat) && Number.isFinite(point.lon));
   if (!points.length) return null;
   const clamped = Math.min(1, Math.max(0, Number(fraction) || 0));
-  const index = Math.round(clamped * (points.length - 1));
-  return points[index];
+  const times = points.map(point => Date.parse(point.t));
+  const usable = times.every(Number.isFinite) && times[times.length - 1] > times[0];
+  if (!usable) return points[Math.round(clamped * (points.length - 1))];
+  const target = times[0] + clamped * (times[times.length - 1] - times[0]);
+  let best = 0;
+  for (let index = 1; index < times.length; index += 1) {
+    if (Math.abs(times[index] - target) < Math.abs(times[best] - target)) best = index;
+  }
+  return points[best];
 }

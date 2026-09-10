@@ -202,9 +202,14 @@
           "NHC forecast cone and track Appears only when official active-storm geometry is available.",
           {
             "role": "checkbox",
-            "name": "Storm surge flooding footprint NHC's potential inundation area, published only during a surge event."
+            "name": "Continuous track colour Colour wind and pressure by their exact value instead of by band. The legend keeps the bands as its key."
           },
-          "Storm surge flooding footprint NHC's potential inundation area, published only during a surge event.",
+          "Continuous track colour Colour wind and pressure by their exact value instead of by band. The legend keeps the bands as its key.",
+          {
+            "role": "checkbox",
+            "name": "Storm surge flooding footprint NHC's potential inundation area. Published only for a storm under a surge watch or warning, so it is usually empty."
+          },
+          "Storm surge flooding footprint NHC's potential inundation area. Published only for a storm under a surge watch or warning, so it is usually empty.",
           {
             "role": "checkbox",
             "name": "NHC tropical outlook Shows current official disturbance areas and formation chances.",

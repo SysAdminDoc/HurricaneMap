@@ -202,9 +202,14 @@
           "Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible.",
           {
             "role": "checkbox",
-            "name": "Huella de inundación por marejada Área de inundación potencial del NHC, publicada solo durante un evento de marejada."
+            "name": "Color de trayectoria continuo Colorea el viento y la presión por su valor exacto en lugar de por banda. La leyenda conserva las bandas como clave."
           },
-          "Huella de inundación por marejada Área de inundación potencial del NHC, publicada solo durante un evento de marejada.",
+          "Color de trayectoria continuo Colorea el viento y la presión por su valor exacto en lugar de por banda. La leyenda conserva las bandas como clave.",
+          {
+            "role": "checkbox",
+            "name": "Huella de inundación por marejada Área de inundación potencial del NHC. Solo se publica para una tormenta bajo vigilancia o aviso de marejada, así que suele estar vacía."
+          },
+          "Huella de inundación por marejada Área de inundación potencial del NHC. Solo se publica para una tormenta bajo vigilancia o aviso de marejada, así que suele estar vacía.",
           {
             "role": "checkbox",
             "name": "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.",

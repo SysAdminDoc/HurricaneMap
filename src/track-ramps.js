@@ -59,6 +59,25 @@ function hslToRgb(hue, saturation, lightness) {
   return [(r + match) * 255, (g + match) * 255, (b + match) * 255];
 }
 
+/**
+ * The ramp at any position along it, not only at a bin stop.
+ *
+ * The stops below are this function at evenly spaced fractions, so a continuous
+ * colour is the same corridor read at finer resolution rather than a second
+ * palette to keep in step with the first. Every property the binned ramp was
+ * measured for holds along the whole corridor by construction: the contrast
+ * gate samples it, rather than trusting that.
+ */
+export function rampColorAt(fraction) {
+  const { hueFrom, hueTo, lightnessFrom, lightnessTo, saturation } = RAMP_GEOMETRY;
+  const position = Math.min(1, Math.max(0, Number(fraction) || 0));
+  return hex(hslToRgb(
+    hueFrom + (hueTo - hueFrom) * position,
+    saturation,
+    lightnessFrom + (lightnessTo - lightnessFrom) * position,
+  ));
+}
+
 /** The ramp sampled at `count` evenly spaced stops, lightest first. */
 export function rampStops(count) {
   const { hueFrom, hueTo, lightnessFrom, lightnessTo, saturation } = RAMP_GEOMETRY;
@@ -120,6 +139,51 @@ function monthBinIndex(iso) {
   const month = Number(String(iso).slice(5, 7));
   const at = SEASON_MONTHS.indexOf(month);
   return at;
+}
+
+/**
+ * Where a value sits along its encoding's range, 0 to 1, or null for no answer.
+ *
+ * The domains are the outer bin edges rather than the observed extremes, so the
+ * colour a reading gets does not shift when the archive gains a stronger storm.
+ * Wind runs from tropical-storm strength to the top of the recorded scale;
+ * pressure runs the other way, because a lower minimum is a stronger storm and
+ * "darker is stronger" has to stay true across both.
+ */
+export const WIND_RANGE = Object.freeze([34, 160]);
+export const PRESSURE_RANGE = Object.freeze([1010, 900]);
+
+export function continuousFraction(mode, point) {
+  if (mode === 'wind') {
+    const wind = point?.wind;
+    if (!Number.isFinite(wind)) return null;
+    const [from, to] = WIND_RANGE;
+    return Math.min(1, Math.max(0, (wind - from) / (to - from)));
+  }
+  if (mode === 'pressure') {
+    const pressure = point?.pres;
+    // Number('') is 0, which is finite and would read as the strongest storm
+    // ever recorded. The binned path guards this the same way.
+    if (!Number.isFinite(pressure) || pressure <= 0) return null;
+    const [from, to] = PRESSURE_RANGE;
+    return Math.min(1, Math.max(0, (pressure - from) / (to - from)));
+  }
+  return null;
+}
+
+/**
+ * The same encodings without the bins.
+ *
+ * A storm that intensifies steadily through a band rendered as one flat colour,
+ * which is the thing bins do to continuous data. Only wind and pressure: a
+ * month is a label, and interpolating between September and October would be
+ * inventing a reading rather than refining one. An encoding with no continuous
+ * answer falls back to the binned colour, so a caller never has to know which
+ * is which.
+ */
+export function trackPointColorContinuous(mode, point) {
+  const fraction = continuousFraction(mode, point);
+  return fraction === null ? trackPointColor(mode, point) : rampColorAt(fraction);
 }
 
 /**
@@ -211,7 +275,7 @@ export function trackLegendTitle(mode) {
  * by test:shell-boundaries and this is the module that already knows what the
  * rows are.
  */
-export function renderTrackColorLegend(mode) {
+export function renderTrackColorLegend(mode, { continuous = false } = {}) {
   const host = document.getElementById('track-color-legend');
   const heading = document.getElementById('track-color-legend-title');
   const list = document.getElementById('track-color-legend-list');
@@ -227,6 +291,15 @@ export function renderTrackColorLegend(mode) {
   const title = trackLegendTitle(mode);
   heading.textContent = title;
   host.setAttribute('aria-label', title);
+  // A continuous ramp with a banded key is only honest if the key says so: the
+  // swatches are then reference points along a gradient rather than the set of
+  // colours a track can take.
+  host.dataset.continuous = String(Boolean(continuous));
+  const note = document.getElementById('track-color-legend-note');
+  if (note) {
+    note.textContent = continuous ? t('trackColor.continuousNote') : '';
+    note.hidden = !continuous;
+  }
   // Built as nodes rather than as an HTML string. These labels carry numbers
   // and month names out of Intl and the swatch carries a colour, so there is
   // nothing here that wants markup.

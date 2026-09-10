@@ -119,6 +119,20 @@ export async function startActiveStormPolling() {
     if (e.detail.key === 'nhcOutlook' || e.detail.key === 'marineWarnings' || e.detail.key === 'marineHorizon') {
       renderOperationalLayers();
     }
+    // Without this the toggle did nothing until the next poll, which is an hour
+    // away with a storm running and six without one: switching the layer on
+    // drew nothing and switching it off left the footprint on the map.
+    if (e.detail.key === 'surgeInundation') {
+      if (getSetting('surgeInundation')) {
+        const request = beginOptionalFeed('inundation');
+        renderSurgeInundation(lastStorms || [], { map: getMap(), enabled: true })
+          .then(result => reportOptionalFeedResult('inundation', result, { requestId: request.requestId }))
+          .catch(error => failOptionalFeed('inundation', { error, requestId: request.requestId }));
+      } else {
+        clearSurgeInundation();
+        idleOptionalFeed('inundation');
+      }
+    }
   });
   document.addEventListener('hm-locale:change', () => {
     if (lastStorms) renderActive(lastStorms);

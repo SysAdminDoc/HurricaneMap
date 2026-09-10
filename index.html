@@ -295,8 +295,14 @@
         </div>
         <div class="settings-row">
           <label class="toggle-row">
+            <input type="checkbox" id="toggle-continuous-track-color" />
+            <span class="settings-toggle-copy"><span data-i18n="settings.continuousTrack">Continuous track colour</span><small data-i18n="settings.continuousTrackHelp">Colour wind and pressure by their exact value instead of by band. The legend keeps the bands as its key.</small></span>
+          </label>
+        </div>
+        <div class="settings-row">
+          <label class="toggle-row">
             <input type="checkbox" id="toggle-surge-inundation" />
-            <span class="settings-toggle-copy"><span data-i18n="settings.inundation">Storm surge flooding footprint</span><small data-i18n="settings.inundationHelp">NHC's potential inundation area, published only during a surge event.</small></span>
+            <span class="settings-toggle-copy"><span data-i18n="settings.inundation">Storm surge flooding footprint</span><small data-i18n="settings.inundationHelp">NHC's potential inundation area. Published only for a storm under a surge watch or warning, so it is usually empty.</small></span>
           </label>
         </div>
         <div class="settings-row">
@@ -463,6 +469,7 @@
     <div class="filter-legend track-color-legend" id="track-color-legend" hidden>
       <h2 class="legend-heading" id="track-color-legend-title"></h2>
       <ul class="filter-legend-list" id="track-color-legend-list"></ul>
+      <p class="track-color-legend-note" id="track-color-legend-note" hidden></p>
     </div>
   </aside>
 

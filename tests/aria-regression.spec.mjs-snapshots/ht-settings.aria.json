@@ -202,9 +202,14 @@
           "Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib.",
           {
             "role": "checkbox",
-            "name": "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a, ki pibliye sèlman pandan yon evènman manmòt."
+            "name": "Koulè trajektwa kontinyèl Bay van ak presyon koulè selon valè egzak yo olye de pa bann. Lejand lan kenbe bann yo kòm kle."
           },
-          "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a, ki pibliye sèlman pandan yon evènman manmòt.",
+          "Koulè trajektwa kontinyèl Bay van ak presyon koulè selon valè egzak yo olye de pa bann. Lejand lan kenbe bann yo kòm kle.",
+          {
+            "role": "checkbox",
+            "name": "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a. Yo pibliye l sèlman pou yon tanpèt ki anba yon veyè oswa yon avètisman manmòt, kidonk li konn vid."
+          },
+          "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a. Yo pibliye l sèlman pou yon tanpèt ki anba yon veyè oswa yon avètisman manmòt, kidonk li konn vid.",
           {
             "role": "checkbox",
             "name": "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.",

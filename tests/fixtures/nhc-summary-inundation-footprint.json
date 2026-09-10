@@ -1,5 +1,5 @@
 {
-  "_comment": "Recorded shape of NHC_tropical_weather_summary/MapServer/23 (Footprint_Inun), read live on 2026-09-09 when the layer was out of season and returned zero features. The geometry here is a synthetic rectangle off the Louisiana coast standing in for a published footprint; the property names, the f=geojson envelope and the field set are the service's own.",
+  "_comment": "The shape of NHC_tropical_weather_summary/MapServer/23 (Footprint_Inun), whose schema was read live on 2026-09-09; it returned zero features that day, because P-Surge issues an inundation product only for a storm under a surge watch or warning. Everything here is synthetic: the geometry is a rectangle off the Louisiana coast, and objectid is included for realism though the service omits it under the restricted outFields this code sends. category is a string here and an integer on the service; nothing reads it. The f=geojson envelope and the four property names are the service's own, and productname and name are the only fields the code reads.",
   "type": "FeatureCollection",
   "features": [
     {

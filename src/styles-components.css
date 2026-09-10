@@ -1003,7 +1003,11 @@ label > input[type="checkbox"] {
 /* NHC's potential inundation footprint. One fill, because the vector layer
    carries one shape per product and banding it would invent depth it does not
    have; the legend does the explaining instead. */
-.surge-inundation-legend {
+.surge-inundation-legend.glass {
+  /* .glass sets position:relative at equal specificity and later in this file,
+     so an unqualified rule here loses and the legend lands in normal flow at
+     the bottom-left, clipped below the fold. .active-badge.glass carries the
+     same guard for the same reason. */
   position: absolute;
   right: 12px;
   bottom: 132px;
@@ -1030,6 +1034,10 @@ label > input[type="checkbox"] {
 }
 
 .surge-inundation-legend small {
+  /* Not smaller than the rest. This line is the one thing a reader has to take
+     away from the legend, and rendering it as a footnote is the opposite of
+     what it is here for. */
+  font-size: inherit;
   color: var(--subtext);
 }
 

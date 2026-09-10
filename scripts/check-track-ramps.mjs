@@ -37,6 +37,7 @@ import {
   MONTH_RAMP,
   NO_DATA_COLOR,
   PRESSURE_RAMP,
+  rampColorAt,
   rampStops,
   WIND_RAMP,
 } from '../src/track-ramps.js';
@@ -179,6 +180,18 @@ async function main() {
     { name: 'month', stops: MONTH_RAMP },
   ];
 
+  // The continuous encoding paints colours between the stops, so measuring the
+  // stops alone stopped being the whole ramp the moment it shipped. Sampled at
+  // one percent, which is 101 colours: finer than a reader can distinguish and
+  // fine enough that no unmeasured colour is more than a hundredth of the
+  // corridor away from a measured one.
+  const CONTINUOUS_SAMPLES = 101;
+  const continuous = Array.from(
+    { length: CONTINUOUS_SAMPLES },
+    (_, index) => rampColorAt(index / (CONTINUOUS_SAMPLES - 1)),
+  );
+  const continuousRamp = { name: 'continuous', stops: continuous };
+
   // 2. Generated, not typed. A stop that drifts from the corridor is a colour
   //    nothing measured before it shipped.
   for (const { name, stops } of ramps) {
@@ -197,7 +210,7 @@ async function main() {
   //    as any ramp stop does.
   let measurements = 0;
   let worst = null;
-  for (const { name, stops } of [...ramps, { name: 'no-data', stops: [NO_DATA_COLOR] }]) {
+  for (const { name, stops } of [...ramps, continuousRamp, { name: 'no-data', stops: [NO_DATA_COLOR] }]) {
     for (const stop of stops) {
       const rgb = parseHex(stop);
       if (!rgb) {
@@ -244,6 +257,46 @@ async function main() {
     }
   }
 
+  // 4. The continuous encoding, held to the rule that actually applies to it.
+  //    Neighbouring samples are meant to be close, so the question is whether
+  //    two readings a MEANINGFUL distance apart stay apart: one bin width, the
+  //    same distance the binned ramp is measured at, taken everywhere along the
+  //    corridor rather than only at the bin edges.
+  const binWidth = Math.round((continuous.length - 1) / (WIND_RAMP.length - 1));
+  let worstContinuousPair = null;
+  for (const kind of ['normal', 'protanopia', 'deuteranopia', 'tritanopia']) {
+    const seen = continuous.map(stop => (kind === 'normal' ? parseHex(stop) : simulateCvd(parseHex(stop), kind)));
+    for (let i = 0; i + binWidth < seen.length; i += 1) {
+      const distance = deltaE(seen[i], seen[i + binWidth]);
+      if (!worstContinuousPair || distance < worstContinuousPair.distance) {
+        worstContinuousPair = { distance, kind, a: continuous[i], b: continuous[i + binWidth] };
+      }
+      if (distance < MINIMUM_DELTA_E) {
+        errors.push(
+          `continuous samples ${continuous[i]} and ${continuous[i + binWidth]}, one bin apart, are `
+          + `dE ${distance.toFixed(1)} apart under ${kind}, under the ${MINIMUM_DELTA_E} this ramp claims`,
+        );
+      }
+    }
+  }
+
+  //    And end to end it has to run one way. A corridor that folds back puts a
+  //    weak reading and a strong one in the same colour, which no amount of
+  //    local separation fixes.
+  for (const kind of ['normal', 'protanopia', 'deuteranopia', 'tritanopia']) {
+    const seen = continuous.map(stop => (kind === 'normal' ? parseHex(stop) : simulateCvd(parseHex(stop), kind)));
+    for (let i = 0; i < seen.length; i += 1) {
+      for (let j = i + binWidth; j < seen.length; j += 1) {
+        if (deltaE(seen[i], seen[j]) < MINIMUM_DELTA_E) {
+          errors.push(
+            `continuous samples ${continuous[i]} and ${continuous[j]}, ${j - i} percent apart, collide at `
+            + `dE ${deltaE(seen[i], seen[j]).toFixed(1)} under ${kind}: the corridor folds back on itself`,
+          );
+        }
+      }
+    }
+  }
+
   if (errors.length) {
     for (const error of errors) console.error(`track ramps: ${error}`);
     process.exit(1);
@@ -252,7 +305,9 @@ async function main() {
   console.log(
     `track ramps ok (${measurements} contrast measurements at ${opacity} opacity across ${modes.length} modes; `
     + `worst ${worst.ratio.toFixed(2)}:1 for ${worst.name} ${worst.stop} on the ${worst.surface} fill in `
-    + `${worst.mode}; closest pair dE ${worstPair.distance.toFixed(1)} in ${worstPair.name} under ${worstPair.kind})`,
+    + `${worst.mode}; closest pair dE ${worstPair.distance.toFixed(1)} in ${worstPair.name} under ${worstPair.kind}; `
+    + `${continuous.length} continuous samples, closest one-bin pair dE ${worstContinuousPair.distance.toFixed(1)} `
+    + `under ${worstContinuousPair.kind})`,
   );
 }
 

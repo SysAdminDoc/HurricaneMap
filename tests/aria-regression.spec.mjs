@@ -968,10 +968,12 @@ test('the radar card marks the timestamp, not the controls around it', async ({ 
   const card = page.locator('#radar-feed-status');
   await expect(card).toHaveAttribute('aria-controls', 'radar-time');
 
-  // The target must not be an ancestor of the card. aria-busy on an ancestor
-  // of a live region tells assistive technology to withhold that region's
-  // updates, so marking #radar-controls suppressed the very announcement the
-  // card exists to make.
+  // The target must not be an ancestor of the card. Both sit inside
+  // #radar-controls, so they are cousins rather than siblings; what matters is
+  // that neither contains the other, because aria-busy on an ancestor of a live
+  // region tells assistive technology to withhold that region's updates, and
+  // marking #radar-controls suppressed the announcement the card exists to
+  // make.
   expect(await page.evaluate(() => {
     const host = document.getElementById('radar-feed-status');
     const target = document.getElementById('radar-time');

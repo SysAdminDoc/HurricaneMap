@@ -330,7 +330,7 @@ async function boot() {
   wireSettingsControls();
   // A stored non-category encoding has to bring its legend up with it, or the
   // map loads recoloured with nothing on screen saying by what.
-  renderTrackColorLegend(getSetting('trackColorBy'));
+  renderTrackColorLegend(getSetting('trackColorBy'), { continuous: getSetting('continuousTrackColor') });
   deferNonCritical(async () => {
     try {
       const [{ initOptionalFeedDiagnostics }, { initStorageManager }, { initOfflineDiagnostics }] = await Promise.all([
@@ -500,6 +500,7 @@ document.addEventListener('advisory-replay:change', event => {
 const SETTING_TOGGLES = Object.freeze([
   ['#toggle-nhc-forecast-cone', 'nhcForecastCone'],
   ['#toggle-surge-inundation', 'surgeInundation'],
+  ['#toggle-continuous-track-color', 'continuousTrackColor'],
   ['#toggle-nhc-outlook', 'nhcOutlook'],
   ['#toggle-marine-warnings', 'marineWarnings'],
   ['#toggle-goes-realtime', 'goesRealtime'],
@@ -622,11 +623,16 @@ function wireSettingsControls() {
       applyFilters();
       refreshOpenStormPanel();
     }
+    if (e.detail.key === 'continuousTrackColor') {
+      renderTrackColorLegend(getSetting('trackColorBy'), { continuous: getSetting('continuousTrackColor') });
+      lastTracksKey = '';
+      applyFilters();
+    }
     if (e.detail.key === 'trackColorBy') {
       // Same reason the palette branch clears it: redrawTracks skips the work
       // when the set of storms has not changed, and here the storms are the
       // same and only their colour moved.
-      renderTrackColorLegend(getSetting('trackColorBy'));
+      renderTrackColorLegend(getSetting('trackColorBy'), { continuous: getSetting('continuousTrackColor') });
       lastTracksKey = '';
       applyFilters();
     }

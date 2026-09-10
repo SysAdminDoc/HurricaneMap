@@ -25,6 +25,7 @@ const DEFAULTS = {
   marineHorizon: '00to24', // Which NHC forecast band the marine layer draws
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
   surgeInundation: false,  // Show NHC's Potential Storm Surge Flooding footprint
+  continuousTrackColor: false, // Colour wind and pressure continuously rather than in bins
   locale: 'en',            // 'en' | 'es' | 'ht'
   highContrast: false,     // WCAG AAA 7:1+ contrast, or whatever the OS asks for
   reducedMotion: false,    // In-app override: reduce animations independent of OS setting
@@ -47,6 +48,7 @@ const BOOLEAN_KEYS = new Set([
   'marineWarnings',
   'goesRealtime',
   'surgeInundation',
+  'continuousTrackColor',
   'highContrast',
   'reducedMotion',
   'onboarded',

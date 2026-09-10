@@ -141,15 +141,21 @@ export async function togglePin(storm) {
   // column disagreeing.
   const used = new Set(pinned.map(p => p.slot));
   const slot = PIN_SLOTS.findIndex((_, index) => !used.has(index));
-  const trackLayer = drawTrack(fullStorm, slot);
+  const paneIndex = pinned.length < 2 ? pinned.length : null;
+  const trackLayer = drawTrack(fullStorm, slot, paneIndex);
   pinned.push({
     id: fullStorm.id,
     name: fullStorm.name,
     year: fullStorm.year,
     storm: fullStorm,
     slot,
+    paneIndex,
     trackLayer,
   });
+  repackPanes();
+  // Without this the markers only appeared once the slider was touched, while
+  // the readout beside it already named both dates.
+  updateSharedTime(timeFraction);
   refreshTray();
   refreshComparePanelIfOpen();
   notifyPinsChanged();
@@ -162,6 +168,7 @@ function removePin(stormId) {
   const pin = pinned[idx];
   if (pin.trackLayer) getMap().removeLayer(pin.trackLayer);
   pinned.splice(idx, 1);
+  repackPanes();
   // A comparison of one storm is not a comparison, so the map goes back to
   // showing both panes whole rather than leaving half the map clipped away
   // with nothing on the other side of the divider.
@@ -170,6 +177,24 @@ function removePin(stormId) {
   refreshTray();
   refreshComparePanelIfOpen();
   notifyPinsChanged();
+}
+
+/**
+ * Keep the panes holding the first two pinned storms, whichever they now are.
+ *
+ * A slot is a colour and is never reused; a pane is a side of the split and has
+ * to follow the order. Unpinning the first of three left slots 1 and 2 holding
+ * the panes, so one pane was empty and one storm drew unclipped over both
+ * halves.
+ */
+function repackPanes() {
+  for (const [index, pin] of pinned.entries()) {
+    const paneIndex = index < 2 ? index : null;
+    if (pin.paneIndex === paneIndex) continue;
+    pin.paneIndex = paneIndex;
+    if (pin.trackLayer) getMap().removeLayer(pin.trackLayer);
+    pin.trackLayer = drawTrack(pin.storm, pin.slot, paneIndex);
+  }
 }
 
 /**
@@ -183,7 +208,7 @@ function updateSharedTime(fraction) {
   timeMarkers = [];
   if (pinned.length < 2) return;
   for (const pin of pinned) {
-    const pane = comparePaneName(pin.slot);
+    const pane = comparePaneName(pin.paneIndex);
     if (!pane) continue;
     const point = trackPointAtFraction(pin.storm.track, timeFraction);
     if (!point) continue;
@@ -216,7 +241,7 @@ function refreshSharedTimeReadout() {
   const host = compareBody?.querySelector('#cp-time-readout');
   if (!host) return;
   host.textContent = pinned
-    .filter(pin => comparePaneName(pin.slot))
+    .filter(pin => comparePaneName(pin.paneIndex))
     .map(pin => {
       const point = trackPointAtFraction(pin.storm.track, timeFraction);
       return `${formatStormName(pin.name)} ${pin.year}: ${point ? formatSharedTime(point) : '-'}`;
@@ -237,14 +262,14 @@ function clearAll() {
 
 // Takes the slot rather than a colour so that no caller can hand it the chip
 // colour by mistake, which is how the track ended up unreadable on the map.
-function drawTrack(storm, slot) {
+function drawTrack(storm, slot, paneIndex) {
   const color = pinSlotTrackColor(slot);
   const map = getMap();
   ensureComparePanes(map);
   // The first two pins get a pane of their own, which is what the swipe and
   // the crossfade act on. A third and fourth pin stay on the map's own overlay
   // pane: comparing four things side by side is two questions, not one.
-  const pane = comparePaneName(slot);
+  const pane = comparePaneName(paneIndex);
   const group = L.layerGroup(pane ? { pane } : {});
   const track = storm.track || [];
   for (let i = 1; i < track.length; i++) {
@@ -457,7 +482,7 @@ function renderMapCompareControls() {
     ['swipe', t('compare.map.modeSwipe')],
     ['fade', t('compare.map.modeFade')],
   ];
-  const named = pinned.filter(pin => comparePaneName(pin.slot));
+  const named = pinned.filter(pin => comparePaneName(pin.paneIndex));
   return `
     <fieldset class="cp-map-compare" id="cp-map-compare">
       <legend>${escapeHtml(t('compare.map.title'))}</legend>
@@ -493,18 +518,35 @@ function wireMapCompareControls() {
   fieldset.querySelectorAll('input[name="cp-map-mode"]').forEach(radio => {
     radio.addEventListener('change', () => {
       if (!radio.checked) return;
-      setComparePaneMode(radio.value);
-      // Re-rendered rather than patched: the slider's own label changes with
-      // the mode, from a divider position to a mix, and a control whose label
-      // is stale is worse than one that flickers.
-      renderComparePanel();
+      const mode = setComparePaneMode(radio.value);
+      // Patched, not re-rendered. Re-rendering from inside the handler
+      // destroyed the radio that fired it, so an arrow key moved the selection
+      // once and then dropped focus onto the panel heading: the third option
+      // could not be reached from the keyboard at all.
+      const label = fieldset.querySelector('label[for="cp-divider"]');
+      if (label) label.textContent = t(mode === 'fade' ? 'compare.map.mix' : 'compare.map.divider');
+      if (divider) divider.disabled = mode === 'off';
     });
   });
   divider?.addEventListener('input', () => setComparePanePosition(divider.value));
+  // The hint names the orientation, and the orientation follows the viewport.
+  document.addEventListener('hm-compare-panes:orientation', () => {
+    const hint = fieldset.querySelector('.cp-hint');
+    if (hint) {
+      hint.textContent = t(isComparePaneStacked() ? 'compare.map.hintStacked' : 'compare.map.hint');
+    }
+  });
   const time = fieldset.querySelector('#cp-time');
   time?.addEventListener('input', () => updateSharedTime(Number(time.value) / 100));
   refreshSharedTimeReadout();
 }
+
+// Closing the panel takes the controls away, so it takes the split away too:
+// half a clipped map with nothing on screen to unclip it is a state the reader
+// cannot get out of without finding the panel again.
+document.addEventListener('hm-panel:hidden', event => {
+  if (event.detail?.id === 'compare-panel') setComparePaneMode('off');
+});
 
 /** Export comparison table + narratives as CSV. */
 function exportComparisonCSV(storms) {

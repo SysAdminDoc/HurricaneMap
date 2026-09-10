@@ -186,9 +186,11 @@ async function openVisualCompare(page) {
 }
 
 /**
- * The map half of the comparison. One map, two clipped panes: a baseline is
- * the only thing that can tell a divider that landed in the right place from
- * one that clipped the whole map away, because both are "no error".
+ * The map half of the comparison. These baselines cover the CONTROLS, not the
+ * clip: openDeterministicApp hides `#map > *` so tile rendering cannot make a
+ * baseline flap, which hides the panes with it. Where the divider landed is
+ * measured in the smoke suite instead, against the map's own coordinate
+ * conversion, which is a stronger check than a pixel diff for a number.
  */
 async function setVisualCompareMode(page, mode, position = 40) {
   await page.check(`input[name="cp-map-mode"][value="${mode}"]`);
@@ -376,8 +378,9 @@ test.describe('critical mobile workflows', () => {
 
     // Below the shell's breakpoint the comparison splits top and bottom rather
     // than left and right: the same control over a map that is taller than it
-    // is wide. The baseline is what tells a stacked split from a vertical one
-    // that happens to have clipped nothing.
+    // is wide. This baseline covers the control at that width; the orientation
+    // of the clip itself is measured in the smoke suite, because the harness
+    // hides the map.
     await openVisualCompare(page);
     await setVisualCompareMode(page, 'swipe', 45);
     await expectMatrixScreenshot(page, 'matrix-mobile-compare-stacked.webp');

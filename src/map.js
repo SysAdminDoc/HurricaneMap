@@ -3,7 +3,12 @@ import { categoryColor, ensureStormsLoaded, getStorm, windToCategory } from './d
 import { escapeHtml, formatStormName } from './html-utils.js';
 import { t } from './i18n.js';
 import { getPaletteColor, getSetting, prefersReducedMotion } from './settings.js';
-import { DEFAULT_TRACK_COLOR_MODE, TRACK_COLOR_MODES, trackPointColor } from './track-ramps.js';
+import {
+  DEFAULT_TRACK_COLOR_MODE,
+  TRACK_COLOR_MODES,
+  trackPointColor,
+  trackPointColorContinuous,
+} from './track-ramps.js';
 
 // Leaflet is loaded from CDN as a UMD module, available as window.L
 const L = window.L;
@@ -330,8 +335,12 @@ function buildIntensitySegments(track) {
 export function segmentColor(seg, override) {
   if (override) return override;
   const mode = getSetting('trackColorBy');
+  // Continuous is a finer reading of the same ramp, not a second palette: at a
+  // bin's own fraction it returns that bin's colour exactly, so switching the
+  // setting refines the encoding rather than replacing it.
+  const paint = getSetting('continuousTrackColor') ? trackPointColorContinuous : trackPointColor;
   const encoded = TRACK_COLOR_MODES.includes(mode) && mode !== DEFAULT_TRACK_COLOR_MODE
-    ? trackPointColor(mode, seg.point)
+    ? paint(mode, seg.point)
     : null;
   return encoded || categoryColor(seg.cat);
 }

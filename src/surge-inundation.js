@@ -3,9 +3,12 @@
 // Source: mapservices.weather.noaa.gov NHC_tropical_weather_summary MapServer,
 // layer 23 (Footprint_Inun), origin-reflective CORS, f=geojson. Verified
 // against the live service on 2026-09-09: the layer is a polygon feature layer
-// carrying name, productname, groupname and category, and returns zero features
-// out of season, which is the state this renders as `empty` rather than as an
-// error.
+// carrying name, productname, groupname and category, and returned zero
+// features that day. Not because of the season, which was at its Atlantic peak
+// with two systems live on neighbouring layers, but because P-Surge publishes
+// an inundation product only for a storm under a surge watch or warning. That
+// is the state this renders as `empty` rather than as an error, and it is the
+// state the layer is in most of the time.
 //
 // The product is P-Surge, and the number it publishes is a 10 percent
 // exceedance: the level the water has a one-in-ten chance of going ABOVE, not

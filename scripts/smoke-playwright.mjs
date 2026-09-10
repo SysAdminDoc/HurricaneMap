@@ -5052,16 +5052,55 @@ async function assertDualPaneComparison(browser, baseUrl) {
       /Katrina 2005: 2005-/.test(readout || '') && /Ian 2022: 2022-/.test(readout || ''),
       `the shared time readout did not name both storms and both dates: ${JSON.stringify(readout)}`,
     );
+    // Measured against the clock, not against the subject's own index formula.
+    // Comparing with points[round(f * (n - 1))] was comparing the function to
+    // itself, and it passed while Katrina sat six hours and Ian twelve hours
+    // from their own midpoints: HURDAT2 intercalates non-synoptic fixes, so a
+    // fraction of the point count is not a fraction of the storm.
     const halfway = await page.evaluate(async () => {
       const { getStorm } = await import('/src/data.js');
       const { trackPointAtFraction } = await import('/src/compare-panes.js');
-      const usable = id => (getStorm(id).track || []).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
       return ['AL122005', 'AL092022'].map(id => {
-        const points = usable(id);
-        return trackPointAtFraction(points, 0.5).t === points[Math.round(0.5 * (points.length - 1))].t;
+        const points = (getStorm(id).track || [])
+          .filter(point => Number.isFinite(point.lat) && Number.isFinite(point.lon));
+        const times = points.map(point => Date.parse(point.t));
+        const wanted = times[0] + 0.5 * (times[times.length - 1] - times[0]);
+        const chosen = Date.parse(trackPointAtFraction(points, 0.5).t);
+        const spacing = (times[times.length - 1] - times[0]) / (points.length - 1);
+        return { id, offHours: Math.abs(chosen - wanted) / 3600000, spacingHours: spacing / 3600000 };
       });
     });
-    assert(halfway.every(Boolean), 'the shared time axis is not halfway through each storm');
+    for (const storm of halfway) {
+      // Within half the average spacing: the axis can only land on a real fix,
+      // so the nearest one is the best answer available.
+      assert(
+        storm.offHours <= storm.spacingHours / 2 + 0.01,
+        `the shared time axis put ${storm.id} ${storm.offHours.toFixed(1)} h from its own midpoint, `
+        + `with fixes ${storm.spacingHours.toFixed(1)} h apart`,
+      );
+    }
+
+    // The panes follow the first two PINS, not the first two colour slots.
+    // Slots are never reused, so unpinning the first of three left the panes
+    // holding slots 1 and 2: one empty, and one storm drawn unclipped over
+    // both halves of the split.
+    await page.evaluate(async () => {
+      const compare = await import('/src/compare.js');
+      await compare.setPinsByIds(['AL041992', 'AL122005', 'AL092022']);
+    });
+    // Unpinned one at a time, not re-set: setPinsByIds clears every pin first,
+    // so it never leaves the surviving storms holding the slots the removed one
+    // did, which is the whole condition this is about.
+    await page.evaluate(async () => {
+      const compare = await import('/src/compare.js');
+      const { getStorm } = await import('/src/data.js');
+      await compare.togglePin(getStorm('AL041992'));
+    });
+    const repacked = await paneState();
+    assert(
+      repacked.a.paths > 5 && repacked.b.paths > 5,
+      `after unpinning the first of three, the panes do not hold the remaining two: ${JSON.stringify(repacked)}`,
+    );
 
     // Unpinning back to one storm cannot leave half the map clipped away with
     // nothing on the other side of the divider.
@@ -5126,9 +5165,22 @@ async function assertDualPaneComparison(browser, baseUrl) {
       Math.abs(cutY - stacked.expected) <= 1,
       `the stacked split cut at y=${cutY} instead of ${stacked.expected}`,
     );
+    // A stacked clip varies its cut in y and spans the full width; a vertical
+    // one does the opposite. Comparing the first two points could not tell them
+    // apart, because both generators emit the same top-left corner pair.
+    const xs = new Set(stacked.points.map(point => point.x));
+    const ys = new Set(stacked.points.map(point => point.y));
     assert(
-      stacked.points[0].y === stacked.points[1].y && stacked.points[0].x !== stacked.points[1].x,
-      `the narrow layout split left-to-right instead of top-to-bottom: ${JSON.stringify(stacked.points)}`,
+      xs.size === 2 && ys.size === 2,
+      `the clip is not a rectangle: ${JSON.stringify(stacked.points)}`,
+    );
+    assert(
+      !xs.has(cutY) && ys.has(cutY),
+      `the narrow layout cut in x instead of y: ${JSON.stringify(stacked.points)}`,
+    );
+    assert(
+      Math.min(...xs) < -1000 && Math.max(...xs) > 1000,
+      `a stacked clip must span the full width, not stop at a divider: ${JSON.stringify([...xs])}`,
     );
   } finally {
     await narrow.close();
@@ -5238,6 +5290,128 @@ async function assertSurgeInundationLayer(browser, baseUrl) {
       return feeds.getOptionalFeedState('inundation')?.state;
     });
     assert(afterOff === 'idle', `the feed did not go idle when the layer was turned off: ${afterOff}`);
+  } finally {
+    await context.close();
+  }
+}
+
+// Continuous track colour: the same corridor read at any position along it,
+// rather than in seven steps. A storm that intensifies steadily through a band
+// rendered as one flat colour, which is what bins do to continuous data.
+async function assertContinuousTrackColour(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en', trackColorBy: 'wind' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+
+    // Driven through the real control, not by writing the setting: the legend
+    // is re-rendered by the toggle's own handler, and a test that skips it
+    // proves the painter changed and nothing else did.
+    await page.evaluate(() => document.getElementById('settings-menu')?.showPopover());
+    await page.waitForSelector('#toggle-continuous-track-color', { timeout: 10_000 });
+    const paintedFor = async (continuous) => {
+      if (await page.isChecked('#toggle-continuous-track-color') !== continuous) {
+        await page.setChecked('#toggle-continuous-track-color', continuous);
+      }
+      await page.waitForFunction(
+        expected => document.getElementById('track-color-legend')?.dataset.continuous === String(expected),
+        continuous,
+        { timeout: 8000 },
+      );
+      // Read through the app's own painter, which is what the map calls: this
+      // is the function under test, not a colour scraped off a rendered path.
+      return page.evaluate(async () => {
+        const { segmentColor } = await import('/src/map.js');
+        const { getStorm, ensureStormsLoaded } = await import('/src/data.js');
+        await ensureStormsLoaded();
+        const track = getStorm('AL122005').track.filter(point => Number.isFinite(point.wind));
+        return track.map(point => segmentColor({ point, cat: 0 }));
+      });
+    };
+
+    const binned = await paintedFor(false);
+    const continuous = await paintedFor(true);
+    assert(binned.length > 20 && binned.length === continuous.length, 'the sampled track is too short to mean anything');
+
+    // Bins collapse a track into a handful of colours; the continuous encoding
+    // gives a distinct reading its own colour.
+    const binnedDistinct = new Set(binned).size;
+    const continuousDistinct = new Set(continuous).size;
+    assert(
+      continuousDistinct > binnedDistinct * 2,
+      `the continuous encoding is not finer than the binned one: ${continuousDistinct} colours against ${binnedDistinct}`,
+    );
+
+    // And it is the SAME corridor, not a second palette: at a bin's own
+    // fraction the continuous sampler returns that bin's colour exactly.
+    const agrees = await page.evaluate(async () => {
+      const ramps = await import('/src/track-ramps.js');
+      return ramps.WIND_RAMP.every(
+        (stop, index) => ramps.rampColorAt(index / (ramps.WIND_RAMP.length - 1)).toLowerCase() === stop.toLowerCase(),
+      );
+    });
+    assert(agrees, 'the continuous sampler and the binned ramp disagree at the bin stops');
+
+    // Two readings inside one band must now differ, which is the defect this
+    // exists to remove.
+    const insideOneBand = await page.evaluate(async () => {
+      const ramps = await import('/src/track-ramps.js');
+      return {
+        binned: [ramps.trackPointColor('wind', { wind: 66 }), ramps.trackPointColor('wind', { wind: 80 })],
+        continuous: [
+          ramps.trackPointColorContinuous('wind', { wind: 66 }),
+          ramps.trackPointColorContinuous('wind', { wind: 80 }),
+        ],
+      };
+    });
+    assert(
+      insideOneBand.binned[0] === insideOneBand.binned[1],
+      `66 kt and 80 kt are meant to share a bin: ${JSON.stringify(insideOneBand.binned)}`,
+    );
+    assert(
+      insideOneBand.continuous[0] !== insideOneBand.continuous[1],
+      `66 kt and 80 kt still paint the same colour: ${JSON.stringify(insideOneBand.continuous)}`,
+    );
+
+    // A reading with no answer still gets the no-data colour rather than an end
+    // of the ramp, which would invent a value.
+    const missing = await page.evaluate(async () => {
+      const ramps = await import('/src/track-ramps.js');
+      return {
+        colour: ramps.trackPointColorContinuous('pressure', { pres: null }),
+        noData: ramps.NO_DATA_COLOR,
+        blank: ramps.trackPointColorContinuous('pressure', { pres: 0 }),
+      };
+    });
+    assert(
+      missing.colour === missing.noData && missing.blank === missing.noData,
+      `a missing pressure was given a place on the ramp: ${JSON.stringify(missing)}`,
+    );
+
+    // The legend keeps the bands as its key and says they are reference points,
+    // because a gradient with a banded key is only honest if it admits that.
+    const legend = await page.evaluate(() => {
+      const host = document.getElementById('track-color-legend');
+      const note = document.getElementById('track-color-legend-note');
+      return {
+        rows: document.querySelectorAll('#track-color-legend-list li').length,
+        continuous: host?.dataset.continuous,
+        note: note?.hidden === false ? note.textContent : '',
+      };
+    });
+    assert(legend.rows > 1, 'the banded legend disappeared when the encoding went continuous');
+    assert(legend.continuous === 'true', 'the legend does not know the encoding is continuous');
+    assert(
+      /reference points/i.test(legend.note),
+      `the legend does not say its swatches are reference points: ${JSON.stringify(legend.note)}`,
+    );
   } finally {
     await context.close();
   }
@@ -7591,6 +7765,7 @@ try {
   await assertFilterResetIsRecoverable(browser, baseUrl);
   await assertDualPaneComparison(browser, baseUrl);
   await assertSurgeInundationLayer(browser, baseUrl);
+  await assertContinuousTrackColour(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);
