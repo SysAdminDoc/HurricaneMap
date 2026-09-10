@@ -1470,7 +1470,7 @@ label > input[type="checkbox"] {
   margin-top: 8px;
   padding-top: 7px;
   border-top: 1px solid color-mix(in srgb, var(--surface0) 72%, transparent);
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 10px;
 }
 
@@ -4042,7 +4042,7 @@ select {
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
   background: var(--surface-sunken);
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -4301,7 +4301,7 @@ select {
   display: block;
   width: fit-content;
   margin: 0;
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 10px;
   font-style: normal;
   font-weight: 800;
@@ -10367,7 +10367,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 
 .timeline-source {
   margin-left: auto;
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 9px;
   font-weight: 650;
 }
@@ -10387,7 +10387,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
   flex: 0 0 auto;
   align-items: center;
   gap: 8px;
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
@@ -10647,7 +10647,7 @@ html:not(.light-theme) #map .leaflet-tile-pane {
 
 .citation-description,
 .citation-status {
-  color: var(--text-dim);
+  color: var(--subtext);
   font-size: 0.76rem;
   line-height: 1.45;
 }

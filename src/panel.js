@@ -227,7 +227,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
         <span class="when">${formatTime(lf.t)}${radarBtn}</span>
       </li>`;
     }).join('')
-    : `<li><em style="color:var(--text-dim);">${t('panel.noLandfallsRecord')}</em></li>`;
+    : `<li><em style="color:var(--subtext);">${t('panel.noLandfallsRecord')}</em></li>`;
 
   const minPres = presentPressure(storm.min_pres_mb);
 

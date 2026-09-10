@@ -627,6 +627,11 @@ async function assertStormPanelContrast(browser, baseUrl) {
     // high contrast until 2026-09-09.
     ['timeline source', '.timeline-source'],
     ['timeline legend', '.timeline-legend'],
+    // The storm-events card, whose tint is darker than the panel it sits on.
+    // Its source credit read 3.47:1 in the light theme and its labels 4.43:1,
+    // and the panel's own darker --subtext was tuned against a paler surface.
+    ['storm events source', '#storm-panel .se-source'],
+    ['storm events label', '#storm-panel .se-label'],
     // Required to be legible by the tile licence, and painted on a 94%-opaque
     // panel over live tiles, so it is the one surface here whose background
     // genuinely moves.
