@@ -2,6 +2,11 @@
 
 All notable changes to HurricaneMap.
 
+## Unreleased
+
+### Fixed
+- Nine landfalls were stamped with the wrong time, by up to 5 hours 24 minutes. Where a storm's centre never sits inside a state at a six-hourly fix but the track between two of them clips the coast, the atlas interpolates the position, the wind and the pressure to the point of closest approach, and it was carrying the later fix's clock across unchanged. So the record said where the storm was and then said it was there hours after it had gone. Iniki is the case that shows it: the atlas had it reaching Kauai at 06:00Z on 12 September 1992, and it crossed the island at 01:48, which is the half past three in the afternoon Hawaii remembers. Dot 1959, Belle 1976, David 1979, Gert 1981, Betsy 1956, the two 1982 landfalls and an 1893 storm move with it. The other branch of the same inference had been corrected already; this is the half that was missed, and both are now covered by a test that fails if either one copies a timestamp again.
+
 ## v1.11.0: The atlas reads a coastline (2026-09-10)
 
 ### Changed

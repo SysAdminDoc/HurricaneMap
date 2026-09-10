@@ -127,4 +127,21 @@ assert len(infer_landfall_candidates(from_the_sea, COASTAL_STATE, "AL", elsewher
     "a track the mask cannot speak to keeps the behaviour it had before the mask existed"
 )
 
+# An interpolated landfall carries an interpolated moment. Both branches of the
+# inference place a landfall between two fixes, and both interpolate the
+# position, the wind and the pressure to get there. The graze branch was still
+# copying the later fix's timestamp, which put nine records in the atlas up to
+# 5 h 24 min late: Iniki 1992 was stamped 06:00Z when it crossed Kauai at 01:48.
+#
+# Both endpoints here are outside the state, and the fifth sample along the
+# segment is the first one inside it, so the landfall is half way along a
+# 24-hour segment and its moment has to be 12:00Z on the first day.
+graze = [fix(24.5, 11, 0), fix(14.5, 21, 1)]
+grazed = infer_landfall_candidates(graze, COASTAL_STATE, "AL", LAND)
+assert len(grazed) == 1, f"a segment that grazes the state is a landfall: {grazed}"
+assert grazed[0]["lat"] == 19.5 and grazed[0]["lon"] == 16.0, grazed[0]
+assert grazed[0]["t"] == "2026-01-01T12:00:00Z", (
+    f"the moment must be interpolated with the position, not copied: {grazed[0]['t']}"
+)
+
 print("AOML landfall contracts ok (parser, metrics, marker filtering, C guard, and the crossing rule)")

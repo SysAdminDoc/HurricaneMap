@@ -1166,8 +1166,11 @@ def infer_landfall_candidates(track, states, basin, mask):
                 crossing = landfall_crossing(track, i, mask)
                 if crossing is not None and crossing_is_outside_the_us(crossing["lon"], crossing["lat"], states):
                     break
+                # Position, wind and pressure are all interpolated to `fraction`,
+                # so the moment has to be as well. Copying b's stamp put a graze
+                # a tenth of the way along a six-hourly segment 5 h 24 min late.
                 append_candidate(
-                    b,
+                    dict(b, t=interpolate_time(a["t"], b["t"], fraction)),
                     mid_state,
                     lat=round(mid_lat, 2),
                     lon=round(mid_lon, 2),

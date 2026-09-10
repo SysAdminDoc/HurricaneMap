@@ -4,7 +4,7 @@
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
     "app_version": "1.11.0",
-    "source_commit": "4281c7712b8e560a1edd282acc8ac74f2adc0f80",
+    "source_commit": "a220232d94d2fadb23c411e3279aca59d52342e6",
     "source_manifest": "data/hurdat2-sources.json",
     "runtime": "Python 3.12.10"
   },
@@ -243,19 +243,19 @@
       "path": "data/landfalls.json",
       "size_bytes": 141010,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "7591a8b29b7791f84588c2f293e2b22755035acdc29e2c545448c0d9e5ad3f0d"
+      "sha256": "076eab70fa60825a373e4600380370dc0080c31b1f595d146726a141eaddc8cf"
     },
     "storms": {
       "path": "data/storms.json",
       "size_bytes": 2269717,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "e65bbaec00757725beab173162a7ec8d359dda798aecc287c33191aa6d81443a"
+      "sha256": "8a58c8ab04dacd33391c24d5337a813bc68cba8bee876f63e51e904d997d9860"
     },
     "storms_gzip": {
       "path": "data/storms.json.gz",
-      "size_bytes": 231709,
+      "size_bytes": 231738,
       "modified_utc": "2026-08-08T00:00:00Z",
-      "sha256": "6d5ee1b30e93e39b21e8fd0e026688741734256a784e2240a31c944a370276e0"
+      "sha256": "8e0219136bdaee242aaa35730bee0b76a8e0e2844f843cb539303ef152b8ebc2"
     },
     "stats": {
       "path": "data/stats.json",
