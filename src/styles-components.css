@@ -3940,7 +3940,7 @@ select {
 .optional-feed-status-overlay {
   position: fixed;
   z-index: 1200;
-  width: min(310px, calc(100vw - 2rem));
+  width: var(--active-feed-card-width);
   padding: 0.65rem 0.75rem;
   pointer-events: auto;
 }
@@ -6034,6 +6034,16 @@ body.side-panel-open .leaflet-top.leaflet-right {
   transform: none;
 }
 
+/* The active-storm card is fixed to the same top-right corner, one stacking
+   context above the map, so it buries the zoom control. The collision was
+   invisible until 2026-09-09 because vendor/leaflet.css was linked unlayered
+   and its own `.leaflet-top { top: 0 }` beat the rule above, parking the
+   control in the corner over the header instead. The control steps left of the
+   card the same way it already steps left of an open side panel. */
+body:has(#active-feed-status:not([hidden])):not(.side-panel-open) .leaflet-top.leaflet-right {
+  right: calc(var(--active-feed-card-width) + 32px);
+}
+
 .leaflet-control-zoom {
   overflow: hidden;
   border: 1px solid var(--border-subtle);
@@ -6417,6 +6427,13 @@ body.side-panel-open .leaflet-top.leaflet-right {
   body.filters-open .optional-feed-status-overlay,
   body.side-panel-open .optional-feed-status-overlay,
   body.track-playback-active .optional-feed-status-overlay {
+    display: none;
+  }
+
+  /* Nor for the zoom control beside that card: the card is up to
+     calc(100vw - 2rem) wide here, so stepping left of it walks off the screen.
+     Hidden while it is up, which is what already happens behind a side panel. */
+  body:has(#active-feed-status:not([hidden])) .leaflet-top.leaflet-right {
     display: none;
   }
 

@@ -50,7 +50,11 @@
   </script>
   <link rel="icon" type="image/png" sizes="192x192" href="branding/logo-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="branding/apple-touch-icon.png" />
-  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <!-- Leaflet is imported into the vendor layer by src/styles.css, not linked.
+       A linked stylesheet is unlayered, and unlayered wins over every layer,
+       so linking it here silently discarded every app rule that restyles a
+       Leaflet class. Preloaded so the fetch still starts with the scan. -->
+  <link rel="preload" as="style" href="vendor/leaflet.css" />
   <link rel="stylesheet" href="src/styles.css" />
   <link rel="preload" as="style" href="src/styles-tokens.css" />
   <link rel="preload" as="style" href="src/styles-reset.css" />

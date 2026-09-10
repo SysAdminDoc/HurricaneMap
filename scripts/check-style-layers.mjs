@@ -1,9 +1,19 @@
 import { readFile } from 'node:fs/promises';
 
 const layers = ['tokens', 'reset', 'base', 'shell', 'components', 'utilities', 'themes', 'accessibility'];
+// Third-party CSS goes in a layer of its own, ordered below everything the app
+// writes. It has to, because a <link rel="stylesheet"> is unlayered and an
+// unlayered declaration beats every layered one whatever the specificity or
+// source order. vendor/leaflet.css was linked that way until 2026-09-09, which
+// silently discarded all 127 app declarations aimed at .leaflet- classes: in
+// dark theme the zoom control rendered white with black glyphs and the
+// attribution rendered a white bar, both over the app's own tokens, and no gate
+// or snapshot noticed.
+const VENDOR_LAYER = 'vendor';
+const VENDOR_SHEETS = [{ layerImport: "@import url('../vendor/leaflet.css') layer(vendor);", href: 'vendor/leaflet.css' }];
 const entry = await readFile(new URL('../src/styles.css', import.meta.url), 'utf8');
 const index = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const expectedOrder = `@layer ${layers.join(', ')};`;
+const expectedOrder = `@layer ${[VENDOR_LAYER, ...layers].join(', ')};`;
 const COMPONENTS_IMPORTANT_CAP = 0;
 const errors = [];
 if (!entry.startsWith(expectedOrder)) errors.push('styles.css does not declare the approved cascade order');
@@ -75,7 +85,33 @@ const linkTags = [...index.matchAll(/<link\b[^>]*>/gi)].map(match => match[0]);
 function attribute(tag, name) {
   return tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1] || '';
 }
+// The rule that keeps the cascade honest: src/styles.css is the only stylesheet
+// the page links, because it is the only one whose contents land in a layer.
+// Anything else linked here outranks the entire app.
+const linkedSheets = linkTags
+  .filter(tag => attribute(tag, 'rel').toLowerCase() === 'stylesheet')
+  .map(tag => attribute(tag, 'href'));
+const strayStylesheets = linkedSheets.filter(href => href !== 'src/styles.css');
+if (strayStylesheets.length) {
+  errors.push(
+    `index.html links ${strayStylesheets.join(', ')} directly. A linked stylesheet is unlayered and beats every `
+    + 'app layer; import it from src/styles.css into a layer instead.',
+  );
+}
+if (!linkedSheets.includes('src/styles.css')) errors.push('index.html does not link src/styles.css');
+
 const preloadTags = linkTags.filter(tag => attribute(tag, 'rel').toLowerCase() === 'preload');
+
+for (const sheet of VENDOR_SHEETS) {
+  if (!entry.includes(sheet.layerImport)) {
+    errors.push(`styles.css must import ${sheet.href} with \`${sheet.layerImport}\``);
+  }
+  // Preloaded rather than linked, so dropping the <link> does not cost the sheet
+  // its place in the preload scan.
+  const preloaded = preloadTags.some(tag =>
+    attribute(tag, 'as').toLowerCase() === 'style' && attribute(tag, 'href') === sheet.href);
+  if (!preloaded) errors.push(`index.html must preload ${sheet.href} as a stylesheet`);
+}
 const stylePreloadHrefs = preloadTags
   .filter(tag => attribute(tag, 'as').toLowerCase() === 'style')
   .map(tag => attribute(tag, 'href'));
@@ -97,4 +133,7 @@ if (errors.length) {
   errors.forEach(error => console.error(`style layers: ${error}`));
   process.exit(1);
 }
-console.log(`style layers ok (${layers.length} ordered layers, ${ruleCount} simple rules, no exact duplicates)`);
+console.log(
+  `style layers ok (${layers.length + 1} ordered layers with ${VENDOR_LAYER} lowest, ${ruleCount} simple rules, `
+  + `no exact duplicates, ${VENDOR_SHEETS.length} vendor sheet imported into a layer and nothing linked unlayered)`,
+);

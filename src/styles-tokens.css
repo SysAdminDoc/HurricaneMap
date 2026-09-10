@@ -206,6 +206,7 @@
 :root {
   color-scheme: dark;
   --background: var(--base);
+  --active-feed-card-width: min(310px, calc(100vw - 2rem));
   --foreground: var(--text);
   --foreground-muted: var(--subtext);
   --foreground-subtle: var(--overlay);
