@@ -4428,6 +4428,58 @@ async function assertPremiumChrome(page, label) {
   assert(!offenders.length, `${label}: oversized rounded controls remain: ${JSON.stringify(offenders)}`);
 }
 
+// The map's own zoom control, which nothing held to being usable. It was
+// invisible on every phone viewport for one commit: a rule keyed on
+// `#active-feed-status:not([hidden])` matched from first paint, because
+// src/active.js creates that card unhidden and never sets the attribute.
+// assertSidePanelLayout only checks the storm panel does not overlap it, which
+// a 0x0 control satisfies perfectly.
+//
+// Withheld and buried are told apart deliberately. Below 720px the layout fades
+// the control away with the filter drawer open, on purpose and in one place;
+// that is a choice. Being painted, opaque and underneath something else is not.
+async function assertMapZoomControlUsable(page, label) {
+  const state = await page.evaluate(() => {
+    const node = document.querySelector('.leaflet-control-zoom');
+    if (!node) return { present: false };
+    const container = node.closest('.leaflet-top') || node;
+    // pointer-events is read from the control, never the container: Leaflet
+    // gives .leaflet-top pointer-events:none as a matter of course and
+    // re-enables it per control, so reading the container calls every state
+    // withheld, including the ones where the control is plainly on screen.
+    const hidden = [node, container].some(target => {
+      const style = getComputedStyle(target);
+      return style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0;
+    });
+    if (hidden || getComputedStyle(node).pointerEvents === 'none') return { present: true, withheld: true };
+    const rect = node.getBoundingClientRect();
+    const centreX = rect.x + rect.width / 2;
+    const centreY = rect.y + rect.height / 2;
+    const onScreen = rect.width > 0 && rect.height > 0
+      && rect.x >= 0 && rect.y >= 0 && rect.right <= innerWidth && rect.bottom <= innerHeight;
+    const hit = onScreen ? document.elementFromPoint(centreX, centreY) : null;
+    const describe = element => element
+      ? `${element.tagName.toLowerCase()}${element.id ? '#' + element.id : '.' + String(element.className || '').split(' ')[0]}`
+      : 'nothing';
+    return {
+      present: true,
+      withheld: false,
+      onScreen,
+      reachable: Boolean(hit && node.contains(hit)),
+      box: `${Math.round(rect.width)}x${Math.round(rect.height)} at ${Math.round(rect.x)},${Math.round(rect.y)}`,
+      covering: hit && !node.contains(hit) ? describe(hit) : null,
+    };
+  });
+  assert(state.present, `${label}: the map has no zoom control`);
+  if (state.withheld) return false;
+  assert(state.onScreen, `${label}: the zoom control is off screen or has no box (${state.box})`);
+  assert(
+    state.reachable,
+    `${label}: the zoom control is ${state.box} but ${state.covering} sits on top of it`,
+  );
+  return true;
+}
+
 async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   const context = await browser.newContext({
     viewport: { width: scenario.width, height: scenario.height },
@@ -4447,6 +4499,10 @@ async function runPanelLayoutScenario(browser, baseUrl, scenario) {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
     if (scenario.width <= 720) await assertMobileHeaderReachability(page, `${scenario.label} header`, { requireOverflow: scenario.width <= 430 });
+    // In the state a reader lands in, before anything is opened. The active
+    // card is on screen here at every width, which is the state that broke.
+    const zoomUsable = await assertMapZoomControlUsable(page, `${scenario.label} as loaded`);
+    assert(zoomUsable, `${scenario.label}: nothing withholds the zoom control in the default view, so it must be usable`);
     await openKatrinaPanel(page);
     await assertSidePanelLayout(page, scenario.label);
     await assertSettingsSurface(page, scenario.label);

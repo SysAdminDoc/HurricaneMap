@@ -2168,6 +2168,17 @@ label > input[type="checkbox"] {
 
 .leaflet-tooltip:before, .leaflet-tooltip-top:before { display: none; }
 
+/* Leaflet hard-codes #757575 on the close button. That was legible on its own
+   white popup and is not on the themed one: 3.86:1 in dark, 4.49:1 in light. */
+.leaflet-popup-close-button {
+  color: var(--foreground-muted);
+}
+
+.leaflet-popup-close-button:hover,
+.leaflet-popup-close-button:focus-visible {
+  color: var(--foreground);
+}
+
 /* Opaque, and in the theme's full-strength ink. A translucent panel here is
    not a style choice: this is the credit line the tile licence requires to be
    legible, and at 94% opacity 6% of whatever tile is underneath bleeds through,
@@ -6042,8 +6053,17 @@ body.side-panel-open .leaflet-top.leaflet-right {
    and its own `.leaflet-top { top: 0 }` beat the rule above, parking the
    control in the corner over the header instead. The control steps left of the
    card the same way it already steps left of an open side panel. */
-body:has(#active-feed-status:not([hidden])):not(.side-panel-open) .leaflet-top.leaflet-right {
+body:not(.side-panel-open) .leaflet-top.leaflet-right {
   right: calc(var(--active-feed-card-width) + 32px);
+}
+
+/* Below 374px the card (310px), its 16px margin, a 16px gap and the 32px
+   control stop fitting on one line, so the control goes back to the corner and
+   lets the card cover it. Every phone width the layout targets is wider. */
+@media (max-width: 373px) {
+  .leaflet-top.leaflet-right {
+    right: 10px;
+  }
 }
 
 .leaflet-control-zoom {
@@ -6429,13 +6449,6 @@ body:has(#active-feed-status:not([hidden])):not(.side-panel-open) .leaflet-top.l
   body.filters-open .optional-feed-status-overlay,
   body.side-panel-open .optional-feed-status-overlay,
   body.track-playback-active .optional-feed-status-overlay {
-    display: none;
-  }
-
-  /* Nor for the zoom control beside that card: the card is up to
-     calc(100vw - 2rem) wide here, so stepping left of it walks off the screen.
-     Hidden while it is up, which is what already happens behind a side panel. */
-  body:has(#active-feed-status:not([hidden])) .leaflet-top.leaflet-right {
     display: none;
   }
 
