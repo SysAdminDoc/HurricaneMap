@@ -4485,6 +4485,129 @@ async function assertMapZoomControlUsable(page, label) {
   return true;
 }
 
+// Text that floats over the map, measured from the pixels rather than from the
+// ancestor chain.
+//
+// #timeline and the Leaflet attribution are siblings of #map with alpha, so a
+// tenth of whatever the reader has panned to comes through them. measureContrast
+// walks parentElement and composites them onto <body>: it reported 4.86:1 for
+// ribbon text that reads 3.89:1 over dark imagery, and it cannot do better,
+// because the surface behind is not an ancestor.
+//
+// The map is flattened to white and then to black, which brackets every tile
+// set and every overlay the app can put there, and each run is judged on the
+// colour actually painted behind the text.
+const OVER_MAP_TARGETS = [
+  ['timeline source', '.timeline-source'],
+  ['timeline legend', '.timeline-legend'],
+  ['timeline legend item', '.timeline-legend span'],
+  ['timeline year label', '.timeline-labels span'],
+  ['timeline toggle', '.timeline-toggle'],
+  ['map attribution', '.leaflet-control-attribution'],
+  ['map attribution link', '.leaflet-control-attribution a'],
+];
+
+async function assertOverMapContrast(browser, baseUrl) {
+  const decoder = await browser.newPage();
+  await decoder.goto('data:text/html,<canvas id=c></canvas>');
+  let measured = 0;
+  try {
+    for (const profile of [
+      { theme: 'light', highContrast: false, minimum: 4.5 },
+      { theme: 'dark', highContrast: false, minimum: 4.5 },
+      { theme: 'light', highContrast: true, minimum: 7 },
+      { theme: 'dark', highContrast: true, minimum: 7 },
+    ]) {
+      for (const [mapLabel, mapColour] of [['a white map', '#ffffff'], ['a black map', '#000000']]) {
+        const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, serviceWorkers: 'block' });
+        await seedSettings(context, { onboarded: true, theme: profile.theme, highContrast: profile.highContrast, reducedMotion: true, locale: 'en' });
+        await stubQuietTropics(context);
+        const page = await context.newPage();
+        try {
+          await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+          await waitForAppReady(page);
+          await page.addStyleTag({
+            content: `.leaflet-tile-pane, .leaflet-overlay-pane { display: none !important; }
+                      .leaflet-container { background: ${mapColour} !important; }`,
+          });
+          await page.waitForFunction(() => document.getAnimations().every(animation => animation.playState !== 'running'));
+
+          const boxes = await page.evaluate(targets => targets.map(([name, selector]) => {
+            const node = document.querySelector(selector);
+            if (!node) return { name, selector, missing: true };
+            const rect = node.getBoundingClientRect();
+            if (rect.width < 4 || rect.height < 4) return { name, selector, missing: true };
+            const style = getComputedStyle(node);
+            const ink = (style.color.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+            return { name, selector, x: rect.x, y: rect.y, width: rect.width, height: rect.height, color: style.color, ink };
+          }), OVER_MAP_TARGETS);
+          const missing = boxes.filter(box => box.missing);
+          assert(!missing.length, `over-map contrast ${profile.theme} over ${mapLabel}: could not measure ${missing.map(box => box.name).join(', ')}`);
+
+          const png = await page.screenshot({ type: 'png' });
+          const sampled = await decoder.evaluate(async ({ dataUrl, items }) => {
+            const image = new Image();
+            await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = dataUrl; });
+            const canvas = document.getElementById('c');
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            const context2d = canvas.getContext('2d', { willReadFrequently: true });
+            context2d.drawImage(image, 0, 0);
+            return items.map(item => {
+              const x = Math.max(0, Math.round(item.x));
+              const y = Math.max(0, Math.round(item.y));
+              const width = Math.max(1, Math.min(Math.round(item.width), canvas.width - x));
+              const height = Math.max(1, Math.min(Math.round(item.height), canvas.height - y));
+              const { data } = context2d.getImageData(x, y, width, height);
+              const counts = new Map();
+              for (let index = 0; index < data.length; index += 4) {
+                const rgb = [data[index], data[index + 1], data[index + 2]];
+                // Glyph pixels and their antialiased fringe are not the
+                // background. Without this the vote returns the ink itself for
+                // anything whose box is tight around dense text.
+                if (Math.abs(rgb[0] - item.ink[0]) + Math.abs(rgb[1] - item.ink[1]) + Math.abs(rgb[2] - item.ink[2]) < 90) continue;
+                const key = rgb.join(',');
+                counts.set(key, (counts.get(key) || 0) + 1);
+              }
+              if (!counts.size) return { name: item.name, background: null };
+              let background = null;
+              let best = -1;
+              for (const [key, count] of counts) if (count > best) { best = count; background = key; }
+              return { name: item.name, background: background.split(',').map(Number) };
+            });
+          }, { dataUrl: `data:image/png;base64,${png.toString('base64')}`, items: boxes });
+
+          const channel = value => {
+            const normalized = value / 255;
+            return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+          };
+          const luminance = ([r, g, b]) => 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+          const failed = [];
+          for (const box of boxes) {
+            const pixel = sampled.find(entry => entry.name === box.name);
+            assert(pixel?.background, `over-map contrast: every pixel behind ${box.name} is its own ink, so nothing was measured`);
+            const high = Math.max(luminance(box.ink), luminance(pixel.background));
+            const low = Math.min(luminance(box.ink), luminance(pixel.background));
+            const value = Number(((high + 0.05) / (low + 0.05)).toFixed(2));
+            measured += 1;
+            if (value < profile.minimum) failed.push(`${box.name} ${value} on rgb(${pixel.background})`);
+          }
+          assert(
+            !failed.length,
+            `over ${mapLabel}, ${profile.theme}${profile.highContrast ? ' + high contrast' : ''} below ${profile.minimum}:1 — ${failed.join(', ')}`,
+          );
+        } finally {
+          await context.close();
+        }
+      }
+    }
+  } finally {
+    await decoder.close();
+  }
+  assert(measured >= OVER_MAP_TARGETS.length * 8, `over-map contrast measured only ${measured} values`);
+  console.log(`over-map contrast ok (${measured} painted measurements: ${OVER_MAP_TARGETS.length} surfaces, four themes, over a white map and a black one)`);
+}
+
 async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   const context = await browser.newContext({
     viewport: { width: scenario.width, height: scenario.height },
@@ -7842,6 +7965,7 @@ try {
   await assertSourceLanguageDisclosures(browser, baseUrl);
   await assertForcedColorsContract(browser, baseUrl);
   await assertComparisonExportParity(browser, baseUrl);
+  await assertOverMapContrast(browser, baseUrl);
   await assertStormPanelContrast(browser, baseUrl);
   await assertAboutDialogContrast(browser, baseUrl);
   await assertFeedListenersDoNotAccumulate(browser, baseUrl);

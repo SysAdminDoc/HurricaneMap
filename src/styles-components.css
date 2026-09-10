@@ -2192,7 +2192,15 @@ label > input[type="checkbox"] {
   font-size: 10px;
 }
 
-.leaflet-control-attribution a { color: var(--ink-link); }
+/* The ribbon's shadow falls across this strip, so it paints darker than its
+   own token: rgb(213,216,225) rather than rgb(230,233,240). The link colour
+   reads 4.16:1 against that in the light theme at 10px. Mixed toward the body
+   ink it reads 4.79:1 and still looks like a link, and it stays derived from
+   the theme rather than frozen to one hex. */
+.leaflet-control-attribution a {
+  color: color-mix(in srgb, var(--ink-link) 60%, var(--foreground));
+  text-decoration: underline;
+}
 
 .leaflet-control-zoom a {
   background: var(--mantle);
