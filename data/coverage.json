@@ -439,12 +439,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 211,
-        "storms": 211,
+        "records": 209,
+        "storms": 209,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "211 storms have bundled tropical-cyclone rainfall summaries."
+        "detail": "209 storms have bundled tropical-cyclone rainfall summaries."
       },
       "distribution": [
         "core",
@@ -481,11 +481,11 @@
       "availability": {
         "runnable": true,
         "records": null,
-        "storms": 139,
-        "frames": 1703,
+        "storms": 138,
+        "frames": 1697,
         "advisories": null,
         "marks": null,
-        "detail": "1703 archived frames across 139 storms; core ships metadata and full ships PNG frames."
+        "detail": "1697 archived frames across 138 storms; core ships metadata and full ships PNG frames."
       },
       "distribution": [
         "core",

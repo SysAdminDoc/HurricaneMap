@@ -39,7 +39,7 @@
       "uscomp"
     ],
     "hurricanemap:frame_count": [
-      1703
+      1697
     ],
     "hurricanemap:year_range": [
       1995,
@@ -50,11 +50,11 @@
       "EP"
     ],
     "hurricanemap:storm_count": [
-      139
+      138
     ],
     "hurricanemap:coverage_status": "final"
   },
-  "hurricanemap:frame_count": 1703,
+  "hurricanemap:frame_count": 1697,
   "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
   "hurricanemap:source_date": "2025-07-06",
   "hurricanemap:distribution": [
@@ -5914,36 +5914,6 @@
     },
     {
       "rel": "item",
-      "href": "../items/radar/AL102010-201009061800.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
-      "href": "../items/radar/AL102010-201009070000.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
-      "href": "../items/radar/AL102010-201009070200.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
-      "href": "../items/radar/AL102010-201009070600.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
-      "href": "../items/radar/AL102010-201009071200.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
-      "href": "../items/radar/AL102010-201009071800.json",
-      "type": "application/geo+json"
-    },
-    {
-      "rel": "item",
       "href": "../items/radar/AL102023-202308291800.json",
       "type": "application/geo+json"
     },
@@ -8601,8 +8571,8 @@
       "roles": [
         "data"
       ],
-      "file:size": 121185,
-      "file:checksum": "sha256:735f2301b60f4891ff49ff5f7a6ae152eea68c7c4deefdbfe1326951a2ea6145",
+      "file:size": 123914,
+      "file:checksum": "sha256:05d8a634007758dde2a1423036e3eb0afa897c9d1e563e591e327136f57ad250",
       "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
       "hurricanemap:source_date": "2026-05-03",
       "hurricanemap:license": "public-domain",

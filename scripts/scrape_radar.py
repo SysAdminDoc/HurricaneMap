@@ -301,6 +301,38 @@ def deduplicate(targets):
     return list(by_key.values())
 
 
+def prune_departed_storms():
+    """Drop manifest entries, and their frames, for storms the atlas no longer has.
+
+    This file merges into the manifest it finds rather than rebuilding it, which
+    is right for an archive that is filled in over many runs and wrong when a
+    storm leaves storms.json. The frames go with the entry, because
+    validate-data refuses a PNG the manifest does not name.
+    """
+    if not MANIFEST.exists():
+        print("no manifest to prune", file=sys.stderr)
+        return
+    manifest = json.loads(MANIFEST.read_text())
+    storm_ids = {storm["id"] for storm in json.loads(STORMS.read_text(encoding="utf-8"))}
+    departed = sorted(sid for sid in manifest if sid not in storm_ids)
+    if not departed:
+        print(f"manifest is clean: {len(manifest)} storms, all in storms.json", file=sys.stderr)
+        return
+    for sid in departed:
+        entry = manifest.pop(sid)
+        directory = RADAR_DIR / entry["dir"]
+        removed = 0
+        if directory.is_dir():
+            for frame in sorted(directory.glob("*.png")):
+                frame.unlink()
+                removed += 1
+            if not any(directory.iterdir()):
+                directory.rmdir()
+        print(f"pruned {sid} ({entry['name']} {entry['year']}): {removed} frames", file=sys.stderr)
+    MANIFEST.write_text(json.dumps(manifest, indent=2, sort_keys=False))
+    print(f"manifest now holds {len(manifest)} storms", file=sys.stderr)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cadence", type=int, default=360, help="Track densification cadence in minutes (default 360 = native 6-hourly)")
@@ -312,7 +344,16 @@ def main():
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--concurrency", type=int, default=8)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--prune-only",
+        action="store_true",
+        help="Drop manifest entries and frames for storms that have left storms.json, and stop. No network.",
+    )
     args = ap.parse_args()
+
+    if args.prune_only:
+        prune_departed_storms()
+        return
 
     targets = collect_targets(args)
     targets = deduplicate(targets)

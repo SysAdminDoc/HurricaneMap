@@ -130,7 +130,7 @@ function sourceUrl(relative) {
   if (relative === 'data/oni.ascii.txt') return 'https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt';
   if (relative === 'data/outlook.json') return 'https://www.cpc.ncep.noaa.gov/products/outlooks/hurricane.shtml';
   if (relative === 'data/distribution.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
-  if (relative === 'data/advisories.json') return 'https://ftp.nhc.noaa.gov/atcf/archive/';
+  if (relative === 'data/advisories.json') return 'https://www.nhc.noaa.gov/archive/';
   if (relative === 'data/coverage.json') return 'https://github.com/SysAdminDoc/HurricaneMap';
   return 'https://www.nhc.noaa.gov/data/hurdat/';
 }

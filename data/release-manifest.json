@@ -23,7 +23,7 @@
       "path": "data/advisories.json",
       "bytes": 1637774,
       "sha256": "b71b5a24cb128ecdc394db5a3a27c718f9a8201ddb3004eccfa066bc9fe6e900",
-      "source_url": "https://ftp.nhc.noaa.gov/atcf/archive/",
+      "source_url": "https://www.nhc.noaa.gov/archive/",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
       "schema_version": 1
@@ -67,7 +67,7 @@
     {
       "path": "data/coverage.json",
       "bytes": 16950,
-      "sha256": "e80c9320d2a267aa0d920e6089b7c50b6a1800f2382ff42c1f253b90c3f5f1af",
+      "sha256": "381ea683b1c1a1b5d3ce3721deea800c9cdf4d3d4f702a09336b90679c7db679",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "bf2c09386cf0f701bbbddf6234b93eb98b540ff04b5d3644578a961525b79ce3",
+      "sha256": "cea8e190ec1e9f848e40b56be4eb7482e83c73f8104f48aeb919fd61ed46182e",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -9740,60 +9740,6 @@
       "schema_version": "IEM-NEXRAD-mosaic"
     },
     {
-      "path": "data/radar/Hermine-2010/t_201009061800.png",
-      "bytes": 301525,
-      "sha256": "5993fa59ffadff353647e42182f3842339a65ef839f6022615915c66338c75d0",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-06",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Hermine-2010/t_201009070000.png",
-      "bytes": 312445,
-      "sha256": "355b8c13e500cb0c734632da82f148d14ace9682790edf3201da2bacb042ca59",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-07",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Hermine-2010/t_201009070200.png",
-      "bytes": 295214,
-      "sha256": "ac4d538d38b7bddd6102c583e7158db8b7c86ccd8a0e47c7987d599486b2f32c",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-07",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Hermine-2010/t_201009070600.png",
-      "bytes": 309353,
-      "sha256": "be931ea1b2c0ea5f17bd4eaceb406139f4a544820118662a71d3e79ad6ec1d61",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-07",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Hermine-2010/t_201009071200.png",
-      "bytes": 363592,
-      "sha256": "46e399790413e5a035d0fea34d15dc20b4cad59422ec7d54873884128452a4db",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-07",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
-      "path": "data/radar/Hermine-2010/t_201009071800.png",
-      "bytes": 263590,
-      "sha256": "2a78c5310d4e794b2b5c2026e4662caf0e1800e6187eb7d174d24ea7efe06c3f",
-      "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "source_date": "2010-09-07",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "IEM-NEXRAD-mosaic"
-    },
-    {
       "path": "data/radar/Hermine-2016/t_201608310600.png",
       "bytes": 212665,
       "sha256": "6a4b77a9a13551ac28acce8b14023767fb132c9b6340f388ed4fba932038d5f1",
@@ -15519,8 +15465,8 @@
     },
     {
       "path": "data/radar/manifest.json",
-      "bytes": 121185,
-      "sha256": "735f2301b60f4891ff49ff5f7a6ae152eea68c7c4deefdbfe1326951a2ea6145",
+      "bytes": 123914,
+      "sha256": "05d8a634007758dde2a1423036e3eb0afa897c9d1e563e591e327136f57ad250",
       "source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
       "source_date": "2026-05-03",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15528,8 +15474,8 @@
     },
     {
       "path": "data/rainfall.json",
-      "bytes": 21387,
-      "sha256": "a276210977fdd8de8d7e45f297154d2d9812b4526b4b32f18243f6476c3fc341",
+      "bytes": 21202,
+      "sha256": "96dacf723ff78c4acaa1d35177455bc1955c9e7c18a5087ce75996bc3c5e0492",
       "source_url": "https://www.wpc.ncep.noaa.gov/tropical/rain/tcrainfall.html",
       "source_date": "2026-06-20",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15555,8 +15501,8 @@
     },
     {
       "path": "data/stac/collections/radar.json",
-      "bytes": 223655,
-      "sha256": "b574eba1367eb2575c6dc8c199c2d237b513b81f0c5ba712ca0ad52e939b3655",
+      "bytes": 222875,
+      "sha256": "af3613d1e870e6e517260bbbc7da6098cd813079075aca3c29b1f5b9dcebda94",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15565,7 +15511,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4539,
-      "sha256": "d698d743b87b4ee5ce980e2e24eb24a8ac4745c5063a070745ad69d15d6be784",
+      "sha256": "d4c81202cea8dc95b0435f14402ea4467cbeec9a2dcecdb368d5dc84cb729882",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -26069,60 +26015,6 @@
       "path": "data/stac/items/radar/AL102007-200709220000.json",
       "bytes": 2334,
       "sha256": "925347fb3354030215e9210f7a679a6f6c5e418ce7b7c2ae02d219a8330b7ce5",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009061800.json",
-      "bytes": 2347,
-      "sha256": "b579bfdb9cb3cec0adec9eb1ce58fc3fea1e4606aa15357fa746a048b9db5bc4",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009070000.json",
-      "bytes": 2347,
-      "sha256": "891b171ef23c8d6faeba746ec444e1a741207f60e6eebd53ef034fd522930c9d",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009070200.json",
-      "bytes": 2347,
-      "sha256": "dbf71244e27b990ffc27141e4811db42a59e0a3f29f3fb4e6a98ba368ae5afaa",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009070600.json",
-      "bytes": 2346,
-      "sha256": "7be6a60ea66acc5875ee7a3bd3fcc07b03739c03a883eb7e666650c0aff6c692",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009071200.json",
-      "bytes": 2347,
-      "sha256": "3b28e1c9ca17e8c023b3374385a1ae71b819c17794b5b5cd9409bd8e998508c5",
-      "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
-      "source_date": "2026-08-08",
-      "generated_at_utc": "2026-08-08T00:00:00Z",
-      "schema_version": "STAC-1.1.0"
-    },
-    {
-      "path": "data/stac/items/radar/AL102010-201009071800.json",
-      "bytes": 2347,
-      "sha256": "d209fd86c8e27baccd7652925840e83ba1265024140b3e8a7873f6f01557ad26",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

@@ -23,7 +23,7 @@ const radarCoverage = coverage.datasets.find(dataset => dataset.id === 'radar-ar
 assert.deepEqual(hurdat2Collection.summaries['hurricanemap:year_range'], hurdatCoverage.year_range);
 assert.equal(hurdat2Collection.summaries['hurricanemap:inferred_landfall_count'][0], 50);
 assert.deepEqual(radarCollection.summaries['hurricanemap:year_range'], radarCoverage.year_range);
-assert.equal(radarCollection.summaries['hurricanemap:storm_count'][0], 139);
+assert.equal(radarCollection.summaries['hurricanemap:storm_count'][0], 138);
 
 // ------------------------------------------------------------- self links
 //

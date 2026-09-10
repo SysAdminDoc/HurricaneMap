@@ -167,7 +167,7 @@ const bundle = buildSanitizedSupportBundle({
       basins: ['AL'],
       year_range: [1995, 2025],
       distribution: ['core', 'full'],
-      availability: { runnable: true, storms: 139, frames: 1703 },
+      availability: { runnable: true, storms: 138, frames: 1697 },
     }],
   },
 });
@@ -181,7 +181,7 @@ assert.equal(bundle.app.version, '1.9.3');
 assert.equal(bundle.storage.radar_pack_count, 1);
 assert.equal(bundle.coverage.available, true);
 assert.equal(bundle.coverage.catalog.storm_count, 590);
-assert.equal(bundle.coverage.datasets[0].availability.frames, 1703);
+assert.equal(bundle.coverage.datasets[0].availability.frames, 1697);
 assert.equal(bundle.storage.scopes[0].cache_name, 'hm-shell-hm-v1.9.3');
 assert.deepEqual(bundle.offline_integrity, {
   state: 'unverified',
