@@ -8,6 +8,7 @@ export const OPTIONAL_FEED_DEFINITIONS = Object.freeze({
   marine: { labelKey: 'feeds.marine', source: 'NOAA NHC Marine Wind Warnings' },
   alerts: { labelKey: 'feeds.alerts', source: 'NOAA/NWS active alerts' },
   surge: { labelKey: 'feeds.surge', source: 'NOAA NHC Peak Storm Surge' },
+  inundation: { labelKey: 'feeds.inundation', source: 'NOAA NHC Potential Storm Surge Flooding' },
   goes: { labelKey: 'feeds.goes', source: 'NOAA/NESDIS/STAR GOES' },
   tides: { labelKey: 'feeds.tides', source: 'NOAA CO-OPS' },
   radar: { labelKey: 'feeds.radar', source: 'Iowa State IEM NEXRAD archive' },

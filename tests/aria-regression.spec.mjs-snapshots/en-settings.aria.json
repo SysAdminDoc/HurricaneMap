@@ -202,6 +202,11 @@
           "NHC forecast cone and track Appears only when official active-storm geometry is available.",
           {
             "role": "checkbox",
+            "name": "Storm surge flooding footprint NHC's potential inundation area, published only during a surge event."
+          },
+          "Storm surge flooding footprint NHC's potential inundation area, published only during a surge event.",
+          {
+            "role": "checkbox",
             "name": "NHC tropical outlook Shows current official disturbance areas and formation chances.",
             "checked": true
           },
@@ -331,6 +336,20 @@
                     "text": "Peak surge forecast"
                   },
                   "Not requested NOAA NHC Peak Storm Surge Last success: Not scheduled Next retry: Not scheduled Origin: None",
+                  {
+                    "role": "button",
+                    "name": "Retry"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Storm surge flooding footprint"
+                  },
+                  "Not requested NOAA NHC Potential Storm Surge Flooding Last success: Not scheduled Next retry: Not scheduled Origin: None",
                   {
                     "role": "button",
                     "name": "Retry"
@@ -722,7 +741,7 @@
             "role": "strong",
             "text": "Optional-feed age"
           },
-          "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful · sst: never successful · hwm: 0 min. ago · storm-events: 0 min. ago · exposure: 0 min. ago · evac: never successful",
+          "active: never successful · forecast: never successful · outlook: never successful · marine: never successful · alerts: never successful · surge: never successful · inundation: never successful · goes: never successful · tides: never successful · radar: never successful · fema: never successful · wind-context: never successful · seasonal: never successful · population: never successful · glossary: never successful · sst: never successful · hwm: 0 min. ago · storm-events: 0 min. ago · exposure: 0 min. ago · evac: never successful",
           {
             "role": "strong",
             "text": "Archive coverage"

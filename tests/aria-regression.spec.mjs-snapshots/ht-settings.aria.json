@@ -202,6 +202,11 @@
           "Kòn ak tras NHC Parèt sèlman lè jeyometri ofisyèl disponib.",
           {
             "role": "checkbox",
+            "name": "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a, ki pibliye sèlman pandan yon evènman manmòt."
+          },
+          "Zòn inondasyon manmòt la Zòn inondasyon posib NHC a, ki pibliye sèlman pandan yon evènman manmòt.",
+          {
+            "role": "checkbox",
             "name": "Pèspektiv twopikal NHC Montre deranjman ofisyèl aktyèl yo ak chans pou yo fòme.",
             "checked": true
           },
@@ -331,6 +336,20 @@
                     "text": "Previzyon pi gwo mare tanpèt"
                   },
                   "Poko mande NOAA NHC Peak Storm Surge Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
+                  {
+                    "role": "button",
+                    "name": "Eseye ankò"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Zòn inondasyon manmòt la"
+                  },
+                  "Poko mande NOAA NHC Potential Storm Surge Flooding Dènye siksè: Pa pwograme Pwochen tantativ: Pa pwograme Orijin: Okenn",
                   {
                     "role": "button",
                     "name": "Eseye ankò"
@@ -722,7 +741,7 @@
             "role": "strong",
             "text": "Laj sous opsyonèl yo"
           },
-          "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi · sst: poko janm reyisi · hwm: sa gen 0 min · storm-events: sa gen 0 min · exposure: sa gen 0 min · evac: poko janm reyisi",
+          "active: poko janm reyisi · forecast: poko janm reyisi · outlook: poko janm reyisi · marine: poko janm reyisi · alerts: poko janm reyisi · surge: poko janm reyisi · inundation: poko janm reyisi · goes: poko janm reyisi · tides: poko janm reyisi · radar: poko janm reyisi · fema: poko janm reyisi · wind-context: poko janm reyisi · seasonal: poko janm reyisi · population: poko janm reyisi · glossary: poko janm reyisi · sst: poko janm reyisi · hwm: sa gen 0 min · storm-events: sa gen 0 min · exposure: sa gen 0 min · evac: poko janm reyisi",
           {
             "role": "strong",
             "text": "Kouvèti achiv la"

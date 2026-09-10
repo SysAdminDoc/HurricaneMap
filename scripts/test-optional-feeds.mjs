@@ -84,7 +84,7 @@ assert.deepEqual(await retryOptionalFeed('glossary'), { ok: false, error: 'retry
 // who turns that layer on and gets nothing has no state to read and no retry
 // to press, and diagnostics cannot see it at all.
 const definitions = Object.keys(OPTIONAL_FEED_DEFINITIONS);
-assert.equal(definitions.length, 19, `expected 19 declared feeds, found ${definitions.length}`);
+assert.equal(definitions.length, 20, `expected 20 declared feeds, found ${definitions.length}`);
 for (const id of ['sst', 'hwm', 'storm-events', 'exposure', 'evac']) {
   assert.ok(definitions.includes(id), `${id} reaches the network and must be a declared feed`);
 }

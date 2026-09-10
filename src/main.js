@@ -494,6 +494,19 @@ document.addEventListener('advisory-replay:change', event => {
   writeHash();
 });
 
+// Every checkbox in the settings menu that is exactly "write this setting".
+// They were six copies of the same four lines in two places, which is also what
+// left no room under the shell-boundaries cap to add a seventh.
+const SETTING_TOGGLES = Object.freeze([
+  ['#toggle-nhc-forecast-cone', 'nhcForecastCone'],
+  ['#toggle-surge-inundation', 'surgeInundation'],
+  ['#toggle-nhc-outlook', 'nhcOutlook'],
+  ['#toggle-marine-warnings', 'marineWarnings'],
+  ['#toggle-goes-realtime', 'goesRealtime'],
+  ['#toggle-high-contrast', 'highContrast'],
+  ['#toggle-reduced-motion', 'reducedMotion'],
+]);
+
 // Settings menu — palette + wind unit toggles. Wires to the cog button in
 // the header and re-renders dependent surfaces on change.
 function wireSettingsControls() {
@@ -523,29 +536,9 @@ function wireSettingsControls() {
     syncRadioGroup('[data-set-locale]', 'locale', 'setLocale');
     syncRadioGroup('[data-set-damage]', 'damageMode', 'setDamage');
     syncRadioGroup('[data-set-marine-horizon]', 'marineHorizon', 'setMarineHorizon');
-    const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
-    if (coneToggle) {
-      coneToggle.checked = getSetting('nhcForecastCone');
-    }
-    const outlookToggle = menu.querySelector('#toggle-nhc-outlook');
-    if (outlookToggle) {
-      outlookToggle.checked = getSetting('nhcOutlook');
-    }
-    const marineToggle = menu.querySelector('#toggle-marine-warnings');
-    if (marineToggle) {
-      marineToggle.checked = getSetting('marineWarnings');
-    }
-    const goesToggle = menu.querySelector('#toggle-goes-realtime');
-    if (goesToggle) {
-      goesToggle.checked = getSetting('goesRealtime');
-    }
-    const hcToggle = menu.querySelector('#toggle-high-contrast');
-    if (hcToggle) {
-      hcToggle.checked = getSetting('highContrast');
-    }
-    const rmToggle = menu.querySelector('#toggle-reduced-motion');
-    if (rmToggle) {
-      rmToggle.checked = getSetting('reducedMotion');
+    for (const [selector, key] of SETTING_TOGGLES) {
+      const toggle = menu.querySelector(selector);
+      if (toggle) toggle.checked = getSetting(key);
     }
   }
   syncMenu();
@@ -592,46 +585,14 @@ function wireSettingsControls() {
     radios[next].click();
   });
 
-  const coneToggle = menu.querySelector('#toggle-nhc-forecast-cone');
-  if (coneToggle) {
-    coneToggle.addEventListener('change', () => {
-      setSetting('nhcForecastCone', coneToggle.checked);
-    });
-  }
-
-  const outlookToggle = menu.querySelector('#toggle-nhc-outlook');
-  if (outlookToggle) {
-    outlookToggle.addEventListener('change', () => {
-      setSetting('nhcOutlook', outlookToggle.checked);
-    });
-  }
-
-  const marineToggle = menu.querySelector('#toggle-marine-warnings');
-  if (marineToggle) {
-    marineToggle.addEventListener('change', () => {
-      setSetting('marineWarnings', marineToggle.checked);
-    });
-  }
-
-  const goesToggle = menu.querySelector('#toggle-goes-realtime');
-  if (goesToggle) {
-    goesToggle.addEventListener('change', () => {
-      setSetting('goesRealtime', goesToggle.checked);
-    });
-  }
-
-  const hcToggle = menu.querySelector('#toggle-high-contrast');
-  if (hcToggle) {
-    hcToggle.addEventListener('change', () => {
-      setSetting('highContrast', hcToggle.checked);
-    });
-  }
-
-  const rmToggle = menu.querySelector('#toggle-reduced-motion');
-  if (rmToggle) {
-    rmToggle.addEventListener('change', () => {
-      setSetting('reducedMotion', rmToggle.checked);
-      document.documentElement.classList.toggle('reduce-motion', rmToggle.checked);
+  for (const [selector, key] of SETTING_TOGGLES) {
+    const toggle = menu.querySelector(selector);
+    toggle?.addEventListener('change', () => {
+      setSetting(key, toggle.checked);
+      // The one toggle whose effect is not a setting somebody else reads.
+      if (key === 'reducedMotion') {
+        document.documentElement.classList.toggle('reduce-motion', toggle.checked);
+      }
     });
   }
 

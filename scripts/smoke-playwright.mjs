@@ -5135,6 +5135,114 @@ async function assertDualPaneComparison(browser, baseUrl) {
   }
 }
 
+// NHC's Potential Storm Surge Flooding footprint.
+//
+// Driven against a recorded fixture, because the live layer is empty out of
+// season: that is the state the layer spends most of the year in, and it is
+// also the one this has to report as `empty` rather than as a failure, so both
+// are driven here.
+async function assertSurgeInundationLayer(browser, baseUrl) {
+  const fixture = JSON.parse(
+    await readFile(new URL('../tests/fixtures/nhc-summary-inundation-footprint.json', import.meta.url), 'utf8'),
+  );
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en', surgeInundation: true });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+
+    const render = async (payload) => {
+      await page.route(
+        '**/NHC_tropical_weather_summary/MapServer/23/query**',
+        route => route.fulfill({
+          status: 200,
+          contentType: 'application/geo+json',
+          body: JSON.stringify(payload),
+        }),
+      );
+      const result = await page.evaluate(async () => {
+        const { getMap } = await import('/src/map.js');
+        const layer = await import('/src/surge-inundation.js');
+        layer.clearSurgeInundationCache();
+        return layer.renderSurgeInundation([], { map: getMap(), enabled: true, force: true });
+      });
+      await page.unroute('**/NHC_tropical_weather_summary/MapServer/23/query**');
+      return result;
+    };
+
+    // Out of season: zero features is not a failure, and reporting it as one
+    // would put a retry in front of a reader for a product nobody has issued.
+    const empty = await render({ type: 'FeatureCollection', features: [] });
+    assert(
+      empty.status === 'empty' && empty.featureCount === 0,
+      `an unpublished footprint was not reported as empty: ${JSON.stringify(empty)}`,
+    );
+    assert(
+      await page.evaluate(() => document.getElementById('surge-inundation-legend')?.hidden !== false),
+      'the legend explained a footprint that does not exist',
+    );
+
+    // Published: the footprint draws, and the legend leads with the sentence
+    // people get wrong about this product.
+    const rendered = await render(fixture);
+    assert(
+      rendered.status === 'rendered' && rendered.featureCount === fixture.features.length,
+      `the recorded footprint did not render: ${JSON.stringify(rendered)}`,
+    );
+    const legend = await page.evaluate(() => {
+      const node = document.getElementById('surge-inundation-legend');
+      return { hidden: node?.hidden, text: node?.textContent || '' };
+    });
+    assert(legend.hidden === false, 'the legend stayed hidden with a footprint on the map');
+    assert(
+      /10 percent chance/i.test(legend.text) && /above/i.test(legend.text),
+      `the legend does not carry the 10 percent exceedance wording: ${JSON.stringify(legend.text)}`,
+    );
+    assert(
+      await page.evaluate(() => document.querySelectorAll('path.surge-inundation-poly').length > 0),
+      'the footprint reported as rendered but nothing was drawn',
+    );
+
+    // It reports itself the way every other optional feed does, so it turns up
+    // in the diagnostics panel rather than being a layer nothing accounts for.
+    const diagnostics = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      const state = feeds.getOptionalFeedState('inundation');
+      return { known: Boolean(state), source: feeds.getOptionalFeedDefinition('inundation')?.source };
+    });
+    assert(diagnostics.known, 'the inundation layer is not a declared optional feed');
+    assert(
+      /Potential Storm Surge Flooding/.test(diagnostics.source || ''),
+      `the feed does not name its source: ${JSON.stringify(diagnostics.source)}`,
+    );
+
+    // Switching it off takes the footprint and its legend away, and reports the
+    // feed idle rather than leaving it reading as a success.
+    await page.evaluate(async () => {
+      const layer = await import('/src/surge-inundation.js');
+      layer.clearSurgeInundation();
+    });
+    assert(
+      await page.evaluate(() => document.querySelectorAll('path.surge-inundation-poly').length === 0
+        && document.getElementById('surge-inundation-legend')?.hidden === true),
+      'turning the layer off left the footprint or its legend on screen',
+    );
+    const afterOff = await page.evaluate(async () => {
+      const feeds = await import('/src/optional-feeds.js');
+      return feeds.getOptionalFeedState('inundation')?.state;
+    });
+    assert(afterOff === 'idle', `the feed did not go idle when the layer was turned off: ${afterOff}`);
+  } finally {
+    await context.close();
+  }
+}
+
 async function assertPanelIsAddressable(browser, baseUrl) {
   const PANELS = ['stats', 'compare', 'on-this-date', 'table-view', 'prep', 'evac'];
   const context = await browser.newContext({
@@ -7482,6 +7590,7 @@ try {
   await assertPanelIsAddressable(browser, baseUrl);
   await assertFilterResetIsRecoverable(browser, baseUrl);
   await assertDualPaneComparison(browser, baseUrl);
+  await assertSurgeInundationLayer(browser, baseUrl);
   await assertLocalizedWorkflowChrome(browser, baseUrl);
   await assertIosInstallGuide(browser, baseUrl);
   await assertSourceLanguageDisclosures(browser, baseUrl);

@@ -1000,6 +1000,55 @@ label > input[type="checkbox"] {
   .hm-compare-pane { transition: none; }
 }
 
+/* NHC's potential inundation footprint. One fill, because the vector layer
+   carries one shape per product and banding it would invent depth it does not
+   have; the legend does the explaining instead. */
+.surge-inundation-legend {
+  position: absolute;
+  right: 12px;
+  bottom: 132px;
+  z-index: 620;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 20rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.surge-inundation-legend strong {
+  font-size: 12px;
+}
+
+.surge-inundation-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.surge-inundation-legend small {
+  color: var(--subtext);
+}
+
+.surge-inundation-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(137, 220, 235, 0.35);
+  border: 1px solid #89dceb;
+}
+
+@media (max-width: 720px) {
+  .surge-inundation-legend {
+    right: 8px;
+    bottom: 148px;
+    max-width: min(20rem, calc(100vw - 16px));
+  }
+}
+
 .cp-map-compare {
   margin: 1rem 0 0;
   padding: 0.75rem;

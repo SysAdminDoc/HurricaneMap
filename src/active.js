@@ -24,6 +24,11 @@ import { bearingDeg, compassLabel, kmToMi } from './metrics.js';
 import { haversineKm } from './geodesy.js';
 import { loadUserPoint } from './user-point.js';
 import { clearPeakSurge, clearPeakSurgeCache, renderPeakSurge } from './peak-surge.js';
+import {
+  clearSurgeInundation,
+  clearSurgeInundationCache,
+  renderSurgeInundation,
+} from './surge-inundation.js';
 import { getSetting } from './settings.js';
 import { t } from './i18n.js';
 import { fetchWithTimeout, REQUEST_TIMEOUT_MS } from './network.js';
@@ -208,6 +213,9 @@ async function fetchAndRender() {
     clearTropicalAlerts();
     clearPeakSurge();
     clearPeakSurgeCache();
+    idleOptionalFeed('inundation');
+    clearSurgeInundation();
+    clearSurgeInundationCache();
     return;
   }
   await renderActive(storms);
@@ -487,6 +495,18 @@ async function renderActive(storms) {
     enabled: officialConeEnabled,
   });
   reportOptionalFeedResult('surge', surgeResult, { requestId: surgeRequest?.requestId });
+
+  // NHC's Potential Storm Surge Flooding footprint. Its own opt-in rather than
+  // the cone's, because the number behind it is a 10 percent exceedance and a
+  // reader should be choosing to see that rather than inheriting it.
+  if (getSetting('surgeInundation')) {
+    const inundationRequest = beginOptionalFeed('inundation');
+    const inundationResult = await renderSurgeInundation(storms, { map, enabled: true });
+    reportOptionalFeedResult('inundation', inundationResult, { requestId: inundationRequest?.requestId });
+  } else {
+    clearSurgeInundation();
+    idleOptionalFeed('inundation');
+  }
 
   const goesEnabled = getSetting('goesRealtime');
   if (goesEnabled) {

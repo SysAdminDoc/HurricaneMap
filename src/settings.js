@@ -24,6 +24,7 @@ const DEFAULTS = {
   marineWarnings: false,  // Opt in to broad marine wind-warning polygons
   marineHorizon: '00to24', // Which NHC forecast band the marine layer draws
   goesRealtime: false,     // Show live NOAA/NESDIS/STAR GOES satellite backdrop
+  surgeInundation: false,  // Show NHC's Potential Storm Surge Flooding footprint
   locale: 'en',            // 'en' | 'es' | 'ht'
   highContrast: false,     // WCAG AAA 7:1+ contrast, or whatever the OS asks for
   reducedMotion: false,    // In-app override: reduce animations independent of OS setting
@@ -45,6 +46,7 @@ const BOOLEAN_KEYS = new Set([
   'nhcOutlook',
   'marineWarnings',
   'goesRealtime',
+  'surgeInundation',
   'highContrast',
   'reducedMotion',
   'onboarded',

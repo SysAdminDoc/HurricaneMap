@@ -202,6 +202,11 @@
           "Cono y trayectoria del NHC Aparece solo cuando hay geometría oficial disponible.",
           {
             "role": "checkbox",
+            "name": "Huella de inundación por marejada Área de inundación potencial del NHC, publicada solo durante un evento de marejada."
+          },
+          "Huella de inundación por marejada Área de inundación potencial del NHC, publicada solo durante un evento de marejada.",
+          {
+            "role": "checkbox",
             "name": "Perspectiva tropical del NHC Muestra las perturbaciones oficiales actuales y sus probabilidades de formación.",
             "checked": true
           },
@@ -331,6 +336,20 @@
                     "text": "Pronóstico de marejada máxima"
                   },
                   "No solicitado NOAA NHC Peak Storm Surge Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
+                  {
+                    "role": "button",
+                    "name": "Reintentar"
+                  }
+                ]
+              },
+              {
+                "role": "listitem",
+                "children": [
+                  {
+                    "role": "strong",
+                    "text": "Huella de inundación por marejada"
+                  },
+                  "No solicitado NOAA NHC Potential Storm Surge Flooding Último éxito: No programado Próximo intento: No programado Origen: Ninguno",
                   {
                     "role": "button",
                     "name": "Reintentar"
@@ -722,7 +741,7 @@
             "role": "strong",
             "text": "Antigüedad de fuentes opcionales"
           },
-          "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito · population: nunca tuvo éxito · glossary: nunca tuvo éxito · sst: nunca tuvo éxito · hwm: hace 0 min · storm-events: hace 0 min · exposure: hace 0 min · evac: nunca tuvo éxito",
+          "active: nunca tuvo éxito · forecast: nunca tuvo éxito · outlook: nunca tuvo éxito · marine: nunca tuvo éxito · alerts: nunca tuvo éxito · surge: nunca tuvo éxito · inundation: nunca tuvo éxito · goes: nunca tuvo éxito · tides: nunca tuvo éxito · radar: nunca tuvo éxito · fema: nunca tuvo éxito · wind-context: nunca tuvo éxito · seasonal: nunca tuvo éxito · population: nunca tuvo éxito · glossary: nunca tuvo éxito · sst: nunca tuvo éxito · hwm: hace 0 min · storm-events: hace 0 min · exposure: hace 0 min · evac: nunca tuvo éxito",
           {
             "role": "strong",
             "text": "Cobertura del archivo"

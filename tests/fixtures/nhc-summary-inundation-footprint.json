@@ -1,0 +1,28 @@
+{
+  "_comment": "Recorded shape of NHC_tropical_weather_summary/MapServer/23 (Footprint_Inun), read live on 2026-09-09 when the layer was out of season and returned zero features. The geometry here is a synthetic rectangle off the Louisiana coast standing in for a published footprint; the property names, the f=geojson envelope and the field set are the service's own.",
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "objectid": 1,
+        "name": "al092026_Inundation",
+        "productname": "Potential Storm Surge Flooding Map",
+        "groupname": "al092026",
+        "category": "Inundation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-90.4, 29.0],
+            [-89.2, 29.0],
+            [-89.2, 29.8],
+            [-90.4, 29.8],
+            [-90.4, 29.0]
+          ]
+        ]
+      }
+    }
+  ]
+}
