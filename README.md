@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.9.3-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.10.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -105,12 +105,12 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 - **👥 Population density**: toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
-## What's new in v1.9.3 - Metric parity and maintainability (2026-08-08)
+## What's new in v1.10.0 - Advisories as issued, and six landfalls that were in Mexico (2026-09-10)
 
-- **Metric parity:** comparison cards, side-by-side rows, and CSV exports now share one typed metric contract with unit-aware formatting for derived ACE, translation, and rapid-intensification values, backed by field-level parity checks across locales and wind units.
-- **Archive coverage:** `data/coverage.json` records each bundled dataset's source/revision, basin and year range, measured records/storms/frames/advisories/marks, lifecycle/value status, end date, and core/full distribution. The About dialog and offline diagnostics render the same facts, and exports plus STAC summaries carry the key coverage counts.
-- **Playwright acceptance:** offline tests route a service-worker-owned IEM tile through the browser context, and ARIA snapshots cover storm details, settings, and advisory replay in English, Spanish, and Haitian Creole.
-- **Visual and release checks:** the 16 Windows/Chromium visual baselines are lossless WebP, while platform-aware runners skip them clearly on Linux/macOS and release metadata stays synchronized across the app shell and data bundle.
+- **Every advisory NHC issued, from the product it issued.** The 2015-2024 replay was built from ATCF a-decks, which are a database of forecast cycles, and a cycle is not an advisory: a special advisory issued off the six-hourly clock has no cycle to be built from. 22 were missing, and where one went out at a synoptic hour exactly it took the number of the advisory that followed it, so eight records held the wrong forecast. Each advisory is now read from its own archived forecast/advisory product, the archive holds 1,684 of them, and the build refuses to ship a hole: a gap in the numbering is either reported by name or an error.
+- **Six landfalls the atlas counted were in Tamaulipas.** The rule that recovers a landfall HURDAT2 never marked tested only whether the previous fix sat inside a US state, and Mexico is not one, so a storm that came ashore south of the Rio Grande and carried on north read as arriving from the Gulf. A centre already ashore cannot come ashore again, and AOML's own table settles the rest, because it marks seven storms as having made landfall over Mexico first. 759 landfall events become 753 and AOML's scoring of this atlas rises from 93.1 to 94.1 percent precision with recall unchanged.
+- **Iselle's Hawaii landfall is the one HURDAT2 records.** The exclusion that keeps Tamaulipas landfalls out of Texas had no western limit, so it covered Hawaii too, threw out a real landfall record and let the fallback put an interpolated one back three hours late.
+- **The replay line names both clocks.** An advisory is issued three hours after the forecast cycle it runs on, and a special one whenever it is needed, so two advisories in a row can carry one forecast with different positions. The panel says when the advisory went out and which cycle it came from, and only the second line makes that legible.
 
 Earlier release history is maintained in the [CHANGELOG](CHANGELOG.md).
 
@@ -120,15 +120,15 @@ Every release carries two offline builds. Neither needs Node, npm or a clone, an
 
 | Profile | Download | Unpacked | Contains |
 | --- | --- | --- | --- |
-| `core` | [`hurricanemap-1.9.3-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-core.tar.gz) (5.7 MB) | 23.5 MB | The whole historical atlas: 590 storms, 753 landfalls, every panel and export |
-| `full` | [`hurricanemap-1.9.3-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-full.tar.gz) (491 MB) | 526 MB | Everything in `core` plus the 1,703 archived NEXRAD radar frames |
+| `core` | [`hurricanemap-1.10.0-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.10.0/hurricanemap-1.10.0-core.tar.gz) (6.1 MB) | 25.3 MB | The whole historical atlas: 590 storms, 753 landfalls, every panel and export |
+| `full` | [`hurricanemap-1.10.0-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.10.0/hurricanemap-1.10.0-full.tar.gz) (489.8 MB) | 525.9 MB | Everything in `core` plus the 1,697 archived NEXRAD radar frames |
 
-Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/SHA256SUMS.txt), which is what to check a download against.
+Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.10.0/SHA256SUMS.txt), which is what to check a download against.
 
 ```bash
-tar -xzf hurricanemap-1.9.3-core.tar.gz
+tar -xzf hurricanemap-1.10.0-core.tar.gz
 sha256sum -c SHA256SUMS.txt      # optional, and worth the two seconds
-cd hurricanemap-1.9.3-core
+cd hurricanemap-1.10.0-core
 python serve.py --port 8765
 # open http://127.0.0.1:8765/
 ```

@@ -3,7 +3,7 @@
   "generated_at_utc": "2026-08-08T00:00:00Z",
   "generator": {
     "name": "scripts/preprocess_hurdat2.py",
-    "app_version": "1.9.3",
+    "app_version": "1.10.0",
     "source_commit": "744f46de1aa589a5fa70f2cf3e84a8ce6fa54128",
     "source_manifest": "data/hurdat2-sources.json",
     "runtime": "Python 3.12.10"

@@ -216,7 +216,7 @@ try {
     const marker = await (await caches.open(dataCacheName)).match('./__hurricanemap-release.json');
     if (!marker) throw new Error('offline release marker was not installed');
     const tuple = await marker.json();
-    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.9.3') {
+    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.10.0') {
       throw new Error(`offline release tuple is incoherent: ${JSON.stringify(tuple)}`);
     }
     return tuple;
@@ -313,13 +313,22 @@ try {
   const sourceState = await page.evaluate(async () => {
     const cache = await caches.open('hm-source-bundle-v1');
     const keys = (await cache.keys()).map(request => new URL(request.url).pathname);
-    const dataRequests = await (await caches.open('hm-data-hm-v1.9.3')).keys();
+    // The name carries the release, so writing it out here meant the leak
+    // check below opened an empty cache the moment the version moved, and an
+    // empty cache leaks nothing. Ask the worker which one it is using.
+    const dataCacheName = (await caches.keys()).find(name => name.startsWith('hm-data-hm-'));
+    const dataRequests = dataCacheName ? await (await caches.open(dataCacheName)).keys() : [];
     return {
       keys,
+      dataCacheName,
       dataKeys: dataRequests.map(request => new URL(request.url).pathname),
     };
   });
   assert(sourceState.keys.length === 4 && sourceState.keys.some(key => key.endsWith('__hurricanemap-source-bundle.json')), 'source bundle cache is missing its marker or assets');
+  assert(
+    sourceState.dataCacheName && sourceState.dataKeys.length > 0,
+    `the mandatory data cache is empty, so the leak check below rests on nothing: ${JSON.stringify(sourceState.dataCacheName)}`,
+  );
   assert(!sourceState.dataKeys.some(key => ['/data/hurdat2-atlantic.txt', '/data/hurdat2-nepac.txt', '/data/release-manifest.json'].includes(key)), `source bundle leaked into mandatory data cache: ${JSON.stringify(sourceState.dataKeys)}`);
 
   // The storage panel rendered once during boot and then only for a pack save

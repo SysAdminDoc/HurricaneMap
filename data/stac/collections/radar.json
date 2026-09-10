@@ -8574,7 +8574,7 @@
       "file:size": 123914,
       "file:checksum": "sha256:05d8a634007758dde2a1423036e3eb0afa897c9d1e563e591e327136f57ad250",
       "hurricanemap:source_url": "https://mesonet.agron.iastate.edu/docs/nexrad_mosaic/",
-      "hurricanemap:source_date": "2026-05-03",
+      "hurricanemap:source_date": "2026-09-10",
       "hurricanemap:license": "public-domain",
       "hurricanemap:distribution": [
         "full"

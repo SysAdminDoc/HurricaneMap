@@ -2,7 +2,7 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.10.0: Advisories as issued, and six landfalls that were in Mexico (2026-09-10)
 
 ### Changed
 - Six landfalls the atlas counted were in Mexico, and the count moves from 759 to 753. The rule that recovers a landfall HURDAT2 never marked was written as "water to land", but the only test it made was whether the previous fix sat inside a US state polygon. Mexico is not one, so a storm that came ashore in Tamaulipas and carried on north across the Rio Grande read as arriving from the Gulf. Hermine 2010 is the plain case: its one landfall record is at 25.3N 97.4W, NHC's report puts it on the northeastern coast of Mexico, and the next fix four hours later is inland Texas. A centre already ashore cannot come ashore again, and the rule says so now. AOML settles the rest, because its own table marks seven storms "hurricane made landfall first over Mexico, but caused hurricane winds in Texas", and the atlas was claiming a Texas landfall for three of them, Beulah 1967 included. That is knowledge no geometry here could reach: HURDAT2 puts Beulah's landfall 0.05 degrees south of the mouth of the Rio Grande, and the 1886 storm carries no landfall record at all. AOML's own scoring of this atlas moves with it, from 93.1 to 94.1 percent precision at unchanged recall, and the three inferred landfalls it could adjudicate, all of which it scored wrong, are gone. Five storms leave the atlas with their only US landfall, so the advisory replay drops Hermine to keep agreeing with the map, and everything else keyed to the storm list follows: 1,703 archived radar frames across 139 storms become 1,697 across 138, rainfall summaries 211 become 209, impact records 244 become 242.

@@ -4,12 +4,12 @@
 // the full 1,700+ artifact manifest at runtime.
 
 export const EXPORT_PROVENANCE_SCHEMA_VERSION = 1;
-const APP_VERSION = '1.9.3';
+const APP_VERSION = '1.10.0';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '744f46de1aa589a5fa70f2cf3e84a8ce6fa54128',
-  manifest_sha256: '1daaac5f1cc3adeb72c42eb57277def2d4135ba84a60774ea8215823b885bf81',
+  manifest_sha256: '7b6e2f35d4694dd75d93e857b2c47a8816902630dfff5a511fee0f50fe96bbc1',
   algorithm: 'SHA-256',
 });
 
@@ -25,7 +25,7 @@ const ARTIFACTS = Object.freeze({
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
     bytes: 16950,
-    sha256: '381ea683b1c1a1b5d3ce3721deea800c9cdf4d3d4f702a09336b90679c7db679',
+    sha256: 'a81c53ec3c19085dcf0282fa17ea617e8de4feaceb34af74e2b1c7cc95e15f03',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -72,8 +72,8 @@ const ARTIFACTS = Object.freeze({
   }),
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
-    bytes: 7819,
-    sha256: '5b83db0ed10c0d369b88c82ffde6ab39e96f4de57e995806d62904ad7cf2f10d',
+    bytes: 7820,
+    sha256: 'd570328c7677e238cce46de1f73c1818e69ba83c58419bd504a9b39aff2da641',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
