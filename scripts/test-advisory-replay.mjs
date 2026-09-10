@@ -206,6 +206,63 @@ assert.deepEqual(clipped[0], [19, -94.5]);
   assert.equal(ringContains(square, 1, 3), false);
 }
 
+// The schema's record-level cone rule, driven with the shapes a review found it
+// letting through. Blocking the half-claim on a single advisory was not enough:
+// a record naming a radii era could carry a full and false published cone on
+// every advisory, and the app would tell the reader the rebuilt outline was the
+// one NHC drew.
+{
+  const { default: Ajv2020 } = await import('ajv/dist/2020.js');
+  const schema = JSON.parse(await readFile(path.join(root, 'schemas/advisories-v1.schema.json'), 'utf8'));
+  const validate = new Ajv2020({ strict: true, allErrors: false }).compile(schema);
+
+  const cone = [[25, -80], [26, -81], [27, -80]];
+  const adeckAdvisory = { n: 1, t: '2017-09-05T00:00:00Z', f: [[0, 25, -80, 100]], e: [], discussion: null };
+  const gisAdvisory = { ...adeckAdvisory, issued: '2017-09-05T03:00:00Z', c: cone, conePeriodHours: 120 };
+  const record = (extra, advisories) => ({
+    schema: 1,
+    era: { startYear: 2008, endYear: 2024, coneEra: 'per-record', label: '2008-2024' },
+    eras: [{ startYear: 2008, endYear: 2024, label: '2008-2024', coneEra: null, publishedCone: true }],
+    model: 'OFCL',
+    labels: { forecast: 'x', actual: 'y' },
+    definitions: { forecast: 'a', trackError: 'b', intensityError: 'c', coverage: 'd', cone: 'e' },
+    sources: {
+      adeckArchive: 'https://a/', productArchive: 'https://b/', format: 'https://c/',
+      coneRadii: 'https://d/', gisArchive: 'https://e/',
+    },
+    totals: { storms: 1, advisories: 1, missingDiscussions: 0 },
+    storms: {
+      AL092017: {
+        name: 'IRMA', year: 2017, basin: 'AL', atcfId: 'al092017',
+        coneEra: '2017', sourceUrl: 'https://a/', archiveUrl: 'https://b/',
+        sourceSubsetSha256: 'a'.repeat(64), advisoryCount: 1, unmatchedForecasts: 0,
+        missingDiscussions: 0, advisories, ...extra,
+      },
+    },
+  });
+
+  const refuses = (document, why) => assert.ok(!validate(document), `the schema accepts ${why}`);
+  const accepts = (document, why) => assert.ok(validate(document), `the schema refuses ${why}: ${JSON.stringify(validate.errors?.[0])}`);
+
+  accepts(record({}, [adeckAdvisory]), 'an ordinary a-deck record');
+  accepts(record({ coneEra: null, publishedCone: true }, [gisAdvisory]), 'an ordinary published-cone record');
+
+  refuses(record({}, [gisAdvisory]), 'an a-deck record whose advisory carries a full published cone');
+  refuses(record({ coneEra: null, publishedCone: true }, [adeckAdvisory]), 'a published-cone record whose advisory carries no cone');
+  refuses(record({ publishedCone: true }, [gisAdvisory]), 'a published-cone record that also names a radii era');
+  refuses(record({ coneEra: null }, [adeckAdvisory]), 'a record that names no cone source at all');
+  refuses(record({}, [{ ...adeckAdvisory, c: cone }]), 'an a-deck advisory carrying only a cone');
+  refuses(
+    record({ coneEra: null, publishedCone: true }, [{ ...gisAdvisory, c: [[25, -80], [26, -81]] }]),
+    'a two-point cone',
+  );
+  refuses(record({ coneEra: null, publishedCone: true }, [{ ...gisAdvisory, conePeriodHours: 48 }]), 'a 48 h cone period');
+  for (const bad of ['0A', '12a', '1AB', '007', 0, -3, 1.5]) {
+    refuses(record({ coneEra: null, publishedCone: true }, [{ ...gisAdvisory, n: bad }]), `the advisory number ${JSON.stringify(bad)}`);
+  }
+  accepts(record({ coneEra: null, publishedCone: true }, [{ ...gisAdvisory, n: '19A' }]), 'an intermediate advisory number');
+}
+
 const archive = JSON.parse(await readFile(path.join(root, 'data/advisories.json'), 'utf8'));
 assert.equal(archive.schema, 1);
 assert.equal(archive.model, 'OFCL');
@@ -321,10 +378,16 @@ for (const [stormId, record] of Object.entries(archive.storms)) {
         `${stormId}/${advisory.n}: discussion link leaves the NHC archive for that season`,
       );
     }
-    // Every verified lead must correspond to a lead that was actually forecast.
+    // Every verified lead must correspond to a lead that was actually forecast,
+    // and must not be the first one. The first entry is where the storm already
+    // was when the advisory went out. Scoring it counted an observation as a
+    // forecast for 335 of the 776 GIS-era advisories and pulled the reported
+    // mean track error down 13 percent, because the old rule skipped lead 0 and
+    // that era's current position sits at 3, 6 or 7.
     const forecastLeads = new Set(advisory.f.map(entry => entry[0]));
     for (const [lead] of advisory.e) {
       assert.ok(forecastLeads.has(lead), `${stormId}/${advisory.n}: verified a ${lead} h lead that was never forecast`);
+      assert.notEqual(lead, advisory.f[0][0], `${stormId}/${advisory.n}: scored its own current position as a forecast`);
     }
   }
   assert.equal(

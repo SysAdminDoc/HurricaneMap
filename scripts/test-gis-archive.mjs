@@ -16,9 +16,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  CONE_MAX_DEVIATION_KM,
   CONE_SIMPLIFY_TOLERANCE_DEGREES,
   memberEndingWith,
   parseAdvDateUtc,
+  ringDeviationKm,
   parseValidTime,
   readAdvisoryArchive,
   readDbf,
@@ -125,31 +127,149 @@ const [dolly, claudette, arthur] = await Promise.all([
   assert.deepEqual(reduced[0], ring[0], 'the first point is kept');
   assert.deepEqual(reduced.at(-1), ring.at(-1), 'the last point is kept');
 
-  // The reduction has to be bounded by its own tolerance, measured against the
-  // ring it came from rather than asserted. A tolerance that is not enforced is
-  // a number in a comment.
-  let worst = 0;
-  for (const point of ring) {
-    let nearest = Infinity;
-    for (let index = 0; index + 1 < reduced.length; index += 1) {
-      const [ax, ay] = reduced[index];
-      const [bx, by] = reduced[index + 1];
-      const dx = bx - ax;
-      const dy = by - ay;
-      const t = dx === 0 && dy === 0
-        ? 0
-        : Math.max(0, Math.min(1, ((point[0] - ax) * dx + (point[1] - ay) * dy) / (dx * dx + dy * dy)));
-      nearest = Math.min(nearest, Math.hypot(point[0] - (ax + t * dx), point[1] - (ay + t * dy)));
-    }
-    worst = Math.max(worst, nearest);
-  }
+  // Two things move a vertex and they add: the simplification, and the
+  // rounding applied to what it returns. Measuring the first alone in degrees
+  // is true and is not what the dataset claims, which is a distance from the
+  // outline NHC published. That mismatch shipped a 1.2 km promise that 291 of
+  // the 776 cones broke.
+  const shipped = simplifyRing(ring).map(([lon, lat]) => [
+    Number(lat.toFixed(3)), Number(lon.toFixed(3)),
+  ]);
+  const deviation = ringDeviationKm(ring, shipped);
   assert.ok(
-    worst <= CONE_SIMPLIFY_TOLERANCE_DEGREES + 1e-9,
-    `simplification moved a vertex ${worst.toFixed(5)} deg, over the ${CONE_SIMPLIFY_TOLERANCE_DEGREES} tolerance`,
+    deviation <= CONE_MAX_DEVIATION_KM,
+    `the shipped cone departs from the published outline by ${deviation.toFixed(3)} km, over the ${CONE_MAX_DEVIATION_KM} km budget`,
   );
-  // And the tolerance has to be doing something: at zero it must keep the ring.
+  // And the budget has to be doing something: coarser rounding must break it,
+  // or this passes whatever the pipeline does.
+  const coarse = simplifyRing(ring).map(([lon, lat]) => [
+    Number(lat.toFixed(1)), Number(lon.toFixed(1)),
+  ]);
+  assert.ok(
+    ringDeviationKm(ring, coarse) > CONE_MAX_DEVIATION_KM,
+    'rounding to one decimal stays inside the budget, so the budget is not measuring the rounding',
+  );
+  // At zero tolerance the simplification drops nothing.
   assert.equal(simplifyRing(ring, 0).length, ring.length, 'a zero tolerance drops nothing');
+  assert.ok(CONE_SIMPLIFY_TOLERANCE_DEGREES > 0, 'the simplification tolerance is a real number');
 }
+
+// ------------------------------------------------------- the row guards
+// A package rebuilt from its own members, stored rather than deflated, so a
+// field can be edited and put back. NHC ships nothing but deflate, so this is
+// also the only thing that reads the stored branch.
+function rezipStored(members) {
+  const locals = [];
+  const central = [];
+  let offset = 0;
+  for (const [name, content] of members) {
+    const rawName = Buffer.from(name, 'latin1');
+    const crc = (() => {
+      let value = ~0;
+      for (const byte of content) {
+        value ^= byte;
+        for (let bit = 0; bit < 8; bit += 1) value = (value >>> 1) ^ (0xedb88320 & -(value & 1));
+      }
+      return ~value >>> 0;
+    })();
+    const local = Buffer.alloc(30 + rawName.length);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0, 8);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(content.length, 18);
+    local.writeUInt32LE(content.length, 22);
+    local.writeUInt16LE(rawName.length, 26);
+    rawName.copy(local, 30);
+    locals.push(local, content);
+
+    const entry = Buffer.alloc(46 + rawName.length);
+    entry.writeUInt32LE(0x02014b50, 0);
+    entry.writeUInt16LE(20, 6);
+    entry.writeUInt16LE(0, 10);
+    entry.writeUInt32LE(crc, 16);
+    entry.writeUInt32LE(content.length, 20);
+    entry.writeUInt32LE(content.length, 24);
+    entry.writeUInt16LE(rawName.length, 28);
+    entry.writeUInt32LE(offset, 42);
+    rawName.copy(entry, 46);
+    central.push(entry);
+    offset += local.length + content.length;
+  }
+  const directory = Buffer.concat(central);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(members.size, 8);
+  end.writeUInt16LE(members.size, 10);
+  end.writeUInt32LE(directory.length, 12);
+  end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...locals, directory, end]);
+}
+
+/** Blank one field of one row in the points table, keeping every length. */
+function blankPointsField(source, fieldName, rowIndex) {
+  const members = new Map([...readZip(source)].map(([name, content]) => [name, Buffer.from(content)]));
+  const [dbfName, dbf] = [...members].find(([name]) => name.toLowerCase().endsWith('_5day_pts.dbf'));
+  const headerLength = dbf.readUInt16LE(8);
+  const recordLength = dbf.readUInt16LE(10);
+  let position = 32;
+  let cursor = 1;
+  let target = null;
+  while (position < headerLength - 1 && dbf[position] !== 0x0d) {
+    const name = dbf.toString('latin1', position, position + 11).replace(/\0[\s\S]*$/, '').trim();
+    const width = dbf[position + 16];
+    if (name === fieldName) target = { at: cursor, width };
+    cursor += width;
+    position += 32;
+  }
+  assert.ok(target, `${fieldName} is not a field of the points table`);
+  dbf.fill(0x20, headerLength + rowIndex * recordLength + target.at, headerLength + rowIndex * recordLength + target.at + target.width);
+  members.set(dbfName, dbf);
+  return rezipStored(members);
+}
+
+{
+  // The rebuild itself has to be faithful, or every case below proves nothing.
+  const rebuilt = rezipStored(new Map([...readZip(dolly)].map(([name, content]) => [name, Buffer.from(content)])));
+  const control = readAdvisoryArchive(rebuilt, { stormId: 'AL042008' });
+  const original = readAdvisoryArchive(dolly, { stormId: 'AL042008' });
+  assert.deepEqual(control, original, 'a stored rebuild of the package does not read the same as the deflated one');
+
+  // A blank position is missing, not the equator.
+  assert.throws(
+    () => readAdvisoryArchive(blankPointsField(dolly, 'LAT', 0), { stormId: 'AL042008' }),
+    /no usable position/,
+    'a blank LAT is read as 0 rather than refused',
+  );
+  assert.throws(
+    () => readAdvisoryArchive(blankPointsField(dolly, 'LON', 2), { stormId: 'AL042008' }),
+    /no usable position/,
+  );
+
+  // A blank intensity is missing, not a forecast of no wind.
+  const noWind = readAdvisoryArchive(blankPointsField(dolly, 'MAXWIND', 1), { stormId: 'AL042008' });
+  assert.equal(noWind.f[1][3], null, 'a blank MAXWIND is read as 0 kt rather than as missing');
+  assert.equal(original.f[1][3], 70, 'the control still carries its real wind, so the case above measured something');
+
+  // Without TAU there is no origin to recover.
+  assert.throws(
+    () => readAdvisoryArchive(blankPointsField(blankPointsField(blankPointsField(
+      blankPointsField(blankPointsField(dolly, 'TAU', 0), 'TAU', 1), 'TAU', 2), 'TAU', 3), 'TAU', 4),
+    { stormId: 'AL042008' }),
+    /no row gives a usable VALIDTIME and TAU|only \d+ row/,
+  );
+}
+
+// VALIDTIME names a day of the month, and a day that cannot belong to the
+// forecast window is a fault rather than something to reinterpret. '11/0000'
+// against an advisory issued on 1 October used to resolve to 11 September, a
+// lead of minus 480 hours.
+assert.throws(() => parseValidTime('11/0000', '2012-10-01T00:00:00Z'), /inside the forecast window/);
+assert.throws(() => parseValidTime('31/0000', '2013-10-01T00:00:00Z'), /inside the forecast window/);
+assert.throws(() => parseValidTime('30/0000', '2013-02-10T00:00:00Z'), /inside the forecast window/);
+// And the days that can belong to it still do, on both sides of a month end.
+assert.equal(parseValidTime('02/1200', '2012-10-01T00:00:00Z').leadHours, 36);
+assert.equal(parseValidTime('30/1800', '2012-10-01T00:00:00Z').leadHours, -6);
 
 // --------------------------------------------------------- a whole advisory
 {

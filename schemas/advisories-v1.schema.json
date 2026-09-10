@@ -96,6 +96,39 @@
           "missingDiscussions", "advisories"
         ],
         "additionalProperties": false,
+        "allOf": [
+          {
+            "$comment": "A record either publishes its cones or names a radii era. Blocking the half-claim on each advisory was not enough: a record naming an era could still carry a full, false cone on every advisory, and the app would tell the reader the rebuilt outline was the one NHC drew.",
+            "if": {
+              "required": ["publishedCone"],
+              "properties": { "publishedCone": { "const": true } }
+            },
+            "then": {
+              "properties": {
+                "coneEra": { "type": "null" },
+                "advisories": { "type": "array", "items": { "type": "object", "required": ["c", "conePeriodHours", "issued"], "properties": { "c": true, "conePeriodHours": true, "issued": true } } }
+              }
+            },
+            "else": {
+              "properties": {
+                "coneEra": { "type": "string" },
+                "advisories": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "not": {
+                      "anyOf": [
+                        { "type": "object", "required": ["c"], "properties": { "c": true } },
+                        { "type": "object", "required": ["issued"], "properties": { "issued": true } },
+                        { "type": "object", "required": ["conePeriodHours"], "properties": { "conePeriodHours": true } }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
         "properties": {
           "name": { "type": "string", "minLength": 1 },
           "year": { "type": "integer", "minimum": 1990, "maximum": 2100 },

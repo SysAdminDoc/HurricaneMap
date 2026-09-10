@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
 import { haversineKm, KM_PER_NAUTICAL_MILE } from '../src/geodesy.js';
-import { readAdvisoryArchive } from './gis-archive.mjs';
+import { CONE_MAX_DEVIATION_KM, readAdvisoryArchive } from './gis-archive.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outputPath = path.join(root, 'data', 'advisories.json');
@@ -94,9 +94,18 @@ export function replayRouteForYear(year) {
   return era.publishedCone ? 'gis-archive' : 'adeck';
 }
 
-// U.S.-landfalling Atlantic storms of the era. Each is present in HURDAT2 with
-// at least one attributed U.S. landfall, so every replay has a best track to sit
-// beside.
+// The Atlantic storms this atlas counts as making a U.S. landfall, which is the
+// list in data/landfalls.json rather than HURDAT2's `L` rows alone. Every replay
+// therefore has a best track to sit beside, and the storm is one a reader can
+// already find on the map.
+//
+// One entry rests on an inference rather than an attributed landfall, and is
+// listed here so nobody re-raises it: Hermine 2010's only `L` row is at
+// 25.3N 97.4W, in Tamaulipas, and NHC's report puts its landfall on the
+// northeastern coast of Mexico. preprocess_hurdat2.py infers a Texas landfall
+// from the track crossing the coast north of the Rio Grande, and the atlas shows
+// Hermine under Texas. Dropping it here would make the replay disagree with the
+// map about the same storm, which is worse than the inference.
 export const STORM_IDS = Object.freeze([
   // 2008-2014, built from the GIS archive.
   'AL042008', 'AL052008', 'AL062008', 'AL072008', 'AL082008', 'AL092008',
@@ -230,11 +239,22 @@ export function advisoryNumberFor(adeckTime, numberByTime) {
 // Verified against the post-season best track only where HURDAT2 carries a point
 // at the exact verification time. No interpolation: a forecast that verifies
 // between synoptic times simply reports no error for that lead.
+/**
+ * Forecast error against the final best track, for the leads that were
+ * forecasts.
+ *
+ * The first entry is where the storm already was when the advisory went out,
+ * not something anybody predicted, so it is skipped. This used to skip
+ * `tau <= 0`, which is the same thing in the a-deck era and nothing at all in
+ * the GIS era, where the current position sits at lead 3, 6 or 7. That scored
+ * an observation as a forecast for 335 of 776 advisories and pulled the
+ * reported mean track error down 13 percent.
+ */
 export function verifyAgainstBestTrack(advisory, trackByTime) {
   const issueMs = Date.parse(advisory.t);
   const errors = [];
-  for (const [tau, lat, lon, wind] of advisory.f) {
-    if (tau <= 0) continue;
+  for (const [index, [tau, lat, lon, wind]] of advisory.f.entries()) {
+    if (index === 0 || tau <= 0) continue;
     const verifyAt = new Date(issueMs + tau * 3_600_000).toISOString().replace('.000Z', 'Z');
     const actual = trackByTime.get(verifyAt);
     if (!actual) continue;
@@ -301,10 +321,14 @@ export async function buildStormFromGisArchive(storm, stormId, fetchImpl) {
   if (!files.length) throw new Error(`${stormId}: the GIS archive index at ${indexUrl} lists no advisory`);
 
   const advisories = [];
+  const contents = createHash('sha256');
   for (const file of files) {
     const buffer = await fetchBinary(GIS_ADVISORY_URL(file), fetchImpl);
+    // Name and bytes, so a package swapped between two advisories moves this.
+    contents.update(file).update('\0').update(buffer);
     advisories.push(readAdvisoryArchive(buffer, { stormId, label: `${stormId} ${file}` }));
   }
+  const digest = contents.digest('hex');
   advisories.sort((a, b) => Date.parse(a.issued) - Date.parse(b.issued));
 
   // Two invariants worth failing on rather than shipping. A replay is a
@@ -324,7 +348,7 @@ export async function buildStormFromGisArchive(storm, stormId, fetchImpl) {
     }
   }
 
-  return { atcfId, indexUrl, files, advisories };
+  return { atcfId, indexUrl, files, digest, advisories };
 }
 
 /** Ray casting, on [lat, lon] pairs. */
@@ -357,7 +381,7 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
     if (!route) throw new Error(`${stormId}: ${storm.year} falls outside the documented ${ERA.label} era`);
 
     if (route === 'gis-archive') {
-      const { atcfId: gisAtcfId, indexUrl, files, advisories } = await buildStormFromGisArchive(storm, stormId, fetchImpl);
+      const { atcfId: gisAtcfId, indexUrl, files, digest, advisories } = await buildStormFromGisArchive(storm, stormId, fetchImpl);
       const trackByTime = bestTrackIndex(storm);
       totalAdvisories += advisories.length;
       output[stormId] = {
@@ -372,7 +396,10 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
         publishedCone: true,
         sourceUrl: indexUrl,
         archiveUrl: indexUrl,
-        sourceSubsetSha256: createHash('sha256').update(files.join('\n')).digest('hex'),
+        // The bytes that were read, not the names of the files they came from.
+        // Hashing the names meant every shapefile upstream could change without
+        // moving this, while the a-deck half hashes its own source lines.
+        sourceSubsetSha256: digest,
         advisoryCount: advisories.length,
         unmatchedForecasts: 0,
         // NHC issues a discussion with a full advisory and not with an
@@ -463,7 +490,7 @@ export async function buildAdvisories(storms, fetchImpl = fetch) {
       trackError: 'Great-circle distance in nautical miles between the issued forecast position and the best-track position at the same verification time.',
       intensityError: 'Absolute difference in knots between the issued forecast wind and the best-track wind at the same verification time.',
       coverage: 'Errors are reported only where HURDAT2 carries a best-track point at the exact verification time; other leads are omitted rather than interpolated.',
-      cone: 'From 2015 the cone is drawn around the issued forecast positions with the published error radii of that advisory\'s era. Before 2015 no radii table exists, and the record instead carries the cone polygon NHC published with the advisory, read from its GIS package and simplified to within 1.2 km of the outline.',
+      cone: `From 2015 the cone is drawn around the issued forecast positions with the published error radii of that advisory's era. Before 2015 no radii table exists, and the record instead carries the cone polygon NHC published with the advisory, read from its GIS package and simplified to within ${CONE_MAX_DEVIATION_KM} km of the outline, measured over every cone in the era.`,
     },
     sources: {
       adeckArchive: 'https://ftp.nhc.noaa.gov/atcf/archive/',
