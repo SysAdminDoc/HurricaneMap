@@ -845,14 +845,14 @@ test('a feed card that floats over the map names the surface it fills, and marks
       track: [],
     }, 0);
   });
-  const controls = page.locator('#radar-controls');
+  const controls = page.locator('#radar-time');
   const card = page.locator('#radar-feed-status');
   await expect(controls).toHaveCount(1);
   await expect(card).toHaveCount(1);
 
   // Named, so the card and the surface it speaks for are not two unrelated
   // things in the accessibility tree.
-  await expect(card).toHaveAttribute('aria-controls', 'radar-controls');
+  await expect(card).toHaveAttribute('aria-controls', 'radar-time');
   await expect(controls).not.toHaveAttribute('aria-busy', 'true');
 
   const drive = (call, args = {}) => page.evaluate(async ({ name, options }) => {
@@ -898,5 +898,100 @@ test('a feed card that floats over the map names the surface it fills, and marks
     const feeds = await import('/src/optional-feeds.js');
     feeds.completeOptionalFeed('tides', { itemCount: 1 });
     window.__hmRadarBusy?.close();
+  });
+});
+
+test('a floating feed card names a surface that exists when it mounts', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+
+  // Three feeds whose status card floats over the map instead of sitting in a
+  // panel. Each names the element its own feed fills, and that element has to
+  // exist by the time the card is mounted: creating it inside a draw meant an
+  // out-of-season outlook, or a marine feed that settled to an error, named
+  // nothing at all for the life of the tab and announced no load ever.
+  await page.evaluate(async () => {
+    const outlook = await import('/src/outlook.js');
+    const marine = await import('/src/marine-warnings.js');
+    const active = await import('/src/active.js');
+    const { getMap } = await import('/src/map.js');
+    // Started, not awaited: what matters is the state of the page while the
+    // fetch is in flight, which is exactly when the old code named nothing.
+    outlook.renderTropicalOutlook({ map: getMap(), enabled: true, force: true }).catch(() => {});
+    marine.renderMarineWarnings({ map: getMap(), enabled: true, horizon: '00to24', force: true }).catch(() => {});
+    active.startActiveStormPolling?.();
+  });
+
+  const pairs = [
+    ['#nhc-outlook-status', 'nhc-outlook-legend'],
+    ['#marine-warning-status', 'marine-warning-legend'],
+    ['#active-feed-status', 'active-storm-badge'],
+  ];
+  for (const [card, target] of pairs) {
+    await page.waitForSelector(card, { timeout: 20_000 });
+    await expect(page.locator(card)).toHaveAttribute('aria-controls', target, { timeout: 20_000 });
+    await expect(page.locator(`#${target}`)).toHaveCount(1);
+  }
+
+  // And the naming survives a failure, which is the state these two feeds spend
+  // most of their time in outside a season.
+  for (const [card, target] of pairs) {
+    const feed = await page.evaluate(selector => document.querySelector(selector)?.dataset.feed, card);
+    await page.evaluate(async id => {
+      const feeds = await import('/src/optional-feeds.js');
+      feeds.beginOptionalFeed(id);
+    }, feed);
+    await expect(page.locator(`#${target}`)).toHaveAttribute('aria-busy', 'true');
+    await page.evaluate(async id => {
+      const feeds = await import('/src/optional-feeds.js');
+      feeds.failOptionalFeed(id, { responseStatus: 503 });
+    }, feed);
+    await expect(page.locator(`#${target}`)).not.toHaveAttribute('aria-busy', 'true');
+    await expect(page.locator(card)).toHaveAttribute('aria-controls', target);
+  }
+});
+
+test('the radar card marks the timestamp, not the controls around it', async ({ page }) => {
+  await prepareLocalizedPage(page, 'en');
+  await page.evaluate(async () => {
+    const { getMap } = await import('/src/map.js');
+    const { RadarOverlay } = await import('/src/radar.js');
+    const overlay = new RadarOverlay(getMap());
+    window.__hmRadarTarget = overlay;
+    await overlay.show({
+      id: 'AL011995',
+      name: 'ALLISON',
+      year: 1995,
+      us_landfalls: [{ t: '1995-06-05T14:00:00Z', lat: 29.9, lon: -84.4, state: 'Florida' }],
+      track: [],
+    }, 0);
+  });
+  const card = page.locator('#radar-feed-status');
+  await expect(card).toHaveAttribute('aria-controls', 'radar-time');
+
+  // The target must not be an ancestor of the card. aria-busy on an ancestor
+  // of a live region tells assistive technology to withhold that region's
+  // updates, so marking #radar-controls suppressed the very announcement the
+  // card exists to make.
+  expect(await page.evaluate(() => {
+    const host = document.getElementById('radar-feed-status');
+    const target = document.getElementById('radar-time');
+    return target.contains(host);
+  })).toBe(false);
+
+  // And it holds no controls of its own, which is the rule the criterion sets.
+  expect(await page.evaluate(
+    () => document.getElementById('radar-time').querySelectorAll('button, a, input, select').length,
+  )).toBe(0);
+
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.beginOptionalFeed('radar');
+  });
+  await expect(page.locator('#radar-time')).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('#radar-controls')).not.toHaveAttribute('aria-busy', 'true');
+  await page.evaluate(async () => {
+    const feeds = await import('/src/optional-feeds.js');
+    feeds.completeOptionalFeed('radar', { itemCount: 1 });
+    window.__hmRadarTarget?.close();
   });
 });

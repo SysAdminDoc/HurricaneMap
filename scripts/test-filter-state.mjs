@@ -158,6 +158,12 @@ function cats(filters) {
   assert.strictEqual(filters.yearMax, 2005);
   assert.strictEqual(filters.showTracks, true);
   assert.strictEqual(filters.retiredOnly, true);
+  // showHeatmap is restored like the rest and was the one field with no
+  // identity assertion, so a restore that wrote it back as a string round
+  // tripped green through captureFilterState's own Boolean().
+  assert.strictEqual(filters.showHeatmap, true);
+  assert.strictEqual(filters.state, 'Florida');
+  assert.ok(filters.categories instanceof Set);
   // The categories go back as a Set the filter engine can use, not the array
   // the snapshot stores them in.
   assert.ok(filters.categories instanceof Set);

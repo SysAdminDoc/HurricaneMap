@@ -67,7 +67,23 @@ let activeStatusEl = null;
 // Settled once per page load by the first probe that gets an untagged 404.
 let relayAbsent = false;
 
+/** The element the feed fills, created before anything names it. */
+function ensureBadgeElement() {
+  if (badgeEl && document.body.contains(badgeEl)) return badgeEl;
+  badgeEl = document.createElement('div');
+  badgeEl.id = 'active-storm-badge';
+  badgeEl.className = 'active-badge glass';
+  badgeEl.setAttribute('role', 'status');
+  badgeEl.setAttribute('aria-live', 'polite');
+  document.body.appendChild(badgeEl);
+  return badgeEl;
+}
+
 function ensureActiveFeedStatus() {
+  // The badge first. The card names it, and a card that mounts before its
+  // target exists names nothing until something else happens to re-render it,
+  // which for this feed is the next poll.
+  ensureBadgeElement();
   if (!activeStatusEl || !document.body.contains(activeStatusEl)) {
     activeStatusEl = document.createElement('div');
     activeStatusEl.id = 'active-feed-status';
@@ -302,14 +318,7 @@ function ensureBadge(count, {
   status = 0,
   advisoryChanged = false,
 } = {}) {
-  if (!badgeEl) {
-    badgeEl = document.createElement('div');
-    badgeEl.id = 'active-storm-badge';
-    badgeEl.className = 'active-badge glass';
-    badgeEl.setAttribute('role', 'status');
-    badgeEl.setAttribute('aria-live', 'polite');
-    document.body.appendChild(badgeEl);
-  }
+  ensureBadgeElement();
 
   updateAppBadge(count);
 

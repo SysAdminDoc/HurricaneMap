@@ -23,7 +23,7 @@ Click any dot and you get the storm's full track, its peak intensity, every U.S.
 
 ## Quality plan
 
-The accessibility conformance report is [`docs/VPAT.html`](docs/VPAT.html), against WCAG 2.2 Level AA. Every row names what checks it, and says "Manual" where nothing automated does, which is eleven of the forty. `npm run check:vpat` fails when the report is older than the newest commit touching `src/styles-accessibility.css` or `tests/aria-regression.spec.mjs`, so it cannot fall behind the work.
+The accessibility conformance report is [`docs/VPAT.html`](docs/VPAT.html), against WCAG 2.2 Level AA. Every row names what checks it, and says "Manual" where nothing automated does: 13 of the 40 rows. `npm run check:vpat` counts that rather than trusting the sentence, checks every command the report names is a script that exists, and fails when the report is older than the newest commit touching `src/styles-accessibility.css` or `tests/aria-regression.spec.mjs`.
 
 [`docs/QUALITY_IMPROVEMENT_PLAN.md`](docs/QUALITY_IMPROVEMENT_PLAN.md) records the quality programme that followed v1.3.9: regression automation, data contracts, URL state, data provenance, service-worker update UX, accessibility coverage, visual snapshots and maintainability. Every item in it has shipped, so it is a record of what was done rather than a list of what is next.
 

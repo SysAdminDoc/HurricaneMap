@@ -205,16 +205,27 @@ function updateLegend(points) {
     if (legendEl) legendEl.hidden = true;
     return;
   }
-  if (!legendEl) {
-    legendEl = document.createElement('div');
-    legendEl.id = 'nhc-outlook-legend';
-    legendEl.className = 'nhc-outlook-legend glass';
-    legendEl.setAttribute('role', 'group');
-    document.body.appendChild(legendEl);
-  }
+  ensureLegendElement();
   legendEl.setAttribute('aria-label', t('outlook.legendTitle'));
   legendEl.innerHTML = `<strong>${t('outlook.legendTitle')}</strong><span><b class="nhc-outlook-x nhc-outlook-x--near-zero">×</b>${t('outlook.nearZero')}</span><span><b class="nhc-outlook-x nhc-outlook-x--low">×</b>${t('outlook.nonZero')}</span>`;
   legendEl.hidden = false;
+}
+
+/**
+ * The legend exists before anything names it, and stays hidden until there is
+ * something to put in it. Creating it inside the draw meant an out-of-season
+ * outlook never had one, so its status card named nothing and no load was ever
+ * announced for the life of the tab.
+ */
+function ensureLegendElement() {
+  if (legendEl && document.body.contains(legendEl)) return legendEl;
+  legendEl = document.createElement('div');
+  legendEl.id = 'nhc-outlook-legend';
+  legendEl.className = 'nhc-outlook-legend glass';
+  legendEl.setAttribute('role', 'group');
+  legendEl.hidden = true;
+  document.body.appendChild(legendEl);
+  return legendEl;
 }
 
 function ensureStatus(map) {
@@ -224,6 +235,7 @@ function ensureStatus(map) {
     statusEl.className = 'optional-feed-status-overlay glass';
     document.body.appendChild(statusEl);
   }
+  ensureLegendElement();
   mountOptionalFeedStatus(statusEl, 'outlook', {
     onRetry: () => renderTropicalOutlook({ map, enabled: true, force: true }),
     busyTarget: () => document.getElementById('nhc-outlook-legend'),

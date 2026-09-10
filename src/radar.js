@@ -438,9 +438,12 @@ export class RadarOverlay {
     this.controls = el;
     mountOptionalFeedStatus(el.querySelector('#radar-feed-status'), 'radar', {
       onRetry: () => this.storm ? this.show(this.storm, this.landfallIndex) : null,
-      // The controls are what a frame fills: the timestamp, the scrubber
-      // position and the legend all describe the frame being fetched.
-      busyTarget: () => document.getElementById('radar-controls'),
+      // The timestamp, not the controls around it. #radar-controls also holds
+      // the frame stepper, the offline-pack button and the close button, which
+      // no frame fills, and it is an ancestor of this card: marking it busy
+      // tells assistive technology to withhold the card's own announcement,
+      // which is the one thing it exists to make.
+      busyTarget: () => document.getElementById('radar-time'),
     });
     el.querySelector('[data-act="prev"]').addEventListener('click', () => this.step(-1));
     el.querySelector('[data-act="next"]').addEventListener('click', () => this.step(+1));

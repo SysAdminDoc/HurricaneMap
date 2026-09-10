@@ -171,13 +171,7 @@ function updateLegend(risks, horizon) {
     if (legendEl) legendEl.hidden = true;
     return;
   }
-  if (!legendEl) {
-    legendEl = document.createElement('div');
-    legendEl.id = 'marine-warning-legend';
-    legendEl.className = 'marine-warning-legend glass';
-    legendEl.setAttribute('role', 'group');
-    document.body.appendChild(legendEl);
-  }
+  ensureLegendElement();
   legendEl.setAttribute('aria-label', t('marine.legendTitle'));
   // The band is named in the legend, not only in the settings menu. Two
   // forecast periods drawn in the same four colours are otherwise
@@ -188,6 +182,23 @@ function updateLegend(risks, horizon) {
   legendEl.hidden = false;
 }
 
+/**
+ * As with the outlook: the legend exists before the card names it, and stays
+ * hidden until there is something to put in it. This feed settles to an error
+ * often enough that a legend created only on a successful draw meant its card
+ * named nothing most of the time.
+ */
+function ensureLegendElement() {
+  if (legendEl && document.body.contains(legendEl)) return legendEl;
+  legendEl = document.createElement('div');
+  legendEl.id = 'marine-warning-legend';
+  legendEl.className = 'marine-warning-legend glass';
+  legendEl.setAttribute('role', 'group');
+  legendEl.hidden = true;
+  document.body.appendChild(legendEl);
+  return legendEl;
+}
+
 function ensureStatus(map, horizon) {
   if (!statusEl || !document.body.contains(statusEl)) {
     statusEl = document.createElement('div');
@@ -195,6 +206,7 @@ function ensureStatus(map, horizon) {
     statusEl.className = 'optional-feed-status-overlay glass';
     document.body.appendChild(statusEl);
   }
+  ensureLegendElement();
   mountOptionalFeedStatus(statusEl, 'marine', {
     onRetry: () => renderMarineWarnings({ map, enabled: true, horizon, force: true }),
     busyTarget: () => document.getElementById('marine-warning-legend'),

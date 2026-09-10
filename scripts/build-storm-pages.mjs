@@ -37,6 +37,13 @@ const STATUS_LABELS = new Map([
   ['DB', 'Disturbance'],
 ]);
 
+// Code-unit order, deliberately. localeCompare reads the host's collation, so
+// the same tree produces different bytes on a machine set to a different
+// locale, and a small-ICU Node degrades to this anyway. The checked-in pages
+// are compared byte for byte, so their order has to be a property of the data
+// and not of the machine that ran the build.
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 export const escapeHtml = value => String(value ?? '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
@@ -487,7 +494,7 @@ export function buildIndexPages(entries, context) {
   const years = [...byYear.keys()].sort((a, b) => a - b);
   const decades = [...byDecade.keys()].sort();
   const states = [...byState.keys()].sort();
-  const order = (rows) => rows.slice().sort((a, b) => a.year - b.year || a.title.localeCompare(b.title));
+  const order = (rows) => rows.slice().sort((a, b) => a.year - b.year || byCodeUnit(a.title, b.title));
 
   for (const year of years) {
     const rows = order(byYear.get(year));
@@ -642,7 +649,7 @@ export async function buildStormPages({ write = true } = {}) {
       throw new Error(`storm slug collision: ${slug} is claimed by ${seen.get(slug)} and ${storm.id}`);
     }
     seen.set(slug, storm.id);
-    const stormLandfalls = (landfallsByStorm.get(storm.id) || []).slice().sort((a, b) => String(a.t).localeCompare(String(b.t)));
+    const stormLandfalls = (landfallsByStorm.get(storm.id) || []).slice().sort((a, b) => byCodeUnit(String(a.t), String(b.t)));
     entries.push({
       slug,
       title: `${headline(storm)}`,
@@ -653,7 +660,7 @@ export async function buildStormPages({ write = true } = {}) {
     files.push({ path: path.join('storms', slug, 'index.html'), body: renderStormPage(storm, stormLandfalls, context) });
   }
 
-  entries.sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+  entries.sort((a, b) => b.year - a.year || byCodeUnit(a.title, b.title));
   files.push({ path: path.join('storms', 'index.html'), body: renderIndexPage(entries, context) });
   const indexes = buildIndexPages(entries, context);
   files.push(...indexes.files);
@@ -672,7 +679,7 @@ export async function buildStormPages({ write = true } = {}) {
 
   const bytes = files.reduce((total, file) => total + Buffer.byteLength(file.body, 'utf8'), 0);
   const digest = createHash('sha256');
-  for (const file of files.slice().sort((a, b) => a.path.localeCompare(b.path))) {
+  for (const file of files.slice().sort((a, b) => byCodeUnit(a.path, b.path))) {
     digest.update(file.path.replace(/\\/g, '/'));
     digest.update(file.body);
   }

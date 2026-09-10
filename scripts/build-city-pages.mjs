@@ -30,6 +30,8 @@ import {
   stormSlug,
 } from './build-storm-pages.mjs';
 
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(root, 'cities');
 
@@ -94,7 +96,9 @@ export function cityPasses(city, storms) {
   }
   // Oldest first: the point of the list is reading a record forwards, and the
   // gaps between rows are the return periods the table above states.
-  passes.sort((a, b) => a.year - b.year || String(a.when).localeCompare(String(b.when)));
+  // Code-unit order: localeCompare reads the host's collation, and these bytes
+  // are compared against what is checked in.
+  passes.sort((a, b) => a.year - b.year || byCodeUnit(String(a.when), String(b.when)));
   return passes;
 }
 
@@ -370,7 +374,7 @@ export async function buildCityPages({ write = true } = {}) {
 
   const bytes = files.reduce((total, file) => total + Buffer.byteLength(file.body, 'utf8'), 0);
   const digest = createHash('sha256');
-  for (const file of files.slice().sort((a, b) => a.path.localeCompare(b.path))) {
+  for (const file of files.slice().sort((a, b) => byCodeUnit(a.path, b.path))) {
     digest.update(file.path.replace(/\\/g, '/'));
     digest.update(file.body);
   }

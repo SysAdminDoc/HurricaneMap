@@ -4762,6 +4762,377 @@ async function assertFilterResetIsRecoverable(browser, baseUrl) {
   }
 
   await assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl);
+  await assertFilterResetDoesNotFetchAnUnusedLayer(browser, baseUrl);
+}
+
+// The sea-surface layer is a lazily imported chunk. Moving its call out of the
+// reset handler's `if (checked)` guard made the reset fetch it for every
+// reader, including the overwhelming majority who never turn the layer on.
+async function assertFilterResetDoesNotFetchAnUnusedLayer(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 960 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  const sstRequests = [];
+  page.on('request', request => {
+    if (/\/src\/sst\.js$/.test(new URL(request.url()).pathname)) sstRequests.push(request.url());
+  });
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await page.locator('#show-tracks').visible().waitFor({ timeout: 10_000 });
+    await page.check('#show-tracks');
+    await page.waitForFunction(
+      () => document.getElementById('reset-filters')?.disabled === false,
+      null,
+      { timeout: 10_000 },
+    );
+    assert(sstRequests.length === 0, `the sea-surface chunk was fetched before anyone asked for it: ${sstRequests.length}`);
+
+    await page.click('#reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('undo-reset-filters')?.hidden === false,
+      null,
+      { timeout: 10_000 },
+    );
+    await page.click('#undo-reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('show-tracks')?.checked === true,
+      null,
+      { timeout: 10_000 },
+    );
+    // Held over a window, because the fetch this is about is asynchronous and
+    // would arrive after the undo returns.
+    assert(
+      await page.evaluate(async () => {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        return true;
+      }) && sstRequests.length === 0,
+      `resetting and undoing fetched the sea-surface chunk on a visit that never used it: ${JSON.stringify(sstRequests)}`,
+    );
+  } finally {
+    await context.close();
+  }
+}
+
+// The sea-surface layer is a lazily imported chunk, and the import is memoised
+// including its rejection, so one failed fetch poisons it for the session.
+// Awaiting it in the middle of the reset destroyed nine pieces of state and
+// then threw before the undo control was ever shown: the snapshot existed and
+// nothing could reach it.
+async function assertFilterResetSurvivesAnUnreachableLayer(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 960 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  await page.route('**/src/sst.js', route => route.abort('failed'));
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    if (await page.getAttribute('#toggle-filters', 'aria-expanded') !== 'true') {
+      await page.click('#toggle-filters');
+    }
+    await page.locator('#show-sst').visible().waitFor({ timeout: 10_000 });
+
+    // A layer the reader asks for and cannot have must not leave its control
+    // ticked: the box would claim a layer that will never arrive.
+    await page.check('#show-sst');
+    await page.waitForFunction(
+      () => document.getElementById('show-sst')?.checked === false,
+      null,
+      { timeout: 15_000 },
+    ).catch(() => {
+      throw new Error('a sea-surface layer that cannot load left its checkbox ticked');
+    });
+
+    await page.check('#show-retired-only');
+    await page.waitForFunction(
+      () => document.getElementById('reset-filters')?.disabled === false,
+      null,
+      { timeout: 10_000 },
+    );
+    await page.click('#reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('undo-reset-filters')?.hidden === false,
+      null,
+      { timeout: 10_000 },
+    ).catch(() => {
+      throw new Error('a reset with an unreachable layer chunk offered no way back');
+    });
+    await page.click('#undo-reset-filters');
+    await page.waitForFunction(
+      () => document.getElementById('show-retired-only')?.checked === true
+        && document.getElementById('undo-reset-filters')?.hidden === true,
+      null,
+      { timeout: 10_000 },
+    ).catch(() => {
+      throw new Error('an undo with an unreachable layer chunk did not finish');
+    });
+    // And the map followed. A half-applied undo left the checkbox saying
+    // "retired only" over a map still showing everything.
+    const counted = await page.textContent('#visible-count');
+    assert(
+      /\b(\d[\d,]*) of /.test(counted || ''),
+      `undo restored the controls but not the map: ${JSON.stringify(counted)}`,
+    );
+  } finally {
+    await page.unroute('**/src/sst.js');
+    await context.close();
+  }
+}
+
+async function expect_hidden(page, selector, message) {
+  // Present AND hidden. `?.hidden !== false` on a missing element is true, so
+  // the old form passed for a control that had been renamed out of existence.
+  const state = await page.evaluate(target => {
+    const element = document.querySelector(target);
+    return { present: Boolean(element), hidden: element?.hidden === true };
+  }, selector);
+  assert(state.present, `${message} (${selector} is not on the page at all)`);
+  assert(state.hidden, message);
+}
+
+// Two pinned storms compared on one map, with two clipped panes.
+//
+// The visual baselines cover the controls and cannot cover the geometry: the
+// visual harness blanks #map for determinism, because tiles are not
+// reproducible. So the clip itself is measured here, which is the stronger
+// check anyway: a pixel diff would say a divider moved, and this says where it
+// landed and that it is still there after the map moves under it.
+async function assertDualPaneComparison(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(context, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  try {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.evaluate(async () => {
+      const compare = await import('/src/compare.js');
+      await compare.setPinsByIds(['AL122005', 'AL092022']);
+      compare.openComparePanel();
+    });
+    await page.waitForSelector('#cp-map-compare', { timeout: 15_000 });
+
+    const paneState = () => page.evaluate(() => {
+      const pane = name => [...document.querySelectorAll('.leaflet-pane')]
+        .find(node => node.className.includes(name));
+      const read = node => (node ? {
+        clip: node.style.clipPath,
+        opacity: node.style.opacity,
+        paths: node.querySelectorAll('path').length,
+      } : null);
+      return { a: read(pane('hm-compare-a')), b: read(pane('hm-compare-b')) };
+    });
+
+    // Each storm draws into its own pane. Without that there is nothing for a
+    // divider to separate, and every assertion below would pass on one pane
+    // holding everything.
+    const drawn = await paneState();
+    assert(drawn.a && drawn.b, 'the comparison panes were never created');
+    assert(
+      drawn.a.paths > 5 && drawn.b.paths > 5,
+      `the two pinned storms did not draw into separate panes: ${JSON.stringify(drawn)}`,
+    );
+    assert(
+      drawn.a.clip === '' && drawn.b.clip === '',
+      'the panes start clipped, so the reader sees half a map before asking for one',
+    );
+
+    // The divider lands where the reader put it. Measured through the map's own
+    // container-to-layer conversion, which is the thing that makes the clip
+    // impossible to drift: it is derived from the map transform, not tracked
+    // beside it.
+    const cutFor = async percent => {
+      await page.check('input[name="cp-map-mode"][value="swipe"]');
+      await page.waitForSelector('#cp-divider:not([disabled])', { timeout: 5000 });
+      await page.fill('#cp-divider', String(percent));
+      await page.dispatchEvent('#cp-divider', 'input');
+      return page.evaluate(async wanted => {
+        const { getMap } = await import('/src/map.js');
+        const map = getMap();
+        const pane = [...document.querySelectorAll('.leaflet-pane')]
+          .find(node => node.className.includes('hm-compare-a'));
+        const cut = Number(/polygon\([^,]+, (-?\d+(?:\.\d+)?)px/.exec(pane.style.clipPath)?.[1]);
+        const expected = map.containerPointToLayerPoint([
+          Math.round((map.getSize().x * wanted) / 100), 0,
+        ]).x;
+        return { cut, expected };
+      }, percent);
+    };
+
+    for (const percent of [25, 50, 75]) {
+      const { cut, expected } = await cutFor(percent);
+      assert(
+        Number.isFinite(cut) && Math.abs(cut - expected) <= 1,
+        `the divider at ${percent}% cut at ${cut} instead of ${expected}`,
+      );
+    }
+
+    // And it survives the map moving under it. Two synced maps drift here;
+    // one map with a clip derived from its own transform cannot.
+    const before = await cutFor(40);
+    await page.evaluate(async () => {
+      const { getMap } = await import('/src/map.js');
+      getMap().panBy([160, 90], { animate: false });
+    });
+    await page.waitForFunction(
+      previous => {
+        const pane = [...document.querySelectorAll('.leaflet-pane')]
+          .find(node => node.className.includes('hm-compare-a'));
+        const cut = Number(/polygon\([^,]+, (-?\d+(?:\.\d+)?)px/.exec(pane.style.clipPath)?.[1]);
+        return Number.isFinite(cut) && cut !== previous;
+      },
+      before.cut,
+      { timeout: 8000 },
+    ).catch(() => {
+      throw new Error('the clip did not follow the map when it was panned');
+    });
+    const afterPan = await page.evaluate(async () => {
+      const { getMap } = await import('/src/map.js');
+      const map = getMap();
+      const pane = [...document.querySelectorAll('.leaflet-pane')]
+        .find(node => node.className.includes('hm-compare-a'));
+      const cut = Number(/polygon\([^,]+, (-?\d+(?:\.\d+)?)px/.exec(pane.style.clipPath)?.[1]);
+      const expected = map.containerPointToLayerPoint([Math.round(map.getSize().x * 0.4), 0]).x;
+      return { cut, expected };
+    });
+    assert(
+      Math.abs(afterPan.cut - afterPan.expected) <= 1,
+      `after a pan the divider cut at ${afterPan.cut} instead of ${afterPan.expected}`,
+    );
+
+    // Crossfade drops the clip and mixes instead. The two opacities sum to one,
+    // so the basemap never shows through more than it would under either storm
+    // alone.
+    await page.check('input[name="cp-map-mode"][value="fade"]');
+    await page.waitForSelector('#cp-divider:not([disabled])', { timeout: 5000 });
+    await page.fill('#cp-divider', '65');
+    await page.dispatchEvent('#cp-divider', 'input');
+    const faded = await paneState();
+    assert(
+      faded.a.clip === '' && faded.b.clip === '',
+      `crossfade left a clip behind: ${JSON.stringify(faded)}`,
+    );
+    const sum = Number(faded.a.opacity) + Number(faded.b.opacity);
+    assert(
+      Math.abs(Number(faded.a.opacity) - 0.35) < 0.01 && Math.abs(sum - 1) < 0.01,
+      `crossfade did not mix the two storms: ${JSON.stringify(faded)}`,
+    );
+
+    // The shared time axis puts one marker on each track at the same fraction
+    // of its own life, which is the only instant two storms decades apart have
+    // in common.
+    await page.fill('#cp-time', '50');
+    await page.dispatchEvent('#cp-time', 'input');
+    await page.waitForFunction(
+      () => document.querySelectorAll('.compare-time-marker').length === 2,
+      null,
+      { timeout: 8000 },
+    ).catch(() => {
+      throw new Error('the shared time axis did not mark both storms');
+    });
+    const readout = await page.textContent('#cp-time-readout');
+    assert(
+      /Katrina 2005: 2005-/.test(readout || '') && /Ian 2022: 2022-/.test(readout || ''),
+      `the shared time readout did not name both storms and both dates: ${JSON.stringify(readout)}`,
+    );
+    const halfway = await page.evaluate(async () => {
+      const { getStorm } = await import('/src/data.js');
+      const { trackPointAtFraction } = await import('/src/compare-panes.js');
+      const usable = id => (getStorm(id).track || []).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
+      return ['AL122005', 'AL092022'].map(id => {
+        const points = usable(id);
+        return trackPointAtFraction(points, 0.5).t === points[Math.round(0.5 * (points.length - 1))].t;
+      });
+    });
+    assert(halfway.every(Boolean), 'the shared time axis is not halfway through each storm');
+
+    // Unpinning back to one storm cannot leave half the map clipped away with
+    // nothing on the other side of the divider.
+    await page.check('input[name="cp-map-mode"][value="swipe"]');
+    await page.evaluate(async () => {
+      const compare = await import('/src/compare.js');
+      await compare.setPinsByIds(['AL122005']);
+    });
+    await page.waitForFunction(
+      () => {
+        const pane = [...document.querySelectorAll('.leaflet-pane')]
+          .find(node => node.className.includes('hm-compare-a'));
+        return pane && pane.style.clipPath === '';
+      },
+      null,
+      { timeout: 8000 },
+    ).catch(() => {
+      throw new Error('unpinning to one storm left the map clipped in half');
+    });
+  } finally {
+    await context.close();
+  }
+
+  // Below the shell's breakpoint the split runs top to bottom. The same
+  // control, over a map that is taller than it is wide.
+  const narrow = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    serviceWorkers: 'block',
+    reducedMotion: 'reduce',
+  });
+  await seedSettings(narrow, { onboarded: true, locale: 'en' });
+  await stubQuietTropics(narrow);
+  const small = await narrow.newPage();
+  try {
+    await small.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(small);
+    await small.evaluate(async () => {
+      const compare = await import('/src/compare.js');
+      await compare.setPinsByIds(['AL122005', 'AL092022']);
+      compare.openComparePanel();
+    });
+    await small.waitForSelector('#cp-map-compare', { timeout: 15_000 });
+    await small.check('input[name="cp-map-mode"][value="swipe"]');
+    await small.waitForSelector('#cp-divider:not([disabled])', { timeout: 5000 });
+    await small.fill('#cp-divider', '45');
+    await small.dispatchEvent('#cp-divider', 'input');
+    const stacked = await small.evaluate(async () => {
+      const { getMap } = await import('/src/map.js');
+      const map = getMap();
+      const pane = [...document.querySelectorAll('.leaflet-pane')]
+        .find(node => node.className.includes('hm-compare-a'));
+      // A stacked split cuts on y: the first two polygon points share a y and
+      // differ in x, where a vertical split has them share an x.
+      const points = [...pane.style.clipPath.matchAll(/(-?\d+(?:\.\d+)?)px (-?\d+(?:\.\d+)?)px/g)]
+        .map(match => ({ x: Number(match[1]), y: Number(match[2]) }));
+      const expected = map.containerPointToLayerPoint([0, Math.round(map.getSize().y * 0.45)]).y;
+      return { points, expected };
+    });
+    assert(stacked.points.length === 4, `the stacked clip is not a quadrilateral: ${JSON.stringify(stacked.points)}`);
+    const cutY = stacked.points[2].y;
+    assert(
+      Math.abs(cutY - stacked.expected) <= 1,
+      `the stacked split cut at y=${cutY} instead of ${stacked.expected}`,
+    );
+    assert(
+      stacked.points[0].y === stacked.points[1].y && stacked.points[0].x !== stacked.points[1].x,
+      `the narrow layout split left-to-right instead of top-to-bottom: ${JSON.stringify(stacked.points)}`,
+    );
+  } finally {
+    await narrow.close();
+  }
 }
 
 async function assertPanelIsAddressable(browser, baseUrl) {

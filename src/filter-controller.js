@@ -128,11 +128,22 @@ export function createFilterController({
    * undo including one restoring "off", stranding applyFilters and leaving a
    * visible button that had already cleared its own snapshot.
    */
-  const applySeaSurfaceLayer = (visible) => {
-    if (!elements.showSST) return;
+  const applySeaSurfaceLayer = (visible, { wasOn = true } = {}) => {
+    // Nothing to turn off that was never on: asking for the chunk then would
+    // download it on a visit that never enabled the layer, which the reset
+    // handler did for every reader once this moved out of its guard.
+    if (!elements.showSST || (!visible && !wasOn)) return;
     loadSST()
       .then(({ setSSTVisible }) => setSSTVisible(visible))
-      .catch(error => console.error('Sea-surface layer unavailable:', error));
+      .catch(error => {
+        console.error('Sea-surface layer unavailable:', error);
+        // Same rule as the checkbox's own handler: a box left ticked over a
+        // layer that will never arrive is a lie, and the reset button goes on
+        // counting it.
+        if (!visible) return;
+        elements.showSST.checked = false;
+        updateResetState();
+      });
   };
 
   const resetYears = () => {
@@ -228,11 +239,15 @@ export function createFilterController({
       resetTrackCache();
       applyFilters();
       showUndo(true);
-      applySeaSurfaceLayer(false);
+      applySeaSurfaceLayer(false, { wasOn: undoSnapshot.showSST });
     });
 
     elements.undoResetFilters?.addEventListener('click', () => {
       if (!undoSnapshot) return;
+      // Read before the checkbox is reassigned: turning a layer off that was
+      // never on has nothing to do, and asking for its chunk to do nothing
+      // downloads it on a visit that never used it.
+      const seaSurfaceWasOn = Boolean(elements.showSST?.checked);
       const layers = applyFilterState(filters, undoSnapshot);
       undoSnapshot = null;
       sync();
@@ -246,7 +261,7 @@ export function createFilterController({
       applyFilters();
       showUndo(false);
       elements.resetFilters?.focus({ preventScroll: true });
-      applySeaSurfaceLayer(layers.showSST);
+      applySeaSurfaceLayer(layers.showSST, { wasOn: seaSurfaceWasOn });
     });
   };
 
