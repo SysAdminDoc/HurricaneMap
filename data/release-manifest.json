@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at_utc": "2026-08-08T00:00:00Z",
-  "source_commit": "46a493e805a9ca70179722a74c637b4218c88155",
+  "source_commit": "4440954e1c55f0556c13f7c9ec20ecee0c2218f4",
   "algorithm": "SHA-256",
   "hand_maintained": {
     "refreshed_utc": "2026-09-05",
@@ -67,7 +67,7 @@
     {
       "path": "data/coverage.json",
       "bytes": 18048,
-      "sha256": "43d3c0c422854ded35652fc44ed9eb8fd6cc865afa97fea6ef47bbf8b2d91e01",
+      "sha256": "e49026704a62d2af41c4a860313279a4ef17f60cd5c2dd8693585e51416ae24a",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "f5c1661757b01a737b5b131feb52607afdbc3ccd20d40d22fb249fc54aa76dcc",
+      "sha256": "87592f78d8b2f3368841ea5923e6f3b1867a7d76431f479c1a1b00cb95192463",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -166,7 +166,7 @@
     {
       "path": "data/metadata.json",
       "bytes": 8055,
-      "sha256": "f84de67ec7b50b0afaa72e383c0807c97dd9a52bb600f40eff8770b6551c96f9",
+      "sha256": "7918ae09bb3cfbb90082237e26426526c320fc8aae5ae05dc876869524270795",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15493,7 +15493,7 @@
     {
       "path": "data/stac/catalog.json",
       "bytes": 1290,
-      "sha256": "294eedbffc686028e6c19858d0a0aed30af275ed5587bc3d0c95c070d1fde2a3",
+      "sha256": "460666a3dc28067fe727269cbbde6740a08b1a66975f529c26b32311cacee74a",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15520,7 +15520,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4539,
-      "sha256": "ea31dccc306de915258b0a3eb9333a534e3edcd792ad02fb3c956b5a4696f43d",
+      "sha256": "acb969adcdf183c3e50d8c16d027b20957b4397c45be8401b83303357913b872",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
