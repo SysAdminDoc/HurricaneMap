@@ -389,7 +389,7 @@ try {
   });
 
   assert(offlineResult.storms >= 500, `offline storms count too low: ${offlineResult.storms}`);
-  assert(offlineResult.catalogStorms === 595 && offlineResult.radarFrames === 1703, 'offline archive coverage facts are unavailable');
+  assert(offlineResult.catalogStorms === 590 && offlineResult.radarFrames === 1703, 'offline archive coverage facts are unavailable');
   assert(/Katrina/i.test(offlineResult.panelText), 'offline storm panel did not render Katrina');
   assert(/Est\. exposure/.test(offlineResult.panelText), 'offline exposure metric did not render from cached state density data');
 

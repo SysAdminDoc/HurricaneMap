@@ -30,7 +30,7 @@ assert scope["start_year"] == 1851 and scope["end_year"] == 2024, scope
 assert scope["minimum_category"] == 1
 
 detected = validation["detected"]
-assert detected["record_count"] == 362, detected
+assert detected["record_count"] == 358, detected
 assert validation["ground_truth"]["record_count"] == 352, validation["ground_truth"]
 assert detected["matched_count"] == 337, detected
 
@@ -54,9 +54,12 @@ assert all(row["storm_id"] and row["year"] and row["t"] for row in missed), miss
 # window the inferred pass exists to recover, so candidates there are not
 # scored as wrong answers.
 inferred = validation["inferred"]
-assert inferred["hurricane_strength_candidate_count"] == 10, inferred
+assert inferred["hurricane_strength_candidate_count"] == 7, inferred
 assert inferred["unscoreable_candidate_count"] == 7, inferred
-assert inferred["scoreable_candidate_count"] == 3, inferred
+# Nothing is left for AOML to score. The three it could adjudicate were
+# the 1880 and 1886 Texas rows, which its own table marks "Mexico
+# landfall first", and it scored all three wrong.
+assert inferred["scoreable_candidate_count"] == 0, inferred
 assert all(1971 <= year <= 1982 for year in inferred["unscoreable_years"]), inferred["unscoreable_years"]
 
 states = [{

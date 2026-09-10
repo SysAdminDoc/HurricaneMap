@@ -508,7 +508,7 @@
                     "role": "strong",
                     "text": "Storm event reports"
                   },
-                  "Current · 157 records NOAA NCEI Storm Events Last success: 8/8/2026, 4:30:00 PM Next retry: Not scheduled Origin: Bundled offline data",
+                  "Current · 155 records NOAA NCEI Storm Events Last success: 8/8/2026, 4:30:00 PM Next retry: Not scheduled Origin: Bundled offline data",
                   {
                     "role": "button",
                     "name": "Retry"
@@ -751,7 +751,7 @@
             "role": "strong",
             "text": "Archive coverage"
           },
-          "15 datasets · 1851–2025 · 595 storms",
+          "15 datasets · 1851–2025 · 590 storms",
           {
             "role": "list",
             "name": "Archive coverage",

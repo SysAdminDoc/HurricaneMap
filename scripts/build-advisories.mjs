@@ -106,18 +106,17 @@ export function replayRouteForYear(year) {
 // therefore has a best track to sit beside, and the storm is one a reader can
 // already find on the map.
 //
-// One entry rests on an inference rather than an attributed landfall, and is
-// listed here so nobody re-raises it: Hermine 2010's only `L` row is at
-// 25.3N 97.4W, in Tamaulipas, and NHC's report puts its landfall on the
-// northeastern coast of Mexico. preprocess_hurdat2.py infers a Texas landfall
-// from the track crossing the coast north of the Rio Grande, and the atlas shows
-// Hermine under Texas. Dropping it here would make the replay disagree with the
-// map about the same storm, which is worse than the inference.
+// Hermine 2010 was here and is not any more. Its only `L` row is at 25.3N
+// 97.4W, in Tamaulipas, and NHC's report puts its landfall on the northeastern
+// coast of Mexico; the atlas showed it under Texas because the landfall
+// inference read "not inside a US state" as "over water" and the next fix after
+// that landfall is inland Texas. The atlas no longer says that, so neither does
+// this.
 export const STORM_IDS = Object.freeze([
   // 2008-2014, built from the GIS archive.
   'AL042008', 'AL052008', 'AL062008', 'AL072008', 'AL082008', 'AL092008',
   'AL042009',
-  'AL022010', 'AL032010', 'AL102010',
+  'AL022010', 'AL032010',
   'AL042011', 'AL092011', 'AL132011',
   'AL022012', 'AL042012', 'AL092012', 'AL182012',
   'AL012013',

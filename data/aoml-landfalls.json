@@ -9331,9 +9331,9 @@
       "direct_landfall_count": 352
     },
     "detected": {
-      "record_count": 362,
+      "record_count": 358,
       "matched_count": 337,
-      "precision": 0.930939,
+      "precision": 0.941341,
       "recall": 0.957386
     },
     "per_decade": [
@@ -9364,9 +9364,9 @@
       {
         "decade": 1880,
         "ground_truth_count": 24,
-        "detected_count": 28,
+        "detected_count": 25,
         "matched_count": 24,
-        "precision": 0.857143,
+        "precision": 0.96,
         "recall": 1.0
       },
       {
@@ -9428,9 +9428,9 @@
       {
         "decade": 1960,
         "ground_truth_count": 19,
-        "detected_count": 20,
+        "detected_count": 19,
         "matched_count": 18,
-        "precision": 0.9,
+        "precision": 0.947368,
         "recall": 0.947368
       },
       {
@@ -9640,12 +9640,12 @@
       }
     ],
     "inferred": {
-      "candidate_count": 56,
-      "hurricane_strength_candidate_count": 10,
-      "scoreable_candidate_count": 3,
+      "candidate_count": 50,
+      "hurricane_strength_candidate_count": 7,
+      "scoreable_candidate_count": 0,
       "unscoreable_candidate_count": 7,
       "matched_count": 0,
-      "precision": 0.0,
+      "precision": null,
       "recall": 0.0,
       "unscoreable_years": [
         1974,

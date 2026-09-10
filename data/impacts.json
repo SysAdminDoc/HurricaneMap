@@ -4089,30 +4089,6 @@
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }
   },
-  "AL102010": {
-    "deaths": "52 direct, 50 indirect, 100 presumed dead",
-    "damages": "740000000",
-    "wiki_title": "Tropical Storm Hermine (2010)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%282010%29",
-    "deaths_total": 102,
-    "deaths_min": 102,
-    "deaths_max": 102,
-    "deaths_qualifier": "direct_indirect_sum",
-    "damage_usd_nominal": 740000000,
-    "damage_millions_usd": 740.0,
-    "damage_source_units": "usd",
-    "damage_qualifier": "exact",
-    "impact_schema_version": 1,
-    "impact_confidence": "medium",
-    "impact_confidence_reason": "Normalized from a qualified source value: direct_indirect_sum.",
-    "impact_provenance": {
-      "source": "Wikipedia infobox",
-      "source_title": "Tropical Storm Hermine (2010)",
-      "source_url": "https://en.wikipedia.org/wiki/Tropical_Storm_Hermine_%282010%29",
-      "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-21T00:15:44Z"
-    }
-  },
   "AL102023": {
     "deaths": "12 (8 direct, 4 indirect)",
     "damages": "3500000000",
@@ -4728,30 +4704,6 @@
       "source": "Wikipedia infobox",
       "source_title": "Hurricane Love (1950)",
       "source_url": "https://en.wikipedia.org/wiki/Hurricane_Love_%281950%29",
-      "scraper": "scripts/scrape_impacts.py",
-      "parsed_at_utc": "2026-06-21T00:15:44Z"
-    }
-  },
-  "AL131967": {
-    "deaths": "59 direct",
-    "damages": "234600000",
-    "wiki_title": "Hurricane Beulah (1967)",
-    "wiki_url": "https://en.wikipedia.org/wiki/Hurricane_Beulah_%281967%29",
-    "deaths_total": 59,
-    "deaths_min": 59,
-    "deaths_max": 59,
-    "deaths_qualifier": "exact",
-    "damage_usd_nominal": 234600000,
-    "damage_millions_usd": 234.6,
-    "damage_source_units": "usd",
-    "damage_qualifier": "exact",
-    "impact_schema_version": 1,
-    "impact_confidence": "high",
-    "impact_confidence_reason": "Retained raw fields contained directly parseable values and explicit damage units when applicable.",
-    "impact_provenance": {
-      "source": "Wikipedia infobox",
-      "source_title": "Hurricane Beulah (1967)",
-      "source_url": "https://en.wikipedia.org/wiki/Hurricane_Beulah_%281967%29",
       "scraper": "scripts/scrape_impacts.py",
       "parsed_at_utc": "2026-06-21T00:15:44Z"
     }

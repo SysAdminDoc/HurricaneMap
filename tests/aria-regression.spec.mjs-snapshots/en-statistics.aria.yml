@@ -81,10 +81,10 @@
           - cell /\d+/
           - cell "—"
           - cell "—"
-        - row /\d+[hmsp]+ \d+ 7 \(\d+%\) \d+ — —/:
+        - row /\d+[hmsp]+ \d+ 6 \(\d+%\) \d+ — —/:
           - rowheader /\d+[hmsp]+/
           - cell /\d+/
-          - cell /7 \(\d+%\)/
+          - cell /6 \(\d+%\)/
           - cell /\d+/
           - cell "—"
           - cell "—"

@@ -11,9 +11,9 @@
       1851,
       2025
     ],
-    "storm_count": 595,
-    "landfall_event_count": 759,
-    "hurricane_landfall_count": 374
+    "storm_count": 590,
+    "landfall_event_count": 753,
+    "hurricane_landfall_count": 370
   },
   "datasets": [
     {
@@ -55,12 +55,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 759,
-        "storms": 595,
+        "records": 753,
+        "storms": 590,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "595 final best-track storms; 759 landfall events, including 56 inferred events."
+        "detail": "590 final best-track storms; 753 landfall events, including 50 inferred events."
       },
       "distribution": [
         "core",
@@ -138,12 +138,12 @@
       "value_status": "inferred",
       "availability": {
         "runnable": true,
-        "records": 244,
-        "storms": 244,
+        "records": 242,
+        "storms": 242,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "244 storms have normalized community-source impact records; missing storms are unavailable, not zero."
+        "detail": "242 storms have normalized community-source impact records; missing storms are unavailable, not zero."
       },
       "distribution": [
         "core",
@@ -360,11 +360,11 @@
       "availability": {
         "runnable": true,
         "records": null,
-        "storms": 52,
+        "storms": 51,
         "frames": null,
-        "advisories": 1684,
+        "advisories": 1667,
         "marks": null,
-        "detail": "1684 preliminary operational advisories across 52 storms; exact-time HURDAT2 verification only."
+        "detail": "1667 preliminary operational advisories across 51 storms; exact-time HURDAT2 verification only."
       },
       "distribution": [
         "core",
@@ -384,7 +384,7 @@
         {
           "name": "NOAA/NCEI Storm Events Database",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/",
-          "revision_date": "2026-05-05"
+          "revision_date": "2026-09-10"
         }
       ],
       "basins": [
@@ -399,12 +399,12 @@
       "value_status": "final",
       "availability": {
         "runnable": true,
-        "records": 157,
-        "storms": 157,
+        "records": 155,
+        "storms": 155,
         "frames": null,
         "advisories": null,
         "marks": null,
-        "detail": "157 storm coincidence records from the bundled NOAA/NCEI extract."
+        "detail": "155 storm coincidence records from the bundled NOAA/NCEI extract."
       },
       "distribution": [
         "core",

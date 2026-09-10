@@ -331,7 +331,7 @@ assert.equal(describeRunFailure(undefined, py313), '');
 
 // A gate that could not run is not a gate that passed. test:notebook returned 0
 // whenever the notebook packages were absent, so the only check that proves the
-// published notebook still reproduces the 595/759/374 release contract was green
+// published notebook still reproduces the 590/753/370 release contract was green
 // on every machine that could not execute it.
 // Not compared to its own literal, which would prove nothing: 0 and 1 are the
 // two codes every gate already uses, so the skip code has to be neither.

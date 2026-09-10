@@ -13,9 +13,9 @@ assert.equal(coverage.source_commit, metadata.generator.source_commit);
 assert.deepEqual(coverage.catalog, {
   basins: ['AL', 'EP'],
   year_range: [1851, 2025],
-  storm_count: 595,
-  landfall_event_count: 759,
-  hurricane_landfall_count: 374,
+  storm_count: 590,
+  landfall_event_count: 753,
+  hurricane_landfall_count: 370,
 });
 assert.equal(coverage.datasets.length, 15);
 for (const dataset of coverage.datasets) {
@@ -25,18 +25,18 @@ for (const dataset of coverage.datasets) {
   assert(['final', 'inferred', 'operational', 'stale', 'closed', 'unavailable'].includes(dataset.value_status), `${dataset.id} value status`);
 }
 
-assert.equal(byId.get('hurdat2').availability.storms, 595);
-assert.equal(byId.get('hurdat2').availability.records, 759);
-assert.match(byId.get('hurdat2').availability.detail, /56 inferred/);
+assert.equal(byId.get('hurdat2').availability.storms, 590);
+assert.equal(byId.get('hurdat2').availability.records, 753);
+assert.match(byId.get('hurdat2').availability.detail, /50 inferred/);
 assert.equal(byId.get('aoml-landfalls').availability.records, 386);
 assert.equal(byId.get('storm-impacts').value_status, 'inferred');
-assert.equal(byId.get('storm-impacts').availability.records, 244);
+assert.equal(byId.get('storm-impacts').availability.records, 242);
 assert.equal(byId.get('ncei-billions').lifecycle_status, 'closed');
 assert.equal(byId.get('ncei-billions').availability.runnable, false);
 assert.equal(byId.get('ncei-billions').end_date, '2024-12-31');
 assert.equal(byId.get('enso').availability.records, 76);
-assert.equal(byId.get('advisory-replay').availability.storms, 52);
-assert.equal(byId.get('advisory-replay').availability.advisories, 1684);
+assert.equal(byId.get('advisory-replay').availability.storms, 51);
+assert.equal(byId.get('advisory-replay').availability.advisories, 1667);
 assert.deepEqual(byId.get('advisory-replay').year_range, [2008, 2024]);
 assert.equal(byId.get('radar-archive').availability.storms, 139);
 assert.equal(byId.get('radar-archive').availability.frames, 1703);

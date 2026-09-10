@@ -351,7 +351,13 @@ def existing_parsed_at(record: dict, fallback: str) -> str:
     return fallback
 
 
-def normalize_impact_records(records: dict, fallback_stamp: str) -> dict:
+def normalize_impact_records(records: dict, fallback_stamp: str, storm_ids=None) -> dict:
+    """Normalize, drop the empty rows, and drop rows for storms that have left.
+
+    The atlas holds the storms with a US landfall, and a storm leaves it when
+    one of those turns out not to be a landfall. Nothing used to drop its
+    impact row, so the file kept pointing at a storm that is no longer there.
+    """
     normalized = {
         key: normalize_impact_record(
             records[key],
@@ -361,7 +367,8 @@ def normalize_impact_records(records: dict, fallback_stamp: str) -> dict:
     }
     return {
         key: record for key, record in normalized.items()
-        if record.get("deaths") or record.get("damages")
+        if (record.get("deaths") or record.get("damages"))
+        and (storm_ids is None or key in storm_ids)
     }
 
 
@@ -421,7 +428,7 @@ def main():
 
     if args.normalize_existing:
         stamp = utc_now()
-        out_sorted = normalize_impact_records(out, stamp)
+        out_sorted = normalize_impact_records(out, stamp, {s["id"] for s in storms})
         OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
         print(f"Normalized {len(out_sorted)} existing impact rows.", file=sys.stderr)
         print(f"Wrote {OUT} ({OUT.stat().st_size / 1024:.1f} KB)", file=sys.stderr)
@@ -445,7 +452,7 @@ def main():
 
     # Sort and write.
     stamp = utc_now()
-    out_sorted = normalize_impact_records(out, stamp)
+    out_sorted = normalize_impact_records(out, stamp, {s["id"] for s in storms})
     OUT.write_text(json.dumps(out_sorted, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n")
     print(f"Done. Found impacts for {len(out_sorted)} storms.", file=sys.stderr)
     print(f"Wrote {OUT} ({OUT.stat().st_size / 1024:.1f} KB)", file=sys.stderr)

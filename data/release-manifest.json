@@ -21,8 +21,8 @@
   "artifacts": [
     {
       "path": "data/advisories.json",
-      "bytes": 1661521,
-      "sha256": "0d227abf159d5c7def47a6888da9ab0898eb511160387d2481ecadeaeaac6e69",
+      "bytes": 1637774,
+      "sha256": "b71b5a24cb128ecdc394db5a3a27c718f9a8201ddb3004eccfa066bc9fe6e900",
       "source_url": "https://ftp.nhc.noaa.gov/atcf/archive/",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30,8 +30,8 @@
     },
     {
       "path": "data/aoml-landfalls.json",
-      "bytes": 228082,
-      "sha256": "641b3ade1b80c5c1e04a90e3521a57267ecc1e78687d3502a5b4cd36c43291e0",
+      "bytes": 228083,
+      "sha256": "7b8741fee98ac7a52b1b251621233481b2ac36ae0f65d79689d48fdd825c7345",
       "source_url": "https://www.aoml.noaa.gov/hrd/hurdat/UShurrs_detailed.html",
       "source_date": "2026-03-01",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -67,7 +67,7 @@
     {
       "path": "data/coverage.json",
       "bytes": 16950,
-      "sha256": "763c4a7af8d31d9602c94febc8ae4ea464926ebf1ed5711e3fb9863e2e019f50",
+      "sha256": "b632a143a1f5eec3aea9894194f9381807cbb2c196f64c5ae75ff3c86cca8362",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "7572ffd6494cff3125813c69ea4f2913ff5f7fd204067376924b98da1dbb6a66",
+      "sha256": "aee416933a514d690ba533c317fc8f90d297a9bffdc8fb80d07720d7c94b539e",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -138,8 +138,8 @@
     },
     {
       "path": "data/impacts.json",
-      "bytes": 225841,
-      "sha256": "a7453ef0cc976efaac8ee1e2d878f850a1fe415fb21f8ef6ac1b5239710468eb",
+      "bytes": 223946,
+      "sha256": "0b69f2965353583f2638f59285f48c53fba473f116b530bfaab853c19723cadb",
       "source_url": "https://en.wikipedia.org/",
       "source_date": "2026-07-25",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -147,8 +147,8 @@
     },
     {
       "path": "data/landfalls.json",
-      "bytes": 142671,
-      "sha256": "7361e307cfd43dda7a36b32e2babb8ae244d4fc5f6be3f6a95fbc48b7a1aadd1",
+      "bytes": 141563,
+      "sha256": "e4d21ef815c41773f4630875c7e7d13c63ffa102350f77bc848084b3f35b68dc",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -156,8 +156,8 @@
     },
     {
       "path": "data/metadata.json",
-      "bytes": 7575,
-      "sha256": "c7c2ca066dff79f859d2b07ce6402bf515d556be7e3e6e374987060d504db165",
+      "bytes": 7819,
+      "sha256": "d3e36b14e41ad6a9244378e2b27b8f3edb90715ec0a8ff955ec93eb1367ca260",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15547,7 +15547,7 @@
     {
       "path": "data/stac/collections/hurdat2.json",
       "bytes": 1752,
-      "sha256": "de0de9127fc59445093bc25da23bb027287a68c17ba76231e8a86663ad20029b",
+      "sha256": "3fe0b06edf2ff82be2c99d3be095c4e0e1470c40b0bbf4c24eecb27f2178c146",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15565,7 +15565,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4539,
-      "sha256": "51a7456f9d750c358468cb1ecd5e18ad52e194cb9ceaef2bad85f284012aa1d0",
+      "sha256": "9e3a52222143c275392103186e58db2a7c6491cafc6e2c2a81700c76fc3210b3",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30901,7 +30901,7 @@
     {
       "path": "data/stats.json",
       "bytes": 8364,
-      "sha256": "721d16f10f1590d02a4c496dcbaf2a2908cff13afa5567a8f14b31284c301f70",
+      "sha256": "05dc26339a5bb1ee7be5ae9aa078693b9094c5a862f81fa4fc50fd85ea9dbbd1",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30909,8 +30909,8 @@
     },
     {
       "path": "data/storm-events.json",
-      "bytes": 111260,
-      "sha256": "676f172b2065c1df21553c23611973274994a5e5e62f4008fcb8b0eba0f26dc3",
+      "bytes": 109184,
+      "sha256": "d770de97945d6d2f093ed83fbb08688b13957fbd9a8bd884f459e2cb260c5680",
       "source_url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/",
       "source_date": "2026-05-05",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30918,8 +30918,8 @@
     },
     {
       "path": "data/storms.json",
-      "bytes": 2299081,
-      "sha256": "8c462a5c9fa8e49bf79a5ff26b97cc68c1fd4b1dfa77f822373f16920c74ed4b",
+      "bytes": 2275482,
+      "sha256": "42dca908a6ac22766ef991243b2238c560a7110050e6dba6a620bfefc0e1950c",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -30927,8 +30927,8 @@
     },
     {
       "path": "data/storms.json.gz",
-      "bytes": 234595,
-      "sha256": "13a51a7fcbaccbe4af1960550cc7da0e4e7e555aa41334af2d9c04081aa16f1a",
+      "bytes": 232295,
+      "sha256": "ec727afea5654942e1c69fe80232c1ef358ebcb7cdc2dfa81a423fa38ffe67d6",
       "source_url": "https://www.nhc.noaa.gov/data/hurdat/",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

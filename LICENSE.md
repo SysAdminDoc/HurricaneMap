@@ -66,7 +66,7 @@ IEM mirrors and archives NEXRAD reflectivity mosaics from the NWS Radar Data Cen
 ### Storm Impacts Data
 
 - **Source:** Wikipedia (community-edited)
-- **Entries Covered:** 244 storms (raw deaths/damage text plus normalized fatality and nominal-USD fields)
+- **Entries Covered:** 242 storms (raw deaths/damage text plus normalized fatality and nominal-USD fields)
 - **License:** Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
 - **Availability:** Displayed in the "Impacts" section of storm detail panels
 

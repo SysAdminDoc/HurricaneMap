@@ -17,6 +17,9 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_billions import RETIREMENT_CITATION as BILLIONS_RETIREMENT_CITATION  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
@@ -24,6 +27,7 @@ ATL_FILE = DATA / "hurdat2-atlantic.txt"
 EPAC_FILE = DATA / "hurdat2-nepac.txt"
 STATES_GEOJSON = DATA / "us-states.geojson"
 SOURCE_LOCK_FILE = DATA / "hurdat2-sources.json"
+AOML_LANDFALLS = DATA / "aoml-landfalls.json"
 
 OUT_LANDFALLS = DATA / "landfalls.json"
 OUT_STORMS = DATA / "storms.json"
@@ -100,11 +104,11 @@ DATASET_STATUSES = [
         "paths": ["data/billions.json", "data/ncei-billions-1980-2024.csv"],
         "status": "closed",
         "end_date": "2024-12-31",
-        "retirement_citation": {
-            "title": "Billion Dollar Weather and Climate Disasters",
-            "date": "2025-05-08",
-            "url": "https://www.nesdis.noaa.gov/about/documents-reports/notice-of-changes/2025-notice-of-changes/billion-dollar-weather-and-climate-disasters",
-        },
+        # Read from the builder that owns the series rather than copied here.
+        # The copy went stale the day the successor was added: build_billions.py
+        # gained the Climate Central handover, metadata.json was edited to match,
+        # and the next run of this file would have silently dropped it again.
+        "retirement_citation": BILLIONS_RETIREMENT_CITATION,
     },
     {
         "id": "enso",
@@ -487,7 +491,7 @@ def build_metadata(source_summaries, stats, outputs, generated_at, source_commit
         "outputs": output_files,
         "methodology": {
             "explicit_landfall_marker": "HURDAT2 records with rec_id L inside or near U.S. state polygons.",
-            "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons; HURDAT2 C (closest approach without a landfall) records and adjacent segments are excluded.",
+            "inferred_landfall_rule": "Storms without explicit U.S. L records are checked for TS+ water-to-land transitions against U.S. state polygons; HURDAT2 C (closest approach without a landfall) records and adjacent segments are excluded, as is any transition whose preceding fix is a landfall record outside the United States, because a centre already ashore cannot come ashore again. Texas landfalls are dropped for the storms AOML marks as having made landfall over Mexico first.",
             "category_rule": "Saffir-Simpson category is computed from sustained wind in knots at U.S. landfall.",
         },
     }
@@ -621,13 +625,66 @@ def nearest_state(lon: float, lat: float, states, max_deg: float = 0.5):
     return (best, best_d) if best else (None, None)
 
 
+def load_mexico_first_storms():
+    """Storms AOML records as having come ashore in Mexico rather than Texas.
+
+    AOML's own footnote, in data/aoml-us-landfalls.html: "# - Indicates that
+    hurricane made landfall first over Mexico, but caused hurricane winds in
+    Texas."  So the marker is about Texas by definition, and the check below
+    fails rather than guessing if that ever stops being true of the rows.
+
+    This is knowledge no geometry here can reach.  HURDAT2 puts Beulah's 1967
+    landfall at 25.9N, which is 0.05 degrees south of the mouth of the Rio
+    Grande, and the 1886 storm carries no landfall record at all.
+    """
+    with AOML_LANDFALLS.open("r", encoding="utf-8") as fh:
+        table = json.load(fh)
+    storm_ids = set()
+    for record in table["records"]:
+        if "#" not in record.get("markers", []):
+            continue
+        states = ",".join(record.get("states_affected") or [])
+        if "TX" not in states:
+            raise SystemExit(
+                f"AOML marks {record['storm_id']} as a Mexico landfall but names {states!r}, not Texas; "
+                "the marker's meaning has changed and load_mexico_first_storms needs rereading"
+            )
+        storm_ids.add(record["storm_id"])
+    if not storm_ids:
+        raise SystemExit("AOML lists no Mexico-first landfall, which it did for seven storms; the parse has moved")
+    return storm_ids
+
+
+def is_us_landfall_record(rec, states) -> bool:
+    """Whether a HURDAT2 landfall record is a landfall on the United States.
+
+    The same three tests the explicit-landfall path makes, in one place, so the
+    inference can ask the question the other half of this file already answers.
+    """
+    if rec.get("rec") != "L":
+        return False
+    if not in_us_bbox(rec["lon"], rec["lat"]):
+        return False
+    if on_known_foreign_coast(rec["lon"], rec["lat"]):
+        return False
+    state, _ = nearest_state(rec["lon"], rec["lat"], states)
+    return bool(state)
+
+
 def on_known_foreign_coast(lon: float, lat: float) -> bool:
     """Exclude explicit-L fixes south of the Rio Grande mouth in Tamaulipas.
 
-    Three current HURDAT2 rows (1857, 1880, 1947) fall within the generic
-    0.5-degree coastline tolerance but are geographically south of Texas.
+    Rows there fall within the generic 0.5-degree coastline tolerance but are
+    geographically south of Texas.
+
+    The longitude window is the point of this, and it used to be missing: an
+    open-ended ``lon <= -96.8`` is everything west of the western Gulf, which
+    includes Hawaii.  So Iselle's 2014 landfall record at 19.2N 155.4W, on the
+    Big Island, was thrown out with Tamaulipas, and the atlas only had that
+    landfall at all because the inference put an interpolated one back.  Every
+    Tamaulipas row this is for sits between 97.0W and 97.8W.
     """
-    return lon <= -96.8 and lat < 25.84
+    return -98.5 <= lon <= -96.8 and lat < 25.84
 
 
 # US territory bounding boxes for the coarse first-pass filter (lat,lat,lon,lon).
@@ -882,11 +939,24 @@ def infer_landfall_candidates(track, states, basin):
             prev_state = here_state
             continue
 
+        # A centre that came ashore somewhere else is already on land, and it
+        # cannot come ashore again without going back to sea.  `prev_state`
+        # only asks whether the previous fix was inside a US state, and Mexico
+        # is not one, so a storm that came ashore in Tamaulipas and carried on
+        # north across the Rio Grande read as arriving from the Gulf.  Hermine
+        # 2010 is the clearest: its one landfall record is at 25.3N 97.4W, in
+        # Tamaulipas, and the next fix four hours later is inland Texas.
+        #
+        # Only the fix immediately before counts.  Reaching further back would
+        # catch Allen 1980, which came ashore on the Yucatan days earlier, went
+        # back over the Gulf and then made a real Texas landfall.
+        came_ashore_abroad = a.get("rec") == "L" and not is_us_landfall_record(a, states)
+
         # Direct entry on a synoptic point.
-        if here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
+        if here_state and not prev_state and not came_ashore_abroad and b["status"] in ("HU", "TS", "SS"):
             append_candidate(b, here_state)
         # Mid-segment crossing: both endpoints offshore but segment grazes land.
-        elif not here_state and not prev_state and b["status"] in ("HU", "TS", "SS"):
+        elif not here_state and not prev_state and not came_ashore_abroad and b["status"] in ("HU", "TS", "SS"):
             for k in range(1, 10):
                 fraction = k / 10.0
                 mid_lon = a["lon"] + (b["lon"] - a["lon"]) * fraction
@@ -945,6 +1015,8 @@ def main():
     print("Loading state polygons...", file=sys.stderr)
     states = load_states()
     print(f"Loaded {len(states)} state/territory polygons.", file=sys.stderr)
+    mexico_first_storms = load_mexico_first_storms()
+    print(f"AOML records {len(mexico_first_storms)} storms as coming ashore in Mexico before Texas.", file=sys.stderr)
 
     storms_with_us_landfall = []
     landfall_events = []  # flat list, one per US landfall record
@@ -990,8 +1062,13 @@ def main():
                     "inferred": False,
                 })
 
+            if storm["id"] in mexico_first_storms:
+                us_landfalls = [lf for lf in us_landfalls if lf["state"] != "Texas"]
+
             if not us_landfalls:
                 us_landfalls = infer_landfall_candidates(storm["track"], states, storm["basin"])
+                if storm["id"] in mexico_first_storms:
+                    us_landfalls = [lf for lf in us_landfalls if lf["state"] != "Texas"]
 
             if not us_landfalls:
                 continue
@@ -1145,7 +1222,11 @@ def main():
         generated_at,
         source_commit,
     )
-    OUT_METADATA.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8", newline="\n")
+    # The file is UTF-8 and one label carries an n-tilde. Escaping it into a
+    # backslash-u sequence parses the same and reads worse, and the committed
+    # file has always had the character itself, so the default here was one
+    # more way a rerun rewrote a file nobody had changed.
+    OUT_METADATA.write_text(json.dumps(metadata, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
     sz = lambda p: f"{p.stat().st_size / 1024:.1f} KB"
     print(f"Wrote {OUT_LANDFALLS.name} ({sz(OUT_LANDFALLS)})", file=sys.stderr)

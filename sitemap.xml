@@ -1825,12 +1825,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/hermine-2010/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/two-2010/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
@@ -2696,12 +2690,6 @@
   </url>
   <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al161968/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/beulah-1967/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
@@ -4417,12 +4405,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al081886/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al101886/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
@@ -4514,12 +4496,6 @@
   </url>
   <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al021881/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al021880/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
@@ -4910,12 +4886,6 @@
   </url>
   <url>
     <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al021857/</loc>
-    <lastmod>2026-02-27</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sysadmindoc.github.io/HurricaneMap/storms/al041857/</loc>
     <lastmod>2026-02-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>

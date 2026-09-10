@@ -508,7 +508,7 @@
                     "role": "strong",
                     "text": "Informes de eventos de tormenta"
                   },
-                  "Actual · 157 registros NOAA NCEI Storm Events Último éxito: 8/8/2026, 16:30:00 Próximo intento: No programado Origen: Datos sin conexión incluidos",
+                  "Actual · 155 registros NOAA NCEI Storm Events Último éxito: 8/8/2026, 16:30:00 Próximo intento: No programado Origen: Datos sin conexión incluidos",
                   {
                     "role": "button",
                     "name": "Reintentar"
@@ -751,7 +751,7 @@
             "role": "strong",
             "text": "Cobertura del archivo"
           },
-          "15 conjuntos · 1851–2025 · 595 tormentas",
+          "15 conjuntos · 1851–2025 · 590 tormentas",
           {
             "role": "list",
             "name": "Cobertura del archivo",

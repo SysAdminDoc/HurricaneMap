@@ -78,11 +78,6 @@
       "svg_sha256": "ff8d54159da326815883fdcba05c65a6b1c05d6e55af1f42078fc92771e54797",
       "png_sha256": "00b0b45b4e995d0c689e5e341d76800ec4bb69a06f9427400ac440f4db7e5e37"
     },
-    "al041857.png": {
-      "storm_id": "AL041857",
-      "svg_sha256": "e9e087a52319ff867dafba68dbfa088f83579a834c35451cdf3fc297ef9fd9c2",
-      "png_sha256": "142be1955a13690b27307757575349fa3031395e62c752bb2b98636c56ab884f"
-    },
     "al031858.png": {
       "storm_id": "AL031858",
       "svg_sha256": "bc90ec3f0bce4c00039e1cdbe19204ba4829bf5ccf94fecbcde1185351b2ded8",
@@ -383,11 +378,6 @@
       "svg_sha256": "393c3090eec3099014b3711d07be0e9021368a1108166ae321cade89994e1a2d",
       "png_sha256": "af5c02c741ef550fbf5c156e2125a29a804bb6ee3d06d25cc7591a460aef1e57"
     },
-    "al021880.png": {
-      "storm_id": "AL021880",
-      "svg_sha256": "ebbe5eca75c008c5fa2fa0012538da469d61d6f7bca2b45646dffb893c7010fb",
-      "png_sha256": "1cb271ded803b6d304e9cb2b98c3821473270e90ac944b961979ab6080a888da"
-    },
     "al041880.png": {
       "storm_id": "AL041880",
       "svg_sha256": "3df33b25e0d73c42ee1c7c974df71a81119c25b336277a4c5faeb9571f50a19f",
@@ -507,11 +497,6 @@
       "storm_id": "AL051886",
       "svg_sha256": "f857a683eb1ed3ffbefc862a53c9bd6a1614c24d4584c67e262c57296e6ca3ca",
       "png_sha256": "a09d664e8170e18319c96e136aa5f67041b37ad1f98eb1e858e5b1258667b4c0"
-    },
-    "al081886.png": {
-      "storm_id": "AL081886",
-      "svg_sha256": "7496d0bc99e57dc3ce35716905e6ebb569b403f257ece580e5e3d9b149ca7d4d",
-      "png_sha256": "c1f2c557fa946f3b68b0fee86bef47bc9e1be51dad6285567b5186a2f2b0a3a5"
     },
     "al101886.png": {
       "storm_id": "AL101886",
@@ -1908,11 +1893,6 @@
       "svg_sha256": "54967e00889ece1148e666c14b1aedcf9fd9527b01384a3bb0c8be531e6033c0",
       "png_sha256": "7ef999cfcda041e9cd5d8b5cba6fe0c0afe7c52e00da94ce39efb114fcb34be5"
     },
-    "beulah-1967.png": {
-      "storm_id": "AL131967",
-      "svg_sha256": "03bd903bf9b99d3e644ccca617a92df2a1a852e94a479b4f483661ec8d5f8b70",
-      "png_sha256": "72b4694427ea9317d015b7b1ffb96903d49cbb43b642ac2efe9ea1035708f183"
-    },
     "doria-1967.png": {
       "storm_id": "AL141967",
       "svg_sha256": "385f3cfeae2e23ff834e72ebdf77f2a36a4f499b988761df6733ab3f2722efef",
@@ -2643,11 +2623,6 @@
       "svg_sha256": "1f1343a5c04e6660b45f67db1550ea320e4dbda159c4309ed377cbf388ea3091",
       "png_sha256": "57c2835d4c9dc3bae90ce80c2e86eb0878d9daddffe66b16cce39b30667dd700"
     },
-    "hermine-2010.png": {
-      "storm_id": "AL102010",
-      "svg_sha256": "4b1c7a7b8129efe160a7d091b8dc2c197e8262d260d1cc5371b46184125e568e",
-      "png_sha256": "461e22c9976c98ae05389fb1d900f739bfaf048445f02d3f9655461067bd12cf"
-    },
     "don-2011.png": {
       "storm_id": "AL042011",
       "svg_sha256": "b3bca56182c494f3bb636bddddb11f7e8cd35bcde43f427fcf5b6033fcbdd16a",
@@ -2970,8 +2945,8 @@
     },
     "iselle-2014.png": {
       "storm_id": "EP092014",
-      "svg_sha256": "c672967a4150f55b3cfa30d924fecc72ffb4f7b0dabe58bf04e9a612886810bd",
-      "png_sha256": "a475c8cafb0f0544599cd53e49c1388dcbd67a0a0c4361a50da3ce7d9e90dab1"
+      "svg_sha256": "577e6d3109c6eaaa76b3577eeebe0aa173c5a38307895ace4130ef28ad48e99d",
+      "png_sha256": "695fee788a03cb9573e0f4afa6e9aa29c445ddeb5654688931bf0f9f96eec622"
     },
     "darby-2016.png": {
       "storm_id": "EP052016",

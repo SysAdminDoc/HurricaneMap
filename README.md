@@ -67,8 +67,8 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 
 ## Highlights
 
-- **595 storms · 759 landfall events · 374 hurricane-strength landfalls** spanning 1851-2025.
-- **Layer depth is not the same as best-track depth.** The best track reaches back to 1851. The archived radar loop covers 1995-2025 (139 storms), advisory replay 2008-2024 (52 storms), and surveyed high-water marks 2003-2024 (25 storms). The About dialog states both tiers from `data/coverage.json`, and `npm run test:coverage-claims` fails if this paragraph and that file disagree.
+- **590 storms · 753 landfall events · 370 hurricane-strength landfalls** spanning 1851-2025.
+- **Layer depth is not the same as best-track depth.** The best track reaches back to 1851. The archived radar loop covers 1995-2025 (139 storms), advisory replay 2008-2024 (51 storms), and surveyed high-water marks 2003-2024 (25 storms). The About dialog states both tiers from `data/coverage.json`, and `npm run test:coverage-claims` fails if this paragraph and that file disagree.
 - HURDAT2 was last revised 2026-02-27. NHC reissues it once a year in the spring, so the next revision is expected in 2027.
 - Both **Atlantic** and **Eastern North Pacific** HURDAT2 basins ingested (so storms like Iniki '92 on Kauai are included).
 - **Inferred-landfall detection** for storms whose 6-hourly track grazes U.S. land between synoptic times, which fixes Iniki and similar Pacific landfalls that don't carry an explicit `L` marker in HURDAT2.
@@ -87,7 +87,7 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 - **🌊 SLOSH MOM storm surge zones**: overlay NHC's Cat 1-5 maximum-of-maximums inundation maps along the U.S. Gulf and East Coast, plus the dedicated Hawaii (Cat 1-4) and Puerto Rico/USVI regional grids. Powered by NOAA's pre-rendered ArcGIS tiles. Picking a category snaps the worst-case envelope into view.
 - **🌬️ Wind-field swaths**: for storms 2004+, a checkbox in the storm panel renders the actual HURDAT2 wind-radii analysis (34/50/64 kt asymmetric quadrants per track point) as overlapping polygons along the path.
 - **🛰️ ✈️ 🍝 🌪️ Quicklinks**: every storm panel links out to GOES satellite imagery (CIRA SLIDER, 2018+), the NOAA Storm Events search, with the storm's dates and states in the link tooltip because NCEI's app takes no filters from a URL, NHC's own Hurricane Hunters recon archive, one directory per year from 1989, Wikipedia, YouTube footage search, NOAA Tropical Cyclone Reports, and the NHC storm wallet.
-- **⚠️ Impacts data**: raw Wikipedia infobox deaths/damage text plus normalized numeric fields, source title/URL, parse time, units, qualifiers, and confidence reasoning (244 storms covered so far; missing means unavailable, not zero; rerun `scripts/scrape_impacts.py` to fill in more).
+- **⚠️ Impacts data**: raw Wikipedia infobox deaths/damage text plus normalized numeric fields, source title/URL, parse time, units, qualifiers, and confidence reasoning (242 storms covered so far; missing means unavailable, not zero; rerun `scripts/scrape_impacts.py` to fill in more).
 - **📏 Observed high-water marks**: 25 modern storms (Katrina, Harvey, Sandy, Ian, Helene…) carry a toggleable layer of surveyed USGS peak-water elevations (10,700+ marks, elevation-colored, coastal vs riverine), the ground truth to compare against the modeled SLOSH surge zones. Preprocessed from the USGS Short-Term Network (`scripts/build_hwm.py`), works offline.
 - **🌊 Tide-gauge water levels ("what the water did")**: for 1990+ storms, load NOAA CO-OPS observed hourly water levels vs the predicted astronomical tide at the 2-3 gauges nearest the strongest landfall, with the peak surge residual called out (Katrina: Grand Isle +3.8 ft, S.W. Pass +4.9 ft at the Aug 29 landfall hour). Fetched live on demand, never automatically.
 - **💰 Billion-dollar disasters**: 65 landfalling storms joined to NOAA NCEI's U.S. Billion-Dollar Weather and Climate Disasters record (1980-2024, CPI-adjusted to 2024 USD, official death tolls). The NCEI product was retired in May 2025, so the dataset is frozen and ships with the repo (`scripts/build_billions.py`).
@@ -120,7 +120,7 @@ Every release carries two offline builds. Neither needs Node, npm or a clone, an
 
 | Profile | Download | Unpacked | Contains |
 | --- | --- | --- | --- |
-| `core` | [`hurricanemap-1.9.3-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-core.tar.gz) (5.7 MB) | 23.5 MB | The whole historical atlas: 595 storms, 759 landfalls, every panel and export |
+| `core` | [`hurricanemap-1.9.3-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-core.tar.gz) (5.7 MB) | 23.5 MB | The whole historical atlas: 590 storms, 753 landfalls, every panel and export |
 | `full` | [`hurricanemap-1.9.3-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/hurricanemap-1.9.3-full.tar.gz) (491 MB) | 526 MB | Everything in `core` plus the 1,703 archived NEXRAD radar frames |
 
 Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.9.3/SHA256SUMS.txt), which is what to check a download against.
@@ -254,7 +254,7 @@ The starter notebook uses Python 3.12 or newer with a pinned pandas, NumPy, Matp
 python -m pip install -r requirements-notebooks.txt
 ```
 
-Then run `python -m notebook notebooks/analysis-starter.ipynb`. The setup cell emits the same APA and BibTeX release citation as the browser and exports. The release gate can execute the same notebook twice without network access, using disposable output directories, and verify the 595-storm, 759-landfall, 374-hurricane-strength, and release-provenance contract:
+Then run `python -m notebook notebooks/analysis-starter.ipynb`. The setup cell emits the same APA and BibTeX release citation as the browser and exports. The release gate can execute the same notebook twice without network access, using disposable output directories, and verify the 590-storm, 753-landfall, 370-hurricane-strength, and release-provenance contract:
 
 ```bash
 npm run test:notebook

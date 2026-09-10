@@ -1077,7 +1077,7 @@ async function assertHoverTreatmentFollowsTheTheme(browser, baseUrl) {
 }
 
 // The subtitle is a flex container, and text-overflow does nothing on one, so
-// at 1024px and again at 1378px the header read "...Atlas · 595 st", cut
+// at 1024px and again at 1378px the header read "...Atlas · 590 st", cut
 // through a word. Either the text fits or it ends in an ellipsis; a clipped
 // word with neither is the defect.
 // Displays whose clientWidth and scrollWidth describe a real content area.
@@ -1147,7 +1147,7 @@ async function assertHeaderTextIsNotCut(browser, baseUrl, locale = 'en') {
               // overflowing is not the defect on its own: an element that shows
               // an ellipsis overflows by definition. The defect is overflowing
               // with no ellipsis to show for it, which is how the header read
-              // "...Atlas · 595 st".
+              // "...Atlas · 590 st".
               //
               // There are two ways to declare an ellipsis that never renders,
               // and both have to be refused or the excuse covers more than the
@@ -2541,7 +2541,7 @@ async function assertFocusReturns(page, id, label) {
 
 /**
  * The empty state. A filter combination that matches nothing used to render a
- * blank map under "0 of 759" with no message and no way back, which reads as a
+ * blank map under "0 of 753" with no message and no way back, which reads as a
  * broken app rather than an empty answer.
  *
  * The combination is derived from the data rather than assumed: the state
@@ -5971,7 +5971,7 @@ async function assertLocalizedWorkflowChrome(browser, baseUrl) {
           savedEmpty: t('savedViews.empty'),
           tableLabel: t('table.filteredLabel'),
           tableYear: t('table.column.year'),
-          tableCount: t('table.countMany', (759).toLocaleString(getLocale())),
+          tableCount: t('table.countMany', (753).toLocaleString(getLocale())),
           trackTitle: t('table.trackTimelineTitle'),
           trackHighlights: t('table.trackHighlights'),
           spatialTitle: t('spatial.title'),
@@ -6648,8 +6648,8 @@ try {
   }, null, { timeout: 5000 });
   const provenanceText = await page.textContent('#data-provenance-body');
   const aboutText = await page.textContent('#info-modal');
-  assert(/595\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
-  assert(/759\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
+  assert(/590\s+storms/.test(provenanceText), 'About provenance did not render the storm count.');
+  assert(/753\s+landfalls/.test(provenanceText), 'About provenance did not render the landfall count.');
   // This used to pin "16 of 16" and "100.0% precision", which were the numbers
   // from a check that only covered 1983-1990. The gate now scores every year
   // the AOML table gives a position for, so the dialog is held to the artifact
@@ -7920,9 +7920,9 @@ try {
     };
   });
   assert(poster.width === 1800 && poster.height === 1200, `poster export resolution changed: ${JSON.stringify(poster)}`);
-  assert(poster.stormCount === 591 && poster.segmentCount > 10000, `poster did not honor the 591 drawable tracks in the unfiltered storm set: ${JSON.stringify(poster)}`);
+  assert(poster.stormCount === 586 && poster.segmentCount > 10000, `poster did not honor the 586 drawable tracks in the unfiltered storm set: ${JSON.stringify(poster)}`);
   assert(poster.colorCount > 30, `poster canvas lacks rendered visual variation: ${JSON.stringify(poster)}`);
-  assert(/NOAA\/NHC HURDAT2/.test(poster.attribution) && /591 storms/.test(poster.label), `poster metadata is incomplete: ${JSON.stringify(poster)}`);
+  assert(/NOAA\/NHC HURDAT2/.test(poster.attribution) && /586 storms/.test(poster.label), `poster metadata is incomplete: ${JSON.stringify(poster)}`);
   if (process.env.HM_POSTER_SCREENSHOT) {
     await page.locator('#poster-view').screenshot({ path: process.env.HM_POSTER_SCREENSHOT });
   }
@@ -8012,7 +8012,7 @@ try {
   await page.waitForSelector('#climate-trends-chart svg', { timeout: 15000 });
   await page.waitForFunction(() => {
     const host = document.querySelector('#impact-coverage-summary');
-    return /244 of 595/.test(host?.textContent || '') &&
+    return /242 of 590/.test(host?.textContent || '') &&
       host?.querySelectorAll('.impact-coverage-table tbody tr').length > 100;
   }, null, { timeout: 15000 });
   const stats = await page.evaluate(() => {
