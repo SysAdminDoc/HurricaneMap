@@ -216,7 +216,7 @@ try {
     const marker = await (await caches.open(dataCacheName)).match('./__hurricanemap-release.json');
     if (!marker) throw new Error('offline release marker was not installed');
     const tuple = await marker.json();
-    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.10.0') {
+    if (tuple.data_cache !== dataCacheName || tuple.shell_cache !== 'hm-shell-hm-v1.11.0') {
       throw new Error(`offline release tuple is incoherent: ${JSON.stringify(tuple)}`);
     }
     return tuple;

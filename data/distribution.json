@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "profile": "full",
-  "source_commit": "4440954e1c55f0556c13f7c9ec20ecee0c2218f4",
+  "source_commit": "0cad68bff7a2d47b6bdf50674e2e382bb9f4f2a3",
   "capabilities": {
     "historical_offline": true,
     "bundled_radar": true,

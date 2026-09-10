@@ -2,7 +2,7 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.11.0: The atlas reads a coastline (2026-09-10)
 
 ### Changed
 - Three more landfalls the atlas counted were in Mexico, and 753 events become 750. These are the ones the last pass could not reach: an 1874 storm, a 1925 storm and Alice in 1954 all came ashore on the Tamaulipas coast and crossed into Texas over the Rio Grande hours later, so nothing about the fix before the entry gave them away. The build reads a coastline now, `data/land-mask.json`, and asks where the storm came ashore rather than where it was one fix earlier. Those three crossings are 76, 103 and 115 km from the United States; the furthest genuine one is Danielle 1980 at 18 km, whose coast is a barrier island the Census polygons leave out. Sweeping the limit over both basins, the atlas is identical anywhere between 20 and 75 km, the 1925 storm returns at 80, and at 10 three real landfalls disappear. AOML's own scoring is unchanged at 94.1 percent precision and 337 of 352 recalled, which is the check that nothing real was lost.
