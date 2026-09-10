@@ -150,7 +150,15 @@ def clip_to_window(ring, window):
 
 
 def _simplify_chain(chain, tolerance):
-    """Douglas-Peucker on an open chain."""
+    """Douglas-Peucker on an open chain.
+
+    Distance is measured to the SEGMENT joining the two endpoints, not to the
+    infinite line through them. The textbook form uses the line, and on a chain
+    that doubles back past an endpoint the two disagree: a vertex can sit a long
+    way beyond the chord and still measure close to the line it lies near. That
+    left one vertex of the coastline 2.27 km from the ring that replaced it,
+    against a tolerance of 0.01 degrees, on the Cabo Rojo spit in Veracruz.
+    """
     if len(chain) < 5:
         return chain
     keep = {0, len(chain) - 1}
@@ -161,12 +169,17 @@ def _simplify_chain(chain, tolerance):
         x2, y2 = chain[last]
         dx = x2 - x1
         dy = y2 - y1
-        length = math.hypot(dx, dy) or 1e-12
+        length_squared = dx * dx + dy * dy
         worst = 0.0
         index = -1
         for i in range(first + 1, last):
             x, y = chain[i]
-            distance = abs(dy * x - dx * y + x2 * y1 - y2 * x1) / length
+            if length_squared <= 0.0:
+                distance = math.hypot(x - x1, y - y1)
+            else:
+                along = ((x - x1) * dx + (y - y1) * dy) / length_squared
+                along = min(1.0, max(0.0, along))
+                distance = math.hypot(x - (x1 + dx * along), y - (y1 + dy * along))
             if distance > worst:
                 worst = distance
                 index = i
@@ -234,15 +247,45 @@ def main() -> int:
     # vertex, so anything else means the simplifier lost or invented one. This
     # is the check the probe table below could not make: the vertex that went
     # missing was in the Caribbean, where no probe looks.
-    pool = iter(clipped)
+    kept_at = []
+    pool = enumerate(clipped)
     for vertex in simplified:
-        for candidate in pool:
+        for position, candidate in pool:
             if candidate == vertex:
+                kept_at.append(position)
                 break
         else:
             raise SystemExit(f"simplification produced {vertex}, which is not a vertex of the clipped ring")
     if simplified[0] != clipped[0] or simplified[-1] != clipped[-1]:
         raise SystemExit("simplification dropped an end of the ring, so the closing edge is unsimplified")
+
+    # The subsequence check says no vertex was invented; this says none was
+    # dropped further than the tolerance allows, which is the guarantee the
+    # tolerance is a statement about. Every dropped vertex is measured against
+    # the segment that now stands in for it, so this is O(n) rather than a
+    # Hausdorff sweep. Measuring to the infinite line instead of the segment is
+    # what let a vertex sit 2.27 km out while every probe passed.
+    worst, worst_at = 0.0, None
+    for start, end in zip(kept_at, kept_at[1:]):
+        x1, y1 = clipped[start]
+        x2, y2 = clipped[end]
+        dx, dy = x2 - x1, y2 - y1
+        length_squared = dx * dx + dy * dy
+        for position in range(start + 1, end):
+            x, y = clipped[position]
+            if length_squared <= 0.0:
+                distance = math.hypot(x - x1, y - y1)
+            else:
+                along = min(1.0, max(0.0, ((x - x1) * dx + (y - y1) * dy) / length_squared))
+                distance = math.hypot(x - (x1 + dx * along), y - (y1 + dy * along))
+            if distance > worst:
+                worst, worst_at = distance, clipped[position]
+    if worst > TOLERANCE_DEGREES:
+        raise SystemExit(
+            f"the simplified ring is {worst:.6f} degrees from the clipped one at {worst_at}, "
+            f"over the declared tolerance of {TOLERANCE_DEGREES}"
+        )
+    print(f"furthest dropped vertex: {worst:.6f} degrees, within {TOLERANCE_DEGREES}", file=sys.stderr)
 
     wrong = [
         label for label, lon, lat, expected in PROBES

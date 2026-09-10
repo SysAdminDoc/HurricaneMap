@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "profile": "full",
-  "source_commit": "05afa32029362f31d7616a395cd9ecbc8df270e5",
+  "source_commit": "5af887fe2d061eeaa97b02bc55b8e9d88e6c29b4",
   "capabilities": {
     "historical_offline": true,
     "bundled_radar": true,
@@ -10,7 +10,7 @@
   },
   "payload": {
     "file_count": 3616,
-    "bytes": 551646897,
+    "bytes": 551646326,
     "mandatory_bytes": 4876196,
     "mandatory_file_count": 171,
     "source_bundle_bytes": 12471611,
