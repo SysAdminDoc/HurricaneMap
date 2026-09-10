@@ -2,7 +2,7 @@
 
 All notable changes to HurricaneMap.
 
-## Unreleased
+## v1.11.1: Three corrections to the coastline release (2026-09-10)
 
 ### Fixed
 - The coastline in `data/land-mask.json` was 2.27 km out at one point, against a tolerance that promises 0.01 degrees. The simplifier measured each vertex against the infinite line through the ends of the run it was thinning, which is the textbook form and is wrong wherever a coast doubles back past one of those ends: a vertex can sit far beyond the chord and still measure close to the line the chord lies on. It measures to the segment now. The build also refuses a ring that is further from the coast it came from than the tolerance it declares, which is the guarantee the tolerance is a statement about, and the probe table could never have made because the damage was on a spit in Veracruz where no probe looks. No landfall in the atlas moves: 750 events, byte for byte the same file.

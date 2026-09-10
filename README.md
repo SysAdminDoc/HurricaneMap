@@ -1,7 +1,7 @@
 # HurricaneMap
 
 [![Live demo](https://img.shields.io/badge/live%20demo-sysadmindoc.github.io%2FHurricaneMap-cba6f7.svg)](https://sysadmindoc.github.io/HurricaneMap/)
-[![Version](https://img.shields.io/badge/version-1.11.0-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
+[![Version](https://img.shields.io/badge/version-1.11.1-blue.svg)](https://github.com/SysAdminDoc/HurricaneMap/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)](#)
 [![Data](https://img.shields.io/badge/data-NOAA%20HURDAT2-orange.svg)](https://www.nhc.noaa.gov/data/)
@@ -105,10 +105,15 @@ That runs every release gate through `scripts/run-gates.mjs` and reports every o
 - **👥 Population density**: toggle the SEDAC GPWv4 1km gridded-population overlay to see how many people live in each storm's path / surge zone.
 - Search by name OR year. Filter by year range, Saffir-Simpson category, or state.
 
-## What's new in v1.11.0 - The atlas reads a coastline (2026-09-10)
+## What's new in v1.11.1 - Three corrections to the coastline release (2026-09-10)
 
-- **Three more landfalls the atlas counted were in Mexico.** These are the ones the last release could not reach. An 1874 storm, a 1925 storm and Alice in 1954 all came ashore on the Tamaulipas coast and crossed into Texas over the Rio Grande hours later, so nothing about the fix before the entry gave them away. The build reads a coastline now, `data/land-mask.json`, and asks where the storm came ashore rather than where it was one fix earlier. Those three crossings are 76, 103 and 115 km from the United States, and the furthest genuine one is Danielle 1980 at 18 km. 753 landfall events become 750, and AOML's scoring of this atlas holds at 94.1 percent precision with 337 of 352 recalled, which is the check that nothing real was lost.
-- **Danielle 1980 came ashore near Galveston, not 154 km inland.** Its landfall moves to 29.4N 94.72W at 23:17Z on 5 September, where its track first meets the coast. The record had it nearly seven hours later and well inland, because the Census state polygons first place the storm in Texas long after Natural Earth has it ashore. Only landfalls that are wrong by a whole fix move. The rest were already within one fix of the crossing.
+- **Nine landfalls were stamped with the wrong time**, by up to 5 hours 24 minutes. Where a storm's centre is never inside a state at a six-hourly fix but the track between two of them clips the coast, the atlas interpolates the position, the wind and the pressure to the point of closest approach, and it was carrying the later fix's clock across unchanged. Iniki shows it plainly: the atlas had it reaching Kauai at 06:00Z on 12 September 1992, and it crossed the island at 01:48, which is the half past three in the afternoon Hawaii remembers. Dot 1959, Belle 1976, David 1979, Gert 1981, Betsy 1956, both 1982 landfalls and an 1893 storm move with it.
+- **The coastline was 2.27 km out at one point**, against a file that promises 0.01 degrees. The simplifier measured each vertex against the infinite line through the ends of the run it was thinning, which is the textbook form and is wrong wherever a coast doubles back past one of those ends. It measures to the segment now, and the build refuses a ring further from the coast it came from than the tolerance it declares. No landfall moves.
+- **Danielle 1980's landfall moved 154 km, not the 155 the last release claimed**, and nearly seven hours rather than six. Both figures are checkable against the two positions the same sentence names.
+
+### And the release this corrects
+
+- **Three more landfalls the atlas counted were in Mexico.** An 1874 storm, a 1925 storm and Alice in 1954 all came ashore on the Tamaulipas coast and crossed into Texas over the Rio Grande hours later. The build reads a coastline now, `data/land-mask.json`, and asks where the storm came ashore rather than where it was one fix earlier. Those three crossings are 76, 103 and 115 km from the United States, and the furthest genuine one is Danielle 1980 at 18 km. 753 landfall events become 750, and AOML's scoring of this atlas holds at 94.1 percent precision with 337 of 352 recalled.
 - **Texas and Louisiana are level on 104 landfall events**, where Texas led on 107.
 
 Earlier release history is maintained in the [CHANGELOG](CHANGELOG.md).
@@ -119,15 +124,15 @@ Every release carries two offline builds. Neither needs Node, npm or a clone, an
 
 | Profile | Download | Unpacked | Contains |
 | --- | --- | --- | --- |
-| `core` | [`hurricanemap-1.11.0-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-core.tar.gz) (6.2 MB) | 25.4 MB | The whole historical atlas: 587 storms, 750 landfalls, every panel and export |
-| `full` | [`hurricanemap-1.11.0-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-full.tar.gz) (489.9 MB) | 526.1 MB | Everything in `core` plus the 1,697 archived NEXRAD radar frames |
+| `core` | [`hurricanemap-1.11.1-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.1/hurricanemap-1.11.1-core.tar.gz) (6.2 MB) | 25.4 MB | The whole historical atlas: 587 storms, 750 landfalls, every panel and export |
+| `full` | [`hurricanemap-1.11.1-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.1/hurricanemap-1.11.1-full.tar.gz) (489.9 MB) | 526.1 MB | Everything in `core` plus the 1,697 archived NEXRAD radar frames |
 
-Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/SHA256SUMS.txt), which is what to check a download against.
+Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.1/SHA256SUMS.txt), which is what to check a download against.
 
 ```bash
-tar -xzf hurricanemap-1.11.0-core.tar.gz
+tar -xzf hurricanemap-1.11.1-core.tar.gz
 sha256sum -c SHA256SUMS.txt      # optional, and worth the two seconds
-cd hurricanemap-1.11.0-core
+cd hurricanemap-1.11.1-core
 python serve.py --port 8765
 # open http://127.0.0.1:8765/
 ```
