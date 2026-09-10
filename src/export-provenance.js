@@ -8,8 +8,8 @@ const APP_VERSION = '1.11.0';
 
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
-  source_commit: 'a220232d94d2fadb23c411e3279aca59d52342e6',
-  manifest_sha256: '9b78c9ea82548b3f6a8407f327a761e976df721efa6907bb0df0f598cb6a9b3f',
+  source_commit: '05afa32029362f31d7616a395cd9ecbc8df270e5',
+  manifest_sha256: '901fb15d652a9530ec67d51a44682dfd7c10438a903b44a94c04c31eb2863a15',
   algorithm: 'SHA-256',
 });
 
@@ -25,7 +25,7 @@ const ARTIFACTS = Object.freeze({
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
     bytes: 18048,
-    sha256: '7d7d8a3017590f89c644b3b541a92aa8085d57952042c058d61a2c285a320c3d',
+    sha256: '44aa8c7a501b19fd1726067a444116b563e361893fa0c1909200e9cd66c7b69b',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -73,7 +73,7 @@ const ARTIFACTS = Object.freeze({
   'data/metadata.json': Object.freeze({
     path: 'data/metadata.json',
     bytes: 8055,
-    sha256: 'b9d60673f8adf5bdb1eb9d5b9eec36315f1e2c18ebc6f01a4e979bf30ad44bbf',
+    sha256: '8512ebfd2d3de356e3292d3c50ace8b5dcf829543b11df9bea5ba81baab06368',
     source_url: 'https://www.nhc.noaa.gov/data/hurdat/',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -99,7 +99,7 @@ const ARTIFACTS = Object.freeze({
 const COVERAGE = Object.freeze({
   schema_version: 1,
   generated_at_utc: '2026-08-08T00:00:00Z',
-  source_commit: 'a220232d94d2fadb23c411e3279aca59d52342e6',
+  source_commit: '05afa32029362f31d7616a395cd9ecbc8df270e5',
   catalog: Object.freeze({
     basins: ['AL', 'EP'],
     year_range: [1851, 2025],
