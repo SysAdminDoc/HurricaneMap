@@ -139,7 +139,11 @@
 
 :root {
   --text-secondary: var(--subtext);
-  --text-dim: var(--overlay);
+  /* Not --overlay: at 9-10px that is 3.47:1 in dark and 3.54:1 in light,
+     which fails 1.4.3 AA on every one of the six surfaces that use it. A tier
+     dimmer than --subtext cannot reach 4.5:1 in the light theme, where
+     --subtext is already 4.94:1 on the palest panel, so this is an alias. */
+  --text-dim: var(--subtext);
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;

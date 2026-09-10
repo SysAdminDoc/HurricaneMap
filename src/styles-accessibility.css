@@ -448,7 +448,6 @@ html.light-theme.high-contrast {
 /* High-contrast dark used --overlay (#404040) as dim TEXT (~1.9:1 on black) —
    unchecked category buttons, section headings, search section labels. */
 html.high-contrast:not(.light-theme) {
-  --text-dim: #a6a6a6;
   --foreground-subtle: #a6a6a6;
 }
 

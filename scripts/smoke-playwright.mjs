@@ -621,6 +621,16 @@ async function assertStormPanelContrast(browser, baseUrl) {
     ['meta pill', '#storm-panel .meta-row > span:not(.cat-pill)'],
     ['landfall row', '#storm-panel .landfall-list li'],
     ['section heading', '#storm-panel .panel-section-h3'],
+    // The timeline footer, which is on screen in every one of these themes and
+    // was measured by none of them. Both read --text-dim, which resolved to
+    // --overlay and sat at 3.47:1 in dark, 3.54:1 in light and 5.01:1 in light
+    // high contrast until 2026-09-09.
+    ['timeline source', '.timeline-source'],
+    ['timeline legend', '.timeline-legend'],
+    // Required to be legible by the tile licence, and painted on a 94%-opaque
+    // panel over live tiles, so it is the one surface here whose background
+    // genuinely moves.
+    ['map attribution', '.leaflet-control-attribution'],
   ];
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   await seedSettings(context, { onboarded: true, theme: 'light', highContrast: false, reducedMotion: true, locale: 'en' });

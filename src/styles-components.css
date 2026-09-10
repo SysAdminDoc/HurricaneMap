@@ -2168,9 +2168,15 @@ label > input[type="checkbox"] {
 
 .leaflet-tooltip:before, .leaflet-tooltip-top:before { display: none; }
 
+/* Opaque, and in the theme's full-strength ink. A translucent panel here is
+   not a style choice: this is the credit line the tile licence requires to be
+   legible, and at 94% opacity 6% of whatever tile is underneath bleeds through,
+   so the effective background moves as the reader pans. Measured from the
+   painted pixels it was 4.13:1 in the light theme, under the 4.5:1 floor, and
+   a darker tile takes it lower. */
 .leaflet-control-attribution {
-  background: var(--crust);
-  color: var(--subtext);
+  background: var(--mantle);
+  color: var(--foreground);
   border-radius: 6px 0 0 0;
   font-size: 10px;
 }
@@ -6017,10 +6023,6 @@ select:disabled,
   border-color: var(--border-subtle);
 }
 
-.leaflet-control-attribution {
-  background: var(--surface-panel);
-  color: var(--foreground-muted);
-}
 
 /* Overlay cleanup v1.3.7 */
 .leaflet-top.leaflet-right {
