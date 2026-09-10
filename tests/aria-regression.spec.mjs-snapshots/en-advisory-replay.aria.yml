@@ -6,7 +6,7 @@
   - button "Previous advisory" [disabled]: ◀
   - slider "Advisory number": "0"
   - button "Next advisory": ▶
-  - paragraph: "/Advisory 1 of \\d+ · NHC advisory #1 · Issued Oct 5, \\d+, \\d+:\\d+ PM UTC/"
+  - paragraph: "/Advisory 1 of \\d+ · NHC advisory #1 · Forecast from Oct 5, \\d+, \\d+:\\d+ PM UTC/"
   - paragraph
   - list:
     - listitem: Preliminary forecast as issued

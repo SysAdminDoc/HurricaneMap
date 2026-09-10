@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict';
 import {
+  ADVISORY_PUBLISHED_CONE,
   CATEGORY_DEFAULTS,
+  LAUNCHER_PANELS,
   applyHashToFilters,
   createDefaultFilters,
   decodeAdvisoryReplayState,
   decodeHashState,
   encodeAdvisoryReplayState,
   encodeHashState,
-  LAUNCHER_PANELS,
   launcherActionFromHash,
   normalizeAdvisoryReplayState,
   normalizeLauncherPanel,
   panelIntentFromHash,
+  replayConeEra,
   restoreFiltersFromHash,
   viewOptionsFromDecoded,
 } from '../src/url-state.js';
@@ -253,6 +255,57 @@ function cats(filters) {
   assert.equal(decoded.v, '999');
   assert.equal(restored.state, 'Texas');
   assert.deepEqual(cats(restored), [...CATEGORY_DEFAULTS].sort());
+}
+
+// The token the panel computes has to be one the URL accepts, for every storm
+// in the archive. It was not: a published-cone record has `coneEra: null`, the
+// panel fell through to `archive.era.coneEra` which is the string 'per-record',
+// and the sub-state dropped the whole key. Nineteen storms and 776 advisories
+// could not be linked to, and every test here used '2025'.
+{
+  const { readFile } = await import('node:fs/promises');
+  const { fileURLToPath } = await import('node:url');
+  const nodePath = (await import('node:path')).default;
+  const repoRoot = nodePath.resolve(nodePath.dirname(fileURLToPath(import.meta.url)), '..');
+  const archive = JSON.parse(await readFile(nodePath.join(repoRoot, 'data/advisories.json'), 'utf8'));
+  const eras = new Set();
+  for (const [stormId, record] of Object.entries(archive.storms)) {
+    const coneEra = replayConeEra(record, archive);
+    eras.add(coneEra);
+    const encoded = encodeAdvisoryReplayState({ stormId, index: 3, coneEra }, { stormId });
+    assert.ok(encoded, `${stormId}: the cone era ${JSON.stringify(coneEra)} cannot be put in a URL`);
+    assert.deepEqual(
+      decodeAdvisoryReplayState(encoded, { stormId }),
+      { stormId, index: 3, coneEra },
+      `${stormId}: the replay sub-state does not round-trip`,
+    );
+    const hashFilters = createDefaultFilters({ yearMin: 1851, yearMax: 2025 });
+    const hash = encodeHashState(hashFilters, {
+      openStormId: stormId,
+      advisoryReplay: { stormId, index: 3, coneEra },
+      yearMinDefault: 1851,
+      yearMaxDefault: 2025,
+      knownStates: null,
+    });
+    assert.ok(hash.includes('replay='), `${stormId}: the hash carries no replay key: ${hash}`);
+    // decodeHashState returns the raw keys; viewOptionsFromDecoded is what
+    // resolves the replay, and it is what the app calls.
+    assert.deepEqual(
+      viewOptionsFromDecoded(decodeHashState(hash)).advisoryReplay,
+      { stormId, index: 3, coneEra },
+      `${stormId}: the replay does not survive a full hash round trip`,
+    );
+  }
+  // Both kinds have to be present, or this loop proves only one of them.
+  assert.ok(eras.has(ADVISORY_PUBLISHED_CONE), 'no storm in the archive uses a published cone, so that path is untested');
+  assert.ok([...eras].some(era => /^\d{4}$/.test(era)), 'no storm in the archive names a radii era, so that path is untested');
+
+  // The era token is a shape, so the next era works without an edit here. It
+  // was a frozen 2015 to 2025 list while cone-radii.json already had 2026.
+  assert.ok(decodeAdvisoryReplayState('1.AL092022.3.2026', { stormId: 'AL092022' }), '2026 must be a usable cone era');
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.3.2014', { stormId: 'AL092022' }), null, '2014 names no radii era');
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.3.per-record', { stormId: 'AL092022' }), null, 'the archive-wide label is not a cone era');
+  assert.equal(decodeAdvisoryReplayState('1.AL092022.3.', { stormId: 'AL092022' }), null, 'an empty cone era is refused');
 }
 
 console.log('url state ok');

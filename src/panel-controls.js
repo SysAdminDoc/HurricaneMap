@@ -16,6 +16,7 @@ import { formatWind } from './settings.js';
 import { MISSING_METRIC } from './metric-presenters.js';
 import { escapeHtml, safeExternalUrl } from './html-utils.js';
 import { getDateLocale, t } from './i18n.js';
+import { replayConeEra } from './url-state.js';
 import {
   clearRetrospectiveCone,
   isEllipseMethodOfficial,
@@ -159,7 +160,17 @@ function wireAdvisoryReplay(storm, initialReplay = null) {
     const result = await renderAdvisory(storm, { map: getMap(), record, coneEra, index });
     if (sequence !== advisoryReplaySequence) return;
     if (result.status !== 'rendered') {
-      status.textContent = result.status === 'error' ? t('advisoryReplay.error') : '';
+      // The previous advisory's line used to stay put while the map went blank
+      // and the scrubber moved on, so the panel described one advisory and
+      // pointed at another.
+      if (result.status === 'error') {
+        meta.textContent = '';
+        discussion.textContent = '';
+        discussion.removeAttribute('href');
+        status.textContent = t('advisoryReplay.advisoryError', String(index + 1));
+      } else {
+        status.textContent = '';
+      }
       return;
     }
     const { advisory, summary } = result;
@@ -179,10 +190,16 @@ function wireAdvisoryReplay(storm, initialReplay = null) {
     scrubber.setAttribute('aria-valuetext', [positionText, nhcNumberText].join(' · '));
     previous.disabled = replayPosition.index <= 0;
     next.disabled = replayPosition.index >= replayPosition.count - 1;
+    // `issued` is when NHC put the advisory out. `t` is the synoptic hour its
+    // forecast was initialised on, which is up to seven hours earlier, and
+    // showing that under the word "Issued" was wrong for all 776 records that
+    // carry both. The a-deck era has only `t`, and says so.
     meta.textContent = [
       positionText,
       nhcNumberText,
-      t('advisoryReplay.issued', formatTime(advisory.t)),
+      advisory.issued
+        ? t('advisoryReplay.issued', formatTime(advisory.issued))
+        : t('advisoryReplay.initialised', formatTime(advisory.t)),
     ].join(' · ');
     provenance.textContent = record.unmatchedForecasts > 0
       ? t('advisoryReplay.postTropical', String(record.unmatchedForecasts))
@@ -230,7 +247,6 @@ function wireAdvisoryReplay(storm, initialReplay = null) {
     }
     if (sequence !== advisoryReplaySequence) return;
     record = getStormAdvisories(archive, storm.id);
-    coneEra = record?.coneEra || archive?.era?.coneEra || '2025';
     if (!record?.advisories?.length) {
       steps.hidden = true;
       provenance.textContent = '';
@@ -240,9 +256,17 @@ function wireAdvisoryReplay(storm, initialReplay = null) {
       return;
     }
     steps.hidden = false;
+    // Said before the archive was loaded, so it could not know which era this
+    // storm belongs to and claimed ATCF for all of them.
+    const explainer = document.getElementById('advisory-replay-explainer');
+    if (explainer) {
+      explainer.textContent = t(record.publishedCone ? 'advisoryReplay.explainerPublished' : 'advisoryReplay.explainer');
+    }
     scrubber.max = String(record.advisories.length - 1);
-    const recordConeEra = record.coneEra || archive?.era?.coneEra || '2025';
-    coneEra = initialReplay?.coneEra === recordConeEra ? initialReplay.coneEra : recordConeEra;
+    // The record decides. A cone era arriving in the URL is only ever the same
+    // value or a stale one, and the ternary that used to sit here returned
+    // recordConeEra on both branches anyway.
+    coneEra = replayConeEra(record, archive);
     scrubber.value = String(initialReplay?.index ?? 0);
     await show(Number(scrubber.value));
   };

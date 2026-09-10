@@ -4608,6 +4608,117 @@ async function assertOverMapContrast(browser, baseUrl) {
   console.log(`over-map contrast ok (${measured} painted measurements: ${OVER_MAP_TARGETS.length} surfaces, four themes, over a white map and a black one)`);
 }
 
+// Both halves of the replay, in a browser, including the half that had no
+// browser coverage at all.
+//
+// What this exists for: the cone tooltip is the only place the app says whether
+// it is showing the outline NHC drew or one rebuilt from that era's radii, and
+// nothing asserted it. And the hash the app writes has to be a hash the app can
+// read back, which it was not for any of the nineteen pre-2015 storms: their
+// records name no cone era, the panel fell through to the archive-wide label,
+// and the whole replay key was dropped from the URL.
+async function assertAdvisoryReplayEras(browser, baseUrl) {
+  const cases = [
+    { stormId: 'AL182012', label: 'Sandy 2012', published: true },
+    { stormId: 'AL092017', label: 'Irma 2017', published: false },
+  ];
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, serviceWorkers: 'block' });
+  await seedSettings(context, { onboarded: true, theme: 'dark', reducedMotion: true, locale: 'en' });
+  await stubQuietTropics(context);
+  const page = await context.newPage();
+  const pageErrors = [];
+  collectPageErrors(page, pageErrors);
+  try {
+    for (const { stormId, label, published } of cases) {
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await openStormPanel(page, stormId);
+      await page.waitForSelector('#advisory-replay-enabled', { timeout: 20000 });
+      await page.locator('#advisory-replay-enabled').check();
+      await page.waitForFunction(() => document.querySelector('#advisory-replay-steps')?.hidden === false, null, { timeout: 20000 });
+      await page.waitForFunction(() => document.querySelectorAll('#map path.advisory-cone-shape').length > 0, null, { timeout: 20000 });
+
+      // Step away from the first advisory so the ordinal in the hash is not the
+      // default, and a lost sub-state cannot pass by coincidence.
+      await page.locator('#advisory-replay-next').click();
+      await page.locator('#advisory-replay-next').click();
+      await page.waitForFunction(() => document.querySelector('#advisory-replay-scrubber')?.value === '2', null, { timeout: 10000 });
+
+      const tooltip = await page.evaluate(async () => {
+        const cone = document.querySelector('#map path.advisory-cone-shape');
+        cone?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+        await new Promise(resolve => setTimeout(resolve, 150));
+        return document.querySelector('.leaflet-tooltip')?.textContent?.trim() || '';
+      });
+      const saysPublished = /as NHC published it/i.test(tooltip);
+      const saysRebuilt = /error radii/i.test(tooltip);
+      assert(
+        saysPublished !== saysRebuilt,
+        `${label}: the cone tooltip says neither or both of published and rebuilt: ${JSON.stringify(tooltip)}`,
+      );
+      assert(
+        saysPublished === published,
+        `${label}: the cone tooltip says ${saysPublished ? 'published' : 'rebuilt'}: ${JSON.stringify(tooltip)}`,
+      );
+      // The era label must never leak the archive-wide placeholder into prose.
+      assert(!/per-record/.test(tooltip), `${label}: the tooltip carries the archive label: ${JSON.stringify(tooltip)}`);
+
+      // The advisory line names when NHC issued it, and for a published-cone
+      // record that is the exact time from the archive rather than the synoptic
+      // hour its forecast was initialised on, which is up to seven hours
+      // earlier and is what it used to show under the word "Issued".
+      const meta = await page.textContent('#advisory-replay-meta');
+      const expectedTime = await page.evaluate(async ([storm, index]) => {
+        const archive = await (await fetch('data/advisories.json')).json();
+        const advisory = archive.storms[storm]?.advisories?.[index];
+        return { issued: advisory?.issued || null, initial: advisory?.t || null };
+      }, [stormId, 2]);
+      assert(
+        published ? Boolean(expectedTime.issued) : expectedTime.issued === null,
+        `${label}: the record ${published ? 'lacks' : 'carries'} an issue time it should ${published ? 'have' : 'not'}`,
+      );
+      // Built with the app's own formatter rather than matched with a pattern.
+      // A hand-written one guesses at the rendering: the panel writes
+      // "Oct 22, 2012, 09:00 PM UTC", and digit-matching "2100" against that
+      // fails on text that is exactly right.
+      const shownTime = await page.evaluate(async iso => {
+        const { formatTime } = await import('/src/data.js');
+        return formatTime(iso);
+      }, published ? expectedTime.issued : expectedTime.initial);
+      assert(
+        new RegExp(published ? 'Issued' : 'Forecast from').test(meta || ''),
+        `${label}: the advisory line uses the wrong label for its era: ${meta}`,
+      );
+      assert(
+        meta && meta.includes(shownTime),
+        `${label}: the advisory line does not show ${published ? 'the issue time' : 'the initial time'} ${shownTime}: ${meta}`,
+      );
+
+      // The hash the app wrote has to reopen what it describes.
+      const hash = await page.evaluate(() => location.hash);
+      assert(/replay=/.test(hash), `${label}: the app wrote no replay sub-state: ${hash}`);
+      await page.goto(`${baseUrl}/${hash}`, { waitUntil: 'domcontentloaded' });
+      await waitForAppReady(page);
+      await page.waitForFunction(
+        () => document.querySelector('#advisory-replay-enabled')?.checked === true,
+        null, { timeout: 20000 },
+      );
+      const restored = await page.evaluate(() => ({
+        index: document.querySelector('#advisory-replay-scrubber')?.value,
+        cones: document.querySelectorAll('#map path.advisory-cone-shape').length,
+      }));
+      assert(
+        restored.index === '2' && restored.cones > 0,
+        `${label}: a copied link did not reopen the same advisory: ${JSON.stringify(restored)} from ${hash}`,
+      );
+    }
+    assert(!pageErrors.length, `advisory replay eras: page errors: ${pageErrors.join(' | ')}`);
+  } finally {
+    await context.close();
+  }
+  console.log(`advisory replay eras ok (${cases.map(entry => entry.label).join(' and ')}: cone provenance named, and a copied link reopens the same advisory)`);
+}
+
 async function runPanelLayoutScenario(browser, baseUrl, scenario) {
   const context = await browser.newContext({
     viewport: { width: scenario.width, height: scenario.height },
@@ -7990,6 +8101,7 @@ try {
   await assertSourceLanguageDisclosures(browser, baseUrl);
   await assertForcedColorsContract(browser, baseUrl);
   await assertComparisonExportParity(browser, baseUrl);
+  await assertAdvisoryReplayEras(browser, baseUrl);
   await assertOverMapContrast(browser, baseUrl);
   await assertStormPanelContrast(browser, baseUrl);
   await assertAboutDialogContrast(browser, baseUrl);

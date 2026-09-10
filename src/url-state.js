@@ -19,10 +19,38 @@ const VALID_DAMAGE_MODES = new Set(['nominal', 'real']);
 const VALID_TRACK_COLORS = new Set(['category', 'wind', 'pressure', 'month']);
 const STORM_ID_PATTERN = /^(?:AL|EP)\d{6}$/;
 const ADVISORY_REPLAY_STATE_VERSION = '1';
-const ADVISORY_CONE_ERAS = new Set(Array.from({ length: 11 }, (_, index) => String(2015 + index)));
+// A record either names the radii era its cone was rebuilt from, or says the
+// cone came from NHC. `published` is that second case, and it has to be a value
+// the sub-state can carry: without it every pre-2015 replay link silently lost
+// its replay, because `null` fell through to a fallback that is not an era.
+export const ADVISORY_PUBLISHED_CONE = 'published';
+// A shape check, not a list. This was a frozen 2015 to 2025 range while
+// data/cone-radii.json already carried a 2026 era, so the first storm of the
+// next era would have lost its replay link exactly as the 2008 ones did. What
+// an era means is data/advisories.json's business; all this contract needs is
+// that the token survives a round trip and cannot carry anything else.
+// From 2015, which is where the radii eras start. 2014 and earlier name no era
+// at all: those records carry the cone NHC published and use the sentinel.
+const ADVISORY_CONE_ERA_PATTERN = /^20(?:1[5-9]|[2-9]\d)$/;
+const isAdvisoryConeEra = value => value === ADVISORY_PUBLISHED_CONE || ADVISORY_CONE_ERA_PATTERN.test(value);
 const MAX_ADVISORY_REPLAY_INDEX = 999;
 const MAX_HASH_LENGTH = 2048;
 const DATA_RELEASE_PATTERN = /^[a-f0-9]{64}$/;
+
+/**
+ * Which cone a record's replay is showing, in the one vocabulary this contract
+ * and the renderer both understand.
+ *
+ * It lives here rather than beside the panel because it decides a token this
+ * file accepts or rejects, and the two disagreed for nineteen storms without
+ * anything catching it: a published-cone record has `coneEra: null`, the panel
+ * fell through that to `archive.era.coneEra`, which is the string 'per-record',
+ * and every one of those replay links lost its replay.
+ */
+export function replayConeEra(record, archive) {
+  if (record?.publishedCone) return ADVISORY_PUBLISHED_CONE;
+  return record?.coneEra || archive?.era?.coneEra || '2025';
+}
 
 export function normalizeLauncherPanel(value) {
   const raw = String(value || '').trim().toLowerCase();
@@ -177,7 +205,7 @@ export function normalizeAdvisoryReplayState(state) {
   const index = Number(state.index);
   const coneEra = String(state.coneEra ?? state.cone_era ?? '');
   if (!stormId || !Number.isSafeInteger(index) || index < 0 || index > MAX_ADVISORY_REPLAY_INDEX) return null;
-  if (!ADVISORY_CONE_ERAS.has(coneEra)) return null;
+  if (!isAdvisoryConeEra(coneEra)) return null;
   return { stormId, index, coneEra };
 }
 

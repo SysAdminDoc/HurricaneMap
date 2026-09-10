@@ -139,11 +139,21 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
   const generation = ++renderGeneration;
   const clamped = Math.max(0, Math.min(index, record.advisories.length - 1));
   const advisory = record.advisories[clamped];
-  // A polygon of at least three points is a cone NHC published; anything less
-  // is not a cone, so the radii path still runs rather than drawing a sliver.
-  const published = Array.isArray(advisory.c) && advisory.c.length >= 3;
+  // A cone NHC published is at least three real coordinate pairs. Anything
+  // else is not a cone, and it must not fall through to the radii path either:
+  // a pre-2015 record has no radii era, so that path reached the '2025' table
+  // and told the reader the cone was "drawn with published per-record error
+  // radii", which is not a sentence about anything.
+  const published = isPublishedCone(advisory.c);
+  const claimsPublished = advisory.c !== undefined;
   try {
-    let envelope = advisory.c || [];
+    // A record that says it carries a cone and carries a broken one is a data
+    // fault, not a reason to invent one from a table that does not apply to it.
+    if (claimsPublished && !published) {
+      clearAdvisoryReplay();
+      return { status: 'error', error: new Error('the published cone for this advisory is not a usable polygon') };
+    }
+    let envelope = published ? advisory.c : [];
     if (!published) {
       const radii = await loadConeRadii();
       if (generation !== renderGeneration) return { status: 'stale' };
@@ -231,6 +241,14 @@ export async function renderAdvisory(storm, { map, record, coneEra = '2025', ind
     clearAdvisoryReplay();
     return { status: 'error', error };
   }
+}
+
+/** At least three pairs of real, in-range coordinates. */
+export function isPublishedCone(ring) {
+  return Array.isArray(ring) && ring.length >= 3 && ring.every(point =>
+    Array.isArray(point) && point.length === 2
+    && Number.isFinite(point[0]) && point[0] >= -90 && point[0] <= 90
+    && Number.isFinite(point[1]) && point[1] >= -180 && point[1] <= 180);
 }
 
 export function clearAdvisoryReplay() {

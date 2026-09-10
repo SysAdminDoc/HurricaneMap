@@ -6,7 +6,7 @@
   - button "Aviso anterior" [disabled]: ◀
   - slider "Número de aviso": "0"
   - button "Aviso siguiente": ▶
-  - paragraph: /Aviso 1 de \d+ · Aviso NHC n\.º 1 · Emitido 5 oct \d+, \d+:\d+ UTC/
+  - paragraph: /Aviso 1 de \d+ · Aviso NHC n\.º 1 · Pronóstico desde 5 oct \d+, \d+:\d+ UTC/
   - paragraph
   - list:
     - listitem: Pronóstico preliminar tal como se emitió

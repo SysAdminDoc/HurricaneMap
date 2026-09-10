@@ -405,7 +405,7 @@ function render(storm, landfall, allStorms, advisoryReplay = null, renderSeq = s
               <span>${t('advisoryReplay.show')}</span>
             </label>
           </div>
-          <p>${t('advisoryReplay.explainer')}</p>
+          <p id="advisory-replay-explainer">${t('advisoryReplay.explainer')}</p>
           <div class="advisory-replay-steps" id="advisory-replay-steps" hidden>
             <div class="advisory-replay-nav">
               <button type="button" class="advisory-replay-step" id="advisory-replay-prev" aria-label="${t('advisoryReplay.previous')}">◀</button>
