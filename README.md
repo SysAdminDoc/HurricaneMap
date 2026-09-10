@@ -119,8 +119,8 @@ Every release carries two offline builds. Neither needs Node, npm or a clone, an
 
 | Profile | Download | Unpacked | Contains |
 | --- | --- | --- | --- |
-| `core` | [`hurricanemap-1.11.0-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-core.tar.gz) (6.1 MB) | 25.4 MB | The whole historical atlas: 587 storms, 750 landfalls, every panel and export |
-| `full` | [`hurricanemap-1.11.0-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-full.tar.gz) (489.8 MB) | 526.1 MB | Everything in `core` plus the 1,697 archived NEXRAD radar frames |
+| `core` | [`hurricanemap-1.11.0-core.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-core.tar.gz) (6.2 MB) | 25.4 MB | The whole historical atlas: 587 storms, 750 landfalls, every panel and export |
+| `full` | [`hurricanemap-1.11.0-full.tar.gz`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/hurricanemap-1.11.0-full.tar.gz) (489.9 MB) | 526.1 MB | Everything in `core` plus the 1,697 archived NEXRAD radar frames |
 
 Both archives are built reproducibly: entries sorted by name, timestamps and ownership pinned, so `npm run dist:package` on the same commit gives the same SHA-256. It needs GNU tar, and a tar built against a different zlib can still compress the same bytes differently, so treat a mismatch as a question rather than a verdict. The sums are published beside the archives in [`SHA256SUMS.txt`](https://github.com/SysAdminDoc/HurricaneMap/releases/download/v1.11.0/SHA256SUMS.txt), which is what to check a download against.
 
