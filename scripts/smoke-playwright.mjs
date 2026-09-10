@@ -2326,7 +2326,15 @@ async function assertAdvisoryForecastInViewport(page, stormId) {
       map: mapRect ? { left: mapRect.left, right: mapRect.right, top: mapRect.top, bottom: mapRect.bottom } : null,
     };
   });
-  assert(geometry.path && geometry.map, `${stormId}: advisory forecast viewport geometry is missing`);
+  // The wait above already required both rects and their overlap, so asserting
+  // they exist proves nothing. What it did not require is that the forecast is
+  // meaningfully on screen rather than one pixel of it clipped at an edge.
+  const visibleWidth = Math.min(geometry.path.right, geometry.map.right) - Math.max(geometry.path.left, geometry.map.left);
+  const visibleHeight = Math.min(geometry.path.bottom, geometry.map.bottom) - Math.max(geometry.path.top, geometry.map.top);
+  assert(
+    visibleWidth >= 24 && visibleHeight >= 24,
+    `${stormId}: the advisory forecast is only ${Math.round(visibleWidth)}x${Math.round(visibleHeight)} px inside the map`,
+  );
 }
 
 // Two things have to have settled before a screenshot means anything.
@@ -6691,19 +6699,33 @@ try {
     /Layer depth is shallower than the best track/.test(coverageText),
     `About did not distinguish layer depth from best-track depth: ${coverageText.slice(0, 200)}`,
   );
-  // Read from data/coverage.json rather than typed here. These ranges were
-  // hard-coded, so extending the advisory replay back to 2008 failed this
-  // assertion on text that had become correct.
+  // Not typed here, because a literal went stale the moment the replay reached
+  // 2008 and failed on text that had become correct. Not read from
+  // data/coverage.json alone either, because the About text is rendered from
+  // that same field and the check became X.includes(X). The replay range comes
+  // from the archive's own storm years, so the archive, the coverage file and
+  // the dialog all have to agree.
   const coverageRanges = await page.evaluate(async () => {
-    const response = await fetch('data/coverage.json');
-    const coverage = await response.json();
+    const [coverage, archive] = await Promise.all([
+      fetch('data/coverage.json').then(response => response.json()),
+      fetch('data/advisories.json').then(response => response.json()),
+    ]);
     const datasets = coverage.datasets || coverage;
     const rangeFor = id => {
       const dataset = datasets.find(entry => entry.id === id);
       return dataset?.year_range ? `${dataset.year_range[0]}-${dataset.year_range[1]}` : null;
     };
-    return { radar: rangeFor('radar-archive'), replay: rangeFor('advisory-replay') };
+    const years = Object.values(archive.storms).map(record => record.year);
+    return {
+      radar: rangeFor('radar-archive'),
+      replay: rangeFor('advisory-replay'),
+      replayFromArchive: `${Math.min(...years)}-${Math.max(...years)}`,
+    };
   });
+  assert(
+    coverageRanges.replay === coverageRanges.replayFromArchive,
+    `data/coverage.json says the replay covers ${coverageRanges.replay} and the archive holds ${coverageRanges.replayFromArchive}`,
+  );
   for (const [label, range] of [['Archived NEXRAD radar', coverageRanges.radar], ['Advisory replay', coverageRanges.replay]]) {
     assert(range, `data/coverage.json carries no year range for ${label}, so the About claim cannot be checked`);
     assert(
@@ -7327,14 +7349,23 @@ try {
   assert(outsideEra.checked === false, 'advisory replay stayed enabled for a storm it cannot replay');
   assert(outsideEra.stepsHidden === true, 'advisory replay left its stepper visible with no advisories');
   assert(outsideEra.shapes === 0, 'advisory replay drew geometry for a storm outside the archived era');
-  // Read from the dataset the message is generated from. Typed here, this
-  // failed the moment the replay reached back to 2008, on text that had become
-  // correct.
+  // The label the message uses, checked against the storms the archive actually
+  // holds rather than against itself. Reading it from `era.label` alone made
+  // this X.includes(X), and nothing anywhere pinned that label to the data.
   const eraLabel = await page.evaluate(async () => {
-    const response = await fetch('data/advisories.json');
-    return (await response.json()).era?.label || '';
+    const archive = await (await fetch('data/advisories.json')).json();
+    const years = Object.values(archive.storms).map(record => record.year);
+    return {
+      label: archive.era?.label || '',
+      fromStorms: `${Math.min(...years)}-${Math.max(...years)}`,
+    };
+  }).then(result => {
+    assert(
+      result.label === result.fromStorms,
+      `the archive says it covers ${result.label} and holds storms from ${result.fromStorms}`,
+    );
+    return result.label;
   });
-  assert(/^\d{4}-\d{4}$/.test(eraLabel), `data/advisories.json carries no era label: ${JSON.stringify(eraLabel)}`);
   assert(
     outsideEra.status.includes(eraLabel),
     `advisory replay did not name its covered era ${eraLabel}: ${outsideEra.status}`,
@@ -7507,13 +7538,17 @@ try {
       position: match ? [Number(match[1]), Number(match[2])] : null,
     };
   });
+  // At the end of the scrubber the readout has to say so. `position[0] <=
+  // position[1]` held at every index, and the aria range check was already
+  // guaranteed by the wait above, which required value and aria-valuenow to
+  // equal max. Neither could fail.
   assert(
-    finalAdvisory.position && finalAdvisory.position[0] <= finalAdvisory.position[1],
-    `final advisory replay position is out of order: ${JSON.stringify(finalAdvisory)}`,
+    finalAdvisory.position && finalAdvisory.position[0] === finalAdvisory.position[1],
+    `the last advisory does not read as the last: ${JSON.stringify(finalAdvisory)}`,
   );
   assert(
-    finalAdvisory.ariaValueNow >= finalAdvisory.min && finalAdvisory.ariaValueNow <= finalAdvisory.max,
-    `final advisory replay aria value is outside its range: ${JSON.stringify(finalAdvisory)}`,
+    finalAdvisory.ariaValueNow === finalAdvisory.max && finalAdvisory.position[1] === finalAdvisory.max + 1,
+    `the scrubber and the readout disagree about how many advisories there are: ${JSON.stringify(finalAdvisory)}`,
   );
   await page.uncheck('#advisory-replay-enabled');
   await page.waitForFunction(() => !document.querySelector('path.advisory-forecast-line'), null, { timeout: 5000 });
