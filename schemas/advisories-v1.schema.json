@@ -64,10 +64,9 @@
     },
     "sources": {
       "type": "object",
-      "required": ["adeckArchive", "productArchive", "format", "coneRadii", "gisArchive"],
+      "required": ["productArchive", "format", "coneRadii", "gisArchive"],
       "additionalProperties": false,
       "properties": {
-        "adeckArchive": { "type": "string", "pattern": "^https://" },
         "productArchive": { "type": "string", "pattern": "^https://" },
         "format": { "type": "string", "pattern": "^https://" },
         "coneRadii": { "type": "string", "pattern": "^https://" },
@@ -92,7 +91,7 @@
         "type": "object",
         "required": [
           "name", "year", "basin", "atcfId", "coneEra", "sourceUrl", "archiveUrl",
-          "sourceSubsetSha256", "advisoryCount", "unmatchedForecasts",
+          "sourceSubsetSha256", "advisoryCount",
           "missingDiscussions", "advisories"
         ],
         "additionalProperties": false,
@@ -106,7 +105,7 @@
             "then": {
               "properties": {
                 "coneEra": { "type": "null" },
-                "advisories": { "type": "array", "items": { "type": "object", "required": ["c", "conePeriodHours", "issued"], "properties": { "c": true, "conePeriodHours": true, "issued": true } } }
+                "advisories": { "type": "array", "items": { "type": "object", "required": ["c", "conePeriodHours"], "properties": { "c": true, "conePeriodHours": true } } }
               }
             },
             "else": {
@@ -119,7 +118,6 @@
                     "not": {
                       "anyOf": [
                         { "type": "object", "required": ["c"], "properties": { "c": true } },
-                        { "type": "object", "required": ["issued"], "properties": { "issued": true } },
                         { "type": "object", "required": ["conePeriodHours"], "properties": { "conePeriodHours": true } }
                       ]
                     }
@@ -140,31 +138,29 @@
           "archiveUrl": { "type": "string", "pattern": "^https://" },
           "sourceSubsetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
           "advisoryCount": { "type": "integer", "minimum": 1 },
-          "unmatchedForecasts": { "type": "integer", "minimum": 0 },
           "missingDiscussions": { "type": "integer", "minimum": 0 },
           "advisories": {
             "type": "array",
             "minItems": 1,
             "items": {
               "type": "object",
-              "required": ["n", "t", "f", "e", "discussion"],
+              "required": ["n", "t", "issued", "f", "e", "discussion"],
               "additionalProperties": false,
               "allOf": [
                 {
-                  "$comment": "A record that carries a published cone has to carry the period it was drawn for and the moment it was issued. One without must carry neither, so an a-deck record cannot half-claim a cone it does not have.",
+                  "$comment": "An advisory that carries a published cone has to carry the period it was drawn for. One without must carry neither, so a record built from a radii era cannot half-claim a cone it does not have. `issued` is not part of this: both eras record the moment NHC put the advisory out, the GIS package from its own header and the product archive from the index that lists it.",
                   "if": {
                     "required": ["c"],
                     "properties": { "c": true }
                   },
                   "then": {
-                    "required": ["c", "conePeriodHours", "issued"],
-                    "properties": { "c": true, "conePeriodHours": true, "issued": true }
+                    "required": ["c", "conePeriodHours"],
+                    "properties": { "c": true, "conePeriodHours": true }
                   },
                   "else": {
                     "not": {
                       "anyOf": [
-                        { "required": ["conePeriodHours"], "properties": { "conePeriodHours": true } },
-                        { "required": ["issued"], "properties": { "issued": true } }
+                        { "required": ["conePeriodHours"], "properties": { "conePeriodHours": true } }
                       ]
                     }
                   }

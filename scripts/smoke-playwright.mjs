@@ -4671,10 +4671,12 @@ async function assertAdvisoryReplayEras(browser, baseUrl) {
       // The era label must never leak the archive-wide placeholder into prose.
       assert(!/per-record/.test(tooltip), `${label}: the tooltip carries the archive label: ${JSON.stringify(tooltip)}`);
 
-      // The advisory line names when NHC issued it, and for a published-cone
-      // record that is the exact time from the archive rather than the synoptic
-      // hour its forecast was initialised on, which is up to seven hours
-      // earlier and is what it used to show under the word "Issued".
+      // The advisory line names when NHC put the advisory out, which is the
+      // exact time from the archive and not the synoptic hour its forecast was
+      // initialised on. Those differ by three to seven hours on every advisory
+      // in both eras, and the second is what the line used to show under the
+      // word "Issued". Both are named, each under its own label, so pairing one
+      // time with the other's label is what this catches.
       const meta = await page.textContent('#advisory-replay-meta');
       const expectedTime = await page.evaluate(async ([storm, index]) => {
         const archive = await (await fetch('data/advisories.json')).json();
@@ -4682,24 +4684,25 @@ async function assertAdvisoryReplayEras(browser, baseUrl) {
         return { issued: advisory?.issued || null, initial: advisory?.t || null };
       }, [stormId, 2]);
       assert(
-        published ? Boolean(expectedTime.issued) : expectedTime.issued === null,
-        `${label}: the record ${published ? 'lacks' : 'carries'} an issue time it should ${published ? 'have' : 'not'}`,
+        Boolean(expectedTime.issued) && Boolean(expectedTime.initial) && expectedTime.issued !== expectedTime.initial,
+        `${label}: the record does not carry both the moment it went out and the cycle it came from: ${JSON.stringify(expectedTime)}`,
       );
       // Built with the app's own formatter rather than matched with a pattern.
       // A hand-written one guesses at the rendering: the panel writes
       // "Oct 22, 2012, 09:00 PM UTC", and digit-matching "2100" against that
       // fails on text that is exactly right.
-      const shownTime = await page.evaluate(async iso => {
+      const [issuedText, initialText] = await page.evaluate(async isos => {
         const { formatTime } = await import('/src/data.js');
-        return formatTime(iso);
-      }, published ? expectedTime.issued : expectedTime.initial);
+        return isos.map(iso => formatTime(iso));
+      }, [expectedTime.issued, expectedTime.initial]);
+      const literal = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       assert(
-        new RegExp(published ? 'Issued' : 'Forecast from').test(meta || ''),
-        `${label}: the advisory line uses the wrong label for its era: ${meta}`,
+        new RegExp(`Issued ${literal(issuedText)}`).test(meta || ''),
+        `${label}: the advisory line does not show ${issuedText} as the moment it was issued: ${meta}`,
       );
       assert(
-        meta && meta.includes(shownTime),
-        `${label}: the advisory line does not show ${published ? 'the issue time' : 'the initial time'} ${shownTime}: ${meta}`,
+        new RegExp(`Forecast from ${literal(initialText)}`).test(meta || ''),
+        `${label}: the advisory line does not show ${initialText} as the cycle it came from: ${meta}`,
       );
 
       // The hash the app wrote has to reopen what it describes.
@@ -6426,10 +6429,10 @@ async function assertAdvisoryTooltipDomSafety(page) {
     const poison = '<img src=x onerror="window.__hmAdvisoryPoisoned=true">';
     window.__hmAdvisoryPoisoned = false;
     const record = {
-      unmatchedForecasts: 0,
       missingDiscussions: 0,
       advisories: [{
         t: '2024-09-24T00:00:00Z',
+        issued: '2024-09-24T03:00:00Z',
         n: 1,
         f: [
           [0, storm.track[0].lat, storm.track[0].lon, poison],
@@ -7376,28 +7379,50 @@ try {
   }
   await assertThemeContrastMatrix(page, { checkMapOverlays: true });
 
-  // The ingester retains the count of OFCL forecasts that continue after the
-  // numbered NHC advisory series. That provenance must be visible only for
-  // storms whose archive actually has such a post-tropical tail.
-  await openStormPanel(page, 'AL092021');
+  // A replay holds every advisory NHC issued, and Irma is the case that shows
+  // it. NHC issued a special advisory 25 at 12Z and the regular advisory 26 at
+  // 15Z three hours later; both were built on the 06Z and 12Z cycles
+  // respectively. Reading forecast cycles instead of advisories gave record 25
+  // advisory 26's forecast and dropped 26 altogether, so the numbers a reader
+  // steps through skipped one without saying so.
+  await openStormPanel(page, 'AL112017');
   await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(
-    () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
-    null,
-    { timeout: 15000 },
+  await page.waitForFunction(() => document.querySelector('path.advisory-forecast-line'), null, { timeout: 15000 });
+  const irma = await page.evaluate(async () => {
+    const scrubber = document.querySelector('#advisory-replay-scrubber');
+    const positions = Number(scrubber.max) + 1;
+    const numbers = [];
+    const metaByIndex = new Map();
+    for (let index = 0; index < positions; index += 1) {
+      scrubber.value = String(index);
+      scrubber.dispatchEvent(new Event('input', { bubbles: true }));
+      // The panel renders synchronously up to the cone, which is awaited. One
+      // turn of the event loop is enough for the meta line.
+      await new Promise(resolve => { setTimeout(resolve, 0); });
+      const meta = document.querySelector('#advisory-replay-meta')?.textContent || '';
+      metaByIndex.set(index, meta);
+      numbers.push(Number(/NHC advisory #(\d+)/.exec(meta)?.[1]));
+    }
+    return { positions, numbers, special: metaByIndex.get(24), regular: metaByIndex.get(25) };
+  });
+  // Every advisory Irma had, in order, with nothing skipped. The old route
+  // produced 51 of these 52 and jumped from 25 to 27.
+  assert(
+    irma.numbers.every((number, index) => number === index + 1),
+    `Irma's replay does not step through its advisories in order: ${irma.numbers.join(',')}`,
   );
-  const idaProvenance = await page.textContent('#advisory-replay-provenance');
-  assert(/10/.test(idaProvenance), `Ida replay did not report its ten post-tropical forecasts: ${idaProvenance}`);
-
-  await openStormPanel(page, 'AL132020');
-  await page.check('#advisory-replay-enabled');
-  await page.waitForFunction(
-    () => /post-tropical stage/i.test(document.querySelector('#advisory-replay-provenance')?.textContent || ''),
-    null,
-    { timeout: 15000 },
+  assert(irma.positions === 52, `Irma's replay holds ${irma.positions} advisories, not the 52 NHC issued`);
+  // A special advisory repeats the cycle before it with a fresh position, so
+  // the panel has to name both the moment it went out and the cycle it came
+  // from. A regular advisory three hours after its own cycle says both too.
+  for (const [label, meta] of [['25', irma.special], ['26', irma.regular]]) {
+    assert(/Issued /.test(meta), `advisory ${label} did not say when it went out: ${meta}`);
+    assert(/Forecast from /.test(meta), `advisory ${label} did not say which cycle it was initialised on: ${meta}`);
+  }
+  assert(
+    irma.special !== irma.regular,
+    `advisories 25 and 26 rendered identically, so one of them is not its own advisory: ${irma.special}`,
   );
-  const lauraProvenance = await page.textContent('#advisory-replay-provenance');
-  assert(/5/.test(lauraProvenance), `Laura replay did not report its five post-tropical forecasts: ${lauraProvenance}`);
 
   await openStormPanel(page, 'AL142024');
   await page.check('#advisory-replay-enabled');

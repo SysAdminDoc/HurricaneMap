@@ -335,14 +335,14 @@
       ],
       "sources": [
         {
-          "name": "NHC archived ATCF advisories",
-          "url": "https://ftp.nhc.noaa.gov/atcf/archive/",
+          "name": "NHC archived forecast/advisory products",
+          "url": "https://www.nhc.noaa.gov/archive/",
           "revision_date": "2026-08-08",
           "basin": "AL"
         },
         {
-          "name": "NHC advisory discussions",
-          "url": "https://www.nhc.noaa.gov/archive/",
+          "name": "NHC GIS forecast archive",
+          "url": "https://www.nhc.noaa.gov/gis/archive_forecast.php",
           "revision_date": "2026-08-08",
           "basin": "AL"
         }
@@ -362,9 +362,9 @@
         "records": null,
         "storms": 52,
         "frames": null,
-        "advisories": 1662,
+        "advisories": 1684,
         "marks": null,
-        "detail": "1662 preliminary operational advisories across 52 storms; exact-time HURDAT2 verification only."
+        "detail": "1684 preliminary operational advisories across 52 storms; exact-time HURDAT2 verification only."
       },
       "distribution": [
         "core",

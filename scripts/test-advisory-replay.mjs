@@ -1,8 +1,9 @@
 // Advisory replay contract: both routes into the dataset, and the dataset's own
-// provenance. 2015-2024 comes from the a-deck parser and the product-archive
-// index; 2008-2014 comes from the GIS forecast archive, whose reader has its own
-// suite in test-gis-archive.mjs. What is checked here is that the two reach one
-// shape, and that each record says honestly which route produced it.
+// provenance. 2015-2024 comes from the forecast/advisory product NHC archived
+// for each advisory; 2008-2014 comes from the GIS forecast archive, whose reader
+// has its own suite in test-gis-archive.mjs. What is checked here is that the
+// two reach one shape, and that each record says honestly which route produced
+// it.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,13 +13,11 @@ import {
   ERA,
   REPLAY_ERAS,
   STORM_IDS,
-  advisoryNumberFor,
   conePublishedForYear,
   coneEraForYear,
   parseAdvisoryIndex,
+  parseForecastAdvisory,
   parseGisArchiveIndex,
-  parseIssueTime,
-  parseOfficialForecasts,
   replayRouteForYear,
   ringContains,
   verifyAgainstBestTrack,
@@ -34,37 +33,103 @@ import {
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// --- a-deck parsing -------------------------------------------------------
+// --- forecast/advisory product parsing ------------------------------------
 
-const ADECK = [
-  'AL, 14, 2024100512, 03, OFCL,   0, 190N,  945W,  30, 1004, TD,  34, NEQ,    0,    0,    0,    0',
-  'AL, 14, 2024100512, 03, OFCL,  12, 200N,  935W,  45,    0, TS,  34, NEQ,   40,   40,    0,   30',
-  // Same lead repeated for the 50 kt radii block: position and intensity are
-  // identical, so the duplicate must not become a second forecast point.
-  'AL, 14, 2024100512, 03, OFCL,  12, 200N,  935W,  45,    0, TS,  50, NEQ,   20,   20,    0,   10',
-  'AL, 14, 2024100512, 03, OFCL,  24, 213N,  920W,  65,    0, HU,  34, NEQ,   50,   50,    0,   40',
-  'AL, 14, 2024100518, 03, OFCL,   0, 197N,  938W,  40, 1002, TS,  34, NEQ,   30,   30,    0,   20',
-  'AL, 14, 2024100518, 03, OFCL,  12, 205N,  928W,  55,    0, TS,  34, NEQ,   50,   50,    0,   40',
-  // Southern/eastern hemisphere sign handling and a non-OFCL model that must be
-  // ignored entirely.
-  'AL, 14, 2024100518, 03, AVNO,  12, 205N,  928W,  55,    0, TS,  34, NEQ,   50,   50,    0,   40',
+// The shape NHC has published since long before this era starts. The lines
+// between the ones that matter are here because they are in the real product
+// and a reader has to skip them: the wind-radii block sits between a forecast
+// position and the next one, and "REPEAT" restates the current position.
+const product = (...body) => [
+  'ZCZC MIATCMAT4 ALL',
+  'TTAA00 KNHC DDHHMM',
+  '',
+  'HURRICANE MILTON FORECAST/ADVISORY NUMBER   9',
+  'NWS NATIONAL HURRICANE CENTER MIAMI FL       AL142024',
+  '1500 UTC SAT OCT 05 2024',
+  '',
+  'HURRICANE CENTER LOCATED NEAR 19.0N  94.5W AT 05/1500Z',
+  'POSITION ACCURATE WITHIN  30 NM',
+  '',
+  'MAX SUSTAINED WINDS  30 KT WITH GUSTS TO  40 KT.',
+  '',
+  'REPEAT...CENTER LOCATED NEAR 19.0N  94.5W AT 05/1500Z',
+  'AT 05/1200Z CENTER WAS LOCATED NEAR 18.7N  94.9W',
+  '',
+  ...body,
+  '',
+  'NEXT ADVISORY AT 05/2100Z',
+  '$$',
 ].join('\n');
 
-const parsed = parseOfficialForecasts(ADECK);
-assert.equal(parsed.length, 2, 'expected two distinct issue times');
-assert.equal(parsed[0].t, '2024-10-05T12:00:00Z');
-assert.deepEqual(parsed[0].f, [
-  [0, 19.0, -94.5, 30],
+const TCM = product(
+  'FORECAST VALID 06/0000Z 20.0N  93.5W',
+  'MAX WIND  45 KT...GUSTS  55 KT.',
+  '34 KT... 40NE  40SE   0SW  30NW.',
+  '',
+  'FORECAST VALID 06/1200Z 21.3N  92.0W',
+  'MAX WIND  65 KT...GUSTS  80 KT.',
+  '50 KT... 20NE  20SE   0SW  10NW.',
+  '',
+  'OUTLOOK VALID 09/1200Z 26.0N  84.0W',
+  'MAX WIND  70 KT...GUSTS  85 KT.',
+);
+
+const productAdvisory = parseForecastAdvisory(TCM, { issuedIso: '2024-10-05T15:00:00Z', label: 'AL142024 advisory 9' });
+assert.equal(productAdvisory.n, 9);
+assert.equal(productAdvisory.t, '2024-10-05T12:00:00Z', 'the forecast is initialised on the analysis, not on issuance');
+assert.equal(productAdvisory.issued, '2024-10-05T15:00:00Z');
+assert.deepEqual(productAdvisory.f, [
+  // Where the storm was when the advisory went out, three hours after the
+  // analysis its forecast runs from.
+  [3, 19.0, -94.5, 30],
   [12, 20.0, -93.5, 45],
   [24, 21.3, -92.0, 65],
-], 'duplicate wind-radii rows must collapse to one point per lead');
-assert.equal(parsed[1].f.length, 2, 'non-OFCL models must be ignored');
+  // An outlook is a forecast at a longer lead, and its day-of-month crosses
+  // into the range the analysis month does not cover on its own.
+  [96, 26.0, -84.0, 70],
+], 'every stated position is a row, with leads measured from the analysis');
 
-assert.equal(parseIssueTime('2024100512'), '2024-10-05T12:00:00Z');
-assert.equal(parseIssueTime('nonsense'), null);
+// A southern/eastern hemisphere product, which the Atlantic archive never
+// serves but the sign handling has to get right regardless.
+assert.deepEqual(
+  parseForecastAdvisory(
+    product('FORECAST VALID 06/0000Z 20.0S  93.5E', 'MAX WIND  45 KT...GUSTS  55 KT.')
+      .replace('19.0N  94.5W', '19.0S  94.5E')
+      .replace('18.7N  94.9W', '18.7S  94.9E'),
+    { issuedIso: '2024-10-05T15:00:00Z' },
+  ).f,
+  [[3, -19.0, 94.5, 30], [12, -20.0, 93.5, 45]],
+  'hemisphere suffixes must set the sign',
+);
 
-const southern = parseOfficialForecasts('AL, 01, 2024100512, 03, OFCL,   0, 190S,  945E,  30, 1004, TD,  34, NEQ, 0, 0, 0, 0');
-assert.deepEqual(southern[0].f, [[0, -19.0, 94.5, 30]], 'hemisphere suffixes must set the sign');
+// The last advisory of a storm forecasts nothing, and says so in words. That is
+// a complete advisory, not a truncated read.
+const dissipating = parseForecastAdvisory(
+  product('FORECAST VALID 06/0000Z...DISSIPATED'),
+  { issuedIso: '2024-10-05T15:00:00Z' },
+);
+assert.deepEqual(dissipating.f, [[3, 19.0, -94.5, 30]], 'a dissipating advisory carries its position and no forecast');
+
+// Everything that would shorten or skew a forecast silently has to throw.
+const refusesProduct = (text, why) => assert.throws(
+  () => parseForecastAdvisory(text, { issuedIso: '2024-10-05T15:00:00Z', label: 'fixture' }),
+  new RegExp(why),
+  `parsing did not refuse ${why}`,
+);
+refusesProduct(product('FORECAST VALID 06/0000Z 20.0N  93.5W'), 'states no maximum wind');
+refusesProduct(product('FORECAST VALID 06/0000Z 20.0N', 'MAX WIND  45 KT.'), 'cannot read the forecast line');
+refusesProduct(TCM.replace(/^FORECAST VALID.*$/gm, '').replace(/^OUTLOOK VALID.*$/gm, ''), 'no forecast or outlook line');
+refusesProduct(TCM.replace('AT 05/1200Z CENTER WAS LOCATED NEAR', 'AT 05/1200Z THE CENTRE SAT NEAR'), 'states no analysis time');
+refusesProduct(TCM.replace('FORECAST/ADVISORY NUMBER   9', 'ADVISORY NUMBER   9'), 'no forecast/advisory number');
+refusesProduct(TCM.replace('MAX SUSTAINED WINDS  30 KT', 'WINDS ARE  30 KT'), 'states no current intensity');
+// An analysis that is not a synoptic hour, and a lead that is not a whole
+// number of twelve-hour steps from it: two readings of the same instant, so a
+// misread analysis line cannot pass both.
+refusesProduct(TCM.replace('AT 05/1200Z CENTER WAS', 'AT 05/1300Z CENTER WAS'), 'not on a synoptic hour');
+refusesProduct(TCM.replace('FORECAST VALID 06/0000Z', 'FORECAST VALID 06/0600Z'), 'twelve-hour steps');
+// A forecast that verifies before the analysis it runs from is a rollover the
+// day-of-month stamp cannot express, not a forecast.
+refusesProduct(TCM.replace('FORECAST VALID 06/0000Z', 'FORECAST VALID 04/0000Z'), 'inside the forecast window');
 
 // --- archive index --------------------------------------------------------
 
@@ -76,26 +141,14 @@ const INDEX = `
 <!-- 20241005 1500 --><a href="/archive/2024/al09/al092024.fstadv.001.shtml">other storm</a>
 `;
 const index = parseAdvisoryIndex(INDEX, 'al142024');
-assert.equal(index.numberByTime.size, 2, 'another storm in the same year must not leak in');
+assert.equal(index.advisories.length, 2, 'another storm in the same year must not leak in');
+assert.deepEqual(index.advisories[0], {
+  n: 1,
+  issued: '2024-10-05T15:00:00Z',
+  url: 'https://www.nhc.noaa.gov/archive/2024/al14/al142024.fstadv.001.shtml',
+}, 'each advisory carries the moment it went out and the product that states it');
+assert.deepEqual(index.advisories.map(entry => entry.n), [1, 2], 'the index is ordered by advisory number');
 assert.equal(index.discussionByNumber.get(2), 'https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.002.shtml');
-
-// An a-deck warning time is the synoptic hour; the advisory built on it is
-// issued three hours later, which is how the index stamps it.
-assert.equal(advisoryNumberFor('2024-10-05T12:00:00Z', index.numberByTime), 1);
-assert.equal(advisoryNumberFor('2024-10-05T18:00:00Z', index.numberByTime), 2);
-assert.equal(advisoryNumberFor('2024-10-07T00:00:00Z', index.numberByTime), null, 'a post-tropical tail must not be numbered');
-// A special advisory stamped at the synoptic hour itself still resolves.
-assert.equal(advisoryNumberFor('2024-10-05T15:00:00Z', index.numberByTime), 1);
-// Some older archive pages contain a special advisory at the exact synoptic
-// time and an off-cycle first issue a few minutes later; exact and nearest
-// historical matches must not skip the numbered series.
-const historicalIndex = new Map([
-  ['2017-07-31T10:00:00Z', 1],
-  ['2017-07-31T12:00:00Z', 2],
-  ['2017-07-31T15:00:00Z', 3],
-]);
-assert.equal(advisoryNumberFor('2017-07-31T06:00:00Z', historicalIndex), 1);
-assert.equal(advisoryNumberFor('2017-07-31T12:00:00Z', historicalIndex), 2);
 
 // --- verification against the best track ----------------------------------
 
@@ -103,13 +156,13 @@ const track = new Map([
   ['2024-10-06T00:00:00Z', { t: '2024-10-06T00:00:00Z', lat: 20.0, lon: -93.5, wind: 60 }],
   ['2024-10-06T12:00:00Z', { t: '2024-10-06T12:00:00Z', lat: 22.0, lon: -91.0, wind: 90 }],
 ]);
-const errors = verifyAgainstBestTrack(parsed[0], track);
+const errors = verifyAgainstBestTrack(productAdvisory, track);
 assert.deepEqual(errors.map(entry => entry[0]), [12, 24], 'lead 0 is not a forecast and must not be verified');
 assert.equal(errors[0][1], 0, 'an exactly correct forecast position must score zero track error');
 assert.equal(errors[0][2], 15, 'intensity error is the absolute wind difference');
 assert.ok(errors[1][1] > 0, 'a displaced forecast must score a positive track error');
 
-const noOverlap = verifyAgainstBestTrack(parsed[0], new Map());
+const noOverlap = verifyAgainstBestTrack(productAdvisory, new Map());
 assert.deepEqual(noOverlap, [], 'leads without a best-track point are omitted, never interpolated');
 
 // --- presentation helpers -------------------------------------------------
@@ -163,10 +216,11 @@ const clipped = clipBestTrack(
       { t: '2024-10-08T00:00:00Z', lat: 28, lon: -82 },
     ],
   },
-  parsed[0],
+  productAdvisory,
 );
-assert.equal(clipped.length, 2, 'the comparison line is clipped to the forecast window');
+assert.equal(clipped.length, 3, 'a best-track point before the advisory went out is not part of its comparison line');
 assert.deepEqual(clipped[0], [19, -94.5]);
+assert.deepEqual(clipped.at(-1), [28, -82], 'the window runs to the longest lead the advisory forecast');
 
 // --- the shipped dataset --------------------------------------------------
 
@@ -217,8 +271,8 @@ assert.deepEqual(clipped[0], [19, -94.5]);
   const validate = new Ajv2020({ strict: true, allErrors: false }).compile(schema);
 
   const cone = [[25, -80], [26, -81], [27, -80]];
-  const adeckAdvisory = { n: 1, t: '2017-09-05T00:00:00Z', f: [[0, 25, -80, 100]], e: [], discussion: null };
-  const gisAdvisory = { ...adeckAdvisory, issued: '2017-09-05T03:00:00Z', c: cone, conePeriodHours: 120 };
+  const radiiAdvisory = { n: 1, t: '2017-09-05T00:00:00Z', issued: '2017-09-05T03:00:00Z', f: [[3, 25, -80, 100]], e: [], discussion: null };
+  const gisAdvisory = { ...radiiAdvisory, c: cone, conePeriodHours: 120 };
   const record = (extra, advisories) => ({
     schema: 1,
     era: { startYear: 2008, endYear: 2024, coneEra: 'per-record', label: '2008-2024' },
@@ -227,7 +281,7 @@ assert.deepEqual(clipped[0], [19, -94.5]);
     labels: { forecast: 'x', actual: 'y' },
     definitions: { forecast: 'a', trackError: 'b', intensityError: 'c', coverage: 'd', cone: 'e' },
     sources: {
-      adeckArchive: 'https://a/', productArchive: 'https://b/', format: 'https://c/',
+      productArchive: 'https://b/', format: 'https://c/',
       coneRadii: 'https://d/', gisArchive: 'https://e/',
     },
     totals: { storms: 1, advisories: 1, missingDiscussions: 0 },
@@ -235,7 +289,7 @@ assert.deepEqual(clipped[0], [19, -94.5]);
       AL092017: {
         name: 'IRMA', year: 2017, basin: 'AL', atcfId: 'al092017',
         coneEra: '2017', sourceUrl: 'https://a/', archiveUrl: 'https://b/',
-        sourceSubsetSha256: 'a'.repeat(64), advisoryCount: 1, unmatchedForecasts: 0,
+        sourceSubsetSha256: 'a'.repeat(64), advisoryCount: 1,
         missingDiscussions: 0, advisories, ...extra,
       },
     },
@@ -244,14 +298,15 @@ assert.deepEqual(clipped[0], [19, -94.5]);
   const refuses = (document, why) => assert.ok(!validate(document), `the schema accepts ${why}`);
   const accepts = (document, why) => assert.ok(validate(document), `the schema refuses ${why}: ${JSON.stringify(validate.errors?.[0])}`);
 
-  accepts(record({}, [adeckAdvisory]), 'an ordinary a-deck record');
+  accepts(record({}, [radiiAdvisory]), 'an ordinary record drawn from a radii era');
   accepts(record({ coneEra: null, publishedCone: true }, [gisAdvisory]), 'an ordinary published-cone record');
 
-  refuses(record({}, [gisAdvisory]), 'an a-deck record whose advisory carries a full published cone');
-  refuses(record({ coneEra: null, publishedCone: true }, [adeckAdvisory]), 'a published-cone record whose advisory carries no cone');
+  refuses(record({}, [gisAdvisory]), 'a radii-era record whose advisory carries a full published cone');
+  refuses(record({ coneEra: null, publishedCone: true }, [radiiAdvisory]), 'a published-cone record whose advisory carries no cone');
   refuses(record({ publishedCone: true }, [gisAdvisory]), 'a published-cone record that also names a radii era');
-  refuses(record({ coneEra: null }, [adeckAdvisory]), 'a record that names no cone source at all');
-  refuses(record({}, [{ ...adeckAdvisory, c: cone }]), 'an a-deck advisory carrying only a cone');
+  refuses(record({ coneEra: null }, [radiiAdvisory]), 'a record that names no cone source at all');
+  refuses(record({}, [{ ...radiiAdvisory, c: cone }]), 'a radii-era advisory carrying only a cone');
+  refuses(record({}, [{ ...radiiAdvisory, issued: undefined }]), 'an advisory that does not say when it went out');
   refuses(
     record({ coneEra: null, publishedCone: true }, [{ ...gisAdvisory, c: [[25, -80], [26, -81]] }]),
     'a two-point cone',
@@ -294,7 +349,7 @@ assert.equal(coneEraForYear(2014), null, 'the GIS era has no radii table');
 assert.equal(replayRouteForYear(2014), 'gis-archive');
 assert.equal(conePublishedForYear(2014), true);
 assert.equal(coneEraForYear(2015), '2015');
-assert.equal(replayRouteForYear(2015), 'adeck');
+assert.equal(replayRouteForYear(2015), 'product-archive');
 assert.equal(conePublishedForYear(2015), false);
 assert.equal(coneEraForYear(2024), '2025');
 
@@ -337,31 +392,32 @@ for (const [stormId, record] of Object.entries(archive.storms)) {
     );
     previous = rankedNow;
     assert.ok(advisory.f.length, `${stormId}/${advisory.n}: an advisory with no forecast is not a replay`);
-    // The first entry is where the storm was when the advisory went out. That is
-    // lead 0 for an a-deck record, whose clock starts at the synoptic analysis,
-    // and lead 3 or 6 for a GIS record, whose first row is the position at
-    // issuance. Either way it is the earliest lead.
+    // The first entry is where the storm was when the advisory went out, which
+    // is after the synoptic hour its forecast runs from and so never lead 0.
+    // Either way it is the earliest lead.
     const leads = advisory.f.map(entry => entry[0]);
     assert.equal(leads[0], Math.min(...leads), `${stormId}/${advisory.n}: forecasts are not ordered by lead`);
     assert.deepEqual(leads, [...leads].sort((a, b) => a - b), `${stormId}/${advisory.n}: leads are out of order`);
     // Leads are rounded to whole hours, so two rows could in principle collide
     // and one would be dropped silently by the first-wins merge.
     assert.equal(new Set(leads).size, leads.length, `${stormId}/${advisory.n}: two forecast rows share a lead`);
+    // Both routes open at issuance, and both record it. The GIS package states
+    // it in its own header, the product archive in the index that lists it.
+    assert.ok(
+      advisory.f[0][0] > 0 && advisory.f[0][0] <= 12,
+      `${stormId}/${advisory.n}: a record opens at issuance, ${advisory.f[0][0]} h after its origin`,
+    );
+    // Leads are whole hours, because that is how an advisory labels them, while
+    // `issued` keeps the exact time. A special advisory can go out at a
+    // 45-minute offset, as Dolly's first did and Alberto 2018's eleventh did,
+    // so the two agree to within the rounding and no further.
+    const gapHours = (Date.parse(advisory.issued) - Date.parse(advisory.t)) / 3600000;
+    assert.ok(
+      Math.abs(gapHours - advisory.f[0][0]) <= 0.5,
+      `${stormId}/${advisory.n}: the first entry is ${advisory.f[0][0]} h in but the advisory went out ${gapHours} h after its origin`,
+    );
+    assert.ok(Number.isInteger(advisory.f[0][0]), `${stormId}/${advisory.n}: leads are whole hours`);
     if (published) {
-      assert.ok(
-        advisory.f[0][0] > 0 && advisory.f[0][0] <= 12,
-        `${stormId}/${advisory.n}: a GIS record opens at issuance, ${advisory.f[0][0]} h after its origin`,
-      );
-      // Leads are whole hours, because that is how an advisory labels them and
-      // what the a-deck era already carries, while `issued` keeps the exact
-      // time. A special advisory can go out at a 45-minute offset, as Dolly's
-      // first did, so the two agree to within the rounding and no further.
-      const gapHours = (Date.parse(advisory.issued) - Date.parse(advisory.t)) / 3600000;
-      assert.ok(
-        Math.abs(gapHours - advisory.f[0][0]) <= 0.5,
-        `${stormId}/${advisory.n}: the first entry is ${advisory.f[0][0]} h in but the advisory went out ${gapHours} h after its origin`,
-      );
-      assert.ok(Number.isInteger(advisory.f[0][0]), `${stormId}/${advisory.n}: leads are whole hours`);
       assert.ok(Array.isArray(advisory.c) && advisory.c.length >= 3, `${stormId}/${advisory.n}: a published-cone record must carry a polygon`);
       assert.ok([72, 120].includes(advisory.conePeriodHours), `${stormId}/${advisory.n}: cone period ${advisory.conePeriodHours} is not one NHC draws`);
       assert.ok(
@@ -369,8 +425,13 @@ for (const [stormId, record] of Object.entries(archive.storms)) {
         `${stormId}/${advisory.n}: the cone does not contain the position its own advisory reports`,
       );
     } else {
-      assert.equal(advisory.f[0][0], 0, `${stormId}/${advisory.n}: an a-deck record starts at its own analysis`);
       assert.ok(!advisory.c, `${stormId}/${advisory.n}: this era has no published cone to carry`);
+      // Every lead past the current position is a whole number of twelve-hour
+      // steps from the analysis, which is the second reading that pins the
+      // forecast clock down.
+      for (const lead of leads.slice(1)) {
+        assert.equal(lead % 12, 0, `${stormId}/${advisory.n}: a ${lead} h lead is not a twelve-hour step from the analysis`);
+      }
     }
     if (advisory.discussion) {
       assert.ok(

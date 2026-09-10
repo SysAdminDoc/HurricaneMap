@@ -192,20 +192,19 @@ function wireAdvisoryReplay(storm, initialReplay = null) {
     next.disabled = replayPosition.index >= replayPosition.count - 1;
     // `issued` is when NHC put the advisory out. `t` is the synoptic hour its
     // forecast was initialised on, which is up to seven hours earlier, and
-    // showing that under the word "Issued" was wrong for all 776 records that
-    // carry both. The a-deck era has only `t`, and says so.
+    // showing that under the word "Issued" was wrong. Both are worth saying
+    // where they differ: a special advisory issued off the six-hourly clock
+    // repeats the cycle before it with a fresh position, so two advisories in a
+    // row can carry one forecast, and only the second line shows that.
     meta.textContent = [
       positionText,
       nhcNumberText,
-      advisory.issued
-        ? t('advisoryReplay.issued', formatTime(advisory.issued))
-        : t('advisoryReplay.initialised', formatTime(advisory.t)),
-    ].join(' · ');
-    provenance.textContent = record.unmatchedForecasts > 0
-      ? t('advisoryReplay.postTropical', String(record.unmatchedForecasts))
-      : record.missingDiscussions > 0
-        ? t('advisoryReplay.missingDiscussions', String(record.missingDiscussions))
-        : '';
+      advisory.issued ? t('advisoryReplay.issued', formatTime(advisory.issued)) : null,
+      advisory.t && advisory.t !== advisory.issued ? t('advisoryReplay.initialised', formatTime(advisory.t)) : null,
+    ].filter(Boolean).join(' · ');
+    provenance.textContent = record.missingDiscussions > 0
+      ? t('advisoryReplay.missingDiscussions', String(record.missingDiscussions))
+      : '';
     status.textContent = summary.verifiedLeads
       ? [
         t('advisoryReplay.verified', String(summary.verifiedLeads), String(summary.meanTrackErrorNmi)),

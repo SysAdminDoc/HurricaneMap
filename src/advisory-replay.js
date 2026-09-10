@@ -61,11 +61,18 @@ export function getAdvisoryReplayPosition(index, advisoryCount) {
 // contribute to a cone without inventing a radius for them.
 export function buildAdvisoryConeSamples(advisory, radii) {
   const table = new Map(Object.entries(radii || {}).map(([hours, radius]) => [Number(hours), Number(radius)]));
+  // The cone starts where the storm is, with no radius, and the table's first
+  // entry is the earliest lead anybody forecast an error for. Anything before
+  // that is the present position, which is lead 0 only when the advisory went
+  // out on the synoptic hour: a full advisory is issued three hours later and a
+  // special one whenever it was needed, so keying the anchor on lead 0 dropped
+  // it for every advisory NHC did not issue on the hour.
+  const earliestForecastLead = table.size ? Math.min(...table.keys()) : 0;
   const samples = [];
   for (const [tau, lat, lon] of advisory?.f || []) {
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-    if (tau === 0) {
-      samples.push({ lat, lon, hours: 0, radius: 0 });
+    if (tau < earliestForecastLead) {
+      samples.push({ lat, lon, hours: tau, radius: 0 });
       continue;
     }
     const radius = table.get(tau);

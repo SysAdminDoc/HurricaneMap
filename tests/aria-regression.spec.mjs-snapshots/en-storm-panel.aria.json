@@ -826,7 +826,7 @@
               "Replay issued forecasts",
               {
                 "role": "paragraph",
-                "text": "Steps through the forecasts NHC actually issued for this storm, read verbatim from the archived ATCF advisory record, beside the final best track."
+                "text": "Steps through the forecasts NHC actually issued for this storm, read verbatim from the forecast/advisory product archived with each one, beside the final best track."
               },
               {
                 "role": "status"

@@ -2,11 +2,11 @@
   - heading "Repetisyon avi yo" [level=3]
   - checkbox "Repase previzyon yo te bay yo" [checked]
   - text: Repase previzyon yo te bay yo
-  - paragraph: Li pase nan previzyon NHC te reyelman bay pou tanpèt sa a, jan yo ekri nan achiv ATCF la, akote dèyè trajektò final la.
+  - paragraph: Li pase nan previzyon NHC te reyelman bay pou tanpèt sa a, jan yo ekri nan pwodwi previzyon/avi ki achive ak chak grenn, akote dèyè trajektò final la.
   - button "Avi anvan" [disabled]: ◀
   - slider "Nimewo avi": "0"
   - button "Avi apre": ▶
-  - paragraph: /Avi 1 sou \d+ · Nimewo avi NHC 1 · Previzyon depi 5 oct\. \d+, \d+:\d+ UTC/
+  - paragraph: /Avi 1 sou \d+ · Nimewo avi NHC 1 · Bay 5 oct\. \d+, \d+:\d+ UTC · Previzyon depi 5 oct\. \d+, \d+:\d+ UTC/
   - paragraph
   - list:
     - listitem: Previzyon preliminè jan yo te bay li
@@ -14,4 +14,4 @@
   - paragraph:
     - link "Li diskisyon previzyon an":
       - /url: https://www.nhc.noaa.gov/archive/2024/al14/al142024.discus.001.shtml
-  - status: /Verifye sou 9 dele · erè trajektò mwayen \d+\.\d+ mn Nan \d+ è, sant previzyon an te \d+\.\d+ mn lwen kote tanpèt la te ye vre\./
+  - status: /Verifye sou 8 dele · erè trajektò mwayen \d+(?:\.\d+)? mn Nan \d+ è, sant previzyon an te \d+(?:\.\d+)? mn lwen kote tanpèt la te ye vre\./

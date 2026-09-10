@@ -21,8 +21,8 @@
   "artifacts": [
     {
       "path": "data/advisories.json",
-      "bytes": 1664517,
-      "sha256": "9f444957fe713fe9d0346d351de470f570f6dab7c53c26c12c4b1916b33f1e4a",
+      "bytes": 1661521,
+      "sha256": "0d227abf159d5c7def47a6888da9ab0898eb511160387d2481ecadeaeaac6e69",
       "source_url": "https://ftp.nhc.noaa.gov/atcf/archive/",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -66,8 +66,8 @@
     },
     {
       "path": "data/coverage.json",
-      "bytes": 16928,
-      "sha256": "a1734123280d98cfdfd55036d11d93142a6322e6f7e96d23755dcf10067bbd96",
+      "bytes": 16950,
+      "sha256": "763c4a7af8d31d9602c94febc8ae4ea464926ebf1ed5711e3fb9863e2e019f50",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -76,7 +76,7 @@
     {
       "path": "data/distribution.json",
       "bytes": 551,
-      "sha256": "e6b1b48f48f34f30e2e28fb17c0c25c1b608698c22dad7098578cbbff5f5cf21",
+      "sha256": "7572ffd6494cff3125813c69ea4f2913ff5f7fd204067376924b98da1dbb6a66",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-09-10",
       "generated_at_utc": "2026-08-08T00:00:00Z",
@@ -15565,7 +15565,7 @@
     {
       "path": "data/stac/items/hurdat2.json",
       "bytes": 4539,
-      "sha256": "074ae58d3fa14ae8c0e4285b7abd12ada0188f7473536cc9fba6e9d26c87d6d2",
+      "sha256": "51a7456f9d750c358468cb1ecd5e18ad52e194cb9ceaef2bad85f284012aa1d0",
       "source_url": "https://github.com/SysAdminDoc/HurricaneMap",
       "source_date": "2026-08-08",
       "generated_at_utc": "2026-08-08T00:00:00Z",

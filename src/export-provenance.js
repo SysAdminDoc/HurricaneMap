@@ -9,7 +9,7 @@ const APP_VERSION = '1.9.3';
 const RELEASE = Object.freeze({
   generated_at_utc: '2026-08-08T00:00:00Z',
   source_commit: '177e0f9c5411ed1499e1d69059882e357cce6e9d',
-  manifest_sha256: 'd14e1925f03508ad543da39802dd0ec32b35e196cfeb7292b9e6051fe901c2a5',
+  manifest_sha256: 'c7bc6ed118ad05960c18f60db0c24f62f6e857525558eebbcfb3218995cd4170',
   algorithm: 'SHA-256',
 });
 
@@ -24,8 +24,8 @@ const ARTIFACTS = Object.freeze({
   }),
   'data/coverage.json': Object.freeze({
     path: 'data/coverage.json',
-    bytes: 16928,
-    sha256: 'a1734123280d98cfdfd55036d11d93142a6322e6f7e96d23755dcf10067bbd96',
+    bytes: 16950,
+    sha256: '763c4a7af8d31d9602c94febc8ae4ea464926ebf1ed5711e3fb9863e2e019f50',
     source_url: 'https://github.com/SysAdminDoc/HurricaneMap',
     source_date: '2026-08-08',
     schema_version: 1,
@@ -115,7 +115,7 @@ const COVERAGE = Object.freeze({
     Object.freeze({ id: 'enso', value_status: 'final', lifecycle_status: 'active', basins: [], year_range: [1950, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 76, storms: null, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'seasonal-outlook', value_status: 'operational', lifecycle_status: 'active', basins: ['AL'], year_range: [2026, 2026], end_date: '2026-12-31', availability: Object.freeze({ runnable: true, records: 2, storms: null, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'forecast-skill', value_status: 'final', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [2021, 2025], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 18, storms: null, frames: null, advisories: null, marks: null }) }),
-    Object.freeze({ id: 'advisory-replay', value_status: 'operational', lifecycle_status: 'active', basins: ['AL'], year_range: [2008, 2024], end_date: '2024-12-31', availability: Object.freeze({ runnable: true, records: null, storms: 52, frames: null, advisories: 1662, marks: null }) }),
+    Object.freeze({ id: 'advisory-replay', value_status: 'operational', lifecycle_status: 'active', basins: ['AL'], year_range: [2008, 2024], end_date: '2024-12-31', availability: Object.freeze({ runnable: true, records: null, storms: 52, frames: null, advisories: 1684, marks: null }) }),
     Object.freeze({ id: 'storm-events', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [1953, 2024], end_date: '2025-12-31', availability: Object.freeze({ runnable: true, records: 157, storms: 157, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'rainfall', value_status: 'final', lifecycle_status: 'active', basins: ['AL'], year_range: [1950, 2020], end_date: '2024-12-31', availability: Object.freeze({ runnable: true, records: 211, storms: 211, frames: null, advisories: null, marks: null }) }),
     Object.freeze({ id: 'radar-archive', value_status: 'final', lifecycle_status: 'active', basins: ['AL', 'EP'], year_range: [1995, 2025], end_date: null, availability: Object.freeze({ runnable: true, records: null, storms: 139, frames: 1703, advisories: null, marks: null }) }),

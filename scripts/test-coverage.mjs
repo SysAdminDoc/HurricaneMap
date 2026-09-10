@@ -36,7 +36,7 @@ assert.equal(byId.get('ncei-billions').availability.runnable, false);
 assert.equal(byId.get('ncei-billions').end_date, '2024-12-31');
 assert.equal(byId.get('enso').availability.records, 76);
 assert.equal(byId.get('advisory-replay').availability.storms, 52);
-assert.equal(byId.get('advisory-replay').availability.advisories, 1662);
+assert.equal(byId.get('advisory-replay').availability.advisories, 1684);
 assert.deepEqual(byId.get('advisory-replay').year_range, [2008, 2024]);
 assert.equal(byId.get('radar-archive').availability.storms, 139);
 assert.equal(byId.get('radar-archive').availability.frames, 1703);

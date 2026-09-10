@@ -164,7 +164,7 @@ export async function buildCoverage({ root: base = root } = {}) {
         notes: ['Forecast skill is a verified summary and does not represent a forecast for a selected storm.'],
       }),
       dataset('advisory-replay', {
-        sources: [source('NHC archived ATCF advisories', advisories.sources.adeckArchive, metadata.generated_at_utc.slice(0, 10), 'AL'), source('NHC advisory discussions', advisories.sources.productArchive, metadata.generated_at_utc.slice(0, 10), 'AL')],
+        sources: [source('NHC archived forecast/advisory products', advisories.sources.productArchive, metadata.generated_at_utc.slice(0, 10), 'AL'), source('NHC GIS forecast archive', advisories.sources.gisArchive, metadata.generated_at_utc.slice(0, 10), 'AL')],
         basins: basinsFromIds(advisoryStormIds),
         year_range: [advisories.era.startYear, advisories.era.endYear],
         value_status: 'operational',
